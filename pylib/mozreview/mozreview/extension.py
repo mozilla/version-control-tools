@@ -48,10 +48,9 @@ from mozreview.fields import (
     BaseCommitField,
     CombinedReviewersField,
     CommitAuthorField,
+    CommitDetailField,
     CommitsListField,
     FileDiffReviewerField,
-    ImportCommitField,
-    PullCommitField,
     TryField,
 )
 from mozreview.file_diff_reviewer.resources import (
@@ -281,12 +280,11 @@ class MozReviewExtension(Extension):
                 info_fieldset.remove_field(field)
 
         # We "monkey patch" (yes, I feel dirty) the should_render method on
-        # the description field so that it is not rendered for parent review
-        # requests.
+        # the description field so that it is not rendered
         description_field = get_review_request_field('description')
         if description_field:
-            description_field.should_render = (lambda self, value:
-                not is_parent(self.review_request_details))
+            self.old_desc_should_render = description_field.should_render
+            description_field.should_render = lambda self, value: False
 
         # All of our review request styling is injected via
         # review-stylings-css, which in turn loads the review.css static
@@ -316,6 +314,7 @@ class MozReviewExtension(Extension):
                      apply_to=review_request_url_names)
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
+        ReviewRequestFieldsHook(self, 'main', [CommitDetailField])
         CommitContextTemplateHook(self, 'mozreview-pre-review-request-box',
                                   'mozreview/commits.html',
                                   apply_to=review_request_url_names)
@@ -328,10 +327,6 @@ class MozReviewExtension(Extension):
         ReviewRequestFieldsHook(self, 'main', [FileDiffReviewerField])
 
         ReviewRequestFieldsHook(self, 'info', [CommitAuthorField])
-        # We want pull to appear first as it is the more robust way of
-        # retrieving changesets.
-        ReviewRequestFieldsHook(self, 'info', [PullCommitField])
-        ReviewRequestFieldsHook(self, 'info', [ImportCommitField])
 
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)
@@ -359,6 +354,10 @@ class MozReviewExtension(Extension):
             info_fieldset.add_field(DependsOnField)
         if not get_review_request_field('blocks'):
             info_fieldset.add_field(BlocksField)
+
+        if self.old_desc_should_render:
+            get_review_request_field('description').should_render = (
+                self.old_desc_should_render)
 
         super(MozReviewExtension, self).shutdown()
 

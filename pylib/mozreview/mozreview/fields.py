@@ -92,14 +92,14 @@ class CommitsListField(CommitDataBackedField):
 
     can_record_change_entry = True
 
+    def should_render(self, value):
+        return False
+
     def has_value_changed(self, old_value, new_value):
         # Just to be safe, we de-serialize the json and compare values
         if old_value is not None and new_value is not None:
             return json.loads(old_value) != json.loads(new_value)
         return old_value != new_value
-
-    def should_render(self, value):
-        return False
 
     def render_change_entry_html(self, info):
         old_value = json.loads(info.get('old', ['[]'])[0])
@@ -125,76 +125,56 @@ class CommitsListField(CommitDataBackedField):
             }))
 
 
-class ImportCommitField(BaseReviewRequestField):
-    """This field provides some information on how to pull down the commit"""
-    # RB validation requires this to be unique, so we fake a field id
-    field_id = "p2rb.ImportCommitField"
-    label = _("Import")
-
-    def __init__(self, review_request_details, *args, **kwargs):
-        self.commit_data = fetch_commit_data(review_request_details)
-
-        super(ImportCommitField, self).__init__(review_request_details,
-                                                *args, **kwargs)
+class CommitDetailField(BaseReviewRequestField):
+    """This field provides the main content for review requests"""
+    label = ""
+    field_id = "p2rb.CommitDetail"
 
     def should_render(self, value):
-        return not is_parent(self.review_request_details, self.commit_data)
+        return is_pushed(self.review_request_details)
 
     def as_html(self):
-        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
-        review_request = self.review_request_details.get_review_request()
-        repo_path = review_request.repository.path
+        user = self.request.user
 
-        if not commit_id:
-            logger.error('No commit_id for review request: %d' % (
-                review_request.id))
-            return ''
-
-        return get_template('mozreview/hg-import.html').render(Context({
-                'commit_id': commit_id,
-                'repo_path': repo_path,
-        }))
-
-
-class PullCommitField(BaseReviewRequestField):
-    """This field provides some information on how to pull down the commit"""
-    # RB validation requires this to be unique, so we fake a field id
-    field_id = "p2rb.PullCommitField"
-    label = _("Pull")
-
-    def __init__(self, review_request_details, *args, **kwargs):
-        self.commit_data = fetch_commit_data(review_request_details)
-
-        super(PullCommitField, self).__init__(review_request_details,
-                                              *args, **kwargs)
-
-    def as_html(self):
-        commit_id = self.commit_data.extra_data.get(COMMIT_ID_KEY)
-
-        if is_parent(self.review_request_details, self.commit_data):
-            user = self.request.user
-            parent = get_parent_rr(
-                self.review_request_details.get_review_request(),
-                self.commit_data)
-            parent_details = parent.get_draft() or parent
-            children = [
-                child for child in gen_child_rrs(parent_details, user=user)
-                if child.is_accessible_by(user)]
-
-            commit_data = fetch_commit_data(children[-1])
-            commit_id = commit_data.extra_data.get(COMMIT_ID_KEY)
+        commit_data = fetch_commit_data(self.review_request_details)
+        commit_id = commit_data.get_for(self.review_request_details, COMMIT_ID_KEY)
 
         review_request = self.review_request_details.get_review_request()
+        parent = get_parent_rr(review_request)
+        parent_details = parent.get_draft(user) or parent
+
+        author = commit_data.extra_data.get(AUTHOR_KEY, None)
+
+        # If a user can view the parent draft they should also have
+        # permission to view every child. We check if the child is
+        # accessible anyways in case it has been restricted for other
+        # reasons.
+        children_details = [
+            child for child in gen_child_rrs(parent_details, user=user)
+            if child.is_accessible_by(user)]
+
+        # Generate the import and pull input field contents
+        import_text = pull_text = ""
         repo_path = review_request.repository.path
 
-        if not commit_id:
-            logger.error('No commit_id for review request: %d' % (
-                review_request.id))
-            return ''
+        if commit_id:
+            import_text = "hg import %s/rev/%s" % (repo_path, commit_id)
 
-        return get_template('mozreview/hg-pull.html').render(Context({
-                'commit_id': commit_id,
-                'repo_path': repo_path,
+        last_child_commit_id = commit_id
+        if is_parent(self.review_request_details, commit_data=commit_data):
+            last_child_commit_data = fetch_commit_data(children_details[-1])
+            last_child_commit_id = (
+                last_child_commit_data.extra_data.get(COMMIT_ID_KEY))
+
+        pull_text = "hg pull -r %s %s" % (last_child_commit_id, repo_path)
+
+        return get_template('mozreview/commit-main.html').render(Context({
+            'review_request_details': self.review_request_details,
+            'parent_details': parent_details,
+            'user': user,
+            'author': author,
+            'pull_text': pull_text,
+            'import_text': import_text,
         }))
 
 

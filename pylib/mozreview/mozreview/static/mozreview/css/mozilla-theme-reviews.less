@@ -45,6 +45,74 @@
     font-size: 110%;
   }
 
+  .status {
+    .review-status-icon();
+    font-size: 20px;
+    margin-bottom: 10px;
+
+    &.no-approval {
+      cursor: default;
+    }
+
+    &.approval {
+      cursor: default;
+      background-color: @approval-bg;
+    }
+
+    &.approval-issues {
+      background: #fff4B0;
+    }
+
+    .issue-count {
+      text-decoration: none;
+      color: inherit;
+     }
+
+    .shipit-count {
+      background-image: url("../shipit_bg.png");
+      background-position: top left;
+      background-repeat: repeat-x;
+      background-color: #6bc810;
+      border: 1px solid @approval-border-color;
+      color: #205003;
+    }
+  }
+
+  #review-request-inputs {
+    margin-top: 20px;
+
+    input {
+      .border-radius(3px);
+      padding: 2px 6px;
+      background: #F9F9F9;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 16px !important;
+      width: 300px;
+      margin-right: 20px;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+#mozreview-review-content {
+  text-align: center;
+
+  h1 {
+    font-size: 28px;
+    font-weight: normal;
+    display: block;
+    line-height: auto;
+    margin-bottom: 10px;
+  }
+
+  .review-request-meta {
+    color: #777;
+    text-align: center;
+    line-height: 1.6;
+    font-size: 110%;
+  }
+
   #review-request-inputs {
     margin-top: 20px;
 
@@ -72,7 +140,7 @@
 
   &.approval {
     cursor: default;
-    background-color: @approval-bg;
+    background-color: @approval-background-color;
   }
 
   &.approval-issues {

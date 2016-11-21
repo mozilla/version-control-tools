@@ -1,0 +1,50 @@
+{% load djblets_utils i18n reviewtags staticfiles %}
+
+<div id="mozreview-review-content">
+
+<h1>{{ review_request_details.get_review_request.summary }}</h1>
+
+<div class="review-request-meta">
+  Submitted by {{review_request_details.get_review_request.submitter.username}} &lt;{{review_request_details.get_review_request.submitter.email}}&gt;
+  {% if author %}
+    &bull; Authored by {{author}}
+  {% endif %}
+  <br>
+
+  {% with review_request_details.time_added|date as dateadded and review_request_details.last_updated as lastupdated and review_request_details.last_updated|date:"c" as lastupdatedraw and latest_diffset.timestamp|date:"c" as lastdiffdateraw and latest_diffset.timestamp as lastdiffdate %}
+  {%  if review_request_details.status == 'S' %}
+  {%   blocktrans %}
+    Created {{dateadded}} and submitted
+    <time class="timesince" datetime="{{lastupdatedraw}}">{{lastupdated}}</time>
+  {%   endblocktrans %}
+  {%  elif review_request_details.status == 'D' %}
+  {%   blocktrans %}
+    Created {{dateadded}} and discarded
+    <time class="timesince" datetime="{{lastupdatedraw}}">{{lastupdated}}</time>
+  {%   endblocktrans %}
+  {%  elif review_request_details.status == 'P' %}
+  {%   blocktrans %}
+    Created {{dateadded}} and updated
+    <time class="timesince" datetime="{{lastupdatedraw}}">{{lastupdated}}</time>
+  {%   endblocktrans %}
+  {%  endif %}
+  {%  if latest_diffset %}
+  {%   blocktrans %}
+    - Latest diff uploaded
+    <time class="timesince" datetime="{{lastdiffdateraw}}">{{lastdiffdate}}</time>
+  {%   endblocktrans %}
+  {%  endif %}
+  {% endwith %}
+</div>
+
+<div id="review-request-inputs">
+  {% if pull_text %}
+    <input type="text" value="{{ pull_text }}" onclick="this.select();" readonly>
+  {% endif %}
+
+  {% if import_text %}
+    <input type="text" value="{{ import_text }}" onclick="this.select();" readonly>
+  {% endif %}
+</div>
+
+</div>
