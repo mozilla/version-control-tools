@@ -1,8 +1,0 @@
-/home/autoland/autoland.log {
-    rotate 7
-    weekly
-    missingok
-    notifempty
-    copytruncate
-    compress
-}

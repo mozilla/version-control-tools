@@ -58,10 +58,6 @@
         group=autoland
         state=link
 
-- name: configure autoland log rotation
-  copy: dest=/etc/logrotate.d/autoland
-        src=../files/autoland_logrotate
-
 - name: set custom selinux rule for virtualenv
   command: semanage fcontext -a -t httpd_sys_script_exec_t "/home/autoland/autoland_venv(/.*)?"
 

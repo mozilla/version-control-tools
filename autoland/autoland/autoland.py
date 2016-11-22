@@ -276,17 +276,15 @@ def main():
 
     parser.add_argument('--dsn', default=dsn,
                         help='Postgresql DSN connection string')
-    parser.add_argument('--log-path', default='autoland.log',
-                        help='Path to which to log')
     args = parser.parse_args()
 
-    logging.basicConfig(filename=args.log_path,
-                        filemode='a',
-                        format='%(asctime)s,%(msecs)d %(name)s '
+    logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s '
                                '%(levelname)s %(message)s',
                         datefmt='%H:%M:%S',
                         level=logging.DEBUG)
     logger = logging.getLogger('autoland')
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(stdout_handler)
     logger.info('starting autoland')
 
     dbconn = get_dbconn(args.dsn)
