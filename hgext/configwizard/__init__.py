@@ -159,14 +159,16 @@ The ``hg wip`` command provides such a view.
 Example Usage:
 
   $ hg wip
-  o   4084:fcfa34d0387b dminor @
-  |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-  | @   4083:786baf6d476a gps
-  | |  mozreview: create child review requests from batch API
-  | o   4082:3f100fa4a94f gps
-  | |  mozreview: copy more read-only processing code; r?smacleod
-  | o   4081:939417680cbe gps
-  |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+  @  5887 armenzg tip @ Bug 1313661 - Bump pushlog_client to 0.6.0. r=me
+  : o  5885 glob mozreview: Improve the error message when pushing to a submitted/discarded review request (bug 1240725) r?smacleod
+  : o  5884 glob hgext: Support line breaks in hgrb error messages (bug 1240725) r?gps
+  :/
+  o  5883 mars mozreview: add py.test and demonstration tests to mozreview (bug 1312875) r=smacleod
+  : o  5881 glob autoland: log mercurial commands to autoland.log (bug 1313300) r?smacleod
+  :/
+  o  5250 gps ansible/docker-hg-web: set USER variable in httpd process
+  |
+  ~
 
 (Not shown are the colors that help denote the state each changeset
 is in.)
@@ -704,30 +706,52 @@ def _checkwip(ui, cw):
 
     cw.c['revsetalias']['wip'] = wiprevset
 
+    cw.c['templates']['wip'] = (
+        "'"
+        # branches
+        '{label("wip.branch", if(branches,"{branches} "))}'
+        # revision and node
+        '{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}'
+        # just the username part of the author, for brevity
+        '{label("wip.user", " {author|user}")}'
+        # tags
+        '{label("wip.tags", if(tags," {tags}"))}'
+        '{label("wip.tags", if(fxheads," {fxheads}"))}'
+        # bookmarks (taking care to not underline the separator)
+        '{if(bookmarks," ")}'
+        '{label("wip.bookmarks", if(bookmarks,bookmarks))}'
+        # first line of commit message
+        '{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
+        "'"
+    )
 
-    cw.c['templates']['wip'] = ("'"
-            # prefix with branch name
-            '{label("log.branch", branches)} '
-            # rev:node
-            '{label("changeset.{phase}", rev)}'
-            '{label("changeset.{phase}", ":")}'
-            '{label("changeset.{phase}", short(node))} '
-            # just the username part of the author, for brevity
-            '{label("grep.user", author|user)}'
-            # tags and bookmarks
-            '{label("log.tag", if(tags," {tags}"))}'
-            '{label("log.tag", if(fxheads," {fxheads}"))} '
-            '{label("log.bookmark", if(bookmarks," {bookmarks}"))}'
-            '\\n'
-            # first line of commit message
-            '{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
-            "'"
-        )
+    # Set the colors for the parts of the WIP output.
+    _set_color(cw, 'wip.bookmarks', 'yellow underline')
+    _set_color(cw, 'wip.branch', 'yellow')
+    _set_color(cw, 'wip.draft', 'green')
+    _set_color(cw, 'wip.here', 'red')
+    _set_color(cw, 'wip.obsolete', 'none')
+    _set_color(cw, 'wip.public', 'blue')
+    _set_color(cw, 'wip.tags', 'yellow')
+    _set_color(cw, 'wip.user', 'magenta')
+
+    # Enabling graphshorten greately improves the graph output.
+    if 'experimental' not in cw.c:
+        cw.c['experimental'] = {}
+    cw.c['experimental']['graphshorten'] = 'true'
 
     # Ensure pager is configured for wip alias if pager is configured.
     if ui.hasconfig('extensions', 'pager') or 'pager' in cw.c.get('extensions', {}):
         cw.c.setdefault('pager', {})
         cw.c['pager']['attend-wip'] = 'true'
+
+
+def _set_color(cw, name, value):
+    """ Set colors without overriding existing values. """
+    if 'color' not in cw.c:
+        cw.c['color'] = {}
+    if name not in cw.c['color']:
+        cw.c['color'][name] = value
 
 
 def _checksecurity(ui, cw, hgversion):

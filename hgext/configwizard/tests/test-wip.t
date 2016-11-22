@@ -20,14 +20,16 @@ Rejecting wip doesn't install it
   Example Usage:
   
     $ hg wip
-    o   4084:fcfa34d0387b dminor @
-    |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-    | @   4083:786baf6d476a gps
-    | |  mozreview: create child review requests from batch API
-    | o   4082:3f100fa4a94f gps
-    | |  mozreview: copy more read-only processing code; r?smacleod
-    | o   4081:939417680cbe gps
-    |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+    @  5887 armenzg tip @ Bug 1313661 - Bump pushlog_client to 0.6.0. r=me
+    : o  5885 glob mozreview: Improve the error message when pushing to a submitted/discarded review request (bug 1240725) r?smacleod
+    : o  5884 glob hgext: Support line breaks in hgrb error messages (bug 1240725) r?gps
+    :/
+    o  5883 mars mozreview: add py.test and demonstration tests to mozreview (bug 1312875) r=smacleod
+    : o  5881 glob autoland: log mercurial commands to autoland.log (bug 1313300) r?smacleod
+    :/
+    o  5250 gps ansible/docker-hg-web: set USER variable in httpd process
+    |
+    ~
   
   (Not shown are the colors that help denote the state each changeset
   is in.)
@@ -53,14 +55,16 @@ wip enabled when requested
   Example Usage:
   
     $ hg wip
-    o   4084:fcfa34d0387b dminor @
-    |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-    | @   4083:786baf6d476a gps
-    | |  mozreview: create child review requests from batch API
-    | o   4082:3f100fa4a94f gps
-    | |  mozreview: copy more read-only processing code; r?smacleod
-    | o   4081:939417680cbe gps
-    |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+    @  5887 armenzg tip @ Bug 1313661 - Bump pushlog_client to 0.6.0. r=me
+    : o  5885 glob mozreview: Improve the error message when pushing to a submitted/discarded review request (bug 1240725) r?smacleod
+    : o  5884 glob hgext: Support line breaks in hgrb error messages (bug 1240725) r?gps
+    :/
+    o  5883 mars mozreview: add py.test and demonstration tests to mozreview (bug 1312875) r=smacleod
+    : o  5881 glob autoland: log mercurial commands to autoland.log (bug 1313300) r?smacleod
+    :/
+    o  5250 gps ansible/docker-hg-web: set USER variable in httpd process
+    |
+    ~
   
   (Not shown are the colors that help denote the state each changeset
   is in.)
@@ -72,13 +76,24 @@ wip enabled when requested
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -0,0 +1,6 @@
+  @@ -0,0 +1,17 @@
   +[alias]
   +wip = log --graph --rev=wip --template=wip
   +[revsetalias]
   +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
   +[templates]
-  +wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+  +wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
+  +[color]
+  +wip.bookmarks = yellow underline
+  +wip.branch = yellow
+  +wip.draft = green
+  +wip.here = red
+  +wip.obsolete = none
+  +wip.public = blue
+  +wip.tags = yellow
+  +wip.user = magenta
+  +[experimental]
+  +graphshorten = true
   
   Write changes to hgrc file (Yn)?  y
 
@@ -88,7 +103,18 @@ wip enabled when requested
   [revsetalias]
   wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
   [templates]
-  wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+  wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
+  [color]
+  wip.bookmarks = yellow underline
+  wip.branch = yellow
+  wip.draft = green
+  wip.here = red
+  wip.obsolete = none
+  wip.public = blue
+  wip.tags = yellow
+  wip.user = magenta
+  [experimental]
+  graphshorten = true
 
 wip alias has pager configuration when pager enabled
 
@@ -118,14 +144,16 @@ wip alias has pager configuration when pager enabled
   Example Usage:
   
     $ hg wip
-    o   4084:fcfa34d0387b dminor @
-    |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-    | @   4083:786baf6d476a gps
-    | |  mozreview: create child review requests from batch API
-    | o   4082:3f100fa4a94f gps
-    | |  mozreview: copy more read-only processing code; r?smacleod
-    | o   4081:939417680cbe gps
-    |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+    @  5887 armenzg tip @ Bug 1313661 - Bump pushlog_client to 0.6.0. r=me
+    : o  5885 glob mozreview: Improve the error message when pushing to a submitted/discarded review request (bug 1240725) r?smacleod
+    : o  5884 glob hgext: Support line breaks in hgrb error messages (bug 1240725) r?gps
+    :/
+    o  5883 mars mozreview: add py.test and demonstration tests to mozreview (bug 1312875) r=smacleod
+    : o  5881 glob autoland: log mercurial commands to autoland.log (bug 1313300) r?smacleod
+    :/
+    o  5250 gps ansible/docker-hg-web: set USER variable in httpd process
+    |
+    ~
   
   (Not shown are the colors that help denote the state each changeset
   is in.)
@@ -137,10 +165,10 @@ wip alias has pager configuration when pager enabled
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -4,3 +4,12 @@
-   wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
-   [templates]
-   wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+  @@ -15,3 +15,12 @@
+   wip.user = magenta
+   [experimental]
+   graphshorten = true
   +[extensions]
   +pager =
   +[pager]
@@ -191,14 +219,16 @@ wip alias ignores old esrs if using firefoxtree
   Example Usage:
   
     $ hg wip
-    o   4084:fcfa34d0387b dminor @
-    |  mozreview: use repository name when displaying treeherder results (bug 1230548) r=mcote
-    | @   4083:786baf6d476a gps
-    | |  mozreview: create child review requests from batch API
-    | o   4082:3f100fa4a94f gps
-    | |  mozreview: copy more read-only processing code; r?smacleod
-    | o   4081:939417680cbe gps
-    |/   mozreview: add web API to submit an entire series of commits (bug 1229468); r?smacleod
+    @  5887 armenzg tip @ Bug 1313661 - Bump pushlog_client to 0.6.0. r=me
+    : o  5885 glob mozreview: Improve the error message when pushing to a submitted/discarded review request (bug 1240725) r?smacleod
+    : o  5884 glob hgext: Support line breaks in hgrb error messages (bug 1240725) r?gps
+    :/
+    o  5883 mars mozreview: add py.test and demonstration tests to mozreview (bug 1312875) r=smacleod
+    : o  5881 glob autoland: log mercurial commands to autoland.log (bug 1313300) r?smacleod
+    :/
+    o  5250 gps ansible/docker-hg-web: set USER variable in httpd process
+    |
+    ~
   
   (Not shown are the colors that help denote the state each changeset
   is in.)
@@ -210,14 +240,17 @@ wip alias ignores old esrs if using firefoxtree
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,11 +1,12 @@
+  @@ -1,7 +1,7 @@
    [alias]
    wip = log --graph --rev=wip --template=wip
    [revsetalias]
   -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
   +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() and not (fxheads() - date(-90))
    [templates]
-   wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+   wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
+   [color]
+  @@ -17,6 +17,7 @@
+   graphshorten = true
    [extensions]
    pager =
   +firefoxtree = */hgext/firefoxtree (glob)
