@@ -56,7 +56,6 @@
         dest=/home/autoland/config.json
         owner=autoland
         group=autoland
-        mode=0600
         state=link
 
 - name: configure autoland log rotation
