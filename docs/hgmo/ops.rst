@@ -245,6 +245,17 @@ get notifications and things stop working.
 
 This service only runs on the master server.
 
+``snsnotifier.service``
+-----------------------
+
+This systemd service monitors the ``replicatedpushdata`` Kafka topic
+and sends messages to Amazon S3 and SNS to advertise repository events.
+
+For more, see :ref:`hgmo_notification`.
+
+This service is essentially identical to ``pulsenotifier.service``
+except it publishes to Amazon services, not Pulse.
+
 ``unifyrepo.service``
 ---------------------
 
@@ -594,6 +605,8 @@ the journal to see what the daemon is doing::
 
 If things are failing, escalate to VCS on call.
 
+.. _hgmo_ops_check_pulsenotifier_lag:
+
 check_pulsenotifier_lag
 -----------------------
 
@@ -670,6 +683,37 @@ Repeat as many times as necessary to clear through the *bad* messages.
    If you skip messages, please file a bug against
    ``Developer Services :: hg.mozilla.org`` and include the systemd journal
    output for ``pulsenotifier.service`` showing the error messages.
+
+check_snsnotifier_lag
+---------------------
+
+``check_snsnotifier_lag`` monitors the lag of Amazon SNS
+:ref:`hgmo_notification` in reaction to server events.
+
+This check is essentially identical to ``check_pulsenotifier_lag`` except
+it monitors the service that posts to Amazon SNS as opposed to Pulse.
+Both services share common code. So if one service is having problems,
+there's a good chance the other service is as well.
+
+The consumer daemon being monitored by this check is tied to the
+``snsnotifier.service`` systemd service. Its logs are in
+``/var/log/snsnotifier.log``.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+Output is essentially identical to :ref:`hgmo_ops_check_pulsenotifier_lag`.
+
+Remediation to Check Failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Remediation is essentially identical to
+:ref:`hgmo_ops_check_pulsenotifier_lag`.
+
+The main differences are the names of the services impacted.
+
+The systemd service is ``snsnotifier.service``. The daemon process is
+``/var/hg/venv_tools/bin/vcsreplicator-sns-notifier``.
 
 Adding/Removing Nodes from Zookeeper and Kafka
 ==============================================
