@@ -10,6 +10,8 @@ from = hg@{{ domain | mandatory }}
 # Enable git-style diffs in order to show binary files, other
 # metadata provided by Git's diff format.
 git = true
+# Show extra lines of context because that's what a lot of Mozillians like.
+unified = 8
 
 [extensions]
 pushlog = /var/hg/version-control-tools/hgext/pushlog/
