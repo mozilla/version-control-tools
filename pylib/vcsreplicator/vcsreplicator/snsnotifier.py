@@ -27,8 +27,17 @@ def on_event(config, message_type, partition, message, created, data):
         message.offset, message_type, repo_url))
 
     c = config.c
-    s3_endpoint_url = c.get('awsevents', 's3_endpoint_url')
-    sns_endpoint_url = c.get('awsevents', 'sns_endpoint_url')
+
+    if c.has_option('awsevents', 's3_endpoint_url'):
+        s3_endpoint_url = c.get('awsevents', 's3_endpoint_url')
+    else:
+        s3_endpoint_url = None
+
+    if c.has_option('awsevents', 'sns_endpoint_url'):
+        sns_endpoint_url = c.get('awsevents', 'sns_endpoint_url')
+    else:
+        sns_endpoint_url = None
+
     access_key_id = c.get('awsevents', 'access_key_id')
     secret_access_key = c.get('awsevents', 'secret_access_key')
     region = c.get('awsevents', 'region')
