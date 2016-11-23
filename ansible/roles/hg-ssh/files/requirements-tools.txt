@@ -4,8 +4,8 @@ amqp==1.4.9 \
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
 
-botocore==1.4.71 \
-    --hash=sha256:073beaa86567b4a3e9b9994794865931cc1a32803d5a53fcc35e6611dea7d0d4
+botocore==1.4.78 \
+    --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7
 
 boto3==1.4.1 \
     --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e

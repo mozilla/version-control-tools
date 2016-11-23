@@ -1,7 +1,7 @@
 awscli==1.11.6 \
     --hash=sha256:949cd09ad6e1ae3887f82a81b83d6b00a064ff27f14f4f2c23d860a7668522c8
-botocore==1.4.63 \
-    --hash=sha256:34c3d5ae027fa5b4f8f732d1ef9a63b1e03d02b87ae2e77d9efcc725dfc53ef6
+botocore==1.4.78 \
+    --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7
 colorama==0.3.7 \
     --hash=sha256:a4c0f5bc358a62849653471e309dcc991223cf86abafbec17cd8f41327279e89
 docutils==0.12 \
@@ -16,7 +16,7 @@ python_dateutil==2.5.3 \
     --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
 rsa==3.4.2 \
     --hash=sha256:43f682fea81c452c98d09fc316aae12de6d30c4b5c84226642cf8f8fd1c93abd
-s3transfer==0.1.8 \
-    --hash=sha256:2607489b0babc041e26a62b431b90fda7eb818af8aa99dbbbbba9cf087f9572b
+s3transfer==0.1.9 \
+    --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
