@@ -8,17 +8,17 @@
 
 import datetime
 import json
-import kombu
+import os
 
-import mozilla_credentials
+import kombu
 
 
 def get_connection():
     return kombu.Connection(
         hostname='pulse.mozilla.org',
         port=5671,
-        userid='github-webhooks',
-        password=mozilla_credentials.pulse_password,
+        userid=os.environ['PULSE_USER'],
+        password=os.environ['PULSE_PASSWORD'],
         virtual_host='/',
         ssl=True,
         connect_timeout=5,

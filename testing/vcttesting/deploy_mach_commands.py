@@ -48,9 +48,7 @@ class DeployCommands(object):
     def github_webhooks(self):
         from vcttesting.deploy import github_webhook_lambda
 
-        password = raw_input('Please enter password for Pulse user: ')
-
-        github_webhook_lambda(password)
+        github_webhook_lambda()
 
     @Command('hgmo', category='deploy',
              description='Deploy hg.mozilla.org')

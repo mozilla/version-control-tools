@@ -92,7 +92,7 @@ def hgmo_reclone_repos(repos, verbosity=0):
     return run_playbook('hgmo-reclone-repos', extra_vars=extra,
                         verbosity=verbosity)
 
-def github_lambda_deploy_package(pulse_password):
+def github_lambda_deploy_package():
     """Obtain a .zip file for a deployment package for GitHub Lambda foo."""
     d = tempfile.mkdtemp()
 
@@ -115,10 +115,6 @@ def github_lambda_deploy_package(pulse_password):
             shutil.copyfile(os.path.join(ROOT, 'github-webhooks', p),
                             os.path.join(d, p))
 
-        # Make a module containing credentials.
-        with open(os.path.join(d, 'mozilla_credentials.py'), 'wb') as fh:
-            fh.write('pulse_password = "%s"\n' % pulse_password)
-
         # Now make a zip file.
         zf = io.BytesIO()
         with zipfile.ZipFile(zf, 'w') as z:
@@ -134,9 +130,9 @@ def github_lambda_deploy_package(pulse_password):
         shutil.rmtree(d)
 
 
-def github_webhook_lambda(pulse_password):
+def github_webhook_lambda():
     """Deploys code for GitHub WebHook processing in AWS Lambda."""
-    zip_content = github_lambda_deploy_package(pulse_password)
+    zip_content = github_lambda_deploy_package()
 
     S3_BUCKET = 'moz-github-webhooks'
     S3_KEY = 'github_lambda.zip'
