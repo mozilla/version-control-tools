@@ -43,8 +43,7 @@ def handler(event, context):
         # of the full repo name plus the event name.
         routing_key = '%s/%s' % (p['repository']['full_name'], m['event'])
 
-        # TODO use /v1 once someone unhacks the exchange on the server.
-        exchange = 'exchange/github-webhooks/v2'
+        exchange = os.environ['PULSE_EXCHANGE']
 
         print('connecting to pulse...')
         c = get_connection()
