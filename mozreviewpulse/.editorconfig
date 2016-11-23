@@ -1,0 +1,4 @@
+# Override for PyCharm Makefile
+[{Makefile, makefile, GNUmakefile}]
+indent_style = tab
+indent_size = 4

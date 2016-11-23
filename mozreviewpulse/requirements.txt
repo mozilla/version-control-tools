@@ -1,0 +1,5 @@
+docker-py
+kombu
+mock
+pytest
+taskcluster
