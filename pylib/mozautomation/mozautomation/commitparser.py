@@ -48,7 +48,7 @@ REVIEWERS_RE = re.compile(
             r'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
             IRC_NICK +                  # reviewer
         r')*' +
-    r')')                               # noqa
+    r')?')                              # noqa
 
 BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
                            re.I)

@@ -325,6 +325,9 @@ differs from that used to generate the hash.'''
         self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
         self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps (DONTBUILD)', ['remus']), 'Bug 123 - Blah blah; r=remus (DONTBUILD)')
 
+        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r?', ['remus']), 'Bug 123 - Blah blah; r=remus')
+        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r? DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
+
 
     def test_backout_missing(self):
         self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
