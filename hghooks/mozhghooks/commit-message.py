@@ -18,7 +18,7 @@
 import re
 from mercurial.node import hex
 
-INVALID_REVIEW_FLAG_RE = re.compile(r'[\s\.;]r\?\w')
+INVALID_REVIEW_FLAG_RE = re.compile(r'[\s\.;]r\?(?:\w|$)')
 
 goodMessage = [re.compile(x, re.I) for x in [
     r'bug [0-9]+',
