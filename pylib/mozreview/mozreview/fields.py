@@ -168,6 +168,10 @@ class CommitDetailField(BaseReviewRequestField):
 
         pull_text = "hg pull -r %s %s" % (last_child_commit_id, repo_path)
 
+        # Get just the extended commit message details for display
+        commit_message_detail = "\n".join(
+            self.review_request_details.description.splitlines()[1:]).strip()
+
         return get_template('mozreview/commit-main.html').render(Context({
             'review_request_details': self.review_request_details,
             'parent_details': parent_details,
@@ -175,6 +179,7 @@ class CommitDetailField(BaseReviewRequestField):
             'author': author,
             'pull_text': pull_text,
             'import_text': import_text,
+            'commit_message_detail': commit_message_detail,
         }))
 
 
