@@ -52,7 +52,8 @@ def test_listener_receives_messages_from_queue(pulse_queue):
 def test_test_starter_can_ping_taskcluster(fake_taskcluster):
     # Arrange
     # Explicitly say we want to confirm service connections
-    TryStarter(pulse_queue, fake_taskcluster.get_endpoint(), confirm_connections=True)
+    TryStarter(pulse_queue, fake_taskcluster.get_endpoint(),
+               confirm_connections=True)
 
     # Act
     requests = fake_taskcluster.get_requests()
@@ -64,9 +65,10 @@ def test_test_starter_can_ping_taskcluster(fake_taskcluster):
     assert r['method'] == 'GET'
 
 
-def test_review_request_starts_task_in_taskcluster(pulse_queue, fake_taskcluster):
-    # Consume pulse message that review request posted -> start tasks in taskcluster using HTTP api
-    # Arrange
+def test_review_request_starts_task_in_taskcluster(
+        pulse_queue, fake_taskcluster):
+    # Consume pulse message that review request posted -> start tasks
+    # in taskcluster using HTTP api Arrange
     test_starter = TryStarter(pulse_queue, fake_taskcluster.get_endpoint())
     payload = {'payload': 'hello'}
     pulse_queue.put(payload)
@@ -87,5 +89,6 @@ def test_review_request_starts_task_in_taskcluster(pulse_queue, fake_taskcluster
 
 
 def result_from_taskcluster_does_X_and_posts_back_to_reviewboard():
-    # Consume from pulse a taskcluster result -> fetch artifact from S3 -> Post result to RB
+    # Consume from pulse a taskcluster result -> fetch artifact
+    # from S3 -> Post result to RB.
     pass

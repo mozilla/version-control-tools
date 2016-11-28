@@ -63,8 +63,8 @@ def mountebank(request, mountebank_server):
 @pytest.fixture(scope='function')
 def pulse_server(request, docker):
     """Run a Mozilla Pulse service container in Docker."""
-    # Use 'rabbitmq:3-management' so that the management plugin is installed and
-    # enabled. See https://hub.docker.com/_/rabbitmq/
+    # Use 'rabbitmq:3-management' so that the management plugin is installed
+    # and enabled. See https://hub.docker.com/_/rabbitmq/
     ip = run_container(request, docker, 'rabbitmq:3-management')
     return ip
 
@@ -74,5 +74,6 @@ def pulse_conn(request, pulse_server):
     conn = kombu.Connection(pulse_server, port=5672)
     request.addfinalizer(conn.release)
     # Wait for the service to come up
-    conn.ensure_connection(max_retries=10, interval_start=0.3, interval_step=0.3)
+    conn.ensure_connection(
+        max_retries=10, interval_start=0.3, interval_step=0.3)
     return conn

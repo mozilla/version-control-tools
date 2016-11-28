@@ -89,8 +89,8 @@ def run_mountebank_server(request, docker_client, record_requests=False):
     return MBHostInfo(ip, 2525, 4000)
 
 
-
-def run_container(fixture_request, docker_client, image, cleanup=True, **kwargs):
+def run_container(fixture_request, docker_client, image, cleanup=True,
+                  **kwargs):
     """Run and clean up a docker container."""
     host_config = docker_client.create_host_config(publish_all_ports=True)
 
@@ -119,8 +119,9 @@ def pull_image(docker_client, image_name, tag, **kwargs):
     lastline = response.splitlines().pop()
     try:
         result = json.loads(lastline)
-    except ValueError as e:
-        raise Exception("Bad JSON result from docker pull: {0}".format(lastline))
+    except ValueError:
+        raise Exception(
+            "Bad JSON result from docker pull: {0}".format(lastline))
 
     # Should get a dict of {'status': ...} on success and {'error': ...} on
     # failure.
