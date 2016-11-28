@@ -77,3 +77,14 @@ def pulse_conn(request, pulse_server):
     conn.ensure_connection(
         max_retries=10, interval_start=0.3, interval_step=0.3)
     return conn
+
+
+@pytest.fixture
+def pulse_producer(pulse_conn):
+    exchange = kombu.Exchange('exchange/mrp/', type='topic')
+    producer = kombu.Producer(pulse_conn, exchange=exchange)
+
+    # Ensure the exchange is declared so that consumers
+    # can start listening before a message is published.
+    producer.maybe_declare(producer.exchange)
+    return producer
