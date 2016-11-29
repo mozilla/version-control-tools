@@ -88,7 +88,7 @@ class CommitsListField(CommitDataBackedField):
     is a "push" based review request.
     """
     field_id = COMMITS_KEY
-    label = _("Commits")
+    label = ""
 
     can_record_change_entry = True
 
@@ -99,44 +99,7 @@ class CommitsListField(CommitDataBackedField):
         return old_value != new_value
 
     def should_render(self, value):
-        return is_pushed(self.review_request_details)
-
-    def as_html(self):
-        user = self.request.user
-        parent = get_parent_rr(self.review_request_details.get_review_request())
-        parent_details = parent.get_draft(user) or parent
-
-        # If a user can view the parent draft they should also have
-        # permission to view every child. We check if the child is
-        # accessible anyways in case it has been restricted for other
-        # reasons.
-        children_details = [
-            child for child in gen_child_rrs(parent_details, user=user)
-            if child.is_accessible_by(user)]
-
-        autoland_requests = AutolandRequest.objects.filter(
-            review_request_id=parent.id).order_by('-autoland_id')
-
-        repo_urls = set()
-        latest_autoland_requests = []
-
-
-        # We would like to fetch the latest AutolandRequest for each
-        # different repository.
-        for request in autoland_requests:
-            if request.repository_url in repo_urls:
-                continue
-
-            repo_urls.add(request.repository_url)
-            latest_autoland_requests.append(request)
-
-        return get_template('mozreview/commits.html').render(Context({
-            'review_request_details': self.review_request_details,
-            'parent_details': parent_details,
-            'children_details': children_details,
-            'latest_autoland_requests': latest_autoland_requests,
-            'user': user
-        }))
+        return False
 
     def render_change_entry_html(self, info):
         old_value = json.loads(info.get('old', ['[]'])[0])

@@ -19,6 +19,7 @@
 
 @approval-bg: #DFFFD7;
 @approval-border-color: #478A06;
+@table-large-font-size: 18px;
 
 #mozreview-request-series{
   margin-top:5px;
@@ -36,14 +37,24 @@
   margin-top: -1px;
 }
 
+#mozreview-review-header {
+    text-transform: uppercase;
+    color: #777;
+    display: block;
+    font-weight: normal;
+}
+
 #mozreview-child-requests {
   width: 100%;
   table-layout: fixed;
   border-spacing: 0px;
   margin-top:10px;
   min-width: 653px;
-  border-top: 1px solid #C1C1C1;
-  border-right: 1px solid #C1C1C1;
+  border-top: 1px solid #EEE;
+  border-right: 1px solid #EEE;
+  margin-bottom: 20px;
+  border: 1px solid #CCC;
+  font-size: 110%;
 
   tr, td {
     text-align: left;
@@ -62,7 +73,7 @@
     ul {
       font-size: 90%;
       list-style-type: none;
-      margin: 0;
+      margin: 0 0 0 44px;
       padding: 6px 0;
 
       li {
@@ -113,18 +124,35 @@
     }
   }
 
-  .status {
-    width: 90px;
-    white-space: nowrap;
+  tbody > tr, tbody > tr:hover {
+    background: #F9F9F9;
   }
 
-  tbody > tr {
+  #mozreview-child-requests-nav-row {
     background: #fff;
+    font-size: 90%;
+
+    td {
+      padding: 7px;
+      position: relative;
+      text-align: center;
+    }
+
+    a[rel="next"] {
+      position: absolute;
+      right: 10px;
+    }
+
+    a[rel="previous"] {
+      position: absolute;
+      left: 10px;
+    }
   }
 
   .mozreview_commit_summary {
     font-weight: bold;
     text-decoration: none;
+    font-size: @table-large-font-size;
 
     &:hover, &:active, &:focus {
       text-decoration: underline;
@@ -136,23 +164,20 @@
   }
 
   .diffstat-delete {
-    color: #a02222;
-  }
-
-  & > tbody > tr[current="true"],
-  & > tbody > tr:hover {
-    background-color: #eee;
+    color: #A02222;
   }
 
  td,
  th {
    padding: 5px;
-   border-left: 1px solid #C1C1C1;
-   border-bottom: 1px solid #C1C1C1;
+   border-left: 1px solid #EEE;
+   border-bottom: 1px solid #EEE;
  }
 
  & > thead > tr {
-   background: @moz-blue-dark;
+   background: #EEE;
+   line-height: 1.5;
+   font-size: @table-large-font-size;
  }
 
  & > tbody td > a.commit_sha {
@@ -173,38 +198,12 @@
 
  /* This was copied from the rb dashboard less file.*/
   .status {
-    text-align: center;
+    font-size: @table-large-font-size;
   }
+}
 
-  .no-approval {
-    cursor: default;
-  }
-
-  .approval {
-    cursor: default;
-    background-color: @approval-bg;
-  }
-
-  .approval-issues {
-    background: #fff4B0;
-    position: relative;
-  }
-
-  .issue-count {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    padding: 10px 0;
-   }
-
-  .shipit-count {
-    background-image: url("../shipit_bg.png");
-    background-position: top left;
-    background-repeat: repeat-x;
-    background-color: #6bc810;
-    border: 1px solid @approval-border-color;
-    color: #205003;
-  }
+#mozreview-all-commits {
+  font-weight: bold;
 }
 
 #error-container {

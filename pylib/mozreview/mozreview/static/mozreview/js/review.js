@@ -15,12 +15,19 @@ $(document).on("mozreview_ready", function() {
     $('#review_request_extra').prepend(MRParents.parentWarning);
   }
 
+  // Show all commits when link is clicked
+  $('#mozreview-all-commits').on('click', function(e) {
+    e.preventDefault();
+    $('#mozreview-child-requests tr[hidden]').removeAttr('hidden');
+    $(this).hide();
+  });
+
   var reviewRequest = RB.PageManager.getPage().reviewRequest;
   RB.apiCall({
     type: 'GET',
     prefix: reviewRequest.get('sitePrefix'),
     noActivityIndicator: true,
-    url: '/api/review-requests/'+reviewRequest.get('id')+'/reviews/' +
+    url: '/api/review-requests/' + reviewRequest.get('id') + '/reviews/' +
          '?max-results=200',
     success: function(data) {
       _.forEach(data.reviews, function(item) {
@@ -45,7 +52,7 @@ $(document).on("mozreview_ready", function() {
   });
 
   // Tooltips for landable and "r?" cells
-  $('#mozreview-child-requests .help-tooltip, #mozreview-child-requests tbody .status').each(function() {
+  $('#mozreview-child-requests tbody .status').each(function() {
      var $element = $(this);
      var text = $element.attr('title');
 
@@ -54,7 +61,7 @@ $(document).on("mozreview_ready", function() {
      $element.attr('title', '');
 
      // Draw the tooltip title and text
-     var $tip = $('<div></div>').attr('class', 'review-tooltip').appendTo($element);
+     var $tip = $('<div></div>').attr('class', 'review-tooltip').appendTo($element.parent());
      $('<div></div>').attr('class', 'review-tooltip-text').text(text).appendTo($tip);
   });
 

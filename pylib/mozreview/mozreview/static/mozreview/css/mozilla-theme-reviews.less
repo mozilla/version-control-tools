@@ -1,9 +1,16 @@
 @import (reference) 'mozilla-theme-common.less';
 
+/* Maximum with for reviews content */
+#review_request .box-container, #reviews, #mozreview-review-header, #mozreview-child-requests {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Review Requests */
 .review-request {
   .main {
-    background: #fff;
+    background: #FFF;
     border: 0;
     border-radius: 0;
   }
@@ -14,12 +21,80 @@
     padding: 0;
     font-size: 90%;
   }
+
+  .header {
+    display: none;
+  }
 }
 
-.reviewable-page #mozreview-child-requests > thead > tr > .status,
-.reviewable-page #mozreview-child-requests > tbody > tr > .status {
-  min-width: 86px;
+#mozreview-review-content {
+  text-align: center;
+
+  h1 {
+    font-size: 28px;
+    font-weight: normal;
+    display: block;
+    line-height: auto;
+    margin-bottom: 10px;
+  }
+
+  .review-request-meta {
+    color: #777;
+    text-align: center;
+    line-height: 1.6;
+    font-size: 110%;
+  }
+
+  #review-request-inputs {
+    margin-top: 20px;
+
+    input {
+      .border-radius(3px);
+      padding: 2px 6px;
+      background: #F9F9F9;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 16px !important;
+      width: 300px;
+      margin-right: 20px;
+    }
+  }
 }
+
+.status {
+  .review-status-icon();
+  font-size: 20px;
+  margin-bottom: 10px;
+
+  &.no-approval {
+    cursor: default;
+  }
+
+  &.approval {
+    cursor: default;
+    background-color: @approval-bg;
+  }
+
+  &.approval-issues {
+    background: #fff4B0;
+  }
+
+  .issue-count {
+    text-decoration: none;
+    color: #000;
+  }
+
+  .shipit-count {
+    background-image: url("../shipit_bg.png");
+    background-position: top left;
+    background-repeat: repeat-x;
+    background-color: #6bc810;
+    border: 1px solid @approval-border-color;
+    color: #205003;
+  }
+}
+
+
 
 /* Review Banners */
 .banner {

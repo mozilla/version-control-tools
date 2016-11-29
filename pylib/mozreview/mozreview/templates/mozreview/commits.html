@@ -5,6 +5,7 @@ This is the template for the "Commits" list in a push-based review request.
 {% load i18n %}
 {% load djblets_utils %}
 {% load mozreview %}
+{% load reviewtags %}
 
 <div id="error-container">
   <h1>Well, this is embarassing...</h1>
@@ -21,11 +22,28 @@ This is the template for the "Commits" list in a push-based review request.
 ></div>
 
 <div id="mozreview-request-series">
-  <div id="mozreview-parent-request">
-    <a href="{{parent_details.get_review_request.get_absolute_url}}">Review Summary</a>
-    <a href="{{parent_details.get_review_request.get_absolute_url}}diff/#index_header">Squashed Diff</a>
+  <div id="mozreview-review-header">
+      {% if child_details.get_review_request.id == review_request_details.get_review_request.id %}
+        Review Summary
+      {% else %}
+        <a href="{{parent_details.get_review_request.get_absolute_url}}">Review Summary</a>
+      {% endif %}
+      &bull;
+      {% if review_request_details.get_review_request.bugs_closed %}
+        {% for bug in review_request_details.get_bug_list %}
+          <a href="{{bug|bug_url:review_request_details}}">Bug #{{bug}}</a>
+          {% if not forloop.last %}, {% endif %}
+        {% endfor %}
+        &bull;
+      {% endif %}
+      {{parent_details.get_review_request.repository}}
+      {% if parent_details.get_review_request.id == review_request_details.get_review_request.id %}
+        &bull; <a href="{{parent_details.get_review_request.get_absolute_url}}diff/#index_header">Squashed Diff</a>
+      {% endif %}
   </div>
+
   {% include 'mozreview/commits-requests.html' %}
+
   {% if latest_autoland_requests %}
   <div id="ci-actions">
     {% for autoland_request in latest_autoland_requests %}

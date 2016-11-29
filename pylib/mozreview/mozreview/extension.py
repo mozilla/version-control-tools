@@ -58,6 +58,7 @@ from mozreview.file_diff_reviewer.resources import (
     file_diff_reviewer_resource,
 )
 from mozreview.hooks import (
+    CommitContextTemplateHook,
     MozReviewApprovalHook,
 )
 from mozreview.hostingservice.bmo_bugtracker import (
@@ -315,9 +316,9 @@ class MozReviewExtension(Extension):
                      apply_to=review_request_url_names)
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
-        # This forces the Commits field to be the top item.
-        main_fieldset.field_classes.insert(0,
-                                           main_fieldset.field_classes.pop())
+        CommitContextTemplateHook(self, 'mozreview-pre-review-request-box',
+                                  'mozreview/commits.html',
+                                  apply_to=review_request_url_names)
 
         # The above hack forced Commits at the top, but the rest of these
         # fields are fine below the Description.

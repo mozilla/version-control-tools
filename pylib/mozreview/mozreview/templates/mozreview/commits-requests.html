@@ -15,34 +15,70 @@ by both the commits template and the commits_summary_table_fragment view.
     <th class="submitter">{% trans "Submitter" %}</th>
     {% endcomment %}
     <th class="reviewers">{% trans "Reviewers" %}</th>
-    <th class="status">
-      {% trans "Landable" %}
-      <div class="help-icon help-tooltip" title="{% trans "Hover over each commit's status to view landable status" %}"><span>?</span></div>
-    </th>
   </tr>
   </thead>
+
+  {% if parent_details.get_review_request.id != review_request_details.get_review_request.id and num_children > 1 %}
+  <tr id="mozreview-child-requests-nav-row">
+    <td colspan="2">
+      {% if prev_child %}
+        <a href="{{prev_child.get_review_request.get_absolute_url}}" rel="previous">&lt;&lt; Previous Commit</a>
+      {% endif %}
+      Viewing commit {{current_child_num}} of {{num_children}}.
+      <a href="javascript:;" id="mozreview-all-commits">View All Commits</a>
+      {% if next_child %}
+        <a href="{{next_child.get_review_request.get_absolute_url}}" rel="next">Next Commit &gt;&gt;</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endif %}
+
+
   {% for child_details in children_details %}
-  <tr {% if child_details.get_review_request.id = review_request_details.get_review_request.id %}current="true"{% endif %}>
+  <tr
+    {% if child_details.get_review_request.id == review_request_details.get_review_request.id %}
+      current="true"
+    {% else %}
+      {% if parent_details.get_review_request.id != review_request_details.get_review_request.id %}
+        hidden
+      {% endif %}
+    {% endif %}>
 
   <td class="commits">
     <div class="truncate_text">
-        <a class="mozreview_commit_summary" title="See diff for commit {{child_details|commit_id|slice:":12"}}"
-        href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
-          {{ child_details.summary }}
-        </a>
-        <ul>
-          <li>
-            <a href="{{child_details.get_review_request.repository.path}}/raw-rev/{{child_details|commit_id|slice:":12"}}">
-              {% trans "View Raw" %}
-            </a>
-          </li><li>
-            <a href="{{child_details.get_review_request.get_absolute_url}}" title="{{ child_details.summary}}">
-                {% trans "View Reviews" %}
-            </a>
-        </li><li class="diffstat" title="{% trans "Lines inserted / deleted" %}">
-            {{ child_details.get_review_request|diffstat_text:user }}
-          </li>
-        </ul>
+      {% if child_details.get_review_request.issue_open_count > 0 %}
+        <div class="status approval-issues" title="{{child_details.get_review_request.issue_open_count}} open issue{{ child_details.get_review_request.issue_open_count|pluralize }}">
+          <a class="issue-count" href="{{child_details.get_review_request.get_absolute_url}}#issue-summary">
+            ! {{child_details.get_review_request.issue_open_count}}
+          </a>
+        </div>
+      {% elif child_details.get_review_request.approved %}
+        <div class="status approval" title="Approved For Landing - You have at least one valid ship it!">
+          r+
+        </div>
+      {% else %}
+        <div class="status no-approval" title="{{child_details.get_review_request.approval_failure}}">
+          r?
+        </div>
+      {% endif %}
+
+      <a class="mozreview_commit_summary" title="See diff for commit {{child_details|commit_id|slice:":12"}}"
+      href="{{child_details.get_review_request.get_absolute_url}}diff/#index_header">
+        {{ child_details.summary }}
+      </a>
+      <ul>
+        <li>
+          <a href="{{child_details.get_review_request.repository.path}}/raw-rev/{{child_details|commit_id|slice:":12"}}">
+            {% trans "View Raw" %}
+          </a>
+        </li><li>
+          <a href="{{child_details.get_review_request.get_absolute_url}}" title="{{ child_details.summary}}">
+              {% trans "View Reviews" %}
+          </a>
+      </li><li class="diffstat" title="{% trans "Lines inserted / deleted" %}">
+          {{ child_details.get_review_request|diffstat_text:user }}
+        </li>
+      </ul>
     </div>
   </td>
 
@@ -63,23 +99,6 @@ by both the commits template and the commits_summary_table_fragment view.
         {% endfor %}
       </span>
     </td>
-
-    {% if child_details.get_review_request.issue_open_count > 0 %}
-      <td class="status approval-issues" title="{{child_details.get_review_request.issue_open_count}} open issues">
-        <a class="issue-count" href="{{child_details.get_review_request.get_absolute_url}}#issue-summary">
-          ! {{child_details.get_review_request.issue_open_count}}
-        </a>
-      </td>
-    {% elif child_details.get_review_request.approved %}
-      <td class="status approval" title="Approved For Landing - You have at least one valid ship it!">
-        r+
-      </td>
-    {% else %}
-      <td class="status no-approval" title="{{child_details.get_review_request.approval_failure}}">
-        r?
-      </td>
-    {% endif %}
-
   </tr>
   {% endfor %}
 </table>

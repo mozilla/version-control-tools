@@ -203,8 +203,7 @@ label[for="id_shipit"] {
 }
 
 // Tooltips for landable and "r?" cells
-#mozreview-child-requests .help-tooltip,
-#mozreview-child-requests .status {
+#mozreview-child-requests .commits {
   position: relative;
 
   &:hover .review-tooltip {
@@ -216,8 +215,8 @@ label[for="id_shipit"] {
   display: none;
   max-width: 400px;
   position: absolute;
-  top: -6px;
-  right: 90px;
+  bottom: 4px;
+  right: 4px;
   font-size: 12px;
   border: 1px #b09700 solid;
   background: #fff49c;
@@ -228,35 +227,4 @@ label[for="id_shipit"] {
   position: relative;
   padding: 10px;
   font-weight: normal;
-}
-
-/* shared with before and after */
-.review-tooltip-text:before, .review-tooltip-text:after {
-  content: ' ';
-  height: 0;
-  position: absolute;
-  width: 0;
-  border: 8px solid transparent; /* arrow size */
-}
-
-/* top-stacked, smaller arrow */
-.review-tooltip-text:before {
-  border-left-color: #fff49c;  /* arrow color */
-
-  /* positioning */
-  position: absolute;
-  top: 8px;
-  right: -15px;
-  z-index: 2;
-}
-
-/* arrow which acts as a background shadow */
-.review-tooltip-text:after {
-  border-left-color: #b09700;  /* arrow color */
-
-  /* positioning */
-  position: absolute;
-  top: 8px;
-  right: -16px;
-  z-index: 1;
 }
