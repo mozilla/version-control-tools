@@ -10,27 +10,27 @@ from rbtools.api.errors import APIError
 class BatchReview(object):
     """Create a review and comments with a single API call
 
-       Using BatchReview is much faster than creating a review and comments
-       with individual API calls.
+    Using BatchReview is much faster than creating a review and comments
+    with individual API calls.
     """
 
     def __init__(self, api_root, review_request_id, diff_revision,
                  max_comments=100, logger=None):
         """Initialize BatchReview
 
-           The ``api_root`` is the result of calling get_root on a Reviewboard
-           client.
+        The ``api_root`` is the result of calling get_root on a Reviewboard
+        client.
 
-           The ``review_request_id`` is the integer identifier of the review
-           request on which to leave the review.
+        The ``review_request_id`` is the integer identifier of the review
+        request on which to leave the review.
 
-           The ``diff_revision`` is the integer identifier of the diff
-           revision for which to leave the review.
+        The ``diff_revision`` is the integer identifier of the diff
+        revision for which to leave the review.
 
-           The ``max_comments`` provides a limit on the number of comments
-           which can be made as part of the BatchReview.
+        The ``max_comments`` provides a limit on the number of comments
+        which can be made as part of the BatchReview.
 
-           The ``logger`` object is a logger to be used.
+        The ``logger`` object is a logger to be used.
         """
 
         self.api_root = api_root
@@ -52,9 +52,10 @@ class BatchReview(object):
         if not self._destfile_to_file:
             start = 0
             while True:
-                files = self.api_root.get_files(review_request_id=self.review_request_id,
-                                                diff_revision=self.diff_revision,
-                                                start=start)
+                files = self.api_root.get_files(
+                    review_request_id=self.review_request_id,
+                    diff_revision=self.diff_revision,
+                    start=start)
                 for f in files:
                     self._destfile_to_file[f.dest_file] = f
                 start += files.num_items
@@ -142,7 +143,8 @@ class BatchReview(object):
                 body_bottom=body_bottom,
                 diff_comments=json.dumps(self.comments))
         except APIError as e:
-            self.logger.error('batchreview: could not publish review: %s' % str(e))
+            self.logger.error(
+                'batchreview: could not publish review: %s' % str(e))
             return False
 
         return True
