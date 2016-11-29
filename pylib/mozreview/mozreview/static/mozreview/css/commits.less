@@ -117,6 +117,22 @@
     background: #F9F9F9;
   }
 
+  .hidden {
+    display: none;
+  }
+
+  &.expanded {
+    .hidden {
+      display: table-row;
+    }
+
+    tbody > tr, tbody > tr:hover {
+      &[current] {
+        background: #fbfab9;
+      }
+    }
+  }
+
   #mozreview-child-requests-nav-row {
     background: #fff;
     font-size: 90%;
@@ -193,6 +209,11 @@
 
 #mozreview-all-commits {
   font-weight: bold;
+}
+
+#mozreview-commits-presist {
+  display: inline-block;
+  margin-top: 8px;
 }
 
 #error-container {

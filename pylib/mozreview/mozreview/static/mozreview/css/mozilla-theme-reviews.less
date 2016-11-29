@@ -46,36 +46,7 @@
   }
 
   .status {
-    .review-status-icon();
-    font-size: 20px;
     margin-bottom: 10px;
-
-    &.no-approval {
-      cursor: default;
-    }
-
-    &.approval {
-      cursor: default;
-      background-color: @approval-bg;
-    }
-
-    &.approval-issues {
-      background: #fff4B0;
-    }
-
-    .issue-count {
-      text-decoration: none;
-      color: inherit;
-     }
-
-    .shipit-count {
-      background-image: url("../shipit_bg.png");
-      background-position: top left;
-      background-repeat: repeat-x;
-      background-color: #6bc810;
-      border: 1px solid @approval-border-color;
-      color: #205003;
-    }
   }
 
   #review-request-inputs {
@@ -132,7 +103,6 @@
 .status {
   .review-status-icon();
   font-size: 20px;
-  margin-bottom: 10px;
 
   &.no-approval {
     cursor: default;

@@ -16,10 +16,32 @@ $(document).on("mozreview_ready", function() {
   }
 
   // Show all commits when link is clicked
-  $('#mozreview-all-commits').on('click', function(e) {
+  var $commitsViewLink = $('#mozreview-all-commits');
+  var $commitsTable = $('#mozreview-child-requests');
+  var toggleTable = function(forceOpen) {
+    var isExpanded = $commitsTable.hasClass('expanded');
+
+    if (forceOpen || !isExpanded) {
+      $commitsTable.addClass('expanded');
+      $commitsViewLink.attr('data-expanded', true).text($commitsViewLink.attr('data-one-text'));
+    }
+    else {
+      $commitsTable.removeClass('expanded');
+      $commitsViewLink.attr('data-expanded', false).text($commitsViewLink.attr('data-all-text'));
+    }
+  };
+
+  $commitsViewLink.on('click', function(e) {
     e.preventDefault();
-    $('#mozreview-child-requests tr[hidden]').removeAttr('hidden');
-    $(this).hide();
+    toggleTable();
+  });
+
+  // Toggle "always show all commits" in table cookie
+  $('#mozreview-commits-presist input').on('change', function(e) {
+    RB.UserSession.instance.set('commitsTableAlwaysShowFull', this.checked + '');
+    if (this.checked) {
+      toggleTable(true);
+    }
   });
 
   var reviewRequest = RB.PageManager.getPage().reviewRequest;
