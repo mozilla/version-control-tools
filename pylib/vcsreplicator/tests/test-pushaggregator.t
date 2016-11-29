@@ -188,6 +188,13 @@ Aggregation of messages from multiple partitions works
     name: hg-repo-init-2
     path: '{moz}/users/foo'
 
+--max-polls argument exits process after N intervals
+
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/vcsreplicator-aggregator --max-polls 1 /etc/mercurial/pushdataaggregator.ini
+  vcsreplicator.aggregator hit max polls threshold; exiting
+  vcsreplicator.aggregator executing loop exiting gracefully
+  vcsreplicator.aggregator process exiting code 0
+
 Cleanup
 
   $ hgmo clean

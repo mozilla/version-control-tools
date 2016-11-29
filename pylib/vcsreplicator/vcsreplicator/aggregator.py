@@ -32,7 +32,7 @@ def read_consumer_groups(path):
 
 
 def _run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
-                    producer_topic, alive, poll_interval=1.0):
+                    producer_topic, alive, max_polls, poll_interval=1.0):
     # We read the consumer groups file on every iteration so the set of
     # consumers can be dynamic. This allows consumers to be marked as
     # offline without causing a stall in message copying.
@@ -45,6 +45,11 @@ def _run_aggregation(client, consumer_topic, consumer_groups_path, ack_group,
         ack_group=ack_group,
         producer_topic=producer_topic,
         alive=alive)
+
+    max_polls[0] -= 1
+    if max_polls[0] <= 0:
+        logger.warn('hit max polls threshold; exiting')
+        alive[0] = False
 
     if not alive[0]:
         return
@@ -196,6 +201,8 @@ def cli():
     parser.add_argument('config', help='Path to config file to load')
     parser.add_argument('--onetime', action='store_true',
                         help='Run once instead of forever')
+    parser.add_argument('--max-polls', default=1800, type=int,
+                        help='Maximum number of loops of main daemon to run')
     args = parser.parse_args()
 
     config = Config(filename=args.config)
@@ -212,11 +219,16 @@ def cli():
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
+    # This is a hack to allow daemon to self-terminate after N runs to avoid
+    # memory leaks tracked in bug 1302564.
+    max_polls = [args.max_polls]
+
     res = run_in_loop(logger, _run_aggregation, onetime=args.onetime,
                       client=client,
                       consumer_topic=topic,
                       consumer_groups_path=groups_path,
                       ack_group=ack_group,
-                      producer_topic=aggregate_topic)
+                      producer_topic=aggregate_topic,
+                      max_polls=max_polls)
     logger.warn('process exiting code %s' % res)
     sys.exit(res)
