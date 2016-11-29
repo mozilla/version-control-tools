@@ -2,4 +2,5 @@ docker-py
 kombu
 mock
 pytest
+RBTools
 taskcluster

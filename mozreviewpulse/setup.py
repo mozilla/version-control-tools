@@ -19,5 +19,9 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     packages=find_packages(),
-    install_requires=['taskcluster'],
+    install_requires=[
+        'kombu',
+        'RBtools',
+        'taskcluster',
+    ],
 )
