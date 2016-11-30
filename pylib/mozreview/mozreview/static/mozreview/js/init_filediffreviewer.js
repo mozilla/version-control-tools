@@ -48,55 +48,51 @@ $(document).ready(function() {
     fileDiffReviewerModels
   );
 
-  var getButtonText = function(elem) {
-    if (elem.get('reviewed')) {
-      return 'reviewed';
-    } else {
-      return 'not reviewed';
-    }
+  var getButtonText = function(diff) {
+    return diff.get('reviewed') ? 'reviewed' : 'not reviewed';
   };
 
-  var renderDiffButton = function() {
-    $.funcQueue('diff_files').add(function() {
-      fileDiffReviewerCollection.each(function(elem) {
-        var diff_box_table = document.getElementById(
-          'file' + elem.get('file_diff_id')
-        );
+  var renderDiffButton = function(fileDiffID) {
+    var diffReviewable = fileDiffReviewerCollection.find(function(diff) {
+      return diff.get('file_diff_id') == fileDiffID &&
+        document.getElementById('file' + fileDiffID);
+      });
+    if (!diffReviewable) return;
 
-        if (diff_box_table !== null) {
-          var reviewButton = document.createElement('button');
-          reviewButton.title = 'Click here to change the review status' +
-                               ' of this file';
-          reviewButton.textContent = getButtonText(elem);
-          reviewButton.classList.add('diff-file-btn');
-          if (elem.get('reviewed')) {
-            reviewButton.classList.add('reviewed');
-          }
+    var reviewButton = document.createElement('button');
+    reviewButton.title = 'Toggle the review status of this file';
+    reviewButton.textContent = getButtonText(diffReviewable);
+    reviewButton.classList.add('diff-file-btn');
+    if (diffReviewable.get('reviewed')) {
+      reviewButton.classList.add('reviewed');
+    }
 
-          reviewButton.addEventListener('click', function(event) {
-            reviewButton.disabled = true;
-            elem.save({ reviewed: !elem.get('reviewed') },{
-              success: function() {
-                reviewButton.disabled = false;
-                reviewButton.textContent = getButtonText(elem);
-                reviewButton.classList.toggle('reviewed');
-              },
-              error: function(model, response) {
-                reviewButton.disabled = false;
-              }
-            });
-          });
-          diff_box_table.parentElement.appendChild(reviewButton);
+    reviewButton.addEventListener('click', function(event) {
+      reviewButton.disabled = true;
+      diffReviewable.save({ reviewed: !diffReviewable.get('reviewed') }, {
+        success: function() {
+          reviewButton.disabled = false;
+          reviewButton.textContent = getButtonText(diffReviewable);
+          reviewButton.classList.toggle('reviewed');
+        },
+        error: function(model, response) {
+          reviewButton.disabled = false;
         }
       });
-      $.funcQueue('diff_files').next();
     });
+    document.getElementById('file' + fileDiffID)
+      .parentElement
+      .appendChild(reviewButton);
   };
 
-  var currentRevision = page.model.get('revision');
-  if (!currentRevision.get('isInterdiff')) {
-    renderDiffButton();
+  // Listen for the diffview-loaded event, which is triggered when the
+  // diffview has completed loaded, so we can add the buttons.
+  if (!page.model.get('revision').get('isInterdiff')) {
+    $(document).on('mr:diffview-loaded', function(event, fileDiffID) {
+      renderDiffButton(fileDiffID);
+    });
   }
+
   // Listening to a route change seems to be the only way
   // to know if the user requested an interdiff or a revision
   // using the revision slider. The 'isInterdiff' property above
