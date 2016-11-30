@@ -84,6 +84,12 @@ differs from that used to generate the hash.'''
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=romulus, r=remus')), ['romulus', 'remus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=romulus, remus')), ['romulus', 'remus'])
 
+        # bare r?
+        self.assertEqual(list(parse_reviewers('Bug 123 - Blah blah; r?')), [])
+        self.assertEqual(list(parse_reviewers(
+            'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
+            [])
+
         # oddball real-world examples
         self.assertEqual(list(parse_reviewers(
             'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
@@ -166,6 +172,13 @@ differs from that used to generate the hash.'''
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=romulus]')), ['romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus'])
+
+        # bare r?
+        self.assertEqual(list(parse_requal_reviewers(
+            'Bug 123 - Blah blah; r?')), [])
+        self.assertEqual(list(parse_requal_reviewers(
+            'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
+            [])
 
         # oddball real-world examples
         self.assertEqual(list(parse_requal_reviewers(

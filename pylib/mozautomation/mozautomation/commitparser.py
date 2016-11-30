@@ -101,6 +101,9 @@ def filter_reviewers(s):
 def parse_reviewers(commit_description, flag_re=None):
     commit_summary = commit_description.splitlines().pop(0)
     for match in re.finditer(REVIEWERS_RE, commit_summary):
+        if not match.group(3):
+            continue
+
         for reviewer in re.split(LIST_RE, match.group(3)):
             if flag_re is None:
                 yield reviewer
