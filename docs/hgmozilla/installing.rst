@@ -104,7 +104,7 @@ Download a `source archive <https://www.mercurial-scm.org/downloads>`_
 from Mercurial. Alternatively, clone the Mercurial source code and check
 out the version you wish to install::
 
-  $ hg clone https://selenic.com/repo/hg
+  $ hg clone https://www.mercurial-scm.org/repo/hg
   $ cd hg
   $ hg up 4.0
 
