@@ -78,3 +78,10 @@ SNS Topic
 
 Non-private GitHub events are published to the
 ``arn:aws:sns:us-west-2:699292812394:github-webhooks-public`` AWS SNS topic.
+
+Kinesis Firehose and S3 Access
+==============================
+
+Access to the streaming GitHub data in Kinesis Firehose and the historical
+data retained in S3 can be granted on a per-case basis. If interested,
+email ``developer-services@mozilla.org``.
