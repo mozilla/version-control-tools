@@ -62,8 +62,8 @@ import bzauth
 import bz
 from mozautomation.commitparser import BUG_RE
 
-testedwith = '3.6 3.7 3.8 3.9'
-minimumhgversion = '3.6'
+testedwith = '3.7 3.8 3.9 4.0'
+minimumhgversion = '3.7'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
 
 cmdtable = {}
