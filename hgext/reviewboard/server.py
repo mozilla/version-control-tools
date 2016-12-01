@@ -56,8 +56,8 @@ with demandimport.deactivated():
         sys.path.insert(0, OUR_DIR)
         import hgrb.proto
 
-testedwith = '3.9 4.0'
-minimumhgversion = '3.9'
+testedwith = '4.0'
+minimumhgversion = '4.0'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
