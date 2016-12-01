@@ -229,6 +229,7 @@ Pushing obsolescence marker without bundle2 works
   remote: adding file changes
   remote: added 1 changesets with 0 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
+  remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/33e52188e17750dee7ec7a6b05b5f707ebc2cba9
@@ -247,10 +248,6 @@ Pushing obsolescence marker without bundle2 works
     nodecount: 1
     path: '{moz}/obs'
     source: serve
-  - _created: * (glob)
-    name: heartbeat-1
-  - _created: * (glob)
-    name: heartbeat-1
   - _created: * (glob)
     key: dump0
     name: hg-pushkey-1
