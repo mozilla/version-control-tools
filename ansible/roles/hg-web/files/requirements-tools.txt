@@ -1,3 +1,6 @@
+Cython==0.25.1 \
+    --hash=sha256:b72debd498e8d06487ae0631b3b7faf953d9fd2e364ffa80f1f35ec1801183d0
+
 futures==3.0.3 \
     --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 

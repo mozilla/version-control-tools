@@ -9,6 +9,8 @@
   with_items:
     # This is likely already installed, but needed for Docker.
     - cronie
+    # To compile hg-experimental extensions.
+    - gcc-c++
     - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
@@ -16,10 +18,14 @@
     - libcap
     # Secures processes, especially moz.build evaluation.
     - libcgroup
+    # To compile hg-experimental extensions.
+    - lz4-devel
     # We use logrotate to control log files
     - logrotate
     - openssh-clients
     - openssh-server
+    # To compile hg-experimental extensions.
+    - openssl-devel
     - python-devel
     - rsync
     # Needed for hg user to execute mozbuild-eval as root.
@@ -168,6 +174,17 @@
 
 - name: delete ignored files from hg-experimental repo
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/hg-experimental purge --all
+
+- name: build C extensions from hg-experimental repo
+  command: /var/hg/venv_tools/bin/python setup.py build_ext -i chdir=/var/hg/hg-experimental
+
+- name: install linelog C extension into hgweb virtualenv
+  copy: src=/var/hg/hg-experimental/linelog.so
+        dest=/var/hg/venv_hgweb/lib/python2.7/site-packages/linelog.so
+        remote_src=yes
+        owner=root
+        group=root
+        mode=0755
 
 # pip doesn't reinstall the same version unless --upgrade is passed.
 # We need to pass --no-deps to prevent dependencies from getting pulled
