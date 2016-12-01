@@ -179,12 +179,7 @@
   command: /var/hg/venv_tools/bin/python setup.py build_ext -i chdir=/var/hg/hg-experimental
 
 - name: install linelog C extension into hgweb virtualenv
-  copy: src=/var/hg/hg-experimental/linelog.so
-        dest=/var/hg/venv_hgweb/lib/python2.7/site-packages/linelog.so
-        remote_src=yes
-        owner=root
-        group=root
-        mode=0755
+  command: cp -a /var/hg/hg-experimental/linelog.so /var/hg/venv_hgweb/lib/python2.7/site-packages/linelog.so
 
 # pip doesn't reinstall the same version unless --upgrade is passed.
 # We need to pass --no-deps to prevent dependencies from getting pulled
