@@ -158,6 +158,17 @@
   command: /usr/bin/rsync -a --delete-after /vct/ /var/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
+- name: set up hg-experimental repo, with 3rd party extensions
+  hg: repo=https://bitbucket.org/facebook/hg-experimental
+      dest=/var/hg/hg-experimental
+      revision=8af0e065c0099abfd17321c41351b2aacad7668d
+      force=yes
+      purge=yes
+      executable=/var/hg/venv_hgweb/bin/hg
+
+- name: delete ignored files from hg-experimental repo
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/hg-experimental purge --all
+
 # pip doesn't reinstall the same version unless --upgrade is passed.
 # We need to pass --no-deps to prevent dependencies from getting pulled
 # in. If we did pull in dependencies, there is a potential MITM since
