@@ -25,7 +25,7 @@
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/77538e1ce4be
+  remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   $ cd ..
 
@@ -314,7 +314,7 @@ We are able to push to the new user repo
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
-  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/72a8548a894a
+  remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/72a8548a894aea3fd307e2b253e34df2b019da34
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ cd ..
