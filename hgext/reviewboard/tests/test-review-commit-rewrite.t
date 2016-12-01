@@ -92,7 +92,7 @@ Check rewriting when submitter == reviewer
   searching for changes
   1 changesets found
   uncompressed size of bundle content:
-       256 (changelog)
+       247 (changelog)
        165 (manifests)
        135  foo
   remote: adding changesets
