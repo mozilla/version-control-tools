@@ -21,8 +21,8 @@
            dest=/var/tmp/{{ item.path }}
            sha256sum={{ item.sha256 }}
   with_items:
-    - { path: mercurial-3.9.1-1.x86_64.rpm, sha256: 67543d6b8d855c7d4acf5adebf5ecda976a57edcf2c985410cf07fdba76e1aac }
+    - { path: mercurial-4.0.1-1.x86_64.rpm, sha256: 4ed004977d5447351dea0a0cf1229dc2c25a944971a04fd6a4d9ca56e0ff20c0 }
 
 - name: install Mozilla rpms
-  command: yum localinstall -y /var/tmp/mercurial-3.9.1-1.x86_64.rpm
+  command: yum localinstall -y /var/tmp/mercurial-4.0.1-1.x86_64.rpm
 

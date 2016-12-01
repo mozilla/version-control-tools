@@ -59,8 +59,8 @@ kombu==3.0.30 \
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
-Mercurial==3.9.1 \
-    --hash=sha256:625e4fc7e85ec2278c2828bdc547fce74091b3bbe4d9eeeba2d61af51195df74
+Mercurial==4.0.1 \
+    --hash=sha256:6aa4ade93c1b5e11937820880a466ebf1c824086d443cd799fc46e2617250d40
 
 mimeparse==0.1.3 \
     --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e
