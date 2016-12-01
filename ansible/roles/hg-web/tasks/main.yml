@@ -212,6 +212,13 @@
 - name: install global hgrc
   copy: src=hgrc dest=/etc/mercurial/hgrc mode=0644 owner=root group=root
 
+- name: install fastannotate hgrc recipe
+  copy: src=hgrc-fastannotate
+        dest=/etc/mercurial/hgrc-fastannotate
+        mode=0644
+        owner=root
+        group=root
+
 # Needed to sniff clients as coming from AWS.
 - name: install AWS IP ranges file
   copy: src=files/aws-ip-ranges.json

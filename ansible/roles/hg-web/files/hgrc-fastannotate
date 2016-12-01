@@ -1,0 +1,13 @@
+# This is an hgrc snippet used to enable fastannotate on repositories.
+# It can be rolled into the main hgrc if/when we enable fastannotate
+# by default.
+
+[extensions]
+fastannotate = /var/hg/hg-experimental/fastannotate
+linkrevcache = /var/hg/hg-experimental/hgext3rd/linkrevcache.py
+
+[fastannotate]
+mainbranch = default
+
+# Default is "fastannotate." Need to enable for hgweb.
+modes = fastannotate hgweb
