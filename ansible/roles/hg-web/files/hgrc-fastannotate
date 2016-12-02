@@ -9,5 +9,5 @@ linkrevcache = /var/hg/hg-experimental/hgext3rd/linkrevcache.py
 [fastannotate]
 mainbranch = default
 
-# Default is "fastannotate." Need to enable for hgweb.
-modes = fastannotate hgweb
+# Enable integration with hgweb.
+hgweb = true
