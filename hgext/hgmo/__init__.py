@@ -27,6 +27,14 @@ hgmo.replacebookmarks
    local bookmarks with incoming bookmarks instead of doing the more
    complicated default behavior, which includes creating diverged bookmarks.
 
+hgmo.convertsource
+   When set and a changeset has a ``convert_revision`` extra data attribute,
+   the changeset template data will contain a link to the source revision it
+   was converted from.
+
+   Value is a relative or absolute path to the repo. e.g.
+   ``/mozilla-central``.
+
 moz.build Wrapper Commands
 ==========================
 
@@ -160,6 +168,15 @@ def addmetadata(repo, ctx, d, onlycheap=False):
                 'newProject=%s&'
                 'newRevision=%s') % (treeherder, push.nodes[-1],
                                      treeherder, lastpushhead)
+
+    # If this changeset was converted from another one and we know which repo
+    # it came from, add that metadata.
+    convertrevision = ctx.extra().get('convert_revision')
+    if convertrevision:
+        sourcerepo = repo.ui.config('hgmo', 'convertsource')
+        if sourcerepo:
+            d['convertsourcepath'] = sourcerepo
+            d['convertsourcenode'] = convertrevision
 
     if onlycheap:
         return

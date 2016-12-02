@@ -46,6 +46,7 @@ changeset |
 <tr><td>push id</td><td>{if(pushid, '<a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a>', 'unknown')}</td></tr>
 <tr><td>push user</td><td>{if(pushuser, pushuser|escape, 'unknown')}</td></tr>
 <tr><td>push date</td><td>{if(pushdate, pushdate|isodate, 'unknown')}</td></tr>
+{if(convertsourcepath, '<tr><td>converted from</td><td><a href="{convertsourcepath}/rev/{convertsourcenode}">{convertsourcenode}</a></td></tr>')}
 {if(treeherderrepourl, if(pushhead, '<tr><td>treeherder</td><td>{treeherderrepo|escape}@{pushhead|short} [<a href="{treeherderrepourl}&revision={pushhead}">default view</a>] [<a href="{treeherderrepourl}&revision={pushhead}&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>'))}
 {if(perfherderurl, '<tr><td>perfherder</td><td>[<a href="{perfherderurl}&framework=1" target="_blank">talos</a>] [<a href="{perfherderurl}&framework=2" target="_blank">build metrics</a>] [<a href="{perfherderurl}&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>')}
 {if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers%reviewerlink, ", ")}</td></tr>')}
