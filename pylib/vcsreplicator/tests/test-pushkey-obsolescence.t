@@ -142,6 +142,8 @@ Changegroup message written
   vcsreplicator.consumer pulling 1 heads (67b45555a21f4d9d470adc4f1ed3af63918f6414) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 
 Obsolescence marker should have been replicated to hgweb
 
@@ -176,6 +178,8 @@ Creating obsolescence marker directly on server will result in replication
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/obs debugobsolete
@@ -263,6 +267,8 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer pulling 1 heads (33e52188e17750dee7ec7a6b05b5f707ebc2cba9) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   $ consumer --onetime
   $ consumer --onetime
 
@@ -384,12 +390,16 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer pulling 1 heads (27eddb78301f686b0894dadaa2deb6dfbb080123) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
   vcsreplicator.consumer pulling 1 heads (84b66e579087f83fdd8ea21456fe68a1c9b60cbe) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 
   $ consumer --dump --partition 2
   []

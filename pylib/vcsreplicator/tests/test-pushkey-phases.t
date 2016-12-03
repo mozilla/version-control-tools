@@ -94,6 +94,8 @@ Locally bumping changeset to public will trigger a pushkey
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 public
 

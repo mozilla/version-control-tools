@@ -83,6 +83,8 @@ Consuming the pushkey message will create a bookmark
   $ consumer --onetime
   $ consumer --onetime
   $ consumer --onetime
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               0:77538e1ce4be

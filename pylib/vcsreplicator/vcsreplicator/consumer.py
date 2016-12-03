@@ -213,11 +213,11 @@ def process_hg_changegroup(config, path, source, node_count, heads):
 def process_hg_pushkey(config, path, namespace, key, old, new, ret):
     path = config.parse_wire_repo_path(path)
     with get_hg_client(path) as c:
-        logger.info('executing pushkey on %s for %s[%s]' %
+        logger.warn('executing pushkey on %s for %s[%s]' %
                     (path, namespace, key))
         try:
             c.rawcommand(['debugpushkey', path, namespace, key, old, new])
-            logger.info('finished pushkey on %s for %s[%s]' %
+            logger.warn('finished pushkey on %s for %s[%s]' %
                         (path, namespace, key))
 
         except hglib.error.CommandError as e:
