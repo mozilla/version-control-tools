@@ -14,11 +14,16 @@
   $ hg -q push
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 1
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -31,7 +36,9 @@ Corrupt the local repo
   $ hg -q push
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 4
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
 
 Pulling into corrupt repo should result in abort
 
@@ -45,6 +52,7 @@ Pulling into corrupt repo should result in abort
     source: serve
 
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
@@ -81,6 +89,7 @@ And the message should still be not consumed
 We should get the same failure if we try again
 
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):

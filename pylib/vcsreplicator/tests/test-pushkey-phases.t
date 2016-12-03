@@ -12,9 +12,12 @@ Create the repository and push a change
   recorded hgrc in replication log
   $ standarduser
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-hgrc-update-1 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: $TESTTMP/repos/mozilla-central/.hg/hgrc
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
@@ -57,8 +60,11 @@ There should be no pushkey on a push with a draft changeset
     source: serve
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 3
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -92,8 +98,11 @@ Locally bumping changeset to public will trigger a pushkey
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 draft
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 6
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 7
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
@@ -140,8 +149,11 @@ of the replication log. (this should be harmless since the state is
 accurate)
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 9
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (fde0c41176556d1ec1bcf85e66706e5e76012508) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/mozilla-central
 
@@ -188,8 +200,11 @@ Now simulate a consumer that is multiple pushes behind
 Pulling first changegroup will find its phase
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 11
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 12
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 13
   vcsreplicator.consumer pulling 1 heads (58017affcc6559ab3237457a5fb1e0e3bde306b1) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -202,8 +217,11 @@ Pulling first changegroup will find its phase
 Similar behavior for second changegroup
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 14
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 15
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 16
   vcsreplicator.consumer pulling 1 heads (601c8c0d17b02057475d528f022cf5d85da89825) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 

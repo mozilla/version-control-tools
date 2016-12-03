@@ -25,7 +25,9 @@ Creating a repository should record an event saying so
     path: '{moz}/mozilla-central'
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
@@ -45,6 +47,8 @@ Creating a repository should record an event saying so
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
@@ -77,7 +81,9 @@ generaldelta is preserved
     path: '{moz}/mcgd'
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 1
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 1
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mcgd
 
   $ hgmo exec hgweb0 cat /repo/hg/mozilla/mcgd/.hg/requires

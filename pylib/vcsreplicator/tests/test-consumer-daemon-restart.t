@@ -28,6 +28,8 @@ Gracefully shut down a consumer daemon
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer received signal 15
   vcsreplicator.consumer exiting gracefully
@@ -36,7 +38,7 @@ Gracefully shut down a consumer daemon
     File "/var/hg/venv_replication/lib/python2.7/site-packages/kafka/conn.py", line 97, in _read_bytes
       data = self._sock.recv(min(bytes_left, 4096))
   error: [Errno 4] Interrupted system call
-  kafka.client ConnectionError attempting to receive a response to request * from server BrokerMetadata(nodeId=*, host='*', port=*): Kafka @ * went away (glob)
+  kafka.client ConnectionError attempting to receive a response to request * from server BrokerMetadata(nodeId=*, host='*', port=9092): Kafka @ *:9092 went away (glob)
   kafka.consumer.simple FailedPayloadsError for pushdata:2
   vcsreplicator.consumer exiting from main consume loop
   vcsreplicator.consumer process exiting gracefully
@@ -54,8 +56,8 @@ Start consumer daemon and verify it picks up where it left off
 
   $ sleep 1
   $ hgmo exec hgweb0 tail -n 3 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer process exiting gracefully
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[2] (glob)
+  vcsreplicator.consumer processing hg-hgrc-update-1 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
 
 Cleanup

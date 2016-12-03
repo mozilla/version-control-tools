@@ -9,7 +9,9 @@ Create the repository and push a change
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
@@ -45,8 +47,11 @@ Phases should be updated on normal push
     source: serve
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 1
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -81,8 +86,11 @@ Creating a bookmark will write a pushkey message
 Consuming the pushkey message will create a bookmark
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 4
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 6
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
 
@@ -124,8 +132,11 @@ We send a changegroup and a pushkey but don't process them immediately
 Mirror gets bookmark updates when pulling the changegroup.
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 7
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 1 heads (2777163b593873bfa63c7129e02a21becc299ff0) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -174,12 +185,15 @@ it doesn't know about since it hasn't pulled it yet. It shouldn't touch
 the bookmark.
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 10
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 11
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               1:2777163b5938
 
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 12
   vcsreplicator.consumer pulling 1 heads (031adcaa8ee7e23dd05ce5900645e771a3637682) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -189,8 +203,11 @@ the bookmark.
 But processing the next changegroup message should advance the bookmark by 1
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 13
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 14
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 15
   vcsreplicator.consumer pulling 1 heads (e20ecd72ffa991598a1b26333788345377318231) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 

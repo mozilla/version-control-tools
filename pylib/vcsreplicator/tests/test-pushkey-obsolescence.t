@@ -12,9 +12,12 @@
   recorded hgrc in replication log
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-hgrc-update-1 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: $TESTTMP/repos/obs/.hg/hgrc
 
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/obs client
@@ -52,8 +55,11 @@
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 3
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
 
@@ -78,8 +84,11 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 6
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (11bec8a6b2a30ac170575ecfd7a06af5a75e2d77) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
 
@@ -137,11 +146,15 @@ Changegroup message written
     ret: 0
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 9
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (67b45555a21f4d9d470adc4f1ed3af63918f6414) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 11
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 
@@ -176,8 +189,11 @@ Creating obsolescence marker directly on server will result in replication
     ret: 0
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 12
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 13
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 14
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 
@@ -217,8 +233,11 @@ Pushing obsolescence marker without bundle2 works
     source: serve
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 15
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 16
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 17
   vcsreplicator.consumer pulling 1 heads (de9a6dc9203d34261c1e2bea219bdd6053d74dda) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer mismatch between expected and actual changeset count: expected 1, got 2
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -262,11 +281,15 @@ Pushing obsolescence marker without bundle2 works
     ret: 0
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 18
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 19
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 20
   vcsreplicator.consumer pulling 1 heads (33e52188e17750dee7ec7a6b05b5f707ebc2cba9) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 21
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   $ consumer --onetime
@@ -369,35 +392,52 @@ Now let's check what happens when replication is lagging
   
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 22
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 23
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 24
   vcsreplicator.consumer pulling 1 heads (3694f932529eff9a4b78fafab6097f27f3c37daa) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 25
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 26
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 27
   vcsreplicator.consumer pulling 1 heads (63d556ea5b9faf08c8c41864c1fcaf3d57f986c8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 28
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 29
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 30
   vcsreplicator.consumer pulling 1 heads (87d2d20529e71d92b847f1bad94c8ebb00203230) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
 
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 31
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 32
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 33
   vcsreplicator.consumer pulling 1 heads (27eddb78301f686b0894dadaa2deb6dfbb080123) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 34
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 35
   $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 36
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 37
   vcsreplicator.consumer pulling 1 heads (84b66e579087f83fdd8ea21456fe68a1c9b60cbe) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 38
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer finished pushkey on $TESTTMP/repos/obs for obsolete[dump0]
 

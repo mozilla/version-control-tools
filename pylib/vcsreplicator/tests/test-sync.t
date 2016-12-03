@@ -54,7 +54,10 @@
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer processing hg-repo-sync-1 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central

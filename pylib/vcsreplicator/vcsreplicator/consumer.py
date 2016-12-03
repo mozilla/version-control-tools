@@ -98,6 +98,8 @@ def consume(config, consumer, timeout=0.1, onetime=False):
             r = consumer.get_message(timeout=timeout)
             if r:
                 partition, message, payload = r
+                logger.warn('processing %s from partition %s offset %s' % (
+                            payload['name'], partition, message.offset))
                 process_message(config, payload)
                 # Only commit offset from partition message came from.
                 consumer.commit(partitions=[partition])
