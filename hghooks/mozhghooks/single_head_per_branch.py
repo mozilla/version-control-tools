@@ -21,10 +21,18 @@ def hook(ui, repo, source=None, **kwargs):
         return 0
 
     for branch, heads in repo.branchmap().iteritems():
-        # Filter closed branch heads.
-        heads = [h for h in heads if not repo[h].closesbranch()]
+        newheads = []
 
-        if len(heads) > 1:
+        for node in heads:
+            ctx = repo[node]
+
+            # Filter closed branch heads.
+            if ctx.closesbranch():
+                continue
+
+            newheads.append(node)
+
+        if len(newheads) > 1:
             print "\n\n************************** ERROR ****************************"
             print "Multiple heads detected on branch '%s'" % branch
             print "Only one head per branch is allowed!"
