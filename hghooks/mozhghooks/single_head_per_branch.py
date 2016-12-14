@@ -30,6 +30,10 @@ def hook(ui, repo, source=None, **kwargs):
             if ctx.closesbranch():
                 continue
 
+            # Hidden changesets shouldn't matter.
+            if ctx.hidden():
+                continue
+
             newheads.append(node)
 
         if len(newheads) > 1:

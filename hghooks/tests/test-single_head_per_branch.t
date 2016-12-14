@@ -149,17 +149,5 @@ Hidden changesets should not impact head detection.
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  
-  
-  ************************** ERROR ****************************
-  Multiple heads detected on branch 'default'
-  Only one head per branch is allowed!
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.b_singlehead hook failed
-  [255]
 
   $ cd ..
