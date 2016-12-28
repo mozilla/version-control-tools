@@ -79,6 +79,7 @@ from mercurial import (
     bookmarks,
     cmdutil,
     commands,
+    error,
     exchange,
     extensions,
     hg,
@@ -138,8 +139,11 @@ def isfirefoxrepo(repo):
     if tree:
         return True
 
-    if len(repo) and repo[0].hex() in (MOZ_ROOT_REV, COMM_ROOT_REV):
-        return True
+    try:
+        if len(repo) and repo[0].hex() in (MOZ_ROOT_REV, COMM_ROOT_REV):
+            return True
+    except error.FilteredRepoLookupError:
+        pass
 
     # Backdoor for testing.
     return repo.opener.exists('IS_FIREFOX_REPO')
