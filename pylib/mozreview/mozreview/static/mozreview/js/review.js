@@ -11,10 +11,6 @@ $(document).on("mozreview_ready", function() {
   // the commits list.
   $("#mozreview-child-requests .editable").inlineEditor("enable");
 
-  // Change string of "Review" button to be a verb so people better
-  // understand what clicking it does.
-  $("#review-link").text("Finish Review...");
-
   if (MozReview.isParent) {
     $('#review_request_extra').prepend(MRParents.parentWarning);
   }
@@ -31,7 +27,7 @@ $(document).on("mozreview_ready", function() {
         var flag = item.extra_data['p2rb.review_flag'];
         var flagDesc = '';
         var reviewText = $('#review'+item.id+' .body');
-        switch(flag){
+        switch (flag) {
           case ' ':
             flagDesc = 'Review flag cleared';
             break;
@@ -53,7 +49,7 @@ $(document).on("mozreview_ready", function() {
      var $element = $(this);
      var text = $element.attr('title');
 
-     if(!text) return;
+     if (!text) return;
 
      $element.attr('title', '');
 
