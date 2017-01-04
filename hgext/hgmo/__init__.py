@@ -117,9 +117,6 @@ import mozhg.mozbuildinfo as mozbuildinfo
 minimumhgversion = '4.0'
 testedwith = '4.0'
 
-RE_BUGZILLA_LINK = r'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2' \
-                   r'">\1</a>'
-
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
@@ -127,7 +124,7 @@ command = cmdutil.command(cmdtable)
 @templatefilters.templatefilter('buglink')
 def buglink(text):
     """Any text. Hyperlink to Bugzilla."""
-    return commitparser.BUG_RE.sub(RE_BUGZILLA_LINK, text)
+    return commitparser.add_hyperlinks(text)
 
 
 def addmetadata(repo, ctx, d, onlycheap=False):

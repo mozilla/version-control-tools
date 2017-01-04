@@ -40,3 +40,19 @@
   <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=12345">12345</a> is a bug
   
   foo <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=123456">123456</a> whitespace!
+
+  $ echo 1 > foo
+  $ hg commit -A -l - << EOF
+  > bug 124562 - fix a thing
+  > 
+  > Fixes #32 and #462
+  > 
+  > Source-Repository: https://github.com/mozilla/foo
+  > EOF
+
+  $ hg log -r . -T '{desc|buglink}\n'
+  <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=124562">bug 124562</a> - fix a thing
+  
+  Fixes <a href="https://github.com/mozilla/foo/issues/32">#32</a> and <a href="https://github.com/mozilla/foo/issues/462">#462</a>
+  
+  Source-Repository: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>
