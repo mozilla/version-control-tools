@@ -56,3 +56,28 @@
   Fixes <a href="https://github.com/mozilla/foo/issues/32">#32</a> and <a href="https://github.com/mozilla/foo/issues/462">#462</a>
   
   Source-Repo: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>
+
+  $ cd ..
+
+The mozlink filter requires context from the full commit message to work properly.
+If the firstline filter runs before it, it lacks this context. This is a quick
+static analysis check that "mozlink" comes before "firstline".
+
+  $ cat >> checktemplate.py << EOF
+  > import os, sys
+  > for path in sys.stdin:
+  >     path = path.rstrip()
+  >     lines = open(path, 'rb').readlines()
+  >     for i, line in enumerate(lines):
+  >         if 'mozlink' in line and 'firstline' in line:
+  >             if line.index('firstline') < line.index('mozlink'):
+  >                 relpath = os.path.relpath(path, os.environ['TESTDIR'])
+  >                 print('%s:%d has firstline before mozlink' % (relpath, i + 1))
+  > EOF
+
+  $ find $TESTDIR/hgtemplates -type f | $PYTHON checktemplate.py
+  hgtemplates/gitweb_mozilla/map:109 has firstline before mozlink
+  hgtemplates/gitweb_mozilla/map:278 has firstline before mozlink
+  hgtemplates/gitweb_mozilla/map:284 has firstline before mozlink
+  hgtemplates/gitweb_mozilla/map:298 has firstline before mozlink
+  hgtemplates/gitweb_mozilla/changeset.tmpl:32 has firstline before mozlink
