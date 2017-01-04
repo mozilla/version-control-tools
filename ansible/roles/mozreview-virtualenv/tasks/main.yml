@@ -16,6 +16,7 @@
     - libjpeg-turbo-devel
     - mysql-devel
     - nodejs
+    - npm
     - python-devel
     - openldap-devel
     - python27
