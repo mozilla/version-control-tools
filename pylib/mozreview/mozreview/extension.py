@@ -312,6 +312,8 @@ class MozReviewExtension(Extension):
         TemplateHook(self, 'base-after-content',
                      'mozreview/user_review_flag.html',
                      apply_to=review_request_url_names)
+        TemplateHook(self, 'review-summary-body',
+                     'mozreview/review_summary_flag_info.html')
 
         ReviewRequestFieldsHook(self, 'main', [CommitsListField])
         ReviewRequestFieldsHook(self, 'main', [CommitDetailField])

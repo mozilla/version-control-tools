@@ -15,6 +15,7 @@ from mozreview.extra_data import (
     fetch_commit_data,
     is_parent,
     is_pushed,
+    REVIEW_FLAG_KEY,
 )
 from mozreview.review_helpers import get_reviewers_status
 
@@ -57,6 +58,13 @@ def reviewer_list(review_request):
 def extra_data(review_request, key):
     return review_request.extra_data[key]
 
+@register.filter()
+def review_flag(review):
+    flag = review.extra_data[REVIEW_FLAG_KEY]
+    if flag == ' ':
+        return 'Review flag cleared'
+
+    return 'Review flag: %s' % flag
 
 @register.filter()
 def scm_level(mozreview_profile):
