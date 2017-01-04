@@ -55,13 +55,13 @@ if __name__ == '__main__':
 
     class TestBugRe(unittest.TestCase):
         def testreplacements(self):
-            for str, result in _tests:
+            for s, result in _tests:
                 if result is None:
-                    resulttext = str
+                    resulttext = s
                 else:
                     pretext, text, bugid, posttext = result
                     resulttext = '%s<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=%s">%s</a>%s' % (pretext, bugid, text, posttext)
 
-                self.assertEqual(resulttext, buglink(str))
+                self.assertEqual(resulttext, buglink(s))
 
     unittest.main()
