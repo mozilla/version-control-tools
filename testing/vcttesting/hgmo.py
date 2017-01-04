@@ -59,7 +59,7 @@ class HgCluster(object):
     hg.mozilla.org server configuration.
     """
     MASTER_FILE_MAP = {
-        'hgext/pushlog-legacy/buglink.py': '/var/hg/version-control-tools/hgext/pushlog-legacy/buglink.py',
+        'hgext/hgmo/buglink.py': '/var/hg/version-control-tools/hgext/hgmo/buglink.py',
         'hgext/pushlog-legacy/pushlog-feed.py': '/var/hg/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py',
         'hgext/pushlog/__init__.py': '/var/hg/version-control-tools/hgext/pushlog/__init__.py',
         'hgext/serverlog/__init__.py': '/var/hg/version-control-tools/hgext/serverlog/__init__.py',

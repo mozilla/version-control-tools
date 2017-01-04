@@ -561,7 +561,7 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
                          os.path.join(ROOT, 'hgext', *paths))
 
         setconfig('pushlog', ['pushlog'])
-        setconfig('buglink', ['pushlog-legacy', 'buglink.py'])
+        setconfig('buglink', ['hgmo', 'buglink.py'])
         setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
 
         # Since new extensions may have been flagged for loading, we need

@@ -21,6 +21,7 @@ from urlparse import urljoin
 
 here = os.path.abspath(os.path.dirname(__file__))
 mydir = os.path.normpath(os.path.join(here, '..'))
+root = os.path.normpath(os.path.join(here, '..', '..', '..'))
 devnull = file("/dev/null", "w")
 
 #==============================
@@ -29,11 +30,11 @@ def write_hgrc(repodir):
     with open(join(repodir, ".hg", "hgrc"), "w") as f:
         f.write("""[extensions]
 pushlog-feed=%s/pushlog-feed.py
-buglink=%s/buglink.py
+buglink=%s/hgext/hgmo/buglink.py
 [web]
 templates=%s
 style=gitweb_mozilla
-""" % (mydir, mydir, os.environ['HG_TEMPLATES']))
+""" % (mydir, root, os.environ['HG_TEMPLATES']))
 
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""

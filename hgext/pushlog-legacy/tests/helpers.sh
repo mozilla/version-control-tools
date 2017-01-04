@@ -2,7 +2,7 @@ serverconfig() {
   cat >> $1 << EOF
 [extensions]
 pushlog-feed = $TESTDIR/hgext/pushlog-legacy/pushlog-feed.py
-buglink = $TESTDIR/hgext/pushlog-legacy/buglink.py
+buglink = $TESTDIR/hgext/hgmo/buglink.py
 pushlog = $TESTDIR/hgext/pushlog
 
 [web]
