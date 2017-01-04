@@ -4,6 +4,7 @@
 
 # This module contains utilities for parsing commit messages.
 
+import cgi
 import re
 
 # These regular expressions are not very robust. Specifically, they fail to
@@ -23,6 +24,11 @@ BUG_RE = re.compile(
            )
            (?:\s*\#?)(\d+)(?=\b)
          )''', re.I | re.X)
+
+# Like BUG_RE except it doesn't flag sequences of numbers, only positive
+# "bug" syntax like "bug X" or "b=".
+BUG_CONSERVATIVE_RE = re.compile(
+    r'''((?:bug|b=)(?:\s*)(\d+)(?=\b))''', re.I | re.X)
 
 SPECIFIER = r'(?:r|a|sr|rs|ui-r)[=?]'
 R_SPECIFIER = r'\br[=?]'
@@ -240,3 +246,64 @@ def parse_commit_id(s):
         return None
 
     return m.group(1)
+
+
+RE_SOURCE_REPO = re.compile('^Source-Repository: (https?:\/\/.*)$',
+                            re.MULTILINE)
+RE_SOURCE_REVISION = re.compile('^Source-Revision: (.*)$', re.MULTILINE)
+
+
+def add_hyperlinks(s,
+                   bugzilla_url='https://bugzilla.mozilla.org/show_bug.cgi?id='):
+    """Add hyperlinks to a commit message.
+
+    This is useful to be used as a Mercurial template filter for converting
+    plain text into rich HTML.
+    """
+    # Look for annotations saying this commit originally came from elsewhere.
+    # If these are present, we are less aggressive about e.g. linking numbers
+    # to Bugzilla bugs.
+    source_repo = None
+    github_repo = None
+
+    m = RE_SOURCE_REPO.search(s)
+    if m:
+        source_repo = m.group(1)
+
+        if source_repo.startswith('https://github.com/'):
+            github_repo = source_repo[len('https://github.com/'):]
+
+        start, end = m.span(1)
+
+        s = '%s<a href="%s">%s</a>%s' % (
+            s[0:start],
+            cgi.escape(source_repo),
+            cgi.escape(source_repo),
+            s[end:])
+
+    m = RE_SOURCE_REVISION.search(s)
+    if m:
+        source_revision = m.group(1)
+
+        start, end = m.span(1)
+
+        # Hyperlink to GitHub commits.
+        if github_repo:
+            s = '%s<a href="https://github.com/%s/commit/%s">%s</a>%s' % (
+                s[0:start],
+                cgi.escape(github_repo),
+                cgi.escape(source_revision),
+                cgi.escape(source_revision),
+                s[end:])
+
+    # We replace #\d+ with links to the GitHub issue.
+    if github_repo:
+        repl = r'<a href="https://github.com/%s/issues/\1">#\1</a>' % github_repo
+        s = re.sub(r'#(\d+)', repl, s)
+
+    # Bugzilla linking.
+    bugzilla_re = BUG_CONSERVATIVE_RE if github_repo else BUG_RE
+    bugzilla_link = r'<a href="%s\2">\1</a>' % bugzilla_url
+    s = bugzilla_re.sub(bugzilla_link, s)
+
+    return s
