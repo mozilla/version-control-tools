@@ -1,23 +1,17 @@
 #!/usr/bin/env python
 # Unit tests for pushlog / json-pushes
 
-import sys
 import unittest
 import silenttestrunner
 import os.path
 import inspect
-from os.path import join, isdir, isfile
-from mercurial import ui, hg, commands, util
-from mercurial.commands import add, clone, commit, init, push
+from os.path import join
+from mercurial import ui, hg
 from mercurial.hgweb import server
 import mercurial.hgweb as hgweb
-from subprocess import check_call, Popen, STDOUT, PIPE
+from subprocess import check_call
 import os
-import stat
-from signal import SIGTERM
-from httplib import HTTPConnection
 from urllib import urlopen
-from time import sleep
 from tempfile import mkdtemp
 import json
 import feedparser
