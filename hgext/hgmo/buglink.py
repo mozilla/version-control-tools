@@ -40,7 +40,10 @@ def reposetup(ui, repo):
 
 if __name__ == '__main__':
     import unittest
-    
+
+    global bugzilla_link
+    bugzilla_link = bugzilla_link_templ % bugzilla
+
     _tests = (
         ('bug 1', ('', 'bug 1', '1', '')),
         ('bug 123456', ('', 'bug 123456', '123456', '')),
