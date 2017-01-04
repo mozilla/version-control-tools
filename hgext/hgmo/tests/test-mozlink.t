@@ -76,8 +76,3 @@ static analysis check that "mozlink" comes before "firstline".
   > EOF
 
   $ find $TESTDIR/hgtemplates -type f | $PYTHON checktemplate.py
-  hgtemplates/gitweb_mozilla/map:109 has firstline before mozlink
-  hgtemplates/gitweb_mozilla/map:278 has firstline before mozlink
-  hgtemplates/gitweb_mozilla/map:284 has firstline before mozlink
-  hgtemplates/gitweb_mozilla/map:298 has firstline before mozlink
-  hgtemplates/gitweb_mozilla/changeset.tmpl:32 has firstline before mozlink
