@@ -1,6 +1,6 @@
   $ cat >> $HGRCPATH << EOF
   > [extensions]
-  > buglink = $TESTDIR/hgext/hgmo/buglink.py
+  > hgmo = $TESTDIR/hgext/hgmo
   > EOF
 
   $ hg init repo

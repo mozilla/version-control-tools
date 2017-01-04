@@ -90,6 +90,7 @@ from mercurial import (
     extensions,
     hg,
     revset,
+    templatefilters,
     util,
     wireproto,
 )
@@ -116,8 +117,17 @@ import mozhg.mozbuildinfo as mozbuildinfo
 minimumhgversion = '4.0'
 testedwith = '4.0'
 
+RE_BUGZILLA_LINK = r'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2' \
+                   r'">\1</a>'
+
 cmdtable = {}
 command = cmdutil.command(cmdtable)
+
+
+@templatefilters.templatefilter('buglink')
+def buglink(text):
+    """Any text. Hyperlink to Bugzilla."""
+    return commitparser.BUG_RE.sub(RE_BUGZILLA_LINK, text)
 
 
 def addmetadata(repo, ctx, d, onlycheap=False):
@@ -561,7 +571,6 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
                          os.path.join(ROOT, 'hgext', *paths))
 
         setconfig('pushlog', ['pushlog'])
-        setconfig('buglink', ['hgmo', 'buglink.py'])
         setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
 
         # Since new extensions may have been flagged for loading, we need

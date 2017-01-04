@@ -2,7 +2,7 @@
   $ cd server
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > buglink = $TESTDIR/hgext/hgmo/buglink.py
+  > hgmo = $TESTDIR/hgext/hgmo
   > pushlog = $TESTDIR/hgext/pushlog
   > 
   > [web]

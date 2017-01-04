@@ -1,8 +1,8 @@
 serverconfig() {
   cat >> $1 << EOF
 [extensions]
+hgmo = $TESTDIR/hgext/hgmo
 pushlog-feed = $TESTDIR/hgext/pushlog-legacy/pushlog-feed.py
-buglink = $TESTDIR/hgext/hgmo/buglink.py
 pushlog = $TESTDIR/hgext/pushlog
 
 [web]

@@ -30,7 +30,7 @@ def write_hgrc(repodir):
     with open(join(repodir, ".hg", "hgrc"), "w") as f:
         f.write("""[extensions]
 pushlog-feed=%s/pushlog-feed.py
-buglink=%s/hgext/hgmo/buglink.py
+hgmo=%s/hgext/hgmo
 [web]
 templates=%s
 style=gitweb_mozilla
