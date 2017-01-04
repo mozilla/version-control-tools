@@ -121,9 +121,9 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
-@templatefilters.templatefilter('buglink')
-def buglink(text):
-    """Any text. Hyperlink to Bugzilla."""
+@templatefilters.templatefilter('mozlink')
+def mozlink(text):
+    """Any text. Hyperlink to Bugzilla and other detected things."""
     return commitparser.add_hyperlinks(text)
 
 

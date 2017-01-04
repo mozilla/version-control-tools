@@ -24,7 +24,7 @@
   > foo 123456 whitespace!
   > EOF
 
-  $ hg log -T '{desc|buglink}\n'
+  $ hg log -T '{desc|mozlink}\n'
   <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1">bug 1</a> - summary line
   
   <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=123456">bug 123456</a>
@@ -50,7 +50,7 @@
   > Source-Repo: https://github.com/mozilla/foo
   > EOF
 
-  $ hg log -r . -T '{desc|buglink}\n'
+  $ hg log -r . -T '{desc|mozlink}\n'
   <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=124562">bug 124562</a> - fix a thing
   
   Fixes <a href="https://github.com/mozilla/foo/issues/32">#32</a> and <a href="https://github.com/mozilla/foo/issues/462">#462</a>
