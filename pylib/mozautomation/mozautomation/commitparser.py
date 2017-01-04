@@ -248,7 +248,7 @@ def parse_commit_id(s):
     return m.group(1)
 
 
-RE_SOURCE_REPO = re.compile('^Source-Repository: (https?:\/\/.*)$',
+RE_SOURCE_REPO = re.compile('^Source-Repo: (https?:\/\/.*)$',
                             re.MULTILINE)
 RE_SOURCE_REVISION = re.compile('^Source-Revision: (.*)$', re.MULTILINE)
 

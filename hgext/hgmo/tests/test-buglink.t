@@ -47,7 +47,7 @@
   > 
   > Fixes #32 and #462
   > 
-  > Source-Repository: https://github.com/mozilla/foo
+  > Source-Repo: https://github.com/mozilla/foo
   > EOF
 
   $ hg log -r . -T '{desc|buglink}\n'
@@ -55,4 +55,4 @@
   
   Fixes <a href="https://github.com/mozilla/foo/issues/32">#32</a> and <a href="https://github.com/mozilla/foo/issues/462">#462</a>
   
-  Source-Repository: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>
+  Source-Repo: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>
