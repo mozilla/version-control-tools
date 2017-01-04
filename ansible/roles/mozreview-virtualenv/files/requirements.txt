@@ -1,8 +1,12 @@
-# Python 2.6 can't verify the x509 cert. So do straight HTTP for now.
---trusted-host downloads.reviewboard.org
---find-links http://downloads.reviewboard.org/releases/Django/1.6/
---find-links http://downloads.reviewboard.org/releases/django-evolution/0.7/
---find-links http://downloads.reviewboard.org/releases/RBTools/0.7/
+# Python 2.6 can't speak SNI, which downloads.reviewboard.org (CloudFront)
+# uses. So, we can't use downloads.reviewboard.org as long as we're using
+# Python 2.6.
+#
+# We work around this by running a very minimal PyPI mirror on an S3 bucket
+# we control. We access the host via http:// because S3 also requires SNI.
+# We require hash verification everywhere, so plain text is still safe.
+--find-links http://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+--trusted-host s3-us-west-2.amazonaws.com
 
 amqp==1.4.8 \
     --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e
