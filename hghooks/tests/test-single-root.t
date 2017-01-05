@@ -74,6 +74,62 @@ Pushing new root should be rejected
   abort: pretxnchangegroup.single_root hook failed
   [255]
 
+  $ cd ..
+
+New allowed roots can be defined in the hgrc
+
+  $ hg init allowedroots
+  $ cat > allowedroots/.hg/hgrc << EOF
+  > [hooks]
+  > pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
+  > EOF
+
+List an unknown root
+
+  $ cat >> $HGRCPATH << EOF
+  > [allowedroots]
+  > 55482a6fb4b1881fa8f746fd52cf6f096bb21c89 = 00aa
+  > EOF
+
+  $ hg -R client -q push -r 2 $TESTTMP/allowedroots
+
+  $ hg -R client push -f $TESTTMP/allowedroots
+  pushing to $TESTTMP/allowedroots
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files (+1 heads)
+  *** pushing unrelated repository ***
+  
+  Changeset 884385885a43 introduces a new root changeset into this repository. This
+  almost certainly means you accidentally force pushed to the wrong
+  repository and/or URL.
+  
+  Your push is being rejected because this is almost certainly not what you
+  intended.
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.single_root hook failed
+  [255]
+
+Whitelist the new root
+
+  $ cat >> $HGRCPATH << EOF
+  > 55482a6fb4b1881fa8f746fd52cf6f096bb21c89 = 00aabb, 884385885a43745398c958eb8eb8386c140268e1
+  > EOF
+
+  $ hg -R client push -f $TESTTMP/allowedroots
+  pushing to $TESTTMP/allowedroots
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files (+1 heads)
+  (allowing new root 884385885a43 because it is in the whitelist)
+
+  $ cd client
+
   $ hg --config extensions.strip= strip -r tip
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/884385885a43-b8fe5de7-backup.hg (glob)
