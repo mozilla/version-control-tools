@@ -23,13 +23,18 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
+    newroots = set()
+
     for rev in range(repo[node].rev(), len(repo)):
         ctx = repo[rev]
         if rev == 0:
             continue
 
         if ctx.p1().node() == nullid:
-            ui.write(MESSAGE % short(ctx.node()))
-            return 1
+            newroots.add(ctx.node())
 
-    return 0
+    if not newroots:
+        return 0
+
+    ui.write(MESSAGE % ', '.join(sorted(map(short, newroots))))
+    return 1
