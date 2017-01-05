@@ -41,7 +41,7 @@ it's acceptable)
 
   $ echo bundle2disabled > foo
   $ hg commit -m 'bundle2 disabled'
-  $ hg --config experimental.bundle2-exp=false push
+  $ hg --config devel.legacy.exchange=bundle1 push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
