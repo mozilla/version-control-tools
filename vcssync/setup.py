@@ -20,5 +20,10 @@ setup(
             'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
         ],
     },
-    install_requires=['dulwich>=0.16', 'github3.py>=0.9.6', 'Mercurial>=4.0'],
+    install_requires=[
+        'dulwich>=0.16',
+        'github3.py>=0.9.6',
+        'kombu>=3.0.37',
+        'Mercurial>=4.0',
+    ],
 )
