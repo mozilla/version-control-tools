@@ -22,6 +22,7 @@ PYTHON_COVERAGE_DIRS = (
     'hgext',
     'pylib',
     'hghooks',
+    'vcssync',
 )
 
 # Directories containing Python unit tests.
@@ -30,6 +31,7 @@ UNIT_TEST_DIRS = [
     'git/tests',
     'hgserver/tests',
     'pylib',
+    'vcssync/tests',
 ]
 
 # Directories whose Python unit tests we should ignore.
