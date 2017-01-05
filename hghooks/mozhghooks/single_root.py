@@ -29,7 +29,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             continue
 
         if ctx.p1().node() == nullid:
-            ui.write(MESSAGE % short(ctx.hex()))
+            ui.write(MESSAGE % short(ctx.node()))
             return 1
 
     return 0

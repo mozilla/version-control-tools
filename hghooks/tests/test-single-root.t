@@ -43,6 +43,17 @@ Create a new root
 
 Pushing new root should be rejected
 
+  $ hg out ../server
+  comparing with ../server
+  searching for changes
+  changeset:   3:884385885a43
+  tag:         tip
+  parent:      -1:000000000000
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root 2 commit 1
+  
+
   $ hg push -f ../server
   pushing to ../server
   searching for changes
@@ -52,7 +63,7 @@ Pushing new root should be rejected
   added 1 changesets with 1 changes to 1 files (+1 heads)
   *** pushing unrelated repository ***
   
-  Changeset 383834333835 introduces a new root changeset into this repository. This
+  Changeset 884385885a43 introduces a new root changeset into this repository. This
   almost certainly means you accidentally force pushed to the wrong
   repository and/or URL.
   
@@ -79,6 +90,23 @@ Pushing new root as part of multiple commits will be rejected
   $ hg commit -A -m 'root 3 commit 1'
   adding bar
   created new head
+
+  $ hg out ../server
+  comparing with ../server
+  searching for changes
+  changeset:   3:205d7e31879f
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root 1 commit 3
+  
+  changeset:   4:4101f99f849b
+  tag:         tip
+  parent:      -1:000000000000
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root 3 commit 1
+  
+
   $ hg push -f ../server
   pushing to ../server
   searching for changes
@@ -88,7 +116,7 @@ Pushing new root as part of multiple commits will be rejected
   added 2 changesets with 2 changes to 2 files (+1 heads)
   *** pushing unrelated repository ***
   
-  Changeset 343130316639 introduces a new root changeset into this repository. This
+  Changeset 4101f99f849b introduces a new root changeset into this repository. This
   almost certainly means you accidentally force pushed to the wrong
   repository and/or URL.
   
