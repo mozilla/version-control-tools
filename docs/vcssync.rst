@@ -197,3 +197,76 @@ Dulwich. This was made far easier by the fact that our filters were implemented
 in Python before. The effort was worth it: **Python + Dulwich performed an
 identical conversion of the Servo repository in ~10s versus ~2 hours** - a
 ~700x speedup.
+
+Converting from Git to Mercurial
+================================
+
+Git and Mercurial have remarkably similar concepts for structuring commit
+data. Essentially, both have commit objects a) with a link to a tree or
+manifest of all files as they exist in that commit b) links to parent commits.
+Not only is conversion between Git and Mercurial repositories possible, but
+numerous tools exist for doing it!
+
+While there are several tools that can perform conversions, each has its
+intended use cases and gotchas.
+
+In many cases ``hg convert`` for performing an unidirectional conversion of
+Git to Mercurial *just works* and is arguably the tool best suited for the
+job (on the grounds that Mercurial itself knows the best way for data to
+be imported into it). That being said, we've run into a few scenarios where
+``hg convert`` on its own isn't sufficient::
+
+Removing merges from history
+   We sometimes want to remove merge commits from Git history as part of
+   converting to Mercurial. ``hg convert`` doesn't handle this case well.
+
+   In theory, you can provide ``hg convert`` a splice map that instructs
+   the conversion to remove parents from a merge. And, ``hg convert`` happily
+   parses this and starts converting away. But it will eventually explode
+   in a few places where it assumes all parents of a source commit exist in
+   the converted history. This could likely be fixed upstream.
+
+Copy/rename detection performance
+   Mercurial stores explicit copy and rename metadata in file history. Git
+   does not. So when converting from Git to Mercurial, ``hg convert`` asks
+   Git to resolve copy and rename metadata, which it then stores in
+   Mercurial. This more or less *just works*.
+
+   A problem with resolving copy and rename metadata is it is very
+   computationally expensive. When Git's ``--find-copies-harder`` flag
+   is used, Git examines *every* file in the commit/tree to find a copy
+   source. For repositories with say 100,000 files, you can imagine how
+   slow this can be.
+
+   Sometimes we want to remove files as part of conversion. If doing the
+   removal inside ``hg convert``, ``hg convert`` will have Git perform
+   the copy and rename detection *before* those discarded files are
+   removed. This means that Git does a lot of throwaway work for files
+   that aren't relevant. When removing tens of thousands of files, the
+   overhead can be staggering.
+
+Copy/rename metadata and deleted files
+   As stated above, Mercurial stores explicit copy and rename metadata in
+   file history. When files are being deleted by ``hg convert``, there
+   appears to be some problems where ``hg convert`` gets confused if
+   the copy or rename source resides in a deleted file. This is almost
+   certainly a correctable bug in ``hg convert``.
+
+Behavior for empty changesets
+   When removing files from history (including ignoring Git submodules), it
+   is possible for the converted Git commit to be empty (no file changes).
+
+   ``hg convert`` has (possibly buggy) behavior where it automatically
+   discards empty changesets, but only if a ``--filemap`` is being used.
+   This means that empty Git commits are preserved unless ``--filemap`` is
+   used. (A workaround is to specify ``--filemap /dev/null``.)
+
+When these scenarios are in play, we've found that it is better to
+perform the Git to Mercurial conversion in 2 phases:
+
+1. Perform a Git->Git rewrite
+2. Convert the rewritten Git history to Mercurial
+
+In cases where lots of files are being removed from Git history, this
+approach is *highly* recommended because of the performance overhead of
+processing the unwanted files during ``hg convert``.
