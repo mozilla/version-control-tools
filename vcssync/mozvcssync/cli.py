@@ -6,8 +6,14 @@ from __future__ import absolute_import, unicode_literals
 
 import argparse
 import logging
+import subprocess
 import sys
 
+import hglib
+
+from .git2hg import (
+    linearize_git_repo_to_hg,
+)
 from .gitrewrite import (
     RewriteError,
 )
@@ -110,3 +116,59 @@ def linearize_git():
         linearize_git_repo(args.git_repo, args.ref, **kwargs)
     except RewriteError as e:
         logger.error('abort: %s' % str(e))
+
+
+def linearize_git_to_hg():
+    parser = argparse.ArgumentParser()
+    for args, kwargs in LINEARIZE_GIT_ARGS:
+        parser.add_argument(*args, **kwargs)
+
+    parser.add_argument('--hg', help='hg executable to use')
+    parser.add_argument('--move-to-subdir',
+                        help='Move the files in the Git repository under a '
+                             'different subdirection in the destination repo')
+    parser.add_argument('--copy-similarity', type=int, default=50,
+                        dest='similarity',
+                        help='File % similarity for it to be identified as a '
+                             'copy')
+    parser.add_argument('--find-copies-harder', action='store_true',
+                        help='Work harder to find file copies')
+    parser.add_argument('--skip-submodules', action='store_true',
+                        help='Skip processing of Git submodules')
+    parser.add_argument('--git-push-url',
+                        help='URL where to push converted Git repo')
+    parser.add_argument('git_repo_url',
+                        help='URL of Git repository to convert')
+    parser.add_argument('git_ref', help='Git ref to convert')
+    parser.add_argument('git_repo_path', help='Local path of where to store '
+                                              'Git repo clone')
+    parser.add_argument('hg_repo_path', help='Local path of where to store '
+                                             'Mercurial conversion of repo')
+
+
+    args = parser.parse_args()
+
+    if args.hg:
+        hglib.HGPATH = args.hg
+
+    configure_logging()
+
+    kwargs = get_git_linearize_kwargs(args)
+    for k in ('similarity', 'find_copies_harder', 'skip_submodules',
+              'move_to_subdir', 'git_push_url'):
+        v = getattr(args, k)
+        if v is not None:
+            kwargs[k] = v
+
+    try:
+        linearize_git_repo_to_hg(
+            args.git_repo_url,
+            args.git_ref,
+            args.git_repo_path,
+            args.hg_repo_path,
+            **kwargs)
+    except RewriteError as e:
+        logger.error('abort: %s' % str(e))
+        sys.exit(1)
+    except subprocess.CalledProcessError:
+        sys.exit(1)

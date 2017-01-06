@@ -11,3 +11,105 @@ export GIT_AUTHOR_DATE='Thu Jan 1 00:00:00 1970 +0000'
 export GIT_COMMITTER_NAME=test
 export GIT_COMMITTER_EMAIL=test@example.com
 export GIT_COMMITTER_DATE='Thu Jan 1 00:00:00 1970 +0000'
+
+standardgitrepo() {
+    here=`pwd`
+    git init $1
+    cd $1
+    echo 0 > foo
+    git add foo
+    git commit -m initial
+    cat > file0 << EOF
+file0 0
+file0 1
+file0 2
+file0 3
+file0 4
+file0 5
+file0 6
+file0 7
+file0 8
+file0 9
+file0 10
+EOF
+    cat > file1 << EOF
+file1 0
+file1 1
+file1 2
+file1 3
+file1 4
+file1 5
+file1 6
+file1 7
+file1 8
+file1 9
+EOF
+
+    git add file0 file1
+    git commit -m 'add file0 and file1'
+    cp file0 file0-copy0
+    git add file0-copy0
+    git commit -m 'copy file0 to file0-copy0'
+    cp file0 file0-copy1
+    cp file0 file0-copy2
+    git add file0-copy1 file0-copy2
+    git commit -m 'copy file0 to file0-copy1 and file0-copy2'
+    git mv file0 file0-moved
+    git commit -m 'move file0 to file0-moved'
+
+    # Make copy then move source so default copy detection kicks in
+    cp file0-moved file0-copied-with-move
+    git mv file0-moved file0-moved-with-copy
+    git add file0-copied-with-move
+    git commit -m 'copy file0-moved and rename source'
+
+    # Create copies of file1 with modifications
+    cat > file1-20 << EOF
+file1 2
+file1 7
+EOF
+
+    cat > file1-50 << EOF
+file1 0
+file1 1
+file1 2
+file1 3
+file1 4
+EOF
+
+   cat > file1-80 << EOF
+file1 0
+file1 1
+file1 2
+file1 3
+file1 5
+file1 6
+file1 7
+file1 9
+EOF
+
+    git add file1-20 file1-50 file1-80
+    git commit -m 'create file1-20, file1-50 and file1-80 as copies with mods'
+
+    git branch head2
+    echo 1 > foo
+    git add foo
+    git commit -m 'dummy commit 1 on master'
+    echo 2 > foo
+    git add foo
+    git commit -m 'dummy commit 2 on master'
+    git checkout head2
+    echo 3 > bar
+    git add bar
+    git commit -m 'dummy commit 1 on head2'
+    echo 4 > bar
+    git add bar
+    git commit -m 'dummy commit 2 on head2'
+    git checkout master
+    git merge head2
+    echo 5 > foo
+    git add foo
+    git commit -m 'dummy commit 1 after merge'
+
+    cd $here
+}
