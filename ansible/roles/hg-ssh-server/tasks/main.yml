@@ -105,6 +105,9 @@
 
 # pash is a collection of Python files handling SSH connections. They behave
 # like a Python module but are installed not as such for historical reasons.
+# TODO there is a window where the files are inconsistent with themselves and
+# pash may not work correctly. This should be fixed by putting the files in
+# a directory and doing an atomic replace of a symlink or something.
 - name: install pash
   copy: src={{ vct }}/hgserver/pash/{{ item }}
         dest=/usr/local/bin/{{ item }}
@@ -119,16 +122,6 @@
     - pash_wrapper
     - repo_group.py
     - sh_helper.py
-
-# Until reviewboard-hg switches to CentOS 7, pash.py's shebang needs to be
-# adjusted to run from the virtualenv. We purposefully use /usr/bin/python
-# in the shebang by default because we can't rely on the virtualenv being
-# present during fresh installs. If we didn't do this, we'd easily lock
-# ourselves out of root login.
-- name: replace shebang in pash.py
-  replace: dest=/usr/local/bin/pash.py
-           regexp='^#! \/usr\/bin\/python'
-           replace='#!/var/hg/venv_pash/bin/python'
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
