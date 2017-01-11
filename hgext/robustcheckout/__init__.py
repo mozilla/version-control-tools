@@ -217,6 +217,19 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase):
 
     # At this point we either have an existing working directory using
     # shared, pooled storage or we have nothing.
+
+    def handlepullabort(e):
+        """Handle an error.Abort raised during a pull.
+
+        Returns True if caller should call ``callself()`` to retry.
+        """
+        if e.args[0] == _('repository is unrelated'):
+            ui.warn('(repository is unrelated; deleting)\n')
+            destvfs.rmtree(forcibly=True)
+            return True
+
+        return False
+
     created = False
 
     if not destvfs.exists():
@@ -293,11 +306,8 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase):
                 if not pullop.rheads:
                     raise error.Abort('unable to pull requested revision')
         except error.Abort as e:
-            if e.message == _('repository is unrelated'):
-                ui.warn('(repository is unrelated; deleting)\n')
-                destvfs.rmtree(forcibly=True)
+            if handlepullabort(e):
                 return callself()
-
             raise
         except error.RepoError as e:
             return handlerepoerror(e)
