@@ -13,10 +13,16 @@ import json
 import sys
 
 import cinnabar.util
-from cinnabar.hg import (
-    get_ui,
-    push,
-)
+try:
+    from cinnabar.hg.repo import (
+        get_ui,
+        push,
+    )
+except ImportError:
+    from cinnabar.hg import (
+        get_ui,
+        push,
+    )
 try:
     from cinnabar.hg.bundle import PushStore
 except ImportError:
