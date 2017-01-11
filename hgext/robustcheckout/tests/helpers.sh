@@ -4,6 +4,10 @@ pool = $TESTTMP/share
 
 [extensions]
 robustcheckout = $TESTDIR/hgext/robustcheckout
+
+[robustcheckout]
+retryjittermin = 0
+retryjittermax = 100
 EOF
 
 mkdir server
