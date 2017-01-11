@@ -3,7 +3,6 @@ experimental/mozilla-central-gd
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
-integration/gaia-central
 releases/mozilla-release bzip2 legacy_stream
 releases/mozilla-aurora bzip2 legacy_stream
 releases/mozilla-beta bzip2 legacy_stream
