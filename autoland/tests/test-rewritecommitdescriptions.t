@@ -128,6 +128,30 @@ We handle long sha1s properly
   
 We handle partial rewrites properly
 
+  $ echo foo >> foo
+  $ hg commit -m 'bug 1 - even more stuff'
+  $ hg --encoding utf-8 log
+  changeset:   3:cf50de63cf42
+  tag:         tip
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - even more stuff
+  
+  changeset:   2:2c6f2ddf672a
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - long sha1 is ok
+  
+  changeset:   1:a1dea3050632
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - stuff++
+  
+  changeset:   0:3a9f6899ef84
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     root commit
+  
   $ cat > descriptions.json <<EOF
   > {
   > "a1dea3050632": "bug 1 - stuff++",
@@ -135,13 +159,18 @@ We handle partial rewrites properly
   > }
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
-  saved backup bundle to $TESTTMP/clone/.hg/strip-backup/2c6f2ddf672a-c8370839-replacing.hg (glob)
+  saved backup bundle to $TESTTMP/clone/.hg/strip-backup/cf50de63cf42-a795aa5f-replacing.hg (glob)
   rev: a1dea3050632 -> a1dea3050632
   rev: 2c6f2ddf672a -> 515eca0c4333
 
   $ hg --encoding utf-8 log
-  changeset:   2:515eca0c4333
+  changeset:   3:404a56cc02c8
   tag:         tip
+  user:        test
+  date:        Thu Jan 01 00:00:00 1970 +0000
+  summary:     bug 1 - even more stuff
+  
+  changeset:   2:515eca0c4333
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
   summary:     bug 1 - partial rewrite is ok
