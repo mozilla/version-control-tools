@@ -72,9 +72,6 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
         original_sha1s[node] = sha1_of(node)
 
     # Update changed nodes.
-    def prune_unchanged(node):
-        return repo[node].description() != description_map[sha1_of(node)]
-
     def create_func(repo, ctx, revmap, filectxfn):
         parents = rewrite.newparents(repo, ctx, revmap)
 
@@ -91,16 +88,9 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
 
         return memctx
 
-    node_map = {}
-    changed_nodes = filter(prune_unchanged, nodes)
-    if changed_nodes:
-        node_map = rewrite.replacechangesets(repo, changed_nodes, create_func)
+    node_map = rewrite.replacechangesets(repo, nodes, create_func)
 
     # Output result.
     for node in nodes:
-        original_sha1 = original_sha1s[node]
-        if node in node_map:
-            new_sha1 = sha1_of(node_map[node])
-        else:
-            new_sha1 = original_sha1s[node]
-        ui.write('rev: %s -> %s\n' % (original_sha1, new_sha1))
+        ui.write('rev: %s -> %s\n' % (original_sha1s[node],
+                                      sha1_of(node_map[node])))
