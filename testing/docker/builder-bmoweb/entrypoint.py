@@ -132,8 +132,8 @@ while True:
                                 unix_socket='/dev/shm/mysqld.sock')
         print('connected to MySQL database as %s' % db_user)
         break
-    except (ConnectionError, mysql.connector.errors.Error):
-        print('error')
+    except (ConnectionError, mysql.connector.errors.Error) as e:
+        print(e)
 
     if time.time() - time_start > db_timeout:
         print('could not connect to database before timeout; giving up')

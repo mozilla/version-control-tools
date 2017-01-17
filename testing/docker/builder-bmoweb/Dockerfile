@@ -100,6 +100,7 @@ RUN cd $BUGZILLA_HOME/bugzilla && perl checksetup.pl --check-modules
 # Configure MySQL
 RUN rm -rf /var/lib/mysql
 ADD my.cnf /etc/mysql/my.cnf
+RUN chmod a-w /etc/mysql/my.cnf
 ADD mysql-init.sh /tmp/mysql-init.sh
 RUN /usr/bin/mysql_install_db --user=mysql --datadir=/var/lib/mysql
 RUN chown -R mysql:mysql /var/lib/mysql
