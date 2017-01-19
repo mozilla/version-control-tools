@@ -16,9 +16,9 @@ $(document).on("mozreview_ready", function() {
   }
 
   // Show all commits when link is clicked
-  var $commitsViewLink = $('#mozreview-all-commits');
-  var $commitsTable = $('#mozreview-child-requests');
   var toggleTable = function(forceOpen) {
+    var $commitsViewLink = $('#mozreview-all-commits');
+    var $commitsTable = $('#mozreview-child-requests');
     var isExpanded = $commitsTable.hasClass('expanded');
 
     if (forceOpen || !isExpanded) {
@@ -31,13 +31,13 @@ $(document).on("mozreview_ready", function() {
     }
   };
 
-  $commitsViewLink.on('click', function(e) {
+  $('body').on('click', '#mozreview-all-commits', function(e) {
     e.preventDefault();
     toggleTable();
   });
 
   // Toggle "always show all commits" in table cookie
-  $('#mozreview-commits-presist input').on('change', function(e) {
+  $('body').on('change', '#mozreview-commits-presist input', function(e) {
     RB.UserSession.instance.set('commitsTableAlwaysShowFull', this.checked + '');
     if (this.checked) {
       toggleTable(true);
@@ -71,20 +71,6 @@ $(document).on("mozreview_ready", function() {
         );
       });
     }
-  });
-
-  // Tooltips for landable and "r?" cells
-  $('#mozreview-child-requests tbody .status').each(function() {
-     var $element = $(this);
-     var text = $element.attr('title');
-
-     if (!text) return;
-
-     $element.attr('title', '');
-
-     // Draw the tooltip title and text
-     var $tip = $('<div></div>').attr('class', 'review-tooltip').appendTo($element.parent());
-     $('<div></div>').attr('class', 'review-tooltip-text').text(text).appendTo($tip);
   });
 
   // Add a link to the parent on submitted children.

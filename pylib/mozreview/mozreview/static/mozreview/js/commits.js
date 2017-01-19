@@ -380,6 +380,20 @@ $(document).on("mozreview_ready", function() {
           updateReviewers($reviewer_list, value);
         }
       });
+
+    // Tooltips for landable and "r?" cells
+    $('#mozreview-child-requests tbody .status').each(function() {
+       var $element = $(this);
+       var text = $element.attr('title');
+
+       if (!text) return;
+
+       $element.attr('title', '');
+
+       // Draw the tooltip title and text
+       var $tip = $('<div></div>').attr('class', 'review-tooltip').appendTo($element.parent());
+       $('<div></div>').attr('class', 'review-tooltip-text').text(text).appendTo($tip);
+    });
   })
   .trigger("mr:commits_setup");
 

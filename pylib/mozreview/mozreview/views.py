@@ -39,6 +39,7 @@ from mozreview.extra_data import (
     is_parent,
     gen_child_rrs,
 )
+from mozreview.template_helpers import get_commit_table_context
 
 from reviewboard.reviews.models import ReviewRequest
 
@@ -296,8 +297,7 @@ def commits_summary_table_fragment(request, parent_id=None, child_id=None):
 
     # Return rendered template.
 
-    return render(request, 'mozreview/commits-requests.html', {
-        'user': request.user,
-        'review_request_details': child_request,
-        'children_details': children_details,
-    })
+    return render(request, 'mozreview/commits-requests.html',
+                  get_commit_table_context(request, child_request))
+
+
