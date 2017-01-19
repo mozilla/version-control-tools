@@ -22,12 +22,12 @@ by both the commits template and the commits_summary_table_fragment view.
   <tr id="mozreview-child-requests-nav-row">
     <td colspan="2">
       {% if prev_child %}
-        <a href="{{prev_child.get_review_request.get_absolute_url}}" rel="previous">&lt;&lt; Previous Commit</a>
+        <a href="{{prev_child.get_review_request.get_absolute_url}}{% if 'diff' in request.path %}diff/#index_header{% endif %}" rel="previous">&lt;&lt; Previous Commit</a>
       {% endif %}
       Viewing commit {{current_child_num}} of {{num_children}}.
       <a href="javascript:;" data-one-text="Hide Other Commits" data-all-text="Show Other Commits" id="mozreview-all-commits">{% if request.COOKIES.commits_table_show == 'true' %}Hide Other Commits{% else %}Show Other Commits{% endif %}</a>
       {% if next_child %}
-        <a href="{{next_child.get_review_request.get_absolute_url}}" rel="next">Next Commit &gt;&gt;</a>
+        <a href="{{next_child.get_review_request.get_absolute_url}}{% if 'diff' in request.path %}diff/#index_header{% endif %}" rel="next">Next Commit &gt;&gt;</a>
       {% endif %}
       <br />
       <label id="mozreview-commits-presist"><input type="checkbox" {% if request.COOKIES.commits_table_show == 'true' %}checked{% endif %}> Always Show All Commits</label>
