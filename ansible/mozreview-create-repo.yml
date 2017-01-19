@@ -1,5 +1,5 @@
 ---
-- hosts: reviewboard-hg1.dmz.scl3.mozilla.com
+- hosts: reviewboard-hg2.dmz.scl3.mozilla.com
   vars:
     repo_root: /repo/hg/mozilla
   vars_prompt:
