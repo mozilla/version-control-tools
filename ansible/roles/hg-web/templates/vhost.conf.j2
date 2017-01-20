@@ -58,10 +58,13 @@ LimitRequestFields 1000
     ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
     CustomLog "/var/log/httpd/hg.mozilla.org/access_log" combined env=!image
 
-    # Enable HSTS. But don't enable it for wire protocol requests, as they are
-    # not browsers and it just adds avoidable overhead.
+    # Enable HSTS and CSP. But don't enable for wire protocol requests, as they
+    # are not browsers and it just adds avoidable overhead.
     <If "(%{QUERY_STRING} !~ /cmd=/) && (%{HTTP_USER_AGENT} !~ m#mercurial/proto#)">
         Header set Strict-Transport-Security max-age=31536000
+        # bugzilla.mo is for l10n
+        # archive.mo and queue.taskcluster.net are for reftest analyzer
+        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/ https://archive.mozilla.org/ https://queue.taskcluster.net/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
     </If>
 </VirtualHost>
 
