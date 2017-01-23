@@ -1,0 +1,19 @@
+mkdir ${VENV}
+
+# Securely download virtualenv, setuptools, and pip.
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/virtualenv-14.0.6.tar.gz \
+    ${VENV}/virtualenv-14.0.6.tar.gz \
+    1ffb6a02d8999e9c97ad8f04b1d2ba44421dfb8f8a98b54aea5c6fdfb53bc526 && \
+  cd ${VENV} && tar -xzf virtualenv-14.0.6.tar.gz && \
+  rm -f ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.0-py2.py3-none-any.whl \
+        ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.2-py2.py3-none-any.whl
+
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0.3-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.3-py2.py3-none-any.whl \
+    b0335bc837f9edb5aad03bd43d0973b084a1cbe616f8188dc23ba13234dbd552
+
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.1.1-py2.py3-none-any.whl \
+    dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb
+
+${VENV}/virtualenv-14.0.6/virtualenv.py --no-download ${VENV}
