@@ -1,6 +1,9 @@
 ansible==1.9.0.1 \
     --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
 
+appdirs==1.4.0 \
+    --hash=sha256:85e58578db8f29538f3109c11250c2a5514a2fcdc9890d9b2fe777eb55517736
+
 blessings==1.6 \
     --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007
 
@@ -43,6 +46,9 @@ mozinfo==0.7 \
 mozprocess==0.22 \
     --hash=sha256:2d56e015a3594f06130e8c015f7ca87f3f8d83d9c4bf54588f077ce9bad9a08b
 
+packaging==16.8 \
+    --hash=sha256:99276dc6e3a7851f32027a68f1095cd3f77c148091b092ea867a351811cfe388
+
 paramiko==1.16.0 \
     --hash=sha256:4ea4b9dd79beabd0301277a26d5e8b54ab8f41ed12414a35f1e00ae08cf06127
 
@@ -53,14 +59,17 @@ PyYAML==3.11 \
 pycrypto==2.6.1 \
     --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
 
+pyparsing==2.1.10 \
+    --hash=sha256:67101d7acee692962f33dd30b5dce079ff532dd9aa99ff48d52a3dad51d2fe84
+
 python-dateutil==2.5.3 \
     --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
 
 s3transfer==0.1.9 \
     --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
 
-setuptools==20.8.1 \
-    --hash=sha256:d5bbc1929feeaa81233bdadc0c720d35ac27a3ca7a1f9641f632af822419114d
+setuptools==34.0.1 \
+    --hash=sha256:ccb91bdfd63edd5aca37508d0a5b3097e57f504a0463a9e0e476d85af8e422ea
 
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1

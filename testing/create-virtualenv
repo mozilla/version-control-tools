@@ -1,19 +1,35 @@
 mkdir ${VENV}
 
 # Securely download virtualenv, setuptools, and pip.
-${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/virtualenv-14.0.6.tar.gz \
-    ${VENV}/virtualenv-14.0.6.tar.gz \
-    1ffb6a02d8999e9c97ad8f04b1d2ba44421dfb8f8a98b54aea5c6fdfb53bc526 && \
-  cd ${VENV} && tar -xzf virtualenv-14.0.6.tar.gz && \
-  rm -f ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.0-py2.py3-none-any.whl \
-        ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.2-py2.py3-none-any.whl
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/virtualenv-15.1.0.tar.gz \
+    ${VENV}/virtualenv-15.1.0.tar.gz \
+    02f8102c2436bb03b3ee6dede1919d1dac8a427541652e5ec95171ec8adbc93a && \
+  cd ${VENV} && tar -xzf virtualenv-15.1.0.tar.gz && \
+  rm -f ${VENV}/virtualenv-15.1.0/virtualenv_support/setuptools-28.8.0-py2.py3-none-any.whl \
+        ${VENV}/virtualenv-15.1.0/virtualenv_support/pip-9.0.1-py2.py3-none-any.whl
 
-${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-8.0.3-py2.py3-none-any.whl \
-    ${VENV}/virtualenv-14.0.6/virtualenv_support/pip-8.0.3-py2.py3-none-any.whl \
-    b0335bc837f9edb5aad03bd43d0973b084a1cbe616f8188dc23ba13234dbd552
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/appdirs-1.4.0-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/appdirs-1.4.0-py2.py3-none-any.whl \
+    85e58578db8f29538f3109c11250c2a5514a2fcdc9890d9b2fe777eb55517736
 
-${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-20.1.1-py2.py3-none-any.whl \
-    ${VENV}/virtualenv-14.0.6/virtualenv_support/setuptools-20.1.1-py2.py3-none-any.whl \
-    dfdbc643f8900d9e617e48a42ae389aa18fd6fbd2846f24f2a4678b8d9412acb
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/packaging-16.8-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/packaging-16.8-py2.py3-none-any.whl \
+    99276dc6e3a7851f32027a68f1095cd3f77c148091b092ea867a351811cfe388
 
-${VENV}/virtualenv-14.0.6/virtualenv.py --no-download ${VENV}
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pip-9.0.1-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/pip-9.0.1-py2.py3-none-any.whl \
+    690b762c0a8460c303c089d5d0be034fb15a5ea2b75bdf565f40421f542fefb0
+
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/pyparsing-2.1.10-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/pyparsing-2.1.10-py2.py3-none-any.whl \
+    67101d7acee692962f33dd30b5dce079ff532dd9aa99ff48d52a3dad51d2fe84
+
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/setuptools-34.0.1-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/setuptools-34.0.1-py2.py3-none-any.whl \
+    ccb91bdfd63edd5aca37508d0a5b3097e57f504a0463a9e0e476d85af8e422ea
+
+${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/six-1.10.0-py2.py3-none-any.whl \
+    ${VENV}/virtualenv-15.1.0/virtualenv_support/six-1.10.0-py2.py3-none-any.whl \
+    0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+
+${VENV}/virtualenv-15.1.0/virtualenv.py --no-download ${VENV}
