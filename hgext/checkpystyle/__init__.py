@@ -39,7 +39,9 @@ def critique(ui, repo, entire=False, node=None, **kwargs):
 
         deleted = repo.status(ctx.p1().node(), ctx.node()).deleted
         files = [f for f in ctx.files() if f.endswith('.py') and f not in deleted]
-        style.check_files(files)
+        for f in files:
+            data = ctx.filectx(f).data()
+            style.input_file(f, lines=data.splitlines())
 
     # Never exit with failure because we don't want to prevent the commit
     # from working.
