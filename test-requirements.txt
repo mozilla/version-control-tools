@@ -129,8 +129,8 @@ ndg-httpsclient==0.4.0 \
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
 
-pep8==1.5.7 \
-    --hash=sha256:62e87fd54535fb932b4a4d94868db523257a1031c8bc6bd358c2015433e646db
+pep8==1.7.0 \
+    --hash=sha256:4fc2e478addcf17016657dff30b2d8d611e8341fac19ccf2768802f6635d7b8a
 
 Pillow==2.7.0 \
     --hash=sha256:01047449bc6e46792217fe62deba683979a60b33de7efd99ed564cf43907021b \
