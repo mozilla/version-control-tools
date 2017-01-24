@@ -37,7 +37,7 @@ UNIT_TEST_IGNORES = (
     'pylib/Bugsy',
     'pylib/flake8',
     'pylib/mccabe',
-    'pylib/pep8',
+    'pylib/pycodestyle',
     'pylib/pyflakes',
     'pylib/requests',
     'pylib/mozreview',
@@ -49,7 +49,7 @@ COVERAGE_OMIT = (
     'pylib/flake/*',
     'pylib/mccabe/*',
     'pylib/mercurial-support/*',
-    'pylib/pep8/*',
+    'pylib/pycodestyle/*',
     'pylib/pyflakes/*',
     'pylib/requests/*',
 )

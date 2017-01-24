@@ -40,7 +40,7 @@ def HGEXT_BOOTSTRAP():
         'pylib/mccabe',
         'pylib/mozautomation',
         'pylib/mozhg',
-        'pylib/pep8',
+        'pylib/pycodestyle',
         'pylib/pyflakes',
         'pylib/requests',
         'pylib/reviewboardmods',
