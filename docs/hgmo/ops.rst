@@ -169,6 +169,30 @@ repository::
   $ cd ansible
   $ ansible-playbook -i hosts -e repo=relative/path/on/server hgmo-retire-repo.yml
 
+Managing Repository Hooks
+=========================
+
+It is somewhat common to have to update hooks on various repositories.
+
+The procedure for doing this is pretty simple:
+
+1. Update a ``.hg/hgrc`` file on the SSH master
+2. Replicate hgrc to mirrors
+
+Generally speaking, ``sudo vim`` to edit ``.hg/hgrc`` files is sufficient.
+Ideally, you should use ``sudo -u hg vim .hg/hgrc``.
+
+To replicate hgrc changes to mirrors after updating an hgrc, simply run::
+
+   $ /var/hg/venv_tools/bin/hg replicatehgrc
+
+.. note::
+
+   ``hg replicatehgrc`` operates on the repo in the current directory.
+
+The definition of hooks is somewhat inconsistent. Generally speaking, hook
+entries are cargo culted from another repo.
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services
