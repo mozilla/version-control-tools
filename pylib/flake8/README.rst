@@ -58,11 +58,40 @@ anything that goes beyond 10 is too complex.
 See https://en.wikipedia.org/wiki/Cyclomatic_complexity.
 
 
+Frequently Asked Questions
+==========================
+
+Why does flake8 pin the version of pep8?
+----------------------------------------
+
+Version 1.6 of pep8 doesn't work properly with flake8.  Until pep8 releases a
+version that works, flake8 pins the version of pep8 so that flake8 will work as
+a whole.
+
+Is flake8 broken?
+-----------------
+
+Flake8 combines two other projects that are significant on their own: pep8 and
+PyFlakes. If flake8 is doing something you don't like, it is quite likely that
+the problem lies in one of those other projects.  You can run them separately
+to see if they are the cause of your difficulties.  We greatly appreciate your
+efforts to diagnose the source of the problem before reporting bugs against
+flake8.
+
+
+Questions or Feedback
+=====================
+
+If you have questions you'd like to ask the developers, or feedback you'd like
+to provide, feel free to use the mailing list: code-quality@python.org We
+would love to hear from you. Additionally, if you have a feature you'd like to
+suggest, the mailing list would be the best place for it.
+
 .. _links:
 
 Links
 =====
 
-* `flake8 documentation <http://flake8.readthedocs.org/en/latest/>`_
+* `flake8 documentation <https://flake8.readthedocs.io/en/latest/>`_
 
-* `pep8 documentation <http://pep8.readthedocs.org/en/latest/>`_
+* `pep8 documentation <https://pep8.readthedocs.io/en/latest/>`_

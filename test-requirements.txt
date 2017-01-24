@@ -72,8 +72,8 @@ factory-boy==2.7.0 \
 fake-factory==0.7.2 \
     --hash=sha256:62a9b211c1eea951f63c992de305c31977768f042210df443885444683528173
 
-flake8==2.4.1 \
-    --hash=sha256:8fc4e865a29f3c6ecae401a7dce18247f8abd046d24e390e16af9976cc9c7aa8
+flake8==2.6.2 \
+    --hash=sha256:7ac3bbaac27174d95bc4734ed23a07de567ffbcf4fc7e316854b4f3015d4fd15
 
 feedparser==5.1.3 \
     --hash=sha256:7f6507d400d07edfd1ea8205da36808009b0c539f5b8a6e0ab54337b955e6dc3 \

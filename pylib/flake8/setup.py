@@ -1,6 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from setuptools import setup
+try:
+    # Work around a traceback with Nose on Python 2.6
+    # http://bugs.python.org/issue15881#msg170215
+    __import__('multiprocessing')
+except ImportError:
+    pass
+
+try:
+    # Use https://docs.python.org/3/library/unittest.mock.html
+    from unittest import mock
+except ImportError:
+    # < Python 3.3
+    mock = None
+
+
+tests_require = ['nose']
+if mock is None:
+    tests_require += ['mock']
 
 
 def get_version(fname='flake8/__init__.py'):
@@ -28,13 +46,12 @@ setup(
     author_email="tarek@ziade.org",
     maintainer="Ian Cordasco",
     maintainer_email="graffatcolmingov@gmail.com",
-    url="http://bitbucket.org/tarek/flake8",
+    url="https://gitlab.com/pycqa/flake8",
     packages=["flake8", "flake8.tests"],
     install_requires=[
-        "setuptools",
-        "pyflakes >= 0.6.1",
-        "pep8 >= 1.4.3",
-        "mccabe >= 0.2",
+        "pyflakes >= 0.8.1, < 1.3, != 1.2.0, != 1.2.1, != 1.2.2",
+        "pycodestyle >= 2.0, < 2.1",
+        "mccabe >= 0.2.1, < 0.6",
     ],
     entry_points={
         'distutils.commands': ['flake8 = flake8.main:Flake8Command'],
@@ -53,6 +70,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Software Development :: Quality Assurance",
     ],
-    tests_require=['nose'],
+    tests_require=tests_require,
     test_suite='nose.collector',
 )
