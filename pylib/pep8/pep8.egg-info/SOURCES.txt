@@ -1,7 +1,9 @@
 CHANGES.txt
+CONTRIBUTING.rst
 MANIFEST.in
 README.rst
 pep8.py
+setup.cfg
 setup.py
 docs/Makefile
 docs/advanced.rst
@@ -37,6 +39,7 @@ testsuite/E50.py
 testsuite/E70.py
 testsuite/E71.py
 testsuite/E72.py
+testsuite/E73.py
 testsuite/E90.py
 testsuite/W19.py
 testsuite/W29.py
@@ -49,6 +52,8 @@ testsuite/python3.py
 testsuite/support.py
 testsuite/test_all.py
 testsuite/test_api.py
+testsuite/test_parser.py
 testsuite/test_shell.py
+testsuite/test_util.py
 testsuite/utf-8-bom.py
 testsuite/utf-8.py

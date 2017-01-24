@@ -22,7 +22,7 @@ Contents:
    developer
 
 * Online documentation: http://pep8.readthedocs.org/
-* Source code and issue tracker: https://github.com/jcrocholl/pep8
+* Source code and issue tracker: https://github.com/pycqa/pep8
 
 
 Indices and tables
@@ -37,7 +37,7 @@ Credits
 
 Created by Johann C. Rocholl.
 
-Maintained by Florent Xicluna.
+Maintained by Florent Xicluna and Ian Lee.
 
 
 .. _license:

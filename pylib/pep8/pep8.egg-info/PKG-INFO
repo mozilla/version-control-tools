@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: pep8
-Version: 1.4.6
+Version: 1.7.0
 Summary: Python style guide checker
 Home-page: http://pep8.readthedocs.org/
 Author: Johann C. Rocholl
@@ -86,21 +86,267 @@ Description: pep8 - Python style guide checker
         Links
         -----
         
-        .. image:: https://api.travis-ci.org/jcrocholl/pep8.png?branch=master
-           :target: https://travis-ci.org/jcrocholl/pep8
+        .. image:: https://api.travis-ci.org/PyCQA/pep8.png?branch=master
+           :target: https://travis-ci.org/PyCQA/pep8
            :alt: Build status
+        
+        .. image:: https://pypip.in/wheel/pep8/badge.png?branch=master
+           :target: https://pypi.python.org/pypi/pep8
+           :alt: Wheel Status
         
         * `Read the documentation <http://pep8.readthedocs.org/>`_
         
-        * `Fork me on GitHub <http://github.com/jcrocholl/pep8>`_
+        * `Fork me on GitHub <http://github.com/PyCQA/pep8>`_
         
         
         Changelog
         =========
         
         
+        1.7.0 (2016-01-12)
+        ------------------
+        
+        Announcements:
+        
+        * Repository moved to PyCQA Organization on GitHub:
+          https://github.com/pycqa/pep8
+        
+        Changes:
+        
+        * Reverted the fix in #368, "options passed on command line are only ones
+          accepted" feature. This has many unintended consequences in pep8 and flake8
+          and needs to be reworked when I have more time.
+        * Added support for Python 3.5. (Issue #420 & #459)
+        * Added support for multi-line config_file option parsing. (Issue #429)
+        * Improved parameter parsing. (Issues #420 & #456)
+        
+        Bugs:
+        
+        * Fixed BytesWarning on Python 3. (Issue #459)
+        
+        1.6.2 (2015-02-15)
+        ------------------
+        
+        Changes:
+        
+        * Added check for breaking around a binary operator. (Issue #197, Pull #305)
+        
+        Bugs:
+        
+        * Restored config_file parameter in process_options(). (Issue #380)
+        
+        
+        1.6.1 (2015-02-08)
+        ------------------
+        
+        Changes:
+        
+        * Assign variables before referenced. (Issue #287)
+        
+        Bugs:
+        
+        * Exception thrown due to unassigned ``local_dir`` variable. (Issue #377)
+        
+        
+        1.6.0 (2015-02-06)
+        ------------------
+        
+        News:
+        
+        * Ian Lee <ianlee1521@gmail.com> joined the project as a maintainer.
+        
+        Changes:
+        
+        * Report E731 for lambda assignment. (Issue #277)
+        
+        * Report E704 for one-liner def instead of E701.
+          Do not report this error in the default configuration. (Issue #277)
+        
+        * Replace codes E111, E112 and E113 with codes E114, E115 and E116
+          for bad indentation of comments. (Issue #274)
+        
+        * Report E266 instead of E265 when the block comment starts with
+          multiple ``#``. (Issue #270)
+        
+        * Report E402 for import statements not at the top of the file. (Issue #264)
+        
+        * Do not enforce whitespaces around ``**`` operator. (Issue #292)
+        
+        * Strip whitespace from around paths during normalization. (Issue #339 / #343)
+        
+        * Update ``--format`` documentation. (Issue #198 / Pull Request #310)
+        
+        * Add ``.tox/`` to default excludes. (Issue #335)
+        
+        * Do not report E121 or E126 in the default configuration. (Issues #256 / #316)
+        
+        * Allow spaces around the equals sign in an annotated function. (Issue #357)
+        
+        * Allow trailing backslash if in an inline comment. (Issue #374)
+        
+        * If ``--config`` is used, only that configuration is processed. Otherwise,
+          merge the user and local configurations are merged. (Issue #368 / #369)
+        
+        Bug fixes:
+        
+        * Don't crash if Checker.build_tokens_line() returns None. (Issue #306)
+        
+        * Don't crash if os.path.expanduser() throws an ImportError. (Issue #297)
+        
+        * Missing space around keyword parameter equal not always reported, E251.
+          (Issue #323)
+        
+        * Fix false positive E711/E712/E713. (Issues #330 and #336)
+        
+        * Do not skip physical checks if the newline is escaped. (Issue #319)
+        
+        * Flush sys.stdout to avoid race conditions with printing. See flake8 bug:
+          https://gitlab.com/pycqa/flake8/issues/17 for more details. (Issue #363)
+        
+        
+        1.5.7 (2014-05-29)
+        ------------------
+        
+        Bug fixes:
+        
+        * Skip the traceback on "Broken pipe" signal. (Issue #275)
+        
+        * Do not exit when an option in ``setup.cfg`` or ``tox.ini``
+          is not recognized.
+        
+        * Check the last line even if it does not end with a newline. (Issue #286)
+        
+        * Always open files in universal newlines mode in Python 2. (Issue #288)
+        
+        
+        1.5.6 (2014-04-14)
+        ------------------
+        
+        Bug fixes:
+        
+        * Check the last line even if it has no end-of-line. (Issue #273)
+        
+        
+        1.5.5 (2014-04-10)
+        ------------------
+        
+        Bug fixes:
+        
+        * Fix regression with E22 checks and inline comments. (Issue #271)
+        
+        
+        1.5.4 (2014-04-07)
+        ------------------
+        
+        Bug fixes:
+        
+        * Fix negative offset with E303 before a multi-line docstring.
+          (Issue #269)
+        
+        
+        1.5.3 (2014-04-04)
+        ------------------
+        
+        Bug fixes:
+        
+        * Fix wrong offset computation when error is on the last char
+          of a physical line. (Issue #268)
+        
+        
+        1.5.2 (2014-04-04)
+        ------------------
+        
+        Changes:
+        
+        * Distribute a universal wheel file.
+        
+        Bug fixes:
+        
+        * Report correct line number for E303 with comments. (Issue #60)
+        
+        * Do not allow newline after parameter equal. (Issue #252)
+        
+        * Fix line number reported for multi-line strings. (Issue #220)
+        
+        * Fix false positive E121/E126 with multi-line strings. (Issue #265)
+        
+        * Fix E501 not detected in comments with Python 2.5.
+        
+        * Fix caret position with ``--show-source`` when line contains tabs.
+        
+        
+        1.5.1 (2014-03-27)
+        ------------------
+        
+        Bug fixes:
+        
+        * Fix a crash with E125 on multi-line strings. (Issue #263)
+        
+        
+        1.5 (2014-03-26)
+        ----------------
+        
+        Changes:
+        
+        * Report E129 instead of E125 for visually indented line with same
+          indent as next logical line.  (Issue #126)
+        
+        * Report E265 for space before block comment. (Issue #190)
+        
+        * Report E713 and E714 when operators ``not in`` and ``is not`` are
+          recommended. (Issue #236)
+        
+        * Allow long lines in multiline strings and comments if they cannot
+          be wrapped. (Issue #224).
+        
+        * Optionally disable physical line checks inside multiline strings,
+          using ``# noqa``. (Issue #242)
+        
+        * Change text for E121 to report "continuation line under-indented
+          for hanging indent" instead of indentation not being a
+          multiple of 4.
+        
+        * Report E131 instead of E121 / E126 if the hanging indent is not
+          consistent within the same continuation block.  It helps when
+          error E121 or E126 is in the ``ignore`` list.
+        
+        * Report E126 instead of E121 when the continuation line is hanging
+          with extra indentation, even if indentation is not a multiple of 4.
+        
+        Bug fixes:
+        
+        * Allow the checkers to report errors on empty files. (Issue #240)
+        
+        * Fix ignoring too many checks when ``--select`` is used with codes
+          declared in a flake8 extension. (Issue #216)
+        
+        * Fix regression with multiple brackets. (Issue #214)
+        
+        * Fix ``StyleGuide`` to parse the local configuration if the
+          keyword argument ``paths`` is specified. (Issue #246)
+        
+        * Fix a false positive E124 for hanging indent. (Issue #254)
+        
+        * Fix a false positive E126 with embedded colon. (Issue #144)
+        
+        * Fix a false positive E126 when indenting with tabs. (Issue #204)
+        
+        * Fix behaviour when ``exclude`` is in the configuration file and
+          the current directory is not the project directory. (Issue #247)
+        
+        * The logical checks can return ``None`` instead of an empty iterator.
+          (Issue #250)
+        
+        * Do not report multiple E101 if only the first indentation starts
+          with a tab. (Issue #237)
+        
+        * Fix a rare false positive W602. (Issue #34)
+        
+        
         1.4.6 (2013-07-02)
         ------------------
+        
+        Changes:
         
         * Honor ``# noqa`` for errors E711 and E712. (Issue #180)
         
@@ -112,8 +358,6 @@ Description: pep8 - Python style guide checker
         
         * Compare full path when excluding a file. (Issue #186)
         
-        * Correctly report other E12 errors when E123 is ignored. (Issue #103)
-        
         * New option ``--hang-closing`` to switch to the alternative style of
           closing bracket indentation for hanging indent.  Add error E133 for
           closing bracket which is missing indentation. (Issue #103)
@@ -121,8 +365,12 @@ Description: pep8 - Python style guide checker
         * Accept both styles of closing bracket indentation for hanging indent.
           Do not report error E123 in the default configuration. (Issue #103)
         
+        Bug fixes:
+        
         * Do not crash when running AST checks and the document contains null bytes.
           (Issue #184)
+        
+        * Correctly report other E12 errors when E123 is ignored. (Issue #103)
         
         * Fix false positive E261/E262 when the file contains a BOM. (Issue #193)
         
@@ -367,7 +615,7 @@ Description: pep8 - Python style guide checker
         * Fix E901 when printing source with ``--show-source``.
         
         * Report all errors for each checker, instead of reporting only the
-          first occurence for each line.
+          first occurrence for each line.
         
         * Option ``--show-pep8`` implies ``--first``.
         
@@ -401,7 +649,7 @@ Description: pep8 - Python style guide checker
         0.7.0 (2012-03-26)
         ------------------
         
-        * Now ``--first`` prints only the first occurence of each error.
+        * Now ``--first`` prints only the first occurrence of each error.
           The ``--repeat`` flag becomes obsolete because it is the default
           behaviour. (Issue #6)
         
