@@ -878,3 +878,86 @@ Clean up by disabling the systemd services::
 
    $ systemctl disable kafka.service
    $ systemctl disable zookeeper.service
+
+Kafka Nuclear Option
+--------------------
+
+If Kafka and/or Zookeeper lose quorum or the state of the cluster gets
+*out of sync*, it might be necessary to *reset* the cluster.
+
+A hard *reset* of the cluster is the *nuclear option*: full data wipe and
+starting the cluster from scratch.
+
+A full reset consists of the following steps:
+
+1. Stop all Kafka consumers and writers
+2. Stop all Kafka and Zookeeper processes
+3. Remove all Kafka and Zookeeper data
+4. Define Zookeeper ID on each node
+5. Start Zookeeper 1 node at a time
+6. Start Kafka 1 node at a time
+7. Start all Kafka consumers and writers
+
+To stop all Kafka consumers and writers::
+
+   # hgweb*
+   $ systemctl stop vcsreplicator@*.service
+
+   # hgssh*
+   $ systemctl stop hg-master.target
+
+You will also want to make all repositories read-only by creating the
+``/etc/mercurial/readonlyreason`` file (and having the content say that
+pushes are disabled for maintenance reasons).
+
+To stop all Kafka and Zookeeper processes::
+
+   $ systemctl stop kafka.service
+   $ systemctl stop zookeeper.service
+
+To remove all Kafka and Zookeeper data::
+
+   $ rm -rf /var/lib/kafka /var/lib/zookeeper
+
+To define the Zookeeper ID on each node (the ``/var/lib/zookeeper/myid`` file),
+perform an Ansible deploy::
+
+   $ ./deploy hgmo
+
+.. note::
+
+   The deploy may fail to create some Kafka topics. This is OK.
+
+Then, start Zookeeper one node at a time::
+
+   $ systemctl start zookeeper.service
+
+Then, start Kafka one node at a time::
+
+   $ systemctl start kafka.service
+
+At this point, the Kafka cluster should be running. Perform an Ansible deploy
+again to create necessary Kafka topics::
+
+   $ ./deploy hgmo
+
+At this point, the Kafka cluster should be fully capable of handling
+hg.mo events. Nagios alerts related to Kafka and Zookeeper should clear.
+
+You can now start consumer daemons::
+
+   # hgweb
+   $ systemctl start vcsreplicator@*.service
+
+   # hgssh
+   $ systemctl start hg-master.target
+
+When starting the consumer daemons, look at the journal logs for any issues
+connecting to Kafka.
+
+As soon as the daemons start running, all Nagios alerts for the systems should
+clear.
+
+Finally, make repositories pushable again::
+
+   $ rm /etc/mercurial/readonlyreason
