@@ -1,7 +1,7 @@
-
 Contributors
 ------------
 
+* Phil Frost - Former Divmod Team
 * Moe Aboulkheir - Former Divmod Team
 * Jean-Paul Calderone - Former Divmod Team
 * Glyph Lefkowitz - Former Divmod Team
@@ -17,3 +17,6 @@ Contributors
 * Marcin Cieślak
 * Steven Myint
 * Ignas Mikalajūnas
+
+See also the contributors list on GitHub:
+https://github.com/PyCQA/pyflakes/graphs/contributors

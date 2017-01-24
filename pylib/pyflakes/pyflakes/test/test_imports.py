@@ -2,7 +2,98 @@
 from sys import version_info
 
 from pyflakes import messages as m
+from pyflakes.checker import (
+    FutureImportation,
+    Importation,
+    ImportationFrom,
+    StarImportation,
+    SubmoduleImportation,
+)
 from pyflakes.test.harness import TestCase, skip, skipIf
+
+
+class TestImportationObject(TestCase):
+
+    def test_import_basic(self):
+        binding = Importation('a', None, 'a')
+        assert binding.source_statement == 'import a'
+        assert str(binding) == 'a'
+
+    def test_import_as(self):
+        binding = Importation('c', None, 'a')
+        assert binding.source_statement == 'import a as c'
+        assert str(binding) == 'a as c'
+
+    def test_import_submodule(self):
+        binding = SubmoduleImportation('a.b', None)
+        assert binding.source_statement == 'import a.b'
+        assert str(binding) == 'a.b'
+
+    def test_import_submodule_as(self):
+        # A submodule import with an as clause is not a SubmoduleImportation
+        binding = Importation('c', None, 'a.b')
+        assert binding.source_statement == 'import a.b as c'
+        assert str(binding) == 'a.b as c'
+
+    def test_import_submodule_as_source_name(self):
+        binding = Importation('a', None, 'a.b')
+        assert binding.source_statement == 'import a.b as a'
+        assert str(binding) == 'a.b as a'
+
+    def test_importfrom_relative(self):
+        binding = ImportationFrom('a', None, '.', 'a')
+        assert binding.source_statement == 'from . import a'
+        assert str(binding) == '.a'
+
+    def test_importfrom_relative_parent(self):
+        binding = ImportationFrom('a', None, '..', 'a')
+        assert binding.source_statement == 'from .. import a'
+        assert str(binding) == '..a'
+
+    def test_importfrom_relative_with_module(self):
+        binding = ImportationFrom('b', None, '..a', 'b')
+        assert binding.source_statement == 'from ..a import b'
+        assert str(binding) == '..a.b'
+
+    def test_importfrom_relative_with_module_as(self):
+        binding = ImportationFrom('c', None, '..a', 'b')
+        assert binding.source_statement == 'from ..a import b as c'
+        assert str(binding) == '..a.b as c'
+
+    def test_importfrom_member(self):
+        binding = ImportationFrom('b', None, 'a', 'b')
+        assert binding.source_statement == 'from a import b'
+        assert str(binding) == 'a.b'
+
+    def test_importfrom_submodule_member(self):
+        binding = ImportationFrom('c', None, 'a.b', 'c')
+        assert binding.source_statement == 'from a.b import c'
+        assert str(binding) == 'a.b.c'
+
+    def test_importfrom_member_as(self):
+        binding = ImportationFrom('c', None, 'a', 'b')
+        assert binding.source_statement == 'from a import b as c'
+        assert str(binding) == 'a.b as c'
+
+    def test_importfrom_submodule_member_as(self):
+        binding = ImportationFrom('d', None, 'a.b', 'c')
+        assert binding.source_statement == 'from a.b import c as d'
+        assert str(binding) == 'a.b.c as d'
+
+    def test_importfrom_star(self):
+        binding = StarImportation('a.b', None)
+        assert binding.source_statement == 'from a.b import *'
+        assert str(binding) == 'a.b.*'
+
+    def test_importfrom_star_relative(self):
+        binding = StarImportation('.b', None)
+        assert binding.source_statement == 'from .b import *'
+        assert str(binding) == '.b.*'
+
+    def test_importfrom_future(self):
+        binding = FutureImportation('print_function', None, None)
+        assert binding.source_statement == 'from __future__ import print_function'
+        assert str(binding) == '__future__.print_function'
 
 
 class Test(TestCase):
@@ -11,16 +102,51 @@ class Test(TestCase):
         self.flakes('import fu, bar', m.UnusedImport, m.UnusedImport)
         self.flakes('from baz import fu, bar', m.UnusedImport, m.UnusedImport)
 
+    def test_unusedImport_relative(self):
+        self.flakes('from . import fu', m.UnusedImport)
+        self.flakes('from . import fu as baz', m.UnusedImport)
+        self.flakes('from .. import fu', m.UnusedImport)
+        self.flakes('from ... import fu', m.UnusedImport)
+        self.flakes('from .. import fu as baz', m.UnusedImport)
+        self.flakes('from .bar import fu', m.UnusedImport)
+        self.flakes('from ..bar import fu', m.UnusedImport)
+        self.flakes('from ...bar import fu', m.UnusedImport)
+        self.flakes('from ...bar import fu as baz', m.UnusedImport)
+
+        checker = self.flakes('from . import fu', m.UnusedImport)
+
+        error = checker.messages[0]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('.fu', )
+
+        checker = self.flakes('from . import fu as baz', m.UnusedImport)
+
+        error = checker.messages[0]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('.fu as baz', )
+
     def test_aliasedImport(self):
         self.flakes('import fu as FU, bar as FU',
                     m.RedefinedWhileUnused, m.UnusedImport)
         self.flakes('from moo import fu as FU, bar as FU',
                     m.RedefinedWhileUnused, m.UnusedImport)
 
+    def test_aliasedImportShadowModule(self):
+        """Imported aliases can shadow the source of the import."""
+        self.flakes('from moo import fu as moo; moo')
+        self.flakes('import fu as fu; fu')
+        self.flakes('import fu.bar as fu; fu')
+
     def test_usedImport(self):
         self.flakes('import fu; print(fu)')
         self.flakes('from baz import fu; print(fu)')
         self.flakes('import fu; del fu')
+
+    def test_usedImport_relative(self):
+        self.flakes('from . import fu; assert fu')
+        self.flakes('from .bar import fu; assert fu')
+        self.flakes('from .. import fu; assert fu')
+        self.flakes('from ..bar import fu as baz; assert baz')
 
     def test_redefinedWhileUnused(self):
         self.flakes('import fu; fu = 3', m.RedefinedWhileUnused)
@@ -54,7 +180,7 @@ class Test(TestCase):
 
     def test_redefinedTry(self):
         """
-        Test that importing a module twice in an try block
+        Test that importing a module twice in a try block
         does raise a warning.
         """
         self.flakes('''
@@ -67,7 +193,7 @@ class Test(TestCase):
 
     def test_redefinedTryExcept(self):
         """
-        Test that importing a module twice in an try
+        Test that importing a module twice in a try
         and except block does not raise a warning.
         """
         self.flakes('''
@@ -172,6 +298,40 @@ class Test(TestCase):
                     pass
         ''', m.RedefinedWhileUnused, m.UnusedImport)
 
+    def test_redefinedInNestedFunctionTwice(self):
+        """
+        Test that shadowing a global name with a nested function definition
+        generates a warning.
+        """
+        self.flakes('''
+        import fu
+        def bar():
+            import fu
+            def baz():
+                def fu():
+                    pass
+        ''',
+                    m.RedefinedWhileUnused, m.RedefinedWhileUnused,
+                    m.UnusedImport, m.UnusedImport)
+
+    def test_redefinedButUsedLater(self):
+        """
+        Test that a global import which is redefined locally,
+        but used later in another scope does not generate a warning.
+        """
+        self.flakes('''
+        import unittest, transport
+
+        class GetTransportTestCase(unittest.TestCase):
+            def test_get_transport(self):
+                transport = 'transport'
+                self.assertIsNotNone(transport)
+
+        class TestTransportMethodArgs(unittest.TestCase):
+            def test_send_defaults(self):
+                transport.Transport()
+        ''')
+
     def test_redefinedByClass(self):
         self.flakes('''
         import fu
@@ -202,6 +362,22 @@ class Test(TestCase):
         print(fu)
         ''')
 
+    def test_importInClass(self):
+        """
+        Test that import within class is a locally scoped attribute.
+        """
+        self.flakes('''
+        class bar:
+            import fu
+        ''')
+
+        self.flakes('''
+        class bar:
+            import fu
+
+        fu
+        ''', m.UndefinedName)
+
     def test_usedInFunction(self):
         self.flakes('''
         import fu
@@ -214,7 +390,7 @@ class Test(TestCase):
         import fu
         def fun(fu):
             print(fu)
-        ''', m.UnusedImport)
+        ''', m.UnusedImport, m.RedefinedWhileUnused)
 
         self.flakes('''
         import fu
@@ -305,7 +481,7 @@ class Test(TestCase):
         import fu
         for fu in range(2):
             pass
-        ''', m.RedefinedWhileUnused)
+        ''', m.ImportShadowedByLoopVar)
 
     def test_shadowedByFor(self):
         """
@@ -328,6 +504,13 @@ class Test(TestCase):
         import fu
         fu.bar()
         for (x, y, z, (a, b, c, (fu,))) in ():
+            pass
+        ''', m.ImportShadowedByLoopVar)
+        # Same with a list instead of a tuple
+        self.flakes('''
+        import fu
+        fu.bar()
+        for [x, y, z, (a, b, c, (fu,))] in ():
             pass
         ''', m.ImportShadowedByLoopVar)
 
@@ -432,8 +615,11 @@ class Test(TestCase):
         self.flakes('import fu; [fu for _ in range(1)]')
         self.flakes('import fu; [1 for _ in range(1) if fu]')
 
+    @skipIf(version_info >= (3,),
+            'in Python 3 list comprehensions execute in a separate scope')
     def test_redefinedByListComp(self):
-        self.flakes('import fu; [1 for fu in range(1)]', m.RedefinedWhileUnused)
+        self.flakes('import fu; [1 for fu in range(1)]',
+                    m.RedefinedInListComp)
 
     def test_usedInTryFinally(self):
         self.flakes('''
@@ -461,10 +647,35 @@ class Test(TestCase):
         ''')
 
     def test_usedInGlobal(self):
+        """
+        A 'global' statement shadowing an unused import should not prevent it
+        from being reported.
+        """
         self.flakes('''
         import fu
         def f(): global fu
         ''', m.UnusedImport)
+
+    def test_usedAndGlobal(self):
+        """
+        A 'global' statement shadowing a used import should not cause it to be
+        reported as unused.
+        """
+        self.flakes('''
+            import foo
+            def f(): global foo
+            def g(): foo.is_used()
+        ''')
+
+    def test_assignedToGlobal(self):
+        """
+        Binding an import to a declared global should not cause it to be
+        reported as unused.
+        """
+        self.flakes('''
+            def f(): global foo; import foo
+            def g(): foo.is_used()
+        ''')
 
     @skipIf(version_info >= (3,), 'deprecated syntax')
     def test_usedInBackquote(self):
@@ -481,7 +692,9 @@ class Test(TestCase):
         self.flakes('import fu; lambda: fu')
 
     def test_shadowedByLambda(self):
-        self.flakes('import fu; lambda fu: fu', m.UnusedImport)
+        self.flakes('import fu; lambda fu: fu',
+                    m.UnusedImport, m.RedefinedWhileUnused)
+        self.flakes('import fu; lambda fu: fu\nfu()')
 
     def test_usedInSliceObj(self):
         self.flakes('import fu; "meow"[::fu]')
@@ -499,7 +712,7 @@ class Test(TestCase):
             import fu
             def fun(self):
                 fu
-        ''', m.UnusedImport, m.UndefinedName)
+        ''', m.UndefinedName)
 
     def test_nestedFunctionsNestScope(self):
         self.flakes('''
@@ -519,7 +732,89 @@ class Test(TestCase):
         ''')
 
     def test_importStar(self):
-        self.flakes('from fu import *', m.ImportStarUsed)
+        """Use of import * at module level is reported."""
+        self.flakes('from fu import *', m.ImportStarUsed, m.UnusedImport)
+        self.flakes('''
+        try:
+            from fu import *
+        except:
+            pass
+        ''', m.ImportStarUsed, m.UnusedImport)
+
+        checker = self.flakes('from fu import *',
+                              m.ImportStarUsed, m.UnusedImport)
+
+        error = checker.messages[0]
+        assert error.message.startswith("'from %s import *' used; unable ")
+        assert error.message_args == ('fu', )
+
+        error = checker.messages[1]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('fu.*', )
+
+    def test_importStar_relative(self):
+        """Use of import * from a relative import is reported."""
+        self.flakes('from .fu import *', m.ImportStarUsed, m.UnusedImport)
+        self.flakes('''
+        try:
+            from .fu import *
+        except:
+            pass
+        ''', m.ImportStarUsed, m.UnusedImport)
+
+        checker = self.flakes('from .fu import *',
+                              m.ImportStarUsed, m.UnusedImport)
+
+        error = checker.messages[0]
+        assert error.message.startswith("'from %s import *' used; unable ")
+        assert error.message_args == ('.fu', )
+
+        error = checker.messages[1]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('.fu.*', )
+
+        checker = self.flakes('from .. import *',
+                              m.ImportStarUsed, m.UnusedImport)
+
+        error = checker.messages[0]
+        assert error.message.startswith("'from %s import *' used; unable ")
+        assert error.message_args == ('..', )
+
+        error = checker.messages[1]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('from .. import *', )
+
+    @skipIf(version_info < (3,),
+            'import * below module level is a warning on Python 2')
+    def test_localImportStar(self):
+        """import * is only allowed at module level."""
+        self.flakes('''
+        def a():
+            from fu import *
+        ''', m.ImportStarNotPermitted)
+        self.flakes('''
+        class a:
+            from fu import *
+        ''', m.ImportStarNotPermitted)
+
+        checker = self.flakes('''
+        class a:
+            from .. import *
+        ''', m.ImportStarNotPermitted)
+        error = checker.messages[0]
+        assert error.message == "'from %s import *' only allowed at module level"
+        assert error.message_args == ('..', )
+
+    @skipIf(version_info > (3,),
+            'import * below module level is an error on Python 3')
+    def test_importStarNested(self):
+        """All star imports are marked as used by an undefined variable."""
+        self.flakes('''
+        from fu import *
+        def f():
+            from bar import *
+            x
+        ''', m.ImportStarUsed, m.ImportStarUsed, m.ImportStarUsage)
 
     def test_packageImport(self):
         """
@@ -566,6 +861,35 @@ class Test(TestCase):
         import fu.baz
         fu.bar, fu.baz
         ''')
+
+    def test_used_package_with_submodule_import(self):
+        """
+        Usage of package marks submodule imports as used.
+        """
+        self.flakes('''
+        import fu
+        import fu.bar
+        fu.x
+        ''')
+
+        self.flakes('''
+        import fu.bar
+        import fu
+        fu.x
+        ''')
+
+    def test_unused_package_with_submodule_import(self):
+        """
+        When a package and its submodule are imported, only report once.
+        """
+        checker = self.flakes('''
+        import fu
+        import fu.bar
+        ''', m.UnusedImport)
+        error = checker.messages[0]
+        assert error.message == '%r imported but unused'
+        assert error.message_args == ('fu.bar', )
+        assert error.lineno == 5 if self.withDoctest else 3
 
     def test_assignRHSFirst(self):
         self.flakes('import fu; fu = fu')
@@ -618,7 +942,6 @@ class Test(TestCase):
             pass
         ''')
 
-    @skip("todo: requires evaluating attribute access")
     def test_importedInClass(self):
         """Imports in class scope can be used through self."""
         self.flakes('''
@@ -626,6 +949,18 @@ class Test(TestCase):
             import i
             def __init__(self):
                 self.i
+        ''')
+
+    def test_importUsedInMethodDefinition(self):
+        """
+        Method named 'foo' with default args referring to module named 'foo'.
+        """
+        self.flakes('''
+        import foo
+
+        class Thing(object):
+            def foo(self, parser=foo.parse_foo):
+                pass
         ''')
 
     def test_futureImport(self):
@@ -650,6 +985,27 @@ class Test(TestCase):
         bar
         ''', m.LateFutureImport)
 
+    def test_futureImportUsed(self):
+        """__future__ is special, but names are injected in the namespace."""
+        self.flakes('''
+        from __future__ import division
+        from __future__ import print_function
+
+        assert print_function is not division
+        ''')
+
+    def test_futureImportUndefined(self):
+        """Importing undefined names from __future__ fails."""
+        self.flakes('''
+        from __future__ import print_statement
+        ''', m.FutureFeatureNotDefined)
+
+    def test_futureImportStar(self):
+        """Importing '*' from __future__ fails."""
+        self.flakes('''
+        from __future__ import *
+        ''', m.FutureFeatureNotDefined)
+
 
 class TestSpecialAll(TestCase):
     """
@@ -668,12 +1024,11 @@ class TestSpecialAll(TestCase):
 
     def test_ignoredInClass(self):
         """
-        An C{__all__} definition does not suppress unused import warnings in a
-        class scope.
+        An C{__all__} definition in a class does not suppress unused import warnings.
         """
         self.flakes('''
+        import bar
         class foo:
-            import bar
             __all__ = ["bar"]
         ''', m.UnusedImport)
 
@@ -686,6 +1041,23 @@ class TestSpecialAll(TestCase):
         import foo
         __all__ = ["foo"]
         ''')
+        self.flakes('''
+        import foo
+        __all__ = ("foo",)
+        ''')
+
+    def test_augmentedAssignment(self):
+        """
+        The C{__all__} variable is defined incrementally.
+        """
+        self.flakes('''
+        import a
+        import c
+        __all__ = ['a']
+        __all__ += ['b']
+        if 1 < 3:
+            __all__ += ['c', 'd']
+        ''', m.UndefinedExport, m.UndefinedExport)
 
     def test_unrecognizable(self):
         """
@@ -724,6 +1096,14 @@ class TestSpecialAll(TestCase):
         from foolib import *
         __all__ = ["foo"]
         ''', m.ImportStarUsed)
+
+    def test_importStarNotExported(self):
+        """Report unused import when not needed to satisfy __all__."""
+        self.flakes('''
+        from foolib import *
+        a = 1
+        __all__ = ['a']
+        ''', m.ImportStarUsed, m.UnusedImport)
 
     def test_usedInGenExp(self):
         """
@@ -769,7 +1149,7 @@ class TestSpecialAll(TestCase):
 
 class Python26Tests(TestCase):
     """
-    Tests for checking of syntax which is valid in PYthon 2.6 and newer.
+    Tests for checking of syntax which is valid in Python 2.6 and newer.
     """
 
     @skipIf(version_info < (2, 6), "Python >= 2.6 only")

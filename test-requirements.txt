@@ -149,8 +149,8 @@ pycodestyle==2.2.0 \
 pycparser==2.14 \
     --hash=sha256:7959b4a74abdc27b312fed1c21e6caf9309ce0b29ea86b591fd2e99ecdf27f73
 
-pyflakes==0.8.1 \
-    --hash=sha256:ac4571695c10ce1536bcdba1a294b9f2d3e6cc9d0ea171b67d50a0864ce3e042
+pyflakes==1.5.0 \
+    --hash=sha256:cc5eadfb38041f8366128786b4ca12700ed05bbf1403d808e89d57d67a3875a7
 
 Pygments==2.1.1 \
     --hash=sha256:05aee25c433d6155defbfbcb6c2e2b0ebf29d28138604867b62a304bd6bbb41d

@@ -3,6 +3,7 @@ LICENSE
 MANIFEST.in
 NEWS.txt
 README.rst
+setup.cfg
 setup.py
 bin/pyflakes
 pyflakes/__init__.py
@@ -21,7 +22,9 @@ pyflakes/scripts/pyflakes.py
 pyflakes/test/__init__.py
 pyflakes/test/harness.py
 pyflakes/test/test_api.py
+pyflakes/test/test_dict.py
 pyflakes/test/test_doctests.py
 pyflakes/test/test_imports.py
 pyflakes/test/test_other.py
+pyflakes/test/test_return_with_arguments_inside_generator.py
 pyflakes/test/test_undefined_names.py
