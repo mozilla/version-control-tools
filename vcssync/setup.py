@@ -14,5 +14,10 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     packages=find_packages(),
-    install_requires=['Mercurial>=4.0'],
+    entry_points={
+        'console_scripts': [
+            'linearize-git=mozvcssync.cli:linearize_git',
+        ],
+    },
+    install_requires=['dulwich>=0.16', 'github3.py>=0.9.6', 'Mercurial>=4.0'],
 )
