@@ -225,13 +225,6 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: unifyrepo.service is enabled and restarted (server only)
-  service: name=unifyrepo.service
-           enabled=yes
-           state=restarted
-  ignore_errors: True
-  when: vct_dir.stat.exists == False
-
 - name: systemd service for bundle generation
   copy: src=hg-bundle-generate.{{ item }}
         dest=/etc/systemd/system/hg-bundle-generate.{{ item }}
@@ -242,11 +235,6 @@
     - service
     - timer
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-
-- name: hg-bundle-generate.timer is enabled (server only)
-  service: name=hg-bundle-generate.timer
-           enabled=yes
   when: vct_dir.stat.exists == False
 
 # Ideally, we would have separate override files for each service. But
@@ -309,13 +297,6 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: pushdataaggregator.service is enabled and restarted (server only)
-  service: name=pushdataaggregator.service
-           enabled=yes
-           state=restarted
-  ignore_errors: True
-  when: vct_dir.stat.exists == False
-
 - name: systemd service file for pulse notification daemon
   copy: src=pulsenotifier.service
         dest=/etc/systemd/system/pulsenotifier.service
@@ -323,13 +304,6 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-
-- name: pulsenotifier.service is enabled and restarted (server only)
-  service: name=pulsenotifier.service
-           enabled=yes
-           state=restarted
-  ignore_errors: True
   when: vct_dir.stat.exists == False
 
 - name: systemd service file for sns notification daemon
@@ -341,9 +315,19 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: snsnotifier.service is enabled and restarted (server only)
-  service: name=snsnotifier.service
+- name: systemd services are enabled (server only)
+  service: name={{ item }}
            enabled=yes
+  when: vct_dir.stat.exists == False
+  with_items:
+    - hg-bundle-generate.timer
+    - pulsenotifier.service
+    - pushdataaggregator.service
+    - snsnotifier.service
+    - unifyrepo.service
+
+- name: restart all services specific to master server (server only)
+  service: name=hg-master.target
            state=restarted
   ignore_errors: True
   when: vct_dir.stat.exists == False
