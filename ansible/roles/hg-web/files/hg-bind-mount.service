@@ -1,7 +1,7 @@
 [Unit]
 Description=Configure hg repos bind mount
 DefaultDependencies=no
-After=repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
+After=repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount repo_local-mozilla-chroot_mozbuild-dev.mount
 Before=local-fs.target
 
 [Service]
@@ -10,9 +10,8 @@ Type=oneshot
 # Re-mount as read-only.
 ExecStart=/bin/mount -o remount,ro,bind /repo_local/mozilla/chroot_mozbuild/repo/hg/mozilla
 
-# We also need a dev filesystem to old urandom. Use a tmpfs for that. This could
-# be in its own unit file. But we leave it here to avoid complexity.
-ExecStart=/bin/mount -T /repo_local/mozilla/chroot_mozbuild/etc/fstab -t tmpfs none /repo_local/mozilla/chroot_mozbuild/dev
+# We also need urandom in the device filesystem. The dev tmpfs is managed by
+# its own unit file so it only is mounted once.
 ExecStart=/usr/bin/mknod -m 444 /repo_local/mozilla/chroot_mozbuild/dev/urandom c 1 9
 
 [Install]

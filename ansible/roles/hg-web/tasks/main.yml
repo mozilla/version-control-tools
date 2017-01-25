@@ -407,6 +407,7 @@
   when: vct_dir.stat.exists == False
   with_items:
     - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
+    - repo_local-mozilla-chroot_mozbuild-dev.mount
     - hg-bind-mount.service
 
 - name: bind mount unit is enabled (server only)
@@ -414,7 +415,6 @@
            enabled=yes
            state=started
   with_items:
-    - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
     - hg-bind-mount.service
   when: vct_dir.stat.exists == False
 
