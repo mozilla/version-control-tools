@@ -1,7 +1,7 @@
 [Unit]
 Description=Configure hg repos bind mount
 DefaultDependencies=no
-After=repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount repo_local-mozilla-chroot_mozbuild-dev.mount repo_local-mozilla-chroot_mozbuild-dev-urandom.service
+Requires=repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount repo_local-mozilla-chroot_mozbuild-dev.mount repo_local-mozilla-chroot_mozbuild-dev-urandom.service
 Before=local-fs.target
 
 [Service]
