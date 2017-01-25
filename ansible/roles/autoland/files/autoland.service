@@ -1,6 +1,6 @@
 [Unit]
 Description=Autoland python daemon
-After=syslog.target network.target auditd.service sshd.service
+After=network.target auditd.service sshd.service
 
 [Service]
 User=autoland

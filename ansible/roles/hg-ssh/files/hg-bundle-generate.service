@@ -1,6 +1,6 @@
 [Unit]
 Description=Generate and Upload Bundle Files for Mercurial repos
-After=network.target syslog.target
+After=network.target
 OnFailure=mail-unit-output@%n.service
 
 [Service]
