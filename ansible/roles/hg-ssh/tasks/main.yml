@@ -216,27 +216,6 @@
         group=root
         mode=0644
 
-- name: systemd service file for unify repo daemon
-  copy: src=unifyrepo.service
-        dest=/etc/systemd/system/unifyrepo.service
-        owner=root
-        group=root
-        mode=0644
-  notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-
-- name: systemd service for bundle generation
-  copy: src=hg-bundle-generate.{{ item }}
-        dest=/etc/systemd/system/hg-bundle-generate.{{ item }}
-        owner=root
-        group=root
-        mode=0644
-  with_items:
-    - service
-    - timer
-  notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-
 # Ideally, we would have separate override files for each service. But
 # it doesn't appear systemd allows there to be a generic e.g.
 # mail-unit-output@.service and an instance e.g.
@@ -288,32 +267,21 @@
     - check_snsnotifier_lag.cfg
   notify: restart nrpe.service
 
-- name: systemd service file for push data aggregation daemon
-  copy: src=pushdataaggregator.service
-        dest=/etc/systemd/system/pushdataaggregator.service
+- name: install systemd unit files
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
         owner=root
         group=root
         mode=0644
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
-
-- name: systemd service file for pulse notification daemon
-  copy: src=pulsenotifier.service
-        dest=/etc/systemd/system/pulsenotifier.service
-        owner=root
-        group=root
-        mode=0644
-  notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-
-- name: systemd service file for sns notification daemon
-  copy: src=snsnotifier.service
-        dest=/etc/systemd/system/snsnotifier.service
-        owner=root
-        group=root
-        mode=0644
-  notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  with_items:
+    - hg-bundle-generate.service
+    - hg-bundle-generate.timer
+    - pulsenotifier.service
+    - pushdataaggregator.service
+    - snsnotifier.service
+    - unifyrepo.service
 
 - name: systemd services are enabled (server only)
   service: name={{ item }}
