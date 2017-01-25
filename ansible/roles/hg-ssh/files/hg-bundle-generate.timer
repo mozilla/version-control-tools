@@ -1,5 +1,6 @@
 [Unit]
 Description=Schedules periodic generation of hg bundles
+PartOf=hg-master.target
 
 # Wait for NFS mount to exist before starting, otherwise AssertPathExists
 # below fails.
