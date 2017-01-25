@@ -1,6 +1,10 @@
 [Unit]
 Description=Schedules periodic generation of hg bundles
 
+# Wait for NFS mount to exist before starting, otherwise AssertPathExists
+# below fails.
+After=remote-fs.target
+
 # We only want to have a single master at a time. Look for a file with the
 # current hostname in it indicating that we are the master.
 AssertPathExists=/repo/hg/master.%H
