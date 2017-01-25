@@ -396,22 +396,26 @@
     - /repo/hg/chroot_mozbuild/repo/hg/mozilla
 
 # In order to get a read-only bind mount, we have to first do a regular
-# bind mount then do a remount. We can't work this magic with the
-# "mount" ansible module, so do it by hand.
-- name: bind mount repositories into mozbuild chroot (servers only)
-  shell: mount -o bind /repo/hg/mozilla /repo/hg/chroot_mozbuild/repo/hg/mozilla && mount -o remount,ro,bind /repo/hg/mozilla /repo/hg/chroot_mozbuild/repo/hg/mozilla creates=/repo/hg/chroot_mozbuild/repo/hg/mozilla/mozilla-central
+# bind mount then do a remount. This is managed by multiple systemd units.
+- name: systemd unit files for repo bind bound (servers only)
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
   when: vct_dir.stat.exists == False
+  with_items:
+    - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
+    - hg-bind-mount.service
 
-- name: create devices mount inside mozbuild chroot (servers only)
-  mount: name=/repo/hg/chroot_mozbuild/dev
-         src=none
-         fstype=tmpfs
-         state=present
-         fstab=/repo/hg/chroot_mozbuild/etc/fstab
-  when: vct_dir.stat.exists == False
-
-- name: configure /dev/urandom in mozbuild chroot (servers only)
-  command: mknod -m 444 /repo_local/mozilla/chroot_mozbuild/dev/urandom c 1 9 creates=/repo_local/mozilla/chroot_mozbuild/dev/urandom
+- name: bind mount unit is enabled (server only)
+  service: name={{ item }}
+           enabled=yes
+           state=started
+  with_items:
+    - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
+    - hg-bind-mount.service
   when: vct_dir.stat.exists == False
 
 - name: synchronize hg templates

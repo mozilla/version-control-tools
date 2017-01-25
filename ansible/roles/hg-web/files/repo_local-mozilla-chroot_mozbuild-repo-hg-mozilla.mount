@@ -1,0 +1,9 @@
+[Unit]
+Description=Bind mount for Mercurial repos
+
+[Mount]
+What=/repo_local/mozilla/mozilla
+Where=/repo_local/mozilla/chroot_mozbuild/repo/hg/mozilla
+# CentOS 7's mount binary doesn't support -o bind,ro. So we have an
+# additional unit file to remount read-only.
+Options=bind
