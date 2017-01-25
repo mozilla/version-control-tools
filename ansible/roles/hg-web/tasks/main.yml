@@ -408,6 +408,7 @@
   with_items:
     - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
     - repo_local-mozilla-chroot_mozbuild-dev.mount
+    - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
     - hg-bind-mount.service
 
 - name: bind mount units are enabled (server only)
@@ -417,6 +418,7 @@
   with_items:
     - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
     - repo_local-mozilla-chroot_mozbuild-dev.mount
+    - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
     - hg-bind-mount.service
   when: vct_dir.stat.exists == False
 

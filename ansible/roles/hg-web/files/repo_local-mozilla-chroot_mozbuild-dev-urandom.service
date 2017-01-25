@@ -1,0 +1,10 @@
+[Unit]
+Description=Create /dev/urandom in hg chroot environment
+DefaultDependencies=no
+After=repo_local-mozilla-chroot_mozbuild-dev.mount
+Before=local-fs.target
+ConditionPathExists=!/repo_local/mozilla/chroot_mozbuild/dev/urandom
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mknod -m 444 /repo_local/mozilla/chroot_mozbuild/dev/urandom c 1 9
