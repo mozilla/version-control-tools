@@ -18,6 +18,5 @@ python-ldap==2.4.20 \
 RBTools==0.7.5 \
     --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
-six==1.9.0 \
-    --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
-
+six==1.10.0 \
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1

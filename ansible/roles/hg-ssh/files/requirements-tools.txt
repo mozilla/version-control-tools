@@ -40,8 +40,8 @@ python-hglib==1.9 \
 s3transfer==0.1.9 \
     --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
 
-six==1.9.0 \
-    --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
+six==1.10.0 \
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
 
 tabulate==0.7.5 \
     --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e

@@ -118,8 +118,8 @@ RBTools==0.7.5 \
 requests==2.4.3 \
     --hash=sha256:124890f41723c85aa82dfe0807432aea46d24aeb0dafce340969d2089548c2c3
 
-six==1.9.0 \
-    --hash=sha256:418a93c397a7edab23e5588dbc067ac74a723edb3d541bd4936f79476e7645da
+six==1.10.0 \
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
 
 Whoosh==2.6.0 \
     --hash=sha256:7de7bc4d00a6d051dbb360b48eb7f3cd002373d87252fb0b284a3c9c453a7677
