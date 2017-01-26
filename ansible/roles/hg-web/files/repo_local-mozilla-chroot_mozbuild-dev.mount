@@ -1,7 +1,6 @@
 [Unit]
 Description=dev filesystem for hg repos bind mount
 DefaultDependencies=no
-After=repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
 Before=local-fs.target
 
 [Mount]

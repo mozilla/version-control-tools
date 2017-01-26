@@ -1,6 +1,7 @@
 [Unit]
 Description=Create /dev/urandom in hg chroot environment
 DefaultDependencies=no
+After=repo_local-mozilla-chroot_mozbuild-dev.mount
 Requires=repo_local-mozilla-chroot_mozbuild-dev.mount
 Before=local-fs.target
 ConditionPathExists=!/repo_local/mozilla/chroot_mozbuild/dev/urandom
