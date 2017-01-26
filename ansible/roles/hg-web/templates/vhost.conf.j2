@@ -58,15 +58,37 @@ LimitRequestFields 1000
     ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
     CustomLog "/var/log/httpd/hg.mozilla.org/access_log" combined env=!image
 
-    # Enable HSTS and CSP. But don't enable for wire protocol requests, as they
-    # are not browsers and it just adds avoidable overhead.
-    <If "(%{QUERY_STRING} !~ /cmd=/) && (%{HTTP_USER_AGENT} !~ m#mercurial/proto#)">
+    # Nested <If> doesn't work reliably. <Location> also doesn't work inside
+    # <If>. So our strategy for complex conditionals is to set an environment
+    # variable then do vanilla <If> or <If> inside <Location>.
+
+    # Set a variable for Mercurial agent and wire protocol requests
+    SetEnvIf User-Agent mercurial\/proto HG_PROTOCOL=1
+    # SetEnvIf can't access the query string. Yes, really. So use mod_rewrite.
+    RewriteCond %{QUERY_STRING} cmd= [NC]
+    RewriteRule ^ - [E=HG_PROTOCOL:1]
+
+    # Enable HSTS unless for HG clients.
+    <If "-z env('HG_PROTOCOL')">
         Header set Strict-Transport-Security max-age=31536000
-        # bugzilla.mo is for l10n
-        # archive.mo, public-artifacts.taskcluster.net, and
-        # queue.taskcluster.net are for reftest analyzer
-        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/ https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
     </If>
+
+    # Enable CSP unless for HG clients.
+    <Location "/">
+        # bugzilla.mo is for l10n
+        # TODO find out URL for l10n tools needing this and restrict to that.
+        <If "-z env('HG_PROTOCOL')">
+            Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        </If>
+    </Location>
+
+    # Reftest analyzer needs a lot of exceptions to work. Bug 1200501
+    # tracks not hosting it from VCS.
+    <Location "/mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml">
+        <If "-z env('HG_PROTOCOL')">
+            Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        </If>
+    </Location>
 </VirtualHost>
 
 # Local variables:
