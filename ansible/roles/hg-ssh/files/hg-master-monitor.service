@@ -1,0 +1,12 @@
+# Triggered periodically by timer to ensure hg-master.target is in appropriate
+# state.
+
+[Unit]
+Description=Ensure hg-master.target is in appropriate state
+OnFailure=mail-unit-output@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/var/hg/version-control-tools/scripts/hg-master-start-stop /repo/hg/master.%H
+User=root
+Group=root

@@ -282,6 +282,8 @@
     - pushdataaggregator.service
     - snsnotifier.service
     - unifyrepo.service
+    - hg-master-monitor.service
+    - hg-master-monitor.timer
 
 - name: systemd services are enabled (server only)
   service: name={{ item }}
@@ -293,6 +295,12 @@
     - pushdataaggregator.service
     - snsnotifier.service
     - unifyrepo.service
+    - hg-master-monitor.timer
+
+- name: ensure hg-master-monitor.timer is started (server only)
+  service: name=hg-master-monitor.timer
+           state=started
+  when: vct_dir.stat.exists == False
 
 - name: restart all services specific to master server (server only)
   service: name=hg-master.target

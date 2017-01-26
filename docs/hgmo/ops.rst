@@ -198,19 +198,64 @@ entries are cargo culted from another repo.
 SSH Server Services
 ===================
 
-This section describes relevant services running on the SSH servers. There
-is a single master server at any given time and a hot standby ready to be
-promoted to master should the master go down.
+This section describes relevant services running on the SSH servers.
 
-hg-master.target
-----------------
+An SSH server can be in 1 of 2 states: *master* or *standby*. At any one
+time, only a single server should be in the *master* state.
 
-This systemd target provides a common target for starting and stopping
-all systemd units that should only be running on the active master server.
+Some services always run on the SSH servers. Some services only run on
+the active master.
 
-The unit only starts if the ``/repo/hg/master.<hostname>`` file is present.
-e.g. ``hgssh1.dmz.scl3.mozilla.com`` will only start the target if
-``/repo/hg/master.hgss1.dmz.scl3.mozilla.com`` is present.
+.. important::
+
+   The services that run on the active master are designed to only have
+   a single global instance. Running multiple instances of these services
+   can result in undefined behavior or event data corruption.
+
+Master Server Management
+------------------------
+
+The current active master server is denoted by the presence of a
+``/repo/hg/master.<hostname>`` file. e.g. the presence of
+``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` indicates that
+``hgssh4.dmz.scl3.mozilla.com`` is the active master.
+
+All services that should have only a single instance (running on the
+master) have systemd unit configs that prevent the unit from starting
+if the ``master.<hostname>`` file for the current server does not exist.
+So, as long as only a single ``master.<hostname>`` file exists, it should
+not be possible to start these services on more than one server.
+
+The ``hg-master.target`` systemd unit provides a common target for
+starting and stopping all systemd units that should only be running on the
+active master server. The unit only starts if the
+``/repo/hg/master.<hostname>`` file is present.
+
+The ``/repo/hg/master.<hostname>`` file is monitored every few seconds by
+the ``hg-master-monitor.timer`` and associated
+``/var/hg/version-control-tools/scripts/hg-master-start-stop`` script.
+This script looks at the status of the ``/repo/hg/master.<hostname>``
+file and the ``hg-master.target`` unit and reconciles the state of
+``hg-master.target`` with what is wanted.
+
+For example, if ``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` exists
+and ``hg-master.target`` isn't active, ``hg-master-start-stop`` will
+start ``hg-master.target``. Similarly, if
+``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` is deleted,
+``hg-master-start-stop`` will ensure ``hg-master.target`` (and all
+associated services by extension) are stopped.
+
+So, the process for transitioning master-only services from one machine
+to another is to delete one ``master.<hostname>`` file then create a
+new ``master.<hostname>`` for the new master.
+
+.. important::
+
+   Since ``hg-master-monitor.timer`` only fires every few seconds and
+   stopping services may take several seconds, one should wait at least
+   60s between removing one ``master.<hostname>`` file and creating a
+   new one for a server server. This limitation could be improved with
+   more advanced service state tracking.
 
 sshd_hg.service
 ---------------

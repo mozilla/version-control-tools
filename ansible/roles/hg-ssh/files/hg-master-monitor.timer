@@ -1,0 +1,14 @@
+# We use a timer to monitor the /repo/hg/master.%H file periodically.
+# Ideally we'd use a path unit. However, the master.%H file is on an
+# NFS volume and path monitoring / inotify doesn't work on NFS volumes.
+
+[Unit]
+Description=Trigger hg-master.target state reconciliation
+After=remote-fs.target
+
+[Timer]
+OnUnitInactiveSec=15
+OnBootSec=60
+
+[Install]
+WantedBy=multi-user.target

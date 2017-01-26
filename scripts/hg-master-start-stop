@@ -1,0 +1,34 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+/usr/bin/systemctl is-active hg-master.target > /dev/null
+
+if [ $? -eq 0 ]; then
+    active=1
+else
+    active=
+fi
+
+# If the master file exists, we are the master and hg-master.target should
+# be running.
+if [ -f $1 ]; then
+    if [[ ! $active ]]; then
+        # We sleep for a few seconds to give services on the old master time to
+        # stop, thus minimizing chances for them running on both machines.
+        echo "hg-master.target not active; starting after 30s sleep..."
+        sleep 30
+        /usr/bin/systemctl start hg-master.target
+    else
+        echo "hg-master.target already started; nothing to do"
+    fi
+# No master file. We shouldn't be running services.
+else
+    if [[ $active ]]; then
+        echo "hg-master.target is active; stopping "
+        /usr/bin/systemctl stop hg-master.target
+    else
+        echo "hg-master.target is already inactive; nothing to do"
+    fi
+fi
