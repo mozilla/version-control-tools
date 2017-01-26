@@ -67,7 +67,7 @@ following:
    and curling ``http://localhost/server-status?auto``. If you see more than
    1 active connection (the connection performing server-status), repeat until
    it goes away.
-5. ``service httpd restart``
+5. ``systemctl restart httpd.service``
 6. Put the host back in service in Zeus.
 7. Repeat 3 to 6 until done with all hosts.
 
