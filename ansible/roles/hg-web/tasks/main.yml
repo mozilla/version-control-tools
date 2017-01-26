@@ -411,15 +411,10 @@
     - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
     - hg-bind-mount.service
 
-- name: bind mount units are enabled (server only)
-  service: name={{ item }}
+- name: main bind mount unit is enabled (server only)
+  service: name=hg-bind-mount.service
            enabled=yes
            state=started
-  with_items:
-    - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
-    - repo_local-mozilla-chroot_mozbuild-dev.mount
-    - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
-    - hg-bind-mount.service
   when: vct_dir.stat.exists == False
 
 - name: synchronize hg templates
