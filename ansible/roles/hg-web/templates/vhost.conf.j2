@@ -63,8 +63,9 @@ LimitRequestFields 1000
     <If "(%{QUERY_STRING} !~ /cmd=/) && (%{HTTP_USER_AGENT} !~ m#mercurial/proto#)">
         Header set Strict-Transport-Security max-age=31536000
         # bugzilla.mo is for l10n
-        # archive.mo and queue.taskcluster.net are for reftest analyzer
-        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/ https://archive.mozilla.org/ https://queue.taskcluster.net/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        # archive.mo, public-artifacts.taskcluster.net, and
+        # queue.taskcluster.net are for reftest analyzer
+        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/ https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
     </If>
 </VirtualHost>
 
