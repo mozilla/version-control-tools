@@ -69,8 +69,8 @@ Mercurial==4.0.1 \
 mimeparse==0.1.3 \
     --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e
 
-mod-wsgi==4.4.11 \
-    --hash=sha256:7dd9540db9797f2a5b491eaff6344643050553ebcbb62f775762cbe3a0343c25
+mod-wsgi==4.5.14 \
+    --hash=sha256:8e6d0ccdea6872b71da2ba0fe5d46ca38a6219becc521dcdc4516992c9fe3247
 
 MozillaPulse==1.0.1 \
     --hash=sha256:dc58b60ab1ace15f5269f8aaf8279b0f6e525d92de73b0f6b6cf8787acfb530c
