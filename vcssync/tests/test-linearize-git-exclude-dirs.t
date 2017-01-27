@@ -97,15 +97,15 @@ Directories can be excluded when linearizing
   1/4 a547cc07d30f025e022b27310c713705158c21b4 initial
   2/4 0ac77c9293242a70f71defcee37a74659207b19e add file1s
   3/4 b7b3abcd50597761f65c0a11846de6ebc98cc5b7 add dir0/file2
+  dropping b7b3abcd50597761f65c0a11846de6ebc98cc5b7 because no tree changes
   4/4 e9fb4537517445c07d491482211919591e4dae45 Merge branch 'head1'
-  4 commits from heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: d8230193bc11a2745bec8258c94b95324f3c4955
+  3 commits from heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: adc3f0cd6e97a4aaded01d4c68119b7566807b07
   $ git log --graph --format=oneline refs/convert/dest/heads/master
-  * d8230193bc11a2745bec8258c94b95324f3c4955 Merge branch 'head1'
-  * 8a2c50c762f3483c5b3d26947d81a0cbe2ba8e69 add dir0/file2
+  * adc3f0cd6e97a4aaded01d4c68119b7566807b07 Merge branch 'head1'
   * 925f1eab825ed50a1f80058c6a1f220c009a8bfd add file1s
   * a547cc07d30f025e022b27310c713705158c21b4 initial
   $ git show -m refs/convert/dest/heads/master
-  commit d8230193bc11a2745bec8258c94b95324f3c4955
+  commit adc3f0cd6e97a4aaded01d4c68119b7566807b07
   Author: test <test@example.com>
   Date:   Thu Jan 1 00:00:00 1970 +0000
   

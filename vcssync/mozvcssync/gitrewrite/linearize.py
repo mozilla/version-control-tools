@@ -192,6 +192,7 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
     if github_client and github_repo and not os.path.exists(github_cache_dir):
         os.mkdir(github_cache_dir)
 
+    last_tree = repo[dest_commit_id].tree if dest_commit_id else None
     rewrite_count = 0
 
     for i, source_commit in enumerate(source_commits):
@@ -206,6 +207,16 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
             dest_commit.tree = prune_directories(repo.object_store,
                                                  dest_commit.tree,
                                                  exclude_dirs).id
+
+        # If the tree is identical to the last commit, the commit is empty.
+        # There is no value in keeping it. So we drop it.
+        #
+        # In some cases, retaining empty commits may be desirable. So this
+        # behavior could be controlled by a function argument if wanted.
+        if dest_commit.tree == last_tree:
+            logger.warn('dropping %s because no tree changes' %
+                        source_commit.id)
+            continue
 
         if use_p2_author and len(source_commit.parents) == 2:
             c = repo[source_commit.parents[1]]
@@ -271,6 +282,7 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
 
         rewrite_count += 1
         dest_commit_id = dest_commit.id
+        last_tree = dest_commit.tree
         result['commit_map'][source_commit.id] = dest_commit_id
 
     result['dest_commit'] = dest_commit_id
