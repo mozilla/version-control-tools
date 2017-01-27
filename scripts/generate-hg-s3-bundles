@@ -30,6 +30,12 @@ CREATES = [
     ('gzip', ['bundle', '-a', '-t', 'gzip-v1'], {}),
     ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {'gd': True}),
     ('bzip2', ['bundle', '-a', '-t', 'bzip2-v1'], {}),
+    # ``zstd`` uses default compression settings and is reasonably fast.
+    # ``zstd-max`` uses the highest available compression settings and is
+    # absurdly slow. But it produces significantly smaller bundles.
+    ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
+    ('zstd-max', ['--config', 'experimental.bundlecomplevel=22',
+                  'bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
     ('stream-legacy', ['streambundle'], {}),
     ('packed1', ['streambundle', '--type', 's1'], {}),
     ('packed1-gd', ['streambundle', '--type', 's1'], {'gd': True}),
@@ -42,6 +48,8 @@ BUNDLECLONE_ORDER = [
 ]
 
 CLONEBUNDLES_ORDER = [
+    ('zstd-max', 'BUNDLESPEC=zstd-v2'),
+    ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
     ('gzip', 'BUNDLESPEC=gzip-v1'),
     ('bzip2', 'BUNDLESPEC=bzip2-v1'),
@@ -103,6 +111,8 @@ HTML_INDEX = '''
     <table border="1">
       <tr>
         <th>Repository</th>
+        <th>zstd</th>
+        <th>zstd (max)</th>
         <th>gzip (v1)</th>
         <th>gzip (v2)</th>
         <th>bz2 (v1)</th>
@@ -120,6 +130,8 @@ HTML_INDEX = '''
 HTML_ENTRY = '''
 <tr>
   <td>{repo}</td>
+  <td class="numeric">{zstd_entry}</td>
+  <td class="numeric">{zstd_max_entry}</td>
   <td class="numeric">{gzip_entry}</td>
   <td class="numeric">{gzip_v2_entry}</td>
   <td class="numeric">{bzip2_entry}</td>
@@ -172,13 +184,16 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
 
 
 def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
-                     legacy_stream=False):
+                     legacy_stream=False, zstd=False, zstd_max=False):
     """Generate bundle files for a repository at a path.
 
     ``bzip2`` denotes whether to generate bzip2 bundles.
     ``legacy_stream`` denotes whether to generate legacy stream bundles
     (required for compatibility with the "bundleclone" extension, which
     pre-dated Mercurial's built-in support for "clonebundles.").
+    ``zstd`` denotes whether to generate zstd bundles.
+    ``zstd_max`` denotes whether to generate zstd bundles with maximum
+    compression.
     """
     # Copy manifest files from the source repository listed. Don't return
     # anything because we don't need to list bundles since this repo isn't
@@ -264,14 +279,24 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
             if t == 'stream-legacy' and not legacy_stream:
                 continue
 
-            # When the repo is generaldelta, only allow generation of
-            # bundles that are compatible with generaldelta. If we don't do
-            # this, CPU usage could blow up attempting to convert a
-            # generaldelta repo to a non-generaldelta compatible bundle.
-            if generaldelta and not opts.get('gd'):
+            # Only generate 1 of zstd or zstd-max since they are redundant.
+            if t == 'zstd' and (not zstd or zstd_max):
                 continue
-            elif not generaldelta and opts.get('gd'):
+
+            if t == 'zstd-max' and not zstd_max:
                 continue
+
+            # The "all" opt allows generation for generaldelta and
+            # non-generaldelta repos. If not set, we key off the generaldelta
+            # state and the "gd" key to determine whether to generate. What
+            # we're trying to prevent is v1 bundle types being generated for
+            # generaldelta repos, which could require a lot of CPU usage to
+            # recalculate deltas.
+            if not opts.get('all'):
+                if generaldelta and not opts.get('gd'):
+                    continue
+                elif not generaldelta and opts.get('gd'):
+                    continue
 
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
             temp_path = '%s.tmp' % final_path
@@ -397,7 +422,8 @@ def generate_index(repos):
 
         opts = {'repo': repo}
 
-        for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd', 'stream-legacy'):
+        for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd',
+                  'stream-legacy', 'zstd', 'zstd-max'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
                 opts[key] = '<a href="{path}">{size:,}</a>'.format(
