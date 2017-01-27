@@ -206,6 +206,9 @@ time, only a single server should be in the *master* state.
 Some services always run on the SSH servers. Some services only run on
 the active master.
 
+The *standby* server is in a state where it is ready to become the
+master at any time (such as if the master crashes).
+
 .. important::
 
    The services that run on the active master are designed to only have
@@ -230,6 +233,12 @@ The ``hg-master.target`` systemd unit provides a common target for
 starting and stopping all systemd units that should only be running on the
 active master server. The unit only starts if the
 ``/repo/hg/master.<hostname>`` file is present.
+
+.. note::
+
+   The ``hg-master.target`` unit only tracks units specific to the master.
+   Services like the sshd daemon processing Mercurial connections are
+   always running and aren't tied to ``hg-master.target``.
 
 The ``/repo/hg/master.<hostname>`` file is monitored every few seconds by
 the ``hg-master-monitor.timer`` and associated
@@ -272,7 +281,8 @@ differences from a typical SSH service are as follows:
   dispatches to Mercurial or performs other adminstrative tasks.
 
 This service should always be running on all servers, even if they aren't
-the master.
+the master. This means that ``hg-master.target`` does not control this
+service.
 
 hg-bundle-generate.timer and hg-bundle-generate.service
 -------------------------------------------------------
