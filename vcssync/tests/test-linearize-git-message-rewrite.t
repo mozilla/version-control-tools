@@ -22,7 +22,7 @@
   linearizing 2 commits from heads/master (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to f3dcf0ea970616078b22c97ff104fa368b61973c)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 f3dcf0ea970616078b22c97ff104fa368b61973c commit 1
-  heads/master converted; original: f3dcf0ea970616078b22c97ff104fa368b61973c; rewritten: 10874c20986a49df5dd96f35017858fc3e52fe70
+  2 commits from heads/master converted; original: f3dcf0ea970616078b22c97ff104fa368b61973c; rewritten: 10874c20986a49df5dd96f35017858fc3e52fe70
 
   $ git cat-file -p 10874c20986a49df5dd96f35017858fc3e52fe70
   tree a229c158b3d5560cc44ad3dec6ff5d13a47e11cf
@@ -73,7 +73,7 @@ Reviewable Markdown can be rewritten to a <key>: <URL> pattern
   linearizing 2 commits from heads/master (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to 9ccde32cb7cc412d2c797a0fea52c258be9b76f2)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 9ccde32cb7cc412d2c797a0fea52c258be9b76f2 Auto merge of #14737 - UK992:package-prefs, r=Wafflespeanut
-  heads/master converted; original: 9ccde32cb7cc412d2c797a0fea52c258be9b76f2; rewritten: 58b5ec5252ed2d3d8ab73d6abae4f6253b88674f
+  2 commits from heads/master converted; original: 9ccde32cb7cc412d2c797a0fea52c258be9b76f2; rewritten: 58b5ec5252ed2d3d8ab73d6abae4f6253b88674f
 
   $ git log convert/dest/heads/master
   commit 58b5ec5252ed2d3d8ab73d6abae4f6253b88674f
@@ -101,7 +101,7 @@ Reviewable.io Markdown can be removed
   linearizing 2 commits from heads/master2 (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to 9ccde32cb7cc412d2c797a0fea52c258be9b76f2)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 9ccde32cb7cc412d2c797a0fea52c258be9b76f2 Auto merge of #14737 - UK992:package-prefs, r=Wafflespeanut
-  heads/master2 converted; original: 9ccde32cb7cc412d2c797a0fea52c258be9b76f2; rewritten: e7fa11e1edfada45a007d36941b4d919f4b7fe5d
+  2 commits from heads/master2 converted; original: 9ccde32cb7cc412d2c797a0fea52c258be9b76f2; rewritten: e7fa11e1edfada45a007d36941b4d919f4b7fe5d
 
   $ git log convert/dest/heads/master2
   commit e7fa11e1edfada45a007d36941b4d919f4b7fe5d
@@ -213,7 +213,7 @@ Servo style commit message syntax rewriting works
   4/6 fa522c79808c18641e57fff1e3a7d67ae802fa04 Auto merge of #6532 - servo/bar-feature, r=gps
   5/6 cf1c79b916bc61fa77a215acb13f00c770d2ac9e auto merge of #4690 : indygreg/servo/some-feature, r=bholley
   6/6 a7332b8424dc931df611b8feab5fa6840218bfa1 Auto merge of #5700 - Ms2ger:content, r=jdm
-  heads/master converted; original: a7332b8424dc931df611b8feab5fa6840218bfa1; rewritten: 804b27caa81d7ac94b2ad48e23f1b152c21c5490
+  6 commits from heads/master converted; original: a7332b8424dc931df611b8feab5fa6840218bfa1; rewritten: 804b27caa81d7ac94b2ad48e23f1b152c21c5490
 
   $ git log refs/convert/dest/heads/master
   commit 804b27caa81d7ac94b2ad48e23f1b152c21c5490

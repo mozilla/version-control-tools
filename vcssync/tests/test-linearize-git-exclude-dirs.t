@@ -72,7 +72,7 @@ Directories can be excluded when linearizing
   2/4 0ac77c9293242a70f71defcee37a74659207b19e add file1s
   3/4 b7b3abcd50597761f65c0a11846de6ebc98cc5b7 add dir0/file2
   4/4 e9fb4537517445c07d491482211919591e4dae45 Merge branch 'head1'
-  heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: d017a118a5429ca800345e6f14e1a61f6f613b57
+  4 commits from heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: d017a118a5429ca800345e6f14e1a61f6f613b57
 
   $ git show -m refs/convert/dest/heads/master
   commit d017a118a5429ca800345e6f14e1a61f6f613b57
@@ -98,7 +98,7 @@ Directories can be excluded when linearizing
   2/4 0ac77c9293242a70f71defcee37a74659207b19e add file1s
   3/4 b7b3abcd50597761f65c0a11846de6ebc98cc5b7 add dir0/file2
   4/4 e9fb4537517445c07d491482211919591e4dae45 Merge branch 'head1'
-  heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: d8230193bc11a2745bec8258c94b95324f3c4955
+  4 commits from heads/master converted; original: e9fb4537517445c07d491482211919591e4dae45; rewritten: d8230193bc11a2745bec8258c94b95324f3c4955
   $ git log --graph --format=oneline refs/convert/dest/heads/master
   * d8230193bc11a2745bec8258c94b95324f3c4955 Merge branch 'head1'
   * 8a2c50c762f3483c5b3d26947d81a0cbe2ba8e69 add dir0/file2
@@ -147,7 +147,7 @@ Excluding an intermediate directory works
   $ linearize-git --exclude-dir dir0/subdir0 . heads/master
   linearizing 1 commits from heads/master (1190a970be8401aac3e4773332dd10f78e4141f2 to 1190a970be8401aac3e4773332dd10f78e4141f2)
   1/1 1190a970be8401aac3e4773332dd10f78e4141f2 initial
-  heads/master converted; original: 1190a970be8401aac3e4773332dd10f78e4141f2; rewritten: 2c092d0f01a4a443e2120c897bc7f1fa3b94c3c5
+  1 commits from heads/master converted; original: 1190a970be8401aac3e4773332dd10f78e4141f2; rewritten: 2c092d0f01a4a443e2120c897bc7f1fa3b94c3c5
 
   $ git ls-tree -r -t refs/convert/dest/heads/master
   040000 tree a5a64b4a01d3e32ff0050e6323ff8abcbce0ded7	dir0
@@ -166,7 +166,7 @@ Excluding an intermediate directory works
   $ linearize-git --exclude-dir dir1 --exclude-dir dir2/subdir0 . heads/master2
   linearizing 1 commits from heads/master2 (1190a970be8401aac3e4773332dd10f78e4141f2 to 1190a970be8401aac3e4773332dd10f78e4141f2)
   1/1 1190a970be8401aac3e4773332dd10f78e4141f2 initial
-  heads/master2 converted; original: 1190a970be8401aac3e4773332dd10f78e4141f2; rewritten: d46fb3759f69a9ed2c56395653cf3e61fad6f5e7
+  1 commits from heads/master2 converted; original: 1190a970be8401aac3e4773332dd10f78e4141f2; rewritten: d46fb3759f69a9ed2c56395653cf3e61fad6f5e7
 
   $ git ls-tree -r -t refs/convert/dest/heads/master2
   040000 tree 871a0c072ebc416415cc682bbda94e7948c8f568	dir0

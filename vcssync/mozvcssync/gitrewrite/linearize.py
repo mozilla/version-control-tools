@@ -192,6 +192,8 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
     if github_client and github_repo and not os.path.exists(github_cache_dir):
         os.mkdir(github_cache_dir)
 
+    rewrite_count = 0
+
     for i, source_commit in enumerate(source_commits):
         logger.warn('%d/%d %s %s' % (
             i + 1, len(source_commits), source_commit.id,
@@ -267,6 +269,7 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
         # Our commit object is fully transformed. Write it.
         repo.object_store.add_object(dest_commit)
 
+        rewrite_count += 1
         dest_commit_id = dest_commit.id
         result['commit_map'][source_commit.id] = dest_commit_id
 
@@ -300,8 +303,8 @@ def linearize_git_repo(git_repo, ref, exclude_dirs=None,
     if res:
         raise Exception('failed to update refs')
 
-    logger.warn('%s converted; original: %s; rewritten: %s' % (
-                ref, head, repo[dest_ref].id))
+    logger.warn('%d commits from %s converted; original: %s; rewritten: %s' % (
+                rewrite_count, ref, head, repo[dest_ref].id))
 
     # Perform a garbage collection so we don't have potentially thousands
     # of loose objects sitting around, as performance will suffer and Git

@@ -27,7 +27,7 @@ Git committer should be retained by default
   $ linearize-git . heads/master
   linearizing 1 commits from heads/master (81ceece45bfdbe831a28eb6b90d196aea1330184 to 81ceece45bfdbe831a28eb6b90d196aea1330184)
   1/1 81ceece45bfdbe831a28eb6b90d196aea1330184 initial
-  heads/master converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 81ceece45bfdbe831a28eb6b90d196aea1330184
+  1 commits from heads/master converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 81ceece45bfdbe831a28eb6b90d196aea1330184
 
   $ git cat-file -p refs/convert/dest/heads/master
   tree 2d2675b9e90bde3e722e6ef55faee52aec2e3857
@@ -41,7 +41,7 @@ Git committer should be retained by default
   $ linearize-git --committer-action keep . heads/keep
   linearizing 1 commits from heads/keep (81ceece45bfdbe831a28eb6b90d196aea1330184 to 81ceece45bfdbe831a28eb6b90d196aea1330184)
   1/1 81ceece45bfdbe831a28eb6b90d196aea1330184 initial
-  heads/keep converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 81ceece45bfdbe831a28eb6b90d196aea1330184
+  1 commits from heads/keep converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 81ceece45bfdbe831a28eb6b90d196aea1330184
 
   $ git cat-file -p refs/convert/dest/heads/keep
   tree 2d2675b9e90bde3e722e6ef55faee52aec2e3857
@@ -55,7 +55,7 @@ use-author copies author to committer
   $ linearize-git --committer-action use-author . heads/use-author
   linearizing 1 commits from heads/use-author (81ceece45bfdbe831a28eb6b90d196aea1330184 to 81ceece45bfdbe831a28eb6b90d196aea1330184)
   1/1 81ceece45bfdbe831a28eb6b90d196aea1330184 initial
-  heads/use-author converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 42591cc3c328b9e9c0ee9ae6e4573894b17ba691
+  1 commits from heads/use-author converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 42591cc3c328b9e9c0ee9ae6e4573894b17ba691
 
   $ git cat-file -p refs/convert/dest/heads/use-author
   tree 2d2675b9e90bde3e722e6ef55faee52aec2e3857
@@ -69,7 +69,7 @@ use-committer copies committer to author
   $ linearize-git --committer-action use-committer . heads/use-committer
   linearizing 1 commits from heads/use-committer (81ceece45bfdbe831a28eb6b90d196aea1330184 to 81ceece45bfdbe831a28eb6b90d196aea1330184)
   1/1 81ceece45bfdbe831a28eb6b90d196aea1330184 initial
-  heads/use-committer converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 610b4fec36ab4c55172fa95cfa9c462323ad335f
+  1 commits from heads/use-committer converted; original: 81ceece45bfdbe831a28eb6b90d196aea1330184; rewritten: 610b4fec36ab4c55172fa95cfa9c462323ad335f
 
   $ git cat-file -p refs/convert/dest/heads/use-committer
   tree 2d2675b9e90bde3e722e6ef55faee52aec2e3857

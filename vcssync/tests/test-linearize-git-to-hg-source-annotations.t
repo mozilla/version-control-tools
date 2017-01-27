@@ -19,7 +19,7 @@ Note: since source repo is in $TESTTMP which is dynamic, commit SHA-1s aren't st
   9/11 7a13658c4512ce4c99800417db933f4a1d3fdcb3 dummy commit 2 on master
   10/11 fc30a4fbd1fe16d4c84ca50119e0c404c13967a3 Merge branch 'head2'
   11/11 a447b9b0ff25bf17daab1c7edae4a998eca0adac dummy commit 1 after merge
-  heads/master converted; original: a447b9b0ff25bf17daab1c7edae4a998eca0adac; rewritten: * (glob)
+  11 commits from heads/master converted; original: a447b9b0ff25bf17daab1c7edae4a998eca0adac; rewritten: * (glob)
   converting 11 Git commits
   scanning source...
   sorting...

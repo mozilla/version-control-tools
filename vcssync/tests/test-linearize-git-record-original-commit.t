@@ -31,7 +31,7 @@ Source repo annotations work
   linearizing 2 commits from heads/master2 (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to 4064f3a8845ed27962b26096cfae39610ea97c8e)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 4064f3a8845ed27962b26096cfae39610ea97c8e commit 1
-  heads/master2 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: 08225afa188929f3b1b5b06d2dff1e0a6dbbd707
+  2 commits from heads/master2 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: 08225afa188929f3b1b5b06d2dff1e0a6dbbd707
 
   $ git cat-file -p 08225afa188929f3b1b5b06d2dff1e0a6dbbd707
   tree a229c158b3d5560cc44ad3dec6ff5d13a47e11cf
@@ -48,7 +48,7 @@ Source repo annotations work
   linearizing 2 commits from heads/master3 (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to 4064f3a8845ed27962b26096cfae39610ea97c8e)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 4064f3a8845ed27962b26096cfae39610ea97c8e commit 1
-  heads/master3 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: f7fabf46f67fae5f49e2776b72307a7d17cd560f
+  2 commits from heads/master3 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: f7fabf46f67fae5f49e2776b72307a7d17cd560f
 
   $ git cat-file -p f7fabf46f67fae5f49e2776b72307a7d17cd560f
   tree a229c158b3d5560cc44ad3dec6ff5d13a47e11cf
@@ -65,7 +65,7 @@ Source repo annotations work
   linearizing 2 commits from heads/master4 (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to 4064f3a8845ed27962b26096cfae39610ea97c8e)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 4064f3a8845ed27962b26096cfae39610ea97c8e commit 1
-  heads/master4 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: e39b36eab045450d8cf25e77532aa5c062da792d
+  2 commits from heads/master4 converted; original: 4064f3a8845ed27962b26096cfae39610ea97c8e; rewritten: e39b36eab045450d8cf25e77532aa5c062da792d
 
   $ git cat-file -p e39b36eab045450d8cf25e77532aa5c062da792d
   tree a229c158b3d5560cc44ad3dec6ff5d13a47e11cf

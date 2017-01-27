@@ -43,7 +43,7 @@ Using p2 parent for rewritten merge commit works
   1/3 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/3 3859ebb89b4a8ef66d455f7f0d550a8a609154da 1
   3/3 1d7609530bb5efe1b11c2be19368669f9892e055 Merge branch 'feature-branch'
-  heads/master converted; original: 1d7609530bb5efe1b11c2be19368669f9892e055; rewritten: 534e8c7588c35783ba75712dc4549852a65ed720
+  3 commits from heads/master converted; original: 1d7609530bb5efe1b11c2be19368669f9892e055; rewritten: 534e8c7588c35783ba75712dc4549852a65ed720
 
   $ git log convert/dest/heads/master
   commit 534e8c7588c35783ba75712dc4549852a65ed720

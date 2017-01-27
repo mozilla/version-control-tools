@@ -32,7 +32,7 @@ Author map works
   linearizing 2 commits from heads/master (dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf to cb229eaf293faecf0580d4b911000425a3338150)
   1/2 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/2 cb229eaf293faecf0580d4b911000425a3338150 1
-  heads/master converted; original: cb229eaf293faecf0580d4b911000425a3338150; rewritten: cc01022a784bb7973b3ec8c5167c41302426286c
+  2 commits from heads/master converted; original: cb229eaf293faecf0580d4b911000425a3338150; rewritten: cc01022a784bb7973b3ec8c5167c41302426286c
 
   $ git log convert/dest/heads/master
   commit cc01022a784bb7973b3ec8c5167c41302426286c

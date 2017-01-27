@@ -88,7 +88,7 @@ Create a Git repo with multiple heads
   2/4 14ed61bb65666fab453c2c73779776b45a82ed1c add file0 file1 file2
   3/4 bcd219215eeef8329b848347a4df596c97637c8d master c1
   4/4 824ed6bd9a20abbdfc2f30d51697fb38aaeed77f master c2
-  heads/master converted; original: 824ed6bd9a20abbdfc2f30d51697fb38aaeed77f; rewritten: a252594d0435ec401a688422fc9d5d8609411b31
+  4 commits from heads/master converted; original: 824ed6bd9a20abbdfc2f30d51697fb38aaeed77f; rewritten: a252594d0435ec401a688422fc9d5d8609411b31
 
   $ git log --graph --format=oneline convert/dest/heads/master
   * a252594d0435ec401a688422fc9d5d8609411b31 prefix: master c2
@@ -133,7 +133,7 @@ Create a Git repo with multiple heads
   1/3 9f1866ba6011fb3621d68dcaa917d8d3044d7ccd master c3
   2/3 8a64d1d9fabfd12eb7c8c2876b3a09b80a60657f Merge branch 'head1'
   3/3 c2aa3459b5fb3528e9808b6229a67165b4a3b565 Merge branch 'head2'
-  heads/master converted; original: c2aa3459b5fb3528e9808b6229a67165b4a3b565; rewritten: 5d54e9062c565acba8fe3b7dda7e7fd1c29e550c
+  3 commits from heads/master converted; original: c2aa3459b5fb3528e9808b6229a67165b4a3b565; rewritten: 5d54e9062c565acba8fe3b7dda7e7fd1c29e550c
 
   $ git log --graph --format=oneline refs/convert/dest/heads/master
   * 5d54e9062c565acba8fe3b7dda7e7fd1c29e550c prefix: Merge branch 'head2'

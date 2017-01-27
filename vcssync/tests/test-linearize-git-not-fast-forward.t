@@ -26,7 +26,7 @@
   1/3 dbd62b82aaf0a7a05665d9455a9b4d490d52ddaf initial
   2/3 f3dcf0ea970616078b22c97ff104fa368b61973c commit 1
   3/3 2a57f453609d9dffe0dad9a0544b792a09d4b234 commit 2
-  heads/master converted; original: 2a57f453609d9dffe0dad9a0544b792a09d4b234; rewritten: 2a57f453609d9dffe0dad9a0544b792a09d4b234
+  3 commits from heads/master converted; original: 2a57f453609d9dffe0dad9a0544b792a09d4b234; rewritten: 2a57f453609d9dffe0dad9a0544b792a09d4b234
 
 Simulate a force push by doing a hard reset + new commit
 
@@ -69,4 +69,4 @@ Resetting back to original will recover
   $ linearize-git . heads/master
   linearizing 1 commits from heads/master (10b45106160cb14fd510875c844f38ea26b559c6 to 10b45106160cb14fd510875c844f38ea26b559c6)
   1/1 10b45106160cb14fd510875c844f38ea26b559c6 commit 3
-  heads/master converted; original: 10b45106160cb14fd510875c844f38ea26b559c6; rewritten: 10b45106160cb14fd510875c844f38ea26b559c6
+  1 commits from heads/master converted; original: 10b45106160cb14fd510875c844f38ea26b559c6; rewritten: 10b45106160cb14fd510875c844f38ea26b559c6

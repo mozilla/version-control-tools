@@ -25,7 +25,7 @@
   9/11 7a13658c4512ce4c99800417db933f4a1d3fdcb3 dummy commit 2 on master
   10/11 fc30a4fbd1fe16d4c84ca50119e0c404c13967a3 Merge branch 'head2'
   11/11 a447b9b0ff25bf17daab1c7edae4a998eca0adac dummy commit 1 after merge
-  heads/master converted; original: a447b9b0ff25bf17daab1c7edae4a998eca0adac; rewritten: aea30981234cf6848489e0ccf541fbf902b27aca
+  11 commits from heads/master converted; original: a447b9b0ff25bf17daab1c7edae4a998eca0adac; rewritten: aea30981234cf6848489e0ccf541fbf902b27aca
   To file://$TESTTMP/grepo-mirror
    * [new branch]      refs/convert/dest/heads/master -> refs/convert/dest/heads/master
    * [new branch]      refs/convert/source/heads/master -> refs/convert/source/heads/master
@@ -76,7 +76,7 @@ Incremental conversion will keep Git repo in sync
      a447b9b..4040c16  master -> master
   linearizing 1 commits from heads/master (4040c1631489c25dd4e0fd1606c4a065e1a24194 to 4040c1631489c25dd4e0fd1606c4a065e1a24194)
   1/1 4040c1631489c25dd4e0fd1606c4a065e1a24194 add incremental
-  heads/master converted; original: 4040c1631489c25dd4e0fd1606c4a065e1a24194; rewritten: d6ec61184bff36a58159341c2584f3cda9dd0b58
+  1 commits from heads/master converted; original: 4040c1631489c25dd4e0fd1606c4a065e1a24194; rewritten: d6ec61184bff36a58159341c2584f3cda9dd0b58
   To file://$TESTTMP/grepo-mirror
      aea3098..d6ec611  refs/convert/dest/heads/master -> refs/convert/dest/heads/master
      a447b9b..4040c16  refs/convert/source/heads/master -> refs/convert/source/heads/master

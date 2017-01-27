@@ -52,7 +52,7 @@ Linearized repo should have no merges
   1/3 a547cc07d30f025e022b27310c713705158c21b4 initial
   2/3 c37ea67cfc02a686d402594235bcba334fb727af add file1
   3/3 9127cbf8ed74dd362cf28e37e8df7864df3057e3 Merge branch 'head1'
-  heads/master converted; original: 9127cbf8ed74dd362cf28e37e8df7864df3057e3; rewritten: 4a8e25bc50dc5e927f209e1cbac8a7c0346b72b7
+  3 commits from heads/master converted; original: 9127cbf8ed74dd362cf28e37e8df7864df3057e3; rewritten: 4a8e25bc50dc5e927f209e1cbac8a7c0346b72b7
 
   $ git log --graph --format=oneline convert/dest/heads/master
   * 4a8e25bc50dc5e927f209e1cbac8a7c0346b72b7 Merge branch 'head1'
@@ -99,7 +99,7 @@ Incremental linearize should only convert new commits, graft on top of existing 
   linearizing 2 commits from heads/master (622273f903fba1c0fabe939ec34a61e804fa66cf to e6c4fa028c4bbb545d8b72667cf224e2141d88e7)
   1/2 622273f903fba1c0fabe939ec34a61e804fa66cf add file2
   2/2 e6c4fa028c4bbb545d8b72667cf224e2141d88e7 add file3
-  heads/master converted; original: e6c4fa028c4bbb545d8b72667cf224e2141d88e7; rewritten: dd15e055c3525362c7d61d09f0e71be97d730415
+  2 commits from heads/master converted; original: e6c4fa028c4bbb545d8b72667cf224e2141d88e7; rewritten: dd15e055c3525362c7d61d09f0e71be97d730415
 
   $ git for-each-ref
   dd15e055c3525362c7d61d09f0e71be97d730415 commit	refs/convert/dest/heads/master
