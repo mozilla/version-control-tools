@@ -1,5 +1,5 @@
 mozilla-central bzip2 legacy_stream
-experimental/mozilla-central-gd
+experimental/mozilla-central-gd zstd-max
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
@@ -13,7 +13,7 @@ mozilla-unified
 build/tools
 build/mozharness
 build/talos
-hgcustom/version-control-tools
+hgcustom/version-control-tools zstd-max
 comm-central bzip2
 projects/ash
 projects/cedar
