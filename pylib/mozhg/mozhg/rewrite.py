@@ -284,8 +284,10 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
         if obsenabled:
             markers = []
             for oldrev, newrev in revmap.items():
-                markers.append((repo[oldrev], (repo[newrev],)))
-            obsolete.createmarkers(repo, markers)
+                if repo[oldrev] != repo[newrev]:
+                    markers.append((repo[oldrev], (repo[newrev],)))
+            if markers:
+                obsolete.createmarkers(repo, markers)
 
         # Move the working directory to the new node, if applicable.
         wdirrev = repo['.'].rev()
@@ -302,10 +304,14 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
 
         tr.close()
 
-        # Unless obsolescence is enabled, strip the old changesets.
+        # Unless obsolescence is enabled, strip any obsolete changesets.
         if not obsenabled:
-            stripnodes = [repo[rev].node() for rev in revmap.keys()]
-            repair.strip(repo.ui, repo, stripnodes, topic=backuptopic)
+            stripnodes = []
+            for oldrev, newrev in revmap.items():
+                if repo[oldrev] != repo[newrev]:
+                    stripnodes.append(repo[oldrev].node())
+            if stripnodes:
+                repair.strip(repo.ui, repo, stripnodes, topic=backuptopic)
 
     finally:
         if tr:

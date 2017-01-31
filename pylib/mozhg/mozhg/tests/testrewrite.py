@@ -7,7 +7,7 @@ from mercurial import (
     cmdutil,
     context,
 )
-
+from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py'))
@@ -22,15 +22,19 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
-@command('rewritemessage', [], 'hg rewrite REVS')
-def rewritemessage(ui, repo, revs=None):
+@command('rewritemessage', [
+    ('', 'unmodified', False, _('Do not modify the revision'), '')
+], 'hg rewrite REVS')
+def rewritemessage(ui, repo, revs=None, **opts):
     nodes = [repo[rev].node() for rev in repo.revs(revs)]
     offset = [0]
 
     def createfn(repo, ctx, revmap, filectxfn):
         parents = newparents(repo, ctx, revmap)
-        memctx = context.memctx(repo, parents,
-                                ctx.description() + '\n%d' % offset[0],
+        description = ctx.description()
+        if not opts['unmodified']:
+            description += '\n%d' % offset[0]
+        memctx = context.memctx(repo, parents, description,
                                 ctx.files(), filectxfn, user=ctx.user(),
                                 date=ctx.date(), extra=ctx.extra())
         status = ctx.p1().status(ctx)

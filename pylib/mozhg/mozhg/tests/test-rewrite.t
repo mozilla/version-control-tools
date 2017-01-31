@@ -103,6 +103,24 @@ Smoke test rewrite a single changeset
   
   
 
+Rewrite a single changeset without modifying the description should leave it
+untouched.
+
+  $ hg rewritemessage 1 --unmodified
+
+  $ hg log -G
+  @  changeset:   1:4f5daa677d00
+  |  tag:         tip
+  |  user:        test
+  |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  summary:     single changeset
+  |
+  o  changeset:   0:96ee1d7354c4
+     user:        test
+     date:        Thu Jan 01 00:00:00 1970 +0000
+     summary:     initial
+  
+
 Rewrite multiple changesets with no children
 
   $ hg up -r 0
