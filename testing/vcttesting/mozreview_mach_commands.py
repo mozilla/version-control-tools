@@ -5,6 +5,8 @@
 import argparse
 import os
 import subprocess
+import sys
+import tempfile
 
 from mach.decorators import (
     CommandArgument,
@@ -368,3 +370,46 @@ class MozReviewCommands(object):
         print('restarting rbweb container')
         subprocess.check_call('docker exec %s /kill-wsgi-procs' % mr.rbweb_id,
                               shell=True)
+
+    @Command('sql', category='mozreview',
+             description='Send commands to sqlite database')
+    @CommandArgument('name', help='Name of container to shell into',
+                     choices={'rbweb'})
+    def sql(self, name):
+        """Run sequence of SQL commands provided in STDIN.
+
+        A tempporary file is created in local filesystem and then copied to the
+        docker container. It is used by sqlite to run stored command sequence.
+        After that file is deleted on the container.
+        """
+        mr = self._get_mozreview(None)
+        container_id = getattr(mr, '%s_id' % name, None)
+        if not container_id:
+            print('No container for %s was found running' % name)
+            return 1
+
+        # Read SQL commands from stdin and store in temp file which will be
+        # deleted when closed.
+        with tempfile.NamedTemporaryFile('w+b') as f:
+            for line in sys.stdin:
+                f.write(line)
+            f.flush()
+            os.fsync(f.fileno())
+
+            # Copy file to the container.
+            subprocess.check_call(
+                'docker cp %(file)s %(container_id)s:/temp_query_file.sql' %
+                {'file': f.name, 'container_id': container_id}, shell=True)
+
+        args = '' if 'TESTTMP' in os.environ else '-it'
+        # Run queries from file on the container's database.
+        subprocess.check_call(
+            'docker exec %(args)s %(container_id)s bash -c "%(sql_cmd)s"' % {
+                'sql_cmd': ('sqlite3 /reviewboard/data/reviewboard.db '
+                            '< /temp_query_file.sql'),
+                'args': args, 'container_id': container_id}, shell=True)
+
+        # Remove the file from the container.
+        subprocess.check_call(
+            'docker exec %(args)s %(container_id)s rm /temp_query_file.sql' % {
+                'args': args, 'container_id': container_id}, shell=True)
