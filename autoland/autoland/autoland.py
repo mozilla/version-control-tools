@@ -223,7 +223,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
     """
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
 
-    mozreview_auth = mozreview.read_credentials()
+    bugzilla_auth = mozreview.instantiate_authentication()
 
     updated = []
     all_posted = True
@@ -237,7 +237,7 @@ def handle_pending_mozreview_updates(logger, dbconn):
         # We allow empty pingback_urls as they make testing easier. We can
         # always check the logs for misconfigured pingback_urls.
         if pingback_url:
-            status_code, text = mozreview.update_review(mozreview_auth,
+            status_code, text = mozreview.update_review(bugzilla_auth,
                                                         pingback_url, data)
             if status_code == 200:
                 updated.append([update_id])
