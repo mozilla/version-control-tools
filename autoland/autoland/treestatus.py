@@ -2,7 +2,7 @@ import config
 import re
 import requests
 
-TREESTATUS_URL = 'https://treestatus.mozilla.org/'
+TREESTATUS_URL = 'https://treestatus.mozilla-releng.net/trees/'
 
 
 def tree_is_open(logger, tree):
@@ -17,9 +17,9 @@ def tree_is_open(logger, tree):
 
     r = None
     try:
-        r = requests.get(treestatus_url + tree + '?format=json', verify=False)
+        r = requests.get(treestatus_url + tree, verify=False)
         if r.status_code == 200:
-            return r.json()['status'] == 'open'
+            return r.json()['result']['status'] == 'open'
         elif r.status_code == 404:
             # We assume unrecognized trees are open
             return True
