@@ -99,6 +99,11 @@
            venv=/var/hg/venv_tools
            requirements=../roles/hg-ssh/files/requirements-tools.txt
 
+- name: create virtualenv with pre-release Mercurial
+  include: ../../../tasks/virtualenv.yml
+           venv=/var/hg/venv_hg_pre
+           requirements=../roles/hg-ssh/files/requirements-hg-pre.txt
+
 # Hooks are referenced in various hgrc files via "python:mozhghooks.*".
 # This means they are imported as Python modules from the "mozhghooks"
 # package. We create a .pth file telling the virtualenv that
