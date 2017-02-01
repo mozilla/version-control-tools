@@ -97,7 +97,7 @@ def handle_pending_transplants(logger, dbconn):
         pingback_url = request.get('pingback_url', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
         tree_open = current_treestatus.setdefault(
-            destination, treestatus.tree_is_open(destination))
+            destination, treestatus.tree_is_open(logger, destination))
 
         if not tree_open:
             handle_treeclosed(transplant_id, tree, rev, destination,
