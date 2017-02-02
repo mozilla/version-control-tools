@@ -193,6 +193,30 @@ To replicate hgrc changes to mirrors after updating an hgrc, simply run::
 The definition of hooks is somewhat inconsistent. Generally speaking, hook
 entries are cargo culted from another repo.
 
+Try Head Management
+===================
+
+The Try repository continuously grows new heads as people push to it.
+There are some version control operations that scale with the number of
+heads. This means that the repository gets slower as the number of heads
+increases.
+
+To work around this slowness, we periodically remove old heads. We do this
+by performing dummy merges. The procedure for this is as follows::
+
+   # Clone the Try repo. This will be very slow unless --uncompressed is used.
+   hg clone --uncompressed -U https://hg.mozilla.org/try
+   cd try
+   # Verify heads to merge (this could take a while on first run)
+   hg log -r 'head() and branch(default) and not public()'
+   # Capture the list of heads to merge
+   hg log -r 'head() and branch(default) and not public()' -T '{node}\n' > heads
+   # Update the working directory to the revision to be merged into. A recent
+   # mozilla-central revision is typically fine.
+   hg up <revision>
+   # Do the merge by invoking `hg debugsetparents` repeatedly
+   for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services
