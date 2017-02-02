@@ -1,4 +1,4 @@
-mozilla-central bzip2 legacy_stream
+mozilla-central bzip2 legacy_stream zstd_max
 experimental/mozilla-central-gd zstd_max
 integration/fx-team
 integration/mozilla-inbound
@@ -9,7 +9,7 @@ releases/mozilla-beta bzip2 legacy_stream
 releases/mozilla-esr45 bzip2 legacy_stream
 releases/mozilla-esr38 bzip2
 releases/mozilla-esr31
-mozilla-unified
+mozilla-unified zstd_max
 build/tools
 build/mozharness
 build/talos
