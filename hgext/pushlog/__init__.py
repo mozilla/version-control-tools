@@ -170,17 +170,10 @@ def addpushmetadata(repo, ctx, d):
         d['pushhead'] = push.nodes[-1]
 
 
-def changesetentry(orig, web, req, tmpl, ctx):
-    """Wraps webutil.changesetentry to provide pushlog metadata to template."""
-    d = orig(web, req, tmpl, ctx)
-    addpushmetadata(web.repo, ctx, d)
-    return d
-
-
-def changelistentry(orig, web, ctx, tmpl):
-    """Wraps webutil.changelistentry to provide pushlog metadata to template."""
-    d = orig(web, ctx, tmpl)
-    addpushmetadata(web.repo, ctx, d)
+def commonentry(orig, repo, ctx):
+    """Wraps webutil.commonentry to provide pushlog metadata to templates."""
+    d = orig(repo, ctx)
+    addpushmetadata(repo, ctx, d)
     return d
 
 
@@ -756,8 +749,7 @@ def extsetup(ui):
     if hasattr(templatekw, 'dockeywords'):
         templatekw.dockeywords.update(keywords)
 
-    extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
-    extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
+    extensions.wrapfunction(webutil, 'commonentry', commonentry)
 
 
 def reposetup(ui, repo):
