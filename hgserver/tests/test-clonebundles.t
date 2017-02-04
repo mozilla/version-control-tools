@@ -32,15 +32,20 @@ And raises during upload since we don't have credentials in the test env
   $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_tools/bin/python -u /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   1 changesets found
+  1 changesets found
   writing 328 bytes for 3 files
   bundle requirements: revlogv1
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   Traceback (most recent call last):
     File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
@@ -75,6 +80,7 @@ An index.html and bundles.json document should be produced
   wrote synchronization message into replication log
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg
+  bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   $ hgmo exec hgssh ls /repo/hg/bundles
   bundles.json
@@ -116,6 +122,11 @@ The full manifest is fetched normally
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
+  https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
@@ -142,6 +153,7 @@ Fetching with an AWS us-west-2 IP will limit to same region URLs
   200
   
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   
 
@@ -156,6 +168,11 @@ Fetching with an AWS IP from "other" region returns full list
   $ http --no-headers --request-header "X-Cluster-Client-IP: 54.248.220.10" ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
+  https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
@@ -194,6 +211,11 @@ The copyfrom=x field copies bundles from another repo
   $ http --no-headers ${HGWEB_0_URL}try?cmd=clonebundles
   200
   
+  https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
@@ -218,6 +240,11 @@ bzip2 bundles created when requested
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
+  https://hg.cdn.mozilla.net/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
@@ -259,35 +286,6 @@ Legacy stream bundles only generated when requested
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-east-1 stream=revlogv1
   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=eu-central-1 stream=revlogv1
 
-zstd bundles created when requested
-
-  $ cd mozilla-central
-  $ echo ztd > foo
-  $ hg commit -m zstd
-  $ hg push >/dev/null
-  $ cd ..
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'mozilla-central zstd' --no-upload > /dev/null
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
-  $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
-  200
-  
-  https://hg.cdn.mozilla.net/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/04de8c7145565ffe061b878c1ec4c197654513ab.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
-
 zstd-max bundles created when requested
 
   $ cd mozilla-central
@@ -301,52 +299,23 @@ zstd-max bundles created when requested
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
-  https://hg.cdn.mozilla.net/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/3c010f45b766cb8c9f24041a078c58576a22fbd8.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
-only zstd-max created if both zstd and zstd-max set
-
-  $ cd mozilla-central
-  $ echo ztd_and_max > foo
-  $ hg commit -m zstd-and-max
-  $ hg push >/dev/null
-  $ cd ..
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'mozilla-central zstd zstd_max' --no-upload > /dev/null
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
-  $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
-  200
-  
-  https://hg.cdn.mozilla.net/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/e5b830f6d033ca863c8a42952b5c2733305a8eed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
-
-Generaldelta repos should create gzip-v2 and streamclone bundles only
+Generaldelta repos should create zstd-v2, gzip-v2, and streamclone bundles only
 
   $ hgmo create-repo generaldelta scm_level_1 --generaldelta
   (recorded repository creation in replication log)
@@ -359,6 +328,11 @@ Generaldelta repos should create gzip-v2 and streamclone bundles only
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'generaldelta' --no-upload > /dev/null
   $ hgmo exec hgssh cat /repo/hg/mozilla/generaldelta/.hg/clonebundles.manifest
+  https://hg.cdn.mozilla.net/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
   https://hg.cdn.mozilla.net/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/generaldelta/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-1

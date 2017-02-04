@@ -184,14 +184,13 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
 
 
 def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
-                     legacy_stream=False, zstd=False, zstd_max=False):
+                     legacy_stream=False, zstd_max=False):
     """Generate bundle files for a repository at a path.
 
     ``bzip2`` denotes whether to generate bzip2 bundles.
     ``legacy_stream`` denotes whether to generate legacy stream bundles
     (required for compatibility with the "bundleclone" extension, which
     pre-dated Mercurial's built-in support for "clonebundles.").
-    ``zstd`` denotes whether to generate zstd bundles.
     ``zstd_max`` denotes whether to generate zstd bundles with maximum
     compression.
     """
@@ -280,7 +279,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
                 continue
 
             # Only generate 1 of zstd or zstd-max since they are redundant.
-            if t == 'zstd' and (not zstd or zstd_max):
+            if t == 'zstd' and zstd_max:
                 continue
 
             if t == 'zstd-max' and not zstd_max:
