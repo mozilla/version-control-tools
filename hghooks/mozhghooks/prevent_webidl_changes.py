@@ -104,18 +104,19 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
             message = c.description().lower()
             email = util.email(c.user()).lower()
+
             def search():
               matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
               for match in matches:
-                  for reviewer in match.split(','):
-                      if reviewer in DOM_peers:
-                          return True
+                  if any(reviewer in DOM_peers for reviewer in match.split(',')):
+                      return True
               # We allow DOM peers to commit changes to WebIDL files without any review
               # requirements assuming that they have looked at the changes they're committing.
-              for peer in DOM_authors:
-                  if peer == email:
-                      return True
+              if any(peer == email for peer in DOM_authors):
+                  return True
+
               return False
+
             webidlReviewed = search()
             if not webidlReviewed and not isBackout(message):
                     error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
