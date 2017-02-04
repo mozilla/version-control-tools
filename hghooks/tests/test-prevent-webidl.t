@@ -279,3 +279,21 @@ Hook should not run when stripping
   $ hg log -T '{rev} {desc}\n'
   1 Bad commit
   0 initial
+
+  $ cd ..
+
+.webidl files in servo/ are immune from the hook
+
+  $ cd client
+  $ mkdir servo
+  $ echo "interface Test{};" > servo/interface.webidl
+  $ hg commit -A -m 'add interface in servo'
+  adding servo/interface.webidl
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  (39da47648c3c modifies servo/interface.webidl from Servo; not enforcing peer review)

@@ -102,6 +102,13 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             if not file.endswith('.webidl'):
                 continue
 
+            # Ignore WebIDL files in Servo, which come from upstream and have
+            # their own review process.
+            if file.startswith('servo/'):
+                ui.write('(%s modifies %s from Servo; not enforcing peer '
+                         'review)\n' % (short(c.node()), file))
+                continue
+
             message = c.description().lower()
             email = util.email(c.user()).lower()
 
