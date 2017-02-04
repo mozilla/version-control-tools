@@ -99,24 +99,26 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         # Loop through each file for the current changeset
         for file in c.files():
             # Only Check WebIDL Files
-            if file.endswith('.webidl'):
-                message = c.description().lower()
-                email = util.email(c.user()).lower()
-                def search():
-                  matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
-                  for match in matches:
-                      for reviewer in match.split(','):
-                          if reviewer in DOM_peers:
-                              return True
-                  # We allow DOM peers to commit changes to WebIDL files without any review
-                  # requirements assuming that they have looked at the changes they're committing.
-                  for peer in DOM_authors:
-                      if peer == email:
+            if not file.endswith('.webidl'):
+                continue
+
+            message = c.description().lower()
+            email = util.email(c.user()).lower()
+            def search():
+              matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
+              for match in matches:
+                  for reviewer in match.split(','):
+                      if reviewer in DOM_peers:
                           return True
-                  return False
-                webidlReviewed = search()
-                if not webidlReviewed and not isBackout(message):
-                        error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
+              # We allow DOM peers to commit changes to WebIDL files without any review
+              # requirements assuming that they have looked at the changes they're committing.
+              for peer in DOM_authors:
+                  if peer == email:
+                      return True
+              return False
+            webidlReviewed = search()
+            if not webidlReviewed and not isBackout(message):
+                    error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
