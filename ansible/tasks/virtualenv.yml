@@ -35,8 +35,6 @@
 - name: copy requirements.txt
   copy: src={{ requirements }}
         dest={{ venv }}/requirements.txt
-        owner=root
-        group=root
         mode=0644
 
 - name: populate virtualenv {{ venv }}
