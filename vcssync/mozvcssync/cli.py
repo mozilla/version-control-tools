@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import argparse
 import logging
+import os
 import subprocess
 import sys
 
@@ -62,6 +63,14 @@ LINEARIZE_GIT_ARGS = [
 
 def get_git_linearize_kwargs(args):
     kwargs = {}
+
+    # Credentials are sensitive. Allow them to come from environment,
+    # which isn't exposed in e.g. `ps`.
+    for env in ('GITHUB_USERNAME', 'GITHUB_TOKEN'):
+        v = os.environ.get(env)
+        if v is not None:
+            kwargs[env.lower()] = v
+
     for k in ('exclude_dirs', 'summary_prefix', 'reviewable_key',
               'remove_reviewable', 'source_repo_key',
               'source_revision_key', 'normalize_github_merge_message',
