@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
                              git_push_url=None,
+                             hg_push_url=None,
                              move_to_subdir=None,
                              find_copies_harder=False,
                              skip_submodules=False,
@@ -46,6 +47,9 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
 
     If ``git_push_url`` is specified, the local clone (including converted
     commits) will be pushed to that URL.
+
+    If ``hg_push_url`` is specified, the converted Mercurial repo will be
+    pushed to that URL.
 
     The conversion works in phases:
 
@@ -102,6 +106,23 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
 
     rev_map = os.path.join(hg_repo, b'.hg', b'shamap')
 
+    def maybe_push_hg():
+        if not hg_push_url:
+            return
+
+        with hglib.open(hg_repo) as hrepo:
+            logger.warn('checking for outgoing changesets to %s' % hg_push_url)
+            outgoing = hrepo.outgoing(path=hg_push_url)
+            if not outgoing:
+                logger.warn('all changesets already in remote; no push '
+                            'necessary')
+                return
+
+            # We may want to add force=True and newbranch=True here. But
+            # until they are needed, go with the safe defaults.
+            out = hrepo.rawcommand([b'push', hg_push_url])
+            logger.warn(out)
+
     result = {
         'git_result': git_state,
         'rev_map_path': rev_map,
@@ -120,6 +141,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
                     if shas[0] == git_state['dest_commit']:
                         logger.warn('all Git commits have already been '
                                     'converted; not doing anything')
+                        maybe_push_hg()
                         return result
         except IOError:
             # Fall through to doing the conversion. If it's a file permissions
@@ -200,5 +222,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
                 'previous tip: %d:%s; current tip: %d:%s' % (
         convert_count, before_hg_tip_rev, before_hg_tip_node,
         after_hg_tip_rev, after_hg_tip_node))
+
+    maybe_push_hg()
 
     return result
