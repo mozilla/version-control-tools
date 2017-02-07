@@ -24,11 +24,22 @@
     - { name: ius-release-1.0-14.20150727.ius.centos6.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: 331d255903875f47dac8b6acaf299097e70ace2ef55405efc5adb90f1a61158e }
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
 
+- name: download IUS community configuration RPMs (CentOS 7)
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.name }}
+           dest=/var/tmp/{{ item.dest }}
+           sha256sum={{ item.sha256 }}
+  with_items:
+    - { name: ius-release-1.0-14.ius.centos7.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: ec12c81b83c4c57faad496d70782b3b9dd6da2b2d4b585985f3c7da0e93c2979 }
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+
 - name: ensure yum package database up to date
   command: yum search python
   when: ansible_distribution_major_version == '6'
 
-- name: configure IUS Community Repos
+- name: configure IUS Community Repos (Release 6)
   command: yum localinstall -y /var/tmp/epel-release-6-5.noarch.rpm /var/tmp/ius-release-1.0-14.rpm
   when: ansible_distribution_major_version == '6'
 
+- name: configure IUS Community Repos (CentOS 7)
+  command: yum localinstall -y /var/tmp/ius-release-1.0-14.rpm
+  when: ansible_distribution_major_version == '7'
