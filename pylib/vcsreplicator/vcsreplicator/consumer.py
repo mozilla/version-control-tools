@@ -380,6 +380,9 @@ def cli():
     import argparse
     import yaml
 
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('config',
             help='Path to config file to load')

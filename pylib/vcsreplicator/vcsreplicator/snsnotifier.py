@@ -7,6 +7,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import datetime
 import json
 import logging
+import os
 import sys
 
 import boto3
@@ -100,6 +101,9 @@ def on_event(config, message_type, partition, message, created, data):
     logger.warn('finished processing message %d' % message.offset)
 
 def cli():
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
     def validate_config(config):
         if not config.c.has_section('awsevents'):
             print('no [awsevents] config section')
