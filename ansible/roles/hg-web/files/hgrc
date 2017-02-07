@@ -15,7 +15,7 @@ style = gitweb_mozilla
 allow_archive = bz2 gz zip
 templates = /repo_local/mozilla/hg_templates/
 encoding = UTF-8
-baseurl = http://hg.mozilla.org/
+baseurl = https://hg.mozilla.org/
 maxchanges = 20
 guessmime = True
 

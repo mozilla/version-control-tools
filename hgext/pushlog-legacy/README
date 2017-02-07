@@ -12,7 +12,7 @@ file in the apache home directory (/var/www/.hgrc on FC8):
 pushlog-feed = /path/to/pushlog-feed.py
 
 This extension also relies on the gitweb_mozilla templates:
-http://hg.mozilla.org/hgcustom/hg_templates/
+https://hg.mozilla.org/hgcustom/hg_templates/
 
 Clone the hg_templates repository somewhere and add the following lines to the .hgrc:
 [web]

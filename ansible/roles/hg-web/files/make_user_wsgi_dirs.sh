@@ -10,7 +10,7 @@ do
     if [ \! -f $USERDIR/hgweb.config ]
     then
         echo    "[web]"                                     > hgweb.config
-        echo -e "baseurl = http://hg.mozilla.org/users/$i" >> hgweb.config
+        echo -e "baseurl = https://hg.mozilla.org/users/$i" >> hgweb.config
         echo    "[paths]"                                  >> hgweb.config
         echo -e "/ = /repo/hg/mozilla/users/$i/*"          >> hgweb.config
     fi

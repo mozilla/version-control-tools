@@ -5,7 +5,7 @@ SCRIPTDIR=`dirname $0`
 
 rm -rf /tmp/hghooks
 # pull an older revision so we can test using the older hooks and converting
-hg clone -r 6209a348c992 http://hg.mozilla.org/users/bsmedberg_mozilla.com/index.cgi/hghooks/ /tmp/hghooks
+hg clone -r 6209a348c992 https://hg.mozilla.org/users/bsmedberg_mozilla.com/index.cgi/hghooks/ /tmp/hghooks
 
 # need the record script in PATH
 export PATH=$PATH:/tmp/hghooks

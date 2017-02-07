@@ -86,7 +86,7 @@ following:
 
 [1] https://mozilla-version-control-tools.readthedocs.io/en/latest/mozreview.html
 
-[2] http://hg.mozilla.org/try
+[2] https://hg.mozilla.org/try
 
 
 Design
