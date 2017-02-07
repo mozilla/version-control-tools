@@ -1,6 +1,5 @@
 ---
 dependencies:
-  - ius-repo
   - mercurial-yum
   - {
       role: kafka-broker,
