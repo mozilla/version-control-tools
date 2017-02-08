@@ -36,6 +36,9 @@ enabling a config option::
 If you are running a Mercurial older than 3.6, upgrade to leverage the
 clone bundles feature.
 
+Mercurial 4.1 is required to support zstd bundles, which are smaller
+and faster than bundles supported by earlier versions.
+
 Configuring
 ===========
 
@@ -46,7 +49,7 @@ Each listing varies by:
 * Server location
 
 By default, Mercurial uses the first entry in the server-advertised
-bundles list.
+bundles list that the client supports.
 
 The *clone bundles* feature allows the client to define preferences of
 which bundles to fetch. The way this works is the client defines some
@@ -62,7 +65,7 @@ BUNDLESPEC
    This defines the type of bundle.
 
    We currently generate bundles with the following specifications:
-   ``gzip-v1``, ``bzip2-v1``, ``none-packed1``.
+   ``zstd-v2``, ``gzip-v1``, ``gzip-v2``, ``bzip2-v1``, ``none-packed1``.
 
 REQUIRESNI
    Indicates whether the URL requires SNI (a TLS extension). This is set
@@ -71,8 +74,8 @@ REQUIRESNI
 
 ec2region
    The EC2 region the bundle file should be served from. We support
-   ``us-west-2`` and ``us-east-1``. You should prefer the region that is
-   closest to you.
+   ``us-west-1``, ``us-west-2``, ``us-east-1``, ``eu-central-``.
+   You should prefer the region that is closest to you.
 
 cdn
    Indicates whether the URL is on a CDN. Value is ``true`` to indicate
@@ -84,49 +87,53 @@ Example Manifests
 
 Here is an example *clone bundles* manifest::
 
-   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-west-2
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.bzip2.hg BUNDLESPEC=bzip2-v1 ec2region=us-east-1
-   https://hg.cdn.mozilla.net/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4a7526d26bd47ce2e01f938702b91c95424026ed.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
+   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
+   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-1
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-east-1
+   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=eu-central-1
+   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 REQUIRESNI=true cdn=true
+   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-2
+   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-1
+   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1
+   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=eu-central-1
 
 As you can see, listed bundle URLs vary by bundle type (compression and
 format) and location. For each repository we generate bundles for, we
 generate:
 
-1. A gzip bundle (the default compression format)
-2. A bzip2 bundle (smaller, but slower)
-3. A *streaming* bundle file (larger but faster)
+1. A zstd bundle (either default compression or maximum compression depending
+   on repo utilization)
+2. A gzip bundle (the default compression format)
+3. A bzip2 bundle (smaller, but slower)
+4. A *streaming* bundle file (larger but faster)
 
-For each of these bundles, we upload them to 3 locations:
+For each of these bundles, we upload them to the following locations:
 
 1. CloudFront CDN
 2. S3 in us-west-2 region
-3. S3 in us-east-1 region
+3. S3 in us-west-1 region
+4. S3 in us-east-1 region
+5. S3 in eu-central-1 region
 
 Which Bundles to Prefer
 -----------------------
 
-The gzipped bundle hosted on CloudFront is the first entry and is thus
-preferred by clients by default. **This is optimized for developers on
-high speed network connections.**
+The zstd bundle hosted on CloudFrond is the first entry and is thus
+preferred by clients by default.
 
-If you have a slower internet connection, you may want to prefer bzip2
-bundles. While they take several more minutes of CPU time to apply, this
-could be cancelled out from the shorter time required to download them.
-To prefer bzip2 bundles::
+zstd bundles are the smallest bundles and for most people they are
+the ideal bundle to use.
 
-   # clone bundles config (3.7+)
-   [ui]
-   clonebundleprefers = COMPRESSION=bzip2
+.. note::
 
-   # clone bundles config (3.6)
-   [experimental]
-   clonebundleprefers = COMPRESSION=bzip2
+   Mercurial 4.1 is required to use zstd bundles. If an older Mercurial
+   client is used, larger, non-zstd bundles will be used.
 
 If you have a super fast internet connection, you can prefer the
 *packed*/*streaming* bundles. This will transfer 30-40% more data on
