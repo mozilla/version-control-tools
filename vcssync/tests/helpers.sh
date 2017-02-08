@@ -113,3 +113,44 @@ EOF
 
     cd $here
 }
+
+standardoverlayenv() {
+    cat >> $HGRCPATH <<EOF
+[extensions]
+overlay=$TESTDIR/hgext/overlay
+
+[overlay]
+sourceurl = http://example.com/dummy-overlay-source
+EOF
+
+    mkdir server
+    cd server
+    hg init overlay-source
+    cd overlay-source
+    echo source-file0 > source-file0
+    echo source-file1 > source-file1
+    hg commit -A -m 'initial - add source-file0 and source-file1'
+    mkdir dir0
+    echo 1 > dir0/file0
+    hg commit -A -m 'add dir0/file0'
+    cd ..
+
+    hg init overlay-dest
+    cd overlay-dest
+    touch dest-file0 dest-file1
+    hg commit -A -m 'initial in dest'
+    cd ..
+
+    cat > hgweb.conf <<EOF
+[paths]
+/ = $TESTTMP/server/*
+[web]
+refreshinterval = -1
+allow_push = *
+push_ssl = False
+EOF
+
+    hg serve -d -p $HGPORT --pid-file hg.pid --web-conf hgweb.conf
+    cat hg.pid >> $DAEMON_PIDS
+    cd ..
+}

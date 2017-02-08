@@ -21,6 +21,11 @@ from .gitrewrite import (
 from .gitrewrite.linearize import (
     linearize_git_repo,
 )
+from .overlay import (
+    overlay_hg_repos,
+    PushRaceError,
+    PushRemoteFail,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -183,3 +188,61 @@ def linearize_git_to_hg():
         sys.exit(1)
     except subprocess.CalledProcessError:
         sys.exit(1)
+
+
+def overlay_hg_repos_cli():
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--into', required=True,
+                        help='Subdirectory into which changesets will be '
+                              'applied')
+    parser.add_argument('source_repo_url',
+                        help='URL of repository whose changesets will be '
+                             'overlayed')
+    parser.add_argument('dest_repo_url',
+                        help='URL of repository where changesets will be '
+                             'overlayed')
+    parser.add_argument('dest_repo_path',
+                        help='Local path to clone of <dest_repo_url>')
+    parser.add_argument('--result-push-url',
+                        help='URL where to push the overlayed result')
+
+    args = parser.parse_args()
+
+    configure_logging()
+
+    MAX_ATTEMPTS = 3
+    attempt = 0
+
+    while attempt < MAX_ATTEMPTS:
+        attempt += 1
+        try:
+            overlay_hg_repos(
+                args.source_repo_url,
+                args.dest_repo_url,
+                args.dest_repo_path,
+                dest_prefix=args.into,
+                result_push_url=args.result_push_url)
+            sys.exit(0)
+        except PushRaceError:
+            logger.warn('likely push race on attempt %d/%d' % (
+                attempt, MAX_ATTEMPTS))
+            if attempt < MAX_ATTEMPTS:
+                logger.warn('retrying immediately...')
+        except PushRemoteFail:
+            logger.warn('push failed by remote on attempt %d/%d' % (
+                attempt, MAX_ATTEMPTS))
+            logger.warn('giving up since retry is likely futile')
+            break
+        except hglib.error.CommandError:
+            logger.error('abort: hg command failed')
+            sys.exit(1)
+        except Exception as e:
+            logger.exception('abort: %s' % str(e))
+            sys.exit(1)
+
+    logger.error('overlay not successful after %d attempts; try again '
+                 'later' % attempt)
+    sys.exit(1)
