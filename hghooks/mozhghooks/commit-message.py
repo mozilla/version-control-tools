@@ -60,7 +60,7 @@ def isGoodMessage(c):
 
     if isvendorctx(c):
         print('(%s looks like a vendoring change; ignoring commit message '
-              'hook)\n' % short(c.node()))
+              'hook)' % short(c.node()))
         return True
 
     desc = c.description()

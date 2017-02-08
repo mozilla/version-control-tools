@@ -603,7 +603,6 @@ Messages without "Source-Revision: " aren't excluded
   adding file changes
   added 1 changesets with 1 changes to 1 files
   (768c84b471a9 looks like a vendoring change; ignoring commit message hook)
-  
 Change a random file and make sure someone isn't cheating the hook
 
   $ mkdir not-vendored
