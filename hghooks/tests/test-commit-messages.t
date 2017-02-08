@@ -537,3 +537,108 @@ Reapplying a stripped bundle should not trigger hook
   $ hg log -T '{rev} {desc}\n'
   1 bad commit
   0 initial
+
+Commit message hook allows changes to special vendored directories to go through
+
+  $ hg init server-vendor
+  $ cat > server-vendor/.hg/hgrc << EOF
+  > [hooks]
+  > pretxnchangegroup.commit_message = python:mozhghooks.commit-message.hook
+  > EOF
+
+  $ hg -q clone --pull server-vendor client-vendor
+  $ cd client-vendor
+
+  $ touch foo
+  $ hg -q commit -A -m 'Bug 123 - initial'
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+Messages without "Source-Revision: " aren't excluded
+
+  $ mkdir servo
+  $ touch servo/foo
+  $ hg -q commit -A -m 'servo: Merge #42 - Do the thing'
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  
+  ************************** ERROR ****************************
+  Rev 4d8b899b5483 needs "Bug N" or "No bug" in the commit message.
+  test
+  servo: Merge #42 - Do the thing
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]
+
+  $ hg commit --amend -l - << EOF
+  > servo: Merge #42 - do the thing
+  > 
+  > Another line.
+  > 
+  > Source-Repo: https://github.com/servo/servo
+  > Source-Revision: 287b02e21fa2c81d58b070be36add5e951512679
+  > EOF
+  saved backup bundle to $TESTTMP/striptest/client-vendor/.hg/strip-backup/4d8b899b5483-3f97f200-amend-backup.hg (glob)
+
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  (768c84b471a9 looks like a vendoring change; ignoring commit message hook)
+  
+Change a random file and make sure someone isn't cheating the hook
+
+  $ mkdir not-vendored
+  $ touch not-vendored/foo
+  $ hg -q commit -A -l - << EOF
+  > servo: Merge #42 - Not really servo
+  > 
+  > Not a real vendor since file not correct.
+  > 
+  > Source-Repo: https://github.com/servo/servo
+  > Source-Revision: 287b02e21fa2c81d58b070be36add5e951512679
+  > EOF
+
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  
+  ************************** ERROR ****************************
+  Rev 39998d39f844 needs "Bug N" or "No bug" in the commit message.
+  test
+  servo: Merge #42 - Not really servo
+  
+  Not a real vendor since file not correct.
+  
+  Source-Repo: https://github.com/servo/servo
+  Source-Revision: 287b02e21fa2c81d58b070be36add5e951512679
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]

@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import re
-from mercurial.node import hex
+from mercurial.node import hex, short
 
 INVALID_REVIEW_FLAG_RE = re.compile(r'[\s\.;]r\?(?:\w|$)')
 
@@ -31,6 +31,25 @@ goodMessage = [re.compile(x, re.I) for x in [
 
 trySyntax = re.compile(r'\btry:')
 
+VENDORED_PATHS = (
+    'servo/',
+)
+
+def isvendorctx(ctx):
+    # This check isn't strictly necessary. But it does filter out
+    # most changesets without having to inspect the file list.
+    desc = ctx.description()
+    if 'Source-Revision: ' not in desc:
+        return False
+
+    # Other hooks should ensure that only certain users can change
+    # vendored paths.
+    if not any(f.startswith(VENDORED_PATHS) for f in ctx.files()):
+        return False
+
+    return True
+
+
 def isGoodMessage(c):
     def message(fmt):
         print "\n\n************************** ERROR ****************************"
@@ -39,8 +58,14 @@ def isGoodMessage(c):
         print c.description()
         print "*************************************************************\n\n"
 
+    if isvendorctx(c):
+        print('(%s looks like a vendoring change; ignoring commit message '
+              'hook)\n' % short(c.node()))
+        return True
+
     desc = c.description()
     firstline = desc.splitlines()[0]
+
     if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld",
                     "Gaia Pushbot <release+gaiajson@mozilla.com>",
                     "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
