@@ -7,7 +7,7 @@ releases/mozilla-release bzip2 legacy_stream
 releases/mozilla-aurora bzip2 legacy_stream
 releases/mozilla-beta bzip2 legacy_stream
 releases/mozilla-esr45 bzip2 legacy_stream
-releases/mozilla-esr38 bzip2
+releases/mozilla-esr38
 releases/mozilla-esr31
 mozilla-unified zstd_max
 build/tools
