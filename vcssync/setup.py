@@ -18,6 +18,7 @@ setup(
         'console_scripts': [
             'linearize-git=mozvcssync.cli:linearize_git',
             'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
+            'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
         ],
     },
     install_requires=[
