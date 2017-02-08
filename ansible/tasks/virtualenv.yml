@@ -12,6 +12,7 @@
   unarchive: src=/var/tmp/virtualenv-14.0.6.tar.gz
              dest=/var/tmp
              copy=no
+             creates=/var/tmp/virtualenv-14.0.6
 
 - name: install latest packaging wheels to virtualenv package
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
