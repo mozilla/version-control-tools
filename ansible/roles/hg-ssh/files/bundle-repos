@@ -15,7 +15,7 @@ build/tools zstd_max
 build/mozharness zstd_max
 build/talos zstd_max
 hgcustom/version-control-tools zstd_max
-comm-central bzip2
+comm-central bzip2 zstd_max
 projects/ash
 projects/cedar
 projects/holly
