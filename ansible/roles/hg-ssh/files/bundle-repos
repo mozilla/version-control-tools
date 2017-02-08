@@ -6,6 +6,7 @@ integration/b2g-inbound
 releases/mozilla-release bzip2 legacy_stream
 releases/mozilla-aurora bzip2 legacy_stream
 releases/mozilla-beta bzip2 legacy_stream
+releases/mozilla-esr52
 releases/mozilla-esr45 bzip2 legacy_stream
 releases/mozilla-esr38
 releases/mozilla-esr31
