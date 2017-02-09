@@ -195,6 +195,7 @@ def overlay_hg_repos_cli():
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--hg', help='hg executable to use')
     parser.add_argument('--into', required=True,
                         help='Subdirectory into which changesets will be '
                               'applied')
@@ -210,6 +211,9 @@ def overlay_hg_repos_cli():
                         help='URL where to push the overlayed result')
 
     args = parser.parse_args()
+
+    if args.hg:
+        hglib.HGPATH = args.hg
 
     configure_logging()
 
