@@ -212,9 +212,15 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
 
         if response.status_code != 200:
             release_lock(lock_id)
+
+            try:
+                error_message = response.json().get('error')
+            except ValueError:
+                error_message = response.text
+
             return AUTOLAND_ERROR, {
                 'status_code': response.status_code,
-                'message': response.json().get('error'),
+                'message': error_message,
             }
 
         # We succeeded in scheduling the job.
