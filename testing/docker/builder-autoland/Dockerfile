@@ -6,11 +6,11 @@
 
 FROM secure:mozsecure:ubuntu14042:sha256 e08475e91c8b342dce147346a11db16357619ed914aaad4d82be2e6ab743a167:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/ubuntu-trusty-core-cloudimg-amd64-docker-20150630.tar.xz
 
-ENV VCT_HOME /home/ubuntu/version-control-tools
-ENV AUTOLAND_HOME /home/ubuntu/version-control-tools/autoland
+ENV VCT_HOME /home/autoland/version-control-tools
+ENV AUTOLAND_HOME /home/autoland/version-control-tools/autoland
 
-RUN /usr/sbin/groupadd -g 1000 ubuntu
-RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
+RUN /usr/sbin/groupadd -g 1000 autoland
+RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 autoland
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 curl gcc libapache2-mod-wsgi openssh-client postgresql-client \
@@ -35,7 +35,7 @@ EXPOSE 80
 
 # Hg
 RUN pip install Mercurial==3.6.2
-RUN cd /home/ubuntu && hg clone -r 4140d680784e https://bitbucket.org/marmoute/mutable-history
+RUN cd /home/autoland && hg clone -r 4140d680784e https://bitbucket.org/marmoute/mutable-history
 RUN mkdir /repos && hg init /repos/try
 ADD try-hgrc /repos/try/.hg/hgrc
 ADD try_hook.sh /

@@ -323,7 +323,7 @@ class MozReviewWebDriverTest(MozReviewTest):
             publish_button.click()
 
     def dump_autoland_log(self):
-        subprocess.call('docker exec %s cat /home/ubuntu/autoland.log' %
+        subprocess.call('docker exec %s cat /home/autoland/autoland.log' %
                         self.mr.autoland_id, shell=True)
 
     def dump_reviewboard_log(self):
