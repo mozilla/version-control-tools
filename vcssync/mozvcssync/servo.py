@@ -70,7 +70,7 @@ def run_pulse_listener(c):
         subprocess.check_call([b'/bin/sudo',
                                b'/usr/bin/systemctl', b'start',
                                b'servo-linearize.service'],
-                              cwd='/', bufsize=0)
+                              cwd='/', bufsize=1)
         message.ack()
 
     # Overlay Servo changesets from the pristine, converted repo onto
@@ -95,7 +95,7 @@ def run_pulse_listener(c):
         subprocess.check_call([b'/bin/sudo',
                                b'/usr/bin/systemctl', b'start',
                                b'servo-overlay.service'],
-                              cwd='/', bufsize=0)
+                              cwd='/', bufsize=1)
         message.ack()
 
     consumer.github_callbacks.append(on_github_message)
