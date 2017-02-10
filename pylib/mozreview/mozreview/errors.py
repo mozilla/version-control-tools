@@ -30,6 +30,18 @@ class ConfidentialBugError(PublishError):
                               'the patch directly to the bug.')
 
 
+class BugzillaUserMapError(Exception):
+    "Non existing Bugzilla user is mapped to MozReview user."
+
+
+class ReviewerUserMapError(PublishError):
+    def __init__(self, username):
+        PublishError.__init__(self, 'Chosen reviewer (%s) is assigned to a '
+                              'non-existing Bugzilla user. If you believe you '
+                              'received this message in error, please ask for '
+                              'help on IRC#mozreview.' % username)
+
+
 NOT_PARENT = WebAPIError(
     1001,
     "Review request is not a parent",

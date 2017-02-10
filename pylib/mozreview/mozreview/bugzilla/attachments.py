@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 from mozreview.bugzilla.client import (
     BugzillaAttachmentUpdates,
 )
+from mozreview.errors import (
+    BugzillaUserMapError,
+)
 from mozreview.extra_data import (
     REVIEW_FLAG_KEY,
 )
@@ -62,6 +65,12 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                 # Since we're making the API call, we might as well ensure the
                 # local database is up to date.
                 users = get_or_create_bugzilla_users(user_data)
+                # There is a chance the user requested a merge of accounts.
+                # In such case bum will exist, but no user will be found
+                # with userid = bum.bugzilla_user_id. MozReview should fail
+                # gracefully
+                if len(users) == 0:
+                    raise BugzillaUserMapError(u.username)
                 email = users[0].email
                 user_email_cache[bum.bugzilla_user_id] = email
 

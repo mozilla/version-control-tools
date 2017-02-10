@@ -54,10 +54,12 @@ from mozreview.diffs import (
     build_plaintext_review,
 )
 from mozreview.errors import (
+    BugzillaUserMapError,
     CommitPublishProhibited,
     ConfidentialBugError,
     InvalidBugIdError,
     ParentShipItError,
+    ReviewerUserMapError,
 )
 from mozreview.extra_data import (
     DISCARD_ON_PUBLISH_KEY,
@@ -343,8 +345,15 @@ def on_review_request_publishing(user, review_request_draft, **kwargs):
                     children_to_post.append((child_draft, child))
 
             if children_to_post or children_to_obsolete:
-                update_bugzilla_attachments(b, bug_id, children_to_post,
-                                            children_to_obsolete)
+                try:
+                    update_bugzilla_attachments(b, bug_id, children_to_post,
+                                                children_to_obsolete)
+                except BugzillaUserMapError, e:
+                    logger.error(
+                        'User (%s) tried to request a review from reviewer '
+                        '(%s) who\'s account is assigned to a non-existing'
+                        'Bugzilla user.', user.username, unicode(e))
+                    raise ReviewerUserMapError(unicode(e))
 
         # Publish draft commits. This will already include items that are in
         # unpublished_rids, so we'll remove anything we publish out of
