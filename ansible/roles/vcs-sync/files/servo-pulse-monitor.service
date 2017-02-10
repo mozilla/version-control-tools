@@ -1,6 +1,7 @@
 [Unit]
 Description=Trigger Servo VCS syncing after Pulse events
 After=local-fs.target network.target nss-lookup.target
+OnFailure=mail-unit-output@%n.service
 
 [Service]
 WorkingDirectory=/
