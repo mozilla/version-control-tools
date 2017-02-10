@@ -31,7 +31,9 @@ def run_pulse_listener(c):
                                   port=c['pulse_port'],
                                   ssl=c['pulse_ssl'],
                                   github_exchange=c['pulse_github_exchange'],
-                                  github_queue=c['pulse_github_queue'])
+                                  github_queue=c['pulse_github_queue'],
+                                  hgmo_exchange=c['pulse_hgmo_exchange'],
+                                  hgmo_queue=c['pulse_hgmo_queue'])
 
     # Trigger linearization + hg conversion after git push.
     def on_github_message(body, message):
@@ -79,6 +81,7 @@ def run_pulse_listener(c):
             return
 
         repo_url = body['payload']['data']['repo_url']
+        logger.warn('observed push to %s' % repo_url)
         if repo_url != c['hg_converted']:
             message.ack()
             return

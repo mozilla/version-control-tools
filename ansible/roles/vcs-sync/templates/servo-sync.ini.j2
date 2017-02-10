@@ -9,6 +9,9 @@ pulse_github_exchange = exchange/github-webhooks/v1
 pulse_github_queue = {{ servo_pulse_queue | default("servo-linearize") }}
 pulse_github_routing_key = #
 
+pulse_hgmo_exchange = exchange/hgpushes/v2
+pulse_hgmo_queue = {{ servo_pulse_hgmo_queue | default("servo-overlay") }}
+
 servo_github_name = servo/servo
 servo_fetch_ref = refs/heads/master
 
