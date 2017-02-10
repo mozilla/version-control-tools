@@ -472,7 +472,7 @@ def _processpublishreview(repo, req):
             draft.update(public=True)
             res['results'].append({'rrid': rrid, 'success': True})
         except APIError as e:
-            res['results'].append({'rrid': rrid, 'error': str(e)})
+            res['results'].append({'rrid': rrid, 'error': unicode(e)})
 
     return res
 
