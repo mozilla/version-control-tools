@@ -1,8 +1,8 @@
-.. _vcssync:
+.. _vcssync_knowledge:
 
-=============================================
-Version Control Rewriting and Synchronization
-=============================================
+=====================
+Accumulated Knowledge
+=====================
 
 Over the years, Mozilla has had to deploy numerous solutions for rewriting
 and synchronizing the history of various version control repositories.
