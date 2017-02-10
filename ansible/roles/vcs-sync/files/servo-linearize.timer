@@ -1,0 +1,11 @@
+# Periodically run a process to convert the Servo Git repo to Mercurial
+[Unit]
+Description=Schedules periodic linearization of Servo repo to Mercurial
+After=local-fs.target network.target nss-lookup.target
+
+[Timer]
+OnUnitInactiveSec=600
+OnBootSec=60
+
+[Install]
+WantedBy=multi-user.target

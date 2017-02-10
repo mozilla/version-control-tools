@@ -1,0 +1,125 @@
+# This playbook configures a system to perform syncing of Servo version control
+# data.
+#
+# By default, tasks are executed as the servo-sync user.
+---
+- name: create servo-sync user
+  user: name=servo-sync
+        shell=/bin/bash
+        state=present
+
+- name: create ~servo-sync/.ssh
+  file: path=/home/servo-sync/.ssh
+        state=directory
+        owner=servo-sync
+        group=servo-sync
+        mode=0700
+
+# Sudoers policy allows user to start systemd services. Ideally we
+# would use systemd user units. But CentOS 7 doesn't have that systemd
+# feature enabled.
+- name: sudoers policy for servo-sync
+  copy: src=sudoers-servo-sync
+        dest=/etc/sudoers.d/servo-sync
+        owner=root
+        group=root
+        mode=0440
+
+- name: install ssh known_hosts file
+  copy: src=known_hosts
+        dest=/home/servo-sync/.ssh/known_hosts
+        mode=0600
+  become_user: servo-sync
+
+- name: ssh config for servo-sync user
+  template: src=servo-ssh_config.j2
+            dest=/home/servo-sync/.ssh/config
+            mode=0600
+  become_user: servo-sync
+
+- name: install SSH keys
+  copy: dest=/home/servo-sync/.ssh/id_{{ item.name }}
+        content="{{ item.value }}"
+        mode=0600
+  with_items:
+    - { name: github, value: "{{ servo_github_ssh_key }}" }
+    - { name: hgmo, value: "{{ servo_hgmo_ssh_key }}" }
+  become_user: servo-sync
+
+- name: create virtualenv for servo syncing
+  include: ../../../tasks/virtualenv.yml
+           venv=/home/servo-sync/venv
+           requirements=../roles/vcs-sync/files/servo-requirements.txt
+  become_user: servo-sync
+
+- name: copy mozvcssync wheel to server
+  copy: src={{ vct | mandatory }}/venv/wheelhouse/{{ mozvcssync_wheel | mandatory }}
+        dest=/home/servo-sync/{{ mozvcssync_wheel }}
+        owner=servo-sync
+        group=servo-sync
+        mode=0644
+  become_user: servo-sync
+
+- name: install mozvcssync into virtualenv
+  command: /home/servo-sync/venv/bin/pip install --upgrade --no-deps --force-reinstall /home/servo-sync/{{ mozvcssync_wheel }}
+  become_user: servo-sync
+
+- name: copy overlay hg extension
+  copy: src={{ vct }}/hgext/overlay/__init__.py
+        dest=/home/servo-sync/overlayext.py
+        owner=servo-sync
+        group=servo-sync
+        mode=0644
+  become_user: servo-sync
+
+- name: hgrc for servo-sync user
+  copy: src=servo-hgrc
+        dest=/home/servo-sync/.hgrc
+        mode=0640
+  become_user: servo-sync
+
+- name: seed Servo Git clone with existing conversion
+  command: /usr/bin/git clone --mirror {{ servo_linear_git_push_url | mandatory }} /home/servo-sync/servo.git creates=/home/servo-sync/servo.git
+  become_user: servo-sync
+
+- name: seed Servo Mercurial repo with existing conversion
+  command: /home/servo-sync/venv/bin/hg clone -U {{ servo_linear_hg_url }} /home/servo-sync/servo-linear creates=/home/servo-sync/servo-linear
+  become_user: servo-sync
+
+- name: seed Firefox Mercurial repo
+  command: /home/servo-sync/venv/bin/hg clone -U https://hg.mozilla.org/experimental/mozilla-central-gd /home/servo-sync/firefox-overlay creates=/home/servo-sync/firefox-overlay
+  become_user: servo-sync
+
+- name: install servo-linearize config files
+  template: src={{ item }}.j2
+            dest=/home/servo-sync/{{ item }}
+            mode=0644
+  with_items:
+    - servo-sync.env
+    - servo-sync.ini
+  become_user: servo-sync
+
+- name: install systemd unit files
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - servo-linearize.service
+    - servo-linearize.timer
+    - servo-overlay.service
+    - servo-overlay.timer
+    - servo-pulse-monitor.service
+
+- name: reload systemd units
+  command: /usr/bin/systemctl daemon-reload
+
+- name: systemd services are enabled
+  service: name={{ item }}
+           enabled=yes
+           state=restarted
+  with_items:
+    - servo-linearize.timer
+    - servo-overlay.timer
+    - servo-pulse-monitor.service

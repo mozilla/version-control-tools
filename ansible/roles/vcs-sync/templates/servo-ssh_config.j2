@@ -1,0 +1,9 @@
+StrictHostKeyChecking yes
+
+Host github.com
+  User git
+  IdentityFile ~/.ssh/id_github
+
+Host hg.mozilla.org
+  User {{ servo_hgmo_ssh_user | mandatory }}
+  IdentityFile ~/.ssh/id_hgmo

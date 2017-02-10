@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import os
+import subprocess
 import sys
 
 from ConfigParser import (
@@ -64,7 +65,10 @@ def run_pulse_listener(c):
         # If a subsequent notification is handled when the service is
         # running, it will no-op and we may not see its push.
         logger.warn('triggering linearization and conversion...')
-        # TODO actually do this.
+        subprocess.check_call([b'/bin/sudo',
+                               b'/usr/bin/systemctl', b'start',
+                               b'servo-linearize.service'],
+                              cwd='/', bufsize=0)
         message.ack()
 
     # Overlay Servo changesets from the pristine, converted repo onto
@@ -85,8 +89,10 @@ def run_pulse_listener(c):
 
         revision = heads[0].encode('ascii')
         logger.warn('overlaying servo-linear changeset %s' % revision)
-        # TODO do the overlay
-
+        subprocess.check_call([b'/bin/sudo',
+                               b'/usr/bin/systemctl', b'start',
+                               b'servo-overlay.service'],
+                              cwd='/', bufsize=0)
         message.ack()
 
     consumer.github_callbacks.append(on_github_message)

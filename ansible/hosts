@@ -22,3 +22,7 @@ hgweb-prod
 
 [reviewbot]
 54.244.13.202 ansible_ssh_user=ubuntu ansible_sudo=yes ansible_python_interpreter=/usr/bin/python2.7
+
+# TODO switch to new, production instance.
+[vcssync]
+54.202.100.174 ansible_ssh_user=centos ansible_become=yes

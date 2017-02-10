@@ -1,0 +1,28 @@
+---
+- name: install system packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - gcc
+    # Version of Git provided by CentOS 7 doesn't have features we need.
+    # So install modern version for IUS.
+    - git2u
+    - openssh-clients
+    - python-devel
+
+- include: ../../../tasks/systemd-mail-unit-output.yml
+
+- name: directory for mail-unit-output override file
+  file: path=/etc/systemd/system/mail-unit-output@.service.d
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: install mail-unit-output override
+  copy: src=mail-unit-output-override.conf
+        dest=/etc/systemd/system/mail-unit-output@.service.d/override.conf
+        owner=root
+        group=root
+        mode=0644
+
+- include: servo-sync.yml

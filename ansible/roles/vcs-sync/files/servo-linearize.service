@@ -1,0 +1,36 @@
+# Triggered by Pulse events and a timer to linearize history of the
+# Servo Git repo and convert to Mercurial.
+
+[Unit]
+Description=Convert Servo Git repo to Mercurial
+After=local-fs.target network.target nss-lookup.target
+OnFailure=mail-unit-output@%n.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/home/servo-sync/servo-sync.env
+ExecStart=/home/servo-sync/venv/bin/linearize-git-to-hg \
+  --exclude-dir src/test/wpt \
+  --exclude-dir src/test/ref \
+  --exclude-dir tests/ref \
+  --exclude-dir tests/wpt \
+  --summary-prefix servo: \
+  --remove-reviewable \
+  --source-repo-key Source-Repo \
+  --source-revision-key Source-Revision \
+  --normalize-github-merge-message \
+  --committer-action use-author \
+  --use-p2-author \
+  --hg /home/servo-sync/venv/bin/hg \
+  --copy-similarity 75 \
+  --find-copies-harder \
+  --skip-submodules \
+  --git-push-url $LINEAR_GIT_PUSH_URL \
+  --hg-push-url $LINEAR_HG_PUSH_URL \
+  $LINEAR_GIT_SOURCE_URL \
+  master \
+  /home/servo-sync/servo.git \
+  /home/servo-sync/servo-linear
+
+User=servo-sync
+Group=servo-sync

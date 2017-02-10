@@ -1,0 +1,18 @@
+---
+mozvcssync_wheel: mozvcssync-0.1-py2-none-any.whl
+
+# Servo Git repository to linearize and convert to Mercurial.
+servo_linear_git_source_url: https://github.com/servo/servo
+# Where to push the converted Git repo to (mostly for backup purposes).
+servo_linear_git_push_url: github.com:mozilla/converted-servo.git
+# URL of converted Mercurial repo.
+servo_linear_hg_url: https://hg.mozilla.org/projects/converted-servo-linear
+# Where to push the converted Mercurial repo to.
+servo_linear_hg_push_url: ssh://hg.mozilla.org/projects/converted-servo-linear
+
+# URL of Mercurial converted Servo repo to overlay into a Firefox repo.
+servo_overlay_source_url: https://hg.mozilla.org/projects/converted-servo-linear
+# Repository that converted Servo changesets should be overlayed into.
+servo_overlay_dest_url: https://hg.mozilla.org/integration/autoland
+# Where to push the overlayed result.
+servo_overlay_result_push_url: ssh://hg.mozilla.org/integration/autoland

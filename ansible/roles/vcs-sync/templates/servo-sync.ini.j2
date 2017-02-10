@@ -1,0 +1,15 @@
+[servo]
+pulse_host = {{ pulse_host | default("pulse.mozilla.org") }}
+pulse_port = {{ pulse_port | default(5671) }}
+pulse_ssl = {{ pulse_ssl | default("true") }}
+pulse_userid = {{ pulse_userid | mandatory }}
+pulse_password = {{ pulse_password | mandatory }}
+
+pulse_github_exchange = exchange/github-webhooks/v1
+pulse_github_queue = {{ servo_pulse_queue | default("servo-linearize") }}
+pulse_github_routing_key = #
+
+servo_github_name = servo/servo
+servo_fetch_ref = refs/heads/master
+
+hg_converted = {{ servo_linear_hg_url }}
