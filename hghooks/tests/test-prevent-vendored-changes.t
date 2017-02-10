@@ -53,7 +53,7 @@ User not in list can't change servo/
 
 User in list can change servo/
 
-  $ USER=gszorc@mozilla.com hg push
+  $ USER=servo-vcs-sync@mozilla.com hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets

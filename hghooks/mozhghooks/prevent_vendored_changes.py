@@ -23,7 +23,7 @@ def isservoallowed(user):
         return True
 
     return user in {
-        'gszorc@mozilla.com',
+        'servo-vcs-sync@mozilla.com',
     }
 
 
