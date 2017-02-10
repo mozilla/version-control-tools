@@ -192,7 +192,7 @@ def linearize_git_to_hg():
 
 def overlay_hg_repos_cli():
     # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--hg', help='hg executable to use')
