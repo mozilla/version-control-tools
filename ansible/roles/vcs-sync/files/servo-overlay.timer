@@ -1,10 +1,11 @@
 [Unit]
 Description=Periodically overlay Servo into a Firefox repo
 After=local-fs.target network.target nss-lookup.target
+PartOf=servo-sync.target
 
 [Timer]
 OnUnitInactiveSec=600
 OnBootSec=60
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=servo-sync.target

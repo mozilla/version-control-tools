@@ -2,10 +2,11 @@
 [Unit]
 Description=Schedules periodic linearization of Servo repo to Mercurial
 After=local-fs.target network.target nss-lookup.target
+PartOf=servo-sync.target
 
 [Timer]
 OnUnitInactiveSec=600
 OnBootSec=60
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=servo-sync.target

@@ -2,6 +2,7 @@
 Description=Trigger Servo VCS syncing after Pulse events
 After=local-fs.target network.target nss-lookup.target
 OnFailure=mail-unit-output@%n.service
+PartOf=servo-sync.target
 
 [Service]
 WorkingDirectory=/
@@ -16,4 +17,4 @@ Restart=always
 TimeoutStopSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=servo-sync.target

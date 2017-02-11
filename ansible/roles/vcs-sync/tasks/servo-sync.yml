@@ -106,6 +106,7 @@
         group=root
         mode=0644
   with_items:
+    - servo-sync.target
     - servo-linearize.service
     - servo-linearize.timer
     - servo-overlay.service
@@ -118,8 +119,14 @@
 - name: systemd services are enabled
   service: name={{ item }}
            enabled=yes
-           state=restarted
   with_items:
+    - servo-sync.target
+    - servo-linearize.service
     - servo-linearize.timer
+    - servo-overlay.service
     - servo-overlay.timer
     - servo-pulse-monitor.service
+
+- name: restart systemd services
+  service: name=servo-sync.target
+           state=restarted
