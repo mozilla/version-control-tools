@@ -46,7 +46,7 @@ Table of Contents
    hgmozilla/index
    hgmo/index
    githubwebhooks
-   vcssync
+   vcssync/index
 
 
 Indices and tables
