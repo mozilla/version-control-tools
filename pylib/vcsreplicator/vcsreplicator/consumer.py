@@ -381,7 +381,7 @@ def cli():
     import yaml
 
     # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('config',

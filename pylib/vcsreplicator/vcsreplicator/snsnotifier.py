@@ -102,7 +102,7 @@ def on_event(config, message_type, partition, message, created, data):
 
 def cli():
     # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
     def validate_config(config):
         if not config.c.has_section('awsevents'):

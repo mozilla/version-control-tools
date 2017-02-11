@@ -199,7 +199,7 @@ def cli():
     import argparse
 
     # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='Path to config file to load')
