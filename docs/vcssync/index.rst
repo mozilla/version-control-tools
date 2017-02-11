@@ -8,4 +8,4 @@ Version Control Synchronization
    :maxdepth: 2
 
    servo
-   technotes
+   knowledge
