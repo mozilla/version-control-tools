@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import hashlib
 import logging
 import os
 import subprocess
@@ -26,6 +27,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
                              find_copies_harder=False,
                              skip_submodules=False,
                              similarity=50,
+                             shamap_s3_upload_url=None,
                              **kwargs):
     """Linearize a Git repo to an hg repo by squashing merges.
 
@@ -175,6 +177,16 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
         before_hg_tip_rev = tip.rev()
         before_hg_tip_node = tip.node()
 
+    shamap_path = os.path.join(hg_repo, b'.hg', b'shamap')
+    def get_shamap_hash():
+        if not os.path.exists(shamap_path):
+            return None
+
+        with open(shamap_path, 'rb') as fh:
+            return hashlib.sha256(fh.read()).digest()
+
+    old_shamap_hash = get_shamap_hash()
+
     args = [hglib.HGPATH]
     for c in hg_config:
         args.extend([b'--config', c])
@@ -224,5 +236,11 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
         after_hg_tip_rev, after_hg_tip_node))
 
     maybe_push_hg()
+
+    # TODO so hacky. Relies on credentials in the environment.
+    if shamap_s3_upload_url and old_shamap_hash != get_shamap_hash():
+        subprocess.check_call([
+            b'aws', b's3', b'cp', shamap_path, shamap_s3_upload_url
+        ])
 
     return result

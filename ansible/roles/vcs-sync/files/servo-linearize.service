@@ -27,6 +27,7 @@ ExecStart=/home/servo-sync/venv/bin/linearize-git-to-hg \
   --skip-submodules \
   --git-push-url $LINEAR_GIT_PUSH_URL \
   --hg-push-url $LINEAR_HG_PUSH_URL \
+  --shamap-s3-upload-url $SHAMAP_S3_UPLOAD_URL \
   $LINEAR_GIT_SOURCE_URL \
   master \
   /home/servo-sync/servo.git \

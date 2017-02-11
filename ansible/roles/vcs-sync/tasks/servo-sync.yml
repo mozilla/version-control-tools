@@ -86,6 +86,10 @@
   command: /home/servo-sync/venv/bin/hg clone -U {{ servo_linear_hg_url }} /home/servo-sync/servo-linear creates=/home/servo-sync/servo-linear
   become_user: servo-sync
 
+- name: seed SHA-1 to avoid redundant conversion, possible divergence
+  command: aws s3 cp {{ servo_shamap_s3_upload_url | mandatory }} /home/servo-sync/servo-linear/.hg/shamap creates=/home/servo-sync/servo-linear/.hg/shamap
+  become_user: servo-sync
+
 - name: seed Firefox Mercurial repo
   command: /home/servo-sync/venv/bin/hg clone -U https://hg.mozilla.org/experimental/mozilla-central-gd /home/servo-sync/firefox-overlay creates=/home/servo-sync/firefox-overlay
   become_user: servo-sync

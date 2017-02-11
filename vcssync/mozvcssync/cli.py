@@ -153,6 +153,9 @@ def linearize_git_to_hg():
                         help='URL where to push converted Git repo')
     parser.add_argument('--hg-push-url',
                         help='URL where to push converted Mercurial repo')
+    # TODO this is a bit hacky. We should probably accept a full path.
+    parser.add_argument('--shamap-s3-upload-url',
+                        help='S3 path where SHA-1 map should be uploaded to')
     parser.add_argument('git_repo_url',
                         help='URL of Git repository to convert')
     parser.add_argument('git_ref', help='Git ref to convert')
@@ -171,7 +174,8 @@ def linearize_git_to_hg():
 
     kwargs = get_git_linearize_kwargs(args)
     for k in ('similarity', 'find_copies_harder', 'skip_submodules',
-              'move_to_subdir', 'git_push_url', 'hg_push_url'):
+              'move_to_subdir', 'git_push_url', 'hg_push_url',
+              'shamap_s3_upload_url'):
         v = getattr(args, k)
         if v is not None:
             kwargs[k] = v

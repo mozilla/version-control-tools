@@ -16,3 +16,5 @@ servo_overlay_source_url: https://hg.mozilla.org/projects/converted-servo-linear
 servo_overlay_dest_url: https://hg.mozilla.org/integration/autoland
 # Where to push the overlayed result.
 servo_overlay_result_push_url: ssh://hg.mozilla.org/integration/autoland
+
+servo_shamap_s3_upload_url: "s3://moz-vcssync-servo-commitmap/shamap"
