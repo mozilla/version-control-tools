@@ -3,17 +3,21 @@ from __future__ import unicode_literals
 import json
 import logging
 
+import requests
 from django.db import transaction
 from django.core.cache import cache
 from django.utils import six
-from djblets.webapi.decorators import (webapi_login_required,
-                                       webapi_request_fields,
-                                       webapi_response_errors)
-from djblets.webapi.errors import (DOES_NOT_EXIST,
-                                   INVALID_FORM_DATA,
-                                   NOT_LOGGED_IN,
-                                   PERMISSION_DENIED)
-import requests
+from djblets.webapi.decorators import (
+    webapi_login_required,
+    webapi_request_fields,
+    webapi_response_errors,
+)
+from djblets.webapi.errors import (
+    DOES_NOT_EXIST,
+    INVALID_FORM_DATA,
+    NOT_LOGGED_IN,
+    PERMISSION_DENIED,
+)
 from reviewboard.changedescs.models import ChangeDescription
 from reviewboard.extensions.base import get_extension_manager
 from reviewboard.reviews.models import ReviewRequest
@@ -21,19 +25,23 @@ from reviewboard.scmtools.models import Repository
 from reviewboard.site.urlresolvers import local_site_reverse
 from reviewboard.webapi.resources import WebAPIResource
 
-from mozreview.autoland.models import (AutolandEventLogEntry,
-                                       AutolandRequest)
+from mozreview.autoland.models import (
+    AutolandEventLogEntry,
+    AutolandRequest,
+)
 from mozreview.decorators import webapi_scm_groups_required
-from mozreview.errors import (AUTOLAND_CONFIGURATION_ERROR,
-                              AUTOLAND_ERROR,
-                              AUTOLAND_REQUEST_IN_PROGRESS,
-                              AUTOLAND_TIMEOUT,
-                              NOT_PUSHED_PARENT_REVIEW_REQUEST)
+from mozreview.errors import (
+    AUTOLAND_CONFIGURATION_ERROR,
+    AUTOLAND_ERROR,
+    AUTOLAND_REQUEST_IN_PROGRESS,
+    AUTOLAND_TIMEOUT,
+    NOT_PUSHED_PARENT_REVIEW_REQUEST,
+)
 from mozreview.extra_data import (
     COMMITS_KEY,
     fetch_commit_data,
     is_parent,
-    is_pushed
+    is_pushed,
 )
 
 AUTOLAND_REQUEST_TIMEOUT = 10.0
@@ -60,15 +68,15 @@ def release_lock(lock_id):
 
 def get_autoland_lock_id(review_request_id, repository_url, revision):
     """Returns a lock id based on the given parameters"""
-    return 'autoland_lock:{0}:{1}:{2}'.format(review_request_id, repository_url,
-                                              revision)
+    return 'autoland_lock:{0}:{1}:{2}'.format(
+        review_request_id, repository_url, revision)
 
 
 class BaseAutolandTriggerResource(WebAPIResource):
     """Base resource for Autoland trigger resources.
 
-       Subclasses should inherit from this and provide their own create
-       methods with the necessary request fields and scm_level validation.
+    Subclasses should inherit from this and provide their own create
+    methods with the necessary request fields and scm_level validation.
     """
 
     allowed_methods = ('POST',)
@@ -106,7 +114,7 @@ class BaseAutolandTriggerResource(WebAPIResource):
 
 
 class AutolandTriggerResource(BaseAutolandTriggerResource):
-    """Resource to kick off Autoland to inbound for a particular review request."""
+    """Resource to kick off Autoland to inbound for a review request."""
 
     name = 'autoland_trigger'
 
@@ -130,7 +138,8 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
         },
     )
     @transaction.atomic
-    def create(self, request, review_request_id, commit_descriptions, *args, **kwargs):
+    def create(self, request, review_request_id, commit_descriptions, *args,
+               **kwargs):
         try:
             rr = ReviewRequest.objects.get(pk=review_request_id)
         except ReviewRequest.DoesNotExist:
@@ -145,6 +154,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
 
         enabled = rr.repository.extra_data.get('autolanding_enabled')
+
         if not enabled:
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autolanding not enabled.')
@@ -159,15 +169,15 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
 
         last_revision = json.loads(
             commit_data.extra_data.get(COMMITS_KEY))[-1][0]
-
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
         logger.info('Submitting a request to Autoland for review request '
-                    'ID %s for revision %s destination %s'
-                     % (review_request_id, last_revision, target_repository))
+                    'ID %s for revision %s destination %s' %
+                    (review_request_id, last_revision, target_repository))
 
         autoland_url = ext.get_settings('autoland_url')
+
         if not autoland_url:
             return AUTOLAND_CONFIGURATION_ERROR
 
@@ -178,10 +188,11 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             return AUTOLAND_CONFIGURATION_ERROR
 
         pingback_url = autoland_request_update_resource.get_uri(request)
-
         lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
+
         if not acquire_lock(lock_id):
             return AUTOLAND_REQUEST_IN_PROGRESS
+
         try:
             response = requests.post(
                 autoland_url + '/autoland',
@@ -234,7 +245,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
                     'request_id': None,
                 }
 
-        autoland_request = AutolandRequest.objects.create(
+        AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
             repository_url=target_repository,
@@ -247,7 +258,7 @@ class AutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id=autoland_request_id)
 
         self.save_autolandrequest_id('p2rb.autoland', rr,
-            autoland_request_id)
+                                     autoland_request_id)
 
         return 200, {}
 
@@ -301,6 +312,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             return NOT_PUSHED_PARENT_REVIEW_REQUEST
 
         enabled = rr.repository.extra_data.get('autolanding_to_try_enabled')
+
         if not enabled:
             return AUTOLAND_CONFIGURATION_ERROR.with_message(
                 'Autolanding to try not enabled.')
@@ -314,7 +326,6 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
 
         last_revision = json.loads(
             commit_data.extra_data.get(COMMITS_KEY))[-1][0]
-
         ext = get_extension_manager().get_enabled_extension(
             'mozreview.extension.MozReviewExtension')
 
@@ -323,6 +334,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                     % (review_request_id, last_revision))
 
         autoland_url = ext.get_settings('autoland_url')
+
         if not autoland_url:
             return AUTOLAND_CONFIGURATION_ERROR
 
@@ -335,6 +347,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
         pingback_url = autoland_request_update_resource.get_uri(request)
 
         lock_id = get_autoland_lock_id(rr.id, target_repository, last_revision)
+
         if not acquire_lock(lock_id):
             return AUTOLAND_REQUEST_IN_PROGRESS
 
@@ -344,19 +357,22 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             # verify that the destination is in fact an "scm_level_1"
             # repository to ensure that people don't try to land to inbound
             # using this resource.
-            response = requests.post(autoland_url + '/autoland',
+            response = requests.post(
+                autoland_url + '/autoland',
                 data=json.dumps({
-                'ldap_username': request.mozreview_profile.ldap_username,
-                'tree': rr.repository.name,
-                'pingback_url': pingback_url,
-                'rev': last_revision,
-                'destination': TRY_AUTOLAND_DESTINATION,
-                'trysyntax': try_syntax,
-            }), headers={
-                'content-type': 'application/json',
-            },
+                    'ldap_username': request.mozreview_profile.ldap_username,
+                    'tree': rr.repository.name,
+                    'pingback_url': pingback_url,
+                    'rev': last_revision,
+                    'destination': TRY_AUTOLAND_DESTINATION,
+                    'trysyntax': try_syntax,
+                }),
+                headers={
+                    'content-type': 'application/json',
+                },
                 timeout=AUTOLAND_REQUEST_TIMEOUT,
-                auth=(autoland_user, autoland_password))
+                auth=(autoland_user, autoland_password)
+            )
         except requests.exceptions.RequestException:
             logger.error('We hit a RequestException when submitting a '
                          'request to Autoland')
@@ -386,7 +402,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
                     'request_id': None,
                 }
 
-        autoland_request = AutolandRequest.objects.create(
+        AutolandRequest.objects.create(
             autoland_id=autoland_request_id,
             push_revision=last_revision,
             repository_url=target_repository,
@@ -402,7 +418,7 @@ class TryAutolandTriggerResource(BaseAutolandTriggerResource):
             autoland_request_id=autoland_request_id)
 
         self.save_autolandrequest_id('p2rb.autoland_try', rr,
-            autoland_request_id)
+                                     autoland_request_id)
 
         return 200, {}
 
@@ -485,6 +501,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
             return INVALID_FORM_DATA, {
                 'error': '%s' % e,
                 }
+
         try:
             autoland_request = AutolandRequest.objects.get(
                 pk=fields['request_id'])
@@ -494,12 +511,14 @@ class AutolandRequestUpdateResource(WebAPIResource):
         rr = ReviewRequest.objects.get(pk=autoland_request.review_request_id)
 
         if fields['landed']:
-            autoland_request.repository_revision=fields['result']
+            autoland_request.repository_revision = fields['result']
             autoland_request.save()
 
             # If we've landed to the "inbound" repository, we'll close the
             # review request automatically.
-            landing_repo = rr.repository.extra_data.get('landing_repository_url')
+            landing_repo = rr.repository.extra_data.get(
+                'landing_repository_url')
+
             if autoland_request.repository_url == landing_repo:
                 rr.close(ReviewRequest.SUBMITTED)
 
@@ -507,7 +526,6 @@ class AutolandRequestUpdateResource(WebAPIResource):
                 autoland_request_id=fields['request_id'],
                 status=AutolandEventLogEntry.SERVED,
                 details=fields['result'])
-
         elif not fields.get('error_msg') and fields.get('result'):
             AutolandEventLogEntry.objects.create(
                 autoland_request_id=fields['request_id'],
@@ -567,7 +585,7 @@ class AutolandEnableResource(WebAPIResource):
         },
     )
     def update(self, request, autolanding_to_try_enabled,
-               autolanding_enabled,*args, **kwargs):
+               autolanding_enabled, *args, **kwargs):
         if not request.user.has_perm('mozreview.enable_autoland'):
             logger.info('Could not set autoland enable: permission '
                         'denied for user: %s' % (request.user.id))
@@ -582,8 +600,10 @@ class AutolandEnableResource(WebAPIResource):
 
         logger.info('Setting autoland enable: repository %s: try: %s '
                     'landing: %s at request of user: %s' % (
-                    kwargs[self.uri_object_key], autolanding_to_try_enabled,
-                    autolanding_enabled, request.user.id))
+                        kwargs[self.uri_object_key],
+                        autolanding_to_try_enabled,
+                        autolanding_enabled,
+                        request.user.id))
         repo.extra_data['autolanding_to_try_enabled'] = autolanding_to_try_enabled
         repo.extra_data['autolanding_enabled'] = autolanding_enabled
         repo.save(update_fields=['extra_data'])
