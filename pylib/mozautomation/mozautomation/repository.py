@@ -44,7 +44,7 @@ TREE_ALIASES = {
     'c-r': ('comm-release',),
     'cr': ('comm-release',),
 
-    'releases': ('esr45', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr52', 'esr45', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'autoland'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
               'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine',
@@ -75,6 +75,7 @@ REPOS = {
     'esr31': 'releases/mozilla-esr31',
     'esr38': 'releases/mozilla-esr38',
     'esr45': 'releases/mozilla-esr45',
+    'esr52': 'releases/mozilla-esr52',
     'b2g18': 'releases/mozilla-b2g18',
     'b2g26': 'releases/mozilla-b2g26_v1_2',
     'b2g28': 'releases/mozilla-b2g28_v1_3',
@@ -124,6 +125,7 @@ REPOS = {
     'comm-esr31': 'releases/comm-esr31',
     'comm-esr38': 'releases/comm-esr38',
     'comm-esr45': 'releases/comm-esr45',
+    'comm-esr52': 'releases/comm-esr52',
 
     # Misc
     'try': 'try',
@@ -143,6 +145,7 @@ OFFICIAL_MAP = {
     'esr31': 'mozilla-esr31',
     'esr38': 'mozilla-esr38',
     'esr45': 'mozilla-esr45',
+    'esr52': 'mozilla-esr52',
 }
 
 RELEASE_TREES = set([
@@ -159,6 +162,7 @@ RELEASE_TREES = set([
     'esr31',
     'esr38',
     'esr45',
+    'esr52',
     'b2g32',
     'b2g34',
     'b2g37',
