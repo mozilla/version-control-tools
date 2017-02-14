@@ -391,6 +391,13 @@ submitting a complicated update to an existing group of commits, you
 are probably fine just telling the interactive prompt that you would
 like to publish from the command line.
 
+If you would like to automatically publish your review requests from
+the command line you can set the option ``reviewboard.autopublish=True``
+in your Mercurial configuration:
+
+  [reviewboard]
+  autopublish = True
+
 Once review requests are published, others can see them! If you have
 requested review from someone, they would have received an e-mail
 notification that they have a pending review request. It's now time
