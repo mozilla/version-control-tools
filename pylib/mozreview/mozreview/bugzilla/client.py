@@ -340,8 +340,8 @@ class Bugzilla(object):
         raise User.DoesNotExist()
 
     @xmlrpc_to_bugzilla_errors
-    def post_comment(self, bug_id, comment, rb_url, reply=False):
-        """Post a comment to a bug.
+    def post_review_comment(self, bug_id, comment, rb_url, reply=False):
+        """Post a comment to a bug representing a review.
 
         'rb_url' is required so that we can use the MozReview.attachments()
         API, which allows mozreview-* tags to be added to comments even if
@@ -368,7 +368,7 @@ class Bugzilla(object):
                              else self.review_comment_tag],
         })
 
-        logger.info('Posting comment on bug %d.' % bug_id)
+        logger.info('Posting review comment on bug %d.' % bug_id)
         return self.proxy.MozReview.attachments(params)
 
     @xmlrpc_to_bugzilla_errors

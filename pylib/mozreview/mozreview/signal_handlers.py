@@ -665,8 +665,8 @@ def on_review_publishing(user, review, **kwargs):
         # to continue to allow comments on parents, we'll have to pick one
         # child for each unique bug.
         first_child = list(gen_child_rrs(review_request))[0]
-        b.post_comment(int(first_child.get_bug_list()[0]), comment,
-                       get_diff_url(first_child), False)
+        b.post_review_comment(int(first_child.get_bug_list()[0]), comment,
+                              get_diff_url(first_child), False)
     else:
         diff_url = get_diff_url(review_request)
         bug_id = int(review_request.get_bug_list()[0])
@@ -690,7 +690,7 @@ def on_review_publishing(user, review, **kwargs):
                                                     diff_url, comment)
 
         if comment and not commented:
-            b.post_comment(bug_id, comment, diff_url, False)
+            b.post_review_comment(bug_id, comment, diff_url, False)
 
 
 def get_reply_url(reply, site=None, siteconfig=None):
@@ -717,4 +717,4 @@ def on_reply_publishing(user, reply, **kwargs):
 
     url = get_reply_url(reply)
     comment = build_plaintext_review(reply, url, {"user": user})
-    b.post_comment(bug_id, comment, get_diff_url(review_request), True)
+    b.post_review_comment(bug_id, comment, get_diff_url(review_request), True)
