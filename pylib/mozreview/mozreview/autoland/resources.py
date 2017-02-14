@@ -29,6 +29,8 @@ from mozreview.autoland.models import (
     AutolandEventLogEntry,
     AutolandRequest,
 )
+from mozreview.bugzilla.client import Bugzilla
+from mozreview.bugzilla.errors import BugzillaError
 from mozreview.decorators import webapi_scm_groups_required
 from mozreview.errors import (
     AUTOLAND_CONFIGURATION_ERROR,
@@ -42,6 +44,9 @@ from mozreview.extra_data import (
     fetch_commit_data,
     is_parent,
     is_pushed,
+)
+from mozreview.models import (
+    get_bugzilla_api_key,
 )
 
 AUTOLAND_REQUEST_TIMEOUT = 10.0
@@ -509,6 +514,7 @@ class AutolandRequestUpdateResource(WebAPIResource):
             return DOES_NOT_EXIST
 
         rr = ReviewRequest.objects.get(pk=autoland_request.review_request_id)
+        bz_comment = None
 
         if fields['landed']:
             autoland_request.repository_revision = fields['result']
@@ -538,10 +544,26 @@ class AutolandRequestUpdateResource(WebAPIResource):
                 error_msg=fields['error_msg']
             )
 
+            # The error message contains context explaining that Autoland
+            # failed, so no leading text is necessary.
+            bz_comment = fields['error_msg']
+
         lock_id = get_autoland_lock_id(rr.id,
                                        autoland_request.repository_url,
                                        autoland_request.push_revision)
         release_lock(lock_id)
+
+        if bz_comment:
+            bugzilla = Bugzilla(get_bugzilla_api_key(request.user))
+            bug_id = int(rr.get_bug_list()[0])
+
+            # Catch and log Bugzilla errors rather than bubbling them up,
+            # since we don't want the Autoland server to continously
+            # retry the update.
+            try:
+                bugzilla.post_comment(bug_id, bz_comment)
+            except BugzillaError as e:
+                logger.error('Failed to post comment to Bugzilla: %s' % e)
 
         return 200, {}
 

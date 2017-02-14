@@ -372,6 +372,17 @@ class Bugzilla(object):
         return self.proxy.MozReview.attachments(params)
 
     @xmlrpc_to_bugzilla_errors
+    def post_comment(self, bug_id, comment):
+        """Post a general comment to a bug."""
+        params = self._auth_params({
+            'id': bug_id,
+            'comment': comment,
+        })
+
+        logger.info('Posting comment on bug %d.' % bug_id)
+        return self.proxy.Bug.add_comment(params)
+
+    @xmlrpc_to_bugzilla_errors
     def is_bug_confidential(self, bug_id):
         # We don't need to authenticate here; if we can't get the bug,
         # that itself means it's confidential.
