@@ -393,7 +393,7 @@ like to publish from the command line.
 
 If you would like to automatically publish your review requests from
 the command line you can set the option ``reviewboard.autopublish=True``
-in your Mercurial configuration:
+in your Mercurial configuration::
 
   [reviewboard]
   autopublish = True
