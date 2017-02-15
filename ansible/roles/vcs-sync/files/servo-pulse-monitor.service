@@ -14,6 +14,7 @@ ExecStart=/home/servo-sync/venv/bin/servo-pulse-listen \
   /home/servo-sync/servo-sync.ini
 
 Restart=always
+RestartSec=300
 TimeoutStopSec=10
 
 [Install]
