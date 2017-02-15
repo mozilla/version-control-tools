@@ -124,7 +124,7 @@ For each of these bundles, we upload them to the following locations:
 Which Bundles to Prefer
 -----------------------
 
-The zstd bundle hosted on CloudFrond is the first entry and is thus
+The zstd bundle hosted on CloudFront is the first entry and is thus
 preferred by clients by default.
 
 zstd bundles are the smallest bundles and for most people they are
