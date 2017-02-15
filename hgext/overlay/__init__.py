@@ -180,7 +180,8 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix):
     # Attempt to find an incoming changeset in dest and prune already processed
     # source revisions.
     lastsourcectx = None
-    for rev in destrepo.changelog.ancestors([destctx.rev()], inclusive=True):
+    for rev in sorted(destrepo.changelog.ancestors([destctx.rev()],
+                      inclusive=True), reverse=True):
         ctx = destrepo[rev]
         overlayed = ctx.extra().get(REVISION_KEY)
 
