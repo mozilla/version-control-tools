@@ -125,7 +125,7 @@ def overlay_hg_repos(source_repo_url, dest_repo_url, dest_repo_path,
         for rev in hrepo.log(revrange=b'%d::%s' % (old_tip.rev() + 1,
                                                    new_tip.node())):
             logger.warn('%s:%s: %s' % (rev[0], rev[1][0:12],
-                                       rev[5].splitlines()[0]))
+                                       rev[5].decode('utf-8').splitlines()[0]))
 
         try:
             run_hg(logger, hrepo,
