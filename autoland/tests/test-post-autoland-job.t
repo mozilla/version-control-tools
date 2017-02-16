@@ -40,7 +40,8 @@ Create a commit to test on Try
 
 Ensure Autoland started without errors
 
-  $ mozreview exec autoland tail -n 20 /home/ubuntu/autoland.log
+  $ mozreview exec autoland tail -n 20 /home/autoland/autoland.log
+  starting autoland
   * autoland INFO starting autoland (glob)
 
 Posting a job with bad credentials should fail
