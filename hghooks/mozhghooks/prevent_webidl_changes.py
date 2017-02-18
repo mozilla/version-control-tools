@@ -15,7 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-This hook is to prevent changes to .webidl files in pushes without proper DOM peer review.
+This hook is to prevent changes to files with strict review requirements in pushes
+without proper peer review.
 """
 
 import re
@@ -82,8 +83,26 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'kmachulis@mozilla.com',   # Kyle Machulis
         'kyle@nonpolynomial.com',  # Kyle Machulis
     ]
+    IPC_peers = [
+        'billm',             # Bill McCloskey
+        'dvander',           # David Anderson
+        'bsmedberg',         # Benjamin Smedberg
+        'bent',              # Ben Turner
+        'jed',               # Jed Davis
+    ]
+    IPC_authors = [
+        'billm@mozilla.com',       # Bill McCloskey,
+        'danderson@mozilla.com',   # David Anderson
+        'dvander@alliedmods.net',  # David Anderson
+        'benjamin@smedbergs.us',   # Benjamin Smedberg
+        'bent.mozilla@gmail.com',  # Ben Turner
+        'jld@mozilla.com',         # Jed Davis
+    ]
+
     error = ""
+    note = ""
     webidlReviewed = False
+    syncIPCReviewed = False
     changesets = list(repo.changelog.revs(repo[node].rev()))
     if 'a=release' in repo.changectx(changesets[-1]).description().lower():
         # Accept the entire push for code uplifts.
@@ -98,12 +117,6 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
         # Loop through each file for the current changeset
         for file in c.files():
-            # Only Check WebIDL Files
-            if not file.endswith('.webidl'):
-                continue
-
-            # Ignore WebIDL files in Servo, which come from upstream and have
-            # their own review process.
             if file.startswith('servo/'):
                 ui.write('(%s modifies %s from Servo; not enforcing peer '
                          'review)\n' % (short(c.node()), file))
@@ -112,31 +125,47 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             message = c.description().lower()
             email = util.email(c.user()).lower()
 
-            def search():
+            # Ignore backouts
+            if isBackout(message):
+                continue
+
+            def search(authors, peers):
               matches = re.findall('\Ws?r\s*=\s*(\w+(?:,\w+)*)', message)
               for match in matches:
-                  if any(reviewer in DOM_peers for reviewer in match.split(',')):
+                  if any(reviewer in peers for reviewer in match.split(',')):
                       return True
-              # We allow DOM peers to commit changes to WebIDL files without any review
-              # requirements assuming that they have looked at the changes they're committing.
-              if any(peer == email for peer in DOM_authors):
+              # We allow peers to commit changes without any review
+              # requirements assuming that they have looked at the changes
+              # they're committing.
+              if any(peer == email for peer in authors):
                   return True
 
               return False
 
-            webidlReviewed = search()
-            if not webidlReviewed and not isBackout(message):
+            # Only check WebIDL files here.
+            if file.endswith('.webidl'):
+                webidlReviewed = search(DOM_authors, DOM_peers)
+                if not webidlReviewed:
                     error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
+                    note = "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
+            # Only check the IPDL sync-messages.ini here.
+            elif file.endswith('ipc/ipdl/sync-messages.ini'):
+                syncIPCReviewed = search(IPC_authors, IPC_peers)
+                if not syncIPCReviewed:
+                    error += "sync-messages.ini altered in changeset %s without IPC peer review\n" % (short(c.node()))
+                    note = "\nChanges to sync-messages.ini in this repo require review from a IPC peer in the form of r=...\nThis is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..\n"
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
         ui.warn("\n" + error + "\n")
-        print "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
+        print note
         print "*************************************************************\n\n"
         # Reject the changesets
         return 1
     else:
         if webidlReviewed:
-            print "You've received proper review from a DOM peer on your WebIDL change(s) in your push, thanks for paying enough attention."
+            print "You've received proper review from a DOM peer on the WebIDL change(s) in your push, thanks for paying enough attention."
+        if syncIPCReviewed:
+            print "You've received proper review from an IPC peer on the sync-messages.ini change(s) in your push, thanks for paying enough attention."
     # Accept the changesets
     return 0
