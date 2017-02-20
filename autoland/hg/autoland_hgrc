@@ -7,4 +7,4 @@ ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER"
 purge =
 rebase =
 strip =
-rewritecommitdescriptions = /home/ubuntu/version-control-tools/autoland/hgext/rewritecommitdescriptions.py
+rewritecommitdescriptions = /home/autoland/version-control-tools/autoland/hgext/rewritecommitdescriptions.py
