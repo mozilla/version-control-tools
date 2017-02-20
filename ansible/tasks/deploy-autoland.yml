@@ -3,15 +3,15 @@
 
 - name: update version-control-tools
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
-      dest=/home/ubuntu/version-control-tools
+      dest=/home/autoland/version-control-tools
       revision={{ rev }}
 
 - name: install autoland dependencies
   sudo: yes
-  command: /home/ubuntu/peep install -r /home/ubuntu/version-control-tools/autoland/requirements.txt
+  command: /home/autoland/peep install -r /home/autoland/version-control-tools/autoland/requirements.txt
 
 - name: install autoland site hgrc
-  shell: cp /home/ubuntu/version-control-tools/autoland/hg/autoland_hgrc /home/ubuntu/.hgrc
+  shell: cp /home/autoland/version-control-tools/autoland/hg/autoland_hgrc /home/autoland/.hgrc
 
 - name: restart apache
   ignore_errors: yes
