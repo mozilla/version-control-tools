@@ -19,8 +19,8 @@ Adding a reviewer with emoji in name string
 
   $ exportbzauth admin@example.com password
   $ bugzilla create-user uni@example.com password 'Emoji here ⌚️ :uni'
-  /Users/zalun/Projects/CONDUIT/vct-pushingerror/version-control-tools/venv/lib/python2.7/site-packages/mach/dispatcher.py:103: UnicodeWarning: Unicode equal comparison failed to convert both arguments to Unicode - interpreting them as being unequal
-    elif '-h' in args or '--help' in args:
+  * UnicodeWarning: * (glob)
+  * (glob)
   created user 6
   $ exportbzauth default@example.com password
   $ echo foo2 > foo
