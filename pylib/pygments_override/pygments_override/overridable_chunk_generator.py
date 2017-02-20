@@ -29,7 +29,7 @@ class OverridableDiffChunkGenerator(DiffChunkGenerator):
         The resulting HTML will be returned as a list of lines.
         """
         lexer = self._get_preferred_lexer(
-            filename, stripln=False, encoding='utf-8')
+            filename, stripnl=False, encoding='utf-8')
         logger.debug('preferred lexer for %s: %s' % (filename, lexer))
         if not lexer:
             lexer = guess_lexer_for_filename(
