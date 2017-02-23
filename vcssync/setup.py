@@ -19,6 +19,7 @@ setup(
             'linearize-git=mozvcssync.cli:linearize_git',
             'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
             'overlay-hg-repos=mozvcssync.cli:overlay_hg_repos_cli',
+            'servo-overlay=mozvcssync.servo:overlay_cli',
             'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
         ],
     },

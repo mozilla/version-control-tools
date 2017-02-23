@@ -121,11 +121,22 @@ def load_config(path):
     return d
 
 
+def configure_stdout():
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
+    # Log to stdout.
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(name)s %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
+
 def pulse_daemon():
     import argparse
 
-    # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+    configure_stdout()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='Path to config file to load')
@@ -133,11 +144,99 @@ def pulse_daemon():
     args = parser.parse_args()
 
     config = load_config(args.config)
-
-    root = logging.getLogger()
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('%(name)s %(message)s')
-    handler.setFormatter(formatter)
-    root.addHandler(handler)
-
     run_pulse_listener(config)
+
+
+def tree_is_open(tree):
+    """Return if the specified tree is open according to treestatus.m.o"""
+    import requests
+
+    # Allow tests to set tree status directly.
+    if 'TEST_TREESTATUS' in os.environ:
+        if os.getenv('TEST_TREESTATUS') == 'error':
+            raise Exception('Failed to determine tree status')
+        return os.getenv('TEST_TREESTATUS') == 'open'
+
+    r = None
+    try:
+        r = requests.get('https://treestatus.mozilla-releng.net/trees/' + tree)
+        if r.status_code == 200:
+            return r.json()['result']['status'] == 'open'
+        elif r.status_code == 404:
+            raise Exception('Unrecognised tree "%s"' % tree)
+        else:
+            raise Exception(
+                'Unexpected response from treestatus API for tree "%s": %s'
+                % (tree, r.status_code))
+    except KeyError:
+        if r is not None:
+            logger.error('Malformed treestatus response: %s' % r.json())
+        raise Exception(
+            'Malformed response from treestatus API for tree "%s"' % tree)
+    except Exception as e:
+        raise Exception(
+            'Failed to determine treestatus for %s: %s' % (tree, str(e)))
+
+
+def overlay_cli():
+    """Wrapper around overlay-hg-repos to perform servo specific tasks."""
+    import argparse
+
+    configure_stdout()
+
+    parser = argparse.ArgumentParser()
+    # Arguments that are passed to mozvcssync.cli:overlay_hg_repos_cli.
+    parser.add_argument('--hg', help='hg executable to use'),
+    parser.add_argument('--into', required=True,
+                        help='Subdirectory into which changesets will be '
+                             'applied')
+    parser.add_argument('source_repo_url',
+                        help='URL of repository whose changesets will be '
+                             'overlayed')
+    parser.add_argument('dest_repo_url',
+                        help='URL of repository where changesets will be '
+                             'overlayed')
+    parser.add_argument('dest_repo_path',
+                        help='Local path to clone of <dest_repo_url>')
+    parser.add_argument('--result-push-url',
+                        help='URL where to push the overlayed result')
+    # Arguments for this script.
+    parser.add_argument('--overlay-hg-repos', default='overlay-hg-repos',
+                        help='Path overlay_hg_repos')
+    parser.add_argument('--push-tree',
+                        help='Name of tree to check on treestatus.mozilla.org '
+                             'before pushing')
+
+    args = parser.parse_args()
+
+    # Ensure the tree is open before starting.
+    try:
+        if args.result_push_url and args.push_tree:
+            push_tree = args.push_tree
+            if not tree_is_open(push_tree):
+                logger.warn('tree "%s" is closed, unable to continue'
+                            % push_tree)
+                sys.exit(0)
+    except Exception as e:
+        logger.error('abort: %s' % str(e))
+        sys.exit(1)
+
+    # Tree is open, overlay.
+    overlay_hg_repos = [
+        args.overlay_hg_repos,
+        args.source_repo_url,
+        args.dest_repo_url,
+        args.dest_repo_path,
+        '--into', args.into,
+    ]
+    if args.result_push_url:
+        overlay_hg_repos.extend(['--result-push-url', args.result_push_url])
+    if args.hg:
+        overlay_hg_repos.extend(['--hg', args.hg])
+
+    try:
+        subprocess.check_call(overlay_hg_repos)
+    except Exception as e:
+        # A stack track from here is not useful.
+        logger.error('abort: %s' % str(e))
+        sys.exit(1)
