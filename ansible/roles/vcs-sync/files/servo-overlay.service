@@ -9,12 +9,13 @@ OnFailure=mail-unit-output@%n.service
 [Service]
 Type=oneshot
 EnvironmentFile=/home/servo-sync/servo-sync.env
-ExecStart=/home/servo-sync/venv/bin/overlay-hg-repos \
+ExecStart=/home/servo-sync/venv/bin/servo-overlay \
   $OVERLAY_SOURCE_URL \
   $OVERLAY_DEST_URL \
   /home/servo-sync/firefox-overlay \
   --into servo \
   --result-push-url $OVERLAY_RESULT_PUSH_URL \
+  --push-tree $OVERLAY_PUSH_TREE \
   --hg /home/servo-sync/venv/bin/hg
 
 User=servo-sync
