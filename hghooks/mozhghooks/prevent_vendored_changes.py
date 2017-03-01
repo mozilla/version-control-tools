@@ -7,9 +7,9 @@ import os
 from mercurial.node import short
 
 
-def isautolandmember(user):
+def is_servo_vender_member(user):
     try:
-        g = grp.getgrnam('scm_autoland')
+        g = grp.getgrnam('scm_servo_vendor')
         if user in g.gr_mem:
             return True
     except KeyError:
@@ -18,8 +18,8 @@ def isautolandmember(user):
     return False
 
 
-def isservoallowed(user):
-    if isautolandmember(user):
+def is_servo_allowed(user):
+    if is_servo_vender_member(user):
         return True
 
     return user in {
@@ -44,10 +44,9 @@ def hook(ui, repo, node, source=None, **kwargs):
 
     if servonodes:
         ui.write('(%d changesets contain changes to protected servo/ '
-                 'directory: %s)\n' % (
-                 len(servonodes), ', '.join(servonodes)))
+                 'directory: %s)\n' % (len(servonodes), ', '.join(servonodes)))
 
-        if isservoallowed(os.environ['USER']):
+        if is_servo_allowed(os.environ['USER']):
             ui.write('(you have permission to change servo/)\n')
         else:
             res = 1
