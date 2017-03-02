@@ -16,6 +16,7 @@
     - { name: 'scm_versioncontrol', gid: 690 }
     - { name: 'scm_autoland', gid: 2346 }
     - { name: 'scm_conduit', gid: 691 }
+    - { name: 'scm_servo_vendor', gid: 2347 }
 
 - name: Create hg group
   group: name=hg
