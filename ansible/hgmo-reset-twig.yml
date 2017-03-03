@@ -1,0 +1,122 @@
+# ansible-playbook -i hosts -e twig=$TWIG hgmo-reset-twig.yml
+# optionally, add:
+#   -e source=<relative_path_to_repo>
+#   -e revision=<hash>
+# e.g. -e source=hgcustom/version-control-tools -e a92571001fda
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Set source_repo fact
+      set_fact:
+        source_repo: "{{ source | default('mozilla-central') }}"
+      tags: always
+
+- hosts: hgssh-prod-master
+  gather_facts: no
+  tasks:
+    - name: Ensure twig exists
+      stat: path=/repo/hg/mozilla/projects/{{ twig | mandatory }}
+      register: twig_st
+      tags: check
+
+    - fail:
+        msg: "Twig {{ twig }} does not exist! Check the name and try again."
+      when: twig_st.stat.exists == False
+      tags: check
+
+    - name: Ensure source exists
+      stat: path=/repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}
+      register: src_st
+      tags: check
+
+    - fail:
+        msg: "Source '{{ hostvars['localhost'].source_repo }}' does not exist! Check the name and try again."
+      when: src_st.stat.exists == False
+      tags: check
+
+    - name: Ensure temporary twig-old does not exist
+      stat: path=/repo/hg/mozilla/projects/{{ twig }}-old
+      register: old_st
+      tags: check
+
+    - fail:
+        msg: "Temporary {{ twig }}-old exists! Check that another reset is not in progress or failed to clean up and try again."
+      when: old_st.stat.exists == True
+      tags: check
+
+- hosts: hgssh-prod-master:hgweb-prod
+  gather_facts: no
+  tasks:
+    - name: Rename twig to twig-old
+      command: mv /repo/hg/mozilla/projects/{{ twig }} /repo/hg/mozilla/projects/{{ twig }}-old
+               creates=/repo/hg/mozilla/projects/{{ twig }}-old
+      tags: rename
+
+- hosts: hgssh-prod-master
+  gather_facts: no
+  tasks:
+    - name: Initialize new twig repo
+      become_user: hg
+      command: /var/hg/venv_tools/bin/hg init /repo/hg/mozilla/projects/{{ twig }}
+               creates=/repo/hg/mozilla/projects/{{ twig }}
+      tags: reset
+
+    - name: Pull new repo
+      become_user: hg
+      command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! pull -r {{ revision | default("tip") }} /repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}
+               chdir=/repo/hg/mozilla/projects/{{ twig }}
+      register: hg_pull
+      tags: reset
+
+    - name: Create hgrc
+      become_user: hg
+      ini_file: dest=/repo/hg/mozilla/projects/{{ twig }}/.hg/hgrc
+                section={{ item.section }}
+                option={{ item.option }}
+                value={{ item.value }}
+                owner=hg
+                group=scm_level_2
+      with_items:
+        - { section: paths, option: default, value: "/repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}" }
+        - { section: hooks, option: pretxnchangegroup.a_treeclosure, value: "python:mozhghooks.treeclosure.hook" }
+      tags: reset
+
+    - name: Set permissions
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg scm_level_2 wwr
+      tags: reset
+
+    - name: Check revision
+      command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! log -l 1
+               chdir=/repo/hg/mozilla/projects/{{ twig }}
+      register: hg_log
+      tags: reset
+
+    - name: Run replicatesync
+      command: /var/hg/venv_tools/bin/hg replicatesync
+               chdir=/repo/hg/mozilla/projects/{{ twig }}
+      tags: reset
+
+    - name: Show revision
+      debug: var=hg_log.stdout.split('\n')
+    
+- hosts: hgssh-prod-master:hgweb-prod
+  gather_facts: no
+  tasks:
+    - name: Stat twig-old
+      stat: path=/repo/hg/mozilla/projects/{{ twig }}-old
+      register: old_st
+      tags: cleanup
+
+    - name: Remove twig-old
+      file: path=/repo/hg/mozilla/projects/{{ twig }}-old
+            state=absent
+      when: old_st.stat.exists
+      tags: cleanup
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Reminder
+      debug:
+        msg: "Please ask buildduty in #releng to issue a no-op reconfig of the buildbot scheduler, and file a bug in Taskcluster: Service Request to reset the branch in mozilla-taskcluster."
