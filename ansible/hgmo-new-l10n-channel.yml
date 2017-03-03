@@ -1,0 +1,46 @@
+# ansible-playbook -i hosts -e repo=$REPO hgmo-new-l10n-channel.yml
+# optionally, add:
+#   -e channel=<channel>
+---
+- hosts: hgssh-prod-master
+  gather_facts: no
+  vars:
+    default_channels: "['mozilla-aurora', 'mozilla-beta', 'mozilla-release']"
+  tasks:
+    - name: Set channels fact
+      set_fact:
+        channels: "{{ [channel] if channel is defined else default_channels }}"
+      tags: always
+
+    - name: Initialize new repos
+      become_user: hg
+      command: /var/hg/venv_tools/bin/hg init /repo/hg/mozilla/releases/l10n/{{ item }}/{{ repo | mandatory }}
+               creates=/repo/hg/mozilla/releases/l10n/{{ item }}/{{ repo }}
+      with_items:
+        - "{{ channels }}"
+      tags: init
+
+    - name: Create hgrc files
+      become_user: hg
+      ini_file: dest=/repo/hg/mozilla/releases/l10n/{{ item }}/{{ repo }}/.hg/hgrc
+                section="hooks"
+                option="pretxnchangegroup.a_singlehead"
+                value="python:mozhghooks.single_head_per_branch.hook"
+                owner=hg
+                group=scm_l10n
+      with_items:
+        - "{{ channels }}"
+      tags: hgrc
+
+    - name: Set permissions
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/releases/l10n/{{ item }}/{{ repo }} hg scm_l10n wwr
+      with_items:
+        - "{{ channels }}"
+      tags: perms
+
+    - name: Run replicatesync
+      command: /var/hg/venv_tools/bin/hg replicatesync
+               chdir=/repo/hg/mozilla/releases/l10n/{{ item }}/{{ repo }}
+      with_items:
+        - "{{ channels }}"
+      tags: replicate
