@@ -11,12 +11,18 @@ import os
 import subprocess
 import sys
 
+import hglib
+
 from ConfigParser import (
     RawConfigParser,
 )
 
 from . import (
     pulse,
+)
+
+from .util import (
+    run_hg,
 )
 
 
@@ -178,6 +184,44 @@ def tree_is_open(tree):
             'Failed to determine treestatus for %s: %s' % (tree, str(e)))
 
 
+def vendor_rust(repo_path, push_url):
+    # Update to tip.
+    with hglib.open(repo_path, 'utf-8') as repo:
+        run_hg(logger, repo, [b'update'])
+
+    # The cargo binaries need to be in the path.
+    cargo_path = os.path.join(os.getenv('HOME'), '.cargo', 'bin')
+    os.environ['PATH'] += os.pathsep + cargo_path
+
+    # Install/Update rust.
+    sys.path.append(os.path.join(repo_path, 'python', 'mozboot'))
+    from mozboot.base import BaseBootstrapper
+    BaseBootstrapper().ensure_rust_modern()
+
+    # Build the cargo-vendor binary.  |vendor rust| does this for us
+    # automatically, however errors are not printed to stdout/err.
+    # Installing cargo-vendor throws an error if it already exists.
+    if not os.path.exists(os.path.join(cargo_path, 'cargo-vendor')):
+        subprocess.check_call(['cargo', 'install', 'cargo-vendor'])
+    else:
+        print('Using %s/cargo-vendor' % cargo_path)
+
+    # Vendor that rust.
+    subprocess.check_call(['./mach', 'vendor', 'rust'], cwd=repo_path)
+
+    # If there are changes, commit and push.
+    with hglib.open(repo_path, 'utf-8') as repo:
+        run_hg(logger, repo, [b'addremove', b'third_party/rust',
+                              b'--cwd', repo_path])
+        if run_hg(logger, repo, [b'status', b'third_party/rust',
+                                 b'--template', b'{status} {path}\\n',
+                                 b'--cwd', repo_path]):
+            print('Pushing changes to %s' % push_url)
+            run_hg(logger, repo,
+                   [b'commit', b'-m', b'servo: revendor rust dependencies'])
+            run_hg(logger, repo, [b'push', push_url])
+
+
 def overlay_cli():
     """Wrapper around overlay-hg-repos to perform servo specific tasks."""
     import argparse
@@ -240,3 +284,7 @@ def overlay_cli():
         # A stack track from here is not useful.
         logger.error('abort: %s' % str(e))
         sys.exit(1)
+
+    # Execute |mach vendor rust|
+    vendor_rust(args.dest_repo_path, args.result_push_url)
+
