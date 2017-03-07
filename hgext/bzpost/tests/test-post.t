@@ -223,7 +223,7 @@ Pushing to Try will post Treeherder comment
     - author: default@example.com
       id: 8
       tags: []
-      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=311111800824
+      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=3111118008240c878e0056e7b6f676214250986f
     component: TestComponent
     depends_on: []
     platform: All
@@ -322,7 +322,7 @@ Public changesets pushed to Try will be ignored if a bug in draft changesets
     - author: default@example.com
       id: 11
       tags: []
-      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7a
+      text: https://treeherder.mozilla.org/#/jobs?repo=try&revision=9257b757fa7ad3ba7eb6b5a0af7046d54366868b
     component: TestComponent
     depends_on: []
     platform: All
