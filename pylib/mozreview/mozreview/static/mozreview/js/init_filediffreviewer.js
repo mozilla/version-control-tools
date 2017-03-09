@@ -110,55 +110,52 @@ $(document).ready(function() {
   });
 
   // Restyle and modify content if commit message FileDiff is present.
-  // commitMsgIds is an array holding a commit message FileDiff ids in
+  // commitMsgIds is an object holding a commit message FileDiff ids in
   // relation to Revision numbers.
-  var commitMsgIds = [];
   var commitMsgData = $('#commit-message-filediff-data');
   var currentRevisionNumber = commitMsgData.data('currentRevisionNumber');
-  if (currentRevisionNumber) {
-    commitMsgIds = commitMsgData.data('commitMessageIds');
-  }
+  var commitMsgIds = (currentRevisionNumber)
+    ? commitMsgData.data('commitMessageIds')
+    : {};
+  var commitMsgIdsArr = Object.keys(commitMsgIds).map(
+    function (key) { return commitMsgIds[key]; });
 
   function changeCommitMsgIndexFileName() {
-    // Change the fileName of the first FileDiff index if commit msg
-    // FileDiff is present.
+    // Change the fileName of the first FileDiff index if commit
+    // message FileDiff is present.
     $('.with-commit-msg-filediff #diff_index tbody tr:first td a')
       .text('commit-message');
   }
 
-  function changeCommitMsgFileDiff(page) {
-    // Commit message FileDiff element is displayed only on the first page.
-    if (page !== 1) {
-      // Remove styling of the first FileDiff element
-      $('#review_request').removeClass('with-commit-msg-filediff');
-      return;
-    }
-    // Add styling of the first FileDiff element
+  function hideCommitMsgStyling() {
+    // Remove styling of the first FileDiff element.
+    $('#review_request').removeClass('with-commit-msg-filediff');
+  }
+
+  function showCommitMsgStyling() {
+    // Add styling of the first FileDiff element.
     $('#review_request').addClass('with-commit-msg-filediff');
     // Set the diff_index's commit message fileName
     changeCommitMsgIndexFileName();
   }
 
-  function detectPageAndChangeCommitMsgFileDiff() {
-    var page;
-    if ($('#pagination1').children().length == 0) {
-      page = 1;
+  function checkFileDiffs() {
+    // Check if any of the files in page's model is a commit message.
+    var files = page.model.get('files').filter(function(file) {
+      return commitMsgIdsArr.indexOf(file.id) !== -1;
+    });
+    if (files.length) {
+      showCommitMsgStyling();
     } else {
-      page = +$('#pagination1 span.paginate-current').text();
+      hideCommitMsgStyling();
     }
-    changeCommitMsgFileDiff(page);
   }
 
   // Old ReviewRequests don't have commit message FileDiff. In such case
-  // commitMsgIds is an empty array.
+  // commitMsgIds is an empty object.
   if (currentRevisionNumber && commitMsgIds[currentRevisionNumber]) {
-    // Check the initial stage of the pager.
-    detectPageAndChangeCommitMsgFileDiff();
-    // Listen to pagination events.
-    page._paginationView1.on('pageSelected', changeCommitMsgFileDiff);
-    page._paginationView2.on('pageSelected', changeCommitMsgFileDiff);
-    // Listen to context loaded event and change name if needed.
-    $(document).on('mr:diff-context-loaded',
-                   detectPageAndChangeCommitMsgFileDiff);
+    // Check the initial stage.
+    checkFileDiffs();
+    $(document).on('mr:diff-context-loaded', checkFileDiffs);
   }
 });
