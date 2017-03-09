@@ -89,6 +89,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'bsmedberg',         # Benjamin Smedberg
         'bent',              # Ben Turner
         'jed',               # Jed Davis
+        'kanru',             # Kan-Ru Chen
     ]
     IPC_authors = [
         'billm@mozilla.com',       # Bill McCloskey,
@@ -97,6 +98,8 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'benjamin@smedbergs.us',   # Benjamin Smedberg
         'bent.mozilla@gmail.com',  # Ben Turner
         'jld@mozilla.com',         # Jed Davis
+        'kchen@mozilla.com',       # Kan-Ru Chen
+        'kanru@kanru.info',        # Kan-Ru Chen
     ]
 
     error = ""
