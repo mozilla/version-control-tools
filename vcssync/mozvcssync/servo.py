@@ -287,6 +287,7 @@ def overlay_cli():
         logger.error('abort: %s' % str(e))
         sys.exit(1)
 
-    # Execute |mach vendor rust|
-    vendor_rust(args.dest_repo_path, args.result_push_url)
+    if not os.getenv('TEST_NOVENDOR'):
+        # Execute |mach vendor rust|
+        vendor_rust(args.dest_repo_path, args.result_push_url)
 

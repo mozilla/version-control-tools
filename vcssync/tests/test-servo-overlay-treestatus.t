@@ -3,7 +3,8 @@
 
 test tree open
 
-  $ TEST_TREESTATUS=open servo-overlay http://localhost:$HGPORT/overlay-source \
+  $ TEST_TREESTATUS=open TEST_NOVENDOR=1 \
+  >   servo-overlay http://localhost:$HGPORT/overlay-source \
   >   http://localhost:$HGPORT/overlay-dest repo --into subdir \
   >   --result-push-url http://localhost:$HGPORT/overlay-dest \
   >   --push-tree test
@@ -43,7 +44,8 @@ test tree open
 
 test tree close
 
-  $ TEST_TREESTATUS=closed servo-overlay http://localhost:$HGPORT/overlay-source \
+  $ TEST_TREESTATUS=closed TEST_NOVENDOR=1 \
+  >   servo-overlay http://localhost:$HGPORT/overlay-source \
   >   http://localhost:$HGPORT/overlay-dest repo --into subdir \
   >   --result-push-url http://localhost:$HGPORT/overlay-dest \
   >   --push-tree test
@@ -51,7 +53,8 @@ test tree close
 
 test tree query error
 
-  $ TEST_TREESTATUS=error servo-overlay http://localhost:$HGPORT/overlay-source \
+  $ TEST_TREESTATUS=error TEST_NOVENDOR=1 \
+  >   servo-overlay http://localhost:$HGPORT/overlay-source \
   >   http://localhost:$HGPORT/overlay-dest repo --into subdir \
   >   --result-push-url http://localhost:$HGPORT/overlay-dest \
   >   --push-tree test
