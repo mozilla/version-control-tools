@@ -189,9 +189,11 @@ def vendor_rust(repo_path, push_url):
     with hglib.open(repo_path, 'utf-8') as repo:
         run_hg(logger, repo, [b'update'])
 
-    # The cargo binaries need to be in the path.
+    # The hg and cargo binaries need to be in the path.
     cargo_path = os.path.join(os.getenv('HOME'), '.cargo', 'bin')
     os.environ['PATH'] += os.pathsep + cargo_path
+    if hglib.HGPATH != 'hg':
+        os.environ['PATH'] += os.pathsep + os.path.dirname(hglib.HGPATH)
 
     # Install/Update rust.
     sys.path.append(os.path.join(repo_path, 'python', 'mozboot'))
