@@ -252,6 +252,8 @@ def overlay_cli():
                              'before pushing')
 
     args = parser.parse_args()
+    if args.hg:
+        hglib.HGPATH = args.hg
 
     # Ensure the tree is open before starting.
     try:
