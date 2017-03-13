@@ -158,10 +158,15 @@ def upload_to_s3(host, bucket_name, local_path, remote_path):
     # Copying the object resets the modification time to current and prevents
     # unwanted early expiration.
     if key.exists():
-        print('copying object to reset expiration time')
+        print('copying %s:%s to reset expiration time' % (bucket_name,
+                                                          remote_path))
         key.copy(bucket_name, remote_path, validate_dst_bucket=False)
+        print('copying %s:%s completed' % (bucket_name, remote_path))
     else:
+        print('uploading %s:%s from %s' % (bucket_name, remote_path,
+                                           local_path))
         key.set_contents_from_filename(local_path)
+        print('uploading %s:%s completed' % (bucket_name, remote_path))
 
 def bundle_paths(root, repo, tag, typ):
     basename = '%s.%s.hg' % (tag, typ)
