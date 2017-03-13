@@ -80,7 +80,8 @@ def main(args):
         # This is a common error. So rather than display the entire stack to
         # the user, exit with a well-defined exit code so the caller can
         # display a nice error message.
-        if e.args[0].startswith('Pushing merges is not supported yet'):
+        if any(arg.startswith('Pushing merges is not supported yet')
+               for arg in getattr(e, 'args', ())[:1]):
             return 127
         raise
 
