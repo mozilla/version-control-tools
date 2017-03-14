@@ -74,14 +74,6 @@ Create a review request from an L1 user
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -131,14 +123,6 @@ Have an L1 user provide a r+ review which should not grant approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -198,14 +182,6 @@ Have an L3 user provide a r+ review which should grant approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -271,14 +247,6 @@ Posting a new review without r+ should cancel the previous approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -353,14 +321,6 @@ One more r+ should switch it back to approved
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -445,14 +405,6 @@ Even though the author is L1, adding a new diff will not cancel approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -466,14 +418,6 @@ Even though the author is L1, adding a new diff will not cancel approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -556,14 +500,6 @@ A new r+ from L3 should give approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -577,14 +513,6 @@ A new r+ from L3 should give approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -680,14 +608,6 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -701,14 +621,6 @@ Opening issues, even from an L1 user, should revoke approval until they're fixed
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -819,14 +731,6 @@ Fixing the issue should restore approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -840,14 +744,6 @@ Fixing the issue should restore approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Initial commit to review
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -966,14 +862,6 @@ Review requests created by L3 users
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 2 - initial commit to review
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -1023,14 +911,6 @@ Even a ship-it from an L1 user will give approval to an L3 author
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 2 - initial commit to review
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -1093,14 +973,6 @@ ship-its. Posting a new diff should not clear approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 2 - initial commit to review
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -1114,14 +986,6 @@ ship-its. Posting a new diff should not clear approval
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 2 - initial commit to review
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

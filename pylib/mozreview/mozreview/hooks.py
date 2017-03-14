@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import json
 
 from django.template.loader import Context
 from django.utils.translation import ugettext as _
@@ -10,9 +11,11 @@ from reviewboard.extensions.hooks import (
     ReviewRequestFieldsHook,
     TemplateHook
 )
+from reviewboard.extensions.fixuphook import DownloadRawHook
 
 from mozreview.extra_data import (
     COMMIT_ID_KEY,
+    COMMIT_MSG_FILEDIFF_IDS_KEY,
     fetch_commit_data,
     gen_child_rrs,
     get_parent_rr,
@@ -30,6 +33,31 @@ from mozreview.template_helpers import get_commit_table_context
 
 
 logger = logging.getLogger(__name__)
+
+
+class MozReviewDownloadRawHook(DownloadRawHook):
+    def filter(self, files):
+        """Filter out commit message FileDiff."""
+        if not files:
+            return []
+
+        history = files[0].diffset.history
+        if not history:
+            # No history, no commit message FileDiff has been created yet
+            return files
+
+        rr = history.review_request.all()[0]
+        commit_data = fetch_commit_data(rr)
+        commit_msg_ids = commit_data.get_for(
+            rr, COMMIT_MSG_FILEDIFF_IDS_KEY)
+        # ReviewRequests created before implementing commit message FileDiff
+        # have no COMMIT_MSG_FILEDIFF_IDS_KEY in their extra_data.
+        if not commit_msg_ids:
+            return files
+
+        commit_msg_ids = json.loads(commit_msg_ids).values()
+        return [x for x in files if x.id not in commit_msg_ids]
+
 
 class CommitContextTemplateHook(TemplateHook):
     """Gathers all information required for commits table

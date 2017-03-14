@@ -35,7 +35,7 @@
   publish these review requests now (Yn)?  y
   (published review request 1)
 
-Commit message file should be created as a first in the set.
+Commit extra data fields should be created
 
   $ reviewboard dumpreview 2
   id: 2
@@ -69,14 +69,6 @@ Commit message file should be created as a first in the set.
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-df673 b/commit-message-df673
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-df673
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo.h b/foo.h
     - '--- a/foo.h'
     - +++ b/foo.h
@@ -87,7 +79,8 @@ Commit message file should be created as a first in the set.
   approved: false
   approval_failure: A suitable reviewer has not given a "Ship It!"
 
-Amended commit message should result with a changed commit msg filediff content
+Amended commit message should result with a changed commit message ids extra 
+data, filename should remain the same.
 
   $ hg commit --amend -m 'Bug 1 - Foo 2 - amended'
   saved backup bundle to $TESTTMP/client/.hg/strip-backup/4a9cf7e91820-f76b5126-amend-backup.hg (glob)
@@ -147,14 +140,6 @@ Amended commit message should result with a changed commit msg filediff content
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-df673 b/commit-message-df673
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-df673
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo.h b/foo.h
     - '--- a/foo.h'
     - +++ b/foo.h
@@ -168,14 +153,6 @@ Amended commit message should result with a changed commit msg filediff content
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-df673 b/commit-message-df673
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-df673
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 2 - amended
-    - +
-    - '+MozReview-Commit-ID: APOgLo'
     - diff --git a/foo.h b/foo.h
     - '--- a/foo.h'
     - +++ b/foo.h

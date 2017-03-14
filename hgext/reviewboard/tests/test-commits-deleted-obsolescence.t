@@ -372,14 +372,6 @@ Review 6 should be marked as discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-4d0f8 b/commit-message-4d0f8
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-4d0f8
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 5
-    - +
-    - '+MozReview-Commit-ID: JmjAjw'
     - diff --git a/foo5 b/foo5
     - new file mode 100644
     - '--- /dev/null'
@@ -606,14 +598,6 @@ The dropped commit should now be discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-93d94 b/commit-message-93d94
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-93d94
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo1 b/foo1
     - new file mode 100644
     - '--- /dev/null'
@@ -1043,14 +1027,6 @@ Review request 5 (whose commit was deleted) should be discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-71387 b/commit-message-71387
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-71387
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 4
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo4 b/foo4
     - new file mode 100644
     - '--- /dev/null'
@@ -1064,14 +1040,6 @@ Review request 5 (whose commit was deleted) should be discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-71387 b/commit-message-71387
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-71387
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 4
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo4 b/foo4
     - new file mode 100644
     - '--- /dev/null'
@@ -1085,14 +1053,6 @@ Review request 5 (whose commit was deleted) should be discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-71387 b/commit-message-71387
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-71387
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 4
-    - +
-    - '+MozReview-Commit-ID: F63vXs'
     - diff --git a/foo4 b/foo4
     - new file mode 100644
     - '--- /dev/null'

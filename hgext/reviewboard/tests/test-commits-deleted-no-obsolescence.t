@@ -266,14 +266,6 @@ Review 6 should be marked as discarded
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-4d0f8 b/commit-message-4d0f8
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-4d0f8
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 5
-    - +
-    - '+MozReview-Commit-ID: JmjAjw'
     - diff --git a/foo5 b/foo5
     - new file mode 100644
     - '--- /dev/null'
@@ -351,14 +343,6 @@ The review request corresponding to the dropped commit has no draft
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-93d94 b/commit-message-93d94
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-93d94
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo1 b/foo1
     - new file mode 100644
     - '--- /dev/null'

@@ -67,14 +67,6 @@ The globbing is patching over a bug in mach
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-3a9f6 b/commit-message-3a9f6
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-3a9f6
-    - '@@ -0,0 +1,3 @@'
-    - "+Bug 1 - Initial commit to review \u2019 \u3053"
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

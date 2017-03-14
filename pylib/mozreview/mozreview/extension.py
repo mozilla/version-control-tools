@@ -59,6 +59,7 @@ from mozreview.file_diff_reviewer.resources import (
 from mozreview.hooks import (
     CommitContextTemplateHook,
     MozReviewApprovalHook,
+    MozReviewDownloadRawHook,
 )
 from mozreview.hostingservice.bmo_bugtracker import (
     BMOBugTracker,
@@ -334,6 +335,8 @@ class MozReviewExtension(Extension):
 
         # Use a custom method to calculate a review approval state.
         MozReviewApprovalHook(self)
+
+        MozReviewDownloadRawHook(self)
 
         # Instantiate the various signal handlers
         initialize_signal_handlers(self)

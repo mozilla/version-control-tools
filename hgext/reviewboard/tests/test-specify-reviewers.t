@@ -241,14 +241,6 @@ Publishing series during push works
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-ccfcf b/commit-message-ccfcf
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-ccfcf
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - More stuff; [r?remus, r?romulus]
-    - +
-    - '+MozReview-Commit-ID: cXO9WC'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo

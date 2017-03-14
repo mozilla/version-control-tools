@@ -190,14 +190,6 @@ Child review request with ID 2 should be closed as discarded...
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-7c5bd b/commit-message-7c5bd
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-7c5bd
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -242,14 +234,6 @@ Child review request with ID 3 should be closed as discarded...
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-98467 b/commit-message-98467
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-98467
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 2
-    - +
-    - '+MozReview-Commit-ID: 5ijR9k'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -426,14 +410,6 @@ Child review request with ID 2 should be re-opened...
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-7c5bd b/commit-message-7c5bd
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-7c5bd
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -500,14 +476,6 @@ Child review request with ID 3 should be re-opened...
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-98467 b/commit-message-98467
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-98467
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 2
-    - +
-    - '+MozReview-Commit-ID: 5ijR9k'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -683,14 +651,6 @@ Child review request with ID 2 should be published.
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-7c5bd b/commit-message-7c5bd
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-7c5bd
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 1
-    - +
-    - '+MozReview-Commit-ID: 124Bxg'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
@@ -735,14 +695,6 @@ Child review request with ID 3 should be published.
     name: diff
     extra: {}
     patch:
-    - diff --git a/commit-message-98467 b/commit-message-98467
-    - new file mode 100644
-    - '--- /dev/null'
-    - +++ b/commit-message-98467
-    - '@@ -0,0 +1,3 @@'
-    - +Bug 1 - Foo 2
-    - +
-    - '+MozReview-Commit-ID: 5ijR9k'
     - diff --git a/foo b/foo
     - '--- a/foo'
     - +++ b/foo
