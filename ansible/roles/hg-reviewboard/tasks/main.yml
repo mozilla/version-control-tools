@@ -21,6 +21,9 @@
     - mod_authnz_external
     - sudo
 
+- name: add logrotate httpd config
+  copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
+
 - name: Repository directories present
   file: path=/repo/hg/webroot_wsgi state=directory mode=0755
 
