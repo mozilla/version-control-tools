@@ -212,9 +212,14 @@ def vendor_rust(repo_path, push_url):
     subprocess.check_call(['./mach', 'vendor', 'rust'], cwd=repo_path)
 
     # If there are changes, commit and push.
-    # For safety this is limited to directories known to be modified by
-    # |mach vendor rust|.
-    vendor_paths = [b'third_party/rust', b'toolkit/library']
+    # For safety this is limited to directories and files known to be modified
+    # by |mach vendor rust|.
+    vendor_paths = [
+        b'third_party/rust',
+        b'toolkit/library/rust/Cargo.lock',
+        b'toolkit/library/gtest/rust/Cargo.lock',
+        b'js/src/Cargo.lock',
+    ]
     with hglib.open(repo_path, 'utf-8') as repo:
         run_hg(logger, repo, [b'addremove', b'--cwd', repo_path] + vendor_paths)
         if run_hg(logger, repo, [b'status', b'--cwd', repo_path,
