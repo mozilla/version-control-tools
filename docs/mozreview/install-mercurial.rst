@@ -13,12 +13,6 @@ can run ``mach mercurial-setup`` from it and a guided wizard will walk
 you through configuring Mercurial for optimal use on Mozilla projects.
 Configuring Mercurial for MozReview is part of this wizard.
 
-.. important::
-
-   The wizard currently does not configure the ``autoreview``
-   repository. See :ref:`mozreview_install_autoreview` for how to do
-   this manually.
-
 If you don't have a Firefox repository, have no fear: just follow the
 instructions below.
 
