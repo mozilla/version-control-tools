@@ -34,6 +34,7 @@ def HGEXT_BOOTSTRAP():
     paths = set(sys.path)
 
     lib_paths = [
+        'pylib/conduitclient',
         'pylib/configobj',
         'pylib/Bugsy',
         'pylib/flake8',
