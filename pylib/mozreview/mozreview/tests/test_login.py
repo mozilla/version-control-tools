@@ -4,9 +4,12 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import unittest
+
 from vcttesting.unittest import MozReviewWebDriverTest
 
 
+@unittest.skip('Skipped due to Bug 1348725')
 class LoginTest(MozReviewWebDriverTest):
     def assertInvalidLogin(self, verify_error_msg=True):
         self.verify_bzurl('auth.cgi')

@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+import unittest
 
 from selenium.webdriver.common.by import (
     By,
@@ -22,6 +23,7 @@ from vcttesting.unittest import (
 )
 
 
+@unittest.skip('Skipped due to Bug 1348725')
 class PublishNoReviewerTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):

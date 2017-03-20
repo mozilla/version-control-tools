@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import time
+import unittest
 
 from rbtools.api.client import RBClient
 from rbtools.api.transport.sync import SyncTransport
@@ -17,6 +18,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from vcttesting.unittest import MozReviewWebDriverTest
 
 
+@unittest.skip('Skipped due to Bug 1348725')
 class AutolandInboundTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):

@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+import unittest
 
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver import ActionChains
@@ -14,6 +15,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from vcttesting.unittest import MozReviewWebDriverTest
 
 
+@unittest.skip('Skipped due to Bug 1348725')
 class BrowserCacheTest(MozReviewWebDriverTest):
     @classmethod
     def setUpClass(cls):
