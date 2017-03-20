@@ -50,7 +50,6 @@ button.diff-file-btn {
             &:hover {
                 pre:before {
                     content: '';
-                    display: relative;
                     box-shadow: 1px 1px 3px black;
                     border: 1px solid grey;
                     height: 15px;
@@ -68,6 +67,11 @@ button.diff-file-btn {
                 padding-right: 20px;
             }
         }
+    }
+
+    /* ensure empty pre elements are the correct height */
+    pre {
+        min-height: 13px;  // 15 (plus.svg) * 0.8 (transform) + 1 (border)
     }
 
     .moved-row {
