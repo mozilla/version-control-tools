@@ -227,7 +227,7 @@ def vendor_rust(repo_path, push_url):
                   + vendor_paths):
             print('Pushing changes to %s' % push_url)
             run_hg(logger, repo,
-                   [b'commit', b'-m', b'servo: revendor rust dependencies'])
+                   [b'commit', b'-m', b'No bug - Revendor rust dependencies'])
             run_hg(logger, repo, [b'push', push_url])
 
 
