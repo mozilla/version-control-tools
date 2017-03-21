@@ -29,7 +29,7 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '3.7 3.8 3.9 4.0'
+testedwith = '3.8 3.9 4.0'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
