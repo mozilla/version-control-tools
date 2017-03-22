@@ -1,9 +1,11 @@
 import config
+import logging
 import re
 import requests
 
 TREESTATUS_URL = 'https://treestatus.mozilla-releng.net/trees/'
 
+logger = logging.getLogger('autoland')
 
 def tree_is_open(logger, tree):
     # treestatus running in dev/CI is an older version, with slightly

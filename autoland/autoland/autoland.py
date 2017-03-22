@@ -33,8 +33,10 @@ MOZREVIEW_RETRY_DELAY = datetime.timedelta(minutes=5)
 # time to wait before retrying a transplant
 TRANSPLANT_RETRY_DELAY = datetime.timedelta(minutes=5)
 
+logger = logging.getLogger('autoland')
 
-def handle_pending_transplants(logger, dbconn):
+
+def handle_pending_transplants(dbconn):
     cursor = dbconn.cursor()
     now = datetime.datetime.now()
     query = """
@@ -97,7 +99,7 @@ def handle_pending_transplants(logger, dbconn):
         pingback_url = request.get('pingback_url', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
         tree_open = current_treestatus.setdefault(
-            destination, treestatus.tree_is_open(logger, destination))
+            destination, treestatus.tree_is_open(destination))
 
         if not tree_open:
             handle_treeclosed(transplant_id, tree, rev, destination,
@@ -117,8 +119,7 @@ def handle_pending_transplants(logger, dbconn):
             #       duplicate work unnecessarily if we have to rebase more
             #       than once.
             os.environ['AUTOLAND_REQUEST_USER'] = requester
-            landed, result = transplant.transplant(logger, tree,
-                                                   destination, rev,
+            landed, result = transplant.transplant(tree, destination, rev,
                                                    trysyntax, push_bookmark,
                                                    commit_descriptions)
             del os.environ['AUTOLAND_REQUEST_USER']
@@ -211,7 +212,7 @@ def handle_pending_transplants(logger, dbconn):
         dbconn.commit()
 
 
-def handle_pending_mozreview_updates(logger, dbconn):
+def handle_pending_mozreview_updates(dbconn):
     """Attempt to post updates to mozreview"""
 
     cursor = dbconn.cursor()
@@ -282,7 +283,6 @@ def main():
                                '%(levelname)s %(message)s',
                         datefmt='%H:%M:%S',
                         level=logging.DEBUG)
-    logger = logging.getLogger('autoland')
     stdout_handler = logging.StreamHandler(sys.stdout)
     logger.addHandler(stdout_handler)
     logger.info('starting autoland')
@@ -292,14 +292,14 @@ def main():
     next_mozreview_update = datetime.datetime.now()
     while True:
         try:
-            handle_pending_transplants(logger, dbconn)
+            handle_pending_transplants(dbconn)
 
             # TODO: In normal configuration, all updates will be posted to the
             # same MozReview instance, so we don't bother tracking failure to
             # post for individual urls. In the future, we might need to
             # support this.
             if datetime.datetime.now() > next_mozreview_update:
-                ok = handle_pending_mozreview_updates(logger, dbconn)
+                ok = handle_pending_mozreview_updates(dbconn)
                 if ok:
                     next_mozreview_update += datetime.timedelta(seconds=1)
                 else:

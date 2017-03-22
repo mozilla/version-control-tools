@@ -1,11 +1,14 @@
 import config
 import hglib
 import json
+import logging
 import os
 import re
 import tempfile
 
 REPO_CONFIG = {}
+
+logger = logging.getLogger('autoland')
 
 
 def get_repo_path(tree):
@@ -19,7 +22,7 @@ def formulate_hg_error(cmd, output):
     return 'hg error in cmd: ' + ' '.join(cmd) + ': ' + output
 
 
-def transplant(logger, tree, destination, rev, trysyntax=None,
+def transplant(tree, destination, rev, trysyntax=None,
                push_bookmark=False, commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
 
@@ -37,12 +40,12 @@ def transplant(logger, tree, destination, rev, trysyntax=None,
     path = get_repo_path(tree)
     configs = ['ui.interactive=False']
     with hglib.open(path, encoding='utf-8', configs=configs) as client:
-        return _transplant(logger, client, tree, destination, rev,
+        return _transplant(client, tree, destination, rev,
                            trysyntax=trysyntax, push_bookmark=push_bookmark,
                            commit_descriptions=commit_descriptions)
 
 
-def _transplant(logger, client, tree, destination, rev, trysyntax=None,
+def _transplant(client, tree, destination, rev, trysyntax=None,
                 push_bookmark=False, commit_descriptions=None):
     landed = True
     result = ''
