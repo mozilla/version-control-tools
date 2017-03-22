@@ -96,6 +96,16 @@ def run_hg(hg_repo, rev, args):
     return out.getvalue()
 
 
+def run_hg_cmds(hg_repo, rev, cmds):
+    last_result = ''
+    for cmd in cmds:
+        try:
+            last_result = run_hg(hg_repo, rev, cmd)
+        except hglib.error.CommandError as e:
+            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+    return last_result
+
+
 def strip_drafts(hg_repo, rev):
     # Strip any lingering draft changesets.
     try:
@@ -108,11 +118,9 @@ def get_remote_tip(hg_repo, rev):
     # Obtain remote tip. We assume there is only a single head.
     # Output can contain bookmark or branch name after a space. Only take
     # first component.
-    cmd = ['identify', 'upstream', '-r', 'tip']
-    try:
-        remote_tip = run_hg(hg_repo, rev, cmd)
-    except hglib.error.CommandError:
-        raise Exception(formulate_hg_error(['hg'] + cmd, ''))
+    remote_tip = run_hg_cmds(hg_repo, rev, [
+        ['identify', 'upstream', '-r', 'tip']
+    ])
     remote_tip = remote_tip.split()[0]
     assert len(remote_tip) == 12, remote_tip
     return remote_tip
@@ -152,24 +160,22 @@ def rewrite_commit_descriptions(hg_repo, rev, commit_descriptions):
         json.dump(commit_descriptions, f)
         f.flush()
 
-        cmd = ['rewritecommitdescriptions', '--descriptions=%s' % f.name, rev]
-        try:
-            cmd_output = run_hg(hg_repo, rev, cmd)
+        cmd_output = run_hg_cmds(hg_repo, rev, [
+            ['rewritecommitdescriptions', '--descriptions=%s' % f.name, rev]
+        ])
 
-            base_revision = None
-            for line in cmd_output.splitlines():
-                m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
-                if m and m.groups():
-                    base_revision = m.groups()[0]
-                    break
+        base_revision = None
+        for line in cmd_output.splitlines():
+            m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
+            if m and m.groups():
+                base_revision = m.groups()[0]
+                break
 
-            if not base_revision:
-                raise Exception('Could not determine base revision for '
-                                'rebase: %s' % cmd_output)
+        if not base_revision:
+            raise Exception('Could not determine base revision for '
+                            'rebase: %s' % cmd_output)
 
-            return base_revision
-        except hglib.error.CommandError as e:
-            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+        return base_revision
 
 
 def rebase(hg_repo, rev, base_revision, remote_tip):
@@ -182,11 +188,9 @@ def rebase(hg_repo, rev, base_revision, remote_tip):
         if 'nothing to rebase' not in output:
             raise Exception(formulate_hg_error(['hg'] + cmd, output))
 
-    cmd = ['log', '-r', 'tip', '-T', '{node|short}']
-    try:
-        return run_hg(hg_repo, rev, cmd)
-    except hglib.error.CommandError as e:
-        raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+    return run_hg_cmds(hg_repo, rev, [
+        ['log', '-r', 'tip', '-T', '{node|short}']
+    ])
 
 
 def validate_descriptions(hg_repo, destination, commit_descriptions):
@@ -212,44 +216,26 @@ def validate_descriptions(hg_repo, destination, commit_descriptions):
 def push_to_try(hg_repo, rev, trysyntax):
     if not trysyntax.startswith("try: "):
         trysyntax = "try: %s" % trysyntax
-    cmds = [
+    return run_hg_cmds(hg_repo, rev, [
         [
             '--encoding=utf-8',
             '--config', 'ui.allowemptycommit=true',
             'commit',
             '-m', trysyntax
         ],
+        ['push', '-r', '.', '-f', 'try'],
         ['log', '-r', 'tip', '-T', '{node|short}'],
-        ['push', '-r', '.', '-f', 'try']
-    ]
-
-    result = ''
-    for cmd in cmds:
-        try:
-            output = run_hg(hg_repo, rev, cmd)
-            if 'log' in cmd:
-                result = output
-        except hglib.error.CommandError as e:
-            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
-    return result
+    ])
 
 
 def push_bookmark_to_repo(hg_repo, rev, destination, bookmark):
-    cmds = [['bookmark', bookmark],
-            ['push', '-B', bookmark, destination]]
-
-    for cmd in cmds:
-        try:
-            run_hg(hg_repo, rev, cmd)
-        except hglib.error.CommandError as e:
-            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+    run_hg_cmds(hg_repo, rev, [
+        ['bookmark', bookmark],
+        ['push', '-B', bookmark, destination],
+    ])
 
 
 def push_to_repo(hg_repo, rev, destination):
-    cmds = [['push', '-r', 'tip', destination]]
-
-    for cmd in cmds:
-        try:
-            run_hg(hg_repo, rev, cmd)
-        except hglib.error.CommandError as e:
-            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+    run_hg_cmds(hg_repo, rev, [
+        ['push', '-r', 'tip', destination]
+    ])
