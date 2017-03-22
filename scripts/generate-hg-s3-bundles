@@ -36,7 +36,7 @@ CREATES = [
     # ``zstd-max`` uses the highest available compression settings and is
     # absurdly slow. But it produces significantly smaller bundles.
     ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
-    ('zstd-max', ['--config', 'experimental.bundlecomplevel=22',
+    ('zstd-max', ['--config', 'experimental.bundlecomplevel=21',
                   'bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
     ('stream-legacy', ['streambundle'], {}),
     ('packed1', ['streambundle', '--type', 's1'], {}),
