@@ -39,34 +39,33 @@ def transplant(tree, destination, rev, trysyntax=None,
 
     path = get_repo_path(tree)
     configs = ['ui.interactive=False']
-    with hglib.open(path, encoding='utf-8', configs=configs) as client:
-        return _transplant(client, tree, destination, rev,
+    with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
+        return _transplant(hg_repo, tree, destination, rev,
                            trysyntax=trysyntax, push_bookmark=push_bookmark,
                            commit_descriptions=commit_descriptions)
 
 
-def _transplant(client, tree, destination, rev, trysyntax=None,
+def run_hg(hg_repo, rev, args):
+    logger.info('rev: %s: executing: %s' % (rev, args))
+    out = hglib.util.BytesIO()
+    out_channels = {b'o': out.write, b'e': out.write}
+    ret = hg_repo.runcommand(args, {}, out_channels)
+    if ret:
+        raise hglib.error.CommandError(args, ret, out, None)
+    return out.getvalue()
+
+
+def _transplant(hg_repo, tree, destination, rev, trysyntax=None,
                 push_bookmark=False, commit_descriptions=None):
     landed = True
     result = ''
 
-    def run_hg(args):
-        logger.info('rev: %s: executing: %s' % (rev, args))
-        out = hglib.util.BytesIO()
-        out_channels = {b'o': out.write, b'e': out.write}
-        ret = client.runcommand(args, {}, out_channels)
-
-        if ret:
-            raise hglib.error.CommandError(args, ret, out, None)
-
-        return out.getvalue()
-
     # Obtain remote tip. We assume there is only a single head.
     # Output can contain bookmark or branch name after a space. Only take
     # first component.
+    cmd = ['identify', 'upstream', '-r', 'tip']
     try:
-        cmd = ['identify', 'upstream', '-r', 'tip']
-        remote_tip = run_hg(cmd)
+        remote_tip = run_hg(hg_repo, rev, cmd)
     except hglib.error.CommandError as e:
         return False, formulate_hg_error(['hg'] + cmd, '')
     remote_tip = remote_tip.split()[0]
@@ -74,7 +73,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
 
     # Strip any lingering draft changesets
     try:
-        run_hg(['strip', '--no-backup', '-r', 'not public()'])
+        run_hg(hg_repo, rev, ['strip', '--no-backup', '-r', 'not public()'])
     except hglib.error.CommandError as e:
         pass
 
@@ -88,7 +87,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
 
     for cmd in cmds:
         try:
-            output = run_hg(cmd)
+            output = run_hg(hg_repo, rev, cmd)
             if 'log' in cmd:
                 result = output
         except hglib.error.CommandError as e:
@@ -116,7 +115,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
             try:
                 cmd = ['rewritecommitdescriptions',
                        '--descriptions=%s' % f.name, rev]
-                cmd_output = run_hg(cmd)
+                cmd_output = run_hg(hg_repo, rev, cmd)
             except hglib.error.CommandError as e:
                 return False, formulate_hg_error(['hg'] + cmd, e.out.getvalue())
 
@@ -139,7 +138,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
     if not trysyntax:
         try:
             cmd = ['rebase', '-s', base_revision, '-d', remote_tip]
-            run_hg(cmd)
+            run_hg(hg_repo, rev, cmd)
         except hglib.error.CommandError as e:
             output = e.out.getvalue()
             if 'nothing to rebase' not in output:
@@ -147,7 +146,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
 
         try:
             cmd = ['log', '-r', 'tip', '-T', '{node|short}']
-            result = run_hg(cmd)
+            result = run_hg(hg_repo, rev, cmd)
         except hglib.error.CommandError as e:
             output = e.out.getvalue()
             return False, formulate_hg_error(['hg'] + cmd, output)
@@ -157,9 +156,9 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
         # Match outgoing commit descriptions against incoming commit
         # descriptions. If these don't match exactly, prevent the landing
         # from occurring.
-        incoming_descriptions = set([c.encode(client.encoding)
+        incoming_descriptions = set([c.encode(hg_repo.encoding)
                                      for c in commit_descriptions.values()])
-        outgoing = client.outgoing('tip', destination)
+        outgoing = hg_repo.outgoing('tip', destination)
         outgoing_descriptions = set([commit[5] for commit in outgoing])
 
         if incoming_descriptions ^ outgoing_descriptions:
@@ -194,7 +193,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
 
     for cmd in cmds:
         try:
-            output = run_hg(cmd)
+            output = run_hg(hg_repo, rev, cmd)
             if 'log' in cmd:
                 result = output
         except hglib.error.CommandError as e:
@@ -203,7 +202,7 @@ def _transplant(client, tree, destination, rev, trysyntax=None,
 
     # Strip any lingering draft changesets
     try:
-        run_hg(['strip', '--no-backup', '-r', 'not public()'])
+        run_hg(hg_repo, rev, ['strip', '--no-backup', '-r', 'not public()'])
     except hglib.error.CommandError as e:
         pass
 
