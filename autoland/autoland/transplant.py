@@ -11,6 +11,16 @@ REPO_CONFIG = {}
 logger = logging.getLogger('autoland')
 
 
+class HgCommandError(Exception):
+    def __init__(self, hg_args, out):
+        # we want to strip out any sensitive --config options
+        hg_args = map(lambda x: x if not x.startswith('bugzilla') else 'xxx',
+                      hg_args)
+        message = 'hg error in cmd: hg %s: %s' % (' '.join(hg_args),
+                                                  out.getvalue())
+        super(self.__class__, self).__init__(message)
+
+
 def transplant(tree, destination, rev, trysyntax=None,
                push_bookmark=False, commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
@@ -80,12 +90,6 @@ def get_repo_path(tree):
                                    os.path.join(os.path.sep, 'repos', tree))
 
 
-def formulate_hg_error(cmd, output):
-    # we want to strip out any sensitive --config options
-    cmd = map(lambda x: x if not x.startswith('bugzilla') else 'xxx', cmd)
-    return 'hg error in cmd: ' + ' '.join(cmd) + ': ' + output
-
-
 def run_hg(hg_repo, rev, args):
     logger.info('rev: %s: executing: %s' % (rev, args))
     out = hglib.util.BytesIO()
@@ -102,7 +106,7 @@ def run_hg_cmds(hg_repo, rev, cmds):
         try:
             last_result = run_hg(hg_repo, rev, cmd)
         except hglib.error.CommandError as e:
-            raise Exception(formulate_hg_error(['hg'] + cmd, e.out.getvalue()))
+            raise HgCommandError(cmd, e.out)
     return last_result
 
 
@@ -147,8 +151,7 @@ def update_repo(hg_repo, rev, tree, remote_rev):
                 # there was no rebase in progress, nothing to see here
                 continue
             else:
-                raise Exception(formulate_hg_error(['hg'] + cmd,
-                                                   e.out.getvalue()))
+                raise HgCommandError(cmd, e.out)
 
 
 def rewrite_commit_descriptions(hg_repo, rev, commit_descriptions):
@@ -184,9 +187,8 @@ def rebase(hg_repo, rev, base_revision, remote_tip):
     try:
         run_hg(hg_repo, rev, cmd)
     except hglib.error.CommandError as e:
-        output = e.out.getvalue()
-        if 'nothing to rebase' not in output:
-            raise Exception(formulate_hg_error(['hg'] + cmd, output))
+        if 'nothing to rebase' not in e.out.getvalue():
+            raise HgCommandError(cmd, e.out)
 
     return run_hg_cmds(hg_repo, rev, [
         ['log', '-r', 'tip', '-T', '{node|short}']
