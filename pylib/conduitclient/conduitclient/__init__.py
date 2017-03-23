@@ -31,5 +31,4 @@ def stage(remote_url, bz_username, bz_apikey, commit_ids):
                                        'commit_ids': commit_ids},
                                  timeout=10)
         response.raise_for_status()
-        # TODO: Define the server response body
-        return 'Stubbed sending request to remote server'
+        return response.json()['message']
