@@ -125,6 +125,8 @@ class ChangeTracker(object):
 
         with self._db:
             for push_id, push in repo.push_info(start_id=last_push_id + 1):
+                if not push['changesets']:
+                    continue
                 self._db.execute('INSERT INTO pushes (push_id, tree_id, time, '
                 'user) VALUES (?, ?, ?, ?)', [push_id, tree_id, push['date'],
                     push['user']])
