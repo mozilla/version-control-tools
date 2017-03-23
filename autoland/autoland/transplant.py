@@ -60,25 +60,12 @@ class Transplant:
                    commit_descriptions=None):
         result = ''
         try:
-            # Obtain remote tip. We assume there is only a single head.
-            remote_tip = self.get_remote_tip()
-
-            # Strip any lingering draft changesets.
-            self.strip_drafts()
-
-            # Pull from "upstream".
-            self.update_repo(remote_tip)
+            # Update from "upstream"
+            remote_tip = self.update_repo()
 
             # Update commit descriptions and rebase.
             if not trysyntax:
-                base_revision = self.rewrite_commit_descriptions(
-                    commit_descriptions)
-                logger.info('base revision: %s' % base_revision)
-
-                result = self.rebase(base_revision, remote_tip)
-                logger.info('rebased (tip) revision: %s' % result)
-
-                self.validate_descriptions(commit_descriptions)
+                result = self.apply_changes(remote_tip, commit_descriptions)
 
             # Now we push to the destination
             if trysyntax:
@@ -95,6 +82,28 @@ class Transplant:
 
         except Exception as e:
             return False, str(e)
+
+    def update_repo(self):
+        # Obtain remote tip. We assume there is only a single head.
+        remote_tip = self.get_remote_tip()
+
+        # Strip any lingering draft changesets.
+        self.strip_drafts()
+
+        # Pull from "upstream".
+        self.update_from_upstream(remote_tip)
+
+        return remote_tip
+
+    def apply_changes(self, remote_tip, commit_descriptions):
+        base_revision = self.rewrite_commit_descriptions(commit_descriptions)
+        logger.info('base revision: %s' % base_revision)
+
+        base_revision = self.rebase(base_revision, remote_tip)
+        logger.info('rebased (tip) revision: %s' % base_revision)
+
+        self.validate_descriptions(commit_descriptions)
+        return base_revision
 
     def run_hg(self, args):
         logger.info('rev: %s: executing: %s' % (self.source_rev, args))
@@ -132,7 +141,7 @@ class Transplant:
         assert len(remote_tip) == 12, remote_tip
         return remote_tip
 
-    def update_repo(self, remote_rev):
+    def update_from_upstream(self, remote_rev):
         # Pull "upstream" and update to remote tip. Pull revisions to land and
         # update to them.
         cmds = [['pull', 'upstream'],
