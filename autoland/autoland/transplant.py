@@ -61,21 +61,43 @@ class Transplant:
 
     def push_try(self, trysyntax):
         self.update_repo()
-        rev = self.push_to_try(trysyntax)
+
+        if not trysyntax.startswith("try: "):
+            trysyntax = "try: %s" % trysyntax
+        rev = self.run_hg_cmds([
+            [
+                '--encoding=utf-8',
+                '--config', 'ui.allowemptycommit=true',
+                'commit',
+                '-m', trysyntax
+            ],
+            ['push', '-r', '.', '-f', 'try'],
+            ['log', '-r', 'tip', '-T', '{node|short}'],
+        ])
+
         self.strip_drafts()
         return rev
 
     def push_bookmark(self, commit_descriptions, bookmark):
         remote_tip = self.update_repo()
+
         rev = self.apply_changes(remote_tip, commit_descriptions)
-        self.push_bookmark_to_repo(bookmark)
+        self.run_hg_cmds([
+            ['bookmark', bookmark],
+            ['push', '-B', bookmark, self.destination],
+        ])
+
         self.strip_drafts()
         return rev
 
     def push(self, commit_descriptions):
         remote_tip = self.update_repo()
+
         rev = self.apply_changes(remote_tip, commit_descriptions)
-        self.push_to_repo()
+        self.run_hg_cmds([
+            ['push', '-r', 'tip', self.destination]
+        ])
+
         self.strip_drafts()
         return rev
 
@@ -218,29 +240,3 @@ class Transplant:
                             "rewriting or rebasing your commits. The commits "
                             "being pushed no longer match what was requested. "
                             "Please file a bug.")
-
-    def push_to_try(self, trysyntax):
-        if not trysyntax.startswith("try: "):
-            trysyntax = "try: %s" % trysyntax
-        return self.run_hg_cmds([
-            [
-                '--encoding=utf-8',
-                '--config', 'ui.allowemptycommit=true',
-                'commit',
-                '-m', trysyntax
-            ],
-            ['push', '-r', '.', '-f', 'try'],
-            ['log', '-r', 'tip', '-T', '{node|short}'],
-        ])
-
-    def push_bookmark_to_repo(self, bookmark):
-        self.run_hg_cmds([
-            ['bookmark', bookmark],
-            ['push', '-B', bookmark, self.destination],
-        ])
-
-    def push_to_repo(self):
-        self.run_hg_cmds([
-            ['push', '-r', 'tip', self.destination]
-        ])
-
