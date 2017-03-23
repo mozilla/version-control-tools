@@ -1,6 +1,11 @@
 WSGISocketPrefix /var/run/wsgi
 WSGIPythonHome /var/hg/venv_hgweb
 
+# Default is 100. Mercurial encodes some arguments in HTTP request headers.
+# Repos with large numbers of heads (like review repos) run into these
+# limits.
+LimitRequestFields 1000
+
 <VirtualHost *:80>
     ServerName {{ domain | mandatory }}
     DocumentRoot /repo/hg/webroot_wsgi
