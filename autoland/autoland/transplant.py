@@ -21,11 +21,6 @@ class HgCommandError(Exception):
         super(self.__class__, self).__init__(message)
 
 
-def get_repo_path(tree):
-    return config.get('repos').get(tree,
-                                   os.path.join(os.path.sep, 'repos', tree))
-
-
 def transplant(tree, destination, rev, trysyntax=None,
                push_bookmark=False, commit_descriptions=None):
     """Transplant a specified revision and ancestors to the specified tree.
@@ -41,12 +36,24 @@ def transplant(tree, destination, rev, trysyntax=None,
     if push_bookmark:
         assert isinstance(push_bookmark, str)
 
-    path = get_repo_path(tree)
-    configs = ['ui.interactive=False']
-    with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
-        tp = Transplant(hg_repo, tree, destination, rev)
-        return tp.transplant(trysyntax=trysyntax, push_bookmark=push_bookmark,
-                             commit_descriptions=commit_descriptions)
+    try:
+        path = config.get('repos').get(tree,
+                                       os.path.join(os.path.sep, 'repos', tree))
+        configs = ['ui.interactive=False']
+        with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
+            tp = Transplant(hg_repo, tree, destination, rev)
+
+            if trysyntax:
+                return True, tp.push_try(trysyntax)
+
+            elif push_bookmark:
+                return True, tp.push_bookmark(commit_descriptions,
+                                              push_bookmark)
+
+            else:
+                return True, tp.push(commit_descriptions)
+    except Exception as e:
+        return False, str(e)
 
 
 class Transplant:
@@ -56,32 +63,25 @@ class Transplant:
         self.destination = destination
         self.source_rev = rev
 
-    def transplant(self, trysyntax=None, push_bookmark=False,
-                   commit_descriptions=None):
-        result = ''
-        try:
-            # Update from "upstream"
-            remote_tip = self.update_repo()
+    def push_try(self, trysyntax):
+        self.update_repo()
+        rev = self.push_to_try(trysyntax)
+        self.strip_drafts()
+        return rev
 
-            # Update commit descriptions and rebase.
-            if not trysyntax:
-                result = self.apply_changes(remote_tip, commit_descriptions)
+    def push_bookmark(self, commit_descriptions, bookmark):
+        remote_tip = self.update_repo()
+        rev = self.apply_changes(remote_tip, commit_descriptions)
+        self.push_bookmark_to_repo(bookmark)
+        self.strip_drafts()
+        return rev
 
-            # Now we push to the destination
-            if trysyntax:
-                result = self.push_to_try(trysyntax)
-            elif push_bookmark:
-                self.push_bookmark_to_repo(push_bookmark)
-            else:
-                self.push_to_repo()
-
-            # Strip any lingering draft changesets.
-            self.strip_drafts()
-
-            return True, result
-
-        except Exception as e:
-            return False, str(e)
+    def push(self, commit_descriptions):
+        remote_tip = self.update_repo()
+        rev = self.apply_changes(remote_tip, commit_descriptions)
+        self.push_to_repo()
+        self.strip_drafts()
+        return rev
 
     def update_repo(self):
         # Obtain remote tip. We assume there is only a single head.
