@@ -44,112 +44,106 @@ def transplant(tree, destination, rev, trysyntax=None,
     path = get_repo_path(tree)
     configs = ['ui.interactive=False']
     with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
-        tp = Transplant()
-        return tp.transplant(hg_repo, tree, destination, rev,
-                             trysyntax=trysyntax, push_bookmark=push_bookmark,
+        tp = Transplant(hg_repo, tree, destination, rev)
+        return tp.transplant(trysyntax=trysyntax, push_bookmark=push_bookmark,
                              commit_descriptions=commit_descriptions)
 
 
 class Transplant:
-    def __init__(self):
-        pass
+    def __init__(self, hg_repo, tree, destination, rev):
+        self.hg_repo = hg_repo
+        self.tree = tree
+        self.destination = destination
+        self.source_rev = rev
 
-    def transplant(self, hg_repo, tree, destination, rev, trysyntax=None,
-                   push_bookmark=False, commit_descriptions=None):
+    def transplant(self, trysyntax=None, push_bookmark=False,
+                   commit_descriptions=None):
         result = ''
         try:
             # Obtain remote tip. We assume there is only a single head.
-            remote_tip = self.get_remote_tip(hg_repo, rev)
+            remote_tip = self.get_remote_tip()
 
             # Strip any lingering draft changesets.
-            self.strip_drafts(hg_repo, rev)
+            self.strip_drafts()
 
             # Pull from "upstream".
-            self.update_repo(hg_repo, rev, tree, remote_tip)
+            self.update_repo(remote_tip)
 
             # Update commit descriptions and rebase.
             if not trysyntax:
                 base_revision = self.rewrite_commit_descriptions(
-                    hg_repo, rev, commit_descriptions)
+                    commit_descriptions)
                 logger.info('base revision: %s' % base_revision)
 
-                result = self.rebase(hg_repo, rev, base_revision, remote_tip)
+                result = self.rebase(base_revision, remote_tip)
                 logger.info('rebased (tip) revision: %s' % result)
 
-                self.validate_descriptions(hg_repo, destination,
-                                           commit_descriptions)
+                self.validate_descriptions(commit_descriptions)
 
             # Now we push to the destination
             if trysyntax:
-                result = self.push_to_try(hg_repo, rev, trysyntax)
+                result = self.push_to_try(trysyntax)
             elif push_bookmark:
-                self.push_bookmark_to_repo(hg_repo, rev, destination,
-                                           push_bookmark)
+                self.push_bookmark_to_repo(push_bookmark)
             else:
-                self.push_to_repo(hg_repo, rev, destination)
+                self.push_to_repo()
 
             # Strip any lingering draft changesets.
-            self.strip_drafts(hg_repo, rev)
+            self.strip_drafts()
 
             return True, result
 
         except Exception as e:
             return False, str(e)
 
-
-    def run_hg(self, hg_repo, rev, args):
-        logger.info('rev: %s: executing: %s' % (rev, args))
+    def run_hg(self, args):
+        logger.info('rev: %s: executing: %s' % (self.source_rev, args))
         out = hglib.util.BytesIO()
         out_channels = {b'o': out.write, b'e': out.write}
-        ret = hg_repo.runcommand(args, {}, out_channels)
+        ret = self.hg_repo.runcommand(args, {}, out_channels)
         if ret:
             raise hglib.error.CommandError(args, ret, out, None)
         return out.getvalue()
 
-
-    def run_hg_cmds(self, hg_repo, rev, cmds):
+    def run_hg_cmds(self, cmds):
         last_result = ''
         for cmd in cmds:
             try:
-                last_result = self.run_hg(hg_repo, rev, cmd)
+                last_result = self.run_hg(cmd)
             except hglib.error.CommandError as e:
                 raise HgCommandError(cmd, e.out)
         return last_result
 
-
-    def strip_drafts(self, hg_repo, rev):
+    def strip_drafts(self):
         # Strip any lingering draft changesets.
         try:
-            self.run_hg(hg_repo, rev,
-                        ['strip', '--no-backup', '-r', 'not public()'])
+            self.run_hg(['strip', '--no-backup', '-r', 'not public()'])
         except hglib.error.CommandError:
             pass
 
-
-    def get_remote_tip(self, hg_repo, rev):
+    def get_remote_tip(self):
         # Obtain remote tip. We assume there is only a single head.
         # Output can contain bookmark or branch name after a space. Only take
         # first component.
-        remote_tip = self.run_hg_cmds(hg_repo, rev, [
+        remote_tip = self.run_hg_cmds([
             ['identify', 'upstream', '-r', 'tip']
         ])
         remote_tip = remote_tip.split()[0]
         assert len(remote_tip) == 12, remote_tip
         return remote_tip
 
-
-    def update_repo(self, hg_repo, rev, tree, remote_rev):
+    def update_repo(self, remote_rev):
         # Pull "upstream" and update to remote tip. Pull revisions to land and
         # update to them.
         cmds = [['pull', 'upstream'],
                 ['rebase', '--abort', '-r', remote_rev],
                 ['update', '--clean', '-r', remote_rev],
-                ['pull', tree, '-r', rev],
-                ['update', rev]]
+                ['pull', self.tree, '-r', self.source_rev],
+                ['update', self.source_rev]]
 
         for cmd in cmds:
             try:
-                self.run_hg(hg_repo, rev, cmd)
+                self.run_hg(cmd)
             except hglib.error.CommandError as e:
                 output = e.out.getvalue()
                 if 'no changes found' in output:
@@ -161,8 +155,7 @@ class Transplant:
                 else:
                     raise HgCommandError(cmd, e.out)
 
-
-    def rewrite_commit_descriptions(self, hg_repo, rev, commit_descriptions):
+    def rewrite_commit_descriptions(self, commit_descriptions):
         # Rewrite commit descriptions as per the mapping provided.  Returns the
         # revision of the base commit.
         assert commit_descriptions
@@ -171,8 +164,9 @@ class Transplant:
             json.dump(commit_descriptions, f)
             f.flush()
 
-            cmd_output = self.run_hg_cmds(hg_repo, rev, [
-                ['rewritecommitdescriptions', '--descriptions=%s' % f.name, rev]
+            cmd_output = self.run_hg_cmds([
+                ['rewritecommitdescriptions', '--descriptions=%s' % f.name,
+                 self.source_rev]
             ])
 
             base_revision = None
@@ -188,28 +182,26 @@ class Transplant:
 
             return base_revision
 
-
-    def rebase(self, hg_repo, rev, base_revision, remote_tip):
+    def rebase(self, base_revision, remote_tip):
         # Perform rebase if necessary.  Returns tip revision.
         cmd = ['rebase', '-s', base_revision, '-d', remote_tip]
         try:
-            self.run_hg(hg_repo, rev, cmd)
+            self.run_hg(cmd)
         except hglib.error.CommandError as e:
             if 'nothing to rebase' not in e.out.getvalue():
                 raise HgCommandError(cmd, e.out)
 
-        return self.run_hg_cmds(hg_repo, rev, [
+        return self.run_hg_cmds([
             ['log', '-r', 'tip', '-T', '{node|short}']
         ])
 
-
-    def validate_descriptions(self, hg_repo, destination, commit_descriptions):
+    def validate_descriptions(self, commit_descriptions):
         # Match outgoing commit descriptions against incoming commit
         # descriptions. If these don't match exactly, prevent the landing
         # from occurring.
-        incoming_descriptions = set([c.encode(hg_repo.encoding)
+        incoming_descriptions = set([c.encode(self.hg_repo.encoding)
                                      for c in commit_descriptions.values()])
-        outgoing = hg_repo.outgoing('tip', destination)
+        outgoing = self.hg_repo.outgoing('tip', self.destination)
         outgoing_descriptions = set([commit[5] for commit in outgoing])
 
         if incoming_descriptions ^ outgoing_descriptions:
@@ -222,11 +214,10 @@ class Transplant:
                             "being pushed no longer match what was requested. "
                             "Please file a bug.")
 
-
-    def push_to_try(self, hg_repo, rev, trysyntax):
+    def push_to_try(self, trysyntax):
         if not trysyntax.startswith("try: "):
             trysyntax = "try: %s" % trysyntax
-        return self.run_hg_cmds(hg_repo, rev, [
+        return self.run_hg_cmds([
             [
                 '--encoding=utf-8',
                 '--config', 'ui.allowemptycommit=true',
@@ -237,16 +228,14 @@ class Transplant:
             ['log', '-r', 'tip', '-T', '{node|short}'],
         ])
 
-
-    def push_bookmark_to_repo(self, hg_repo, rev, destination, bookmark):
-        self.run_hg_cmds(hg_repo, rev, [
+    def push_bookmark_to_repo(self, bookmark):
+        self.run_hg_cmds([
             ['bookmark', bookmark],
-            ['push', '-B', bookmark, destination],
+            ['push', '-B', bookmark, self.destination],
         ])
 
-
-    def push_to_repo(self, hg_repo, rev, destination):
-        self.run_hg_cmds(hg_repo, rev, [
-            ['push', '-r', 'tip', destination]
+    def push_to_repo(self):
+        self.run_hg_cmds([
+            ['push', '-r', 'tip', self.destination]
         ])
 
