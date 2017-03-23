@@ -176,7 +176,7 @@ def upload_to_s3(host, bucket_name, local_path, remote_path):
 
             return
         except socket.error as e:
-            print('%s:%s failed: %s' % e)
+            print('%s:%s failed: %s' % (bucket_name, remote_path, e))
             time.sleep(15)
     raise Exception('S3 upload of %s:%s not successful after %s attempts, '
                     'giving up' % (bucket_name, remote_path, attempt))
