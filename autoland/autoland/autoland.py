@@ -119,10 +119,16 @@ def handle_pending_transplants(dbconn):
             #       duplicate work unnecessarily if we have to rebase more
             #       than once.
             os.environ['AUTOLAND_REQUEST_USER'] = requester
-            landed, result = transplant.transplant(tree, destination, rev,
-                                                   trysyntax, push_bookmark,
-                                                   commit_descriptions)
-            del os.environ['AUTOLAND_REQUEST_USER']
+            try:
+                result = transplant.transplant(tree, destination, rev,
+                                               trysyntax, push_bookmark,
+                                               commit_descriptions)
+                landed = True
+            except Exception as e:
+                result = str(e)
+                landed = False
+            finally:
+                del os.environ['AUTOLAND_REQUEST_USER']
 
             logger.info('transplant from tree: %s rev: %s attempt: %s: %s' % (
                 tree, rev, attempts + 1, result))

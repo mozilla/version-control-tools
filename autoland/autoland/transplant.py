@@ -36,24 +36,20 @@ def transplant(tree, destination, rev, trysyntax=None,
     if push_bookmark:
         assert isinstance(push_bookmark, str)
 
-    try:
-        path = config.get('repos').get(tree,
-                                       os.path.join(os.path.sep, 'repos', tree))
-        configs = ['ui.interactive=False']
-        with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
-            tp = Transplant(hg_repo, tree, destination, rev)
+    path = config.get('repos').get(tree,
+                                   os.path.join(os.path.sep, 'repos', tree))
+    configs = ['ui.interactive=False']
+    with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
+        tp = Transplant(hg_repo, tree, destination, rev)
 
-            if trysyntax:
-                return True, tp.push_try(trysyntax)
+        if trysyntax:
+            return tp.push_try(trysyntax)
 
-            elif push_bookmark:
-                return True, tp.push_bookmark(commit_descriptions,
-                                              push_bookmark)
+        elif push_bookmark:
+            return tp.push_bookmark(commit_descriptions, push_bookmark)
 
-            else:
-                return True, tp.push(commit_descriptions)
-    except Exception as e:
-        return False, str(e)
+        else:
+            return tp.push(commit_descriptions)
 
 
 class Transplant:
