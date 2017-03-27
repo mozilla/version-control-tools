@@ -21,45 +21,35 @@ class HgCommandError(Exception):
         super(self.__class__, self).__init__(message)
 
 
-def transplant(tree, destination, rev, trysyntax=None,
-               push_bookmark=False, commit_descriptions=None):
-    """Transplant a specified revision and ancestors to the specified tree.
+class Transplant(object):
+    """Transplant a specified revision and ancestors to the specified tree."""
 
-    If ``trysyntax`` is specified, a Try commit will be created using the
-    syntax specified.
-    """
-    # These values can appear in command arguments. Don't let unicode leak
-    # into these.
-    assert isinstance(tree, str)
-    assert isinstance(destination, str)
-    assert isinstance(rev, str)
-    if push_bookmark:
-        assert isinstance(push_bookmark, str)
+    def __init__(self, tree, destination, rev):
+        # These values can appear in command arguments. Don't let unicode leak
+        # into these.
+        assert isinstance(tree, str), "tree arg is not str"
+        assert isinstance(destination, str), "destination arg is not str"
+        assert isinstance(rev, str), "rev arg is not str"
 
-    path = config.get('repos').get(tree,
-                                   os.path.join(os.path.sep, 'repos', tree))
-    configs = ['ui.interactive=False']
-    with hglib.open(path, encoding='utf-8', configs=configs) as hg_repo:
-        tp = Transplant(hg_repo, tree, destination, rev)
-
-        if trysyntax:
-            return tp.push_try(trysyntax)
-
-        elif push_bookmark:
-            return tp.push_bookmark(commit_descriptions, push_bookmark)
-
-        else:
-            return tp.push(commit_descriptions)
-
-
-class Transplant:
-    def __init__(self, hg_repo, tree, destination, rev):
-        self.hg_repo = hg_repo
         self.tree = tree
         self.destination = destination
         self.source_rev = rev
 
+    def __enter__(self):
+        path = config.get('repos').get(
+            self.tree, os.path.join(os.path.sep, 'repos', self.tree))
+        configs = ['ui.interactive=False']
+        self.hg_repo = hglib.open(path, encoding='utf-8', configs=configs)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.strip_drafts()
+        self.hg_repo.close()
+
     def push_try(self, trysyntax):
+        # Don't let unicode leak into command arguments.
+        assert isinstance(trysyntax, str), "trysyntax arg is not str"
+
         self.update_repo()
 
         if not trysyntax.startswith("try: "):
@@ -75,10 +65,12 @@ class Transplant:
             ['log', '-r', 'tip', '-T', '{node|short}'],
         ])
 
-        self.strip_drafts()
         return rev
 
     def push_bookmark(self, commit_descriptions, bookmark):
+        # Don't let unicode leak into command arguments.
+        assert isinstance(bookmark, str), "bookmark arg is not str"
+
         remote_tip = self.update_repo()
 
         rev = self.apply_changes(remote_tip, commit_descriptions)
@@ -87,7 +79,6 @@ class Transplant:
             ['push', '-B', bookmark, self.destination],
         ])
 
-        self.strip_drafts()
         return rev
 
     def push(self, commit_descriptions):
@@ -98,7 +89,6 @@ class Transplant:
             ['push', '-r', 'tip', self.destination]
         ])
 
-        self.strip_drafts()
         return rev
 
     def update_repo(self):

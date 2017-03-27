@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
                                                              'pylib',
                                                              'mozautomation')))
 
-import transplant
+from transplant import Transplant
 import treestatus
 
 
@@ -120,9 +120,14 @@ def handle_pending_transplants(dbconn):
             #       than once.
             os.environ['AUTOLAND_REQUEST_USER'] = requester
             try:
-                result = transplant.transplant(tree, destination, rev,
-                                               trysyntax, push_bookmark,
-                                               commit_descriptions)
+                with Transplant(tree, destination, rev) as tp:
+                    if trysyntax:
+                        result = tp.push_try(str(trysyntax))
+                    elif push_bookmark:
+                        result = tp.push_bookmark(commit_descriptions,
+                                                  push_bookmark)
+                    else:
+                        result = tp.push(commit_descriptions)
                 landed = True
             except Exception as e:
                 result = str(e)
