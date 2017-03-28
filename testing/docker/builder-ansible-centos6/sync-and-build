@@ -5,12 +5,7 @@
 
 set -e
 
-if [ -z "${VCT_RSYNC_URL}" ]; then
-    echo "VCT_RSYNC_URL not defined"
-    exit 1
-fi
-
-/usr/bin/rsync -a --delete-after ${VCT_RSYNC_URL} /vct/
+/usr/bin/rsync -a --delete-after /vct-mount/ /vct/
 chown -R root:root /vct
 cd /vct/ansible
 /usr/bin/python -u /usr/bin/ansible-playbook -c local $1

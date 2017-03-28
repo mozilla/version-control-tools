@@ -725,16 +725,10 @@ class Docker(object):
 
         with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) \
                 as vct_state:
-
-            vct_ports = vct_state['NetworkSettings']['Ports']
-            vct_port = vct_ports['873/tcp'][0]['HostPort']
-            rsync_url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname,
-                                                      vct_port)
-            environment = {'VCT_RSYNC_URL': rsync_url}
-
             cmd = ['/sync-and-build', '%s.yml' % playbook]
-            with self.create_container(start_image, command=cmd,
-                                       environment=environment) as cid:
+            host_config = self.client.create_host_config(
+                volumes_from=[vct_state['Name']])
+            with self.create_container(start_image, command=cmd, host_config=host_config) as cid:
                 output = deque(maxlen=20)
                 self.client.start(cid)
 
