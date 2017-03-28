@@ -178,5 +178,26 @@ Getting status for an unknown job should return a 404
   1:Bug 1 - more goodness; r=cthulhu:public
   0:Bug 1 - some stuff; r=cthulhu:public
 
+Test pingback url whitelist.  localhost, private IPs, and example.com are in
+the whitelist. example.org is not.
+
+  $ REV=`hg log -r . --template "{node|short}"`
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://example.com:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 6\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 7\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://127.0.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 8\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://192.168.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 9\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://172.16.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 10\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://10.0.0.1:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (200, u'{\n  "request_id": 11\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://8.8.8.8:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://example.org:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
+
   $ mozreview stop
   stopped 9 containers

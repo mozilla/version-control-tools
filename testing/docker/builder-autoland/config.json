@@ -12,5 +12,8 @@
     "test-repo": {
       "tree": "test"
     }
-  }
+  },
+  "pingback_allow": [
+    "example.com"
+  ]
 }

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-import config
 import json
 import logging
-import psycopg2
 import urlparse
 
+import ipaddress
+import psycopg2
 from flask import Flask, request, jsonify, Response, abort, make_response
 
+import config
 
 app = Flask(__name__, static_url_path='', static_folder='')
 
@@ -27,8 +28,35 @@ def get_dbconn():
 
 def check_auth(user, passwd):
     auth = config.get('auth')
-    if user in auth and auth[user] == passwd:
+    return user in auth and auth[user] == passwd
+
+
+def check_pingback_url(pingback_url):
+    try:
+        url = urlparse.urlparse(pingback_url)
+    except ValueError:
+        return False
+
+    if url.scheme not in ('http', 'https'):
+        return False
+
+    # Allow pingbacks to loopback and private IPs (for dev/test).
+    if url.hostname == 'localhost':
         return True
+    try:
+        ip = ipaddress.ip_address(url.hostname)
+        if ip.is_loopback or ip.is_private:
+            return True
+    except ValueError:
+        # Ignore hostnames and invalid addresses.
+        pass
+
+    # Allow pingbacks to whitelisted hosts from config.json
+    for allowed_host in config.get('pingback_allow', []):
+        if url.hostname == allowed_host:
+            return True
+
+    return False
 
 
 @app.route('/autoland', methods=['POST'])
@@ -72,12 +100,7 @@ def autoland():
             error = 'Bad request: missing json field: %s' % field
             return make_response(jsonify({'error': error}), 400)
 
-    try:
-        parsed = urlparse.urlparse(request.json['pingback_url'])
-        if 'http' not in parsed.scheme:
-            error = 'Bad request: bad pingback_url'
-            return make_response(jsonify({'error': error}), 400)
-    except:
+    if not check_pingback_url(request.json['pingback_url']):
         error = 'Bad request: bad pingback_url'
         return make_response(jsonify({'error': error}), 400)
 
