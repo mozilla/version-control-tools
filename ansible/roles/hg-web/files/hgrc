@@ -57,6 +57,12 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 #[serverlog]
 #reporoot = /repo_local/mozilla/
 
+[experimental]
+# Repos with large numbers of heads can overflow limits in total size of HTTP
+# request headers. Enable argument passing via HTTP POST bodies to work around
+# this limit.
+httppostargs = true
+
 [bundleclone]
 pullmanifest=True
 
