@@ -14,7 +14,7 @@ hgrc file content is sent in a message
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
@@ -42,7 +42,7 @@ Replicating hgrc without hgrc file will delete file
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
@@ -73,7 +73,7 @@ Unicode in hgrc is preserved
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)

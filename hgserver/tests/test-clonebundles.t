@@ -6,7 +6,7 @@
 
 Create and seed repository
 
-  $ hgmo create-repo mozilla-central scm_level_1
+  $ hgmo create-repo mozilla-central scm_level_1 --no-generaldelta
   (recorded repository creation in replication log)
 
   $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central > /dev/null
@@ -195,7 +195,7 @@ Fetching with an AWS IP from "other" region returns full list
 
 The copyfrom=x field copies bundles from another repo
 
-  $ hgmo create-repo try scm_level_1
+  $ hgmo create-repo try scm_level_1 --no-generaldelta
   (recorded repository creation in replication log)
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/try
   $ cd try
@@ -317,7 +317,7 @@ zstd-max bundles created when requested
 
 Generaldelta repos should create zstd-v2, gzip-v2, and streamclone bundles only
 
-  $ hgmo create-repo generaldelta scm_level_1 --generaldelta
+  $ hgmo create-repo generaldelta scm_level_1
   (recorded repository creation in replication log)
   $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/generaldelta
   $ cd generaldelta

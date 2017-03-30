@@ -14,8 +14,8 @@ do
         --non-publishing)
         NONPUBLISHING=1
         ;;
-        --generaldelta)
-        GENERALDELTA=1
+        --no-generaldelta)
+        NO_GENERALDELTA=1
         ;;
         *)
         ;;
@@ -23,8 +23,10 @@ do
 done
 
 INITFLAGS=
-if [ -n "${GENERALDELTA}" ]; then
-  INITFLAGS="--config format.generaldelta=true"
+if [ -n "${NO_GENERALDELTA}" ]; then
+  INITFLAGS="--config format.usegeneraldelta=false"
+else
+  INITFLAGS="--config format.usegeneraldelta=true"
 fi
 
 /var/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO} ${INITFLAGS}

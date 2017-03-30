@@ -23,7 +23,7 @@ The aggregate topic should contain a heartbeat and repo creation message
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
 
@@ -172,19 +172,19 @@ Aggregation of messages from multiple partitions works
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mc2'
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 4
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/try'
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 7
-    generaldelta: false
+    generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/users/foo'
 
