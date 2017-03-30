@@ -170,7 +170,9 @@ def process_hg_repo_init(config, path, generaldelta=False):
     args.insert(0, hglib.HGPATH)
 
     if generaldelta:
-        args.extend(['--config', 'format.generaldelta=true'])
+        args.extend(['--config', 'format.usegeneraldelta=true'])
+    else:
+        args.extend(['--config', 'format.usegeneraldelta=false'])
 
     proc = hglib.util.popen(args)
     out, err = proc.communicate()

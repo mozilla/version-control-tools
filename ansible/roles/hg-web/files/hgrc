@@ -74,8 +74,3 @@ obsolescenceexchangeusers = hg
 [hgmo]
 mozbuildinfowrapper = /usr/bin/sudo /usr/local/bin/mozbuild-eval %repo%
 awsippath = /etc/mercurial/aws-ip-ranges.json
-
-# Disable new repos being created with generaldelta because it can cause
-# performance issues when serving large repos to old clients.
-[format]
-usegeneraldelta=false
