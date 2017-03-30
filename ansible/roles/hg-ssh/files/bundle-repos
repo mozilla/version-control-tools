@@ -3,7 +3,7 @@ experimental/mozilla-central-gd zstd_max
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
-releases/mozilla-release bzip2 legacy_stream
+releases/mozilla-release
 releases/mozilla-aurora bzip2 legacy_stream
 releases/mozilla-beta bzip2 legacy_stream
 releases/mozilla-esr52
