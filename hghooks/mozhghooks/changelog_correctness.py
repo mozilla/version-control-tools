@@ -35,8 +35,16 @@ def get_changed_files(repo, cs1, cs2):
     # it raises exceptions when used on changesets part of the push.
     # So a manual diff of the manifests, as below, is faster.
 
-    manifest1 = repo.manifest.revision(cs1.manifestnode())
-    manifest2 = repo.manifest.revision(cs2.manifestnode())
+    # 4.1 overhauled the manifest API.
+    # TODO much of the code below can likely be written in terms of
+    # the new API. So look into that.
+    if hasattr(repo, 'manifestlog'):
+        manifest1 = repo.manifestlog[cs1.manifestnode()].read().text()
+        manifest2 = repo.manifestlog[cs2.manifestnode()].read().text()
+    else:
+        manifest1 = repo.manifest.revision(cs1.manifestnode())
+        manifest2 = repo.manifest.revision(cs2.manifestnode())
+
     lines1 = iter(StringIO(manifest1))
     lines2 = iter(StringIO(manifest2))
 
