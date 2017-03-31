@@ -612,18 +612,8 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     return
 
 
-def clonebundleswireproto(orig, repo, proto):
-    """Wraps wireproto.clonebundles."""
-    return processbundlesmanifest(repo, proto, orig(repo, proto))
-
-
-def bundleclonewireproto(orig, repo, proto):
-    """Wraps wireproto.bundles."""
-    return processbundlesmanifest(repo, proto, orig(repo, proto))
-
-
-def processbundlesmanifest(repo, proto, manifest):
-    """Processes a bundleclone/clonebundles manifest.
+def processbundlesmanifest(orig, repo, proto):
+    """Wraps wireproto.clonebundles.
 
     We examine source IP addresses and advertise URLs for the same
     AWS region if the source is in AWS.
@@ -631,6 +621,8 @@ def processbundlesmanifest(repo, proto, manifest):
     # Delay import because this extension can be run on local
     # developer machines.
     import ipaddress
+
+    manifest = orig(repo, proto)
 
     if not isinstance(proto, webproto):
         return manifest
@@ -676,16 +668,10 @@ def processbundlesmanifest(repo, proto, manifest):
             # the fastest way to clone and we want our automation to be fast.
             def mancmp(a, b):
                 packed = 'BUNDLESPEC=none-packed1'
-                stream = 'stream='
 
                 if packed in a and packed not in b:
                     return -1
                 if packed in b and packed not in a:
-                    return 1
-
-                if stream in a and stream not in b:
-                    return -1
-                if stream in b and stream not in a:
                     return 1
 
                 return 0
@@ -756,12 +742,7 @@ def extsetup(ui):
     # Install IP filtering for bundle URLs.
 
     # Build-in command from core Mercurial.
-    extensions.wrapcommand(wireproto.commands, 'clonebundles', clonebundleswireproto)
-
-    # Legacy bundleclone command. Need to support until all clients run
-    # 3.6+.
-    if 'bundles' in wireproto.commands:
-        extensions.wrapcommand(wireproto.commands, 'bundles', bundleclonewireproto)
+    extensions.wrapcommand(wireproto.commands, 'clonebundles', processbundlesmanifest)
 
     entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
     entry[1].append(('', 'hgmo', False,
