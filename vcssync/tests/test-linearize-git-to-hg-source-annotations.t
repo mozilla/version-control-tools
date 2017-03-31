@@ -1,3 +1,5 @@
+#require hg40+
+
   $ . $TESTDIR/vcssync/tests/helpers.sh
   $ standardgitrepo grepo > /dev/null 2>&1
 

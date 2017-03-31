@@ -1,3 +1,5 @@
+#require hg40+
+
   $ . $TESTDIR/vcssync/tests/helpers.sh
 
   $ cat >> $HGRCPATH << EOF
