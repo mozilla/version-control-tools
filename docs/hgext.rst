@@ -8,15 +8,6 @@ described in the sections below.
 
 All extensions are located under the ``hgext/`` subdirectory.
 
-bundleclone
------------
-
-The bundleclone extension is an **experimental** extension that allows
-Mercurial servers to advertise where pre-generated bundles may be
-fetched from. When ``hg clone`` is performed, the client will fetch a
-static bundle file then do an incremental ``hg pull``. This is much more
-efficient for the server.
-
 bzexport
 --------
 
