@@ -42,11 +42,6 @@ CREATES = [
     ('packed1-gd', ['streambundle', '--type', 's1'], {'gd': True}),
 ]
 
-BUNDLECLONE_ORDER = [
-    ('gzip', 'compression=gzip'),
-    ('bzip2', 'compression=bzip2'),
-]
-
 CLONEBUNDLES_ORDER = [
     ('zstd-max', 'BUNDLESPEC=zstd-v2'),
     ('zstd', 'BUNDLESPEC=zstd-v2'),
@@ -214,14 +209,13 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
         assert not os.path.isabs(copyfrom)
         source_repo = os.path.join('/repo/hg/mozilla', copyfrom)
         dest_repo = os.path.join('/repo/hg/mozilla', repo)
-        for p in ('bundleclone.manifest', 'clonebundles.manifest'):
-            source = os.path.join(source_repo, '.hg', p)
-            dest = os.path.join(dest_repo, '.hg', p)
+        source = os.path.join(source_repo, '.hg', 'clonebundles.manifest')
+        dest = os.path.join(dest_repo, '.hg', 'clonebundles.manifest')
 
-            print('copying %s -> %s' % (source, dest))
+        print('copying %s -> %s' % (source, dest))
 
-            # copy2 copies metadata.
-            shutil.copy2(source, dest)
+        # copy2 copies metadata.
+        shutil.copy2(source, dest)
 
         # Replicate manifest to mirrors.
         subprocess.check_call([PUSH_REPO], cwd=dest_repo)
@@ -365,21 +359,6 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
 
     bundle_types = set(t[0] for t in bundles)
 
-    bundleclone_manifest = []
-    for t, params in BUNDLECLONE_ORDER:
-        if t not in bundle_types:
-            continue
-
-        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
-
-        bundleclone_manifest.append('%s/%s %s cdn=true requiresni=true' % (
-            CDN, remote_path, params))
-
-        for host, bucket, name in HOSTS:
-            entry = 'https://%s/%s/%s ec2region=%s %s' % (
-                host, bucket, remote_path, name, params)
-            bundleclone_manifest.append(entry)
-
     clonebundles_manifest = []
     for t, params in CLONEBUNDLES_ORDER:
         if t not in bundle_types:
@@ -394,10 +373,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
                 host, bucket, remote_path, params, name)
             clonebundles_manifest.append(entry)
 
-    bundleclone_path = os.path.join(repo_full, '.hg', 'bundleclone.manifest')
     clonebundles_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest')
-    with open(bundleclone_path, 'wb') as fh:
-        fh.write('\n'.join(bundleclone_manifest))
     with open(clonebundles_path, 'wb') as fh:
         fh.write('\n'.join(clonebundles_manifest))
 
@@ -405,9 +381,7 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
     # permissions.
     # TODO we can't do this yet since the "hg" user isn't a member of the
     # scm_* groups.
-    #os.chown(bundleclone_path, uid, gid)
     #os.chown(clonebundles_path, uid, gid)
-    os.chmod(bundleclone_path, 0664)
     os.chmod(clonebundles_path, 0664)
 
     # Replicate manifest to mirrors.
