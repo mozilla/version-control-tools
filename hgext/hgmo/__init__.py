@@ -87,6 +87,7 @@ from mercurial import (
     commands,
     encoding,
     error,
+    exchange,
     extensions,
     hg,
     revset,
@@ -612,6 +613,27 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     return
 
 
+def pull(orig, repo, remote, *args, **kwargs):
+    """Wraps exchange.pull to fetch the remote clonebundles.manifest."""
+    res = orig(repo, remote, *args, **kwargs)
+
+    if not repo.ui.configbool('hgmo', 'pullclonebundlesmanifest', False):
+        return res
+
+    if not remote.capable('clonebundles'):
+        return res
+
+    lock = repo.lock()
+    repo.ui.status(_('pulling clonebundles manifest\n'))
+    try:
+        manifest = remote._call('clonebundles')
+        repo.vfs.write('clonebundles.manifest', manifest)
+    finally:
+        lock.release()
+
+    return res
+
+
 def processbundlesmanifest(orig, repo, proto):
     """Wraps wireproto.clonebundles.
 
@@ -728,6 +750,7 @@ def filelog(orig, web, req, tmpl):
 
 
 def extsetup(ui):
+    extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
     extensions.wrapfunction(bookmarks, 'updatefromremote', bmupdatefromremote)

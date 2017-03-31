@@ -3,6 +3,7 @@ startserver() {
   cd server
   cat > .hg/hgrc << EOF
 [extensions]
+clonebundles =
 hgmo = $TESTDIR/hgext/hgmo
 
 [web]
