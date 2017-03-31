@@ -1,4 +1,4 @@
-#require hg40+
+#require hg41+
 
   $ . $TESTDIR/vcssync/tests/helpers.sh
   $ standardoverlayenv > /dev/null 2>&1
