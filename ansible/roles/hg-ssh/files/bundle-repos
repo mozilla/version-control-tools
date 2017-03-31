@@ -1,13 +1,13 @@
-mozilla-central bzip2 legacy_stream zstd_max
+mozilla-central bzip2 zstd_max
 experimental/mozilla-central-gd zstd_max
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
 releases/mozilla-release
-releases/mozilla-aurora bzip2 legacy_stream
-releases/mozilla-beta bzip2 legacy_stream
+releases/mozilla-aurora bzip2
+releases/mozilla-beta bzip2
 releases/mozilla-esr52
-releases/mozilla-esr45 bzip2 legacy_stream
+releases/mozilla-esr45 bzip2
 releases/mozilla-esr38
 releases/mozilla-esr31
 mozilla-unified zstd_max
