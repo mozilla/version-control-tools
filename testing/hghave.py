@@ -118,6 +118,16 @@ def has_39_plus():
     v = tuple(hgversion()[0:2])
     return v >= (3, 9)
 
+@check('hg40+', 'Running with Mercurial 4.0+')
+def has_40_plus():
+    v = tuple(hgversion()[0:2])
+    return v >= (4, 0)
+
+@check('hg41+', 'Running with Mercurial 4.1+')
+def has_41_plus():
+    v = tuple(hgversion()[0:2])
+    return v >= (4, 1)
+
 # Now we reimplement the command line syntax of the CLI hghave script.
 failures = 0
 
