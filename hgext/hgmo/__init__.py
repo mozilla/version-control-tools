@@ -111,7 +111,6 @@ ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.commitparser as commitparser
-import mozhg.mozbuildinfo as mozbuildinfo
 
 
 minimumhgversion = '4.0'
@@ -584,6 +583,11 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
     ], _('show files info from moz.build files'),
     optionalrepo=True)
 def mozbuildinfocommand(ui, repo, *paths, **opts):
+    # This module imports modules not available to the hgweb virtualenv.
+    # Delay importing it so it doesn't interfere with operation outside the
+    # moz.build evaluation context.
+    import mozhg.mozbuildinfo as mozbuildinfo
+
     if opts['pipemode']:
         data = json.loads(ui.fin.read())
 
