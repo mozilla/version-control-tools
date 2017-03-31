@@ -261,31 +261,6 @@ bzip2 bundles created when requested
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/70b5a2a0a3ef0e272c12bb90a28c0fb534724368.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
-Legacy stream bundles only generated when requested
-
-  $ cd mozilla-central
-  $ echo legacystream > foo
-  $ hg commit -m legacystream
-  $ hg push > /dev/null
-  $ cd ..
-
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'mozilla-central legacy_stream' --no-upload > /dev/null
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
-  $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=bundles
-  200
-  
-  https://hg.cdn.mozilla.net/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg compression=gzip cdn=true requiresni=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-west-2 compression=gzip
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-west-1 compression=gzip
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=us-east-1 compression=gzip
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.gzip.hg ec2region=eu-central-1 compression=gzip
-  https://hg.cdn.mozilla.net/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg stream=revlogv1 cdn=true requiresni=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-west-2 stream=revlogv1
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-west-1 stream=revlogv1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=us-east-1 stream=revlogv1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/4123d33678728ad98862cdac91d6a3f447a0271a.stream-legacy.hg ec2region=eu-central-1 stream=revlogv1
-
 zstd-max bundles created when requested
 
   $ cd mozilla-central
@@ -299,21 +274,21 @@ zstd-max bundles created when requested
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
-  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/934273ae8830f7bf6f12950ba87e02185a177467.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
+  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
+  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
+  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/0a63a7e04e27e4e600286c04bb070171a6e5259d.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1
 
 Generaldelta repos should create zstd-v2, gzip-v2, and streamclone bundles only
 
