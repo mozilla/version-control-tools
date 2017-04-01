@@ -160,7 +160,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
         # Git commit. This is valuable as a persistent SHA map, but that's it.
         # We (hopefully) insert the original Git commit via
         # ``source_revision_key``, so this is of marginal value.
-        b'convert.git.saverev=false',
+        #b'convert.git.saverev=false',
         b'convert.git.similarity=%d' % similarity,
     ]
 
