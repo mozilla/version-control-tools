@@ -55,7 +55,7 @@ Basic git to hg linearize works
   2 dummy commit 2 on master
   1 Merge branch 'head2'
   0 dummy commit 1 after merge
-  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:74b93af557b18fa56b0e9fad513ef9da1a1d950f
+  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:7d80acaa161029d9e746e3125e7cc0916406403f
 
 Subsequent invocation no-ops
 

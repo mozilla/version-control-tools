@@ -46,7 +46,7 @@
   2 dummy commit 2 on master
   1 Merge branch 'head2'
   0 dummy commit 1 after merge
-  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:74b93af557b18fa56b0e9fad513ef9da1a1d950f
+  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:7d80acaa161029d9e746e3125e7cc0916406403f
 
 All refs from local Git repo should be in mirror
 
@@ -87,7 +87,7 @@ Incremental conversion will keep Git repo in sync
   sorting...
   converting...
   0 add incremental
-  1 Git commits converted to Mercurial; previous tip: 10:74b93af557b18fa56b0e9fad513ef9da1a1d950f; current tip: 11:b53d6fba975e3face586964aace142716b2191a7
+  1 Git commits converted to Mercurial; previous tip: 10:7d80acaa161029d9e746e3125e7cc0916406403f; current tip: 11:bb82033b3f2dca56396a933e94a1ed802ae5cd26
 
   $ git -C grepo-source for-each-ref
   d6ec61184bff36a58159341c2584f3cda9dd0b58 commit	refs/convert/dest/heads/master

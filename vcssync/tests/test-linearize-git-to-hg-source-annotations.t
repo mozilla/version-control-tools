@@ -40,7 +40,6 @@ Note: since source repo is in $TESTTMP which is dynamic, commit SHA-1s aren't st
   11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:* (glob)
 
 Key: Value metadata identifying source should appear in commit message
-TODO Mercurial 4.1 will remove convert_revision from extra, which is wanted
 
   $ hg -R grepo-dest log --debug -r 0
   changeset:   0:* (glob)
@@ -52,7 +51,6 @@ TODO Mercurial 4.1 will remove convert_revision from extra, which is wanted
   date:        Thu Jan 01 00:00:00 1970 +0000
   files+:      foo
   extra:       branch=default
-  extra:       convert_revision=* (glob)
   description:
   initial
   

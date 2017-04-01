@@ -41,7 +41,7 @@
   2 dummy commit 2 on master
   1 Merge branch 'head2'
   0 dummy commit 1 after merge
-  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:74b93af557b18fa56b0e9fad513ef9da1a1d950f
+  11 Git commits converted to Mercurial; previous tip: -1:0000000000000000000000000000000000000000; current tip: 10:7d80acaa161029d9e746e3125e7cc0916406403f
 
 Move annotation should be preserved automatically
 
@@ -50,8 +50,8 @@ Move annotation should be preserved automatically
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID 045473c2b7065422c50de2de883bbfabd42307e9
-  # Parent  4670490276d96d9f5aafbcfba095b94401ce2f7b
+  # Node ID 87dc2703fa8274f2cbb4368fc5cd21dd6b891283
+  # Parent  cf8b7b151d770811c9bdd22ecf9252ce497ac902
   move file0 to file0-moved
   
   diff --git a/file0 b/file0-moved
@@ -65,8 +65,8 @@ Copy annotation should be preserved automatically
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID 2f1c561c2bba03de041ae91b9bd996a8e1592a46
-  # Parent  045473c2b7065422c50de2de883bbfabd42307e9
+  # Node ID 9448d0d725df65d963f7c9772f656c1777eff035
+  # Parent  87dc2703fa8274f2cbb4368fc5cd21dd6b891283
   copy file0-moved and rename source
   
   diff --git a/file0-moved b/file0-copied-with-move
@@ -83,8 +83,8 @@ Normal copy won't be detected if source not modified
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID ef5cf78e1c5224adea8f6cebba99ed88bed64389
-  # Parent  9b56156dddc3d86f3afaba790ad91260c85c74b2
+  # Node ID 0645166c54cc387ec7b451618db945e6921a2f05
+  # Parent  39f28bdb42e2c48e9dff20d047ccba4d69bbf319
   copy file0 to file0-copy0
   
   diff --git a/file0-copy0 b/file0-copy0
@@ -113,8 +113,8 @@ Normal copy won't be detected if source not modified
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID 69b9ae19ba84e5c77b119294715e992a8d7070bf
-  # Parent  9b56156dddc3d86f3afaba790ad91260c85c74b2
+  # Node ID f793a24cb294215e734ba63f1741635927792532
+  # Parent  39f28bdb42e2c48e9dff20d047ccba4d69bbf319
   copy file0 to file0-copy0
   
   diff --git a/file0 b/file0-copy0
@@ -128,8 +128,8 @@ Copy detection similarity is sane
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID b5b3e192ecdecbfc25d1ef6241664db3c63ef4d0
-  # Parent  c1afa6c62b584e017c1a3900055d2eba740092b5
+  # Node ID 5c6526a3256267aa3530fef4d51387ec90b61b20
+  # Parent  f16834370a2a91f32d16d537de3590fd2f86c3fb
   create file1-20, file1-50 and file1-80 as copies with mods
   
   diff --git a/file1-20 b/file1-20
@@ -178,8 +178,8 @@ Increase similarity threshold removes copy annotation from file1-50
   # User test <test@example.com>
   # Date 0 0
   #      Thu Jan 01 00:00:00 1970 +0000
-  # Node ID 2cbb8f45b28f77c4b45382629a4b9fa297df0960
-  # Parent  c1afa6c62b584e017c1a3900055d2eba740092b5
+  # Node ID 65ca132d671b09006951d7b6f611cc6a7cc327c0
+  # Parent  f16834370a2a91f32d16d537de3590fd2f86c3fb
   create file1-20, file1-50 and file1-80 as copies with mods
   
   diff --git a/file1-20 b/file1-20
