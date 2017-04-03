@@ -10,7 +10,7 @@ from mercurial import demandimport
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-testedwith = '3.8 3.9 4.0'
+testedwith = '3.8 3.9 4.0 4.1'
 minimumhgversion = '3.8'
 
 def critique(ui, repo, entire=False, node=None, **kwargs):

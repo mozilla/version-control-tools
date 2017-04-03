@@ -29,7 +29,7 @@ import conduitclient
 
 VERSION = '0.0.1'
 
-testedwith = '4.0'
+testedwith = '4.0 4.1'
 minimumhgversion = '4.0'
 cmdtable = {}
 command = cmdutil.command(cmdtable)
