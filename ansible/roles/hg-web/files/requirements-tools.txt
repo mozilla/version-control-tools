@@ -4,8 +4,8 @@ Cython==0.25.1 \
 futures==3.0.3 \
     --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 
-Mercurial==4.0.1 \
-    --hash=sha256:6aa4ade93c1b5e11937820880a466ebf1c824086d443cd799fc46e2617250d40
+Mercurial==4.1.2 \
+    --hash=sha256:09415253fb409a77e19b9951532a3c22c4e07e74bab80652527064617daab194
 
 tabulate==0.7.5 \
     --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e
