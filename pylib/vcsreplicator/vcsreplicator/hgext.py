@@ -33,7 +33,7 @@ from mercurial import (
     wireproto,
 )
 
-testedwith = '4.0'
+testedwith = '4.1'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)

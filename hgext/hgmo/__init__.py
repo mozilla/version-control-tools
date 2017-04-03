@@ -114,8 +114,8 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import mozautomation.commitparser as commitparser
 
 
-minimumhgversion = '4.0'
-testedwith = '4.0'
+minimumhgversion = '4.1'
+testedwith = '4.1'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
