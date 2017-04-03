@@ -17,7 +17,7 @@ Requires a bugzilla username to be set
 Set bugzilla username
   $ cat >> $HGRCPATH << EOF
   > [bugzilla]
-  > username = nobody@mozilla.org
+  > username = mozillian@example.com
   > EOF
 
 Requires a bugzilla apikey to be set
@@ -33,12 +33,12 @@ Set bugzilla apikey
 
 The magic happy path works
   $ hg conduitstage -r 0 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
 
 The argument order doesn't matter
   $ hg conduitstage http://localhost:77777 -r 0
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
 
 Add two new commits
@@ -49,49 +49,49 @@ Add two new commits
 
 Publishes only the given commit, no ancestors
   $ hg conduitstage -r 2 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the current commit if given '.'
   $ hg conduitstage -r . http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the current commit and ancestors if -d is given, but -r is not
   $ hg conduitstage -d http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the commit 1 and ancestors if -d is given and -r is 1
   $ hg conduitstage -d -r 1 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
   372194518d2b158d172f98ec436c85e73a3625e4
 
 Publishes the commits in the revision range, entire tree
   $ hg conduitstage -r 0::2 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the commits in the revision range, subset of tree
   $ hg conduitstage -r 1::2 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the commits in the correct order
   $ hg conduitstage -r 2:1 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
 
 Publishes the commits in the revision range using full ids
   $ hg conduitstage -r fe1507847927::cb0b9488cd76 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
   fe1507847927ea10fbd79bc4821fa4fb34ea1282
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
@@ -101,7 +101,14 @@ Publishes only non public commits
   $ hg -q phase --public -r .
   $ hg -q update 2
   $ hg conduitstage -r 0::2 http://localhost:77777
-  Publishing commits for nobody@mozilla.org:
+  Publishing commits for mozillian@example.com:
+  372194518d2b158d172f98ec436c85e73a3625e4
+  cb0b9488cd76939275b57aefa675a390c752fab2
+
+Publishes to a given topic id
+  $ hg conduitstage -r 0::2 -t test_topic_123 http://localhost:77777
+  Publishing to specific topic: test_topic_123
+  Publishing commits for mozillian@example.com:
   372194518d2b158d172f98ec436c85e73a3625e4
   cb0b9488cd76939275b57aefa675a390c752fab2
 

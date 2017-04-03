@@ -36,9 +36,10 @@ command = cmdutil.command(cmdtable)
 @command('conduitstage',
          [('d', 'drafts', None,
            _('Stage the current commit and its draft ancestors.')),
-          ('r', 'rev', '', _('Specify the revision set to stage'))],
-         _('[-d] [-r REV] remote_url'))
-def conduitstage(ui, repo, remote_url, rev=None, drafts=False):
+          ('r', 'rev', '', _('Specify the revision set to stage')),
+          ('t', 'topic', '', _('Specify the topic to update'))],
+         _('[-d] [-r REV] [-t TOPIC] remote_url'))
+def conduitstage(ui, repo, remote_url, drafts=False, rev=None, topic=None):
     """Stages a series of commits as a new Topic Iteration
 
     Requests the remote repo server to create a new iteration on a topic using
@@ -61,9 +62,9 @@ def conduitstage(ui, repo, remote_url, rev=None, drafts=False):
 
     revset = rev if rev else '.'
     nodes = get_commits(ui, repo, revset, drafts)
-    ids = [repo[node].hex() for node in nodes]
+    commit_ids = [repo[node].hex() for node in nodes]
 
-    stage(ui, remote_url, bz_username, bz_apikey, ids)
+    stage(ui, remote_url, bz_username, bz_apikey, commit_ids, topic)
 
 def get_commits(ui, repo, revset, include_drafts):
     """Creates a list of commit ids given a revision set.
@@ -144,11 +145,11 @@ def get_commits(ui, repo, revset, include_drafts):
 
     return nodes
 
-def stage(ui, remote_url, bz_username, bz_apikey, commit_ids):
+def stage(ui, remote_url, bz_username, bz_apikey, commit_ids, topic):
     """Performs the request to stage the commits creating a new iteration."""
     try:
         out = conduitclient.stage(remote_url, bz_username, bz_apikey,
-                                         commit_ids)
+                                  commit_ids, topic)
         ui.status(_(out))
     except Exception as e:
         raise util.Abort(
