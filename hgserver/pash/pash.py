@@ -97,13 +97,4 @@ def process_non_root_login(user):
 
 if __name__ == '__main__':
     user = os.environ.get('USER')
-
-    if user == 'root':
-        root_shell = pwd.getpwuid(0)[6]
-        ssh_command = os.environ.get('SSH_ORIGINAL_COMMAND')
-        if ssh_command:
-            os.system(root_shell + " -c " + QuoteForPOSIX(ssh_command))
-        else:
-            os.execl(root_shell, root_shell)
-    else:
-        process_non_root_login(user)
+    process_non_root_login(user)
