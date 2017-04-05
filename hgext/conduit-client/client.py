@@ -37,7 +37,7 @@ command = cmdutil.command(cmdtable)
          [('d', 'drafts', None,
            _('Stage the current commit and its draft ancestors.')),
           ('r', 'rev', '', _('Specify the revision set to stage')),
-          ('t', 'topic', '', _('Specify the topic to update'))],
+          ('t', 'topic', None, _('Specify the topic to update'))],
          _('[-d] [-r REV] [-t TOPIC] remote_url'))
 def conduitstage(ui, repo, remote_url, drafts=False, rev=None, topic=None):
     """Stages a series of commits as a new Topic Iteration

@@ -28,11 +28,12 @@ def stage(remote_url, bz_username, bz_apikey, commit_ids, topic=None):
             output += '%s\n' % id
         return output
     else:
-        response = requests.post(stage_url,
-                                 data={'bugzilla_username': bz_username,
-                                       'bugzilla_api_key': bz_apikey,
-                                       'commit_ids': commit_ids,
-                                       'topic': topic},
+        headers = {
+            'X-Bugzilla-Login': bz_username,
+            'X-Bugzilla-API-Key': bz_apikey
+        }
+        data = {'commit_ids': commit_ids, 'topic': topic}
+        response = requests.post(stage_url, headers=headers, data=data,
                                  timeout=10)
         response.raise_for_status()
         return response.json()['message']
