@@ -31,7 +31,6 @@ PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 CREATES = [
     ('gzip', ['bundle', '-a', '-t', 'gzip-v1'], {}),
     ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {'gd': True}),
-    ('bzip2', ['bundle', '-a', '-t', 'bzip2-v1'], {}),
     # ``zstd`` uses default compression settings and is reasonably fast.
     # ``zstd-max`` uses the highest available compression settings and is
     # absurdly slow. But it produces significantly smaller bundles. Level 20
@@ -49,7 +48,6 @@ CLONEBUNDLES_ORDER = [
     ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
     ('gzip', 'BUNDLESPEC=gzip-v1'),
-    ('bzip2', 'BUNDLESPEC=bzip2-v1'),
     ('packed1-gd', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
     ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Drevlogv1'),
 ]
@@ -112,7 +110,6 @@ HTML_INDEX = '''
         <th>zstd (max)</th>
         <th>gzip (v1)</th>
         <th>gzip (v2)</th>
-        <th>bz2 (v1)</th>
         <th>stream</th>
         <th>stream (generaldelta)</th>
       </tr>
@@ -130,7 +127,6 @@ HTML_ENTRY = '''
   <td class="numeric">{zstd_max_entry}</td>
   <td class="numeric">{gzip_entry}</td>
   <td class="numeric">{gzip_v2_entry}</td>
-  <td class="numeric">{bzip2_entry}</td>
   <td class="numeric">{packed1_entry}</a></td>
   <td class="numeric">{packed1_gd_entry}</td>
 </tr>
@@ -195,11 +191,9 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     os.rename(temp_path, final_path)
 
 
-def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
-                     zstd_max=False):
+def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     """Generate bundle files for a repository at a path.
 
-    ``bzip2`` denotes whether to generate bzip2 bundles.
     ``zstd_max`` denotes whether to generate zstd bundles with maximum
     compression.
     """
@@ -280,9 +274,6 @@ def generate_bundles(repo, upload=True, bzip2=False, copyfrom=None,
     fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args, opts in CREATES:
-            if t == 'bzip2' and not bzip2:
-                continue
-
             # Only generate 1 of zstd or zstd-max since they are redundant.
             if t == 'zstd' and zstd_max:
                 continue
@@ -406,7 +397,7 @@ def generate_index(repos):
 
         opts = {'repo': repo}
 
-        for k in ('bzip2', 'gzip', 'gzip-v2', 'packed1', 'packed1-gd',
+        for k in ('gzip', 'gzip-v2', 'packed1', 'packed1-gd',
                   'zstd', 'zstd-max'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
