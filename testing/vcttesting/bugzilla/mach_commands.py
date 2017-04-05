@@ -42,6 +42,21 @@ class BugzillaCommands(object):
     def create_bug(self, product, component, summary):
         self.b.create_bug(product, component, summary)
 
+    @Command('update-bug-group', category='bugzilla',
+             description='Add or remove groups from the bug')
+    @CommandArgument('id', help='Bug id')
+    @CommandArgument('--add', nargs='*', help='Group(s) to add')
+    @CommandArgument('--remove', nargs='*', help='Group(s) to remove')
+    def update_bug_add_group(self, id, add=None, remove=None):
+        groups = {}
+        if add:
+            groups['add'] = add
+
+        if remove:
+            groups['remove'] = remove
+
+        self.b.update_bug(ids=[id], groups=groups)
+
     @Command('create-bug-range', category='bugzilla',
             description='Create multiple bugs at once')
     @CommandArgument('product', help='Product to create bugs in')
@@ -125,3 +140,4 @@ class BugzillaCommands(object):
     @CommandArgument('bugs', nargs='+', help='Bugs to dump')
     def dump_bug(self, bugs):
         print(self.b.serialize_bugs(bugs))
+

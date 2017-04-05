@@ -52,6 +52,17 @@ class Bugzilla(object):
                         summary=summary)
         self.client.put(bug)
 
+    def update_bug(self, **kwargs):
+        """Update bug(s).
+
+        Required
+        ids: Array of ints or strings. The ids or aliases of the bugs that
+             you want to modify.
+
+        https://www.bugzilla.org/docs/4.2/en/html/api/Bugzilla/
+                                 WebService/Bug.html#update"""
+        return self.proxy.Bug.update(kwargs)
+
     def create_bug_range(self, product, component, total):
         first = None
         last = None
