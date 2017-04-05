@@ -1,6 +1,7 @@
 ---
 repos:
     "buildbot-configs": "/repos/buildbot-configs"
+    "conduit": "/repos/conduit"
     "build-buildbotcustom": "/repos/build-buildbotcustom"
     "gecko": "/repos/mozreview-gecko"
     "reviewboard": "/repos/reviewboard"
