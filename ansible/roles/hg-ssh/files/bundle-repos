@@ -1,12 +1,12 @@
-mozilla-central bzip2 zstd_max
+mozilla-central zstd_max
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
 releases/mozilla-release
-releases/mozilla-aurora bzip2
-releases/mozilla-beta bzip2
+releases/mozilla-aurora
+releases/mozilla-beta
 releases/mozilla-esr52
-releases/mozilla-esr45 bzip2
+releases/mozilla-esr45
 releases/mozilla-esr38
 releases/mozilla-esr31
 mozilla-unified zstd_max
@@ -14,7 +14,7 @@ build/tools zstd_max
 build/mozharness zstd_max
 build/talos zstd_max
 hgcustom/version-control-tools zstd_max
-comm-central bzip2 zstd_max
+comm-central zstd_max
 projects/ash
 projects/cedar
 projects/holly

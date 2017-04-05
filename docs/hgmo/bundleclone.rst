@@ -65,7 +65,7 @@ BUNDLESPEC
    This defines the type of bundle.
 
    We currently generate bundles with the following specifications:
-   ``zstd-v2``, ``gzip-v1``, ``gzip-v2``, ``bzip2-v1``, ``none-packed1``.
+   ``zstd-v2``, ``gzip-v1``, ``gzip-v2``, ``none-packed1``.
 
 REQUIRESNI
    Indicates whether the URL requires SNI (a TLS extension). This is set
@@ -110,8 +110,7 @@ generate:
 1. A zstd bundle (either default compression or maximum compression depending
    on repo utilization)
 2. A gzip bundle (the default compression format)
-3. A bzip2 bundle (smaller, but slower)
-4. A *streaming* bundle file (larger but faster)
+3. A *streaming* bundle file (larger but faster)
 
 For each of these bundles, we upload them to the following locations:
 
