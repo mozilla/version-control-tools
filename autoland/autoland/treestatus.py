@@ -7,7 +7,8 @@ TREESTATUS_URL = 'https://treestatus.mozilla-releng.net/trees/'
 
 logger = logging.getLogger('autoland')
 
-def tree_is_open(logger, tree):
+
+def tree_is_open(tree):
     # treestatus running in dev/CI is an older version, with slightly
     # different request and response structures.
     is_test_env = config.testing()
