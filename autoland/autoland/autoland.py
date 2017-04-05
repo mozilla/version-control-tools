@@ -98,8 +98,13 @@ def handle_pending_transplants(dbconn):
         push_bookmark = request.get('push_bookmark', '').encode('ascii')
         pingback_url = request.get('pingback_url', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
-        tree_open = current_treestatus.setdefault(
-            destination, treestatus.tree_is_open(destination))
+        repo_config = config.get_repo(tree)
+        if not repo_config['tree']:
+            # Trees not present on treestatus cannot be closed.
+            tree_open = True
+        else:
+            tree_open = current_treestatus.setdefault(
+                destination, treestatus.tree_is_open(repo_config['tree']))
 
         if not tree_open:
             handle_treeclosed(transplant_id, tree, rev, destination,

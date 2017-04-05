@@ -34,12 +34,11 @@ class Transplant(object):
         self.tree = tree
         self.destination = destination
         self.source_rev = rev
+        self.path = config.get_repo(tree)['path']
 
     def __enter__(self):
-        path = config.get('repos').get(
-            self.tree, os.path.join(os.path.sep, 'repos', self.tree))
         configs = ['ui.interactive=False']
-        self.hg_repo = hglib.open(path, encoding='utf-8', configs=configs)
+        self.hg_repo = hglib.open(self.path, encoding='utf-8', configs=configs)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

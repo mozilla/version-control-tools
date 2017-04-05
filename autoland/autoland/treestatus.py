@@ -1,6 +1,5 @@
 import config
 import logging
-import re
 import requests
 
 TREESTATUS_URL = 'https://treestatus.mozilla-releng.net/trees/'
@@ -12,11 +11,6 @@ def tree_is_open(tree):
     # treestatus running in dev/CI is an older version, with slightly
     # different request and response structures.
     is_test_env = config.testing()
-
-    # Map integration branches to their short form name
-    m = re.match('ssh://hg\.mozilla\.org/integration/([^/]+)', tree)
-    if m and m.groups():
-        tree = m.groups()[0]
 
     r = None
     try:

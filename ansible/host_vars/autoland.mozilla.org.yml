@@ -1,8 +1,21 @@
 ---
 repos:
-    "buildbot-configs": "/repos/buildbot-configs"
-    "conduit": "/repos/conduit"
-    "build-buildbotcustom": "/repos/build-buildbotcustom"
-    "gecko": "/repos/mozreview-gecko"
-    "reviewboard": "/repos/reviewboard"
-    "version-control-tools": "/repos/version-control-tools"
+
+  buildbot-configs:
+    path: "/repos/buildbot-configs"
+
+  conduit:
+    path: "/repos/conduit"
+
+  build-buildbotcustom:
+    path: "/repos/build-buildbotcustom"
+
+  gecko:
+    path: "/repos/mozreview-gecko"
+    tree: "autoland"
+
+  reviewboard:
+    path: "/repos/reviewboard"
+
+  version-control-tools:
+    path: "/repos/version-control-tools"
