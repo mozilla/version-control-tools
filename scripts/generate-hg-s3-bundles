@@ -29,8 +29,7 @@ PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 #
 # Define in order bundles should be listed in manifest.
 CREATES = [
-    ('gzip', ['bundle', '-a', '-t', 'gzip-v1'], {}),
-    ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {'gd': True}),
+    ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {}),
     # ``zstd`` uses default compression settings and is reasonably fast.
     # ``zstd-max`` uses the highest available compression settings and is
     # absurdly slow. But it produces significantly smaller bundles. Level 20
@@ -39,17 +38,14 @@ CREATES = [
     ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
     ('zstd-max', ['--config', 'experimental.bundlecomplevel=20',
                   'bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
-    ('packed1', ['debugcreatestreamclonebundle'], {}),
-    ('packed1-gd', ['debugcreatestreamclonebundle'], {'gd': True}),
+    ('packed1-gd', ['debugcreatestreamclonebundle'], {}),
 ]
 
 CLONEBUNDLES_ORDER = [
     ('zstd-max', 'BUNDLESPEC=zstd-v2'),
     ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
-    ('gzip', 'BUNDLESPEC=gzip-v1'),
     ('packed1-gd', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
-    ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Drevlogv1'),
 ]
 
 # Defines hostname and bucket where uploads should go.
@@ -108,9 +104,7 @@ HTML_INDEX = '''
         <th>Repository</th>
         <th>zstd</th>
         <th>zstd (max)</th>
-        <th>gzip (v1)</th>
         <th>gzip (v2)</th>
-        <th>stream</th>
         <th>stream (generaldelta)</th>
       </tr>
       %s
@@ -125,9 +119,7 @@ HTML_ENTRY = '''
   <td>{repo}</td>
   <td class="numeric">{zstd_entry}</td>
   <td class="numeric">{zstd_max_entry}</td>
-  <td class="numeric">{gzip_entry}</td>
   <td class="numeric">{gzip_v2_entry}</td>
-  <td class="numeric">{packed1_entry}</a></td>
   <td class="numeric">{packed1_gd_entry}</td>
 </tr>
 '''.strip()
@@ -281,18 +273,6 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
             if t == 'zstd-max' and not zstd_max:
                 continue
 
-            # The "all" opt allows generation for generaldelta and
-            # non-generaldelta repos. If not set, we key off the generaldelta
-            # state and the "gd" key to determine whether to generate. What
-            # we're trying to prevent is v1 bundle types being generated for
-            # generaldelta repos, which could require a lot of CPU usage to
-            # recalculate deltas.
-            if not opts.get('all'):
-                if generaldelta and not opts.get('gd'):
-                    continue
-                elif not generaldelta and opts.get('gd'):
-                    continue
-
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
             temp_path = '%s.tmp' % final_path
 
@@ -391,14 +371,13 @@ def generate_index(repos):
         p = repos[repo]
 
         # Should only be for bundles with copyfrom.
-        if 'gzip' not in p and 'gzip-v2' not in p:
+        if 'gzip-v2' not in p:
             print('ignoring repo %s in index because no gzip bundle' % repo)
             continue
 
         opts = {'repo': repo}
 
-        for k in ('gzip', 'gzip-v2', 'packed1', 'packed1-gd',
-                  'zstd', 'zstd-max'):
+        for k in ('gzip-v2', 'packed1-gd', 'zstd', 'zstd-max'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
                 opts[key] = '<a href="{path}">{size:,}</a>'.format(
