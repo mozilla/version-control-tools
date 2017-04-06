@@ -231,11 +231,8 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     tip = subprocess.check_output([HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
     print('tip is %s' % tip)
 
-    generaldelta = False
     with open(os.path.join(repo_full, '.hg', 'requires'), 'rb') as fh:
-        for line in fh:
-            if line.strip() == 'generaldelta':
-                generaldelta = True
+        generaldelta = 'generaldelta\n' in fh.readlines()
 
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
 
