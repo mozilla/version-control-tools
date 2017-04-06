@@ -211,7 +211,6 @@
         group=root
         mode=0644
   with_items:
-    - unify-mozilla-central-gd.ini
     - unify-mozilla-unified.ini
 
 - name: sysconfig file for unify repo daemon
