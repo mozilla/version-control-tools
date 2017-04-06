@@ -1,5 +1,4 @@
 mozilla-central bzip2 zstd_max
-experimental/mozilla-central-gd zstd_max
 integration/fx-team
 integration/mozilla-inbound
 integration/b2g-inbound
