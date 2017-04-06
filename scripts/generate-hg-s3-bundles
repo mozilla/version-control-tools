@@ -38,14 +38,14 @@ CREATES = [
     ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
     ('zstd-max', ['--config', 'experimental.bundlecomplevel=20',
                   'bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
-    ('packed1-gd', ['debugcreatestreamclonebundle'], {}),
+    ('packed1', ['debugcreatestreamclonebundle'], {}),
 ]
 
 CLONEBUNDLES_ORDER = [
     ('zstd-max', 'BUNDLESPEC=zstd-v2'),
     ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
-    ('packed1-gd', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
+    ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
 ]
 
 # Defines hostname and bucket where uploads should go.
@@ -105,7 +105,7 @@ HTML_INDEX = '''
         <th>zstd</th>
         <th>zstd (max)</th>
         <th>gzip (v2)</th>
-        <th>stream (generaldelta)</th>
+        <th>stream</th>
       </tr>
       %s
     </table>
@@ -120,7 +120,7 @@ HTML_ENTRY = '''
   <td class="numeric">{zstd_entry}</td>
   <td class="numeric">{zstd_max_entry}</td>
   <td class="numeric">{gzip_v2_entry}</td>
-  <td class="numeric">{packed1_gd_entry}</td>
+  <td class="numeric">{packed1_entry}</td>
 </tr>
 '''.strip()
 
@@ -377,7 +377,7 @@ def generate_index(repos):
 
         opts = {'repo': repo}
 
-        for k in ('gzip-v2', 'packed1-gd', 'zstd', 'zstd-max'):
+        for k in ('gzip-v2', 'packed1', 'zstd', 'zstd-max'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
                 opts[key] = '<a href="{path}">{size:,}</a>'.format(
