@@ -22,7 +22,6 @@ import concurrent.futures as futures
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
 HG = '/var/hg/venv_tools/bin/hg'
-HG_BUNDLE = '/var/hg/venv_hg_pre/bin/hg'
 PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 
 # The types of bundles to generate.
@@ -176,7 +175,7 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     Generates using the command specified by ``extra_args`` into ``temp_path``
     before moving the fully created bundle to ``final_path``.
     """
-    args = [HG_BUNDLE,
+    args = [HG,
             '--config', 'extensions.vcsreplicator=!',
             '-R', repo] + extra_args + [temp_path]
     subprocess.check_call(args)
