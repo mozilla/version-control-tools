@@ -5,6 +5,11 @@
   become: true
 
   pre_tasks:
+  - name: check ansible version
+    assert:
+      that: "ansible_version.major | version_compare('2', '>=')"
+      msg: "ansible 2.0+ is required to run this playbook"
+
   - name: import autoland secrets
     shell: cat /opt/secrets/autoland/autoland_vars.yml
     register: autoland_vars

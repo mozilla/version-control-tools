@@ -18,7 +18,7 @@
 - name: create virtualenv for autoland
   include: ../../../tasks/virtualenv.yml
            venv=/home/autoland/autoland_venv
-           requirements=../files/requirements.txt
+           requirements=../roles/autoland/files/requirements.txt
 
 - name: set up version-control-tools repo
   become: true

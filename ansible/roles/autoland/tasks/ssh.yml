@@ -20,7 +20,7 @@
         owner=autoland
         group=autoland
         mode=0600
-        remote_src=yes
+        remote_src=True
 
 - name: install autoland public ssh keys
   copy: src=/opt/secrets/autoland/ssh/{{ secrets.ssh_key_name }}.pub
@@ -28,7 +28,7 @@
         owner=autoland
         group=autoland
         mode=0644
-        remote_src=yes
+        remote_src=True
 
 - name: install system wide known_hosts
   copy: src=../files/known_hosts
