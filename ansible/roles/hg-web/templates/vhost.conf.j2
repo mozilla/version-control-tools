@@ -92,22 +92,18 @@ LimitRequestFields 1000
         Header set Strict-Transport-Security max-age=31536000
     </If>
 
-    # Enable CSP unless for HG clients.
-    <Location "/">
-        # bugzilla.mo is for l10n
-        # TODO find out URL for l10n tools needing this and restrict to that.
-        <If "-z env('HG_PROTOCOL')">
-            Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
-        </If>
-    </Location>
-
     # Reftest analyzer needs a lot of exceptions to work. Bug 1200501
     # tracks not hosting it from VCS.
+    #
+    # Mercurial's built-in CSP support doesn't allow to change the policy per
+    # URL. So we special case it and override hgweb's header here.
     <Location "/mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml">
-        <If "-z env('HG_PROTOCOL')">
-            Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
-        </If>
+        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
     </Location>
+
+    <If "-n env('HG_PROTOCOL')">
+        Header unset Content-Security-Policy
+    </If>
 </VirtualHost>
 
 # Local variables:

@@ -19,6 +19,10 @@ baseurl = https://hg.mozilla.org/
 maxchanges = 20
 guessmime = True
 
+# bugzilla.mo is for l10n tool.
+# TODO find out URL for l10n tools needing this and restrict to that.
+csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
+
 # We don't allow pushes over HTTP. But if this isn't set, pushing to https://
 # prints a "SSL required" message because the load balancer terminates TLS
 # and Mercurial thinks SSL isn't being used.
