@@ -23,7 +23,7 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
-**As of November 2016, the latest stable release is 4.0.**
+**As of April 2017, the latest stable release is 4.1.**
 
 .. danger::
 
@@ -43,7 +43,9 @@ Installing on Windows
 =====================
 
 If you are a Firefox developer, you should install Mercurial indirectly
-through `MozillaBuild <https://wiki.mozilla.org/MozillaBuild>`_.
+through `MozillaBuild <https://wiki.mozilla.org/MozillaBuild>`_. Mercurial
+can be upgraded within MozillaBuild by running
+``pip install --upgrade Mercurial``.
 
 If you are not a Firefox developer, download a Windows installer
 `direct from the Mercurial project <https://www.mercurial-scm.org/downloads>`_.
@@ -106,7 +108,7 @@ out the version you wish to install::
 
   $ hg clone https://www.mercurial-scm.org/repo/hg
   $ cd hg
-  $ hg up 4.0
+  $ hg up 4.1.2
 
 Once you have the source code, run ``make`` to install Mercurial::
 
@@ -168,6 +170,11 @@ pulling from repositories. Avoid versions older than 3.7.3!
 
 Cloning and Pulling Performance
 -------------------------------
+
+Mercurial 4.1 introduced supported for compression data over the
+wire protocol with zstandard. This is substantially faster than zlib
+and can result in faster clones and pulls due to faster compression
+and fewer bytes transferred over the wire.
 
 Mercurial 3.6 contains a number of enhancements to performance of
 cloning and pull operations, especially on Windows. Clone times for
@@ -234,3 +241,7 @@ Mercurial 3.6 supports transparently cloning from pre-generated bundle
 files. When you clone from hg.mozilla.org, many of the larger
 repositories will be served from a CDN. This results in a faster
 and more reliable clone.
+
+Mercurial 4.1 will download zstandard-compressed bundles from
+hg.mozilla.org by default. These are substantially smaller than
+gzip-based bundles.
