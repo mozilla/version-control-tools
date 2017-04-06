@@ -30,5 +30,5 @@ releases/mozilla-b2g32_v2_0m
 releases/mozilla-b2g44_v2_5
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
-incubator/stylo copyfrom=experimental/mozilla-central-gd
-incubator/stylo-try copyfrom=experimental/mozilla-central-gd
+incubator/stylo copyfrom=mozilla-central
+incubator/stylo-try copyfrom=mozilla-central
