@@ -223,7 +223,7 @@ zstd-max bundles created when requested
   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-central/6ed7c1ea69ee8362d21174681a219d1a9e7aad52.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1
   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/6ed7c1ea69ee8362d21174681a219d1a9e7aad52.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=eu-central-1
 
-Non-generaldelta repos should create old bundle versions
+Non-generaldelta repos aren't supported
 
   $ hgmo create-repo nogd scm_level_1 --no-generaldelta
   (recorded repository creation in replication log)
@@ -234,22 +234,14 @@ Non-generaldelta repos should create old bundle versions
   $ hg push > /dev/null
   $ cd ..
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'nogd' --no-upload > /dev/null
-  $ hgmo exec hgssh cat /repo/hg/mozilla/nogd/.hg/clonebundles.manifest
-  https://hg.cdn.mozilla.net/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip.hg BUNDLESPEC=gzip-v1 ec2region=eu-central-1
-  https://hg.cdn.mozilla.net/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-2
-  https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-west-1
-  https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=us-east-1
-  https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/nogd/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Drevlogv1 ec2region=eu-central-1 (no-eol)
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'nogd'
+  tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  Traceback (most recent call last):
+    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
+      paths[repo] = generate_bundles(repo, upload=upload, **opts)
+    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in generate_bundles (re)
+      raise Exception('non-generaldelta repo not supported: %s' % repo_full)
+  Exception: non-generaldelta repo not supported: /repo/hg/mozilla/nogd
+  [1]
 
   $ hgmo clean

@@ -234,6 +234,9 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     with open(os.path.join(repo_full, '.hg', 'requires'), 'rb') as fh:
         generaldelta = 'generaldelta\n' in fh.readlines()
 
+    if not generaldelta:
+        raise Exception('non-generaldelta repo not supported: %s' % repo_full)
+
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
 
     # Create directory to hold bundle files.
