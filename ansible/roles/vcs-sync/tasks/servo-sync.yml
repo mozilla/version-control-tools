@@ -91,7 +91,7 @@
   become_user: servo-sync
 
 - name: seed Firefox Mercurial repo
-  command: /home/servo-sync/venv/bin/hg clone -U https://hg.mozilla.org/experimental/mozilla-central-gd /home/servo-sync/firefox-overlay creates=/home/servo-sync/firefox-overlay
+  command: /home/servo-sync/venv/bin/hg clone -U https://hg.mozilla.org/mozilla-central /home/servo-sync/firefox-overlay creates=/home/servo-sync/firefox-overlay
   become_user: servo-sync
 
 - name: install servo-linearize config files
