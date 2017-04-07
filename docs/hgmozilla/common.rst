@@ -106,8 +106,27 @@ directory. Perform a clone-based upgrade by running the following::
 
    # Now rename/remove your repos as appropriate.
 
+.. important::
+
+   That config adjustment for ``phases.publish=false`` is important. Without it,
+   *draft* changesets will become *public* and Mercurial won't let you edit them.
+   To guard against, it is a good practice to add the following to your per-repo
+   ``.hg/hgrc`` file immediately after a clone::
+
+       [phases]
+       publish = false
+
+   If you accidentally *publish* your *draft* changesets, you can reset phases by
+   running the following commands::
+
+       # Reset all phases to draft.
+       $ hg phase --draft --force -r 0:tip
+
+       # Synchronize phases from a publishing repo.
+       $ hg pull https://hg.mozilla.org/...
+
 Upgrading Storage via ``debugupgraderepo``
-==========================================
+------------------------------------------
 
 *(Requires Mercurial 4.1 or newer)*
 
