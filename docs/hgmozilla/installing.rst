@@ -96,6 +96,34 @@ are available on `Mercurial's web site <https://www.mercurial-scm.org/downloads>
 However, many distros don't keep their Mercurial package reasonably
 current. You often need to perform a source install.
 
+Installing from Pip
+===================
+
+Mercurial source packages can be installed via ``pip`` - Python's
+preferred package management tool.
+
+Installing Mercurial via pip is simple::
+
+   $ pip install Mercurial
+
+To upgrade Mercurial::
+
+   $ pip install --upgrade Mercurial
+
+By default, ``pip install`` may try to write to ``/usr/local`` or ``/usr/lib``
+or other parts of your system that require elevated permissions to write to.
+To perform an install into your user directory::
+
+   $ pip install --user Mercurial
+
+That *may* install Mercurial to a directory not in ``PATH``, such as
+``~/.local/bin``. You may need to adjust your shell's startup file to
+add this directory to ``PATH``. To see exactly where it installs things
+in ``--user`` mode, run ``pip show Mercurial``. There will be a line
+like ``Location: /home/myuser/.local/lib/python2.7/site-packages``. The
+``hg`` executable is likely in a ``bin`` directory at the same level of
+the ``lib/`` directory.
+
 Installing from Source
 ======================
 
