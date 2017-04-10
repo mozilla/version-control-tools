@@ -17,9 +17,15 @@ Extension works with default config
 
 Connecting to non-running server fails
 
-  $ hg robustcheckout http://localhost:$HGPORT1/repo0 no-server --revision 94086d65796f
+  $ hg robustcheckout http://localhost:$HGPORT1/repo0 no-server --revision 94086d65796f --networkattempts 2
   ensuring http://localhost:$HGPORT1/repo0@94086d65796f is available at no-server
-  abort: error: Connection refused
+  socket error: [Errno 111] Connection refused
+  (retrying after network failure on attempt 1 of 2)
+  (waiting *s before retry) (glob)
+  ensuring http://localhost:$HGPORT1/repo0@94086d65796f is available at no-server
+  socket error: [Errno 111] Connection refused
+  abort: reached maximum number of network attempts; giving up
+  
   [255]
 
 Server abort part way through response results in retries

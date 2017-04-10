@@ -17,6 +17,7 @@ import functools
 import os
 import random
 import re
+import socket
 import time
 
 from mercurial.i18n import _
@@ -28,6 +29,7 @@ from mercurial import (
     extensions,
     cmdutil,
     hg,
+    pycompat,
     scmutil,
     util,
 )
@@ -265,6 +267,11 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 # Will raise if failure limit reached.
                 handlenetworkfailure()
                 return True
+        elif isinstance(e, pycompat.urlerr.urlerror):
+            if isinstance(e.reason, socket.error):
+                ui.warn('socket error: %s\n' % e.reason)
+                handlenetworkfailure()
+                return True
 
         return False
 
@@ -288,7 +295,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         try:
             res = hg.clone(ui, {}, cloneurl, dest=dest, update=False,
                            shareopts={'pool': sharebase, 'mode': 'identity'})
-        except error.Abort as e:
+        except (error.Abort, pycompat.urlerr.urlerror) as e:
             if handlepullerror(e):
                 return callself()
             raise
@@ -347,7 +354,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 pullop = exchange.pull(repo, remote, heads=pullrevs)
                 if not pullop.rheads:
                     raise error.Abort('unable to pull requested revision')
-        except error.Abort as e:
+        except (error.Abort, pycompat.urlerr.urlerror) as e:
             if handlepullerror(e):
                 return callself()
             raise
