@@ -250,20 +250,21 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
         networkattempts[0] += 1
 
-    def handlepullabort(e):
-        """Handle an error.Abort raised during a pull.
+    def handlepullerror(e):
+        """Handle an exception raised during a pull.
 
         Returns True if caller should call ``callself()`` to retry.
         """
-        if e.args[0] == _('repository is unrelated'):
-            ui.warn('(repository is unrelated; deleting)\n')
-            destvfs.rmtree(forcibly=True)
-            return True
-        elif e.args[0].startswith(_('stream ended unexpectedly')):
-            ui.warn('%s\n' % e.args[0])
-            # Will raise if failure limit reached.
-            handlenetworkfailure()
-            return True
+        if isinstance(e, error.Abort):
+            if e.args[0] == _('repository is unrelated'):
+                ui.warn('(repository is unrelated; deleting)\n')
+                destvfs.rmtree(forcibly=True)
+                return True
+            elif e.args[0].startswith(_('stream ended unexpectedly')):
+                ui.warn('%s\n' % e.args[0])
+                # Will raise if failure limit reached.
+                handlenetworkfailure()
+                return True
 
         return False
 
@@ -288,7 +289,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             res = hg.clone(ui, {}, cloneurl, dest=dest, update=False,
                            shareopts={'pool': sharebase, 'mode': 'identity'})
         except error.Abort as e:
-            if handlepullabort(e):
+            if handlepullerror(e):
                 return callself()
             raise
         except error.RepoError as e:
@@ -347,7 +348,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 if not pullop.rheads:
                     raise error.Abort('unable to pull requested revision')
         except error.Abort as e:
-            if handlepullabort(e):
+            if handlepullerror(e):
                 return callself()
             raise
         except error.RepoError as e:
