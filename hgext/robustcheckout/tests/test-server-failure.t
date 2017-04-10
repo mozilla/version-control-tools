@@ -15,6 +15,13 @@ Extension works with default config
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 94086d65796fd7fc8f957a2c5548db17a13f1f1f
 
+Connecting to non-running server fails
+
+  $ hg robustcheckout http://localhost:$HGPORT1/repo0 no-server --revision 94086d65796f
+  ensuring http://localhost:$HGPORT1/repo0@94086d65796f is available at no-server
+  abort: error: Connection refused
+  [255]
+
 Server abort part way through response results in retries
 
   $ cp -a server/bad-server server/bad-server-bytelimit
