@@ -34,9 +34,9 @@ CREATES = [
     # absurdly slow. But it produces significantly smaller bundles. Level 20
     # (and not higher) is used because it is the largest level supported
     # by the zstd library in 32-bit processes.
-    ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
+    ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {}),
     ('zstd-max', ['--config', 'experimental.bundlecomplevel=20',
-                  'bundle', '-a', '-t', 'zstd-v2'], {'all': True}),
+                  'bundle', '-a', '-t', 'zstd-v2'], {}),
     ('packed1', ['debugcreatestreamclonebundle'], {}),
 ]
 
