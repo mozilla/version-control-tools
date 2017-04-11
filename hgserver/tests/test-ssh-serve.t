@@ -23,8 +23,8 @@ We are able to clone via SSH
 Invalid paths are rejected
 
   $ hg clone ssh://$SSH_SERVER:$HGPORT/foo/../../etc/password
-  remote: Only alpha-numeric characters, ".", and "-" are allowed in the repository names.
-  remote: Please try again with only those characters.
+  remote: Only alpha-numeric characters, ".", "_", and "-" are allowed in repository
+  remote: names.  Additionally the first character of repository names must be alpha-numeric.
   abort: no suitable response from remote hg!
   [255]
 

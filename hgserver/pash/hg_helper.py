@@ -123,14 +123,27 @@ def is_valid_user(mail):
         return 0
 
 
-# Please be very careful when you relax/change the good_chars regular expression.
-# Being lax with it can open us up to all kind of security problems.
+# Please be very careful when you relax/change the regular expressions.
+# Being lax can open us up to all kind of security problems.
+def is_valid_repo_name(repo_name):
+    part_re = re.compile(
+        r'^[a-zA-Z0-9]'       # must start with a letter or number
+        r'[a-zA-Z0-9./_-]*$'  # . / _ and - are allowed after the first char
+    )
+    for part in repo_name.split('/'):
+        if not part_re.search(part):
+            return False
+        if part.endswith(('.hg', '.git')):
+            return False
+    return True
+
+
 def assert_valid_repo_name(repo_name):
-    good_chars = re.compile('^(\w|-|/|\.\w)+\s*$')
-    if not good_chars.search(repo_name):
-        sys.stderr.write('Only alpha-numeric characters, ".", and "-" are '
-                         'allowed in the repository names.\n')
-        sys.stderr.write('Please try again with only those characters.\n')
+    if not is_valid_repo_name(repo_name):
+        sys.stderr.write('Only alpha-numeric characters, ".", "_", and "-" are '
+                         'allowed in repository\n')
+        sys.stderr.write('names.  Additionally the first character of '
+                         'repository names must be alpha-numeric.\n')
         sys.exit(1)
 
 
@@ -576,7 +589,7 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
         if repo_expr.search(ssh_command):
             [(hg_path, repo_path, hg_command)] = repo_expr.findall(ssh_command)
             if hg_command == 'serve --stdio':
-                assert_valid_repo_name(repo_path)
+                assert_valid_repo_name(repo_path.rstrip())
                 hg_arg_string = HG + ' -R ' + DOC_ROOT + '/' + repo_path + hg_command
                 hg_args = hg_arg_string.split()
                 os.execv(HG, hg_args)
