@@ -53,6 +53,13 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
 
     for review_request_draft, review_request in children_to_post:
         carry_forward = {}
+
+        bum = BugzillaUserMap.objects.get(user=review_request_draft.submitter)
+        submitter_email = bugzilla.get_user_from_userid(
+            bum.bugzilla_user_id)['users'][0]['email']
+
+        user_email_cache[bum.bugzilla_user_id] = submitter_email
+
         has_code_changes = review_request_draft.diffset is not None
 
         for u in review_request_draft.target_people.all():
@@ -102,6 +109,19 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
         flags = []
         attachment = attachment_updates.get_attachment(review_request)
 
+        # Map of current r? flags, requestee -> flag object.
+        #
+        # If this review-request change is actually a reviewer delegating
+        # reviews, that is, they are removing themselves and adding another
+        # reviewer, we want to reuse the r? flag if possible.  In this case,
+        # the person submitting the review-request update is not the
+        # author, so they cannot create a new r? flag as though it were
+        # coming from the author.  However, the reviewer ("requestee") of an
+        # existing flag *can* be changed while preserving the flag creator.
+        # Thus, we record them here and then match them up later.
+
+        attachment_rq_flags = {}
+
         if attachment:
             # Update flags on an existing attachment.
             for f in attachment.get('flags', []):
@@ -146,6 +166,9 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                         # In either case, we've dealt with this reviewer, so
                         # remove it from the carry_forward dict.
                         carry_forward.pop(f['setter'])
+                elif f['status'] == '?' and f['setter'] == submitter_email:
+                    # Record this and sort out r? flags later.
+                    attachment_rq_flags[f['requestee']] = f
                 elif ('requestee' not in f or
                       f['requestee'] not in carry_forward):
                     # We clear review flags where the requestee is not
@@ -158,22 +181,53 @@ def update_bugzilla_attachments(bugzilla, bug_id, children_to_post,
                     carry_forward.pop(f['requestee'])
 
         # Add flags for new reviewers.
+        #
         # We can't set a missing r+ (if it was manually removed) except in the
         # trivial (and useless) case that the setter and the requestee are the
         # same person.  We could set r? again, but in the event that the
         # reviewer is not accepting review requests, this will block
         # publishing, with no way for the author to fix it.  So we'll just
         # ignore manually removed r+s.
+        #
         # This is sorted so behavior is deterministic (this mucks with test
         # output otherwise).
+
+        # If there are existing r? flags and we want to re-request review for
+        # that reviewer, don't send any update to the server so that we keep
+        # the flag in place.
+
         for reviewer, keep in sorted(carry_forward.iteritems()):
             if not keep:
-                flags.append({
-                    'name': 'review',
-                    'status': '?',
-                    'requestee': reviewer,
-                    'new': True
-                })
+                if reviewer in attachment_rq_flags:
+                    del(attachment_rq_flags[reviewer])
+                    del(carry_forward[reviewer])
+
+        # At this point, attachment_rq_flags contains r? flags that
+        # are no longer needed.  Reuse them for any new r? so that the
+        # creator is preserved.
+
+        for reviewer, keep in sorted(carry_forward.iteritems()):
+            if not keep:
+                if attachment_rq_flags:
+                    rr_flag = attachment_rq_flags.values()[0]
+                    flags.append({
+                        'id': rr_flag['id'],
+                        'requestee': reviewer,
+                        'status': '?',
+                    })
+                    del(attachment_rq_flags[rr_flag['requestee']])
+                else:
+                    flags.append({
+                        'name': 'review',
+                        'status': '?',
+                        'requestee': reviewer,
+                        'new': True
+                    })
+
+        # Clear any remaining r? flags.
+
+        for reviewer, flag in attachment_rq_flags.iteritems():
+            flags.append({'id': flag['id'], 'status': 'X'})
 
         attachment_updates.create_or_update_attachment(
             review_request, review_request_draft, flags)
