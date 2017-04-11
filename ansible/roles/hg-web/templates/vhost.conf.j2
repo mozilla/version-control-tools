@@ -11,6 +11,25 @@ LimitRequestFields 1000
     ServerName hg.mozilla.org
     DocumentRoot /repo_local/mozilla/webroot_wsgi
 
+    # Clients processing e.g. bundle data may consume data much slower than the
+    # server can emit. This can result in the network being idle for >60s.
+    # Compounding this problem is that the load balancer has its own buffer.
+    # So there may be network activity between the client and the load balancer
+    # but not between the load balancer and this server. That can lead to even
+    # longer periods of network idle. We increase the timeout from its default
+    # of 60s to mitigate this problem.
+    #
+    # Since the TCP connection between the load balancer and this server doesn't
+    # totally reflect what the TCP connection between the client and load
+    # balancer is doing, measuring idle on this server is not very useful.
+    # Instead, network idle should be measured (and enforced) on the load
+    # balancer.
+    #
+    # If this value is too small, logs will appear in the error log:
+    #
+    #   The timeout specified has expired: ... mod_wsgi ... Failed to proxy response to client
+    Timeout 120
+
     RewriteEngine on
     RewriteRule ^/(.*)index.cgi/?(.*) https://hg.mozilla.org/$1$2
 
