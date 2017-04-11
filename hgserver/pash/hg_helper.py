@@ -125,14 +125,13 @@ def is_valid_user(mail):
 
 # Please be very careful when you relax/change the good_chars regular expression.
 # Being lax with it can open us up to all kind of security problems.
-def check_repo_name(repo_name):
+def assert_valid_repo_name(repo_name):
     good_chars = re.compile('^(\w|-|/|\.\w)+\s*$')
     if not good_chars.search(repo_name):
         sys.stderr.write('Only alpha-numeric characters, ".", and "-" are '
                          'allowed in the repository names.\n')
         sys.stderr.write('Please try again with only those characters.\n')
         sys.exit(1)
-    return True
 
 
 def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
@@ -144,8 +143,8 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
         print(USER_REPO_EXISTS % repo_name)
         sys.exit(1)
 
-    if (not os.path.exists('%s/%s' % (DOC_ROOT, source_repo_path)) or
-            not check_repo_name(source_repo_path)):
+    assert_valid_repo_name(source_repo_path)
+    if not os.path.exists('%s/%s' % (DOC_ROOT, source_repo_path)):
         print(NO_SOURCE_REPO % source_repo_path)
         sys.exit(1)
 
@@ -576,7 +575,8 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
         repo_expr = re.compile('(.*)\s+-R\s+([^\s]+\s+)(.*)')
         if repo_expr.search(ssh_command):
             [(hg_path, repo_path, hg_command)] = repo_expr.findall(ssh_command)
-            if hg_command == 'serve --stdio' and check_repo_name(repo_path):
+            if hg_command == 'serve --stdio':
+                assert_valid_repo_name(repo_path)
                 hg_arg_string = HG + ' -R ' + DOC_ROOT + '/' + repo_path + hg_command
                 hg_args = hg_arg_string.split()
                 os.execv(HG, hg_args)
@@ -589,39 +589,41 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
             sys.exit(1)
 
         args = ssh_command.replace('clone', '').split()
-        if check_repo_name(args[0]):
-            if len(args) == 1:
-                make_repo_clone(cname, args[0], None)
-            elif len(args) == 2:
-                make_repo_clone(cname, args[0], args[1])
-            sys.exit(0)
-        sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo '
-                         '[srcrepo]\n')
-        sys.exit(1)
+        if len(args) == 0:
+            sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo '
+                             '[srcrepo]\n')
+            sys.exit(1)
+        assert_valid_repo_name(args[0])
+        if len(args) == 1:
+            make_repo_clone(cname, args[0], None)
+        elif len(args) == 2:
+            make_repo_clone(cname, args[0], args[1])
+        sys.exit(0)
     elif ssh_command.startswith('edit '):
         if not enable_user_repos:
             print('user repository management is not enabled')
             sys.exit(1)
 
         args = ssh_command.replace('edit', '',  1).split()
-        if check_repo_name(args[0]):
-            if len(args) == 1:
-                edit_repo(cname, args[0], False)
-            elif len(args) == 3 and args[1] == 'delete' and args[2] == 'YES':
-                edit_repo(cname, args[0], True)
-            else:
-                sys.stderr.write('edit usage: ssh hg.mozilla.org edit '
-                                 '[userrepo delete] - WARNING: will not '
-                                 'prompt!\n')
-                sys.exit(1)
+        if len(args) == 1:
+            assert_valid_repo_name(args[0])
+            edit_repo(cname, args[0], False)
+        elif len(args) == 3 and args[1] == 'delete' and args[2] == 'YES':
+            assert_valid_repo_name(args[0])
+            edit_repo(cname, args[0], True)
+        else:
+            sys.stderr.write('edit usage: ssh hg.mozilla.org edit '
+                             '[userrepo delete] - WARNING: will not '
+                             'prompt!\n')
+            sys.exit(1)
     elif ssh_command.startswith('repo-group'):
         if not enable_repo_group:
             print('repo-group command not available')
             sys.exit(1)
 
         args = ssh_command.replace('repo-group', '').split()
-        if check_repo_name(args[0]):
-            print(repo_group.repo_owner(args[0]))
+        assert_valid_repo_name(args[0])
+        print(repo_group.repo_owner(args[0]))
     elif ssh_command.startswith('repo-config '):
         if not enable_repo_config:
             print('repo-config command not available')
@@ -629,11 +631,11 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
 
         args = ssh_command.split()[1:]
         repo = args[0]
-        if check_repo_name(repo):
-            hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
-            if os.path.exists(hgrc):
-                with open(hgrc, 'rb') as fh:
-                    sys.stdout.write(fh.read())
+        assert_valid_repo_name(repo)
+        hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
+        if os.path.exists(hgrc):
+            with open(hgrc, 'rb') as fh:
+                sys.stdout.write(fh.read())
     elif ssh_command.startswith('mozreview-ldap-associate'):
         if not enable_mozreview_ldap_associate:
             print('mozreview-ldap-associate command not available')

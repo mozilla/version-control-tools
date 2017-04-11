@@ -3,8 +3,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#import cgi
-#import cgitb
 from grp import getgrgid
 import hg_helper
 import os
@@ -17,16 +15,7 @@ def repo_owner(repo):
         print "Need a repository to check"
         sys.exit(1)
 
-    if not hg_helper.check_repo_name(repo):
-        print "You've included some illegal characters in your repo name"
-        sys.stderr.write("Warning: illegal characters in repo name\n")
-        sys.exit(1)
-
-    # ensure that the repo is within repo_root
-    if repo.find('/../') != -1:
-        print "That's not allowed"
-        sys.stderr.write("Warning: /../ found in a repo name.\n")
-        sys.exit(1)
+    hg_helper.assert_valid_repo_name(repo)
 
     dir = "%s/%s" % (repo_root, repo)
 
