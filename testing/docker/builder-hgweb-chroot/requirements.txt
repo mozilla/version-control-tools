@@ -1,14 +1,11 @@
-futures==3.0.5 \
-    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
-
 jsmin==2.1.2 \
     --hash=sha256:5e710e9db14f210dfd55ebec43bca5c812d34c5b6179dbcba2e61d9f965bf4e1
 
 Mercurial==4.1.2 \
     --hash=sha256:09415253fb409a77e19b9951532a3c22c4e07e74bab80652527064617daab194
 
-mozbuild==0.3 \
-    --hash=sha256:605e0fb5f14b3b47abf5b5d62c993def5f756268e83d97b0b3367592a34595d6
+mozbuild==0.2 \
+    --hash=sha256:24227608fc3c735fbb5c629d0540a600368c1d5e57013dd39272a0a5c9cccb13
 
 mozfile==1.2 \
     --hash=sha256:d3b00f336c6a89449bd78dd3ae65d74eb98497438d1ccfec07af0a736d20e957
