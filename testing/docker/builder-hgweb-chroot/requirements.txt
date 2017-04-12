@@ -1,3 +1,6 @@
+futures==3.0.5 \
+    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
+
 jsmin==2.1.2 \
     --hash=sha256:5e710e9db14f210dfd55ebec43bca5c812d34c5b6179dbcba2e61d9f965bf4e1
 
