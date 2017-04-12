@@ -73,6 +73,13 @@ the -Q option to all relevant commands in your ~/.hgrc::
   qnew = -Q
   qdelete = -Q
   qimport = -Q
+
+The extension also installs a hook that disallows pushes and pulls to
+repositories that have MQ patches applied. To disable this behavior, set the
+following config option::
+
+  [mqext]
+  allowexchangewithapplied = true
 '''
 
 testedwith = '3.8 3.9 4.0 4.1'
@@ -885,3 +892,28 @@ def extsetup_post_crecord():
     entry = extensions.wrapcommand(crecord_ext.cmdtable, 'qcrecord', qcrecord_wrapper)
     entry[1].extend([('Q', 'mqcommit', None, 'commit change to patch queue'),
                      ('M', 'mqmessage', '%a: %p%Q', 'commit message for patch creation')])
+
+
+def prechangegroup_hook(ui, repo, source=None, **kwargs):
+    # No MQ patches applied. Nothing to do.
+    if not repo.mq.applied:
+        return
+
+    if source not in ('push', 'pull'):
+        return
+
+    if ui.configbool('mqext', 'allowexchangewithapplied', False):
+        return
+
+    ui.warn(_('cannot %s with MQ patches applied\n') % source)
+    ui.warn(_('(allow this behavior by setting '
+              'mqext.allowexchangewithapplied=true)\n'))
+    return True
+
+
+def reposetup(ui, repo):
+    if not util.safehasattr(repo, 'mq'):
+        return
+
+    ui.setconfig('hooks', 'prechangegroup.mqpreventpull', prechangegroup_hook,
+                 'mqext')
