@@ -103,8 +103,11 @@ def handle_pending_transplants(dbconn):
             # Trees not present on treestatus cannot be closed.
             tree_open = True
         else:
+            # When pushing to try we need to check if try is open, not the
+            # tree for the source repo.
+            tree_name = 'try' if trysyntax else repo_config['tree']
             tree_open = current_treestatus.setdefault(
-                destination, treestatus.tree_is_open(repo_config['tree']))
+                destination, treestatus.tree_is_open(tree_name))
 
         if not tree_open:
             handle_treeclosed(transplant_id, tree, rev, destination,
