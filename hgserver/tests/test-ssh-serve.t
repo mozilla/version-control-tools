@@ -46,4 +46,12 @@ A push works
   remote:   https://hg.mozilla.org/repo1/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
+Trailing slash works
+
+  $ hg push ssh://$SSH_SERVER:$HGPORT/repo1/
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/repo1/
+  searching for changes
+  no changes found
+  [1]
+
   $ hgmo clean

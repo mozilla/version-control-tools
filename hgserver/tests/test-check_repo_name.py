@@ -19,6 +19,7 @@ class TestRepoNameValidation(unittest.TestCase):
             '1.repo.name',
             '1-repo-name',
             '1_repo_name',
+            'reponame/',
         ]:
             self.assertTrue(is_valid_repo_name(name))
 

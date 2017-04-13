@@ -126,6 +126,9 @@ def is_valid_user(mail):
 # Please be very careful when you relax/change the regular expressions.
 # Being lax can open us up to all kind of security problems.
 def is_valid_repo_name(repo_name):
+    # Trailing slashes can be ignored.
+    repo_name = repo_name.rstrip('/')
+
     part_re = re.compile(
         r'^[a-zA-Z0-9]'       # must start with a letter or number
         r'[a-zA-Z0-9./_-]*$'  # . / _ and - are allowed after the first char
