@@ -49,7 +49,7 @@
 - name: create virtualenv for servo syncing
   include: ../../../tasks/virtualenv.yml
            venv=/home/servo-sync/venv
-           requirements=../roles/vcs-sync/files/servo-requirements.txt
+           requirements=../../vcssync/prod-requirements.txt
   become_user: servo-sync
 
 - name: copy mozvcssync wheel to server
