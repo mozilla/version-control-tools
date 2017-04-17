@@ -135,10 +135,6 @@ cd pylib/vcsreplicator
 python setup.py develop
 cd ../..
 
-cd vcssync
-python setup.py develop
-cd ..
-
 cd hghooks
 python setup.py develop
 cd ..
