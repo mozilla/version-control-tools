@@ -26,7 +26,11 @@ if __name__ == '__main__':
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
         os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
-    import vcttesting.docker as vctdocker
+    try:
+        import vcttesting.docker as vctdocker
+    except ImportError:
+        vctdocker = None
+
     from vcttesting.testing import (
         get_docker_state,
         get_extensions,
@@ -59,6 +63,9 @@ if __name__ == '__main__':
         help='Only run tests that do not require Docker')
 
     options, extra = parser.parse_known_args(sys.argv)
+
+    if not vctdocker:
+        options.no_docker = True
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     filter_args = {
@@ -158,19 +165,25 @@ if __name__ == '__main__':
                 'in parallel.', file=sys.stderr)
 
     # Enable tests to interact with our Docker controlling script.
-    docker_state = os.path.join(HERE, '.dockerstate')
-    docker_url, docker_tls = vctdocker.params_from_env(os.environ)
-    docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
-    if not options.no_docker and docker.is_alive():
-        os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+    have_docker = False
+    if not options.no_docker:
+        docker_state = os.path.join(HERE, '.dockerstate')
+        docker_url, docker_tls = vctdocker.params_from_env(os.environ)
+        docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
 
-        # We build the base BMO images in the test runner because doing it
-        # from tests would be racey. It is easier to do it here instead of
-        # complicating code with locks.
-        #
-        # But only do this if a test we are running utilizes Docker.
-        os.environ.update(get_docker_state(docker, run_all_tests,
-                          verbose=verbose, use_last=options.use_last_images))
+        if docker.is_alive():
+            have_docker = True
+            os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+
+            # We build the base BMO images in the test runner because doing it
+            # from tests would be racey. It is easier to do it here instead of
+            # complicating code with locks.
+            #
+            # But only do this if a test we are running utilizes Docker.
+            os.environ.update(
+                get_docker_state(docker, run_all_tests,
+                                 verbose=verbose,
+                                 use_last=options.use_last_images))
 
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
@@ -194,16 +207,24 @@ if __name__ == '__main__':
         # We should ideally not leak containers and images. But until
         # the Mercurial test harness allows tests to register cleanup
         # actions, there is only so much we can do.
-        with docker.auto_clean_orphans():
-            res = subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
+        run = lambda: subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
+        if have_docker:
+            with docker.auto_clean_orphans():
+                res = run()
+        else:
+            res = run()
 
     if options.no_unit:
         run_unit_tests = []
 
     if run_unit_tests:
-        with docker.auto_clean_orphans():
-            noseres = run_nose_tests(run_unit_tests, options.jobs,
-                                     verbose=verbose)
+        run = lambda: run_nose_tests(run_unit_tests, options.jobs, verbose=verbose)
+        if have_docker:
+            with docker.auto_clean_orphans():
+                noseres = run()
+        else:
+            noseres = run()
+
         if noseres:
             res = noseres
 
@@ -262,8 +283,12 @@ if __name__ == '__main__':
             print('Testing with Mercurial %s' % version)
             sys.stdout.flush()
             os.environ['HGVERSION'] = version
-            with docker.auto_clean_orphans():
-                r = subprocess.call(args, cwd=HERE)
+            run = lambda: subprocess.call(args, cwd=HERE)
+            if have_docker:
+                with docker.auto_clean_orphans():
+                    run()
+            else:
+                run()
             sys.stdout.flush()
             sys.stderr.flush()
 
