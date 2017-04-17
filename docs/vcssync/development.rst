@@ -21,4 +21,4 @@ Running Tests
 
 To run the vcssync tests, run::
 
-   $ ./run-tests -j4 vcssync
+   $ ./run-tests -j4

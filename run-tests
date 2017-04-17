@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
     extensions = get_extensions(EXTDIR)
 
-    test_files = get_test_files(extensions)
+    test_files = get_test_files(extensions, venv_name)
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
     hook_tests = test_files['hook']

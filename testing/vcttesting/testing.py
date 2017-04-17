@@ -26,13 +26,23 @@ PYTHON_COVERAGE_DIRS = (
 )
 
 # Directories containing Python unit tests.
-UNIT_TEST_DIRS = [
-    'autoland/tests',
-    'git/tests',
-    'hgserver/tests',
-    'pylib',
-    'vcssync/tests',
-]
+UNIT_TEST_DIRS = {
+    'autoland/tests': {
+        'venvs': {'global'},
+    },
+    'git/tests': {
+        'venvs': {'global',},
+    },
+    'hgserver/tests': {
+        'venvs': {'global',},
+    },
+    'pylib': {
+        'venvs': {'global',},
+    },
+    'vcssync/tests': {
+        'venvs': {'vcssync',},
+    },
+}
 
 # Directories whose Python unit tests we should ignore.
 UNIT_TEST_IGNORES = (
@@ -108,18 +118,28 @@ def get_extensions(extdir):
     return m
 
 
-def get_test_files(extensions):
+def get_test_files(extensions, venv):
     extension_tests = []
-    for e in extensions.values():
-        extension_tests.extend(e['tests'])
 
-    hooks_test_dir = os.path.join(ROOT, 'hghooks', 'tests')
-    hook_tests = [os.path.join(hooks_test_dir, f)
-                   for f in os.listdir(hooks_test_dir)
-                   if is_test_filename(f)]
+    if venv == 'global':
+        for e in extensions.values():
+            extension_tests.extend(e['tests'])
+
+    hook_tests = []
+
+    if venv == 'global':
+        hooks_test_dir = os.path.join(ROOT, 'hghooks', 'tests')
+        hook_tests = [os.path.join(hooks_test_dir, f)
+                       for f in os.listdir(hooks_test_dir)
+                       if is_test_filename(f)]
 
     unit_tests = []
-    for base in UNIT_TEST_DIRS:
+    for base, settings in sorted(UNIT_TEST_DIRS.items()):
+        # Only add tests from path if marked as compatible with the
+        # current virtualenv.
+        if venv not in settings['venvs']:
+            continue
+
         base = os.path.join(ROOT, base)
         for root, dirs, files in os.walk(base):
             relative = root[len(ROOT) + 1:]
