@@ -26,6 +26,16 @@ if __name__ == '__main__':
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
         os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
+    venv_name = os.path.relpath(os.environ['VIRTUAL_ENV'],
+                                os.path.join(HERE, 'venv'))
+
+    if venv_name == '.':
+        venv_name = 'global'
+
+    if venv_name not in ('global', 'vcssync'):
+        print('unknown virtualenv: %s (this should not happen)' % venv_name)
+        sys.exit(1)
+
     try:
         import vcttesting.docker as vctdocker
     except ImportError:
