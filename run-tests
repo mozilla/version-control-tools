@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
-    hg = os.path.join(HERE, 'venv', 'bin', 'hg')
+    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
     if options.with_hg:
         hg = options.with_hg
     hgversion = get_hg_version(hg)
