@@ -1,0 +1,34 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import argparse
+import os
+import sys
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+sys.path.insert(0, os.path.join(HERE, 'testing'))
+
+from vcttesting.environment import (
+    create_vcssync,
+)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('name', choices=('vcssync',),
+                        help='Which environment to create')
+
+    args = parser.parse_args()
+
+    env = args.name
+
+    if env == 'vcssync':
+        create_vcssync()
+    else:
+        raise Exception('unhandled environment: %s' % env)
+
+if __name__ == '__main__':
+    main()

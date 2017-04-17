@@ -1,0 +1,29 @@
+amqp==1.4.9 \
+    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
+
+anyjson==0.3.3 \
+    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
+
+dulwich==0.16.1 \
+    --hash=sha256:470d0feec9d4e7aba091c02f62db7f9cc6549ffe3f623a8039f96f584159da05
+
+github3.py==0.9.6 \
+    --hash=sha256:650d31dbc3f3290ea56b18cfd0e72e00bbbd6777436578865a7e45b496f09e4c
+
+kombu==3.0.37 \
+    --hash=sha256:7ceab743e3e974f3e5736082e8cc514c009e254e646d6167342e0e192aee81a6
+
+Mercurial==4.1.2 \
+    --hash=sha256:09415253fb409a77e19b9951532a3c22c4e07e74bab80652527064617daab194
+
+python-hglib==1.7 \
+    --hash=sha256:0dc087d15b774cda82d3c8096fb0e514caeb2ddb60eed38e9056b16e279ba3c5
+
+requests==2.13.0 \
+    --hash=sha256:1a720e8862a41aa22e339373b526f508ef0c8988baf48b84d3fc891a8e237efb
+
+uritemplate==3.0.0 \
+    --hash=sha256:1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd
+
+uritemplate.py==3.0.2 \
+    --hash=sha256:a0c459569e80678c473175666e0d1b3af5bc9a13f84463ec74f808f3dd12ca47
