@@ -61,7 +61,7 @@ fi
 ROOT=`pwd`
 VENV=${ROOT}/venv
 
-if [ ! -d ${VENV} ]; then
+if [ ! -d ${VENV}/lib ]; then
   # There is a bug in pycrypto where it tries to invoke `configure` instead
   # of a path qualified configure. So if there is a "configure" on $PATH
   # it will invoke the wrong one.

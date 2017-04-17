@@ -5,7 +5,7 @@ set -eu
 ROOT=`pwd`
 VENV=${ROOT}/venv
 
-if [ ! -d ${VENV} ]; then
+if [ ! -d ${VENV}/lib ]; then
   . ${ROOT}/testing/create-virtualenv
 fi
 

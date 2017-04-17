@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir ${VENV}
+mkdir -p ${VENV}
 
 # Securely download virtualenv, setuptools, and pip.
 ${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/virtualenv-15.1.0.tar.gz \
