@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import errno
 import hashlib
 import logging
 import os
@@ -22,6 +23,38 @@ from .gitrewrite.linearize import (
 
 
 logger = logging.getLogger(__name__)
+
+
+def source_commits_in_map_file(path, commits):
+    """Determine whether all source commits are present in a map file.
+
+    Accepts the ``path`` to an ``hg convert`` revision mapping file and an
+    iterable of source revisions to test for presence.
+
+    Returns a 2-tuple of (bool, dict) indicating whether all commits are
+    present in the map file and a mapping of the original commit to the
+    converted commit for all found commits.
+    """
+    commit_map = {}
+    remaining = set(commits)
+
+    try:
+        with open(path, 'rb') as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                shas = line.split()
+                if shas[0] in remaining:
+                    remaining.remove(shas[0])
+                    commit_map[shas[0]] = shas[1]
+                    if not remaining:
+                        break
+    except IOError as e:
+        if e.errno != errno.ENOENT:
+            raise
+
+    return len(remaining) == 0, commit_map
 
 
 def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
@@ -148,22 +181,13 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
     # If nothing was converted, no-op if the head is already converted
     # according to the `hg convert` revision map.
     if not git_state['commit_map']:
-        try:
-            with open(rev_map, 'rb') as fh:
-                for line in fh:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    shas = line.split()
-                    if shas[0] == git_state['dest_commit']:
-                        logger.warn('all Git commits have already been '
-                                    'converted; not doing anything')
-                        maybe_push_hg()
-                        return result
-        except IOError:
-            # Fall through to doing the conversion. If it's a file permissions
-            # error, `hg convert` will abort.
-            pass
+        found = source_commits_in_map_file(rev_map,
+                                           [git_state['dest_commit']])[0]
+        if found:
+            logger.warn('all Git commits have already been '
+                        'converted; not doing anything')
+            maybe_push_hg()
+            return result
 
     logger.warn('converting %d Git commits' % len(git_state['commit_map']))
 
