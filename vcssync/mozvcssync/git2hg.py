@@ -57,6 +57,62 @@ def source_commits_in_map_file(path, commits):
     return len(remaining) == 0, commit_map
 
 
+def run_hg_convert(git_repo_path,
+                   hg_repo_path,
+                   rev_map,
+                   rev=None,
+                   similarity=50,
+                   find_copies_harder=False,
+                   skip_submodules=False,
+                   move_to_subdir=None):
+    """Run ``hg convert`` to convert Git commits to Mercurial."""
+    hg_config = [
+        b'extensions.convert=',
+        # Make the rename detection limit essentially infinite.
+        b'convert.git.renamelimit=1000000000',
+        # The ``convert_revision`` that would be stored reflects the rewritten
+        # Git commit. This is valuable as a persistent SHA map, but that's it.
+        # We (hopefully) insert the original Git commit via
+        # ``source_revision_key``, so this is of marginal value.
+        b'convert.git.saverev=false',
+        b'convert.git.similarity=%d' % similarity,
+    ]
+
+    if find_copies_harder:
+        hg_config.append(b'convert.git.findcopiesharder=true')
+    if skip_submodules:
+        hg_config.append(b'convert.git.skipsubmodules=true')
+
+    args = [hglib.HGPATH]
+    for c in hg_config:
+        args.extend([b'--config', c])
+
+    args.extend([b'convert'])
+
+    if rev:
+        args.extend([b'--rev', rev])
+
+    # `hg convert` needs a filemap to prune empty changesets. So use an
+    # empty file even if we don't have any filemap rules.
+    with tempfile.NamedTemporaryFile('wb') as tf:
+        if move_to_subdir:
+            tf.write(b'rename . %s\n' % move_to_subdir)
+
+        tf.flush()
+
+        args.extend([b'--filemap', tf.name])
+
+        args.extend([git_repo_path, hg_repo_path, rev_map])
+
+        # hglib doesn't appear to stream output very well. So just invoke
+        # `hg` directly.
+        env = dict(os.environ)
+        env[b'HGPLAIN'] = b'1'
+        env[b'HGENCODING'] = b'utf-8'
+
+        subprocess.check_call(args, cwd='/', env=env)
+
+
 def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
                              git_push_url=None,
                              hg_push_url=None,
@@ -191,23 +247,6 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
 
     logger.warn('converting %d Git commits' % len(git_state['commit_map']))
 
-    hg_config = [
-        b'extensions.convert=',
-        # Make the rename detection limit essentially infinite.
-        b'convert.git.renamelimit=1000000000',
-        # The ``convert_revision`` that would be stored reflects the rewritten
-        # Git commit. This is valuable as a persistent SHA map, but that's it.
-        # We (hopefully) insert the original Git commit via
-        # ``source_revision_key``, so this is of marginal value.
-        b'convert.git.saverev=false',
-        b'convert.git.similarity=%d' % similarity,
-    ]
-
-    if find_copies_harder:
-        hg_config.append(b'convert.git.findcopiesharder=true')
-    if skip_submodules:
-        hg_config.append(b'convert.git.skipsubmodules=true')
-
     if not os.path.exists(hg_repo_path):
         hglib.init(hg_repo_path)
 
@@ -226,32 +265,12 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
 
     old_shamap_hash = get_shamap_hash()
 
-    args = [hglib.HGPATH]
-    for c in hg_config:
-        args.extend([b'--config', c])
-
-    args.extend([b'convert'])
-    args.extend([b'--rev', b'refs/convert/dest/heads/%s' % ref])
-
-    # `hg convert` needs a filemap to prune empty changesets. So use an
-    # empty file even if we don't have any filemap rules.
-    with tempfile.NamedTemporaryFile('wb') as tf:
-        if move_to_subdir:
-            tf.write(b'rename . %s\n' % move_to_subdir)
-
-        tf.flush()
-
-        args.extend([b'--filemap', tf.name])
-
-        args.extend([git_repo_path, hg_repo_path, rev_map])
-
-        # hglib doesn't appear to stream output very well. So just invoke
-        # `hg` directly.
-        env = dict(os.environ)
-        env[b'HGPLAIN'] = b'1'
-        env[b'HGENCODING'] = b'utf-8'
-
-        subprocess.check_call(args, cwd='/', env=env)
+    run_hg_convert(git_repo_path, hg_repo_path, rev_map,
+                   rev=b'refs/convert/dest/heads/%s' % ref,
+                   similarity=similarity,
+                   find_copies_harder=find_copies_harder,
+                   skip_submodules=skip_submodules,
+                   move_to_subdir=move_to_subdir)
 
     with hglib.open(hg_repo_path) as hrepo:
         tip = hrepo[b'tip']
