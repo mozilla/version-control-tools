@@ -20,7 +20,7 @@ from .gitrewrite.linearize import (
 logger = logging.getLogger(__name__)
 
 
-def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
+def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
                              git_push_url=None,
                              hg_push_url=None,
                              move_to_subdir=None,
@@ -44,7 +44,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
     clone`` and ``ref`` is a Git ref, like ``master``. Only converting
     a single ref is allowed.
 
-    The source Git repository is locally cloned to the path ``git_repo``.
+    The source Git repository is locally cloned to the path ``git_repo_path``.
     This directory will be created if necessary.
 
     If ``git_push_url`` is specified, the local clone (including converted
@@ -79,40 +79,40 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
        SHA-1 of ``tip`` Mercurial changeset after conversion.
     """
     # Many processes execute with cwd=/ so normalize to absolute paths.
-    git_repo = os.path.abspath(git_repo)
-    hg_repo = os.path.abspath(hg_repo)
+    git_repo_path = os.path.abspath(git_repo_path)
+    hg_repo_path = os.path.abspath(hg_repo_path)
 
     # Create Git repo, if necessary.
-    if not os.path.exists(git_repo):
-        subprocess.check_call([b'git', b'init', b'--bare', git_repo])
+    if not os.path.exists(git_repo_path):
+        subprocess.check_call([b'git', b'init', b'--bare', git_repo_path])
         # We don't need to set up a remote because we use an explicit refspec
         # during fetch.
 
     subprocess.check_call([b'git', b'fetch', b'--no-tags', git_source_url,
                            b'heads/%s:heads/%s' % (ref, ref)],
-                          cwd=git_repo)
+                          cwd=git_repo_path)
 
     if git_push_url:
         subprocess.check_call([b'git', b'push', b'--mirror', git_push_url],
-                              cwd=git_repo)
+                              cwd=git_repo_path)
 
     git_state = linearize_git_repo(
-        git_repo,
+        git_repo_path,
         b'heads/%s' % ref,
         source_repo=git_source_url,
         **kwargs)
 
     if git_push_url:
         subprocess.check_call([b'git', b'push', b'--mirror', git_push_url],
-                              cwd=git_repo)
+                              cwd=git_repo_path)
 
-    rev_map = os.path.join(hg_repo, b'.hg', b'shamap')
+    rev_map = os.path.join(hg_repo_path, b'.hg', b'shamap')
 
     def maybe_push_hg():
         if not hg_push_url:
             return
 
-        with hglib.open(hg_repo) as hrepo:
+        with hglib.open(hg_repo_path) as hrepo:
             logger.warn('checking for outgoing changesets to %s' % hg_push_url)
             outgoing = hrepo.outgoing(path=hg_push_url)
             if not outgoing:
@@ -169,15 +169,15 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
     if skip_submodules:
         hg_config.append(b'convert.git.skipsubmodules=true')
 
-    if not os.path.exists(hg_repo):
-        hglib.init(hg_repo)
+    if not os.path.exists(hg_repo_path):
+        hglib.init(hg_repo_path)
 
-    with hglib.open(hg_repo) as hrepo:
+    with hglib.open(hg_repo_path) as hrepo:
         tip = hrepo[b'tip']
         before_hg_tip_rev = tip.rev()
         before_hg_tip_node = tip.node()
 
-    shamap_path = os.path.join(hg_repo, b'.hg', b'shamap')
+    shamap_path = os.path.join(hg_repo_path, b'.hg', b'shamap')
     def get_shamap_hash():
         if not os.path.exists(shamap_path):
             return None
@@ -204,7 +204,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
 
         args.extend([b'--filemap', tf.name])
 
-        args.extend([git_repo, hg_repo, rev_map])
+        args.extend([git_repo_path, hg_repo_path, rev_map])
 
         # hglib doesn't appear to stream output very well. So just invoke
         # `hg` directly.
@@ -214,7 +214,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo, hg_repo,
 
         subprocess.check_call(args, cwd='/', env=env)
 
-    with hglib.open(hg_repo) as hrepo:
+    with hglib.open(hg_repo_path) as hrepo:
         tip = hrepo[b'tip']
         after_hg_tip_rev = tip.rev()
         after_hg_tip_node = tip.node()
