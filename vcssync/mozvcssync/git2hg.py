@@ -10,8 +10,12 @@ import os
 import subprocess
 import tempfile
 
+import dulwich.repo
 import hglib
 
+from .gitrewrite import (
+    commit_metadata_rewriter,
+)
 from .gitrewrite.linearize import (
     linearize_git_repo,
 )
@@ -28,7 +32,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
                              skip_submodules=False,
                              similarity=50,
                              shamap_s3_upload_url=None,
-                             **kwargs):
+                             git_commit_rewriter_args=None):
     """Linearize a Git repo to an hg repo by squashing merges.
 
     Many Git repositories (especially those on GitHub) have an excessive
@@ -52,6 +56,10 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
 
     If ``hg_push_url`` is specified, the converted Mercurial repo will be
     pushed to that URL.
+
+    ``git_commit_rewriter_args`` is a dict of arguments to pass to
+    ``gitrewrite.commit_metadata_rewriter()`` to construct a function for
+    rewriting Git commits.
 
     The conversion works in phases:
 
@@ -88,6 +96,8 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
         # We don't need to set up a remote because we use an explicit refspec
         # during fetch.
 
+    git_repo = dulwich.repo.Repo(git_repo_path)
+
     subprocess.check_call([b'git', b'fetch', b'--no-tags', git_source_url,
                            b'heads/%s:heads/%s' % (ref, ref)],
                           cwd=git_repo_path)
@@ -96,11 +106,14 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
         subprocess.check_call([b'git', b'push', b'--mirror', git_push_url],
                               cwd=git_repo_path)
 
+    rewriter = commit_metadata_rewriter(git_repo,
+                                        source_repo=git_source_url,
+                                        **git_commit_rewriter_args)
+
     git_state = linearize_git_repo(
-        git_repo_path,
+        git_repo,
         b'heads/%s' % ref,
-        source_repo=git_source_url,
-        **kwargs)
+        commit_rewriter=rewriter)
 
     if git_push_url:
         subprocess.check_call([b'git', b'push', b'--mirror', git_push_url],

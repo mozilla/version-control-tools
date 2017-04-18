@@ -296,3 +296,136 @@ def rewrite_commit_message(message, summary_prefix=None, reviewable_key=None,
     result['message'] = message
 
     return result
+
+
+def commit_metadata_rewriter(
+        repo,
+        summary_prefix=None,
+        reviewable_key=None,
+        remove_reviewable=False,
+        normalize_github_merge_message=False,
+        source_repo_key=None,
+        source_repo=None,
+        source_revision_key=None,
+        committer_action='keep',
+        author_map=None,
+        use_p2_author=False,
+        github_username=None,
+        github_token=None):
+    """Obtain a function used to rewrite Git commit object metadata.
+
+    The returned function is called with 2 arguments: the old and new Git commit
+    objects. The function is expected to mutate the new Git commit object.
+
+    The function is attached to a ``dulwich.repo.Repo`` instance and a set of
+    behavioral options  defined via arguments. Those arguments are as follows:
+
+    ``summary_prefix`` allows prefixing the summary line of the commit
+    message with a string. A space separates the prefix from the original
+    message.
+
+    ``reviewable_key`` if set will replace Reviewable.io Markdown in the
+    commit message with a string of the form ``<reviewable_key>: <URL>``.
+
+    ``remove_reviewable`` will remove Reviewable.io Markdown in the commit
+    message.
+
+    ``source_repo_key`` and ``source_repo`` rewrite the commit message to
+    contain metadata listing the source repository in the form
+    ``<source_repo_key>: <source_repo>``. ``source_repo`` should presumably
+    be a URL.
+
+    ``source_revision_key`` if specified will rewrite the commit message
+    to contain a line of the form ``<source_revision_key>: COMMIT`` where
+    ``COMMIT`` is the original Git commit ID.
+
+    ``committer_action`` specifies how to handle the ``committer`` field in
+    the Git commit object. Possible values are ``keep`` (the default) to
+    not modify the field, ``use-author`` to copy the ``author`` field to the
+    ``committer`` field, or ``use-committer`` to copy the ``committer``
+    field to the ``author`` field.
+
+    ``author_map`` is a dict mapping old author/committer values to new
+    ones.
+
+    ``use_p2_author`` indicates whether to use the author of the 2nd parent
+    on merge commits. By default, the author of the merge commit is used.
+    """
+    if committer_action not in ('keep', 'use-author', 'use-committer'):
+        raise ValueError('committer_action must be one of keep, use-author, '
+                         'or use-committer')
+
+    author_map = author_map or {}
+
+    github_client = None
+    if github_username and github_token:
+        github_client = github3.login(username=github_username,
+                                      token=github_token)
+
+    github_org, github_repo = None, None
+    github_cache_dir = os.path.join(repo.path, 'github-cache')
+
+    if source_repo and source_repo.startswith(b'https://github.com/'):
+        orgrepo = source_repo[len(b'https://github.com/'):]
+        github_org, github_repo = orgrepo.split(b'/')
+
+    if github_client and github_repo and not os.path.exists(github_cache_dir):
+        os.mkdir(github_cache_dir)
+
+
+    def rewrite_commit(source_commit, dest_commit):
+        if use_p2_author and len(source_commit.parents) == 2:
+            c = repo[source_commit.parents[1]]
+            author = c.author
+            committer = c.committer
+        else:
+            author = source_commit.author
+            committer = source_commit.committer
+
+        dest_commit.author = author_map.get(author, author)
+        dest_commit.committer = author_map.get(committer, committer)
+
+        if committer_action == 'use-author':
+            dest_commit.committer = dest_commit.author
+            dest_commit.commit_time = dest_commit.author_time
+            dest_commit.commit_timezone = dest_commit.author_timezone
+        elif committer_action == 'use-committer':
+            dest_commit.author = dest_commit.committer
+            dest_commit.author_time = dest_commit.commit_time
+            dest_commit.author_timezone = dest_commit.commit_timezone
+        else:
+            assert committer_action == 'keep'
+
+        if summary_prefix or reviewable_key or remove_reviewable or normalize_github_merge_message:
+            message_result = rewrite_commit_message(
+                dest_commit.message,
+                summary_prefix=summary_prefix,
+                reviewable_key=reviewable_key,
+                remove_reviewable=remove_reviewable,
+                normalize_github_merge=normalize_github_merge_message,
+                github_client=github_client,
+                github_org=github_org,
+                github_repo=github_repo,
+                github_cache_dir=github_cache_dir,
+            )
+
+            dest_commit.message = message_result['message']
+
+        # Record source repository and revision annotations in commit message
+        # if requested.
+        if source_repo_key or source_revision_key:
+            lines = dest_commit.message.rstrip().splitlines()
+
+            # Insert a blank line if previous line isn't a "metadata" line.
+            if not re.match('^[a-zA-Z-]+: \S+$', lines[-1]) or len(lines) == 1:
+                lines.append(b'')
+
+            if source_repo_key:
+                lines.append(b'%s: %s' % (source_repo_key, source_repo))
+            if source_revision_key:
+                lines.append(b'%s: %s' % (source_revision_key,
+                                          source_commit.id))
+
+            dest_commit.message = b'%s\n' % b'\n'.join(lines)
+
+    return rewrite_commit

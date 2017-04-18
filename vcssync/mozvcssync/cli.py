@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 
+import dulwich.repo
 import hglib
 
 from .git2hg import (
@@ -17,6 +18,7 @@ from .git2hg import (
 )
 from .gitrewrite import (
     RewriteError,
+    commit_metadata_rewriter,
 )
 from .gitrewrite.linearize import (
     linearize_git_repo,
@@ -66,7 +68,8 @@ LINEARIZE_GIT_ARGS = [
 ]
 
 
-def get_git_linearize_kwargs(args):
+def get_commit_rewriter_kwargs(args):
+    """Obtain keyword arguments to pass to ``commit_metadata_rewriter()``"""
     kwargs = {}
 
     # Credentials are sensitive. Allow them to come from environment,
@@ -76,7 +79,7 @@ def get_git_linearize_kwargs(args):
         if v is not None:
             kwargs[env.lower()] = v
 
-    for k in ('exclude_dirs', 'summary_prefix', 'reviewable_key',
+    for k in ('summary_prefix', 'reviewable_key',
               'remove_reviewable', 'source_repo_key',
               'source_revision_key', 'normalize_github_merge_message',
               'committer_action', 'use_p2_author',
@@ -121,13 +124,18 @@ def linearize_git():
 
     configure_logging()
 
-    kwargs = get_git_linearize_kwargs(args)
+    kwargs = get_commit_rewriter_kwargs(args)
 
     if args.source_repo:
         kwargs['source_repo'] = args.source_repo
 
+    repo = dulwich.repo.Repo(args.git_repo)
+    rewriter = commit_metadata_rewriter(repo, **kwargs)
+
     try:
-        linearize_git_repo(args.git_repo, args.ref, **kwargs)
+        linearize_git_repo(repo, args.ref,
+                           exclude_dirs=args.exclude_dirs,
+                           commit_rewriter=rewriter)
     except RewriteError as e:
         logger.error('abort: %s' % str(e))
 
@@ -172,13 +180,7 @@ def linearize_git_to_hg():
 
     configure_logging()
 
-    kwargs = get_git_linearize_kwargs(args)
-    for k in ('similarity', 'find_copies_harder', 'skip_submodules',
-              'move_to_subdir', 'git_push_url', 'hg_push_url',
-              'shamap_s3_upload_url'):
-        v = getattr(args, k)
-        if v is not None:
-            kwargs[k] = v
+    rewriter_args = get_commit_rewriter_kwargs(args)
 
     try:
         linearize_git_repo_to_hg(
@@ -186,7 +188,14 @@ def linearize_git_to_hg():
             args.git_ref,
             args.git_repo_path,
             args.hg_repo_path,
-            **kwargs)
+            git_push_url=args.git_push_url,
+            hg_push_url=args.hg_push_url,
+            move_to_subdir=args.move_to_subdir,
+            find_copies_harder=args.find_copies_harder,
+            skip_submodules=args.skip_submodules,
+            similarity=args.similarity,
+            shamap_s3_upload_url=args.shamap_s3_upload_url,
+            git_commit_rewriter_args=rewriter_args)
     except RewriteError as e:
         logger.error('abort: %s' % str(e))
         sys.exit(1)
