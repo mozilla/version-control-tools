@@ -17,6 +17,9 @@ from . import (
     prune_directories,
     RewriteError,
 )
+from ..gitutil import (
+    update_git_refs,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -174,30 +177,19 @@ def linearize_git_repo(repo, ref, exclude_dirs=None,
     # Store refs to the converted source and dest commits. We use
     # ``git update-ref`` so reflogs are written (Dulwich doesn't appear
     # to write reflogs).
-    reflog_commands = []
+    reflog_actions = []
     if source_ref in repo:
-        reflog_commands.append(b'update %s\0%s\0%s' % (
-            source_ref, head, repo[source_ref].id))
+        reflog_actions.append(('update', source_ref, head, repo[source_ref].id))
     else:
-        reflog_commands.append(b'create %s\0%s' % (source_ref, head))
+        reflog_actions.append(('create', source_ref, head))
 
     if dest_ref in repo:
-        reflog_commands.append(b'update %s\0%s\0%s' % (
-            dest_ref, dest_commit_id, repo[dest_ref].id))
+        reflog_actions.append(('update', dest_ref, dest_commit_id,
+                               repo[dest_ref].id))
     else:
-        reflog_commands.append(b'create %s\0%s' % (dest_ref, dest_commit_id))
+        reflog_actions.append(('create', dest_ref, dest_commit_id))
 
-    p = subprocess.Popen([b'git', b'update-ref',
-                          b'--create-reflog',
-                          b'-m', b'linearize %s' % ref,
-                          b'--stdin', b'-z'],
-                         stdin=subprocess.PIPE,
-                         cwd=repo.path)
-    p.stdin.write(b'\0'.join(reflog_commands))
-    p.stdin.close()
-    res = p.wait()
-    if res:
-        raise Exception('failed to update refs')
+    update_git_refs(repo, b'linearize %s' % ref, *reflog_actions)
 
     logger.warn('%d commits from %s converted; original: %s; rewritten: %s' % (
                 rewrite_count, ref, head, repo[dest_ref].id))
