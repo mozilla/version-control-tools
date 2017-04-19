@@ -26,9 +26,22 @@ def main():
     env = args.name
 
     if env == 'vcssync':
-        create_vcssync()
+        info = create_vcssync()
     else:
         raise Exception('unhandled environment: %s' % env)
+
+    print('%s environment created successfully.' % env)
+    print('')
+    print('To activate this environment, source a shell script:')
+    print('')
+    print('  $ source %s' % os.path.relpath(info['activate'], HERE))
+    print('')
+    print('To update the environment, just run this command again.')
+    print('')
+    print('To run tests relevant to this environment:')
+    print('')
+    print('  $ ./run-tests')
+
 
 if __name__ == '__main__':
     main()

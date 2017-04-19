@@ -23,12 +23,15 @@ def create_virtualenv(name):
 
     if os.name == 'nt':
         pip = os.path.join(path, 'Scripts', 'pip.exe')
+        activate = os.path.join(path, 'Scripts', 'activate')
     else:
         pip = os.path.join(path, 'bin', 'pip')
+        activate = os.path.join(path, 'bin', 'activate')
 
     res = {
         'path': path,
         'pip': pip,
+        'activate': activate,
     }
 
     env = dict(os.environ)
