@@ -5,7 +5,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import errno
-import hashlib
 import logging
 import os
 import subprocess
@@ -19,6 +18,9 @@ from .gitrewrite import (
 )
 from .gitrewrite.linearize import (
     linearize_git_repo,
+)
+from .util import (
+    monitor_hg_repo,
 )
 
 
@@ -250,52 +252,40 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
     if not os.path.exists(hg_repo_path):
         hglib.init(hg_repo_path)
 
-    with hglib.open(hg_repo_path) as hrepo:
-        tip = hrepo[b'tip']
-        before_hg_tip_rev = tip.rev()
-        before_hg_tip_node = tip.node()
+    with monitor_hg_repo(hg_repo_path, [b'shamap']) as changes:
+        run_hg_convert(git_repo_path, hg_repo_path, rev_map,
+                       rev=b'refs/convert/dest/heads/%s' % ref,
+                       similarity=similarity,
+                       find_copies_harder=find_copies_harder,
+                       skip_submodules=skip_submodules,
+                       move_to_subdir=move_to_subdir)
 
-    def get_shamap_hash():
-        if not os.path.exists(rev_map):
-            return None
+    # Aliasing makes this slightly easier to read.
+    before = changes['before']
+    after = changes['after']
 
-        with open(rev_map, 'rb') as fh:
-            return hashlib.sha256(fh.read()).digest()
-
-    old_shamap_hash = get_shamap_hash()
-
-    run_hg_convert(git_repo_path, hg_repo_path, rev_map,
-                   rev=b'refs/convert/dest/heads/%s' % ref,
-                   similarity=similarity,
-                   find_copies_harder=find_copies_harder,
-                   skip_submodules=skip_submodules,
-                   move_to_subdir=move_to_subdir)
-
-    with hglib.open(hg_repo_path) as hrepo:
-        tip = hrepo[b'tip']
-        after_hg_tip_rev = tip.rev()
-        after_hg_tip_node = tip.node()
-
-    if before_hg_tip_rev == -1:
-        convert_count = after_hg_tip_rev + 1
+    if before['tip_rev'] == -1:
+        convert_count = after['tip_rev'] + 1
     else:
-        convert_count = after_hg_tip_rev - before_hg_tip_rev
+        convert_count = after['tip_rev'] - before['tip_rev']
 
-    result['hg_before_tip_rev'] = before_hg_tip_rev
-    result['hg_after_tip_rev'] = after_hg_tip_rev
-    result['hg_before_tip_node'] = before_hg_tip_node
-    result['hg_after_tip_node'] = after_hg_tip_node
+    result['hg_before_tip_rev'] = before['tip_rev']
+    result['hg_after_tip_rev'] = after['tip_rev']
+    result['hg_before_tip_node'] = before['tip_node']
+    result['hg_after_tip_node'] = after['tip_node']
     result['hg_convert_count'] = convert_count
 
     logger.warn('%d Git commits converted to Mercurial; '
                 'previous tip: %d:%s; current tip: %d:%s' % (
-        convert_count, before_hg_tip_rev, before_hg_tip_node,
-        after_hg_tip_rev, after_hg_tip_node))
+        convert_count, before['tip_rev'], before['tip_node'],
+        after['tip_rev'], after['tip_node']))
 
     maybe_push_hg()
 
+    shamap_changed = before['hashes']['shamap'] != after['hashes']['shamap']
+
     # TODO so hacky. Relies on credentials in the environment.
-    if shamap_s3_upload_url and old_shamap_hash != get_shamap_hash():
+    if shamap_s3_upload_url and shamap_changed:
         subprocess.check_call([
             b'aws', b's3', b'cp', rev_map, shamap_s3_upload_url
         ])

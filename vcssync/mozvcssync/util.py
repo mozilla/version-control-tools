@@ -4,6 +4,9 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import contextlib
+import errno
+import hashlib
 import os
 import pipes
 
@@ -69,3 +72,57 @@ def get_github_client(token):
     gh.login(token=token)
 
     return gh
+
+
+def hash_path(path):
+    try:
+        with open(path, 'rb') as fh:
+            return hashlib.sha256(fh.read()).digest()
+    except IOError as e:
+        if e.errno != errno.ENOENT:
+            raise
+
+        return None
+
+
+@contextlib.contextmanager
+def monitor_hg_repo(repo_path, hg_paths=None):
+    """Context manager to monitor a Mercurial repo for changes.
+
+    Before the context manager is active, the Mercurial repo at
+    ``repo_path`` is opened and state is collected.
+
+    When the context manager closes, a similar sampling is performed.
+
+    The context manager returns a dict describing the state of the repo. It
+    has keys ``before`` and ``after`` which hold state from before and
+    after the body of the context manager executes. It is currently up to the
+    caller to perform diffing.
+
+    Note: currently only the tip rev and node are recorded to compute for
+    differences. This is insufficient to detect changes for all use cases. For
+    example, it may not accurately detect certain strip operations.
+    """
+    hg_paths = hg_paths or []
+
+    def get_state():
+        with hglib.open(repo_path) as repo:
+            tip = repo[b'tip']
+            tip_rev = tip.rev()
+            tip_node = tip.node()
+
+        hashes = {path: hash_path(os.path.join(b'.hg', path))
+                  for path in hg_paths}
+
+        return {
+            'tip_rev': tip_rev,
+            'tip_node': tip_node,
+            'hashes': hashes,
+        }
+
+    state = {'before': get_state()}
+
+    try:
+        yield state
+    finally:
+        state['after'] = get_state()
