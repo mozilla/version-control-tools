@@ -255,12 +255,11 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
         before_hg_tip_rev = tip.rev()
         before_hg_tip_node = tip.node()
 
-    shamap_path = os.path.join(hg_repo_path, b'.hg', b'shamap')
     def get_shamap_hash():
-        if not os.path.exists(shamap_path):
+        if not os.path.exists(rev_map):
             return None
 
-        with open(shamap_path, 'rb') as fh:
+        with open(rev_map, 'rb') as fh:
             return hashlib.sha256(fh.read()).digest()
 
     old_shamap_hash = get_shamap_hash()
@@ -298,7 +297,7 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
     # TODO so hacky. Relies on credentials in the environment.
     if shamap_s3_upload_url and old_shamap_hash != get_shamap_hash():
         subprocess.check_call([
-            b'aws', b's3', b'cp', shamap_path, shamap_s3_upload_url
+            b'aws', b's3', b'cp', rev_map, shamap_s3_upload_url
         ])
 
     return result
