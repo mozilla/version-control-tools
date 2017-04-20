@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import pipes
 
+import github3
 import hglib
 
 
@@ -25,3 +26,12 @@ def run_hg(logger, client, args):
         raise hglib.error.CommandError(args, ret, out.getvalue(), b'')
 
     return out.getvalue()
+
+
+def get_github_client(token):
+    """Obtain a github3 client using an API token for authentication."""
+
+    gh = github3.GitHub()
+    gh.login(token=token)
+
+    return gh

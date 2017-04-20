@@ -13,6 +13,11 @@ import uuid
 
 import github3.pulls
 
+from ..util import (
+    get_github_client,
+)
+
+
 class RewriteError(Exception):
     """Represents an error that occurred during rewriting."""
 
@@ -356,10 +361,7 @@ def commit_metadata_rewriter(
 
     author_map = author_map or {}
 
-    github_client = None
-    if github_token:
-        github_client = github3.login(token=github_token)
-
+    github_client = get_github_client(github_token) if github_token else None
     github_org, github_repo = None, None
     github_cache_dir = os.path.join(repo.path, 'github-cache')
 
