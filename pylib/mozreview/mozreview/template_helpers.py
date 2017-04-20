@@ -43,18 +43,20 @@ def get_commit_table_context(request, review_request_details):
                       if cur_index - 1 >= 0 else None)
 
     latest_autoland_requests = []
+    try_syntax = ''
     repo_urls = set()
     autoland_requests = AutolandRequest.objects.filter(
         review_request_id=parent.id).order_by('-autoland_id')
 
     # We would like to fetch the latest AutolandRequest for each
     # different repository.
-    for request in autoland_requests:
-        if request.repository_url in repo_urls:
+    for land_request in autoland_requests:
+        if land_request.repository_url in repo_urls:
             continue
 
-        repo_urls.add(request.repository_url)
-        latest_autoland_requests.append(request)
+        repo_urls.add(land_request.repository_url)
+        latest_autoland_requests.append(land_request)
+        try_syntax = try_syntax or land_request.extra_data.get('try_syntax', '')
 
     return {
         'review_request_details': review_request_details,
@@ -66,5 +68,6 @@ def get_commit_table_context(request, review_request_details):
         'prev_child': prev_child,
         'latest_autoland_requests': latest_autoland_requests,
         'user': user,
+        'try_syntax': try_syntax,
     }
 
