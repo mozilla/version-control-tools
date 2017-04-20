@@ -310,7 +310,6 @@ def commit_metadata_rewriter(
         committer_action='keep',
         author_map=None,
         use_p2_author=False,
-        github_username=None,
         github_token=None):
     """Obtain a function used to rewrite Git commit object metadata.
 
@@ -358,9 +357,8 @@ def commit_metadata_rewriter(
     author_map = author_map or {}
 
     github_client = None
-    if github_username and github_token:
-        github_client = github3.login(username=github_username,
-                                      token=github_token)
+    if github_token:
+        github_client = github3.login(token=github_token)
 
     github_org, github_repo = None, None
     github_cache_dir = os.path.join(repo.path, 'github-cache')

@@ -61,8 +61,6 @@ LINEARIZE_GIT_ARGS = [
     (('--use-p2-author',), dict(action='store_true',
                                 help='Use the author of the 2nd parent for '
                                      'merge commits')),
-    (('--github-username',), dict(help='Username to use for GitHub API '
-                                       'requests')),
     (('--github-token',), dict(help='GitHub API token to use for GitHub API '
                                     'requests')),
 ]
@@ -74,7 +72,7 @@ def get_commit_rewriter_kwargs(args):
 
     # Credentials are sensitive. Allow them to come from environment,
     # which isn't exposed in e.g. `ps`.
-    for env in ('GITHUB_USERNAME', 'GITHUB_TOKEN'):
+    for env in ('GITHUB_TOKEN',):
         v = os.environ.get(env)
         if v is not None:
             kwargs[env.lower()] = v
@@ -83,7 +81,7 @@ def get_commit_rewriter_kwargs(args):
               'remove_reviewable', 'source_repo_key',
               'source_revision_key', 'normalize_github_merge_message',
               'committer_action', 'use_p2_author',
-              'github_username', 'github_token'):
+              'github_token'):
         v = getattr(args, k)
         if v is not None:
             kwargs[k] = v
