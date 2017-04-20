@@ -196,7 +196,8 @@ def rewrite_commit_message(message, summary_prefix=None, reviewable_key=None,
             if user and github_cache_dir:
                 with open(path, 'wb') as fh:
                     json.dump(user.to_json(), fh, encoding='utf-8',
-                              indent=2, sort_keys=True)
+                              indent=2, sort_keys=True,
+                              separators=(',', ': '))
 
             return user
 
@@ -219,7 +220,8 @@ def rewrite_commit_message(message, summary_prefix=None, reviewable_key=None,
             if pr and github_cache_dir:
                 with open(path, 'wb') as fh:
                     json.dump(pr.to_json(), fh, encoding='utf-8',
-                              indent=2, sort_keys=True)
+                              indent=2, sort_keys=True,
+                              separators=(',', ': '))
 
         user = None
         if pr and pr.head.user:
