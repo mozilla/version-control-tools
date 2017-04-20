@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import os
 import pipes
 
 import github3
@@ -29,9 +30,34 @@ def run_hg(logger, client, args):
 
 
 def get_github_client(token):
-    """Obtain a github3 client using an API token for authentication."""
+    """Obtain a github3 client using an API token for authentication.
+
+    If the ``BETAMAX_LIBRARY_DIR`` and ``BETAMAX_CASSETTE`` environment
+    variables are defined, the ``requests.Session`` used by the client
+    will be hooked up to betamax and pre-recorded HTTP requests will be used
+    instead of incurring actual requests. When betamax is active, the auth
+    token is not relevant.
+    """
 
     gh = github3.GitHub()
+
+    betamax_library_dir = os.environ.get('BETAMAX_LIBRARY_DIR')
+    betamax_cassette = os.environ.get('BETAMAX_CASSETTE')
+
+    if betamax_library_dir and betamax_cassette:
+        # Delay import because only needed for testing.
+        import betamax
+
+        with betamax.Betamax.configure() as config:
+            config.cassette_library_dir = betamax_library_dir
+
+            # We don't want requests hitting the network at all.
+            config.default_cassette_options['record_mode'] = 'none'
+
+        recorder = betamax.Betamax(gh._session)
+        recorder.use_cassette(betamax_cassette)
+        recorder.start()
+
     gh.login(token=token)
 
     return gh

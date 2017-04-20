@@ -12,6 +12,8 @@ export GIT_COMMITTER_NAME=test
 export GIT_COMMITTER_EMAIL=test@example.com
 export GIT_COMMITTER_DATE='Thu Jan 1 00:00:00 1970 +0000'
 
+export BETAMAX_LIBRARY_DIR=$TESTDIR/vcssync/tests/cassettes
+
 standardgitrepo() {
     here=`pwd`
     git init $1

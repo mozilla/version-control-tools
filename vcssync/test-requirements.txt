@@ -1,4 +1,10 @@
 -r prod-requirements.txt
 
+betamax==0.8.0 \
+    --hash=sha256:91d5f6ca6b03901df93f9c0c2ac7fe1a0ff557bd6f30124ec73cefae00fc14a2
+
+betamax-serializers==0.2.0 \
+    --hash=sha256:c7c4bd96f71d763debbec21e09bea932613cf651c2055514e6fd889358a46e3e
+
 coverage==3.7.1 \
     --hash=sha256:d1aea1c4aa61b8366d6a42dd3650622fbf9c634ed24eaf7f379c8b970e5ed44e
