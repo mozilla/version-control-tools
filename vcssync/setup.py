@@ -1,5 +1,13 @@
 from setuptools import setup, find_packages
 
+console_scripts = [
+    'linearize-git=mozvcssync.cli:linearize_git',
+    'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
+    'overlay-hg-repos=mozvcssync.cli:overlay_hg_repos_cli',
+    'servo-overlay=mozvcssync.servo:overlay_cli',
+    'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
+]
+
 setup(
     name='mozvcssync',
     version='0.1',
@@ -15,13 +23,7 @@ setup(
     ],
     packages=find_packages(),
     entry_points={
-        'console_scripts': [
-            'linearize-git=mozvcssync.cli:linearize_git',
-            'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
-            'overlay-hg-repos=mozvcssync.cli:overlay_hg_repos_cli',
-            'servo-overlay=mozvcssync.servo:overlay_cli',
-            'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
-        ],
+        'console_scripts': console_scripts,
     },
     install_requires=[
         'dulwich>=0.16',
