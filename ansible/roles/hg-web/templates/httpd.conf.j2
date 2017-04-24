@@ -104,9 +104,9 @@ CustomLog logs/access_log combined
 
 ServerSignature Off
 
-Alias /icons/ "/var/www/icons/"
+Alias /icons/ "/usr/share/httpd/icons/"
 
-<Directory "/var/www/icons">
+<Directory "/usr/share/httpd/icons">
     Options Indexes MultiViews FollowSymLinks
     AllowOverride None
     Require all granted
