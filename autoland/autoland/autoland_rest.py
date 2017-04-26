@@ -99,9 +99,13 @@ def autoland():
     """
 
     auth = request.authorization
-    if not auth or not check_auth(auth.username, auth.password):
-        return Response('Login required', 401,
-                        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    auth_response = {'WWW-Authenticate': 'Basic realm="Login Required"'}
+    if not auth:
+        return Response('Login required', 401, auth_response)
+    if not check_auth(auth.username, auth.password):
+        logging.warn('Failed authentication for "%s" from %s' % (
+            auth.username, request.remote_addr))
+        return Response('Login required', 401, auth_response)
 
     if request.json is None:
         error = 'Bad request: missing json'
