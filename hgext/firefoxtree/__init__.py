@@ -146,7 +146,7 @@ def isfirefoxrepo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.opener.exists('IS_FIREFOX_REPO')
+    return repo.vfs.exists('IS_FIREFOX_REPO')
 
 # Wrap repo lookup to automagically resolve tree names to URIs.
 def peerorrepo(orig, ui, path, *args, **kwargs):
@@ -235,7 +235,7 @@ def writefirefoxtrees(repo):
     # this file is read by Mercurial and has no relevance to us any more, we
     # prune relevant entries from this file so the data isn't redundant with
     # what we now write.
-    localtags = repo.opener.tryread('localtags')
+    localtags = repo.vfs.tryread('localtags')
     havedata = len(localtags) > 0
     taglines  = []
     for line in localtags.splitlines():
