@@ -140,6 +140,21 @@ should be created.
    and for the specified Bugzilla account to have admin privileges on
    reviewboard.mozilla.org.
 
+Stripping Changesets from a Review Repository
+=============================================
+
+It is sometimes necessary to remove traces of a changeset from a **review**
+repository. This can be accomplished by running a command from a shell on
+a reviewboard-hg server::
+
+   $ cd /repo/hg/mozilla/<repo>
+   $ sudo -u hg /var/hg/venv_pash/bin/hg --config extensions.strip= strip -r <revision>
+
+.. important::
+
+   If the ``hg`` from the ``pash`` virtualenv isn't used, the pushlog may get
+   corrupted when running ``hg strip``.
+
 Marking Repositories as Read-only
 =================================
 
