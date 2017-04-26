@@ -245,7 +245,7 @@ def select_users(valid, keys):
 
 # Copied from savecommitmessage in localrepo.py (but with variable filename and unicode)
 def savefile(repo, basename, text):
-    fp = repo.opener(basename, 'wb')
+    fp = repo.vfs(basename, 'wb')
     try:
         fp.write(text.encode('utf-8'))
     finally:
