@@ -12,7 +12,6 @@
     - create-repo
     - kill-wsgi-procs
     - refresh
-    - set-strip-users
     - set-urls
 
 - name: Install psutil

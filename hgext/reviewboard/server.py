@@ -28,9 +28,6 @@ from mercurial import (
     demandimport,
     extensions,
     hg,
-    phases,
-    pushkey,
-    repair,
     util,
     wireproto,
 )
@@ -149,45 +146,6 @@ def changegrouphook(ui, repo, source, url, **kwargs):
 def disallowpushhook(ui, repo, **kwargs):
     repo.ui.write(nopushdiscoveryrepos)
     return 1
-
-
-def pushstrip(repo, key, old, new):
-    """pushkey for strip that allows remote stripping.
-
-    We only allow users in a controlled users list to perform remote stripping.
-    """
-    if 'USER' not in os.environ:
-        repo.ui.write(_('request not authenticated; cannot perform remote strip\n'))
-        return 0
-
-    allowed = repo.ui.configlist('reviewboard', 'remote_strip_users')
-    if os.environ['USER'] not in allowed:
-        repo.ui.write(_('user not in list of users allowed to remote strip\n'))
-        return 0
-
-    nodes = []
-    for node in new.splitlines():
-        ctx = repo[node]
-        # Stripping changesets that are public carries too much risk that too
-        # many children changesets will also get stripped. Disallow the
-        # practice.
-        if ctx.phase() == phases.public:
-            repo.ui.write(_('cannot strip public changeset: %s\n') % ctx.hex())
-            return 0
-
-        nodes.append(ctx.node())
-
-    # The strip extension does higher-level things like remove bookmarks
-    # referencing stripped changesets. We shouldn't need this functionality, so
-    # we use the core API.
-    repair.strip(repo.ui, repo, nodes, backup=True, topic='remotestrip')
-    return 1
-
-
-def liststrip(repo):
-    """listkeys for strip pushkey namespace."""
-    # Namespace is push only, so nothing to return.
-    return {}
 
 
 def listreviewrepos(repo):
@@ -372,7 +330,6 @@ def capabilitieswebcommand(web, req, tmpl):
 
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
-    pushkey.register('strip', pushstrip, liststrip)
 
     # To short circuit operations with discovery repos.
     extensions.wrapcommand(wireproto.commands, 'heads', wrappedwireprotoheads)
