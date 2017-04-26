@@ -41,6 +41,16 @@ cmdtable = {}
 command = cmdutil.command(cmdtable)
 
 
+# Mercurial 4.2 introduced the vfs module and deprecated the symbol in
+# scmutil.
+def getvfs():
+    try:
+        from mercurial.vfs import vfs
+        return vfs
+    except ImportError:
+        return scmutil.vfs
+
+
 if os.name == 'nt':
     import ctypes
 
@@ -176,7 +186,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     ui.write('ensuring %s@%s is available at %s\n' % (url, revision or branch,
                                                       dest))
 
-    destvfs = scmutil.vfs(dest, audit=False, realpath=True)
+    destvfs = getvfs()(dest, audit=False, realpath=True)
 
     if destvfs.exists() and not destvfs.exists('.hg'):
         raise error.Abort('destination exists but no .hg directory')
@@ -208,7 +218,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         if storepath.endswith('.hg'):
             storepath = os.path.dirname(storepath)
 
-        storevfs = scmutil.vfs(storepath, audit=False)
+        storevfs = getvfs()(storepath, audit=False)
         storevfs.rmtree(forcibly=True)
 
     def handlerepoerror(e):

@@ -782,7 +782,14 @@ class reviewstore(object):
     """
     def __init__(self, repo):
         self._repo = repo
-        self._vfs = scmutil.vfs(repo.vfs.join('reviewboard'), audit=False)
+
+        # Mercurial 4.2 introduced the vfs module and deprecated scmutil.vfs.
+        try:
+            from mercurial.vfs import vfs
+        except ImportError:
+            vfs = scmutil.vfs
+
+        self._vfs = vfs(repo.vfs.join('reviewboard'), audit=False)
 
         # Maps review identifiers to identifierrecord instances.
         self._identifiers = {}

@@ -191,7 +191,12 @@ def share(orig, ui, source, *args, **kwargs):
     else:
         dest = ui.expandpath(dest)
 
-    destwvfs = scmutil.vfs(dest, realpath=True)
+    try:
+        from mercurial.vfs import vfs
+    except ImportError:
+        vfs = scmutil.vfs
+
+    destwvfs = vfs(dest, realpath=True)
     r = hg.repository(ui, destwvfs.base)
 
     with r.vfs('shared', 'ab') as fh:
