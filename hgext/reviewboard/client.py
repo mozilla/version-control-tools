@@ -20,6 +20,7 @@ This extension adds new options to the `push` command:
   * -c Single changeset to review.
 """
 
+import contextlib
 import errno
 import json
 import os
@@ -98,6 +99,13 @@ clientcapabilities = {
     'jsonproto',
     'commitid',
 }
+
+
+@contextlib.contextmanager
+def dummycontextmanager(*args, **kwargs):
+    """A context manager that does nothing. Useful for use as a stub."""
+    yield
+
 
 def calljsoncommand(ui, remote, command, data=None, httpcap=None, httpcommand=None):
     """Call a wire protocol command parse the response as JSON."""
@@ -296,12 +304,22 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     repo.ui.__class__ = repofilteringwrite
     remote.ui.__class__ = remotefilteringwrite
     try:
-        # We always do force push because we don't want users to need to
-        # specify it. The big danger here is pushing multiple heads or
-        # branches or mq patches. We check the former above and we don't
-        # want to limit user choice on the latter two.
-        return orig(repo, remote, force=True, revs=revs, newbranch=newbranch,
-                **kwargs)
+        # FUTURE can be made unconditional once support for 4.0 is dropped.
+        try:
+            configoverride = repo.ui.configoverride
+        except AttributeError:
+            configoverride = dummycontextmanager
+
+        # This has the side-effect of obtaining a repo.wlock(), which prevents
+        # a lock ordering issue if subsequent code executing during push obtains
+        # a wlock.
+        with configoverride({('experimental', 'bundle2.pushback'): 'true'}):
+            # We always do force push because we don't want users to need to
+            # specify it. The big danger here is pushing multiple heads or
+            # branches or mq patches. We check the former above and we don't
+            # want to limit user choice on the latter two.
+            return orig(repo, remote, force=True, revs=revs,
+                        newbranch=newbranch, **kwargs)
     finally:
         repo.ui.__class__ = oldrepocls
         remote.ui.__class__ = oldremotecls
