@@ -1396,7 +1396,7 @@ def reposetup(ui, repo):
             if ui.configbool('mozext', 'disable_local_database'):
                 return None
             try:
-                return ChangeTracker(self.join('changetracker.db'))
+                return ChangeTracker(self.vfs.join('changetracker.db'))
             except Exception as e:
                 raise util.Abort(e.message)
 

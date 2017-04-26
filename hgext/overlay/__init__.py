@@ -269,7 +269,7 @@ def _mirrorrepo(ui, repo, url):
 
     # Remove scheme from path and normalize reserved characters.
     path = url.replace('%s://' % u.scheme, '').replace('/', '_')
-    mirrorpath = repo.join(store.encodefilename(path))
+    mirrorpath = repo.vfs.join(store.encodefilename(path))
 
     peer = hg.peer(ui, {}, url)
     mirrorrepo = hg.repository(ui, mirrorpath,
