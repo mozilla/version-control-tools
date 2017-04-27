@@ -1,3 +1,5 @@
+#require vcsreplicator
+
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > vcsreplicator = $TESTDIR/pylib/vcsreplicator/vcsreplicator/hgext.py

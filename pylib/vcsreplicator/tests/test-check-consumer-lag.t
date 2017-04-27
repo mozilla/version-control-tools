@@ -1,4 +1,4 @@
-#require hgmodocker
+#require hgmodocker vcsreplicator
 
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv

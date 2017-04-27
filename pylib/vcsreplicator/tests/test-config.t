@@ -1,3 +1,5 @@
+#require vcsreplicator
+
   $ hg init server
   $ cd server
   $ cat >> .hg/hgrc << EOF

@@ -58,6 +58,14 @@ def has_eslint():
     from distutils.spawn import find_executable
     return find_executable('eslint') is not None
 
+@check('vcsreplicator', 'vcsreplicator Python modules')
+def has_vcsreplicator():
+    try:
+        from vcsreplicator.config import Config
+        return True
+    except ImportError:
+        return False
+
 @check('watchman', 'Require watchman')
 def has_watchman():
     from distutils.spawn import find_executable
