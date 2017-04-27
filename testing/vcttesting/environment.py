@@ -21,7 +21,7 @@ if os.environ.get('CODE_COVERAGE', False):
 
     covpath = os.path.join(os.environ['COVERAGE_DIR'],
         'coverage.%s' % uuid.uuid1())
-    cov = coverage.Coverage(data_file=covpath, auto_data=True)
+    cov = coverage.Coverage(data_file=covpath, auto_data=True, branch=True)
     cov._warn_no_data = False
     cov._warn_unimported_source = False
     cov.start()
