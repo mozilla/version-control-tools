@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import hmac
 import json
 import logging
 import urlparse
@@ -26,9 +27,21 @@ def get_dbconn():
     return psycopg2.connect(config.get('database'))
 
 
+def compare_digest_backport(a, b):
+    # hmac.compare_digest requires Python 2.7.7, while autoland has 2.7.6.
+    # This implementation is from urllib3.
+    result = abs(len(a) - len(b))
+    for l, r in zip(bytearray(a), bytearray(b)):
+        result |= l ^ r
+    return result == 0
+
+compare_digest = getattr(hmac, 'compare_digest', compare_digest_backport)
+
+
 def check_auth(user, passwd):
     auth = config.get('auth')
-    return user in auth and auth[user] == passwd
+    return compare_digest(auth.get(user, '').encode('utf8'),
+                          passwd.encode('utf8'))
 
 
 def check_pingback_url(pingback_url):
