@@ -27,30 +27,8 @@ provides a fully capable environment.
 Ubuntu Requirements
 -------------------
 
-On a fresh Ubuntu 14.04 install, the following packages need to be
+On a fresh Ubuntu 16.04 install, the following packages need to be
 installed:
-
-* libldap2-dev
-* libsasl2-dev
-* libxml2-dev
-* libxslt1-dev
-* mercurial (to clone version-control-tools)
-* python-dev
-* python-virtualenv
-* zlib1g-dev
-
-Many of these dependencies are needed to compile binary Python
-extensions that are part of the virtualenv.
-
-You can install these dependencies by running::
-
-   $ sudo apt-get install libldap2-dev libsasl2-dev \
-     libxml2-dev libxslt1-dev \
-     mercurial \
-     python-dev python-virtualenv \
-     zlib1g-dev
-
-On Ubuntu 16.04, the following packages are needed:
 
 * python-dev
 * npm
@@ -63,7 +41,10 @@ On Ubuntu 16.04, the following packages are needed:
 * libssl-dev
 * mercurial (to clone version-control-tools)
 
-which you can install by running::
+Many of these dependencies are needed to compile binary Python
+extensions that are part of the virtualenv.
+
+You can install these dependencies by running::
 
    $ sudo apt-get install python-dev npm libxml2-dev \
      libxslt1-dev libffi-dev liblzma-dev libsasl2-dev \
