@@ -249,8 +249,8 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
 
 
 def produce_coverage_reports(coverdir):
-    cov = Coverage(data_file=os.path.join(coverdir, 'coverage'))
-    cov.combine()
+    cov = Coverage(data_file='coverage')
+    cov.combine(data_paths=[os.path.join(coverdir, 'data')])
 
     pydirs = [os.path.join(ROOT, d) for d in PYTHON_COVERAGE_DIRS]
     omit = [os.path.join(ROOT, d) for d in COVERAGE_OMIT]

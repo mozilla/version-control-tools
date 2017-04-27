@@ -8,6 +8,7 @@
 from __future__ import print_function
 
 import argparse
+import errno
 import os
 import subprocess
 import sys
@@ -89,14 +90,18 @@ if __name__ == '__main__':
     hg_harness_args[0] = RUNTESTS
 
     coveragerc = os.path.join(HERE, '.coveragerc')
-    coverdir = os.path.join(HERE, 'coverage')
-    if not os.path.exists(coverdir):
-        os.mkdir(coverdir)
+    cover_dir = os.path.join(HERE, 'coverage')
+    cover_data_dir = os.path.join(cover_dir, 'data')
+    try:
+        os.makedirs(cover_data_dir)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
     # run-tests.py's coverage options don't work for us... yet. So, we hack
     # in code coverage manually.
     if options.cover:
-        os.environ['COVERAGE_DIR'] = coverdir
+        os.environ['COVERAGE_DIR'] = cover_dir
         os.environ['CODE_COVERAGE'] = '1'
 
     if options.headless:
@@ -320,6 +325,6 @@ if __name__ == '__main__':
 
 
     if options.cover:
-        produce_coverage_reports(coverdir)
+        produce_coverage_reports(cover_dir)
 
     sys.exit(res)
