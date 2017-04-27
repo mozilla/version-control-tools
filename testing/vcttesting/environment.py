@@ -12,6 +12,22 @@ ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 CREATE_VIRTUALENV = os.path.join(ROOT, 'testing', 'create-virtualenv')
 
 
+SITECUSTOMIZE = b'''
+import os
+
+if os.environ.get('CODE_COVERAGE', False):
+    import uuid
+    import coverage
+
+    covpath = os.path.join(os.environ['COVERAGE_DIR'],
+        'coverage.%s' % uuid.uuid1())
+    cov = coverage.coverage(data_file=covpath, auto_data=True)
+    cov._warn_no_data = False
+    cov._warn_unimported_source = False
+    cov.start()
+'''
+
+
 def create_virtualenv(name):
     path = os.path.join(ROOT, 'venv', name)
 
@@ -22,11 +38,13 @@ def create_virtualenv(name):
             raise
 
     if os.name == 'nt':
-        pip = os.path.join(path, 'Scripts', 'pip.exe')
-        activate = os.path.join(path, 'Scripts', 'activate')
+        bin_dir = os.path.join(path, 'Scripts')
+        pip = os.path.join(bin_dir, 'pip.exe')
+        activate = os.path.join(bin_dir, 'activate')
     else:
-        pip = os.path.join(path, 'bin', 'pip')
-        activate = os.path.join(path, 'bin', 'activate')
+        bin_dir = os.path.join(path, 'bin')
+        pip = os.path.join(bin_dir, 'pip')
+        activate = os.path.join(bin_dir, 'activate')
 
     res = {
         'path': path,
@@ -40,6 +58,11 @@ def create_virtualenv(name):
 
     if not os.path.exists(path):
         subprocess.check_call([CREATE_VIRTUALENV, path], env=env)
+
+    # Install a sitecustomize.py that starts code coverage if an environment
+    # variable is set.
+    with open(os.path.join(bin_dir, 'sitecustomize.py'), 'wb') as fh:
+        fh.write(SITECUSTOMIZE)
 
     return res
 
