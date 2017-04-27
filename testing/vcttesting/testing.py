@@ -11,7 +11,7 @@ import subprocess
 import sys
 import time
 
-from coverage import coverage
+from coverage import Coverage
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -249,7 +249,7 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
 
 
 def produce_coverage_reports(coverdir):
-    cov = coverage(data_file=os.path.join(coverdir, 'coverage'))
+    cov = Coverage(data_file=os.path.join(coverdir, 'coverage'))
     cov.combine()
 
     pydirs = [os.path.join(ROOT, d) for d in PYTHON_COVERAGE_DIRS]
