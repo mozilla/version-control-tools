@@ -104,9 +104,6 @@ kombu==3.0.30 \
 lockfile==0.10.2 \
     --hash=sha256:81ee2d4b0923a2ee3e51b93af0db82efa3f049c7435a00549f9a3ba22cf70cbf
 
-lxml==3.5.0 \
-    --hash=sha256:349f93e3a4b09cc59418854ab8013d027d246757c51744bf20069bc89016f578
-
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
