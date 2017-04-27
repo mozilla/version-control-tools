@@ -199,8 +199,8 @@ use Mercurial!
 Mozilla Centric Extensions
 ==========================
 
-In addition to the many :ref:`extensions <hgext>` in this repository, you
-should also consider the following.
+In addition to the many :ref:`extensions <hgmods_extensions>` in this
+repository, you should also consider the following.
 
 trychooser
 ----------

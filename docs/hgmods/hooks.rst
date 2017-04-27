@@ -1,8 +1,8 @@
-.. _hghooks:
+.. _hgmods_hooks:
 
-===============
-Mercurial Hooks
-===============
+=====
+Hooks
+=====
 
 The ``hghooks`` directory contains a number of Mercurial hooks used by
 Mozilla projects.

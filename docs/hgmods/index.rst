@@ -1,4 +1,4 @@
-.. _hgcustom:
+.. _hgmods:
 
 ========================
 Mercurial Customizations
@@ -10,5 +10,5 @@ This repository contains numerous customizations to the
 .. toctree::
    :maxdepth: 2
 
-   hgext
-   hghooks
+   extensions
+   hooks

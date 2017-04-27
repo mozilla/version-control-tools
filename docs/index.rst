@@ -40,7 +40,7 @@ Table of Contents
    :maxdepth: 2
 
    devguide/index
-   hgcustom
+   hgmods/index
    mozreview
    headless-repositories
    hgmozilla/index
