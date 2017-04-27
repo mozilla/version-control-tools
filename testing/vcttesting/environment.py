@@ -83,6 +83,18 @@ def install_editable(venv, relpath):
     subprocess.check_call(args)
 
 
+def create_hgdev():
+    """Create an environment used for hacking on Mercurial extensions."""
+    venv = create_virtualenv('hgdev')
+    process_pip_requirements(venv, 'testing/requirements-hgdev.txt')
+    install_editable(venv, 'hghooks')
+    install_editable(venv, 'pylib/mozhginfo')
+    install_editable(venv, 'pylib/mozautomation')
+    install_editable(venv, 'testing')
+
+    return venv
+
+
 def create_vcssync():
     """Create an environment used for testing VCSSync."""
     venv = create_virtualenv('vcssync')

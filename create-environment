@@ -12,20 +12,23 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(HERE, 'testing'))
 
 from vcttesting.environment import (
+    create_hgdev,
     create_vcssync,
 )
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('name', choices=('vcssync',),
+    parser.add_argument('name', choices=('hgdev', 'vcssync',),
                         help='Which environment to create')
 
     args = parser.parse_args()
 
     env = args.name
 
-    if env == 'vcssync':
+    if env == 'hgdev':
+        info = create_hgdev()
+    elif env == 'vcssync':
         info = create_vcssync()
     else:
         raise Exception('unhandled environment: %s' % env)

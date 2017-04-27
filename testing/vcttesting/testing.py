@@ -37,7 +37,7 @@ UNIT_TEST_DIRS = {
         'venvs': {'global',},
     },
     'pylib': {
-        'venvs': {'global',},
+        'venvs': {'global', 'hgdev',},
     },
     'vcssync/tests': {
         'venvs': {'vcssync',},
@@ -121,13 +121,13 @@ def get_extensions(extdir):
 def get_test_files(extensions, venv):
     extension_tests = []
 
-    if venv == 'global':
+    if venv in ('global', 'hgdev'):
         for e in extensions.values():
             extension_tests.extend(e['tests'])
 
     hook_tests = []
 
-    if venv == 'global':
+    if venv in ('global', 'hgdev'):
         hooks_test_dir = os.path.join(ROOT, 'hghooks', 'tests')
         hook_tests = [os.path.join(hooks_test_dir, f)
                        for f in os.listdir(hooks_test_dir)

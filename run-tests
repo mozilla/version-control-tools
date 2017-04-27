@@ -33,7 +33,7 @@ if __name__ == '__main__':
     if venv_name == '.':
         venv_name = 'global'
 
-    if venv_name not in ('global', 'vcssync'):
+    if venv_name not in ('global', 'hgdev', 'vcssync'):
         print('unknown virtualenv: %s (this should not happen)' % venv_name)
         sys.exit(1)
 
