@@ -4,6 +4,7 @@
 
 import errno
 import os
+import shutil
 import subprocess
 
 
@@ -48,6 +49,7 @@ def create_virtualenv(name):
 
     res = {
         'path': path,
+        'bin_dir': bin_dir,
         'pip': pip,
         'activate': activate,
     }
@@ -83,6 +85,78 @@ def install_editable(venv, relpath):
     subprocess.check_call(args)
 
 
+def install_mercurials(hg):
+    """Install supported Mercurial versions in a central location."""
+    VERSIONS = [
+        '3.8.4',
+        '3.9.2',
+        '4.0.2',
+        # 4.1 should be installed in virtualenv
+        '@',
+    ]
+
+    hg_dir = os.path.join(ROOT, 'venv', 'hg')
+    mercurials = os.path.join(ROOT, 'venv', 'mercurials')
+
+    # Setting HGRCPATH to an empty value stops the global and user hgrc from
+    # being loaded. These could interfere with behavior we expect from
+    # vanilla Mercurial.
+    hg_env = dict(os.environ)
+    hg_env['HGRCPATH'] = ''
+
+    # Ensure a Mercurial clone is present and up to date.
+    if not os.path.isdir(hg_dir):
+        print('cloning Mercurial repository to %s' % hg_dir)
+        subprocess.check_call([hg, 'clone',
+                               'https://www.mercurial-scm.org/repo/hg',
+                               hg_dir],
+                              cwd='/', env=hg_env)
+
+    subprocess.check_call([hg, 'pull'], cwd=hg_dir, env=hg_env)
+
+    try:
+        os.makedirs(mercurials)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    # Remove old versions.
+    for p in os.listdir(mercurials):
+        if p in ('.', '..'):
+            continue
+
+        if p not in VERSIONS:
+            print('removing old, unsupported Mercurial version: %s' % p)
+            shutil.rmtree(os.path.join(mercurials, p))
+
+    for v in VERSIONS:
+        dest = os.path.join(mercurials, v)
+
+        # Always reinstall @ because it isn't a static tag.
+        if v == '@' and os.path.exists(dest):
+            shutil.rmtree(dest)
+
+        if os.path.exists(dest):
+            continue
+
+        print('installing Mercurial %s to %s' % (v, dest))
+        try:
+            subprocess.check_output([hg, 'update', v], cwd=hg_dir, env=hg_env,
+                                    stderr=subprocess.STDOUT)
+            # We don't care about support files, which only slow down
+            # installation. So install-bin is a suitable target.
+            subprocess.check_output(['make', 'install-bin', 'PREFIX=%s' % dest],
+                                    cwd=hg_dir, env=hg_env,
+                                    stderr=subprocess.STDOUT)
+            subprocess.check_output([hg, '--config', 'extensions.purge=',
+                                     'purge', '--all'],
+                                    cwd=hg_dir, env=hg_env,
+                                    stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            print('error installing: %s' % e.output)
+            raise Exception('could not install Mercurial')
+
+
 def create_hgdev():
     """Create an environment used for hacking on Mercurial extensions."""
     venv = create_virtualenv('hgdev')
@@ -91,6 +165,8 @@ def create_hgdev():
     install_editable(venv, 'pylib/mozhginfo')
     install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
+
+    install_mercurials(hg=os.path.join(venv['bin_dir'], 'hg'))
 
     return venv
 
@@ -103,3 +179,12 @@ def create_vcssync():
     install_editable(venv, 'vcssync')
 
     return venv
+
+
+if __name__ == '__main__':
+    import sys
+
+    # This is a hack to support create-test-environment.
+    if sys.argv[1] == 'install-mercurials':
+        # PATH has global virtualenv activated.
+        install_mercurials(hg='hg')
