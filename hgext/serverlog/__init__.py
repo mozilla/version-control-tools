@@ -184,7 +184,7 @@ from mercurial.hgweb import (
     hgwebdir_mod,
 )
 
-testedwith = '4.1'
+testedwith = '4.1 4.2'
 minimumhgversion = '4.1'
 
 origcall = protocol.call

@@ -11,7 +11,7 @@ from mercurial import (
     obsolete,
 )
 
-testedwith = '4.1'
+testedwith = '4.1 4.2'
 minimumhgversion = '4.1'
 
 

@@ -82,7 +82,7 @@ following config option::
   allowexchangewithapplied = true
 '''
 
-testedwith = '3.8 3.9 4.0 4.1'
+testedwith = '3.8 3.9 4.0 4.1 4.2'
 
 import os
 import re
