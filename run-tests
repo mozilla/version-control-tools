@@ -289,9 +289,12 @@ if __name__ == '__main__':
             args = list(orig_args) + ['--with-hg', hg_path] + sorted(tests)
             args[0] = RUNTESTS
 
-            print('Testing with Mercurial %s' % version)
+            real_version = get_hg_version(hg_path)
+
+            print('Testing with Mercurial %s (resolved to %s)' % (
+                version, real_version))
             sys.stdout.flush()
-            os.environ['HGVERSION'] = version
+            os.environ['HGVERSION'] = real_version
             run = lambda: subprocess.call(args, cwd=HERE)
             if have_docker:
                 with docker.auto_clean_orphans():
