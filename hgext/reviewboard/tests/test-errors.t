@@ -1,3 +1,5 @@
+#require hg41+
+
   $ . $TESTDIR/hgext/reviewboard/tests/helpers.sh
   $ hg init client
   $ hg init server
