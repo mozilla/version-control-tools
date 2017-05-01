@@ -57,10 +57,9 @@ def handle_pending_transplants(dbconn):
     mozreview_updates = []
     retry_revisions = []
 
-    def handle_treeclosed(transplant_id, tree, rev, destination, trysyntax,
-                          pingback_url):
+    def handle_tree_retry(reason, transplant_id, tree, rev, destination,
+                          trysyntax):
         retry_revisions.append((now, transplant_id))
-
         data = {
             'request_id': transplant_id,
             'tree': tree,
@@ -69,7 +68,7 @@ def handle_pending_transplants(dbconn):
             'trysyntax': trysyntax,
             'landed': False,
             'error_msg': '',
-            'result': 'Tree %s is closed - retrying later.' % tree
+            'result': reason,
         }
         mozreview_updates.append([transplant_id, json.dumps(data)])
 
@@ -96,7 +95,6 @@ def handle_pending_transplants(dbconn):
         rev = request['rev'].encode('ascii')
         trysyntax = request.get('trysyntax', '')
         push_bookmark = request.get('push_bookmark', '').encode('ascii')
-        pingback_url = request.get('pingback_url', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
         repo_config = config.get_repo(tree)
         if not repo_config['tree']:
@@ -110,12 +108,13 @@ def handle_pending_transplants(dbconn):
                 destination, treestatus.tree_is_open(tree_name))
 
         if not tree_open:
-            handle_treeclosed(transplant_id, tree, rev, destination,
-                              trysyntax, pingback_url)
+            handle_tree_retry('Tree %s is closed - retrying later.' % tree,
+                              transplant_id, tree, rev, destination, trysyntax)
             continue
 
         attempts = 0
         started = datetime.datetime.now()
+        landed = False
         while attempts < MAX_TRANSPLANT_ATTEMPTS:
             logger.info('initiating transplant from tree: %s rev: %s '
                         'to destination: %s, attempt %s' % (
@@ -153,18 +152,30 @@ def handle_pending_transplants(dbconn):
 
         if landed:
             logger.info('transplant successful - new revision: %s' % result)
+
         else:
             if 'is CLOSED!' in result:
-                logger.info('transplant failed: tree: %s is closed - '
-                            ' retrying later.' % tree)
+                reason = 'Tree %s is closed - retrying later.' % tree
+                logger.info('transplant failed: %s' % reason)
                 current_treestatus[destination] = False
-                handle_treeclosed(transplant_id, tree, rev, destination,
-                                  trysyntax, pingback_url)
+                handle_tree_retry(reason, transplant_id, tree, rev,
+                                  destination, trysyntax)
                 continue
+
+            elif 'APPROVAL REQUIRED' in result:
+                reason = 'Tree %s is set to "approval required" - retrying ' \
+                         'later.' % tree
+                logger.info('transplant failed: %s' % reason)
+                current_treestatus[destination] = False
+                handle_tree_retry(reason, transplant_id, tree, rev,
+                                  destination, trysyntax)
+                continue
+
             elif 'abort: push creates new remote head' in result:
                 logger.info('transplant failed: we lost a push race')
                 retry_revisions.append((now, transplant_id))
                 continue
+
             elif 'unresolved conflicts (see hg resolve' in result:
                 logger.info('transplant failed - manual rebase required: '
                             'tree: %s rev: %s destination: %s error: %s' %
@@ -172,11 +183,11 @@ def handle_pending_transplants(dbconn):
                 # This is the only autoland error for which we expect the
                 # user to take action. We should make things nicer than the
                 # raw mercurial error.
-                # TODO: sad trombone sound
-                header = ('We\'re sorry, Autoland could not rebase your '
-                          'commits for you automatically. Please manually '
-                          'rebase your commits and try again.\n\n')
+                header = ("We're sorry, Autoland could not rebase your "
+                          "commits for you automatically. Please manually "
+                          "rebase your commits and try again.\n\n")
                 result = header + result
+
             else:
                 logger.info('transplant failed: tree: %s rev: %s '
                             'destination: %s error: %s' %
