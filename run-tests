@@ -284,10 +284,9 @@ if __name__ == '__main__':
 
             remove_err_files(tests)
 
-            args = list(orig_args) + [
-                '--with-hg',
-                os.path.join(mercurials_dir, version, 'bin', 'hg'),
-            ] + sorted(tests)
+            hg_path = os.path.join(mercurials_dir, version, 'bin', 'hg')
+
+            args = list(orig_args) + ['--with-hg', hg_path] + sorted(tests)
             args[0] = RUNTESTS
 
             print('Testing with Mercurial %s' % version)
