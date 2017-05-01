@@ -29,6 +29,14 @@ def run_hg(logger, client, args):
     return out.getvalue()
 
 
+def clean_hg_repo(logger, path):
+    """Clean a Mercurial working directory."""
+    logger.warn('reverting all local changes and purging %s' % path)
+    with hglib.open(path, 'utf-8', [b'extensions.purge=']) as repo:
+        run_hg(logger, repo, [b'revert', b'--no-backup', b'--all'])
+        run_hg(logger, repo, [b'purge', b'--all'])
+
+
 def get_github_client(token):
     """Obtain a github3 client using an API token for authentication.
 
