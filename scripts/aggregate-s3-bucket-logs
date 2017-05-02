@@ -8,14 +8,14 @@
 import datetime
 import sys
 
-from boto.s3.connection import S3Connection
+import boto3
 
 
 def aggregate_s3_logs(bucket, path):
     today = datetime.datetime.utcnow().date()
 
-    c = S3Connection()
-    bucket = c.get_bucket(bucket, validate=False)
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(bucket)
 
     if not path.endswith('/'):
         path += '/'
@@ -23,8 +23,8 @@ def aggregate_s3_logs(bucket, path):
     current_day = None
     current_keys = []
 
-    for key in bucket.list(prefix=path):
-        name = key.name
+    for obj in bucket.objects.filter(Prefix=path):
+        name = obj.key
         name = name[len(path):]
 
         # Default names are of the form YYYY-MM-DD-HH-MM-SS-<RANDOM>.
@@ -47,20 +47,31 @@ def aggregate_s3_logs(bucket, path):
 
             data = []
             for k in current_keys:
-                data.append(k.get_contents_as_string())
+                data.append(k.get()['Body'].read())
 
-            aggregate_key = bucket.new_key(dest_name)
-            aggregate_key.set_metadata('Content-Type', 'text/plain')
-            aggregate_key.set_contents_from_string(''.join(data))
-            bucket.delete_keys(current_keys)
+            bucket.put_object(Key=dest_name,
+                              Body=b''.join(data),
+                              ContentType='text/plain')
+
+            i = 0
+            while True:
+                delete_keys = current_keys[i:i+1000]
+                i += 1000
+
+                if not delete_keys:
+                    break
+
+                deletes = [{'Key': k.key} for k in delete_keys]
+                bucket.delete_objects(Delete={'Objects': deletes})
+
             current_keys = []
 
         if day >= today:
-            print('ignoring %s due to incomplete day' % key.name)
+            print('ignoring %s due to incomplete day' % obj.key)
             continue
 
         current_day = day
-        current_keys.append(key)
+        current_keys.append(obj)
 
 
 if __name__ == '__main__':
