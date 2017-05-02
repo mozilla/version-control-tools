@@ -3,8 +3,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import sys
-
 import botocore
 import boto3
 import concurrent.futures as futures
@@ -55,6 +53,30 @@ def get_s3_daily_totals(day):
 
 
 if __name__ == '__main__':
-    for day in sys.argv[1:]:
+    import argparse
+    import datetime
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--from')
+    parser.add_argument('--to')
+    parser.add_argument('days', nargs='*')
+
+    args = parser.parse_args()
+
+    days = args.days
+
+    if getattr(args, 'from') and args.to:
+        old_day = datetime.datetime.strptime(getattr(args, 'from'),
+                                             '%Y-%m-%d').date()
+        new_day = datetime.datetime.strptime(args.to, '%Y-%m-%d').date()
+
+        td = datetime.timedelta(days=1)
+        d = old_day
+
+        while d <= new_day:
+            days.append(d.strftime('%Y-%m-%d'))
+            d += td
+
+    for day in days:
         total = get_s3_daily_totals(day)
         print('%s\t%d' % (day, total))
