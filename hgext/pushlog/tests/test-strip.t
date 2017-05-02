@@ -47,9 +47,15 @@ Stripping changesets should result in pushlog getting stripped
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
 
+#if hg42+
+  $ cat .hg/blackbox.log
+  * deleted 1 changesets from pushlog: d0fddd3a3fb51076c33010ecf66692621f989a2c (glob)
+  * --config 'extensions.mq=' strip -r 1 --no-backup exited 0 after * (glob)
+#else
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: d0fddd3a3fb51076c33010ecf66692621f989a2c (glob)
   * --config extensions.mq= strip -r 1 --no-backup exited 0 after * (glob)
+#endif
 
   $ rm .hg/blackbox.log
 
@@ -115,7 +121,14 @@ Note the missing push ID 2!
   ID: 4; user: hguser; Date: \d+; Rev: 2; Node: 8fda3d2bda784adb73caa3fdbefe2421407d49b7 (re)
   ID: 4; user: hguser; Date: \d+; Rev: 3; Node: 5ad35eee611812e38f944019076bd4ed6b095d97 (re)
 
+#if hg42+
+  $ cat .hg/blackbox.log
+  * deleted 1 changesets from pushlog: 919c29ac42c0b25851d19be2d9d3883c45ba2ce4 (glob)
+  * reordered 2 changesets in pushlog (glob)
+  * --config 'extensions.mq=' strip -r 2 --no-backup exited 0 after * (glob)
+#else
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: 919c29ac42c0b25851d19be2d9d3883c45ba2ce4 (glob)
   * reordered 2 changesets in pushlog (glob)
   * --config extensions.mq= strip -r 2 --no-backup exited 0 after * (glob)
+#endif
