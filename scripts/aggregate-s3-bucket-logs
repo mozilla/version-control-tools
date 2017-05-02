@@ -9,6 +9,7 @@ import datetime
 import sys
 
 import boto3
+import concurrent.futures as futures
 
 
 def aggregate_s3_logs(bucket, path):
@@ -46,23 +47,39 @@ def aggregate_s3_logs(bucket, path):
             print('aggregating %d keys under %s' % (len(current_keys), dest_name))
 
             data = []
-            for k in current_keys:
-                data.append(k.get()['Body'].read())
+
+            def get_key(key):
+                return key.get()['Body'].read()
+
+            with futures.ThreadPoolExecutor(32) as e:
+                fs = []
+                for k in current_keys:
+                    fs.append(e.submit(get_key, k))
+
+                for f in fs:
+                    data.append(f.result())
 
             bucket.put_object(Key=dest_name,
                               Body=b''.join(data),
                               ContentType='text/plain')
 
-            i = 0
-            while True:
-                delete_keys = current_keys[i:i+1000]
-                i += 1000
+            with futures.ThreadPoolExecutor(8) as e:
+                fs = []
+                i = 0
+                while True:
+                    delete_keys = current_keys[i:i+1000]
+                    i += 1000
 
-                if not delete_keys:
-                    break
+                    if not delete_keys:
+                        break
 
-                deletes = [{'Key': k.key} for k in delete_keys]
-                bucket.delete_objects(Delete={'Objects': deletes})
+                    deletes = [{'Key': k.key} for k in delete_keys]
+                    fs.append(e.submit(bucket.delete_objects,
+                                       Delete={'Objects': deletes}))
+
+                # Will raise if there was an error.
+                for f in fs:
+                    f.result()
 
             current_keys = []
 
