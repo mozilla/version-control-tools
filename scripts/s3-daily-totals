@@ -7,6 +7,7 @@ import sys
 
 import botocore
 import boto3
+import concurrent.futures as futures
 
 
 BUCKETS = (
@@ -20,17 +21,25 @@ def get_s3_daily_totals(day):
     s3 = boto3.resource('s3')
 
     total = 0
-    for bn in BUCKETS:
-        path = 's3/hg-bundles/%s' % day
 
+    def get_body(b, k):
         try:
             obj = s3.Object(bn, path)
-            data = obj.get()['Body'].read()
+            return obj.get()['Body'].read()
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] != 'NoSuchKey':
                 raise
 
-            continue
+            return ''
+
+    fs = []
+    with futures.ThreadPoolExecutor(len(BUCKETS)) as e:
+        for bn in BUCKETS:
+            path = 's3/hg-bundles/%s' % day
+            fs.append(e.submit(get_body, bn, path))
+
+    for f in fs:
+        data = f.result()
 
         for line in data.splitlines():
             parts = line.split(' ')
