@@ -11,6 +11,15 @@ servo_linear_hg_url: https://hg.mozilla.org/projects/converted-servo-linear
 # Where to push the converted Mercurial repo to.
 servo_linear_hg_push_url: ssh://hg.mozilla.org/projects/converted-servo-linear
 
+# URL of the integration Mercurial repo; used to detect backouts.
+backout_integration_hg_url: https://hg.mozilla.org/integration/autoland
+# Github user/repo to create backout PRs.
+backout_github_name: servo/servo
+# Author of all backout PRs.
+backout_author: "Gecko Backout <gecko-backout@mozilla.org>"
+# S3 url to persist tracking data
+backout_s3_upload_url: "s3://moz-vcssync-servo-commitmap/backout-tracking"
+
 # URL of Mercurial converted Servo repo to overlay into a Firefox repo.
 servo_overlay_source_url: https://hg.mozilla.org/projects/converted-servo-linear
 # Repository that converted Servo changesets should be overlayed into.
