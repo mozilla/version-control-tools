@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
     - name: produce mozvcssync Python wheel
-      command: '{{ vct | mandatory }}/venv/bin/pip wheel --no-deps -w {{ vct }}/venv/wheelhouse {{ vct }}/vcssync/'
+      command: '{{ vct | mandatory }}/venv/vcssync/bin/pip wheel --no-deps -w {{ vct }}/venv/wheelhouse {{ vct }}/vcssync/'
 
 - name: deploy vcs syncing service
   hosts: servovcssync
