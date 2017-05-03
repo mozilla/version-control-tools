@@ -1,5 +1,6 @@
 ---
 mozvcssync_wheel: mozvcssync-0.1-py2-none-any.whl
+mozautomation_wheel: mozautomation-0.2-py2-none-any.whl
 
 # Servo Git repository to linearize and convert to Mercurial.
 servo_linear_git_source_url: https://github.com/servo/servo

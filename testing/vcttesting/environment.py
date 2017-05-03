@@ -181,6 +181,7 @@ def create_vcssync():
     """Create an environment used for testing VCSSync."""
     venv = create_virtualenv('vcssync')
     process_pip_requirements(venv, 'vcssync/test-requirements.txt')
+    install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
     install_editable(venv, 'vcssync')
 

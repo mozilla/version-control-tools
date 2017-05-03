@@ -8,6 +8,9 @@ console_scripts = [
     'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
 ]
 
+# ansible/roles/vcs-sync/defaults/main.yml must be updated if this package's
+# version number is changed.
+
 setup(
     name='mozvcssync',
     version='0.1',

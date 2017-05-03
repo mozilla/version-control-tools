@@ -5,6 +5,8 @@
   tasks:
     - name: produce mozvcssync Python wheel
       command: '{{ vct | mandatory }}/venv/vcssync/bin/pip wheel --no-deps -w {{ vct }}/venv/wheelhouse {{ vct }}/vcssync/'
+    - name: produce mozautomation Python wheel
+      command: '{{ vct | mandatory }}/venv/vcssync/bin/pip wheel --no-deps -w {{ vct }}/venv/wheelhouse {{ vct }}/pylib/mozautomation/'
 
 - name: deploy vcs syncing service
   hosts: servovcssync

@@ -53,15 +53,21 @@
   become_user: servo-sync
 
 - name: copy mozvcssync wheel to server
-  copy: src={{ vct | mandatory }}/venv/wheelhouse/{{ mozvcssync_wheel | mandatory }}
-        dest=/home/servo-sync/{{ mozvcssync_wheel }}
+  copy: src={{ vct | mandatory }}/venv/wheelhouse/{{ item }}
+        dest=/home/servo-sync/{{ item }}
         owner=servo-sync
         group=servo-sync
         mode=0644
+  with_items:
+    - "{{ mozvcssync_wheel | mandatory }}"
+    - "{{ mozautomation_wheel | mandatory }}"
   become_user: servo-sync
 
-- name: install mozvcssync into virtualenv
-  command: /home/servo-sync/venv/bin/pip install --upgrade --no-deps --force-reinstall /home/servo-sync/{{ mozvcssync_wheel }}
+- name: install wheels into virtualenv
+  command: /home/servo-sync/venv/bin/pip install --upgrade --no-deps --force-reinstall /home/servo-sync/{{ item }}
+  with_items:
+    - "{{ mozvcssync_wheel }}"
+    - "{{ mozautomation_wheel }}"
   become_user: servo-sync
 
 - name: copy overlay hg extension
