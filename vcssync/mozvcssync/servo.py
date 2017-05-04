@@ -218,8 +218,8 @@ def vendor_rust(repo_path, push_url):
         subprocess.check_call(['./mach', 'vendor', 'rust'], cwd=repo_path)
 
         # If there are changes, commit and push.
-        # For safety this is limited to directories and files known to be modified
-        # by |mach vendor rust|.
+        # For safety this is limited to directories and files known to be
+        # modified by |mach vendor rust|.
         vendor_paths = [
             b'third_party/rust',
             b'toolkit/library/rust/Cargo.lock',
@@ -227,13 +227,15 @@ def vendor_rust(repo_path, push_url):
             b'js/src/Cargo.lock',
         ]
         with hglib.open(repo_path, 'utf-8') as repo:
-            run_hg(logger, repo, [b'addremove', b'--cwd', repo_path] + vendor_paths)
+            run_hg(logger, repo,
+                   [b'addremove', b'--cwd', repo_path] + vendor_paths)
             if run_hg(logger, repo, [b'status', b'--cwd', repo_path,
                                      b'--template', b'{status} {path}\\n']
                       + vendor_paths):
                 print('Pushing changes to %s' % push_url)
                 run_hg(logger, repo,
-                       [b'commit', b'-m', b'No bug - Revendor rust dependencies'])
+                       [b'commit',
+                        b'-m', b'No bug - Revendor rust dependencies'])
                 run_hg(logger, repo, [b'push', push_url])
     finally:
         clean_hg_repo(logger, repo_path)
@@ -307,4 +309,3 @@ def overlay_cli():
     if not os.getenv('TEST_NOVENDOR'):
         # Execute |mach vendor rust|
         vendor_rust(args.dest_repo_path, args.result_push_url)
-
