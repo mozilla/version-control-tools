@@ -6,7 +6,60 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import logging
+import os
+import pipes
 import subprocess
+
+logger = logging.getLogger(__name__)
+
+
+class GitCommand(object):
+    """Helper class for running git commands"""
+
+    def __init__(self, repo_path, secret=None):
+        """
+        :param repo_path: the full path to the git repo.
+        :param logger: if set the command executed will be logged with
+                       level info.
+        :param secret: this string will be replaced with 'xxx' when logging.
+        """
+        self.repo_path = repo_path
+        self.logger = logger
+        self.secret = secret
+
+    def cmd(self, *command):
+        """ Run the specified command with git.
+
+        eg. git.cmd('status', '--short')
+        """
+        assert command and len(command)
+        command = ['git'] + list(command)
+        if self.logger:
+            command_str = ' '.join(map(pipes.quote, command))
+            if self.secret:
+                command_str = command_str.replace(self.secret, 'xxx')
+            self.logger.info('$ %s' % command_str)
+        subprocess.check_call(command, cwd=self.repo_path)
+
+    def get(self, *command):
+        """ Run the specified command with git and return the result.
+
+        eg. diff = git.cmd('diff', '--no-color')
+        """
+        assert command and len(command)
+        command = ['git'] + list(command)
+        return subprocess.check_output(command, cwd=self.repo_path)
+
+
+def setup_local_clone(path, url, git=None):
+    git = git or GitCommand(path)
+
+    if not os.path.exists(path):
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        logger.info('cloning %s to %s' % (url, path))
+        git.cmd('clone', url, path)
 
 
 def update_git_refs(repo, reason, *actions):

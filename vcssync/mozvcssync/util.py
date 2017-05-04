@@ -9,6 +9,7 @@ import errno
 import hashlib
 import os
 import pipes
+import shutil
 
 import github3
 import hglib
@@ -126,3 +127,40 @@ def monitor_hg_repo(repo_path, hg_paths=None):
         yield state
     finally:
         state['after'] = get_state()
+
+
+def apply_changes_from_list(logger, source_path, dest_path, files):
+    """Updates `files` in `dest_path` from `source_path`.
+
+    `files` should contain a list of all modified files, including files that
+    have been deleted from `source_path`."""
+    for filename in files:
+        source_file = '%s/%s' % (source_path, filename)
+        dest_file = '%s/%s' % (dest_path, filename)
+
+        if os.path.exists(source_file):
+            if os.path.exists(dest_file):
+                logger.info('updating %s' % dest_file)
+            else:
+                logger.info('creating %s' % dest_file)
+
+            path = os.path.dirname(dest_file)
+            if not os.path.exists(path):
+                os.mkdir(path)
+            shutil.copy(source_file, dest_file)
+
+        else:
+            if os.path.exists(dest_file):
+                logger.info('deleting %s' % dest_file)
+                os.unlink(dest_file)
+
+                # Delete empty directories.
+                path = os.path.dirname(dest_file)
+                try:
+                    os.rmdir(path)
+                    logger.info('deleting %s/' % path)
+                except OSError as e:
+                    if e.errno != errno.ENOTEMPTY:
+                        raise
+            else:
+                logger.warn('%s already deleted' % dest_file)

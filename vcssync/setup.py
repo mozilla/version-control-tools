@@ -4,6 +4,7 @@ console_scripts = [
     'linearize-git=mozvcssync.cli:linearize_git',
     'linearize-git-to-hg=mozvcssync.cli:linearize_git_to_hg',
     'overlay-hg-repos=mozvcssync.cli:overlay_hg_repos_cli',
+    'servo-backout-pr-cli=mozvcssync.cli:servo_backout_pr_cli',
     'servo-overlay=mozvcssync.servo:overlay_cli',
     'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
 ]

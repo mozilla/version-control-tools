@@ -4,28 +4,18 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-"""Functionality to support VCS syncing for Servo."""
-
 import logging
 import os
 import subprocess
 import sys
+from ConfigParser import RawConfigParser
 
 import hglib
 
-from ConfigParser import (
-    RawConfigParser,
-)
+from . import pulse
+from .util import clean_hg_repo, run_hg
 
-from . import (
-    pulse,
-)
-
-from .util import (
-    clean_hg_repo,
-    run_hg,
-)
-
+"""Functionality to support VCS syncing for Servo."""
 
 logger = logging.getLogger('mozvcssync.servo')
 
@@ -83,6 +73,9 @@ def on_hgmo_message(body, message, config):
     if repo_url == config['hg_converted']:
         on_hg_converted(body)
 
+    elif repo_url == config['backout_integration']:
+        on_hg_integration(body)
+
     message.ack()
 
 
@@ -97,6 +90,20 @@ def on_hg_converted(body):
     subprocess.check_call([b'/bin/sudo',
                            b'/usr/bin/systemctl', b'start',
                            b'servo-overlay.service'],
+                          cwd='/', bufsize=1)
+
+
+def on_hg_integration(body):
+    """Trigger backout service when the integration repo is updated."""
+    heads = body['payload']['data']['heads']
+    if len(heads) != 1:
+        raise Exception('unexpected heads count in upstream')
+
+    revision = heads[0].encode('ascii')
+    logger.warn('checking for servo backout from changeset %s' % revision)
+    subprocess.check_call([b'/bin/sudo',
+                           b'/usr/bin/systemctl', b'start',
+                           b'servo-backout.service'],
                           cwd='/', bufsize=1)
 
 

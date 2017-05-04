@@ -28,7 +28,9 @@ from .overlay import (
     PushRaceError,
     PushRemoteFail,
 )
-
+from .servo_backout import (
+    backout_servo_pr,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +108,7 @@ def configure_logging():
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)
     root.addHandler(handler)
+    logging.getLogger('mozvcssync').setLevel(logging.INFO)
 
 
 def linearize_git():
@@ -262,3 +265,51 @@ def overlay_hg_repos_cli():
     logger.error('overlay not successful after %d attempts; try again '
                  'later' % attempt)
     sys.exit(1)
+
+
+def servo_backout_pr_cli():
+    # Unbuffer stdout.
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--hg',
+                        help='hg executable to use')
+    parser.add_argument('integration_repo_url',
+                        help='URL to mercurial repository to scan for backout '
+                             'commits')
+    parser.add_argument('integration_repo_path',
+                        help='Local path to clone of <integration_repo_url>')
+    parser.add_argument('github_repo_name',
+                        help='Github repository name to submit pull requests '
+                             'to.  Must be in the form user/repo (eg. '
+                             'servo/servo)')
+    parser.add_argument('github_repo_path',
+                        help='Local path to clone of <github_repo_name>')
+    parser.add_argument('--author',
+                        help='If provided sets the author of all pull '
+                             'requests.  Defaults to the commit\'s author.')
+    parser.add_argument('--tracking-s3-upload-url',
+                        help='S3 path where the tracking file should be '
+                             'uploaded to')
+    parser.add_argument('--revision',
+                        help='If provided start scanning commits at this '
+                             'revision')
+    args = parser.parse_args()
+    if args.hg:
+        hglib.HGPATH = args.hg
+
+    configure_logging()
+
+    try:
+        backout_servo_pr(
+            args.integration_repo_url,
+            args.integration_repo_path,
+            args.github_repo_name,
+            args.github_repo_path,
+            args.author,
+            args.tracking_s3_upload_url,
+            args.revision,
+        )
+    except Exception as e:
+        logger.exception(e)
+        sys.exit(1)
