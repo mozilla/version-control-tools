@@ -206,6 +206,15 @@ def docker_requirements(tests):
 
 
 def get_docker_state(docker, tests, verbose=False, use_last=False):
+    """Obtain usable Docker images, possibly by building them.
+
+    Given a Docker client and list of .t test paths, determine what
+    Docker images are needed to run the tests and then return a dictionary
+    of environment variables that define the Docker image IDs.
+
+    If ``use_last`` is set, existing Docker images will be used. Otherwise,
+    Docker images are rebuilt to ensure they are up-to-date.
+    """
     build_docker, hgmo, mozreview, bmo = docker_requirements(tests)
 
     if not build_docker:
