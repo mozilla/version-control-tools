@@ -202,7 +202,7 @@ if __name__ == '__main__':
             #
             # But only do this if a test we are running utilizes Docker.
             os.environ.update(
-                get_docker_state(docker, run_all_tests,
+                get_docker_state(docker, venv_name, run_all_tests,
                                  verbose=verbose,
                                  use_last=options.use_last_images))
 

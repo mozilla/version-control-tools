@@ -75,6 +75,14 @@ COVERAGE_OMIT = (
     'pylib/requests/*',
 )
 
+# Maps virtualenv name to allowed Docker requirements.
+# If key not present, all Docker requirements are allowed. A
+# test will be skipped if Docker isn't available or if test
+# requires Docker component not enabled by the virtualenv.
+VIRTUALENV_DOCKER_REQUIREMENTS = {
+    'hgdev': {'bmo',},
+}
+
 
 def is_test_filename(f):
     """Is a path a test file."""
@@ -251,17 +259,26 @@ def docker_requirements(tests):
     return res
 
 
-def get_docker_state(docker, tests, verbose=False, use_last=False):
+def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
     """Obtain usable Docker images, possibly by building them.
 
-    Given a Docker client and list of .t test paths, determine what
-    Docker images are needed to run the tests and then return a dictionary
-    of environment variables that define the Docker image IDs.
+    Given a Docker client, name of virtualenv, and list of .t test paths,
+    determine what Docker images are needed/allowed to run the tests and
+    then return a dictionary of environment variables that define the Docker
+    image IDs.
 
     If ``use_last`` is set, existing Docker images will be used. Otherwise,
     Docker images are rebuilt to ensure they are up-to-date.
+
+    Only Docker images "allowed" by the specified virtualenv will be built.
+    Not all virtualenvs support all Docker images.
     """
     requirements = docker_requirements(tests)
+
+    # Filter out requirements not specified by the virtualenv.
+    allowed_requirements = VIRTUALENV_DOCKER_REQUIREMENTS.get(venv_name,
+                                                              set(requirements))
+    requirements = requirements & allowed_requirements
 
     if not requirements:
         return {}
