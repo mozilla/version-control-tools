@@ -9,9 +9,6 @@ import socket
 import time
 
 import concurrent.futures as futures
-from kafka.client import KafkaClient
-import kombu
-import paramiko
 import requests
 
 
@@ -58,6 +55,8 @@ def wait_for_http(host, port, path='', timeout=240, extra_check_fn=None):
 
 def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
                   extra_check_fn=None):
+    # Delay import to facilitate module use in limited virtualenvs.
+    import kombu
     c = kombu.Connection(hostname=hostname, port=port, userid=userid,
             password=password, ssl=ssl)
 
@@ -79,13 +78,15 @@ def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
         time.sleep(0.1)
 
 
-class IgnoreHostKeyPolicy(paramiko.MissingHostKeyPolicy):
-    def missing_host_key(self, client, hostname, key):
-        return
-
-
 def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
     """Wait for an SSH server to start on the specified host and port."""
+    # Delay import to facilitate module use in limited virtualenvs.
+    import paramiko
+
+    class IgnoreHostKeyPolicy(paramiko.MissingHostKeyPolicy):
+        def missing_host_key(self, client, hostname, key):
+            return
+
     start = time.time()
 
     while True:
@@ -115,6 +116,9 @@ def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
 
 def wait_for_kafka(hostport, timeout=60):
     """Wait for Kafka to start responding on the specified host:port string."""
+    # Delay import to facilitate module use in limited virtualenvs.
+    from kafka.client import KafkaClient
+
     start = time.time()
     while True:
         try:
@@ -131,6 +135,9 @@ def wait_for_kafka(hostport, timeout=60):
 
 def wait_for_kafka_topic(hostport, topic, timeout=60):
     """Wait for a Kafka topic to become available."""
+    # Delay import to facilitate module use in limited virtualenvs.
+    from kafka.client import KafkaClient
+
     start = time.time()
     client = KafkaClient(hostport, client_id=b'dummy', timeout=1)
     while not client.has_metadata_for_topic(topic):

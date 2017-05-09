@@ -5,7 +5,6 @@
 import base64
 
 import bugsy
-import mechanize
 import xmlrpclib
 import yaml
 
@@ -129,6 +128,9 @@ class Bugzilla(object):
         })
 
     def create_login_cookie(self):
+        # Delay import to facilitate module use in limited virtualenvs.
+        import mechanize
+
         # We simulate a browser's HTML interaction with Bugzilla to obtain a
         # login cookie. Is there a better way?
         br = mechanize.Browser()

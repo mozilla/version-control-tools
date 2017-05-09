@@ -11,7 +11,7 @@ from mach.decorators import (
 )
 
 from vcttesting.bugzilla import Bugzilla
-from vcttesting.mozreview import MozReview
+
 
 @CommandProvider
 class BugzillaCommands(object):
@@ -24,6 +24,9 @@ class BugzillaCommands(object):
             self.b = Bugzilla(self.base_url, username=username, password=password)
 
         elif 'MOZREVIEW_HOME' in os.environ:
+            # Delay import to facilitate module use in limited virtualenvs.
+            from vcttesting.mozreview import MozReview
+
             mr = MozReview(os.environ['MOZREVIEW_HOME'])
             username = os.environ.get('BUGZILLA_USERNAME')
             password = os.environ.get('BUGZILLA_PASSWORD')
