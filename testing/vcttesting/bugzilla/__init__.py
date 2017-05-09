@@ -9,7 +9,7 @@ import mechanize
 import xmlrpclib
 import yaml
 
-from mozreview.bugzilla.transports import bugzilla_transport
+from mozautomation.bugzilla_transports import bugzilla_transport
 
 
 def create_xmlrpc_proxy(url, username, password):

@@ -12,9 +12,9 @@ from django.contrib.auth.models import User
 from djblets.siteconfig.models import SiteConfiguration
 from djblets.util.decorators import simple_decorator
 
+from mozautomation.bugzilla_transports import bugzilla_transport
 from mozreview.bugzilla.errors import BugzillaError, BugzillaUrlError
 from mozreview.bugzilla.models import get_or_create_bugzilla_users
-from mozreview.bugzilla.transports import bugzilla_transport
 from mozreview.rb_utils import (
     get_diff_url,
     get_diff_url_from_rr_url,
