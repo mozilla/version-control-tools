@@ -6,7 +6,9 @@
 # This script runs on container start and is used to bootstrap the BMO
 # database and start an HTTP server.
 
+import grp
 import os
+import pwd
 import subprocess
 import sys
 import time
@@ -215,7 +217,22 @@ with open(j(b, 'localconfig'), 'w') as fh:
 mysqld.terminate()
 mysqld.wait()
 
-cc(['/bin/chown', '-R', 'bugzilla:bugzilla', b])
+# Some docker filesystem drivers can make chown really slow. Surprisingly,
+# `chown` doesn't appear to do minimal work, so a Python implementation is
+# faster.
+uid = pwd.getpwnam('bugzilla').pw_uid
+gid = grp.getgrnam('bugzilla').gr_gid
+
+for root, dirs, files in os.walk(b):
+    st = os.stat(root)
+    if st.st_uid != uid or st.st_gid != gid:
+        os.chown(root, uid, gid)
+
+    for f in files:
+        full = os.path.join(root, f)
+        st = os.stat(full)
+        if st.st_uid != uid or st.st_gid != gid:
+            os.chown(full, uid, gid)
 
 # If the container is aborted, the apache run file will be present and Apache
 # will refuse to start.
