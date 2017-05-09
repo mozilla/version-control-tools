@@ -6,17 +6,32 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import subprocess
+import sys
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
 
+def hg_executable():
+    if 'VIRTUAL_ENV' in os.environ:
+        venv = os.environ['VIRTUAL_ENV']
+    # Virtualenv activated by Python itself, not from shell.
+    elif hasattr(sys, 'real_prefix'):
+        venv = sys.prefix
+    else:
+        venv = os.path.join(ROOT, 'venv')
+
+    if os.name == 'nt':
+        return os.path.join(venv, 'Scripts', 'hg.exe')
+    else:
+        return os.path.join(venv, 'bin', 'hg')
+
+
 def get_and_write_vct_node():
-    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
     env = dict(os.environ)
     env['HGRCPATH'] = '/dev/null'
-    args = [hg, '-R', ROOT, 'log', '-r', '.', '-T', '{node|short}']
+    args = [hg_executable(), '-R', ROOT, 'log', '-r', '.', '-T', '{node|short}']
     with open(os.devnull, 'wb') as null:
         node = subprocess.check_output(args, env=env, cwd='/', stderr=null)
 

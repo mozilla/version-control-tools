@@ -47,6 +47,7 @@ from .util import (
 )
 from .vctutil import (
     get_and_write_vct_node,
+    hg_executable,
 )
 
 
@@ -260,10 +261,9 @@ class Docker(object):
 
         Returns a dict of relpath to full path.
         """
-        hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
         env = dict(os.environ)
         env['HGRCPATH'] = '/dev/null'
-        args = [hg, '-R', '.', 'locate']
+        args = [hg_executable(), '-R', '.', 'locate']
         with open(os.devnull, 'wb') as null:
             files = subprocess.check_output(
                 args, env=env, cwd=ROOT, stderr=null).splitlines()
