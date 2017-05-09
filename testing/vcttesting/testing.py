@@ -199,43 +199,56 @@ def get_test_files(extensions, venv):
     }
 
 
-def docker_requirements(tests):
-    """Whether any of the specified test files require Docker."""
+def docker_requirements_for_test(path):
+    """Given a path to a test, determine its Docker requirements.
+
+    Returns a set of strings describing which Docker features are
+    needed. String values are:
+
+    bmo
+       Requires images to run Bugzilla
+    hgmo
+       Requires images to run hg.mozilla.org
+    mozreview
+       Requires images to run mozreview
+    """
     docker_keywords = (
         b'MozReviewTest',
         b'MozReviewWebDriverTest',
     )
 
-    hgmo = False
-    mozreview = False
-    bmo = False
-    d = False
+    res = set()
 
-    for t in tests:
-        with open(t, 'rb') as fh:
-            content = fh.read()
+    with open(path, 'rb') as fh:
+        content = fh.read()
 
-            if b'#require hgmodocker' in content:
-                d = True
-                hgmo = True
+        if b'#require hgmodocker' in content:
+            res.add('hgmo')
 
-            if b'#require mozreviewdocker' in content:
-                d = True
-                mozreview = True
-                bmo = True
+        if b'#require mozreviewdocker' in content:
+            res.add('bmo')
+            res.add('mozreview')
 
-            if b'#require bmodocker' in content:
-                d = True
-                bmo = True
+        if b'#require bmodocker' in content:
+            res.add('bmo')
 
-            for keyword in docker_keywords:
-                if keyword in content:
-                    # This could probably be defined better.
-                    d = True
-                    hgmo = True
-                    mozreview = True
+        for keyword in docker_keywords:
+            if keyword in content:
+                # This could probably be defined better.
+                res.add('hgmo')
+                res.add('mozreview')
 
-    return d, hgmo, mozreview, bmo
+    return res
+
+
+def docker_requirements(tests):
+    """Determine what Docker features are needed by the given tests."""
+
+    res = set()
+    for test in tests:
+        res |= docker_requirements_for_test(test)
+
+    return res
 
 
 def get_docker_state(docker, tests, verbose=False, use_last=False):
@@ -248,9 +261,9 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
     If ``use_last`` is set, existing Docker images will be used. Otherwise,
     Docker images are rebuilt to ensure they are up-to-date.
     """
-    build_docker, hgmo, mozreview, bmo = docker_requirements(tests)
+    requirements = docker_requirements(tests)
 
-    if not build_docker:
+    if not requirements:
         return {}
 
     env = {}
@@ -259,13 +272,13 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
     mr_images, hgmo_images, bmo_images = docker.build_all_images(
             verbose=verbose,
             use_last=use_last,
-            hgmo=hgmo,
-            mozreview=mozreview,
-            bmo=bmo)
+            hgmo='hgmo' in requirements,
+            mozreview='mozreview' in requirements,
+            bmo='bmo' in requirements)
 
     t_end = time.time()
     print('got Docker images in %.2fs' % (t_end - t_start))
-    if mozreview:
+    if 'mozreview' in requirements:
         env['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
         env['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
         env['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
@@ -273,18 +286,18 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
         env['DOCKER_TREESTATUS_IMAGE'] = mr_images['treestatus']
         env['DOCKER_LDAP_IMAGE'] = mr_images['ldap']
-        if not hgmo:
+        if 'hgmo' not in requirements:
             env['DOCKER_HGWEB_IMAGE'] = mr_images['hgweb']
-        if not bmo:
+        if 'bmo' not in requirements:
             env['DOCKER_BMOWEB_IMAGE'] = mr_images['bmoweb']
 
-    if hgmo:
+    if 'hgmo' in requirements:
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
         env['DOCKER_PULSE_IMAGE'] = hgmo_images['pulse']
 
-    if bmo:
+    if 'bmo' in requirements:
         env['DOCKER_BMOWEB_IMAGE'] = bmo_images['bmoweb']
 
     return env
