@@ -19,12 +19,17 @@ from vcttesting.environment import (
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('name', choices=('hgdev', 'vcssync',),
-                        help='Which environment to create')
+    subparsers = parser.add_subparsers(title='environment', dest='environment')
+
+    sp = subparsers.add_parser('hgdev',
+                               help='Mercurial hooks and extensions')
+
+    sp = subparsers.add_parser('vcssync',
+                               help='Version control synchronization')
 
     args = parser.parse_args()
 
-    env = args.name
+    env = args.environment
 
     if env == 'hgdev':
         info = create_hgdev()
