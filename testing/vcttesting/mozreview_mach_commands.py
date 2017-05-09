@@ -31,7 +31,7 @@ class MozReviewCommands(object):
                 if os.path.isdir(default_path):
                     where = default_path
 
-        web_image = os.environ.get('DOCKER_BMO_WEB_IMAGE')
+        web_image = os.environ.get('DOCKER_BMOWEB_IMAGE')
         hgrb_image = os.environ.get('DOCKER_HGRB_IMAGE')
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')

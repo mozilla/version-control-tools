@@ -31,7 +31,7 @@ from vcttesting.mozreview import MozReview
 # they aren't set, you are likely invoking the tests wrong.
 def start_mozreview(mr):
     mr.start(
-         web_image=os.environ['DOCKER_BMO_WEB_IMAGE'],
+         web_image=os.environ['DOCKER_BMOWEB_IMAGE'],
          ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
          pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
          autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],

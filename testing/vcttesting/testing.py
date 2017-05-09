@@ -276,7 +276,7 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         if not hgmo:
             env['DOCKER_HGWEB_IMAGE'] = mr_images['hgweb']
         if not bmo:
-            env['DOCKER_BMO_WEB_IMAGE'] = mr_images['bmoweb']
+            env['DOCKER_BMOWEB_IMAGE'] = mr_images['bmoweb']
 
     if hgmo:
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
@@ -285,7 +285,7 @@ def get_docker_state(docker, tests, verbose=False, use_last=False):
         env['DOCKER_PULSE_IMAGE'] = hgmo_images['pulse']
 
     if bmo:
-        env['DOCKER_BMO_WEB_IMAGE'] = bmo_images['bmoweb']
+        env['DOCKER_BMOWEB_IMAGE'] = bmo_images['bmoweb']
 
     return env
 
