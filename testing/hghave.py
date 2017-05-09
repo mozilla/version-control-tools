@@ -30,6 +30,17 @@ execfile(HGHAVE_PY)
 # from the context of run-tests.py. This is very hacky.
 sys.path.insert(0, os.path.join(REPO_ROOT, 'testing'))
 
+def have_docker_images(images):
+    # These environment variables are exported by run-tests. If they aren't
+    # present, we assume the Docker image isn't built and available.
+    # If the environment variables aren't present, the test still works because
+    # d0cker will build images automatically if needed. This slows down tests
+    # drastically. So it is better to catch the issue sooner so the slowdown
+    # can be identified.
+    keys = [b'DOCKER_%s_IMAGE' % i.upper() for i in images]
+    return all(k in os.environ for k in keys)
+
+
 # Define custom checks for our environment.
 @check('docker', 'We can talk to Docker')
 def has_docker():
@@ -45,13 +56,33 @@ def has_docker():
     d = Docker(tf.name, url, tls=tls)
     return d.is_alive()
 
+
 @check('hgmodocker', 'Require hgmo Docker pieces')
 def has_hgmodocker():
-    return has_docker()
+    images = (
+        'ldap',
+        'hgmaster',
+        'hgweb',
+        'pulse',
+    )
+    return has_docker() and have_docker_images(images)
+
 
 @check('mozreviewdocker', 'Require mozreview Docker pieces')
 def has_mozreviewdocker():
-    return has_docker()
+    images = (
+        'autolanddb',
+        'autoland',
+        'bmoweb',
+        'hgrb',
+        'hgweb',
+        'ldap',
+        'pulse',
+        'rbweb',
+        'treestatus',
+    )
+    return has_docker() and have_docker_images(images)
+
 
 @check('eslint', 'Require eslint')
 def has_eslint():
@@ -71,9 +102,11 @@ def has_watchman():
     from distutils.spawn import find_executable
     return find_executable('watchman') is not None
 
+
 @check('bmodocker', 'Require BMO Docker pieces')
 def has_bmodocker():
-    return has_docker()
+    return has_docker() and have_docker_images(['bmoweb'])
+
 
 def hgversion():
     v = os.environ['HGVERSION']
