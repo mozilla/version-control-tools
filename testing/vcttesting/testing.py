@@ -191,10 +191,6 @@ def docker_requirements(tests):
                 d = True
                 bmo = True
 
-            if b'#require docker' in content:
-                raise Exception('"#require docker" is not longer supported: '
-                                'use "#require {hgmo,mozreview,bmo}docker"')
-
             for keyword in docker_keywords:
                 if keyword in content:
                     # This could probably be defined better.
