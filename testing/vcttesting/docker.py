@@ -164,6 +164,7 @@ class Docker(object):
             'last-rbweb-id': None,
             'last-bmoweb-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
+            'last-hgrb-id': None,
             'last-autolanddb-id': None,
             'last-autoland-id': None,
             'last-hgmaster-id': None,
