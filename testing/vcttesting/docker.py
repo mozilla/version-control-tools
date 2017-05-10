@@ -194,6 +194,7 @@ class Docker(object):
             'last-autolanddb-id',
             'last-autoland-id',
             'last-hgmaster-id',
+            'last-hgrb-id',
             'last-hgweb-id',
             'last-ldap-id',
             'last-vct-id',
