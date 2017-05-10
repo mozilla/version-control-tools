@@ -16,3 +16,4 @@ rewriting commits within and across repositories, etc.
    development
    servo
    knowledge
+   vendoring
