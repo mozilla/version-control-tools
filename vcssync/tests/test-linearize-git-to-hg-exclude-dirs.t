@@ -24,8 +24,7 @@ Directories can be excluded when linearizing
   0 commits from heads/master converted; original: ad3f6b56f7320d386c2ce2574b0573d1ad88773b; rewritten: aea30981234cf6848489e0ccf541fbf902b27aca
   all Git commits have already been converted; not doing anything
   $ cd grepo-dest
-  $ hg co tip > /dev/null
-  $ ls
+  $ hg files -r tip
   bar
   file0-copied-with-move
   file0-copy0
@@ -57,8 +56,7 @@ Directories can be excluded when linearizing
   0 commits from heads/master converted; original: 04ac57d95ed6dd954cceead6f95fcbb047c80760; rewritten: aea30981234cf6848489e0ccf541fbf902b27aca
   all Git commits have already been converted; not doing anything
   $ cd grepo-dest
-  $ hg co tip > /dev/null
-  $ ls
+  $ hg files -r tip
   bar
   file0-copied-with-move
   file0-copy0
@@ -95,10 +93,9 @@ Excluding an intermediate directory works  --exclude-dir ignore2/subdir0
   0 ignore-multi
   1 Git commits converted to Mercurial; previous tip: 10:7d80acaa161029d9e746e3125e7cc0916406403f; current tip: 11:4c82e4e6f1944acf408939cee63fc5c078de73df
   $ cd grepo-dest
-  $ hg co tip > /dev/null
-  $ ls -R
+  $ hg files -r tip
   bar
-  dir3
+  dir3/file0
   file0-copied-with-move
   file0-copy0
   file0-copy1
@@ -109,7 +106,4 @@ Excluding an intermediate directory works  --exclude-dir ignore2/subdir0
   file1-50
   file1-80
   foo
-  
-  ./dir3:
-  file0
   $ cd ..
