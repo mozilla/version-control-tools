@@ -193,7 +193,8 @@ def linearize_git_to_hg():
             skip_submodules=args.skip_submodules,
             similarity=args.similarity,
             shamap_s3_upload_url=args.shamap_s3_upload_url,
-            git_commit_rewriter_args=rewriter_args)
+            git_commit_rewriter_args=rewriter_args,
+            exclude_dirs=args.exclude_dirs)
     except RewriteError as e:
         logger.error('abort: %s' % str(e))
         sys.exit(1)

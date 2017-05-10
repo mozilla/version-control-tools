@@ -32,7 +32,8 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
                              skip_submodules=False,
                              similarity=50,
                              shamap_s3_upload_url=None,
-                             git_commit_rewriter_args=None):
+                             git_commit_rewriter_args=None,
+                             exclude_dirs=None):
     """Linearize a Git repo to an hg repo by squashing merges.
 
     Many Git repositories (especially those on GitHub) have an excessive
@@ -113,7 +114,8 @@ def linearize_git_repo_to_hg(git_source_url, ref, git_repo_path, hg_repo_path,
     git_state = linearize_git_repo(
         git_repo,
         b'heads/%s' % ref,
-        commit_rewriter=rewriter)
+        commit_rewriter=rewriter,
+        exclude_dirs=exclude_dirs)
 
     if git_push_url:
         subprocess.check_call([b'git', b'push', b'--mirror', git_push_url],
