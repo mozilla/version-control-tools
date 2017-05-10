@@ -55,6 +55,7 @@ def create_virtualenv(name):
         'pip': pip,
         'python': python,
         'activate': activate,
+        'activate_this': os.path.join(bin_dir, 'activate_this.py'),
     }
 
     env = dict(os.environ)
@@ -70,6 +71,11 @@ def create_virtualenv(name):
         fh.write(SITECUSTOMIZE)
 
     return res
+
+
+def activate_virtualenv(venv):
+    """Activate a virtualenv in the current Python process."""
+    execfile(venv['activate_this'], dict(__file__=venv['activate_this']))
 
 
 def process_pip_requirements(venv, requirements):
@@ -163,16 +169,52 @@ def install_mercurials(venv, hg):
             raise Exception('could not install Mercurial')
 
 
-def create_hgdev():
+def docker_client():
+    """Attempt to obtain a Docker client.
+
+    Returns a client on success. None on failure.
+    """
+    from .docker import (
+        Docker,
+        params_from_env,
+    )
+
+    state_file = os.path.join(ROOT, '.dockerstate')
+    docker_url, tls = params_from_env(os.environ)
+
+    d = Docker(state_file, docker_url, tls=tls)
+
+    return d if d.is_alive() else None
+
+
+def create_hgdev(docker_bmo=False):
     """Create an environment used for hacking on Mercurial extensions."""
     venv = create_virtualenv('hgdev')
-    process_pip_requirements(venv, 'testing/requirements-hgdev.txt')
+
+    if docker_bmo:
+        reqs = 'testing/requirements-hgdev-docker.txt'
+    else:
+        reqs = 'testing/requirements-hgdev.txt'
+
+    process_pip_requirements(venv, reqs)
     install_editable(venv, 'hghooks')
+    install_editable(venv, 'pylib/Bugsy')
     install_editable(venv, 'pylib/mozhginfo')
     install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
 
     install_mercurials(venv, hg=os.path.join(venv['bin_dir'], 'hg'))
+
+    if docker_bmo:
+        activate_virtualenv(venv)
+        docker = docker_client()
+
+        if docker:
+            docker.build_bmo(verbose=True)
+        else:
+            print('Docker not available; cannot build BMO Docker image')
+
+        print('attempting to builder bugzilla.mozilla.org Docker image')
 
     return venv
 

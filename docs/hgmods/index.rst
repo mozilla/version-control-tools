@@ -23,6 +23,11 @@ From the root directory of a version-control-tools checkout::
 
    $ ./create-environment hgdev
 
+Or to create an environment with support for running Bugzilla tests
+requiring Docker::
+
+   $ ./create-environment hgdev --docker-bmo
+
 This will create a Python virtualenv in ``venv/hgdev``. Assuming all
 goes well, it will print instructions on how to *activate* that
 environment in your local shell and how to run tests.
