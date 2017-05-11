@@ -27,6 +27,7 @@ A HTTP GET request should not require authentication
   date: * (glob)
   etag: * (glob)
   server: Apache
+  strict-transport-security: max-age=300
   transfer-encoding: chunked
   
   {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "default@example.com"}} (glob)
@@ -156,6 +157,7 @@ Valid user and API key is authenticated properly
   date: * (glob)
   etag: * (glob)
   server: Apache
+  strict-transport-security: max-age=300
   transfer-encoding: chunked
   
   {"1": {"changesets": ["96ee1d7354c4ad7372047672c36a1f561e3a6a4c"], "date": *, "user": "default@example.com"}} (glob)

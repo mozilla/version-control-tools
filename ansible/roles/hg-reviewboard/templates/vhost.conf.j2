@@ -31,6 +31,21 @@ LimitRequestFields 1000
     ErrorLog "/var/log/httpd/{{ domain | mandatory }}/error_log"
     CustomLog "/var/log/httpd/{{ domain | mandatory }}/access_log" combined env=!image
 
+    # Nested <If> doesn't work reliably. <Location> also doesn't work inside
+    # <If>. So our strategy for complex conditionals is to set an environment
+    # variable then do vanilla <If> or <If> inside <Location>.
+
+    # Set a variable for Mercurial agent and wire protocol requests
+    SetEnvIf User-Agent mercurial\/proto HG_PROTOCOL=1
+    # SetEnvIf can't access the query string. Yes, really. So use mod_rewrite.
+    RewriteCond %{QUERY_STRING} cmd= [NC]
+    RewriteRule ^ - [E=HG_PROTOCOL:1]
+
+    # Enable HSTS unless for HG clients.
+    <If "-z env('HG_PROTOCOL')">
+        Header set Strict-Transport-Security max-age=300
+    </If>
+
     # Add basic auth using Bugzilla username and API Key as credentials
     # to enable non-LDAP/SSH users to push.
     #
