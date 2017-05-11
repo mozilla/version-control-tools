@@ -1,4 +1,5 @@
 ---
+- include: journald.yml
 - include: yum_epel_update.yml
 - include: custom_packages.yml
 

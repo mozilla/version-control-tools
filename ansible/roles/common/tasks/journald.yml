@@ -1,0 +1,11 @@
+---
+
+# By default, journald.conf uses Storage=auto. Without a /var/log/journal
+# file, journald logs aren't persisted to disk. If the directory exists,
+# the logs are persisted.
+- name: create /var/log/journal
+  file: path=/var/log/journal
+        state=directory
+        owner=root
+        group=root
+        mode=0755
