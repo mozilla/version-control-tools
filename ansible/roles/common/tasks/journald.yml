@@ -7,5 +7,5 @@
   file: path=/var/log/journal
         state=directory
         owner=root
-        group=root
-        mode=0755
+        group=systemd-journal
+        mode=2755
