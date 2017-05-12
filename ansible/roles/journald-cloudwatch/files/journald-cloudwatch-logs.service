@@ -1,0 +1,12 @@
+[Unit]
+Description=journald-cloudwatch-logs
+Wants=basic.target
+After=basic.target network.target
+
+[Service]
+User=journald-cloudwatch
+Group=journald-cloudwatch
+ExecStart=/usr/local/bin/journald-cloudwatch-logs /etc/journald-cloudwatch
+KillMode=process
+Restart=on-failure
+RestartSec=1s

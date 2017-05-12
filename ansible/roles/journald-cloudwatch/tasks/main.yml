@@ -1,0 +1,49 @@
+---
+
+- name: create journald-cloudwatch group
+  group: name=journald-cloudwatch
+
+- name: create journald-cloudwatch user
+  user: name=journald-cloudwatch
+        group=journald-cloudwatch
+        groups=systemd-journal
+        shell=/bin/false
+        createhome=no
+        comment="Runs journald-cloudwatch service"
+
+- name: download journald-cloudwatch-logs
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/journald-cloudwatch-logs-df8eb69f89f8
+           dest=/usr/local/bin/journald-cloudwatch-logs
+           sha256sum=2ac6b55fa9f1d1b4e1163f4526c4a396a0fa2146c00df029c439db6e5a94d863
+           owner=root
+           group=root
+           mode=0755
+
+- name: directory for journald-cloudwatch-logs state
+  file: path=/var/lib/journald-cloudwatch-logs
+        state=directory
+        owner=journald-cloudwatch
+        group=journald-cloudwatch
+        mode=0750
+
+- name: install journald-cloudwatch-logs config file
+  template: src=journald-cloudwatch.j2
+            dest=/etc/journald-cloudwatch
+            owner=root
+            group=root
+            mode=0644
+
+- name: install journald-cloudwatch-logs systemd unit
+  copy: src=journald-cloudwatch-logs.service
+        dest=/etc/systemd/system/journald-cloudwatch-logs.service
+        owner=root
+        group=root
+        mode=0644
+
+- name: reload systemd units
+  command: /usr/bin/systemctl daemon-reload
+
+- name: journald-cloudwatch-logs systemd service enabled and running
+  service: name=journald-cloudwatch-logs.service
+           enabled=yes
+           state=started

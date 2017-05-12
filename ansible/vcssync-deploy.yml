@@ -29,4 +29,5 @@
 
   roles:
     - common
+    - { role: journald-cloudwatch, journald_cloudwatch_group: /vcssync }
     - vcs-sync
