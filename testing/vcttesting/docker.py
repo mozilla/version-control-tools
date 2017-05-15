@@ -775,6 +775,7 @@ class Docker(object):
         self.state['last-hgweb-id'] = images['hgweb']
         self.state['last-ldap-id'] = images['ldap']
         self.state['last-pulse-id'] = images['pulse']
+        self.save_state()
 
         return images
 
