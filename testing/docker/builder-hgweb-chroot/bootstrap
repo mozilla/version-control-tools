@@ -11,9 +11,7 @@ set -e
 VCT=/python/var/hg/version-control-tools
 
 mkdir -p /python/var/hg
-/usr/bin/rsync -a --delete-after /vct-mount/ ${VCT}/
-
-chown -R root:root ${VCT}
+/usr/bin/rsync -rlpt --delete-after /vct-mount/ ${VCT}/
 
 mkdir /python/dev
 

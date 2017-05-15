@@ -5,7 +5,8 @@
 
 set -e
 
-/usr/bin/rsync -a --delete-after /vct-mount/ /vct/
-chown -R root:root /vct
+# We don't preserve owner/group here because chown is slow on certain
+# Docker filesystems, like overlay2.
+/usr/bin/rsync -rlpt --delete-after /vct-mount/ /vct/
 cd /vct/ansible
 /usr/bin/python -u /usr/bin/ansible-playbook -c local $1

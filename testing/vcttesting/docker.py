@@ -1668,7 +1668,12 @@ class Docker(object):
                     fh.write('.vctnode\n')
                     fh.flush()
 
-                    rsync('-a', '--delete-before', '--files-from', fh.name,
+                    # We don't use -a (implies -tlptgoD) because with some
+                    # filesystems used by Docker (namely overlay2), touching
+                    # files only to update attributes has a ton of overhead.
+                    # We shouldn't care about owner/group, so we don't sync
+                    # these.
+                    rsync('-rlpt', '--delete-before', '--files-from', fh.name,
                           ROOT, url)
 
                 self.state['last-vct-id'] = image
