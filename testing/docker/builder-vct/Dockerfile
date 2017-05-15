@@ -4,9 +4,9 @@
 
 # This container holds a copy of all vct data.
 
-FROM secure:mozsecure:ubuntu1604:sha256 90243b2f486d1c6ca0c1e6649da940eb499759c4dad28bc831299df1ccef4e80:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/ubuntu-1604-20160818-docker.tar.xz
+FROM secure:mozsecure:centos7:sha256 219b47fc575d9884a7062a575ca36e71b03f14ebfbb5a87f41ae8475b925e903:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20170515-docker.tar.xz
 
-RUN apt-get update && apt-get install -y rsync
+RUN yum update -y && yum install -y rsync && yum clean all
 
 VOLUME /vct-mount
 ADD run.sh /run.sh

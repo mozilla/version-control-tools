@@ -1613,6 +1613,11 @@ class Docker(object):
         """
         existing_cid = self.state['vct-cid']
 
+        # Force rebuild if a clobber is needed.
+        if self.clobber_needed('vct'):
+            existing_cid = None
+            image = None
+
         # If we're going to use an existing container, verify it exists.
         if not cid and existing_cid:
             try:
