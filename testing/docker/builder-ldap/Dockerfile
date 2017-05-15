@@ -4,28 +4,28 @@
 
 # This is a Docker container for running a Mozilla flavored LDAP server.
 
-FROM secure:mozsecure:ubuntu14042:sha256 e08475e91c8b342dce147346a11db16357619ed914aaad4d82be2e6ab743a167:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/ubuntu-trusty-core-cloudimg-amd64-docker-20150630.tar.xz
+FROM secure:mozsecure:centos7:sha256 219b47fc575d9884a7062a575ca36e71b03f14ebfbb5a87f41ae8475b925e903:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20170515-docker.tar.xz
 
-RUN apt-get update && apt-get --no-install-recommends -y install slapd
+RUN yum update -y && yum install -y openldap-servers sudo && yum clean all
 
-RUN rm -rf /etc/ldap/slapd.d
+RUN rm -rf /etc/openldapldap/slapd.d
 
-ADD ldap.conf /etc/ldap/ldap.conf
-ADD slapd.conf /etc/ldap/slapd.conf
-ADD ssh_lpk.schema /etc/ldap/schema/ssh_lpk.schema
-ADD mozilla.schema /etc/ldap/schema/mozilla.schema
-RUN chown -R openldap:openldap /etc/ldap
+ADD ldap.conf /etc/openldap/ldap.conf
+ADD slapd.conf /etc/openldap/slapd.conf
+ADD ssh_lpk.schema /etc/openldap/schema/ssh_lpk.schema
+ADD mozilla.schema /etc/openldap/schema/mozilla.schema
+RUN chown -R ldap:ldap /etc/openldap
 
 # Seed the data.
 RUN mkdir /var/slapd
-RUN chown openldap:openldap /var/slapd
+RUN chown ldap:ldap /var/slapd
 ADD mozilla.ldif /mozilla.ldif
-RUN chown openldap:openldap /mozilla.ldif
-RUN sudo -u openldap /usr/sbin/slapadd -v -f /etc/ldap/slapd.conf -l /mozilla.ldif
+RUN chown ldap:ldap /mozilla.ldif
+RUN sudo -u ldap /usr/sbin/slapadd -v -f /etc/openldap/slapd.conf -l /mozilla.ldif
 
 ADD entrypoint.sh /entrypoint.sh
 
 EXPOSE 389
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/usr/sbin/slapd", "-h", "ldap:///", "-g", "openldap", "-u", "openldap", "-f", "/etc/ldap/slapd.conf", "-d", "256"]
+CMD ["/usr/sbin/slapd", "-h", "ldap:///", "-g", "ldap", "-u", "ldap", "-f", "/etc/openldap/slapd.conf", "-d", "256"]
