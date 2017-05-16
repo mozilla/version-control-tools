@@ -607,29 +607,27 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
             print('user repository management is not enabled')
             sys.exit(1)
 
-        args = args[1:]
-        if len(args) == 0:
+        if len(args) == 1:
             sys.stderr.write('clone usage: ssh hg.mozilla.org clone newrepo '
                              '[srcrepo]\n')
             sys.exit(1)
-        assert_valid_repo_name(args[0])
-        if len(args) == 1:
-            make_repo_clone(cname, args[0], None)
-        elif len(args) == 2:
-            make_repo_clone(cname, args[0], args[1])
+        assert_valid_repo_name(args[1])
+        if len(args) == 2:
+            make_repo_clone(cname, args[1], None)
+        elif len(args) == 3:
+            make_repo_clone(cname, args[1], args[2])
         sys.exit(0)
     elif args[0] == 'edit':
         if not enable_user_repos:
             print('user repository management is not enabled')
             sys.exit(1)
 
-        args = args[1:]
-        if len(args) == 1:
-            assert_valid_repo_name(args[0])
-            edit_repo(cname, args[0], False)
-        elif len(args) == 3 and args[1] == 'delete' and args[2] == 'YES':
-            assert_valid_repo_name(args[0])
-            edit_repo(cname, args[0], True)
+        if len(args) == 2:
+            assert_valid_repo_name(args[1])
+            edit_repo(cname, args[1], False)
+        elif len(args) == 4 and args[2] == 'delete' and args[3] == 'YES':
+            assert_valid_repo_name(args[1])
+            edit_repo(cname, args[1], True)
         else:
             sys.stderr.write('edit usage: ssh hg.mozilla.org edit '
                              '[userrepo delete] - WARNING: will not '
@@ -640,16 +638,14 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
             print('repo-group command not available')
             sys.exit(1)
 
-        args = args[1:]
-        assert_valid_repo_name(args[0])
-        print(repo_group.repo_owner(args[0]))
+        assert_valid_repo_name(args[1])
+        print(repo_group.repo_owner(args[1]))
     elif args[0] == 'repo-config':
         if not enable_repo_config:
             print('repo-config command not available')
             sys.exit(1)
 
-        args = args[1:]
-        repo = args[0]
+        repo = args[1]
         assert_valid_repo_name(repo)
         hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
         if os.path.exists(hgrc):
@@ -660,8 +656,7 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
             print('mozreview-ldap-associate command not available')
             sys.exit(1)
 
-        args = args[1:]
-        sys.exit(mozreview_ldap_associate(args))
+        sys.exit(mozreview_ldap_associate(args[1:]))
     else:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
         sys.stderr.write(INVALID_SSH_COMMAND)
