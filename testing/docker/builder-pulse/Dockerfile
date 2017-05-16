@@ -1,8 +1,11 @@
-FROM secure:mozsecure:ubuntu14042:sha256 e08475e91c8b342dce147346a11db16357619ed914aaad4d82be2e6ab743a167:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/ubuntu-trusty-core-cloudimg-amd64-docker-20150630.tar.xz
+FROM secure:mozsecure:centos7:sha256 219b47fc575d9884a7062a575ca36e71b03f14ebfbb5a87f41ae8475b925e903:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20170515-docker.tar.xz
 
 ENV RABBITMQ_CONFIG_FILE /etc/rabbitmq/rabbitmq
 
-RUN apt-get update && apt-get --no-install-recommends -y install rabbitmq-server
+RUN yum update -y && yum install -y \
+  https://github.com/rabbitmq/erlang-rpm/releases/download/v19.3.2/erlang-19.3.2-1.el7.centos.x86_64.rpm \
+  https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_9/rabbitmq-server-3.6.9-1.el7.noarch.rpm && \
+  yum clean all
 
 ADD rabbitmq.config /etc/rabbitmq/rabbitmq.config
 RUN chmod 644 /etc/rabbitmq/rabbitmq.config
