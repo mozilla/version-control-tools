@@ -164,3 +164,32 @@ On a Firefox repository, it could take 2-3 hours to perform data
 optimizations if the repository isn't already optimized. If you
 clone from hg.mozilla.org, you will get these optimizations
 automatically because the server performs them.
+
+Analyzing Pushlog Data Offline
+==============================
+
+The ``mozext`` extension replicates pushlog data to a local SQLite
+database during ``hg pull`` operations. The extension also exposes
+some *revsets* and *template* features that allow querying and
+formatting of pushlog data.
+
+To enable ``mozext``, add the following to your hgrc::
+
+   [extensions]
+   firefoxtree = /path/to/version-control-tools/hgext/firefoxtree
+   mozext = /path/to/version-control-tools/hgext/mozext
+
+Then, in a Firefox clone, run an ``hg pull`` to grab pushlog data::
+
+   $ hg pull central
+   $ hg pull inbound
+   $ hg pull autoland
+
+Now, you can run revsets to query pushlog data::
+
+   # Find all changesets initially pushed to autoland
+   $ hg log -r 'firstpushtree(autoland)' -T '{rev} {node|short} {desc|firstline}\n'
+
+   # Find revisions that were heads at time of push (this means they should have CI
+   # results available)
+   $ hg log -r 'pushhead(central)'
