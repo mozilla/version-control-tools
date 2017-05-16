@@ -591,17 +591,32 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
     args = shlex.split(ssh_command)
 
     if args[0] == 'hg':
-        repo_expr = re.compile('(.*)\s+-R\s+([^\s]+\s+)(.*)')
-        if repo_expr.search(ssh_command):
-            [(hg_path, repo_path, hg_command)] = repo_expr.findall(ssh_command)
-            if hg_command == 'serve --stdio':
-                assert_valid_repo_name(repo_path.rstrip())
-                hg_arg_string = HG + ' -R ' + DOC_ROOT + '/' + repo_path + hg_command
-                hg_args = hg_arg_string.split()
-                os.execv(HG, hg_args)
-            else:
-                sys.stderr.write("Thank you dchen! but.. I don't think so!\n")
-                sys.exit(1)
+        # SECURITY it is critical that invoked commands be limited to
+        # `hg -R <path> serve --stdio`. If a user manages to pass arguments
+        # to coerce Mercurial into say opening a debugger, that is effectively
+        # giving them a remote shell. We require that command arguments match
+        # an exact pattern and that the repo name is sanitized.
+        if args[1] != '-R' or args[3:] != ['serve', '--stdio']:
+            sys.stderr.write('invalid `hg` command executed; can only run '
+                             'serve --stdio\n')
+            sys.exit(1)
+
+        # At this point, the only argument not validated to match exact bytes
+        # is the value for -R. We sanitize that through our repo name validator
+        # *and* verify it exists on disk.
+
+        repo_path = args[2].strip()
+        # This will ensure the repo path is essentially alphanumeric. So we
+        # don't have to worry about ``..``, Unicode, spaces, etc.
+        assert_valid_repo_name(repo_path)
+        full_repo_path = '%s/%s' % (DOC_ROOT, repo_path)
+
+        if not os.path.isdir('%s/.hg' % full_repo_path):
+            sys.stderr.write('requested repo %s does not exist\n' % repo_path)
+            sys.exit(1)
+
+        os.execv(HG, [HG, '-R', full_repo_path, 'serve', '--stdio'])
+
     elif args[0] == 'clone':
         if not enable_user_repos:
             print('user repository management is not enabled')

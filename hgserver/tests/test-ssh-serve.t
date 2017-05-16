@@ -10,6 +10,8 @@
   > ssh = ssh -F `pwd`/ssh_config -i `pwd`/testuser -l user@example.com
   > EOF
 
+  $ alias hgssh="ssh -F `pwd`/ssh_config -i `pwd`/testuser -l user@example.com -p $HGPORT"
+
 We are able to clone via SSH
 
   $ hgmo create-repo repo1 scm_level_1
@@ -53,5 +55,48 @@ Trailing slash works
   searching for changes
   no changes found
   [1]
+
+Various hg command invocations aren't allowed
+
+  $ hgssh ${SSH_SERVER} hg serve
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} foohg -R repo1 serve --stdio
+  A SSH connection has been successfully established.
+  
+  Your account (user@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  The command you specified is not allowed on this server.
+  
+  Goodbye.
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R repo1 log
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R repo1 serve --debugger
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R repo1 serve --stdio --debugger
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R repo1 serve --config ui.test=foo --stdio --debugger
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R repo 1 serve --stdio
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R "repo 1" serve --stdio
+  invalid `hg` command executed; can only run serve --stdio
+  [1]
+
+Cleanup
 
   $ hgmo clean
