@@ -97,6 +97,16 @@ Various hg command invocations aren't allowed
   invalid `hg` command executed; can only run serve --stdio
   [1]
 
+  $ hgssh ${SSH_SERVER} hg -R \'repo 1\' serve --stdio
+  Only alpha-numeric characters, ".", "_", and "-" are allowed in repository
+  names.  Additionally the first character of repository names must be alpha-numeric.
+  [1]
+
+  $ hgssh ${SSH_SERVER} hg -R \"repo 1\" serve --stdio
+  Only alpha-numeric characters, ".", "_", and "-" are allowed in repository
+  names.  Additionally the first character of repository names must be alpha-numeric.
+  [1]
+
 Cleanup
 
   $ hgmo clean
