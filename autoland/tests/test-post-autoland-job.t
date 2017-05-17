@@ -184,22 +184,33 @@ Test pingback url whitelist.  localhost, private IPs, and example.com are in
 the whitelist. example.org is not.
 
   $ REV=`hg log -r . --template "{node|short}"`
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://example.com:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound1 http://example.com:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 6\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound2 http://localhost --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 7\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://127.0.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound3 http://127.0.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 8\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://192.168.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound4 http://192.168.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 9\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://172.16.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound5 http://172.16.0.1 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 10\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://10.0.0.1:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound6 http://10.0.0.1:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 11\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://8.8.8.8:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound7 http://8.8.8.8:443 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://example.org:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound8 http://example.org:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
+
+Post the same job twice.  Start with stopping the autoland service to
+guarentee the first request is still in the queue when the second is submitted.
+
+  $ PID=`mozreview exec autoland ps x | grep autoland.py | grep -v grep | awk '{ print $1 }'`
+  $ mozreview exec autoland kill $PID
+  $ REV=`hg log -r . --template "{node|short}"`
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
+  (200, u'{\n  "request_id": 12\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
+  (400, u'{\n  "error": "Bad request: a request to land revision e7f4a0f07be3 to try is already in progress"\n}')
 
   $ mozreview stop
   stopped 9 containers
