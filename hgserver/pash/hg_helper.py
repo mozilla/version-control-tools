@@ -605,7 +605,7 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
         # is the value for -R. We sanitize that through our repo name validator
         # *and* verify it exists on disk.
 
-        repo_path = args[2].strip()
+        repo_path = args[2]
         # This will ensure the repo path is essentially alphanumeric. So we
         # don't have to worry about ``..``, Unicode, spaces, etc.
         assert_valid_repo_name(repo_path)
