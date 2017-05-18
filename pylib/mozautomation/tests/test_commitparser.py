@@ -342,42 +342,95 @@ differs from that used to generate the hash.'''
         self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r?', ['remus']), 'Bug 123 - Blah blah; r=remus')
         self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r? DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
 
+    def test_backout_partial(self):
+        # bug without node
+        self.assertIsNone(parse_backouts(
+            'Bug 1 - More stuff; r=romulus'))
 
-    def test_backout_missing(self):
-        self.assertIsNone(parse_backouts('Bug 1 - More stuff; r=romulus'))
+        # node without bug
+        self.assertEqual(parse_backouts(
+            'Backout f484160e0a08 for causing slow heat death of the universe'),
+            (['f484160e0a08'], []))
+
+        # backout not on first line
+        self.assertIsNone(parse_backouts(
+            'Bug 123 - Blah blah; r=gps\n'
+            'Backout ffffffffffff'))
 
     def test_backout_single(self):
-        self.assertEqual(
-            parse_backouts('Backed out changeset 6435d5aab611 (bug 858680)'),
-            (['6435d5aab611'], [858680]))
+        # 'backed out'
         self.assertEqual(parse_backouts(
-            'Backed out changeset 2f9d54c153ed on CLOSED TREE (bug 1067325)'),
-            (['2f9d54c153ed'], [1067325]))
-        self.assertEqual(
-            parse_backouts('Backout b8601df335c1 (Bug 1174857) for bustage'),
-            (['b8601df335c1'], [1174857]))
+            'Backed out changeset 6435d5aab611 (bug 858680)'),
+            (['6435d5aab611'], [858680]))
 
-        self.assertEqual(
-            parse_backouts('Back out b8601df335c1 (Bug 1174857) for bustage'),
+        # 'backout of'
+        self.assertEqual(parse_backouts(
+            'backout of f9abb9c83452 (bug 1319111) for crashes, r=bz'),
+            (['f9abb9c83452'], [1319111]))
+
+        # 'backout revision'
+        self.assertEqual(parse_backouts(
+            'Backout revision 20a9d741cdf4 (bug 1354641) a=me'),
+            (['20a9d741cdf4'], [1354641]))
+
+        # 'backout'
+        self.assertEqual(parse_backouts(
+            'Backout b8601df335c1 (Bug 1174857) for bustage'),
             (['b8601df335c1'], [1174857]))
 
     def test_backout_multiple_changesets(self):
+        # 'and' separated
         self.assertEqual(parse_backouts(
-            'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b '
-            '(bug 1150549) for Mulet crashes.'),
+            'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b (bug 1150549) for Mulet crashes.'),
             (['4b6aa5c0a1bf', 'fdf38a41d92b'], [1150549]))
 
+        # more than two
         self.assertEqual(parse_backouts(
-            'Back out changesets ed293fc9596c and f18cb4c41578 '
-            '(bug 1174700) for fatal assertions in all Windows debug '
-            'reftest runs.'),
-            (['ed293fc9596c', 'f18cb4c41578'], [1174700]))
+            'Backed out changesets a8abdd77a92c, dda84d1fb12b and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
+            (['a8abdd77a92c', 'dda84d1fb12b', '21fdf73bbb17'], [1302907]))
+
+        # oxford comma
+        self.assertEqual(parse_backouts(
+            'Backed out changesets a8abdd77a92c, dda84d1fb12b, and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
+            (['a8abdd77a92c', 'dda84d1fb12b', '21fdf73bbb17'], [1302907]))
 
     def test_backout_n_changesets(self):
+        # all nodes returned
+        self.assertEqual(
+            parse_backouts(
+            'Backed out 3 changesets (bug 1310885) for heap write hazard failures\n'
+            'Backed out changeset 77352010d8e8 (bug 1310885)\n'
+            'Backed out changeset 9245a2fbb974 (bug 1310885)\n'
+            'Backed out changeset 7c2db290c4b6 (bug 1310885)'),
+            (['77352010d8e8', '9245a2fbb974', '7c2db290c4b6'], [1310885]))
+
+        # nodes must be provided on following lines in strict mode
+        self.assertIsNone(parse_backouts(
+            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
+            strict=True))
+
+        # .. but is ok without strict mode
         self.assertEqual(parse_backouts(
-            'Backed out 6 changesets (bug 1164777, bug 1163207, bug 1156914, '
-            'bug 1164778) for SM(cgc) caused by something in the push.'),
-            ([], [1164777, 1163207, 1156914, 1164778]))
+            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
+            strict=False),
+            ([], [1335751]))
+
+        # .. default should be with strict disabled
+        self.assertEqual(parse_backouts(
+            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures'),
+            ([], [1335751]))
+
+        # the correct number of nodes must be provided in strict mode
+        self.assertIsNone(parse_backouts(
+            'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
+            'Backed out changeset ab9fdee3a6a4 (bug 1360992)',
+            strict=True))
+
+        # .. but is ok without strict mode
+        self.assertEqual(parse_backouts(
+            'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
+            'Backed out changeset ab9fdee3a6a4 (bug 1360992)'),
+            (['ab9fdee3a6a4'], [1360992]))
 
     def test_strip_commit_metadata(self):
         self.assertEqual(strip_commit_metadata('foo'), 'foo')

@@ -56,17 +56,37 @@ REVIEWERS_RE = re.compile(
         r')*' +
     r')?')                              # noqa
 
-BACKED_OUT_RE = re.compile('^backed out changeset (?P<node>[0-9a-f]{12}) ',
-                           re.I)
+BACKOUT_KEYWORD = r'^(?:backed out|backout|back out)\b'
+BACKOUT_KEYWORD_RE = re.compile(BACKOUT_KEYWORD, re.I)
+CHANGESET_KEYWORD = r'(?:\b(?:changeset|revision|change|cset|of)\b)'
+CHANGESETS_KEYWORD = r'(?:\b(?:changesets|revisions|changes|csets|of)\b)'
+SHORT_NODE = r'([0-9a-f]{12}\b)'
+SHORT_NODE_RE = re.compile(SHORT_NODE, re.I)
 
-BACKOUT_RE = re.compile('^back\s?out (?P<node>[0-9a-f]{12}) ', re.I)
+BACKOUT_SINGLE_RE = re.compile(
+    BACKOUT_KEYWORD + r'\s+' +
+    CHANGESET_KEYWORD + r'?\s*' +
+    r'(?P<node>' + SHORT_NODE + r')',
+    re.I
+)
+
+BACKOUT_MULTI_SPLIT_RE = re.compile(
+    BACKOUT_KEYWORD + r'\s+' +
+    r'(?P<count>\d+)\s+' +
+    CHANGESETS_KEYWORD,
+    re.I
+)
+
+BACKOUT_MULTI_ONELINE_RE = re.compile(
+    BACKOUT_KEYWORD + r'\s+' +
+    CHANGESETS_KEYWORD + r'?\s*' +
+    r'(?P<nodes>(?:(?:\s+|and|,)+' + SHORT_NODE + r')+)',
+    re.I
+)
 
 SHORT_RE = re.compile('^[0-9a-f]{12}$', re.I)
 
 DIGIT_RE = re.compile('#?\d+')
-
-BACK_OUT_MULTIPLE_RE = re.compile(
-    '^back(?:ed)? out \d+ changesets \(bug ', re.I)
 
 # Strip out a white-list of metadata prefixes.
 # Currently just MozReview-Commit-ID
@@ -172,43 +192,57 @@ def replace_reviewers(commit_description, reviewers):
         return commit_summary.strip() + "\n" + commit_description
 
 
-def parse_backouts(s):
+def is_backout(commit_desc):
+    """Returns True if the first line of the commit description appears to
+    contain a backout.
+
+    Backout commits should always result in is_backout() returning True,
+    and parse_backouts() not returning None.  Malformed backouts may return
+    True here and None from parse_backouts()."""
+    return BACKOUT_KEYWORD_RE.match(commit_desc) is not None
+
+
+def parse_backouts(commit_desc, strict=False):
     """Look for backout annotations in a string.
 
     Returns a 2-tuple of (nodes, bugs) where each entry is an iterable of
     changeset identifiers and bug numbers that were backed out, respectively.
     Or return None if no backout info is available.
+
+    Setting `strict` to True will enable stricter validation of the commit
+    description (eg. ensuring N commits are provided when given N commits are
+    being backed out).
     """
-    l = s.splitlines()[0].lower()
+    if not is_backout(commit_desc):
+        return None
 
-    m = BACKED_OUT_RE.match(l)
+    lines = commit_desc.splitlines()
+    first_line = lines[0]
+
+    # Single backout.
+    m = BACKOUT_SINGLE_RE.match(first_line)
     if m:
-        return [m.group('node')], parse_bugs(s)
+        return [m.group('node')], parse_bugs(first_line)
 
-    m = BACKOUT_RE.match(l)
+    # Multiple backouts, with nodes listed in commit description.
+    m = BACKOUT_MULTI_SPLIT_RE.match(first_line)
     if m:
-        return [m.group('node')], parse_bugs(s)
+        expected = int(m.group('count'))
+        nodes = []
+        for line in lines[1:]:
+            single_m = BACKOUT_SINGLE_RE.match(line)
+            if single_m:
+                nodes.append(single_m.group('node'))
+        if strict:
+            # The correct number of nodes must be specified.
+            if expected != len(nodes):
+                return None
+        return nodes, parse_bugs(commit_desc)
 
-    if BACK_OUT_MULTIPLE_RE.match(l):
-        return [], parse_bugs(s)
-
-    for prefix in ('backed out changesets ', 'back out changesets '):
-        if l.startswith(prefix):
-            nodes = []
-            remaining = l[len(prefix):]
-
-            # Consume all the node words that follow, stopping after a non-node
-            # word or separator.
-            for word in remaining.split():
-                word = word.strip(',')
-                if SHORT_RE.match(word):
-                    nodes.append(word)
-                elif word == 'and':
-                    continue
-                else:
-                    break
-
-            return nodes, parse_bugs(s)
+    # Multiple backouts, with nodes listed on the first line
+    m = BACKOUT_MULTI_ONELINE_RE.match(first_line)
+    if m:
+        return SHORT_NODE_RE.findall(m.group('nodes')), parse_bugs(first_line)
 
     return None
 
