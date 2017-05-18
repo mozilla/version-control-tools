@@ -34,13 +34,20 @@ except ImportError:
     def init_logging(): pass
 
 try:
-    from cinnabar.hg import (
+    from cinnabar.hg.repo import (
         get_repo,
         passwordmgr,
         Remote,
     )
 except ImportError:
-    passwordmgr = False
+    try:
+        from cinnabar.hg import (
+            get_repo,
+            passwordmgr,
+            Remote,
+        )
+    except ImportError:
+        passwordmgr = False
 
 # Disable progress printing otherwise output can be a bit wonky.
 cinnabar.util.progress = False
