@@ -98,7 +98,7 @@ LimitRequestFields 1000
     # Mercurial's built-in CSP support doesn't allow to change the policy per
     # URL. So we special case it and override hgweb's header here.
     <Location "/mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml">
-        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests"
+        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors: https:"
     </Location>
 
     <If "-n env('HG_PROTOCOL')">
