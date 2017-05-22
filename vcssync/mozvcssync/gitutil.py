@@ -71,6 +71,8 @@ def update_git_refs(repo, reason, *actions):
 
     ('update', ref, new_id, old_id)
     ('create', ref, id)
+    ('delete', ref, old_id)
+    ('force-delete', ref)
     """
     assert isinstance(reason, bytes)
 
@@ -84,6 +86,12 @@ def update_git_refs(repo, reason, *actions):
         elif action[0] == 'create':
             cmd, ref, new = action
             commands.append(b'create %s\0%s' % (ref, new))
+        elif action[0] == 'delete':
+            cmd, ref, old = action
+            commands.append(b'delete %s\0%s' % (ref, old))
+        elif action[0] == 'force-delete':
+            cmd, ref = action
+            commands.append(b'delete %s\0' % ref)
         else:
             raise Exception('unhandled action %s' % action[0])
 
@@ -92,7 +100,9 @@ def update_git_refs(repo, reason, *actions):
                           b'--stdin', b'-z'],
                          stdin=subprocess.PIPE,
                          cwd=repo.path)
-    p.stdin.write(b'\0'.join(commands))
+    for command in commands:
+        p.stdin.write(command)
+        p.stdin.write(b'\0')
     p.stdin.close()
     res = p.wait()
     # TODO could use a more rich exception type that captures output.
