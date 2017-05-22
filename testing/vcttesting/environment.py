@@ -62,7 +62,7 @@ def create_virtualenv(name):
     env['ROOT'] = ROOT
     env['VENV'] = path
 
-    if not os.path.exists(path):
+    if not os.path.exists(res['pip']):
         subprocess.check_call([CREATE_VIRTUALENV, path], env=env)
 
     # Install a sitecustomize.py that starts code coverage if an environment
