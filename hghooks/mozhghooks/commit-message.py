@@ -13,12 +13,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 
 import re
 from mercurial.node import hex, short
 
-INVALID_REVIEW_FLAG_RE = re.compile(r'[\s\.;]r\?(?:\w|$)')
+INVALID_REVIEW_FLAG_RE = re.compile(r'[\s.;]r\?(?:\w|$)')
 
 goodMessage = [re.compile(x, re.I) for x in [
     r'bug [0-9]+',
@@ -35,7 +35,8 @@ VENDORED_PATHS = (
     'servo/',
 )
 
-def isvendorctx(ctx):
+
+def is_vendor_ctx(ctx):
     # This check isn't strictly necessary. But it does filter out
     # most changesets without having to inspect the file list.
     desc = ctx.description()
@@ -50,17 +51,20 @@ def isvendorctx(ctx):
     return True
 
 
-def isGoodMessage(c):
+def is_good_message(ui, c):
     def message(fmt):
-        print "\n\n************************** ERROR ****************************"
-        print fmt.format(rev = hex(c.node())[:12])
-        print c.user()
-        print c.description()
-        print "*************************************************************\n\n"
+        ui.write(
+            '\n\n'
+            '************************** ERROR ****************************\n'
+            '%s\n%s\n%s\n'
+            '*************************************************************\n'
+            '\n\n'
+            % (fmt.format(rev=hex(c.node())[:12]), c.user(), c.description())
+        )
 
-    if isvendorctx(c):
-        print('(%s looks like a vendoring change; ignoring commit message '
-              'hook)' % short(c.node()))
+    if is_vendor_ctx(c):
+        ui.write('(%s looks like a vendoring change; ignoring commit message '
+                 'hook)\n' % short(c.node()))
         return True
 
     desc = c.description()
@@ -72,37 +76,43 @@ def isGoodMessage(c):
         return True
 
     if trySyntax.search(desc):
-        message("Rev {rev} uses try syntax. (Did you mean to push to Try instead?)")
+        message("Rev {rev} uses try syntax. (Did you mean to push to Try "
+                "instead?)")
         return False
 
     # Match against [PATCH] and [PATCH n/m]
     if "[PATCH" in desc:
-        message("Rev {rev} contains git-format-patch \"[PATCH]\" cruft. Use git-format-patch -k to avoid this.")
+        message('Rev {rev} contains git-format-patch "[PATCH]" cruft. Use '
+                'git-format-patch -k to avoid this.')
         return False
 
     if INVALID_REVIEW_FLAG_RE.search(firstline):
-        message("Rev {rev} contains 'r?' in the commit message. Please use 'r=' instead.")
+        message("Rev {rev} contains 'r?' in the commit message. Please use "
+                "'r=' instead.")
         return False
 
     for r in goodMessage:
         if r.search(firstline):
             return True
 
-    dlower = desc.lower()
-    if dlower.startswith("merge") or dlower.startswith("merging") or dlower.startswith("automated merge"):
+    desc_lower = desc.lower()
+    if desc_lower.startswith(('merge', 'merging', 'automated merge')):
         if len(c.parents()) == 2:
             return True
         else:
-            message("Rev {rev} claims to be a merge, but it has only one parent.")
+            message("Rev {rev} claims to be a merge, but it has only one "
+                    "parent.")
             return False
 
-    if dlower.startswith("back") or dlower.startswith("revert"):
-        # Purposely ambiguous: it's ok to say "backed out rev N" or "reverted to rev N-1"
+    if desc_lower.startswith(('back', 'revert')):
+        # Purposely ambiguous: it's ok to say "backed out rev N" or
+        # "reverted to rev N-1"
         message("Backout rev {rev} needs a bug number or a rev id.")
     else:
-        message("Rev {rev} needs \"Bug N\" or \"No bug\" in the commit message.")
+        message('Rev {rev} needs "Bug N" or "No bug" in the commit message.')
 
     return False
+
 
 def hook(ui, repo, node, hooktype, source=None, **kwargs):
     if source in ('pull', 'strip'):
@@ -120,16 +130,16 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
             # Ignore commit messages for all earlier revs in this push.
             break
 
-        if not isGoodMessage(c):
+        if not is_good_message(ui, c):
             # Keep looping so the pusher sees all commits they need to fix.
             rejecting = True
 
     if not rejecting:
-      return 0
+        return 0
 
     # We want to allow using this hook locally
     if hooktype == "pretxnchangegroup":
         return 1
 
-    print "This changeset would have been rejected!"
-    return 0 # to fail not warn change to 1
+    ui.write('This changeset would have been rejected!\n')
+    return 0  # to fail not warn change to 1
