@@ -122,6 +122,8 @@
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
     - { venv: venv_pash, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
+    - { venv: venv_pash, path: pylib/mozautomation, pth: mozautomation }
+    - { venv: venv_tools, path: pylib/mozautomation, pth: mozautomation }
 
 - name: determine if v-c-t clone is present
   stat: path=/var/hg/version-control-tools/.hg
