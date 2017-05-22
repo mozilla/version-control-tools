@@ -86,12 +86,16 @@ def process_pip_requirements(venv, requirements):
     subprocess.check_call(args)
 
 
-def install_editable(venv, relpath):
+def install_editable(venv, relpath, extra_env=None):
     args = [
         venv['pip'], 'install', '--no-deps', '--editable',
         os.path.join(ROOT, relpath)
     ]
-    subprocess.check_call(args)
+
+    env = dict(os.environ)
+    env.update(extra_env or {})
+
+    subprocess.check_call(args, env=env)
 
 
 def install_mercurials(venv, hg):
@@ -225,7 +229,8 @@ def create_vcssync():
     process_pip_requirements(venv, 'vcssync/test-requirements.txt')
     install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
-    install_editable(venv, 'vcssync')
+    install_editable(venv, 'vcssync',
+                     extra_env={'VCSSYNC_ENABLE_TESTING_COMMANDS': '1'})
 
     return venv
 

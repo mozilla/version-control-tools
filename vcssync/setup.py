@@ -1,3 +1,4 @@
+import os
 from setuptools import setup, find_packages
 
 console_scripts = [
@@ -9,6 +10,12 @@ console_scripts = [
     'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
     'test-apply-changes=mozvcssync.util:test_apply_changes_from_list',
 ]
+
+# These commands are really only useful for testing. So don't expose them by
+# default.
+if 'VCSSYNC_ENABLE_TESTING_COMMANDS' in os.environ:
+    console_scripts.extend([
+    ])
 
 # ansible/roles/vcs-sync/defaults/main.yml must be updated if this package's
 # version number is changed.
