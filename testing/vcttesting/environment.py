@@ -41,16 +41,19 @@ def create_virtualenv(name):
     if os.name == 'nt':
         bin_dir = os.path.join(path, 'Scripts')
         pip = os.path.join(bin_dir, 'pip.exe')
+        python = os.path.join(bin_dir, 'python.exe')
         activate = os.path.join(bin_dir, 'activate')
     else:
         bin_dir = os.path.join(path, 'bin')
         pip = os.path.join(bin_dir, 'pip')
+        python = os.path.join(bin_dir, 'python')
         activate = os.path.join(bin_dir, 'activate')
 
     res = {
         'path': path,
         'bin_dir': bin_dir,
         'pip': pip,
+        'python': python,
         'activate': activate,
     }
 
@@ -145,7 +148,9 @@ def install_mercurials(venv, hg):
                                     stderr=subprocess.STDOUT)
             # We don't care about support files, which only slow down
             # installation. So install-bin is a suitable target.
-            subprocess.check_output(['make', 'install-bin', 'PREFIX=%s' % dest],
+            subprocess.check_output(['make', 'install-bin',
+                                     'PREFIX=%s' % dest,
+                                     'PYTHON=%s' % venv['python']],
                                     cwd=hg_dir, env=hg_env,
                                     stderr=subprocess.STDOUT)
             subprocess.check_output([hg, '--config', 'extensions.purge=',
@@ -188,6 +193,7 @@ if __name__ == '__main__':
     if sys.argv[1] == 'install-mercurials':
         venv = {
             'path': os.path.join(ROOT, 'venv'),
+            'python': os.path.join(ROOT, 'venv', 'bin', 'python'),
         }
         # PATH has global virtualenv activated.
         install_mercurials(venv, hg='hg')
