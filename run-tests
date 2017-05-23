@@ -219,7 +219,11 @@ if __name__ == '__main__':
     os.environ['HGVERSION'] = hgversion
 
     res = 0
-    if run_hg_tests:
+
+    # Don't run with main Mercurial if --all-versions is used because
+    # --all-versions should run the same version that is installed in the
+    # virtualenv.
+    if run_hg_tests and not options.all_versions:
         # The Mercurial test harness has been observed to not remove the .err
         # files after execution. This is probably a result of us using
         # separate directories. Manually remove .err files.
