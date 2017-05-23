@@ -30,17 +30,19 @@ from .util import (
 logger = logging.getLogger('mozvcssync.servo')
 
 
-def run_pulse_listener(c):
+def run_pulse_listener(config):
     """Trigger events from Pulse messages."""
-    consumer = pulse.get_consumer(userid=c['pulse_userid'],
-                                  password=c['pulse_password'],
-                                  hostname=c['pulse_host'],
-                                  port=c['pulse_port'],
-                                  ssl=c['pulse_ssl'],
-                                  github_exchange=c['pulse_github_exchange'],
-                                  github_queue=c['pulse_github_queue'],
-                                  hgmo_exchange=c['pulse_hgmo_exchange'],
-                                  hgmo_queue=c['pulse_hgmo_queue'])
+    consumer = pulse.get_consumer(
+        userid=config['pulse_userid'],
+        password=config['pulse_password'],
+        hostname=config['pulse_host'],
+        port=config['pulse_port'],
+        ssl=config['pulse_ssl'],
+        github_exchange=config['pulse_github_exchange'],
+        github_queue=config['pulse_github_queue'],
+        hgmo_exchange=config['pulse_hgmo_exchange'],
+        hgmo_queue=config['pulse_hgmo_queue'],
+        extra_data=config)
 
     # Trigger linearization + hg conversion after git push.
     def on_github_message(body, message, _):
@@ -52,7 +54,7 @@ def run_pulse_listener(c):
 
         # We only care about activity to the configured repository.
         repo_name = body['payload']['repository']['full_name']
-        if repo_name != c['servo_github_name']:
+        if repo_name != config['servo_github_name']:
             logger.warn('ignoring push for non-monitored repo: %s' % repo_name)
             message.ack()
             return
@@ -60,7 +62,7 @@ def run_pulse_listener(c):
         ref = body['payload']['ref']
         logger.warn('observed push to %s of %s' % (ref, repo_name))
 
-        if ref != c['servo_fetch_ref']:
+        if ref != config['servo_fetch_ref']:
             message.ack()
             return
 
@@ -89,7 +91,7 @@ def run_pulse_listener(c):
 
         repo_url = body['payload']['data']['repo_url']
         logger.warn('observed push to %s' % repo_url)
-        if repo_url != c['hg_converted']:
+        if repo_url != config['hg_converted']:
             message.ack()
             return
 
