@@ -30,6 +30,72 @@ from .util import (
 logger = logging.getLogger('mozvcssync.servo')
 
 
+def on_github_message(body, message, config):
+    """Trigger linearization + hg conversion after git push."""
+
+    # We only care about push events.
+    if body['event'] != 'push':
+        logger.warn('ignoring non-push event: %s' % body['event'])
+        message.ack()
+        return
+
+    # We only care about activity to the configured repository.
+    repo_name = body['payload']['repository']['full_name']
+    if repo_name != config['servo_github_name']:
+        logger.warn('ignoring push for non-monitored repo: %s' % repo_name)
+        message.ack()
+        return
+
+    ref = body['payload']['ref']
+    logger.warn('observed push to %s of %s' % (ref, repo_name))
+
+    if ref != config['servo_fetch_ref']:
+        message.ack()
+        return
+
+    # Trigger the systemd unit that will linearize the Git repo
+    # and convert to Mercurial. It does all the heavy lifting.
+    #
+    # `systemctl start` will block. This is fine. We want to wait
+    # for the conversion to finish in case there are multiple remote
+    # pushes queued up. Otherwise, there is a race condition between
+    # the initial run finishing and subsequent Pulse events arriving.
+    # If a subsequent notification is handled when the service is
+    # running, it will no-op and we may not see its push.
+    logger.warn('triggering linearization and conversion...')
+    subprocess.check_call([b'/bin/sudo',
+                           b'/usr/bin/systemctl', b'start',
+                           b'servo-linearize.service'],
+                          cwd='/', bufsize=1)
+    message.ack()
+
+
+def on_hgmo_message(body, message, config):
+    """Overlay Servo changesets from the pristine, converted repo onto
+    a Firefox repo in response to new hg changesets."""
+    if body['payload']['type'] != 'changegroup.1':
+        message.ack()
+        return
+
+    repo_url = body['payload']['data']['repo_url']
+    logger.warn('observed push to %s' % repo_url)
+    if repo_url != config['hg_converted']:
+        message.ack()
+        return
+
+    heads = body['payload']['data']['heads']
+    if len(heads) != 1:
+        raise Exception('unexpected heads count in upstream')
+
+    revision = heads[0].encode('ascii')
+    logger.warn('overlaying servo-linear changeset %s' % revision)
+    subprocess.check_call([b'/bin/sudo',
+                           b'/usr/bin/systemctl', b'start',
+                           b'servo-overlay.service'],
+                          cwd='/', bufsize=1)
+    message.ack()
+
+
 def run_pulse_listener(config):
     """Trigger events from Pulse messages."""
     consumer = pulse.get_consumer(
@@ -43,69 +109,6 @@ def run_pulse_listener(config):
         hgmo_exchange=config['pulse_hgmo_exchange'],
         hgmo_queue=config['pulse_hgmo_queue'],
         extra_data=config)
-
-    # Trigger linearization + hg conversion after git push.
-    def on_github_message(body, message, _):
-        # We only care about push events.
-        if body['event'] != 'push':
-            logger.warn('ignoring non-push event: %s' % body['event'])
-            message.ack()
-            return
-
-        # We only care about activity to the configured repository.
-        repo_name = body['payload']['repository']['full_name']
-        if repo_name != config['servo_github_name']:
-            logger.warn('ignoring push for non-monitored repo: %s' % repo_name)
-            message.ack()
-            return
-
-        ref = body['payload']['ref']
-        logger.warn('observed push to %s of %s' % (ref, repo_name))
-
-        if ref != config['servo_fetch_ref']:
-            message.ack()
-            return
-
-        # Trigger the systemd unit that will linearize the Git repo
-        # and convert to Mercurial. It does all the heavy lifting.
-        #
-        # `systemctl start` will block. This is fine. We want to wait
-        # for the conversion to finish in case there are multiple remote
-        # pushes queued up. Otherwise, there is a race condition between
-        # the initial run finishing and subsequent Pulse events arriving.
-        # If a subsequent notification is handled when the service is
-        # running, it will no-op and we may not see its push.
-        logger.warn('triggering linearization and conversion...')
-        subprocess.check_call([b'/bin/sudo',
-                               b'/usr/bin/systemctl', b'start',
-                               b'servo-linearize.service'],
-                              cwd='/', bufsize=1)
-        message.ack()
-
-    # Overlay Servo changesets from the pristine, converted repo onto
-    # a Firefox repo in response to new hg changesets.
-    def on_hgmo_message(body, message, _):
-        if body['payload']['type'] != 'changegroup.1':
-            message.ack()
-            return
-
-        repo_url = body['payload']['data']['repo_url']
-        logger.warn('observed push to %s' % repo_url)
-        if repo_url != config['hg_converted']:
-            message.ack()
-            return
-
-        heads = body['payload']['data']['heads']
-        if len(heads) != 1:
-            raise Exception('unexpected heads count in upstream')
-
-        revision = heads[0].encode('ascii')
-        logger.warn('overlaying servo-linear changeset %s' % revision)
-        subprocess.check_call([b'/bin/sudo',
-                               b'/usr/bin/systemctl', b'start',
-                               b'servo-overlay.service'],
-                              cwd='/', bufsize=1)
-        message.ack()
 
     consumer.github_callbacks.append(on_github_message)
     consumer.hgmo_callbacks.append(on_hgmo_message)
