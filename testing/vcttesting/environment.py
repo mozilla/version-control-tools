@@ -94,7 +94,7 @@ def install_mercurials(venv, hg):
         '3.8.4',
         '3.9.2',
         '4.0.2',
-        # 4.1 should be installed in virtualenv
+        '4.1.2',
         '@',
     ]
 
