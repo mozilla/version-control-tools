@@ -85,7 +85,7 @@ def install_editable(venv, relpath):
     subprocess.check_call(args)
 
 
-def install_mercurials(hg):
+def install_mercurials(venv, hg):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
         '3.8.4',
@@ -96,7 +96,7 @@ def install_mercurials(hg):
     ]
 
     hg_dir = os.path.join(ROOT, 'venv', 'hg')
-    mercurials = os.path.join(ROOT, 'venv', 'mercurials')
+    mercurials = os.path.join(venv['path'], 'mercurials')
 
     # Setting HGRCPATH to an empty value stops the global and user hgrc from
     # being loaded. These could interfere with behavior we expect from
@@ -166,7 +166,7 @@ def create_hgdev():
     install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
 
-    install_mercurials(hg=os.path.join(venv['bin_dir'], 'hg'))
+    install_mercurials(venv, hg=os.path.join(venv['bin_dir'], 'hg'))
 
     return venv
 
@@ -186,5 +186,8 @@ if __name__ == '__main__':
 
     # This is a hack to support create-test-environment.
     if sys.argv[1] == 'install-mercurials':
+        venv = {
+            'path': os.path.join(ROOT, 'venv'),
+        }
         # PATH has global virtualenv activated.
-        install_mercurials(hg='hg')
+        install_mercurials(venv, hg='hg')

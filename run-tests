@@ -261,7 +261,7 @@ if __name__ == '__main__':
         except KeyError:
             pass
 
-        mercurials_dir = os.path.join(HERE, 'venv', 'mercurials')
+        mercurials_dir = os.path.join(os.environ['VIRTUAL_ENV'], 'mercurials')
 
         # Maps directories/versions to lists of tests to run.
         # We normalize X.Y.Z to X.Y for compatibility because the monthly
