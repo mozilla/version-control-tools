@@ -79,10 +79,15 @@ def on_hgmo_message(body, message, config):
 
     repo_url = body['payload']['data']['repo_url']
     logger.warn('observed push to %s' % repo_url)
-    if repo_url != config['hg_converted']:
-        message.ack()
-        return
 
+    if repo_url == config['hg_converted']:
+        on_hg_converted(body)
+
+    message.ack()
+
+
+def on_hg_converted(body):
+    """Trigger overlay service when the linearize repo is updated."""
     heads = body['payload']['data']['heads']
     if len(heads) != 1:
         raise Exception('unexpected heads count in upstream')
@@ -93,7 +98,6 @@ def on_hgmo_message(body, message, config):
                            b'/usr/bin/systemctl', b'start',
                            b'servo-overlay.service'],
                           cwd='/', bufsize=1)
-    message.ack()
 
 
 def run_pulse_listener(config):
