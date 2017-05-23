@@ -11,12 +11,13 @@ import kombu
 
 class Consumer(object):
     """Represents a Pulse consumer to version control data."""
-    def __init__(self, conn, github_exchange, hgmo_exchange):
+    def __init__(self, conn, github_exchange, hgmo_exchange, extra_data):
         self._conn = conn
         self._consumer = None
         self._entered = False
         self._github_exchange = github_exchange
         self._hgmo_exchange = hgmo_exchange
+        self._extra_data = extra_data
 
         self.github_callbacks = []
         self.hgmo_callbacks = []
@@ -51,17 +52,18 @@ class Consumer(object):
             except socket.timeout:
                 pass
 
-    def _on_message(self, body, message):
+    def on_message(self, body, message):
         exchange = message.delivery_info['exchange']
         if exchange == self._github_exchange:
             for cb in self.github_callbacks:
-                cb(body, message)
+                cb(body, message, self._extra_data)
         elif exchange == self._hgmo_exchange:
             for cb in self.hgmo_callbacks:
-                cb(body, message)
+                cb(body, message, self._extra_data)
         else:
             raise Exception('received message from unknown exchange: %s' %
                             exchange)
+
 
 def get_consumer(userid, password,
                  hostname='pulse.mozilla.org',
@@ -70,7 +72,8 @@ def get_consumer(userid, password,
                  github_exchange='exchange/github-webhooks/v1',
                  hgmo_exchange='exchange/hgpushes/v2',
                  github_queue=None,
-                 hgmo_queue=None):
+                 hgmo_queue=None,
+                 extra_data=None):
     """Obtain a Pulse consumer that can handle received messages.
 
     Caller passes Pulse connection details, including credentials. These
@@ -90,10 +93,13 @@ def get_consumer(userid, password,
     The returned ``Consumer`` must be active as a context manager for processing
     to work.
 
-    The callback functions receive arguments ``body`` and ``message``.
-    ``body`` is the decoded message body. ``message`` is the AMQP message
-    from Pulse. **Callbacks must call ``message.ack()`` to acknowledge the
-    message when done processing it.**
+    The callback functions receive arguments ``body``, ``message``,
+    and ``extra_data``. ``body`` is the decoded message body. ``message`` is
+    the AMQP message from Pulse.  ``extra_data`` holds optional data for the
+    consumers.
+
+     **Callbacks must call ``message.ack()`` to acknowledge the message when
+     done processing it.**
     """
     if not github_queue and not hgmo_queue:
         raise Exception('one of github_queue or hgmo_queue must be specified')
@@ -148,8 +154,8 @@ def get_consumer(userid, password,
                                channel=conn)
         queues.append(hg_queue)
 
-    consumer = Consumer(conn, github_exchange, hgmo_exchange)
-    kombu_consumer = conn.Consumer(queues, callbacks=[consumer._on_message],
+    consumer = Consumer(conn, github_exchange, hgmo_exchange, extra_data)
+    kombu_consumer = conn.Consumer(queues, callbacks=[consumer.on_message],
                                    auto_declare=False)
     consumer._consumer = kombu_consumer
 

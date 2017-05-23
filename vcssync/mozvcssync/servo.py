@@ -43,7 +43,7 @@ def run_pulse_listener(c):
                                   hgmo_queue=c['pulse_hgmo_queue'])
 
     # Trigger linearization + hg conversion after git push.
-    def on_github_message(body, message):
+    def on_github_message(body, message, _):
         # We only care about push events.
         if body['event'] != 'push':
             logger.warn('ignoring non-push event: %s' % body['event'])
@@ -82,7 +82,7 @@ def run_pulse_listener(c):
 
     # Overlay Servo changesets from the pristine, converted repo onto
     # a Firefox repo in response to new hg changesets.
-    def on_hgmo_message(body, message):
+    def on_hgmo_message(body, message, _):
         if body['payload']['type'] != 'changegroup.1':
             message.ack()
             return
