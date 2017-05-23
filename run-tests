@@ -78,6 +78,12 @@ if __name__ == '__main__':
     if not vctdocker:
         options.no_docker = True
 
+    # This is somewhat arbitrary. It makes version management logic a bit
+    # more complicated and isn't worth supporting.
+    if options.all_versions and options.with_hg:
+        print('abort: --all-versions and --with-hg are mutually exclusive')
+        sys.exit(1)
+
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     filter_args = {
         '--all-versions',
