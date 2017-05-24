@@ -99,7 +99,7 @@ Backing out a single changeset
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
-Including the local numeric ID is silly, but allowed
+Including the local numeric ID is silly and deprecated, but allowed
 
   $ hg backout -r . -m 'backout 5:41f80b316d60'
   reverting foo
@@ -111,6 +111,7 @@ Including the local numeric ID is silly, but allowed
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  Warning: Rev 8b918b1082f8 has malformed backout message.
 
 Checking "revert to" syntax
 
@@ -345,6 +346,7 @@ Test some bad commit messages
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  Warning: Rev 0c2851fbf7ba has malformed backout message.
   
   
   ************************** ERROR ****************************
@@ -603,10 +605,61 @@ Messages without "Source-Revision: " aren't excluded
   adding file changes
   added 1 changesets with 1 changes to 1 files
   (768c84b471a9 looks like a vendoring change; ignoring commit message hook)
-Change a random file and make sure someone isn't cheating the hook
+
+Malformed backout message in vendored path
+
+  $ touch servo/bar
+  $ hg -q commit -A -m 'backout bug 123456'
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  
+  ************************** ERROR ****************************
+  Rev 169f75837913 has malformed backout message.
+  test
+  backout bug 123456
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]
+
+Well formed backout message in vendored path
+
+  $ hg -q commit --amend -m 'Backout changeset 287b02e21fa2'
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+Malformed backout message outside of vendored path should be allowed but show
+a warning.
 
   $ mkdir not-vendored
   $ touch not-vendored/foo
+  $ hg -q commit -A -m 'backout bug 123456'
+  $ hg push
+  pushing to $TESTTMP/striptest/server-vendor
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  Warning: Rev 018e10233c06 has malformed backout message.
+
+Change a random file and make sure someone isn't cheating the hook
+
+  $ touch not-vendored/bar
   $ hg -q commit -A -l - << EOF
   > servo: Merge #42 - Not really servo
   > 
@@ -626,7 +679,7 @@ Change a random file and make sure someone isn't cheating the hook
   
   
   ************************** ERROR ****************************
-  Rev 39998d39f844 needs "Bug N" or "No bug" in the commit message.
+  Rev b2f8699d705c needs "Bug N" or "No bug" in the commit message.
   test
   servo: Merge #42 - Not really servo
   

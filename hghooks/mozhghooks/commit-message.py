@@ -16,7 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 
 import re
-from mercurial.node import hex, short
+from mercurial.node import short
+from mozautomation import commitparser
 
 INVALID_REVIEW_FLAG_RE = re.compile(r'[\s.;]r\?(?:\w|$)')
 
@@ -37,12 +38,6 @@ VENDORED_PATHS = (
 
 
 def is_vendor_ctx(ctx):
-    # This check isn't strictly necessary. But it does filter out
-    # most changesets without having to inspect the file list.
-    desc = ctx.description()
-    if 'Source-Revision: ' not in desc:
-        return False
-
     # Other hooks should ensure that only certain users can change
     # vendored paths.
     if not any(f.startswith(VENDORED_PATHS) for f in ctx.files()):
@@ -59,16 +54,32 @@ def is_good_message(ui, c):
             '%s\n%s\n%s\n'
             '*************************************************************\n'
             '\n\n'
-            % (fmt.format(rev=hex(c.node())[:12]), c.user(), c.description())
+            % (fmt.format(rev=c.hex()[:12]), c.user(), c.description())
         )
-
-    if is_vendor_ctx(c):
-        ui.write('(%s looks like a vendoring change; ignoring commit message '
-                 'hook)\n' % short(c.node()))
-        return True
 
     desc = c.description()
     firstline = desc.splitlines()[0]
+
+    # Ensure backout commit descriptions are well formed.
+    if commitparser.is_backout(desc):
+        try:
+            if not commitparser.parse_backouts(desc, strict=True):
+                raise ValueError('Rev {rev} has malformed backout message.')
+            nodes, bugs = commitparser.parse_backouts(desc, strict=True)
+            if not nodes:
+                raise ValueError('Rev {rev} is missing backed out revisions.')
+        except ValueError as e:
+            # Reject invalid backout messages on vendored paths, warn otherwise.
+            if is_vendor_ctx(c):
+                message(str(e))
+                return False
+            ui.write('Warning: %s\n' % str(e).format(rev=c.hex()[:12]))
+
+    # Vendored merges must reference source revisions.
+    if 'Source-Revision: ' in desc and is_vendor_ctx(c):
+        ui.write('(%s looks like a vendoring change; ignoring commit message '
+                 'hook)\n' % short(c.node()))
+        return True
 
     if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld"]:
         return True
