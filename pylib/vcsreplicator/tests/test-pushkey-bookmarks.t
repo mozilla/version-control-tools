@@ -214,6 +214,94 @@ But processing the next changegroup message should advance the bookmark by 1
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               3:e20ecd72ffa9
 
+Now test bookmark divergence
+
+  $ hg bookmark divergent
+  $ hg push -B divergent
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  searching for changes
+  no changes found
+  remote: recorded updates to bookmarks in replication log in \d+\.\d+s (re)
+  exporting bookmark divergent
+  [1]
+
+  $ consumer --dump --partition 2
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    key: divergent
+    name: hg-pushkey-1
+    namespace: bookmarks
+    new: e20ecd72ffa991598a1b26333788345377318231
+    old: ''
+    path: '{moz}/mozilla-central'
+    ret: true
+
+  $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 16
+  $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 17
+  $ consumer --onetime
+  vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 18
+  vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[divergent]
+  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for bookmarks[divergent]
+
+  $ hg -q up 0
+  $ echo diverge > foo
+  $ hg commit -m 'create divergent head'
+  created new head
+  $ hg bookmark -f divergent
+  $ hg push -f -B divergent
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
+  remote: recorded push in pushlog
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/mozilla-central/rev/e84fdf206e79496713b3a56eae2e16c490475cc8
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  updating bookmark divergent
+
+  $ consumer --dump --partition 2
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    heads:
+    - e84fdf206e79496713b3a56eae2e16c490475cc8
+    name: hg-changegroup-2
+    nodecount: 1
+    path: '{moz}/mozilla-central'
+    source: serve
+
+  $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 19
+  $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 20
+  $ consumer --onetime
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 21
+  vcsreplicator.consumer pulling 1 heads (e84fdf206e79496713b3a56eae2e16c490475cc8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
+
+TODO bug 1268963 divergence should not occur
+
+  $ hg -R $TESTTMP/repos/mozilla-central bookmarks
+     divergent                 3:e20ecd72ffa9
+     divergent@1               4:e84fdf206e79
+     my-bookmark               3:e20ecd72ffa9
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/mozilla-central bookmarks
+     divergent                 3:e20ecd72ffa9
+     divergent@1               4:e84fdf206e79
+     my-bookmark               3:e20ecd72ffa9
+
 Cleanup
 
   $ hgmo clean
