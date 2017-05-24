@@ -713,32 +713,30 @@ def processbundlesmanifest(orig, repo, proto):
 
 def filelog(orig, web, req, tmpl):
     """Wraps webcommands.filelog to provide pushlog metadata to template."""
+    # Template wrapper to add pushlog data to entries when the template is
+    # evaluated.
+    class tmplwrapper(tmpl.__class__):
+        def __call__(self, *args, **kwargs):
+            for entry in kwargs.get('entries', []):
+                push = web.repo.pushlog.pushfromnode(bin(entry['node']))
+                if push:
+                    entry['pushid'] = push.pushid
+                    entry['pushdate'] = util.makedate(push.when)
+                else:
+                    entry['pushid'] = None
+                    entry['pushdate'] = None
 
-    if hasattr(web.repo, 'pushlog'):
+            return super(tmplwrapper, self).__call__(*args, **kwargs)
 
-        class _tmpl(object):
+    orig_class = tmpl.__class__
+    try:
+        if hasattr(web.repo, 'pushlog'):
+            tmpl.__class__ = tmplwrapper
 
-            def __init__(self):
-                self.defaults = tmpl.defaults
-
-            def __call__(self, *args, **kwargs):
-                self.args = args
-                self.kwargs = kwargs
-                return self
-
-        t = orig(web, req, _tmpl())
-        for entry in t.kwargs['entries']:
-            push = web.repo.pushlog.pushfromnode(bin(entry['node']))
-            if push:
-                entry['pushid'] = push.pushid
-                entry['pushdate'] = util.makedate(push.when)
-            else:
-                entry['pushid'] = None
-                entry['pushdate'] = None
-
-        return tmpl(*t.args, **t.kwargs)
-    else:
-        return orig(web, req, tmpl)
+        for r in orig(web, req, tmpl):
+            yield r
+    finally:
+        tmpl.__class__ = orig_class
 
 
 def extsetup(ui):
