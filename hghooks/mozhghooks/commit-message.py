@@ -70,9 +70,7 @@ def is_good_message(ui, c):
     desc = c.description()
     firstline = desc.splitlines()[0]
 
-    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld",
-                    "Gaia Pushbot <release+gaiajson@mozilla.com>",
-                    "B2G Bumper Bot <release+b2gbumper@mozilla.com>"]:
+    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld"]:
         return True
 
     if trySyntax.search(desc):
