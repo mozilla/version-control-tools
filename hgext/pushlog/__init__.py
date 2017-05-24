@@ -12,7 +12,7 @@ import sqlite3
 import stat
 import time
 
-from mercurial.node import bin
+from mercurial.node import bin, hex
 from mercurial import (
     cmdutil,
     encoding,
@@ -379,22 +379,27 @@ class pushlog(object):
             if current:
                 yield current
 
-    def pushfromchangeset(self, ctx):
+    def pushfromnode(self, node):
         """Obtain info about a push that added the specified changeset.
 
         Returns a Push namedtuple of (pushid, who, when, [nodes]) or None if
-        there is no pushlog info for this changeset.
+        there is no pushlog info for this node.
+
+        Argument is specified as binary node.
         """
         with self.conn(readonly=True) as c:
             if not c:
                 return None
 
             res = c.execute('SELECT pushid from changesets WHERE node=?',
-                            (ctx.hex(),)).fetchone()
+                            (hex(node),)).fetchone()
             if not res:
                 return None
 
             return self.pushfromid(c, res[0])
+
+    def pushfromchangeset(self, ctx):
+        return self.pushfromnode(ctx.node())
 
     def pushfromid(self, conn, pushid):
         """Obtain a push from its numeric push id.
