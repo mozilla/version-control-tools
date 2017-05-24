@@ -726,17 +726,9 @@ def filelog(orig, web, req, tmpl):
                 self.kwargs = kwargs
                 return self
 
-        class _ctx(object):
-
-            def __init__(self, hex):
-                self._hex = hex
-
-            def hex(self):
-                return self._hex
-
         t = orig(web, req, _tmpl())
         for entry in t.kwargs['entries']:
-            push = web.repo.pushlog.pushfromchangeset(_ctx(entry['node']))
+            push = web.repo.pushlog.pushfromnode(bin(entry['node']))
             if push:
                 entry['pushid'] = push.pushid
                 entry['pushdate'] = util.makedate(push.when)
