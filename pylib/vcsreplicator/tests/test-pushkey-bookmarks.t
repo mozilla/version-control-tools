@@ -289,17 +289,13 @@ Now test bookmark divergence
   vcsreplicator.consumer pulling 1 heads (e84fdf206e79496713b3a56eae2e16c490475cc8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
-TODO bug 1268963 divergence should not occur
-
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
-     divergent                 3:e20ecd72ffa9
-     divergent@1               4:e84fdf206e79
+     divergent                 4:e84fdf206e79
      my-bookmark               3:e20ecd72ffa9
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/mozilla-central bookmarks
-     divergent                 3:e20ecd72ffa9
-     divergent@1               4:e84fdf206e79
+     divergent                 4:e84fdf206e79
      my-bookmark               3:e20ecd72ffa9
 
 Cleanup

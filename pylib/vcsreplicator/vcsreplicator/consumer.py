@@ -20,6 +20,11 @@ from .util import (
     wait_for_topic,
 )
 
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+CONSUMER_EXT = os.path.join(HERE, 'consumerext.py')
+
+
 logger = logging.getLogger('vcsreplicator.consumer')
 
 MAX_BUFFER_SIZE = 104857600 # 100 MB
@@ -259,7 +264,11 @@ def process_hg_sync(config, path, requirements, hgrc, heads):
 
 
 def get_hg_client(path):
-    return hglib.open(path, encoding='UTF-8')
+    # This engages some client-specific functionality to mirror changes instead
+    # of using default Mercurial semantics.
+    configs = ['extensions.vcsreplicatorconsumer=%s' % CONSUMER_EXT]
+
+    return hglib.open(path, encoding='UTF-8', configs=configs)
 
 
 def update_hgrc(repo_path, content):
