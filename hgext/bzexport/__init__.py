@@ -674,18 +674,21 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
 
     # Add "Bug nnnn - " to the beginning of the description
     if update_patch == 'mq':
-        ph = mq.patchheader(q.join(rev), q.plainmode)
-        msg = [s.decode('utf-8') for s in ph.message]
-        if not msg:
-            msg = ["Bug %s patch" % bug]
-        elif not BUG_RE.search(msg[0]):
-            msg[0] = "Bug %s - %s" % (bug, msg[0])
-        opts = {
-            'amend': True,
-            'git': True,
-            'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]
-        }
-        mq.refresh(ui, repo, **opts)
+        if not q.applied or q.applied[-1].name != rev:
+            ui.write("skipping update of non-qtip patch\n")
+        else:
+            ph = mq.patchheader(q.join(rev), q.plainmode)
+            msg = [s.decode('utf-8') for s in ph.message]
+            if not msg:
+                msg = ["Bug %s patch" % bug]
+            elif not BUG_RE.search(msg[0]):
+                msg[0] = "Bug %s - %s" % (bug, msg[0])
+            opts = {
+                'amend': True,
+                'git': True,
+                'message': '\n'.join(msg).encode('utf-8'), 'include': ["re:."]
+            }
+            mq.refresh(ui, repo, **opts)
     elif update_patch == 'amend':
         msg = repo[rev].description().splitlines()
         changed = False
