@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically trigger servo-backout-pr service
+After=local-fs.target network.target nss-lookup.target
+PartOf=servo-sync.target
+
+[Timer]
+OnUnitInactiveSec=600
+OnBootSec=60
+
+[Install]
+WantedBy=servo-sync.target
