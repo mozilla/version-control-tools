@@ -37,16 +37,19 @@ UNIT_TEST_DIRS = {
         'venvs': {'global'},
     },
     'git/tests': {
-        'venvs': {'global',},
+        'venvs': {'global'},
+    },
+    'hgext/overlay': {
+        'venvs': {'vcssync'},
     },
     'hgserver/tests': {
-        'venvs': {'global',},
+        'venvs': {'global'},
     },
     'pylib': {
-        'venvs': {'global', 'hgdev',},
+        'venvs': {'global', 'hgdev'},
     },
     'vcssync/tests': {
-        'venvs': {'vcssync',},
+        'venvs': {'vcssync'},
     },
 }
 
