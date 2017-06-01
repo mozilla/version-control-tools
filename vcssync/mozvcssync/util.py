@@ -36,7 +36,7 @@ def clean_hg_repo(logger, path):
     """Clean a Mercurial working directory."""
     logger.warn('reverting all local changes and purging %s' % path)
     with hglib.open(path, 'utf-8', [b'extensions.purge=']) as repo:
-        run_hg(logger, repo, [b'revert', b'--no-backup', b'--all'])
+        run_hg(logger, repo, [b'--quiet', b'revert', b'--no-backup', b'--all'])
         run_hg(logger, repo, [b'purge', b'--all'])
 
 
