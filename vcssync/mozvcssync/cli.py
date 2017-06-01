@@ -213,7 +213,7 @@ def overlay_hg_repos_cli():
     parser.add_argument('--hg', help='hg executable to use')
     parser.add_argument('--into', required=True,
                         help='Subdirectory into which changesets will be '
-                              'applied')
+                             'applied')
     parser.add_argument('source_repo_url',
                         help='URL of repository whose changesets will be '
                              'overlayed')
@@ -222,6 +222,8 @@ def overlay_hg_repos_cli():
                              'overlayed')
     parser.add_argument('dest_repo_path',
                         help='Local path to clone of <dest_repo_url>')
+    parser.add_argument('--source_revs',
+                        help='Revset describing changesets to overlay')
     parser.add_argument('--result-push-url',
                         help='URL where to push the overlayed result')
 
@@ -242,6 +244,7 @@ def overlay_hg_repos_cli():
                 args.source_repo_url,
                 args.dest_repo_url,
                 args.dest_repo_path,
+                source_rev=args.source_revs,
                 dest_prefix=args.into,
                 result_push_url=args.result_push_url)
             sys.exit(0)
