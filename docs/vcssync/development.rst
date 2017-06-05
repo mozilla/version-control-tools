@@ -4,6 +4,32 @@
 Development Guide
 =================
 
+Repositories and Relevant Code
+==============================
+
+Most code related to version control syncing is in the
+`version-control-tools repo <https://hg.mozilla.org/hgcustom/version-control-tools>`_.
+In this repository, the following directories are relevant:
+
+ansible/roles/vcs-sync
+   Ansible role for version control sync server.
+docs/vcssync
+   Sphinx documentation for everything related to version control
+   synchronization (you are reading this now).
+vcssync
+   Python package containing code and services for everything related
+   to version control synchronization.
+
+Code reviews for everything in version-control-tools should be conducted
+with MozReview. Reviews should be directed at ``gps`` or ``glob``.
+
+Terraform configs for AWS infrastructure for VCS Sync lives in the
+`devservices-aws repo <https://github.com/mozilla-platform-ops/devservices-aws>`_,
+specifically in the ``vcssync`` directory. Change proposals are submitted
+via GitHub Pull Requests. Reviews are typically handled by someone
+on the Ops Team, namely ``fubar``, ``dividehex``, or ``dhouse. For new
+infrastructure, ``gps`` or ``glob`` should likely take a look.
+
 Creating a Development and Testing Environment
 ==============================================
 
