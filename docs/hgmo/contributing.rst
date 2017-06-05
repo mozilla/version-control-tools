@@ -4,6 +4,53 @@
 Contributing
 ============
 
+Repositories and Relevant Files
+===============================
+
+Most code for hg.mozilla.org and related services can be found in the
+`version-control-tools repo <https://hg.mozilla.org/hgcustom/version-control-tools>`_.
+In this repo, the following directories are relevant:
+
+ansible/roles/hg-ssh
+   Ansible role for the hg.mozilla.org SSH/master servers.
+ansible/roles/hg-ssh-server
+   Shared Ansible role for Mercurial SSH servers.
+ansible/roles/hg-web
+   Ansible role for the hg.mozilla.org HTTP/mirror servers.
+docs/hgmo
+   Sphinx documentation related to hg.mozilla.org (you are reading this now).
+hgext
+   Various Mercurial extensions. Many of which are used on hg.mozilla.org.
+hgext/hgmo
+   Contains hodgepodge of Mercurial customizations specific to hg.mozilla.org.
+hghooks
+   Mercurial hooks that run (primarily) on hg.mozilla.org.
+hgserver
+   Mercurial code and tests specific to Mercurial servers.
+hgtemplates
+   Mercurial templates. Contains both upstream templates and Mozilla
+   customizations.
+hgtemplates/gitweb_mozilla
+   Fork of the ``gitweb`` Mercurial web style with Mozilla customizations.
+   If you want to hack the theming on hg.mozilla.org, this is what you
+   modify.
+hgwsgi
+   WSGI and Mercurial config files for repos on hg.mozilla.org.
+pylib/mozautomation
+   Python package containing utility code for things like defining names
+   and URLs of common repos, parsing commit messages, etc.
+pylib/mozhg
+   Python package containing shared Mercurial code (code using Mercurial
+   APIs and therefore covered by the GPL).
+pylib/vcsreplicator
+   Code for managing replication of data from Mercurial master server
+   to read-only mirrors.
+
+Terraform code for managing associated AWS infrastructure can be found
+in the
+`devservices-aws repo <https://github.com/mozilla-platform-ops/devservices-aws>`_
+under the ``hgmo`` directory.
+
 Hacking the Theming
 ===================
 
