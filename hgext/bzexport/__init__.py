@@ -52,7 +52,7 @@ import urlparse
 from cStringIO import StringIO
 
 from mercurial.i18n import _
-from mercurial import cmdutil, commands, context, node, patch, util
+from mercurial import cmdutil, commands, context, encoding, error, node, patch, scmutil, util
 from hgext import mq, histedit
 
 OUR_DIR = os.path.dirname(__file__)
@@ -458,13 +458,16 @@ def infer_arguments(ui, repo, args, opts):
                 # unapplied patches will be found here.
                 rev = args[0]
                 ui.debug("interpreting '%s' as an (unapplied) mq patch")
-            else:
+            elif re.match(r'\w[\w\.\-]+$', args[0]):
                 # Assume it's a bug alias. The REST API will fail with bad bug
                 # numbers.
                 bug = args[0]
                 if ' ' in bug:
                     raise util.Abort(_("Invalid arguments. Can only pass revision and/or bug number"))
                 ui.debug("interpreting '%s' as a bug alias. Fingers crossed.")
+            else:
+                # Assume a revset.
+                rev = args[0]
 
         # With zero args we'll guess at both, and if we fail we'll
         # fail later.
@@ -906,17 +909,26 @@ def bzexport(ui, repo, *args, **opts):
     context = ui.config("bzexport", "unified", ui.config("diff", "unified", None))
     if context:
         diffopts.context = int(context)
-    if rev in repo:
-        description_from_patch = repo[rev].description().decode('utf-8')
+    description_from_patch = None
+    if hasattr(repo, 'mq'):
+        q = repo.mq
+        try:
+            contents = q.opener(q.lookup(rev), "r")
+            description_from_patch = '\n'.join(mq.patchheader(q.join(rev), q.plainmode).message)
+        except error.Abort:
+            # mq failed to find a patch named rev. Fall through and do a normal
+            # lookup instead.
+            pass
+
+    if description_from_patch is None:
+        ctx = scmutil.revsingle(repo, rev)
+        rev = node.hex(ctx.node())
+        description_from_patch = encoding.tolocal(ctx.description())
         if hasattr(cmdutil, "export"):
             cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
         else:
             # Support older hg versions
             patch.export(repo, [rev], fp=contents, opts=diffopts)
-    else:
-        q = repo.mq
-        contents = q.opener(q.lookup(rev), "r")
-        description_from_patch = '\n'.join(mq.patchheader(q.join(rev), q.plainmode).message)
 
     # Just always use the rev name as the patch name. Doesn't matter much,
     # unless you want to avoid obsoleting existing patches when uploading a
