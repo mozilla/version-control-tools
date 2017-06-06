@@ -52,8 +52,8 @@ import urlparse
 from cStringIO import StringIO
 
 from mercurial.i18n import _
-from mercurial import cmdutil, util, patch, commands
-from hgext import mq
+from mercurial import cmdutil, commands, context, node, patch, util
+from hgext import mq, histedit
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -61,6 +61,7 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import bzauth
 import bz
 from mozautomation.commitparser import BUG_RE
+from mozhg.rewrite import newparents, replacechangesets
 
 testedwith = '3.8 3.9 4.0 4.1 4.2'
 minimumhgversion = '3.7'
@@ -701,16 +702,32 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
             msg = ["Bug %s patch" % bug]
 
         if changed:
+            newmessage = '\n'.join(msg).encode('utf-8')
             if repo[rev] == repo['.']:
                 opts = {
                     'amend': True,
                     'git': True,
-                    'message': '\n'.join(msg).encode('utf-8'),
+                    'message': newmessage,
                     'logfile': None,
                 }
                 commands.commit(ui, repo, **opts)
             else:
-                ui.write("WARNING: Can only update description of working directory's parent rev\n")
+                # Rewrite commit messages for patches deeper in the stack
+                # through the power of mozhg.
+                def makememctx(repo, ctx, revmap, copyfilectxfn):
+                    msg = newmessage if repo[rev] == ctx else ctx.description()
+                    parents = newparents(repo, ctx, revmap)
+                    return context.memctx(repo, parents, msg,
+                                          ctx.files(), copyfilectxfn,
+                                          user=ctx.user(),
+                                          date=ctx.date(),
+                                          extra=dict(ctx.extra()))
+
+                rev = repo.lookup(rev)
+                todo = [repo.lookup(n) for n in repo.revs('%n::', rev)]
+                nodemap = replacechangesets(repo, todo, makememctx,
+                                            backuptopic='addbugnum')
+                rev = node.short(nodemap.get(rev, rev))
 
     return rev
 
