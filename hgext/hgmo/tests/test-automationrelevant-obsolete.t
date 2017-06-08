@@ -118,10 +118,6 @@ Unless --hidden is used
         ],
         "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
         "pushid": 3,
-        "pushnodes": [
-          "11743f8081842eb047711e85120177ed46be343e",
-          "3208166ea10954e86c390c32fe6f7166f06161b2"
-        ],
         "pushuser": "testuser",
         "rev": 3,
         "reviewers": []
@@ -151,10 +147,6 @@ Unless --hidden is used
         ],
         "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
         "pushid": 3,
-        "pushnodes": [
-          "11743f8081842eb047711e85120177ed46be343e",
-          "3208166ea10954e86c390c32fe6f7166f06161b2"
-        ],
         "pushuser": "testuser",
         "rev": 4,
         "reviewers": []

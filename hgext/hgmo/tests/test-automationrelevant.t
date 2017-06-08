@@ -155,11 +155,6 @@ web command for exposing automation relevance works
         ],
         "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
         "pushid": 3,
-        "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
-          "66a66c6c6ae312ec88240754300468a6cea8f71d",
-          "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ],
         "pushuser": "testuser",
         "rev": 3,
         "reviewers": []
@@ -189,11 +184,6 @@ web command for exposing automation relevance works
         ],
         "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
         "pushid": 3,
-        "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
-          "66a66c6c6ae312ec88240754300468a6cea8f71d",
-          "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ],
         "pushuser": "testuser",
         "rev": 4,
         "reviewers": []
@@ -223,11 +213,6 @@ web command for exposing automation relevance works
         ],
         "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
         "pushid": 3,
-        "pushnodes": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
-          "66a66c6c6ae312ec88240754300468a6cea8f71d",
-          "5d04c4fd236c19e241d1587e120b39840344eee8"
-        ],
         "pushuser": "testuser",
         "rev": 5,
         "reviewers": []

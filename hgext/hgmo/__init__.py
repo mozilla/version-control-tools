@@ -455,6 +455,15 @@ def automationrelevancewebcommand(web, req, tmpl):
         for rev in revs:
             ctx = urepo[rev]
             entry = webutil.changelistentry(web, ctx, tmpl)
+
+            # The pushnodes list is redundant with data from other changesets.
+            # The amount of redundant data for pushes containing N>100
+            # changesets can add up to megabytes in size.
+            try:
+                del entry['pushnodes']
+            except KeyError:
+                pass
+
             # Some items in changelistentry are generators, which json.dumps()
             # can't handle. So we expand them.
             for k, v in entry.items():
