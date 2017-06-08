@@ -190,6 +190,12 @@ class pushlog(object):
         # greater than the repo's.
         self.repo = repo
 
+        # Caches of pushlog data to avoid database I/O.
+        # int -> Push
+        self._push_by_id = {}
+        # bin node -> int
+        self._push_id_by_node = {}
+
     def _getconn(self, readonly=False, tr=None):
         """Get a SQLite connection to the pushlog.
 
@@ -388,6 +394,10 @@ class pushlog(object):
 
         Argument is specified as binary node.
         """
+        if node in self._push_id_by_node:
+            pushid = self._push_id_by_node[node]
+            return self._push_by_id[pushid] if pushid is not None else None
+
         with self.conn(readonly=True) as c:
             if not c:
                 return None
@@ -411,6 +421,10 @@ class pushlog(object):
         Returns a Push namedtuple or None if there is no push with this push
         id.
         """
+        push = self._push_by_id.get(pushid)
+        if push:
+            return push
+
         res = conn.execute('SELECT id, user, date, node from pushlog '
                            'LEFT JOIN changesets on id=pushid '
                            'WHERE id=? ORDER BY rev ASC', (pushid,))
@@ -423,6 +437,35 @@ class pushlog(object):
             return None
 
         return Push(pushid, who, when, nodes)
+
+    @contextlib.contextmanager
+    def cache_data_for_nodes(self, nodes):
+        """Given an iterable of nodes, cache pushlog data for them.
+
+        Due to current API design, many pushlog methods open a SQLite
+        database, perform a query, then close the database. Calling these
+        within tight loops can be slow.
+
+        This context manager can be used to pre-load pushlog data to
+        avoid inefficient SQLite access patterns.
+        """
+        with self.conn(readonly=True) as c:
+            if not c:
+                return
+
+            try:
+                for node in nodes:
+                    push = self._push_from_node(c, node)
+                    if push:
+                        self._push_id_by_node[node] = push.pushid
+                        self._push_by_id[push.pushid] = push
+                    else:
+                        self._push_id_by_node[node] = None
+
+                yield
+            finally:
+                self._push_id_by_node = {}
+                self._push_by_id = {}
 
     def verify(self):
         # Attempt to create database (since .pushes below won't).

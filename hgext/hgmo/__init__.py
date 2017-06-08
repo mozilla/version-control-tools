@@ -444,28 +444,36 @@ def automationrelevancewebcommand(web, req, tmpl):
     # about what to do if the changeset isn't visible.
     urepo = repo.unfiltered()
     revs = list(urepo.revs('automationrelevant(%r)', req.form['node'][0]))
-    for rev in revs:
-        ctx = urepo[rev]
-        entry = webutil.changelistentry(web, ctx, tmpl)
-        # Some items in changelistentry are generators, which json.dumps()
-        # can't handle. So we expand them.
-        for k, v in entry.items():
-            # "files" is a generator that attempts to call a template.
-            # Don't even bother and just repopulate it.
-            if k == 'files':
-                entry['files'] = sorted(ctx.files())
-            elif k == 'allparents':
-                entry['parents'] = [p['node'] for p in v()]
-                del entry['allparents']
-            # These aren't interesting to us, so prune them. The
-            # original impetus for this was because "changelogtag"
-            # isn't part of the json template and adding it is non-trivial.
-            elif k in deletefields:
-                del entry[k]
-            elif isinstance(v, types.GeneratorType):
-                entry[k] = list(v)
 
-        csets.append(entry)
+    # The pushlog extensions wraps webutil.commonentry and the way it is called
+    # means pushlog opens a SQLite connection on every call. This is inefficient.
+    # So we pre load and cache data for pushlog entries we care about.
+    cl = urepo.changelog
+    nodes = [cl.node(rev) for rev in revs]
+
+    with repo.unfiltered().pushlog.cache_data_for_nodes(nodes):
+        for rev in revs:
+            ctx = urepo[rev]
+            entry = webutil.changelistentry(web, ctx, tmpl)
+            # Some items in changelistentry are generators, which json.dumps()
+            # can't handle. So we expand them.
+            for k, v in entry.items():
+                # "files" is a generator that attempts to call a template.
+                # Don't even bother and just repopulate it.
+                if k == 'files':
+                    entry['files'] = sorted(ctx.files())
+                elif k == 'allparents':
+                    entry['parents'] = [p['node'] for p in v()]
+                    del entry['allparents']
+                # These aren't interesting to us, so prune them. The
+                # original impetus for this was because "changelogtag"
+                # isn't part of the json template and adding it is non-trivial.
+                elif k in deletefields:
+                    del entry[k]
+                elif isinstance(v, types.GeneratorType):
+                    entry[k] = list(v)
+
+            csets.append(entry)
 
     # Advertise whether the requested revision is visible (non-obsolete).
     if csets:
