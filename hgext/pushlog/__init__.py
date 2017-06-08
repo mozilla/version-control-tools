@@ -392,12 +392,15 @@ class pushlog(object):
             if not c:
                 return None
 
-            res = c.execute('SELECT pushid from changesets WHERE node=?',
-                            (hex(node),)).fetchone()
-            if not res:
-                return None
+            return self._push_from_node(c, node)
 
-            return self.pushfromid(c, res[0])
+    def _push_from_node(self, conn, node):
+        res = conn.execute('SELECT pushid from changesets WHERE node=?',
+                           (hex(node),)).fetchone()
+        if not res:
+            return None
+
+        return self.pushfromid(conn, res[0])
 
     def pushfromchangeset(self, ctx):
         return self.pushfromnode(ctx.node())
