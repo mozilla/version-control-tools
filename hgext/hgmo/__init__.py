@@ -442,7 +442,10 @@ def automationrelevancewebcommand(web, req, tmpl):
     # changesets that have since become hidden. The response exposes whether the
     # requested node is visible, so consumers can make intelligent decisions
     # about what to do if the changeset isn't visible.
-    for ctx in repo.unfiltered().set('automationrelevant(%r)', req.form['node'][0]):
+    urepo = repo.unfiltered()
+    revs = list(urepo.revs('automationrelevant(%r)', req.form['node'][0]))
+    for rev in revs:
+        ctx = urepo[rev]
         entry = webutil.changelistentry(web, ctx, tmpl)
         # Some items in changelistentry are generators, which json.dumps()
         # can't handle. So we expand them.
