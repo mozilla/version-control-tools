@@ -81,21 +81,21 @@ mozbuildinfo is available via web command
       "bug_component_counts": [
         [
           [
-            "Product1", 
+            "Product1",
             "Component 1"
-          ], 
+          ],
           1
         ]
-      ], 
+      ],
       "recommended_bug_component": [
-        "Product1", 
+        "Product1",
         "Component 1"
       ]
-    }, 
+    },
     "files": {
       "moz.build": {
         "bug_component": [
-          "Product1", 
+          "Product1",
           "Component 1"
         ]
       }
@@ -113,27 +113,27 @@ we can request info for specific files
       "bug_component_counts": [
         [
           [
-            "Product1", 
+            "Product1",
             "Component 1"
-          ], 
+          ],
           2
         ]
-      ], 
+      ],
       "recommended_bug_component": [
-        "Product1", 
+        "Product1",
         "Component 1"
       ]
-    }, 
+    },
     "files": {
       "file1": {
         "bug_component": [
-          "Product1", 
+          "Product1",
           "Component 1"
         ]
-      }, 
+      },
       "file2": {
         "bug_component": [
-          "Product1", 
+          "Product1",
           "Component 1"
         ]
       }

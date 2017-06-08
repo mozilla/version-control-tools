@@ -127,6 +127,16 @@ def mozlink(text):
     return commitparser.add_hyperlinks(text)
 
 
+def stream_json(data):
+    """Convert a data structure to a generator of chunks representing JSON."""
+    # We use latin1 as the encoding because all data should be treated as
+    # byte strings. ensure_ascii will escape non-ascii values using \uxxxx.
+    # Also, use stable output and indentation to make testing easier.
+    encoder = json.JSONEncoder(indent=2, sort_keys=True, encoding='latin1',
+                               separators=(',', ': '))
+    return encoder.iterencode(data)
+
+
 def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
     description = encoding.fromlocal(ctx.description())
@@ -309,7 +319,7 @@ def mozbuildinfowebcommand(web, req, tmpl):
     # Round trip to ensure we have valid JSON.
     try:
         d = json.loads(stdout)
-        return json.dumps(d, indent=2, sort_keys=True)
+        return stream_json(d)
     except Exception:
         return json.dumps({'error': 'invalid JSON returned; report this error'},
                           indent=2)
@@ -466,10 +476,7 @@ def automationrelevancewebcommand(web, req, tmpl):
     }
 
     req.respond(HTTP_OK, 'application/json')
-    # We use latin1 as the encoding here because all data should be treated as
-    # byte strings. ensure_ascii will escape non-ascii values using \uxxxx.
-    return json.dumps(data, indent=2, sort_keys=True, encoding='latin1',
-                      separators=(',', ': '))
+    return stream_json(data)
 
 
 def revset_reviewer(repo, subset, x):
