@@ -224,6 +224,7 @@ class pushlog(object):
             create = True
 
         conn = sqlite3.connect(path)
+        conn.text_factory = str
         if not create:
             res = conn.execute(
                 "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
@@ -378,11 +379,6 @@ class pushlog(object):
             lastid = None
             current = None
             for pushid, who, when, rev, node in res:
-                who = who.encode('utf-8')
-
-                # node could be None if no nodes associated with push.
-                if node:
-                    node = node.encode('ascii')
                 if pushid != lastid:
                     if current:
                         yield current
@@ -440,8 +436,7 @@ class pushlog(object):
                            'WHERE id=? ORDER BY rev ASC', (pushid,))
         nodes = []
         for pushid, who, when, node in res:
-            who = who.encode('utf-8')
-            nodes.append(node.encode('ascii'))
+            nodes.append(node)
 
         if not nodes:
             return None
