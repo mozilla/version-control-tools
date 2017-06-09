@@ -22,6 +22,8 @@ changegroup.z_advertize_upgrade = python:mozhghooks.advertise_upgrade.hook
 #pretxnchangegroup.author_format = python:mozhghooks.author_format.hook
 pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
+pretxnclose.populate_caches = python:mozhghooks.populate_caches.hook
+
 [extensions]
 blackbox =
 clonebundles =
