@@ -623,7 +623,8 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 
     return 1
 
-@revsetpredicate('pushhead()')
+
+@revsetpredicate('pushhead()', safe=True)
 def revset_pushhead(repo, subset, x):
     """Changesets that were heads when they were pushed.
 
@@ -642,7 +643,8 @@ def revset_pushhead(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
-@revsetpredicate('pushdate(interval)')
+
+@revsetpredicate('pushdate(interval)', safe=True)
 def revset_pushdate(repo, subset, x):
     """Changesets that were pushed within the interval, see :hg:`help dates`."""
     l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
@@ -658,7 +660,8 @@ def revset_pushdate(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
-@revsetpredicate('pushuser(string)')
+
+@revsetpredicate('pushuser(string)', safe=True)
 def revset_pushuser(repo, subset, x):
     """User name that pushed the changeset contains string.
 
@@ -680,7 +683,8 @@ def revset_pushuser(repo, subset, x):
 
     return subset & revset.generatorset(getrevs())
 
-@revsetpredicate('pushid(int)')
+
+@revsetpredicate('pushid(int)', safe=True)
 def revset_pushid(repo, subset, x):
     """Changesets that were part of the specified numeric push id."""
     l = revset.getargs(x, 1, 1, 'pushid requires one argument')
@@ -704,7 +708,8 @@ def revset_pushid(repo, subset, x):
 
     return subset & pushrevs
 
-@revsetpredicate('pushrev(set)')
+
+@revsetpredicate('pushrev(set)', safe=True)
 def revset_pushrev(repo, subset, x):
     """Changesets that were part of the same push as the specified changeset(s)."""
     l = revset.getset(repo, subset, x)

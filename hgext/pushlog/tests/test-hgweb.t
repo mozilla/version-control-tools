@@ -55,3 +55,253 @@ Push info should show up in changeset view
   Push <a href="/pushloghtml?changeset=82f53df85e9f">2</a> by user2@example.com at *<br /> (glob)
   Push <a href="/pushloghtml?changeset=6c9721b3b4df">2</a> by user2@example.com at *<br /> (glob)
   Push <a href="/pushloghtml?changeset=55482a6fb4b1">1</a> by user1@example.com at *<br /> (glob)
+
+pushhead() works in search
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushhead()" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "third",
+              "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+              "parents": [
+                  "6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 2,
+              "tags": [
+                  "tip"
+              ],
+              "user": "test"
+          },
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "initial",
+              "node": "55482a6fb4b1881fa8f746fd52cf6f096bb21c89",
+              "parents": [],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 1,
+              "tags": [],
+              "user": "test"
+          }
+      ],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushhead()"
+  }
+
+pushdate() works in search
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushdate('>2017')" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "third",
+              "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+              "parents": [
+                  "6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 2,
+              "tags": [
+                  "tip"
+              ],
+              "user": "test"
+          },
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "second",
+              "node": "6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2",
+              "parents": [
+                  "55482a6fb4b1881fa8f746fd52cf6f096bb21c89"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 2,
+              "tags": [],
+              "user": "test"
+          },
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "initial",
+              "node": "55482a6fb4b1881fa8f746fd52cf6f096bb21c89",
+              "parents": [],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 1,
+              "tags": [],
+              "user": "test"
+          }
+      ],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushdate('>2017')"
+  }
+
+pushuser() works in search
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushuser(user1)" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "initial",
+              "node": "55482a6fb4b1881fa8f746fd52cf6f096bb21c89",
+              "parents": [],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 1,
+              "tags": [],
+              "user": "test"
+          }
+      ],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushuser(user1)"
+  }
+
+pushid() works in search
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushid(1)" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "initial",
+              "node": "55482a6fb4b1881fa8f746fd52cf6f096bb21c89",
+              "parents": [],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 1,
+              "tags": [],
+              "user": "test"
+          }
+      ],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushid(1)"
+  }
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushid(3)" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushid(3)"
+  }
+
+pushrev() works in search
+
+  $ http "http://localhost:$HGPORT/json-log?rev=pushrev(1)" --body-file body > /dev/null
+  $ python -m json.tool < body
+  {
+      "entries": [
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "third",
+              "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+              "parents": [
+                  "6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 2,
+              "tags": [
+                  "tip"
+              ],
+              "user": "test"
+          },
+          {
+              "bookmarks": [],
+              "branch": "default",
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "second",
+              "node": "6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2",
+              "parents": [
+                  "55482a6fb4b1881fa8f746fd52cf6f096bb21c89"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushid": 2,
+              "tags": [],
+              "user": "test"
+          }
+      ],
+      "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
+      "query": "pushrev(1)"
+  }
