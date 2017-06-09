@@ -24,10 +24,12 @@ def hook(ui, repo, node, source=None, **kwargs):
             continue
 
         if any(f.startswith('nsprpub/') for f in ctx.files()):
-            nspr_nodes.append(short(ctx.node()))
+            if 'UPGRADE_NSPR_RELEASE' not in ctx.description():
+                nspr_nodes.append(short(ctx.node()))
 
         if any(f.startswith('security/nss/') for f in ctx.files()):
-            nss_nodes.append(short(ctx.node()))
+            if 'UPGRADE_NSS_RELEASE' not in ctx.description():
+                nss_nodes.append(short(ctx.node()))
 
     res = 0
 
@@ -35,22 +37,12 @@ def hook(ui, repo, node, source=None, **kwargs):
         if nspr_nodes:
             ui.write('(%d changesets contain changes to protected nsprpub/ '
                      'directory: %s)\n' % (len(nspr_nodes), ', '.join(nspr_nodes)))
-
-            if 'UPGRADE_NSPR_RELEASE' not in repo['tip'].description():
-                #ui.write("=== NSPR change, but couldn't find NSPR magic word===\n")
-                res = 1
-            else:
-                ui.write('good, you said you are following the rules and are upgrading to an NSPR release snapshot, permission granted.\n')
+            res = 1
 
         if nss_nodes:
             ui.write('(%d changesets contain changes to protected security/nss/ '
                      'directory: %s)\n' % (len(nss_nodes), ', '.join(nss_nodes)))
-
-            if 'UPGRADE_NSS_RELEASE' not in repo['tip'].description():
-                #ui.write("=== NSS change, but couldn't find NSS magic word===\n")
-                res = 1
-            else:
-                ui.write('good, you said you are following the rules and are upgrading to an NSS release snapshot, permission granted.\n')
+            res = 1
 
         if res:
             header = '*' * 72
@@ -63,8 +55,8 @@ def hook(ui, repo, node, source=None, **kwargs):
                      'https://hg.mozilla.org/projects/nspr and '
                      'https://hg.mozilla.org/projects/nss\n')
             ui.write('\n')
-            ui.write('Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC channel #nss to request that '
-                     'your changes are merged, released and uplifted.\n')
+            ui.write('Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC\n'
+                     'channel #nss to request that your changes are merged, released and uplifted.\n')
             ui.write('%s\n' % header)
 
     return res

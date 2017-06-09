@@ -45,7 +45,8 @@ Without magic word, can't change nsprpub/
   These directories are kept in sync with the canonical upstream repositories at
   https://hg.mozilla.org/projects/nspr and https://hg.mozilla.org/projects/nss
   
-  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC channel #nss to request that your changes are merged, released and uplifted.
+  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC
+  channel #nss to request that your changes are merged, released and uplifted.
   ************************************************************************
   transaction abort!
   rollback completed
@@ -64,8 +65,6 @@ With magic word, can change nsprpub/
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (1 changesets contain changes to protected nsprpub/ directory: f5ea564fca36)
-  good, you said you are following the rules and are upgrading to an NSPR release snapshot, permission granted.
 
 Without magic word, can't change security/nss/
 
@@ -88,7 +87,8 @@ Without magic word, can't change security/nss/
   These directories are kept in sync with the canonical upstream repositories at
   https://hg.mozilla.org/projects/nspr and https://hg.mozilla.org/projects/nss
   
-  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC channel #nss to request that your changes are merged, released and uplifted.
+  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC
+  channel #nss to request that your changes are merged, released and uplifted.
   ************************************************************************
   transaction abort!
   rollback completed
@@ -107,10 +107,9 @@ With magic word, can change security/nss/
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (1 changesets contain changes to protected security/nss/ directory: 80aa80b3e14a)
-  good, you said you are following the rules and are upgrading to an NSS release snapshot, permission granted.
 
-Multiple changesets handled properly, the most recent commit must give permission for everything
+Multiple changesets handled properly, each changeset touching protected
+files must contain the correct corresponding keyword
 
   $ touch file1
   $ hg -q commit -A -m 'add file1'
@@ -126,7 +125,6 @@ Multiple changesets handled properly, the most recent commit must give permissio
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 3 files
-  (1 changesets contain changes to protected nsprpub/ directory: d62a1c14ba9b)
   (1 changesets contain changes to protected security/nss/ directory: b0b7d814f51e)
   ************************************************************************
   You do not have permissions to modify files under nsprpub/ or security/nss/
@@ -134,14 +132,15 @@ Multiple changesets handled properly, the most recent commit must give permissio
   These directories are kept in sync with the canonical upstream repositories at
   https://hg.mozilla.org/projects/nspr and https://hg.mozilla.org/projects/nss
   
-  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC channel #nss to request that your changes are merged, released and uplifted.
+  Please contact the NSPR/NSS maintainers at nss-dev@mozilla.org or on IRC
+  channel #nss to request that your changes are merged, released and uplifted.
   ************************************************************************
   transaction abort!
   rollback completed
   abort: pretxnchangegroup.prevent_nspr_nss hook failed
   [255]
 
-  $ hg -q commit --amend -m 'add security/nss/file3, UPGRADE_NSPR_RELEASE UPGRADE_NSS_RELEASE'
+  $ hg -q commit --amend -m 'add security/nss/file3, UPGRADE_NSS_RELEASE'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -149,7 +148,3 @@ Multiple changesets handled properly, the most recent commit must give permissio
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 3 files
-  (1 changesets contain changes to protected nsprpub/ directory: d62a1c14ba9b)
-  good, you said you are following the rules and are upgrading to an NSPR release snapshot, permission granted.
-  (1 changesets contain changes to protected security/nss/ directory: fc0732589dae)
-  good, you said you are following the rules and are upgrading to an NSS release snapshot, permission granted.
