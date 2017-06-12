@@ -1,0 +1,63 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-06-12T13:13:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": "application/vnd.github.v3.full+json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "identity",
+          "Authorization": "token <AUTH_TOKEN>",
+          "Connection": "keep-alive",
+          "Content-Type": "application/json",
+          "User-Agent": "github3.py/0.9.6"
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/user"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"login\":\"smacleod-test\",\"id\":29234277,\"avatar_url\":\"https://avatars2.githubusercontent.com/u/29234277?v=3\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/smacleod-test\",\"html_url\":\"https://github.com/smacleod-test\",\"followers_url\":\"https://api.github.com/users/smacleod-test/followers\",\"following_url\":\"https://api.github.com/users/smacleod-test/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/smacleod-test/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/smacleod-test/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/smacleod-test/subscriptions\",\"organizations_url\":\"https://api.github.com/users/smacleod-test/orgs\",\"repos_url\":\"https://api.github.com/users/smacleod-test/repos\",\"events_url\":\"https://api.github.com/users/smacleod-test/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/smacleod-test/received_events\",\"type\":\"User\",\"site_admin\":false,\"name\":null,\"company\":null,\"blog\":\"\",\"location\":null,\"email\":null,\"hireable\":null,\"bio\":null,\"public_repos\":0,\"public_gists\":0,\"followers\":0,\"following\":0,\"created_at\":\"2017-06-06T16:16:10Z\",\"updated_at\":\"2017-06-06T16:16:10Z\",\"private_gists\":0,\"total_private_repos\":0,\"owned_private_repos\":0,\"disk_usage\":0,\"collaborators\":0,\"two_factor_authentication\":false,\"plan\":{\"name\":\"free\",\"space\":976562499,\"collaborators\":0,\"private_repos\":0}}"
+        },
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "Content-Length": "1372",
+          "Content-Security-Policy": "default-src 'none'",
+          "Content-Type": "application/json; charset=utf-8",
+          "Date": "Mon, 12 Jun 2017 13:13:45 GMT",
+          "ETag": "\"7b10ad10935a368246e4880a4d6fc05d\"",
+          "Last-Modified": "Tue, 06 Jun 2017 16:16:10 GMT",
+          "Server": "GitHub.com",
+          "Status": "200 OK",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "X-Accepted-OAuth-Scopes": "",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-GitHub-Media-Type": "github.v3; param=full; format=json",
+          "X-GitHub-Request-Id": "D232:620B:3707483:465D31A:593E9389",
+          "X-OAuth-Scopes": "admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Remaining": "4999",
+          "X-RateLimit-Reset": "1497276825",
+          "X-Runtime-rack": "0.040894",
+          "X-Served-By": "e724c57ebb9961c772a91e2dd7421c8d",
+          "X-XSS-Protection": "1; mode=block"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://api.github.com/user"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
