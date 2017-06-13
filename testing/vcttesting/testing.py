@@ -25,7 +25,13 @@ PYTHON_COVERAGE_DIRS = (
     'vcssync',
 )
 
-# Directories containing Python unit tests.
+# Directories containing tests. See ``get_test_files()``.
+#
+# The Mercurial test harness can run ``.py`` tests. So it isn't necessary
+# to list directories here that are scanned for Mercurial tests (namely
+# ``hgext/`` and ``hghooks/``. ``.t`` files in directories listed here will
+# be executed by the Mercurial test harness and ``.py`` tests will be executed
+# by the Python test harness.
 UNIT_TEST_DIRS = {
     'autoland/tests': {
         'venvs': {'global'},
@@ -119,6 +125,34 @@ def get_extensions(extdir):
 
 
 def get_test_files(extensions, venv):
+    """Resolves test files to run.
+
+    ``extensions`` is the result of ``get_extensions()``. ``venv`` is the
+    name of the activated virtualenv.
+
+    The returned dict maps classes of tests to sets of paths. Keys are:
+
+    extension
+       Related to Mercurial extensions
+    hook
+       Related to Mercurial hooks
+    unit
+       Generic Python unit tests (to be executed with a Python test harness)
+    all
+       Union of all of the above
+
+    Essentially, the tests are segmented by whether they are executed by
+    Mercurial's test harness (``run-tests.py``) or a Python test harness
+    (like nose).
+
+    The Mercurial test harness is the only harness capable of executing
+    ``.t`` tests. So all ``.t`` tests are assigned to it. ``.py`` tests
+    can be executed by both the Mercurial and Python harness. Some ``.py``
+    tests require the Mercurial test harness. So input directories that are
+    related to Mercurial automatically have their ``.py`` tests assigned to
+    Mercurial. The Python test harness should only get ``.py`` tests if they
+    obviously don't belong to Mercurial.
+    """
     extension_tests = []
 
     if venv in ('global', 'hgdev'):
