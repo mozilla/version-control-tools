@@ -118,6 +118,26 @@ command = cmdutil.command(cmdtable)
 
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
+def resolve_patchfile(ui, repo, patchspec):
+    if patchspec is None:
+        return None
+
+    try:
+        q = repo.mq
+    except AttributeError:
+        return None
+
+    try:
+        p = q.lookup(patchspec, strict=True)
+        return q.opener(p, "r")
+    except util.Abort, e:
+        pass
+
+    try:
+        return file(patchspec, "r")
+    except Exception, e:
+        return None
+
 @command('qshow', [
     ('', 'stat', None, 'output diffstat-style summary of changes')],
     ('hg qshow [patch]'))
@@ -125,37 +145,29 @@ def qshow(ui, repo, patchspec=None, **opts):
     '''display a patch
 
     If no patch is given, the top of the applied stack is shown.'''
-    q = repo.mq
 
-    patchf = None
-    if patchspec is None:
-        p = q.lookup("qtip")
-        patchf = q.opener(p, "r")
-    else:
+    patchf = resolve_patchfile(ui, repo, patchspec)
+
+    if patchf is None:
+        # commands.diff has a bad error message
+        if patchspec is None:
+            patchspec = '.'
+        if patchspec not in repo and not repo.revs(patchspec).first():
+            raise util.Abort(_("Unknown patch '%s'") % patchspec)
+
+        # the built-in export command does not label the diff for color
+        # output, and the patch header generation is not reusable
+        # independently
+        def empty_diff(*args, **kwargs):
+            return []
+        temp = patch.diff
         try:
-            p = q.lookup(patchspec)
-            patchf = q.opener(p, "r")
-        except util.Abort, e:
-            try:
-                patchf = file(patchspec, "r")
-            except Exception, e:
-                # commands.diff has a bad error message
-                if patchspec not in repo:
-                    raise util.Abort(_("Unknown patch '%s'") % patchspec)
+            patch.diff = empty_diff
+            cmdutil.export(repo, repo.revs(patchspec), fp=ui)
+        finally:
+            patch.diff = temp
 
-                # the built-in export command does not label the diff for color
-                # output, and the patch header generation is not reusable
-                # independently
-                def empty_diff(*args, **kwargs):
-                    return []
-                temp = patch.diff
-                try:
-                    patch.diff = empty_diff
-                    cmdutil.export(repo, [ patchspec ], fp=ui)
-                finally:
-                    patch.diff = temp
-
-                return commands.diff(ui, repo, change=patchspec, date=None)
+        return commands.diff(ui, repo, change=patchspec, date=None, **opts)
 
     if opts['stat']:
         del opts['stat']
@@ -328,7 +340,7 @@ def reviewers(ui, repo, patchfile=None, **opts):
     else:
         for (reviewer, count) in supersuckers.most_common(10):
             ui.write("  %s: %d\n" % (reviewer, count))
- 
+
 
 def fetch_bugs(url, ui, bugs):
     data = json.dumps({
