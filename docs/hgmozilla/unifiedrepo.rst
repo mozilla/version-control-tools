@@ -28,24 +28,16 @@ beta, release, esr, etc) in chronological order by push time.
 Advantages of the Unified Repo
 ------------------------------
 
-The unified repository is **smaller than mozilla-central** despite
-containing more data. This is because they are using a more
-efficient storage mechanism (*generaldelta*) on the server.
+If you pull from multiple Firefox repositories or maintain multiple
+clones, pulling from the unified repository will be faster and
+require less local storage than pulling from or cloning *N* repositories.
 
-Because the data is smaller and more optimally encoded, these
-repositories are **faster to clone and pull from**.
-
-If you are already using a unified repository workflow (such as with
-the :ref:`firefoxtree extension <firefoxtree>`, ``hg pull`` will
-complete quicker because you are pulling from 1 repository instead
-of *N*. This also means less overall work for the server.
-
-These repositories **do not include extra branches**, notable the
+The unified repository **does not include extra branches**, notably the
 ``*_RELBRANCH`` branches. If you've ever pulled the mozilla-beta
 or mozilla-release repositories, you know how annoying the presence
 of these branches can be.
 
-These repositories feature **bookmarks that track each canonical
+The unified repository features **bookmarks that track each canonical
 repository's head**. For example, the ``central`` bookmark tracks the
 current head of mozilla-central. If you naively pulled all the Firefox
 repositories into a local Mercurial repository, you would have multiple
@@ -53,16 +45,17 @@ repositories into a local Mercurial repository, you would have multiple
 head belonged to which Firefox repository. The bookmarks solve this
 problem.
 
-In a nutshell, these unified repositories solve many of the problems
+In a nutshell, the unified repository solves many of the problems
 with Firefox's multi repository management model in a way that doesn't
 require client-side workarounds like the
 :ref:`firefoxtree extension <firefoxtree>`.
 
-Working with the Unified Repo
------------------------------
+Working with the Unified Repo (Vanilla Mercurial)
+-------------------------------------------------
 
 Here is the basic workflow for interacting with the unified
-repo.
+repo when using a vanilla Mercurial configuration (no ``firefoxtree``
+extension).
 
 First, clone the repo::
 
@@ -102,15 +95,60 @@ way to do this is::
    the currently active bookmark, which is useful to prevent accidentally
    committing on bookmark belonging to a Firefox repo.
 
-Interactions with firefoxtree
------------------------------
+Working with the Unified Repo (firefoxtree)
+-------------------------------------------
 
-There are known issues between the *firefoxtree* extension and the
-unified repository, notably around the area of conflicts between
-bookmarks and *fxtree* namespace labels.
+If you have the ``firefoxtree`` extension installed, the behavior of
+the unified repository changes slightly. Instead of pulling bookmarks,
+the ``firefoxtree`` extension stores labels of the same name in a read-only
+namespace instead.
 
-`bug 1264814 <https://bugzilla.mozilla.org/show_bug.cgi?id=1264814>`_
-tracks improvements.
+Not using bookmarks means you can't accidentally update your local bookmarks
+corresponding to Firefox repo state and drift out of sync with reality. It
+also means you don't have to activate and deactivate bookmarks locally: enabling
+you to engage in simpler workflows.
+
+Here is how workflows typically look like with ``firefoxtree`` installed.
+
+First, clone the repo::
+
+   $ hg clone --uncompressed https://hg.mozilla.org/mozilla-unified
+
+Update to the repo/head you want to work on::
+
+   $ hg up central
+   42 files updated, 0 files merged, 0 files removed, 0 files unresolved
+   (activating bookmark central)
+
+**Optionally** create a new bookmark to track your work::
+
+   $ hg bookmark myfeature
+
+Then make changes and commit::
+
+   <edit some files>
+   $ hg commit
+
+If you want to rebase::
+
+   $ hg pull
+   $ hg rebase -b myfeature -d central
+
+The ``firefoxtree`` extension will also print the number of new commits
+to each repo since last pull.::
+
+   $ hg pull
+   pulling from https://hg.mozilla.org/mozilla-unified
+   searching for changes
+   adding changesets
+   adding manifests
+   adding file changes
+   added 39 changesets with 309 changes to 235 files
+   updated firefox tree tag beta (+2 commits)
+   updated firefox tree tag esr52 (+2 commits)
+   updated firefox tree tag inbound (+34 commits)
+   updated firefox tree tag release (+1 commits)
+   (run 'hg update' to get a working copy)
 
 generaldelta and the Unified Repo
 ---------------------------------
@@ -136,29 +174,8 @@ To check whether your existing Firefox clone is using generaldelta::
 If there is no ``generaldelta`` entry in that file, you will need to
 create a new repo that has generaldelta enabled. **Adding
 ``generaldelta`` to the requires file does not enable generaldelta on an
-existing repo, so don't do it.**
-
-If you have an existing, non-generaldelta repository with work in progress
-commits, you can *convert* to generaldelta by doing something like the
-following.
-
-Create a new clone of the unified repo::
-
-   $ hg clone -U --uncompressed https://hg.mozilla.org/mozilla-unified firefox
-   $ cd firefox
-
-Now set your new repository to non-publishing (this means commits pushed to it
-won't be marked as public and will still be mutable)::
-
-   $ hg config -l
-   [phases]
-   publish = false
-
-Finally, go to your existing repo and push your work-in-progress changesets::
-
-   $ cd /existing/repo
-   $ hg push -f -r 'not public()' /path/to/firefox
-
+existing repo, so don't do it.** See :ref:`hgmozilla_common_upgrade_storage`
+for instructions on how to do this.
 
 incompatible Mercurial client; bundle2 required
 -----------------------------------------------
@@ -182,9 +199,6 @@ If you see this message, one of the following is true:
 
 * Your Mercurial client is too old. You should
   :ref:`upgrade <hgmozilla_installing>`.
-* You are using git-cinnabar. git-cinnabar doesn't currently support
-  bundle2 but support is
-  `tracked on GitHub <https://github.com/glandium/git-cinnabar/issues/64>`_.
 
 Uplifting / Backporting Commits
 ===============================

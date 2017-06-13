@@ -63,6 +63,8 @@ so, it would entered the merge resolution workflow and asked you to run
 If you are familiar with Git, ``hg graft`` is roughly equivalent to
 ``git cherry-pick``.
 
+.. _hgmozilla_common_upgrade_storage:
+
 Upgrading Repository Storage
 ============================
 
