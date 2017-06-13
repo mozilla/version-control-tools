@@ -955,8 +955,6 @@ def patch_id(ui, repo, rev):
           'Interactive -- request confirmation before any permanent action'),
          ('', 'no-take-bug', False,
           'Do not assign bug to myself'),
-         ('', 'patch-id', '',
-          'Use the given name as the patch filename, obsoleting any patches with the same name'),
          ('', 'bug-description', '',
           'New bug description (aka comment 0)'),
          ('u', 'update', None,
@@ -1020,7 +1018,7 @@ def bzexport(ui, repo, *args, **opts):
             # Support older hg versions
             patch.export(repo, [rev], fp=contents, opts=diffopts)
 
-    filename = opts['patch_id'] or patch_id(ui, repo, rev)
+    filename = patch_id(ui, repo, rev)
 
     if opts['ignore_all_space']:
         filename += "_ws"
