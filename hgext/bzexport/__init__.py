@@ -926,7 +926,7 @@ def patch_id(ui, repo, rev):
 
     if repo.obsstore.precursors.get(ctx.node()):
         base = scmutil.revsingle(fullrepo, 'bzbasechange(%s)' % rev)
-        return 'base-' + node.short(base)
+        return 'base-' + node.short(base.node())
 
     try:
         bookmarks = repo.names['bookmarks'].names(repo, ctx.node())
