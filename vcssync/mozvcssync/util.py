@@ -7,9 +7,11 @@ from __future__ import absolute_import, unicode_literals
 import contextlib
 import errno
 import hashlib
+import logging
 import os
 import pipes
 import shutil
+import sys
 
 import github3
 import hglib
@@ -164,3 +166,12 @@ def apply_changes_from_list(logger, source_path, dest_path, files):
                         raise
             else:
                 logger.warn('%s already deleted' % dest_file)
+
+
+def test_apply_changes_from_list():
+    logger = logging.getLogger('mozvcssync')
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.setLevel(logging.INFO)
+    source_path, dest_path, filelist = sys.argv[1::]
+    apply_changes_from_list(logger,
+                            source_path, dest_path, filelist.split(','))

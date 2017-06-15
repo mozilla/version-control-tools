@@ -7,6 +7,7 @@ console_scripts = [
     'servo-backout-pr-cli=mozvcssync.cli:servo_backout_pr_cli',
     'servo-overlay=mozvcssync.servo:overlay_cli',
     'servo-pulse-listen=mozvcssync.servo:pulse_daemon',
+    'test-apply-changes=mozvcssync.util:test_apply_changes_from_list',
 ]
 
 # ansible/roles/vcs-sync/defaults/main.yml must be updated if this package's
