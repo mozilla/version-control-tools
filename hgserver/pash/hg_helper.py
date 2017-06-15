@@ -14,6 +14,7 @@ import subprocess
 from ldap_helper import (
     get_ldap_attribute,
     get_ldap_settings,
+    get_scm_groups,
 )
 import repo_group
 from sh_helper import (
@@ -47,6 +48,31 @@ The command you specified is not allowed on this server.
 
 Goodbye.
 '''.lstrip()
+
+LDAP_GROUP_MEMBERSHIP = """
+You are a member of the following LDAP groups that govern source control
+access:
+
+   {groups}
+
+This will give you write access to the following repos:
+
+   {access}
+
+You will NOT have write access to the following repos:
+
+   {no_access}
+""".lstrip()
+
+NO_LDAP_GROUP_MEMBERSHIP = """
+You are NOT a member of any LDAP groups that govern source control access.
+
+You will NOT be able to push to any repository until you have been granted
+commit access.
+
+See https://www.mozilla.org/about/governance/policies/commit/access-policy/ for
+more information.
+""".lstrip()
 
 USER_REPO_EXISTS = """
 You already have a repo called %s.
@@ -122,6 +148,54 @@ def is_valid_user(mail):
     else:
         return 0
 
+
+GROUP_REPOS = {
+    'scm_level_1': {
+        'Try',
+        'User Repos (users/)',
+    },
+    'scm_level_2': {
+        'Project Repos (projects/)',
+    },
+    'scm_level_3': {
+        'Firefox Repos (mozilla-central, releases/*)',
+    },
+    'scm_autoland': {
+        'Autoland (integration/autoland)',
+    },
+    'scm_l10n': {
+        'Localization Repos (releases/l10n/*, others)',
+    }
+}
+
+
+def group_membership_message(mail):
+    """Obtain a message denoting LDAP group membership."""
+    groups = get_scm_groups(mail)
+
+    if groups is None:
+        return 'Unable to determine LDAP group membership.'
+    elif not groups:
+        return NO_LDAP_GROUP_MEMBERSHIP
+    else:
+        access = set()
+        for group in groups:
+            access |= GROUP_REPOS.get(group, set())
+
+        no_access = set()
+        for group, values in GROUP_REPOS.items():
+            if group not in groups:
+                no_access |= values
+
+        if not access:
+            access.add('Unknown')
+        if not no_access:
+            no_access.add('Unknown')
+
+        return LDAP_GROUP_MEMBERSHIP.format(
+            groups=', '.join(sorted(groups)),
+            access=', '.join(sorted(access)),
+            no_access=', '.join(sorted(no_access)))
 
 # Please be very careful when you relax/change the regular expressions.
 # Being lax can open us up to all kind of security problems.
@@ -585,6 +659,8 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
     ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
+        sys.stderr.write(group_membership_message(os.environ['USER']))
+        sys.stderr.write('\n')
         sys.stderr.write(NO_SSH_COMMAND)
         sys.exit(1)
 

@@ -73,6 +73,19 @@ Your terminal output should resemble the following::
    Your account (me@example.com) has privileges to access Mercurial over
    SSH.
 
+  You are a member of the following LDAP groups that govern source control
+  access:
+
+     scm_level_1
+
+  This will give you write access to the following repos:
+
+     Try
+
+  You will NOT have write access to the following repos:
+
+     Autoland (integration/autoland), Firefox Repos (mozilla-central, releases/*), ...
+
    You did not specify a command to run on the server. This server only
    supports running specific commands. Since there is nothing to do, you
    are being disconnected.

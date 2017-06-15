@@ -91,3 +91,23 @@ def update_access_date(mail, attr, value, conn_string_ro,
 
     if last_access < yesterday:
         ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
+
+
+def get_scm_groups(mail):
+    """Obtain SCM LDAP group membership for a specified user."""
+    settings = get_ldap_settings()
+    conn = ldap_connect(settings['url'])
+    if not conn:
+        return None
+
+    fltr = '(&(cn=scm_*)(memberUid=%s))' % mail
+
+    result = conn.search_s('ou=groups,dc=mozilla', ldap.SCOPE_ONELEVEL,
+                           fltr, ['cn'])
+
+    groups = set()
+    for dn, attrs in result:
+        for group in attrs['cn']:
+            groups.add(group)
+
+    return groups

@@ -56,7 +56,8 @@ SSH as a valid user without proper key
   Permission denied (publickey).\r (esc)
   [255]
 
-SSH with a valid key gives us warning about no command
+SSH with a valid key gives us warning about no command. Also prints note about
+lack of LDAP group membership.
 
   $ hgmo add-ssh-key user1@example.com - < key1.pub
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
@@ -64,6 +65,14 @@ SSH with a valid key gives us warning about no command
   
   Your account (user1@example.com) has privileges to access Mercurial over
   SSH.
+  
+  You are NOT a member of any LDAP groups that govern source control access.
+  
+  You will NOT be able to push to any repository until you have been granted
+  commit access.
+  
+  See https://www.mozilla.org/about/governance/policies/commit/access-policy/ for
+  more information.
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -81,6 +90,36 @@ SSH with invalid command prints appropriate error message
   The command you specified is not allowed on this server.
   
   Goodbye.
+  [1]
+
+SCM LDAP group membership is printed with no-op login.
+
+  $ hgmo add-user-to-group user1@example.com scm_autoland
+  $ hgmo add-user-to-group user1@example.com scm_level_1
+  $ hgmo add-user-to-group user1@example.com scm_level_2
+
+  $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
+  A SSH connection has been successfully established.
+  
+  Your account (user1@example.com) has privileges to access Mercurial over
+  SSH.
+  
+  You are a member of the following LDAP groups that govern source control
+  access:
+  
+     scm_autoland, scm_level_1, scm_level_2
+  
+  This will give you write access to the following repos:
+  
+     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+  
+  You will NOT have write access to the following repos:
+  
+     Firefox Repos (mozilla-central, releases/*), Localization Repos (releases/l10n/*, others)
+  
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
   [1]
 
 Successful login should set hgAccessDate LDAP attribute
@@ -196,6 +235,19 @@ Do another login to verify no pash errors are present
   Your account (user1@example.com) has privileges to access Mercurial over
   SSH.
   
+  You are a member of the following LDAP groups that govern source control
+  access:
+  
+     scm_autoland, scm_level_1, scm_level_2
+  
+  This will give you write access to the following repos:
+  
+     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+  
+  You will NOT have write access to the following repos:
+  
+     Firefox Repos (mozilla-central, releases/*), Localization Repos (releases/l10n/*, others)
+  
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
   are being disconnected.
@@ -294,6 +346,19 @@ Failure to connect to LDAP master server is not fatal
   
   Your account (user1@example.com) has privileges to access Mercurial over
   SSH.
+  
+  You are a member of the following LDAP groups that govern source control
+  access:
+  
+     scm_autoland, scm_level_1, scm_level_2
+  
+  This will give you write access to the following repos:
+  
+     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+  
+  You will NOT have write access to the following repos:
+  
+     Firefox Repos (mozilla-central, releases/*), Localization Repos (releases/l10n/*, others)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
