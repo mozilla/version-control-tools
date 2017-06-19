@@ -638,8 +638,9 @@ def revset_pushhead(repo, subset, x):
     # this optimal by batching SQL, but that adds complexity. For now,
     # simplicity wins.
     def getrevs():
+        to_rev = repo.changelog.rev
         for push in repo.pushlog.pushes():
-            yield repo[push.nodes[-1]].rev()
+            yield to_rev(bin(push.nodes[-1]))
 
     return subset & revset.generatorset(getrevs())
 
@@ -653,10 +654,11 @@ def revset_pushdate(repo, subset, x):
     dm = util.matchdate(ds)
 
     def getrevs():
+        to_rev = repo.changelog.rev
         for push in repo.pushlog.pushes():
             if dm(push.when):
                 for node in push.nodes:
-                    yield repo[node].rev()
+                    yield to_rev(bin(node))
 
     return subset & revset.generatorset(getrevs())
 
@@ -676,10 +678,11 @@ def revset_pushuser(repo, subset, x):
     kind, pattern, matcher = revset._substringmatcher(n)
 
     def getrevs():
+        to_rev = repo.changelog.rev
         for push in repo.pushlog.pushes():
             if matcher(encoding.lower(push.user)):
                 for node in push.nodes:
-                    yield repo[node].rev()
+                    yield to_rev(bin(node))
 
     return subset & revset.generatorset(getrevs())
 
@@ -699,10 +702,11 @@ def revset_pushid(repo, subset, x):
     if not push:
         return revset.baseset()
 
+    to_rev = repo.changelog.rev
     pushrevs = set()
     for node in push.nodes:
         try:
-            pushrevs.add(repo[node].rev())
+            pushrevs.add(to_rev(bin(node)))
         except RepoLookupError:
             pass
 
@@ -716,12 +720,13 @@ def revset_pushrev(repo, subset, x):
 
     # This isn't the most optimal implementation, especially if the input
     # set is large. But it gets the job done.
+    to_rev = repo.changelog.rev
     revs = set()
     for rev in l:
         push = repo.pushlog.pushfromchangeset(repo[rev])
         if push:
             for node in push.nodes:
-                revs.add(repo[node].rev())
+                revs.add(to_rev(bin(node)))
 
     return subset.filter(revs.__contains__)
 
