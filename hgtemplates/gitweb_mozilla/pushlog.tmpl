@@ -41,16 +41,8 @@ $(document).ready(function () \{
 <a href="/">Mercurial</a> {pathdef%breadcrumb} / pushlog
 </div>
 
-<form action="{url|urlescape}pushloghtml">
-<div class="search">
-From:
-<input type="text" name="startdate"  value="{startdate|escape}"/>
-To:
-<input type="text" name="enddate"  value="{enddate|escape}"/>
-<input type="submit" value="Search"/>
-</div>
-</form>
 <div class="page_nav">
+<div>
 <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
 <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
 <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -62,7 +54,17 @@ pushlog |
 <a href="{url|urlescape}file/tip{sessionvars%urlparameter}">files</a>{archives%archiveentry} |
 <a href="{url|urlescape}help{sessionvars%urlparameter}">help</a>
 <br/>
-Page {changenav%navpushentry}<br/>
+Page {changenav%navpushentry}
+</div>
+<div class="search">
+<form action="{url|urlescape}pushloghtml">
+From:
+<input type="text" name="startdate"  value="{startdate|escape}"/>
+To:
+<input type="text" name="enddate"  value="{enddate|escape}"/>
+<input type="submit" value="Search"/>
+</form>
+</div>
 </div>
 
 <div class="title">{querydescription|escape}</div>
@@ -72,7 +74,8 @@ Page {changenav%navpushentry}<br/>
 </table>
 
 <div class="page_nav">
-Page {changenav%navpushentry}
+<div>Page {changenav%navpushentry}</div>
+<div></div>
 </div>
 
 {footer}
