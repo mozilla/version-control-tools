@@ -19,6 +19,7 @@ from mercurial import (
     error,
     exchange,
     extensions,
+    localrepo,
     registrar,
     revset,
     templatekw,
@@ -764,7 +765,10 @@ def reposetup(ui, repo):
     ui.setconfig('hooks', 'pretxnchangegroup.pushlog', pretxnchangegrouphook, 'pushlog')
 
     class pushlogrepo(repo.__class__):
-        @property
+        # We /may/ be able to turn this into a property cache without the
+        # filesystem check. But the filesystem check is safer in case pushlog
+        # mutation invalidates cached state on type instances.
+        @localrepo.repofilecache('pushlog2.db')
         def pushlog(self):
             return pushlog(self)
 
