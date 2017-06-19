@@ -40,11 +40,7 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
-# registrar.revsetpredicate replaces revset.extpredicate in Mercurial 3.8.
-if getattr(revset, 'extpredicate', None):
-    revsetpredicate = revset.extpredicate()
-else:
-    revsetpredicate = registrar.revsetpredicate()
+revsetpredicate = registrar.revsetpredicate()
 
 SCHEMA = [
     'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
@@ -794,9 +790,6 @@ def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
-    if util.safehasattr(revsetpredicate, 'setup'):
-        revsetpredicate.setup()
-
     keywords = {
         'pushid': template_pushid,
         'pushuser': template_pushuser,
@@ -806,10 +799,6 @@ def extsetup(ui):
     }
 
     templatekw.keywords.update(keywords)
-
-    # dockeywords was removed in Mercurial 3.6.
-    if hasattr(templatekw, 'dockeywords'):
-        templatekw.dockeywords.update(keywords)
 
     extensions.wrapfunction(webutil, 'commonentry', commonentry)
 
