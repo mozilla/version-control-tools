@@ -24,6 +24,16 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
+    # Don't apply hook to repos outside the repo root directory.
+    repos_root = ui.config('hgmo', 'repo_root', '/repo/hg/mozilla')
+    if not repo.root.startswith(repos_root):
+        return 0
+
+    # Don't apply hook to user repos, since user repos are the wild west.
+    repo_name = repo.root[len(repos_root) + 1:]
+    if repo_name.startswith('users/'):
+        return 0
+
     newroots = set()
 
     for rev in range(repo[node].rev(), len(repo)):

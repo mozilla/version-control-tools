@@ -1,3 +1,8 @@
+  $ cat >> $HGRCPATH << EOF
+  > [hgmo]
+  > repo_root = $TESTTMP
+  > EOF
+
   $ hg init server
   $ cat >> server/.hg/hgrc << EOF
   > [hooks]
@@ -73,6 +78,18 @@ Pushing new root should be rejected
   rollback completed
   abort: pretxnchangegroup.single_root hook failed
   [255]
+
+But it works on repos in users/
+
+  $ mkdir ../users
+  $ hg init ../users/server
+  $ hg push -f ../users/server
+  pushing to ../users/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 4 changesets with 4 changes to 2 files (+1 heads)
 
   $ cd ..
 
