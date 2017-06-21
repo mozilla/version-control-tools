@@ -103,7 +103,7 @@ def on_hg_integration(body):
     logger.warn('checking for servo backout from changeset %s' % revision)
     subprocess.check_call([b'/bin/sudo',
                            b'/usr/bin/systemctl', b'start',
-                           b'servo-backout.service'],
+                           b'servo-backout-pr.service'],
                           cwd='/', bufsize=1)
 
 
