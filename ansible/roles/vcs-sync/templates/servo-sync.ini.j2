@@ -17,6 +17,6 @@ servo_fetch_ref = refs/heads/master
 
 hg_converted = {{ servo_linear_hg_url }}
 
-backout_integration_url = {{ backout_integration_hg_url }}
-backout_github_name = {{ backout_github_name }}
-backout_author = {{ backout_author }}
+backout_integration_url = {{ backout_integration_url | mandatory }}
+backout_github_name = {{ backout_github_name | mandatory }}
+backout_author = {{ backout_author | mandatory }}

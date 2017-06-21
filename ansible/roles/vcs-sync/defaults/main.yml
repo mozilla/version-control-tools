@@ -12,7 +12,7 @@ servo_linear_hg_url: https://hg.mozilla.org/projects/converted-servo-linear
 servo_linear_hg_push_url: ssh://hg.mozilla.org/projects/converted-servo-linear
 
 # URL of the integration Mercurial repo; used to detect backouts.
-backout_integration_hg_url: https://hg.mozilla.org/integration/autoland
+backout_integration_url: https://hg.mozilla.org/integration/autoland
 # Github user/repo to create backout PRs.
 backout_github_name: servo/servo
 # Author of all backout PRs.
