@@ -13,7 +13,7 @@ ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 
 
 def get_and_write_vct_node():
-    hg = os.path.join(ROOT, 'venv', 'bin', 'hg')
+    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
     env = dict(os.environ)
     env['HGRCPATH'] = '/dev/null'
     args = [hg, '-R', ROOT, 'log', '-r', '.', '-T', '{node|short}']
