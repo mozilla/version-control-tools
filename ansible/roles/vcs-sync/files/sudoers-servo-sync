@@ -1,3 +1,4 @@
 # Allow servo-sync user to start various systemd units.
 servo-sync ALL=NOPASSWD: /usr/bin/systemctl start servo-linearize.service
 servo-sync ALL=NOPASSWD: /usr/bin/systemctl start servo-overlay.service
+servo-sync ALL=NOPASSWD: /usr/bin/systemctl start servo-backout-pr.service
