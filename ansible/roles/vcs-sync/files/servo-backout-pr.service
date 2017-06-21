@@ -14,7 +14,7 @@ ExecStart=/home/servo-sync/venv/bin/servo-backout-pr-cli \
   /home/servo-sync/backout-autoland \
   $BACKOUT_GITHUB_NAME \
   /home/servo-sync/backout-servo \
-  --author "$BACKOUT_AUTHOR" \
+  --author ${BACKOUT_AUTHOR} \
   --hg /home/servo-sync/venv/bin/hg \
   --tracking-s3-upload-url $BACKOUT_S3_UPLOAD_URL
 
