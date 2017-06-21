@@ -96,9 +96,10 @@
   command: aws s3 cp {{ servo_shamap_s3_upload_url | mandatory }} /home/servo-sync/servo-linear/.hg/shamap creates=/home/servo-sync/servo-linear/.hg/shamap
   become_user: servo-sync
 
-- name: seed backout-pr SHA1 to avoid redundant pull requests, possible divergence
-  command: aws s3 cp {{ backout_s3_upload_url | mandatory }} /home/servo-sync/backout-autoland/.hg/backout-rev creates=/home/servo-sync/backout-autoland/.hg/backout-rev
-  become_user: servo-sync
+# Disabled; 403
+#- name: seed backout-pr SHA1 to avoid redundant pull requests, possible divergence
+#  command: aws s3 cp {{ backout_s3_upload_url | mandatory }} /home/servo-sync/backout-autoland/.hg/backout-rev creates=/home/servo-sync/backout-autoland/.hg/backout-rev
+#  become_user: servo-sync
 
 - name: seed Firefox Mercurial repo
   command: /home/servo-sync/venv/bin/hg clone -U https://hg.mozilla.org/mozilla-central /home/servo-sync/firefox-overlay creates=/home/servo-sync/firefox-overlay
