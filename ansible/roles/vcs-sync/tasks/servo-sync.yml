@@ -127,6 +127,8 @@
     - servo-overlay.service
     - servo-overlay.timer
     - servo-pulse-monitor.service
+    - servo-backout-pr.service
+    - servo-backout-pr.timer
 
 - name: reload systemd units
   command: /usr/bin/systemctl daemon-reload
@@ -141,6 +143,8 @@
     - servo-overlay.service
     - servo-overlay.timer
     - servo-pulse-monitor.service
+    - servo-backout-pr.service
+    - servo-backout-pr.timer
 
 - name: restart systemd services
   service: name=servo-sync.target
