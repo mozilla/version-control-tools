@@ -1,4 +1,5 @@
 -r prod-requirements.txt
+-r ../deploy-requirements.txt
 
 betamax==0.8.0 \
     --hash=sha256:91d5f6ca6b03901df93f9c0c2ac7fe1a0ff557bd6f30124ec73cefae00fc14a2
