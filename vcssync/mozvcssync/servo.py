@@ -73,7 +73,7 @@ def on_hgmo_message(body, message, config):
     if repo_url == config['hg_converted']:
         on_hg_converted(body)
 
-    elif repo_url == config['backout_integration']:
+    elif repo_url == config['backout_integration_url']:
         on_hg_integration(body)
 
     message.ack()
