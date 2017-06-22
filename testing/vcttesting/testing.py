@@ -39,6 +39,9 @@ UNIT_TEST_DIRS = {
     'git/tests': {
         'venvs': {'global'},
     },
+    'hgext/manualoverlay': {
+        'venvs': {'vcssync'},
+    },
     'hgext/overlay': {
         'venvs': {'vcssync'},
     },
