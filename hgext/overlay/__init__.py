@@ -243,7 +243,8 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
     # have a diff that didn't match the source repository. In other words,
     # the history wouldn't be accurate. So prevent that from happening.
     if lastsourcectx:
-        if sourcerepo[sourcerevs[0]].p1() != lastsourcectx:
+        if (not noncontiguous and
+                sourcerepo[sourcerevs[0]].p1() != lastsourcectx):
             raise error.Abort(_('parent of initial source changeset does not '
                                 'match last overlayed changeset (%s)') %
                               short(lastsourcectx.node()))
