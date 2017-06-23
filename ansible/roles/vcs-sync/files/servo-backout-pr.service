@@ -5,6 +5,7 @@
 Description=Generate Servo PRs from Firefox backouts
 After=local-fs.target network.target nss-lookup.target
 #OnFailure=mail-unit-output@%n.service
+StartLimitBurst=20
 
 [Service]
 Type=oneshot
