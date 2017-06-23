@@ -28,7 +28,7 @@ class PushRemoteFail(Exception):
 
 def overlay_hg_repos(source_repo_url, dest_repo_url, dest_repo_path,
                      dest_prefix, source_rev=None, dest_rev='tip',
-                     result_push_url=None):
+                     result_push_url=None, noncontiguous=False):
     """Overlay changesets from an hg repo into a sub-directory of another.
 
     This function will take changesets from the Mercurial repo
@@ -95,6 +95,10 @@ def overlay_hg_repos(source_repo_url, dest_repo_url, dest_repo_path,
             b'--into', dest_prefix,
             b'-d', dest_node,
         ]
+
+        if noncontiguous:
+            args.append('--noncontiguous')
+
         if source_rev:
             args.append(source_rev)
 
