@@ -5,7 +5,6 @@
 Description=Generate Servo PRs from Firefox backouts
 After=local-fs.target network.target nss-lookup.target
 #OnFailure=mail-unit-output@%n.service
-StartLimitBurst=20
 
 [Service]
 Type=oneshot
@@ -21,3 +20,4 @@ ExecStart=/home/servo-sync/venv/bin/servo-backout-pr-cli \
 
 User=servo-sync
 Group=servo-sync
+StartLimitBurst=20
