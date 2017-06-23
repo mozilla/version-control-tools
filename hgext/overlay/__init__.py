@@ -138,7 +138,8 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
     return memctx.commit()
 
 
-def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix):
+def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
+               noncontiguous):
     """Overlay changesets from one repository into another.
 
     ``sourcerevs`` (iterable of revs) from ``sourcerepo`` will effectively
@@ -147,6 +148,9 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix):
 
     ``sourcerevs`` may include revisions that have already been overlayed.
     If so, overlay will resume at the first revision not yet processed.
+
+    ``noncontigous`` removes the restriction that sourcerevs must be a
+    contiguous DAG.
     """
     assert prefix
     prefix = prefix.rstrip('/') + '/'
@@ -165,8 +169,9 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix):
         try:
             left.remove(ctx.rev())
         except KeyError:
-            raise error.Abort(_('source revisions must be part of contiguous '
-                                'DAG range'))
+            if not noncontiguous:
+                raise error.Abort(
+                    _('source revisions must be part of contiguous DAG range'))
 
     if left:
         raise error.Abort(_('source revisions must be part of same DAG head'))
@@ -209,6 +214,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix):
             # Else the changeset in the destination isn't in the incoming set.
             # This is OK iff the destination changeset is a conversion of
             # the parent of the first incoming changeset.
+            # TODO: This assumption doesn't hold with noncontiguous=True
             firstsourcectx = sourcerepo[sourcerevs[0]]
             if firstsourcectx.p1().hex() == overlayed:
                 break
@@ -287,8 +293,10 @@ def _mirrorrepo(ui, repo, url):
     ('d', 'dest', '', _('destination changeset on top of which to overlay '
                         'changesets')),
     ('', 'into', '', _('directory in destination in which to add files')),
+    ('', 'noncontiguous', False, _('allow non continuous dag heads')),
 ], _('[-d REV] SOURCEURL [REVS]'))
-def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None):
+def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
+            noncontiguous=False):
     """Integrate contents of another repository.
 
     This command essentially replays changesets from another repository into
@@ -304,7 +312,7 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None):
 
     * The imported changesets must be in a single DAG head
     * The imported changesets (as evaluated by ``REVS``) must be a contiguous
-      DAG range.
+      DAG range (Unless --noncontiguous is passed).
     * Importing merges is not supported.
     * The state of the files in the destination directory/changeset must
       exactly match the last imported changeset.
@@ -341,4 +349,5 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None):
     # Backdoor for testing to force static URL.
     sourceurl = ui.config('overlay', 'sourceurl', sourceurl)
 
-    _dooverlay(sourcerepo, sourceurl, sourcerevs, repo, destctx, into)
+    _dooverlay(sourcerepo, sourceurl, sourcerevs, repo, destctx, into,
+               noncontiguous)
