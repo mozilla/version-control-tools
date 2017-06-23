@@ -133,7 +133,7 @@ class GitHubPR(object):
         :param patch_callback: Callback function that will apply changes to
             the git repository.  Called with a single argument of the
             `GitCommand` object.  Cannot be set if `patch_file` is set.
-        :return: String with pull request URL, or None if no changes were made.
+        :return: a github3.PullRequest object, or None if no changes were made.
         """
         assert branch_name is not None
         assert description is not None
@@ -210,6 +210,5 @@ class GitHubPR(object):
 
         pr_title = pr_title_multiple or pr_title or description.splitlines()[0]
         pr_body = pr_body or description
-        pr = self.update_or_create_pr(
+        return self.update_or_create_pr(
             upstream_repo, self.user, branch_name, pr_title, pr_body)
-        return pr.html_url if pr else None

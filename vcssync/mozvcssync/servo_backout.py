@@ -124,9 +124,6 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
 
         desc = _build_commit_desc(commit.desc, backed_out_urls)
 
-        # This incantation forces this PR to the head of homu's queue.
-        pr_body = '@bors-servo r+ force treeclosed=9001\n\n%s' % desc
-
         # Remove detritus.
         clean_hg_repo(logger, integration_repo_path)
 
@@ -140,15 +137,23 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
             apply_changes_from_list(logger, '%s/servo' % integration_repo_path,
                                     github_pr.repo_path, touched_files)
 
-        # Finally we can create/update the pull request.
-        github_pr.create_pr_from_patch(
+        # Create/update the pull request.
+        pr = github_pr.create_pr_from_patch(
             branch_name='gecko-backout',
             reuse_branch=True,
             description=desc,
             author=author,
-            pr_body=pr_body,
+            pr_body=desc,
             pr_title_multiple='Multiple gecko backouts',
             patch_callback=apply_patch)
+
+        if pr:
+            # Tell homu this has been approved, and to abort any in-flight
+            # work against the PR if we're updating it.
+            # Unfortunately github3.py v0.9.6 doesn't implement create_comment.
+            # It's implemented in github3.py v1 however that isn't stable yet.
+            pr._post(pr.comments_url,
+                     {'body': '@bors-servo r+ force treeclosed=9001\n'})
 
 
 def backout_servo_pr(integration_repo_url, integration_repo_path,
