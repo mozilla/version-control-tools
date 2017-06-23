@@ -153,7 +153,7 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
             # Unfortunately github3.py v0.9.6 doesn't implement create_comment.
             # It's implemented in github3.py v1 however that isn't stable yet.
             pr._post(pr.comments_url,
-                     {'body': '@bors-servo r+ force treeclosed=9001\n'})
+                     {'body': '@bors-servo r+ force p=9001 treeclosed=9000\n'})
 
 
 def backout_servo_pr(integration_repo_url, integration_repo_path,
