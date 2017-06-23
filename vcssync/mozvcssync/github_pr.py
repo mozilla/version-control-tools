@@ -65,7 +65,8 @@ class GitHubPR(object):
     def previous_pr(repo, head):
         return next(repo.iter_pulls(head=head), None)
 
-    def update_or_create_pr(self, repo, user, branch, title, body):
+    def update_or_create_pr(self, repo, user, branch, title, body,
+                            title_multiple=None):
         head = "%s:%s" % (user, branch)
 
         try:
@@ -78,7 +79,7 @@ class GitHubPR(object):
                 # the title to reflect that, and append the new backout to
                 # the current PR body.
                 pr.update(
-                    title=title,
+                    title=title_multiple or title,
                     body='%s\n\n---\n\n%s' % (pr.body.strip(), body))
             else:
                 logger.info('creating pull request against %s'
@@ -208,7 +209,8 @@ class GitHubPR(object):
         else:
             logger.warn('No changes to commit/push')
 
-        pr_title = pr_title_multiple or pr_title or description.splitlines()[0]
+        pr_title = pr_title or description.splitlines()[0]
         pr_body = pr_body or description
         return self.update_or_create_pr(
-            upstream_repo, self.user, branch_name, pr_title, pr_body)
+            upstream_repo, self.user, branch_name, pr_title, pr_body,
+            title_multiple=pr_title_multiple)
