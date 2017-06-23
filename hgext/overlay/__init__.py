@@ -235,21 +235,32 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
                               short(ctx.node()))
 
     # If we previously performed an overlay, verify that changeset
-    # continuity is uninterrupted. We ensure the parent of the first source
-    # changeset matches the last imported changeset and that the state of
-    # files in the last imported changeset matches exactly the state of files
-    # in the destination changeset. If these conditions don't hold, the repos
-    # got out of sync. If we continued, the first overlayed changeset would
-    # have a diff that didn't match the source repository. In other words,
-    # the history wouldn't be accurate. So prevent that from happening.
+    # continuity is uninterrupted.
+    #
+    # For the default mode of contiguous importing, we verify the last overlayed
+    # changeset is the first parent of the first changeset to be overlayed. We
+    # also verify that files in the destination match the last overlayed
+    # changeset.
+    #
+    # For non-contiguous operation, we skip the parent check because it doesn't
+    # make sense. For file comparisons, we check against the parent of the first
+    # incoming changeset rather than the last overlayed changeset.
+    #
+    # The file content check ensures that repos don't get out of sync. They
+    # ensure that diffs from the source repository match diffs in the
+    # destination repository.
     if lastsourcectx:
-        if (not noncontiguous and
-                sourcerepo[sourcerevs[0]].p1() != lastsourcectx):
-            raise error.Abort(_('parent of initial source changeset does not '
-                                'match last overlayed changeset (%s)') %
-                              short(lastsourcectx.node()))
+        if not noncontiguous:
+            if sourcerepo[sourcerevs[0]].p1() != lastsourcectx:
+                raise error.Abort(_('parent of initial source changeset does '
+                                    'not match last overlayed changeset (%s)') %
+                                  short(lastsourcectx.node()))
 
-        _verifymanifestsequal(sourcerepo, lastsourcectx, destrepo, destctx,
+            comparectx = lastsourcectx
+        else:
+            comparectx = sourcerepo[sourcerevs[0]].p1()
+
+        _verifymanifestsequal(sourcerepo, comparectx, destrepo, destctx,
                               prefix)
 
     # All the validation is done. Proceed with the data conversion.
