@@ -624,9 +624,9 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
 # https://bz.mercurial-scm.org/show_bug.cgi?id=5601 is resolved.
 #@revsetpredicate('pushhead()', safe=True)
 def revset_pushhead(repo, subset, x):
-    """Changesets that were heads when they were pushed.
+    """``pushhead()``
 
-    A push head is a changeset that was a head at the time it was pushed.
+    Changesets that were heads when they were pushed.
     """
     revset.getargs(x, 0, 0, 'pushhead takes no arguments')
 
@@ -645,7 +645,10 @@ def revset_pushhead(repo, subset, x):
 
 #@revsetpredicate('pushdate(interval)', safe=True)
 def revset_pushdate(repo, subset, x):
-    """Changesets that were pushed within the interval, see :hg:`help dates`."""
+    """``pushdate(interval)``
+
+    Changesets that were pushed within the interval. See :hg:`help dates`.
+    """
     l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
 
     ds = revset.getstring(l[0], 'pushdate requires a string argument')
@@ -663,7 +666,9 @@ def revset_pushdate(repo, subset, x):
 
 #@revsetpredicate('pushuser(string)', safe=True)
 def revset_pushuser(repo, subset, x):
-    """User name that pushed the changeset contains string.
+    """``pushuser(string)``
+
+    User name that pushed the changeset contains string.
 
     The match is case-insensitive.
 
@@ -687,7 +692,10 @@ def revset_pushuser(repo, subset, x):
 
 #@revsetpredicate('pushid(int)', safe=True)
 def revset_pushid(repo, subset, x):
-    """Changesets that were part of the specified numeric push id."""
+    """``pushid(int)``
+
+    Changesets that were part of the specified numeric push id.
+    """
     l = revset.getargs(x, 1, 1, 'pushid requires one argument')
     try:
         pushid = int(revset.getstring(l[0], 'pushid requires a number'))
@@ -713,7 +721,10 @@ def revset_pushid(repo, subset, x):
 
 #@revsetpredicate('pushrev(set)', safe=True)
 def revset_pushrev(repo, subset, x):
-    """Changesets that were part of the same push as the specified changeset(s)."""
+    """``pushrev(set)``
+
+    Changesets that were part of the same push as the specified changeset(s).
+    """
     l = revset.getset(repo, subset, x)
 
     # This isn't the most optimal implementation, especially if the input
