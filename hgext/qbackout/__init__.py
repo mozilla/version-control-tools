@@ -18,7 +18,7 @@ import re
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-from mozautomation.commitparser import BUG_RE
+from mozautomation.commitparser import BUG_CONSERVATIVE_RE
 # mercurial version portability
 import sys
 if not getattr(cmdutil, 'bailifchanged', None):
@@ -164,7 +164,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
 
     def parse_bugs(msg):
         bugs = set()
-        m = BUG_RE.search(msg)
+        m = BUG_CONSERVATIVE_RE.search(msg)
         if m:
             bugs.add(m.group(2))
         return bugs
