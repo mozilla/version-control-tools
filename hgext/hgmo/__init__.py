@@ -100,7 +100,9 @@ from mercurial.hgweb import (
     webutil,
 )
 from mercurial.hgweb.common import (
+    ErrorResponse,
     HTTP_OK,
+    HTTP_NOT_FOUND,
 )
 from mercurial.hgweb.protocol import (
     webproto,
@@ -499,6 +501,39 @@ def automationrelevancewebcommand(web, req, tmpl):
     return stream_json(data)
 
 
+def isancestorwebcommand(web, req, tmpl):
+    """Determine whether a changeset is an ancestor of another."""
+    for k in ('head', 'node'):
+        if k not in req.form:
+            raise ErrorResponse(HTTP_NOT_FOUND, "missing parameter '%s'" % k)
+
+    head = req.form['head'][0]
+    node = req.form['node'][0]
+
+    try:
+        headctx = web.repo[head]
+    except error.RepoLookupError:
+        raise ErrorResponse(HTTP_NOT_FOUND, 'unknown head revision %s' % head)
+
+    try:
+        testctx = web.repo[node]
+    except error.RepoLookupError:
+        raise ErrorResponse(HTTP_NOT_FOUND, 'unknown node revision %s' % node)
+
+    testrev = testctx.rev()
+    isancestor = False
+
+    for rev in web.repo.changelog.ancestors([headctx.rev()], inclusive=True):
+        if rev == testrev:
+            isancestor = True
+            break
+
+    return tmpl('isancestor',
+                headnode=headctx.hex(),
+                testnode=testctx.hex(),
+                isancestor=isancestor)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -805,3 +840,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'automationrelevance', automationrelevancewebcommand)
     webcommands.__all__.append('automationrelevance')
+
+    setattr(webcommands, 'isancestor', isancestorwebcommand)
+    webcommands.__all__.append('isancestor')

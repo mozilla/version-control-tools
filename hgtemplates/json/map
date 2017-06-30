@@ -26,6 +26,11 @@ headdivergence = '\{
   "filemerges": {filemerges|json},
   "filemergesignored": {filemergesignored|json}
   }'
+isancestor = '\{
+  "headnode": {headnode|json},
+  "testnode": {testnode|json},
+  "isancestor": {isancestor|json}
+  }'
 filerevision = '\{
   "node": {node|json},
   "path": {file|json},
