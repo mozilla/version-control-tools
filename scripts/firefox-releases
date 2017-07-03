@@ -1,0 +1,88 @@
+#!/usr/bin/env python2.7
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+"""This script is used to perform common actions with the Firefox releases
+scraper and database.
+"""
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+import argparse
+import datetime
+import sys
+
+import mozautomation.releasedb as releasedb
+from mozautomation.releaseutil import (
+    import_nightly_builds,
+)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(title='subcommands', dest='command')
+
+    sp = subparsers.add_parser('import-nightly',
+                               help='import Nightly releases into the database')
+    sp.add_argument('--start-day',
+                    help='Earliest day to search for releases')
+    sp.add_argument('database')
+    sp.add_argument('repo',
+                    help='Path to Firefox repo to resolve revisions')
+
+    sp = subparsers.add_parser('serialize-builds')
+    sp.add_argument('--start-insertion-key', type=int)
+    sp.add_argument('database')
+
+    sp = subparsers.add_parser('import-serialized-builds')
+    sp.add_argument('database')
+
+    args = parser.parse_args()
+
+    command = args.command
+
+    if command == 'import-nightly':
+        if args.start_day:
+            year, month, day = map(int, args.start_day.split('-'))
+            start_day = datetime.date(year, month, day)
+            print('using %s as start day because requested explicitly' %
+                  start_day)
+        else:
+            start_day = None
+
+        count = import_nightly_builds(args.database, args.repo,
+                                      start_day=start_day)
+
+        print('imported %d nightly builds' % count)
+    elif command == 'serialize-builds':
+        if args.start_insertion_key is not None:
+            start_insertion_key = args.start_insertion_key
+        else:
+            start_insertion_key = None
+
+        db = releasedb.FirefoxReleaseDatabase(args.database)
+
+        builds = db.serialize_builds(start_insertion_key=start_insertion_key)
+        for data in builds:
+            print(data)
+
+    elif command == 'import-serialized-builds':
+        builds = []
+
+        for line in sys.stdin:
+            line = line.strip()
+            if not line:
+                continue
+
+            builds.append(line)
+
+        db = releasedb.FirefoxReleaseDatabase(args.database)
+        count = db.import_serialized(builds)
+
+        print('imported %d builds' % count)
+    else:
+        raise Exception('unhandled command: %s' % command)
+
+if __name__ == '__main__':
+    sys.exit(main())
