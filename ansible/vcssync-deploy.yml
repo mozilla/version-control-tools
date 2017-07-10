@@ -25,6 +25,8 @@
         pulse_userid: "{{ (secrets.stdout | from_yaml).pulse_userid | mandatory }}"
         pulse_password: "{{ (secrets.stdout | from_yaml).pulse_password | mandatory }}"
         servo_github_token: "{{ (secrets.stdout | from_yaml).servo_github_token | mandatory }}"
+        servo_github_email: "{{ (secrets.stdout | from_yaml) .servo_github_email | mandatory }}"
+        servo_github_name: "{{ (secrets.stdout | from_yaml) .servo_github_name | mandatory }}"
         servo_github_ssh_key: "{{ (secrets.stdout | from_yaml).servo_github_ssh_key | mandatory }}"
         servo_hgmo_ssh_key: "{{ (secrets.stdout | from_yaml).servo_hgmo_ssh_key | mandatory }}"
         servo_hgmo_ssh_user: "{{ (secrets.stdout | from_yaml).servo_hgmo_ssh_user | mandatory }}"

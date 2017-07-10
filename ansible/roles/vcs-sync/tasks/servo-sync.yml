@@ -37,6 +37,12 @@
             mode=0600
   become_user: servo-sync
 
+- name: git config for servo-sync user
+  template: src=servo-git_config.j2
+            dest=/home/servo-sync/.gitconfig
+            mode=0600
+  become_user: servo-sync
+
 - name: install SSH keys
   copy: dest=/home/servo-sync/.ssh/id_{{ item.name }}
         content="{{ item.value }}"
