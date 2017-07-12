@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedules periodic scraping for Firefox releases
+After=network.target remote-fs.target nss-lookup.target
+
+[Timer]
+# Run every 5 minutes.
+OnUnitInactiveSec=600
+OnBootSec=60
+
+[Install]
+WantedBy=multi-user.target

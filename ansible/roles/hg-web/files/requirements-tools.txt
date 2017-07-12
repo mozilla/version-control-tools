@@ -1,11 +1,26 @@
+certifi==2017.4.17 \
+    --hash=sha256:f4318671072f030a33c7ca6acaef720ddd50ff124d1388e50c1bda4cbd6d7010
+
+chardet==3.0.4 \
+    --hash=sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691
+
 Cython==0.25.1 \
     --hash=sha256:b72debd498e8d06487ae0631b3b7faf953d9fd2e364ffa80f1f35ec1801183d0
 
 futures==3.0.3 \
     --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 
+idna==2.5 \
+    --hash=sha256:cc19709fd6d0cbfed39ea875d29ba6d4e22c0cebc510a76d6302a28385e8bb70
+
 Mercurial==4.1.2 \
     --hash=sha256:09415253fb409a77e19b9951532a3c22c4e07e74bab80652527064617daab194
 
+requests==2.18.1 \
+    --hash=sha256:6afd3371c1f4c1970497cdcace5c5ecbbe58267bf05ca1abd93d99d170803ab7
+
 tabulate==0.7.5 \
     --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e
+
+urllib3==1.21.1 \
+    --hash=sha256:8ed6d5c1ff9d6ba84677310060d6a3a78ca3072ce0684cb3c645023009c114b1

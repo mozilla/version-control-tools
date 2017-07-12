@@ -1,0 +1,11 @@
+[Unit]
+Description=Scrape servers for Firefox releases
+After=network.target
+OnFailure=mail-unit-output@%n.service
+
+[Service]
+ExecStart=/var/hg/venv_tools/bin/python -u /var/hg/version-control-tools/scripts/firefox-releases import-and-sync /repo/hg/fxreleases/db.db /repo/hg/mozilla/mozilla-unified
+Type=oneshot
+User=hg
+Group=hg
+Nice=10
