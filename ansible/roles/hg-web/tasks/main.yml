@@ -323,6 +323,25 @@
         minute=12
         hour=2
 
+- include: ../../../tasks/systemd-mail-unit-output.yml
+  when: vct_dir.stat.exists == False
+
+- name: create directory mail-unit-output override file
+  file: path=/etc/systemd/system/mail-unit-output@.service.d
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: install mail-unit-output override
+  copy: src=mail-unit-output-override.conf
+        dest=/etc/systemd/system/mail-unit-output@.service.d/override.conf
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
 # moz.build evaluation occurs in a chroot with a specific control group
 # to limit potential for danger. We have a dedicated user and establish
 # a cgroup policy that all processes for that user go in the limited
@@ -438,7 +457,7 @@
         state=directory
         owner=hg
         group=hg
-        mode=0664
+        mode=0775
 
 - name: systemd service files for firefox release scraper (server only)
   copy: src={{ item }}
@@ -446,12 +465,16 @@
         owner=root
         group=root
         mode=0644
+  with_items:
+    - firefox-release-scraper.service
+    - firefox-release-scraper.timer
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
 - name: firefox release scraper service enabled (server only)
   service: name=firefox-release-scraper.timer
            enabled=yes
+           state=started
   when: vct_dir.stat.exists == False
 
 - name: copy vcsreplicator config

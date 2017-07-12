@@ -16,6 +16,9 @@ idna==2.5 \
 Mercurial==4.1.2 \
     --hash=sha256:09415253fb409a77e19b9951532a3c22c4e07e74bab80652527064617daab194
 
+python-hglib==1.9 \
+    --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
+
 requests==2.18.1 \
     --hash=sha256:6afd3371c1f4c1970497cdcace5c5ecbbe58267bf05ca1abd93d99d170803ab7
 
