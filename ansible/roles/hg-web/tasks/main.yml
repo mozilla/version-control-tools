@@ -453,7 +453,7 @@
   command: /bin/chown -R hg:hg /repo/hg/hg_templates
 
 - name: directory for Firefox release scraper
-  file: path=/repo/hg/fxreleases
+  file: path=/var/hg/fxreleases
         state=directory
         owner=hg
         group=hg
