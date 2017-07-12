@@ -14,6 +14,7 @@ hg.mozilla.org
    bundleclone
    contributing
    mozbuildinfo
+   firefoxreleases
    replication
    ops
    upgrading
