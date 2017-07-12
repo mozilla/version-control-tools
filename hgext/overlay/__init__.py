@@ -36,7 +36,70 @@ REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
 
 
-def _verifymanifestsequal(sourcerepo, sourcectx, destrepo, destctx, prefix):
+def _ctx_summary(ctx):
+    return [
+        '',
+        _('changeset: %s') % ctx.hex(),
+        _('user:      %s') % ctx.user(),
+        _('date:      %s') % util.datestr(ctx.date()),
+        _('summary:   %s') % ctx.description().splitlines()[0],
+    ]
+
+
+def _summarise_changed(summary, repo_name, repo, last_ctx, prefix, files):
+    overlaid_ctx = None
+    all_ctxs = []
+    matching_ctxs = []
+
+    # Find revisions newer than the last overlaid.
+    dest_revs = scmutil.revrange(
+        repo, ['%s:: and file("path:%s")' % (last_ctx.hex(), prefix)])
+    for rev in dest_revs:
+        ctx = repo[rev]
+
+        if not overlaid_ctx:
+            overlaid_ctx = ctx
+            continue
+
+        all_ctxs.append(ctx)
+
+        # Report on revisions that touch problematic files.
+        if files and (set(ctx.files()) & files):
+            matching_ctxs.append(ctx)
+
+    # No revisions to report.
+    if not all_ctxs:
+        return
+
+    summary.extend(['', _('%s Repository:') % repo_name,
+                    '', _('Last overlaid revision:')])
+    summary.extend(_ctx_summary(overlaid_ctx))
+    summary.extend(['', _('Revisions that require investigation:')])
+
+    # If we didn't find any revisions that match the problematic files report
+    # on all revisions instead.
+    for ctx in matching_ctxs if matching_ctxs else all_ctxs:
+        summary.extend(_ctx_summary(ctx))
+
+
+def _report_mismatch(ui, sourcerepo, lastsourcectx, destrepo, lastdestctx,
+                     prefix, files, error_message, hint=None):
+    if files:
+        prefixed_file_set = set('%s%s' % (prefix, f) for f in files)
+    else:
+        prefixed_file_set = set()
+
+    summary = [error_message.rstrip()]
+    _summarise_changed(summary, _('Source'), sourcerepo, lastsourcectx,
+                       prefix, prefixed_file_set)
+    _summarise_changed(summary, _('Destination'), destrepo, lastdestctx,
+                       prefix, prefixed_file_set)
+
+    raise error.Abort(error_message, hint=hint)
+
+
+def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
+                          prefix, lastsourcectx, lastdestctx):
     assert prefix.endswith('/')
 
     sourceman = sourcectx.manifest()
@@ -46,11 +109,13 @@ def _verifymanifestsequal(sourcerepo, sourcectx, destrepo, destctx, prefix):
     destfiles = set(p[len(prefix):] for p in destman if p.startswith(prefix))
 
     if sourcefiles ^ destfiles:
-        raise error.Abort(_('files mismatch between source and destiation: %s')
-                          % _(', ').join(sorted(destfiles ^ sourcefiles)),
-                          hint=_('destination must match previously imported '
-                                 'changeset (%s) exactly') %
-                               short(sourcectx.node()))
+        _report_mismatch(
+            ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
+            destfiles ^ sourcefiles,
+            (_('files mismatch between source and destination: %s')
+             % ', '.join(sorted(destfiles ^ sourcefiles))),
+            'destination must match previously imported changeset (%s) exactly'
+            % short(sourcectx.node()))
 
     # The set of paths is the same. Now verify the contents are identical.
     for sourcepath, sourcenode, sourceflags in sourceman.iterentries():
@@ -58,11 +123,12 @@ def _verifymanifestsequal(sourcerepo, sourcectx, destrepo, destctx, prefix):
         destnode, destflags = destman.find(destpath)
 
         if sourceflags != destflags:
-            raise error.Abort(_('file flags mismatch between source and '
-                                'destination for %s: %s != %s') %
-                              (sourcepath,
-                               sourceflags or _('(none)'),
-                               destflags or _('(none)')))
+            _report_mismatch(
+                ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
+                [sourcepath],
+                (_('file flags mismatch between source and destination for '
+                   '%s: %s != %s') % (sourcepath, sourceflags or _('(none)'),
+                                      destflags or _('(none)'))))
 
         # We can't just compare the nodes because they are derived from
         # content that may contain file paths in metadata, causing divergence
@@ -72,9 +138,12 @@ def _verifymanifestsequal(sourcerepo, sourcectx, destrepo, destctx, prefix):
         destfl = destrepo.file(destpath)
 
         if sourcefl.read(sourcenode) != destfl.read(destnode):
-            raise error.Abort(_('content mismatch between source (%s) '
-                                'and destination (%s) in %s') % (
-                short(sourcectx.node()), short(destctx.node()), destpath))
+            _report_mismatch(
+                ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
+                [sourcepath],
+                _('content mismatch between source (%s) and destination (%s) '
+                  'in %s') % (short(sourcectx.node()), short(destctx.node()),
+                              destpath))
 
         sourcetext = sourcefl.revision(sourcenode)
         desttext = destfl.revision(destnode)
@@ -94,9 +163,11 @@ def _verifymanifestsequal(sourcerepo, sourcectx, destrepo, destctx, prefix):
             del destmeta['copyrev']
 
         if sourcemeta != destmeta:
-            raise error.Abort(_('metadata mismatch for file %s between source '
-                                'and dest: %s != %s') % (
-                                destpath, sourcemeta, destmeta))
+            _report_mismatch(
+                ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
+                [sourcepath],
+                (_('metadata mismatch for file %s between source and dest: '
+                   '%s != %s') % (destpath, sourcemeta, destmeta)))
 
 
 def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
@@ -185,6 +256,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
     # Attempt to find an incoming changeset in dest and prune already processed
     # source revisions.
     lastsourcectx = None
+    lastdestctx = None
     for rev in sorted(destrepo.changelog.ancestors([destctx.rev()],
                       inclusive=True), reverse=True):
         ctx = destrepo[rev]
@@ -203,6 +275,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
         # the offset of the first seen rev and assume everything before
         # has been imported.
         try:
+            lastdestctx = ctx
             idx = sourcerevs.index(lastsourcectx.rev()) + 1
             ui.write(_('%s already processed as %s; '
                        'skipping %d/%d revisions\n' %
@@ -260,8 +333,8 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
         else:
             comparectx = sourcerepo[sourcerevs[0]].p1()
 
-        _verifymanifestsequal(sourcerepo, comparectx, destrepo, destctx,
-                              prefix)
+        _verifymanifestsequal(ui, sourcerepo, comparectx, destrepo, destctx,
+                              prefix, lastsourcectx, lastdestctx)
 
     # All the validation is done. Proceed with the data conversion.
     with destrepo.lock():

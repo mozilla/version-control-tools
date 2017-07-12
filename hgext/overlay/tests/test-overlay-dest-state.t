@@ -54,7 +54,7 @@ Addition of file in destination fails precondition testing
   adding file changes
   added 1 changesets with 2 changes to 2 files
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
-  abort: files mismatch between source and destiation: extra-file
+  abort: files mismatch between source and destination: extra-file
   (destination must match previously imported changeset (0f7e081c425c) exactly)
   [255]
 
@@ -66,7 +66,7 @@ Removal of file in destination fails precondition testing
   $ hg commit -m 'remove bar'
   $ hg overlay http://localhost:$HGPORT --into subdir
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
-  abort: files mismatch between source and destiation: bar
+  abort: files mismatch between source and destination: bar
   (destination must match previously imported changeset (0f7e081c425c) exactly)
   [255]
 
