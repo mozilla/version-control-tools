@@ -257,3 +257,15 @@ indexentry = '\{
   "lastchange": {lastchange|json},
   "labels": {labels|json}
   }'
+
+firefoxreleases = '\{
+  "builds": [{join(releases%firefoxreleasebuild, ", ")}]
+  }'
+firefoxreleasebuild = '\{
+  "node": {revision|json},
+  "buildid": {build_id|json},
+  "channel": {channel|json},
+  "platform": {platform|json},
+  "app_version": {app_version|json},
+  "files_url": {artifacts_url|json}
+  }'

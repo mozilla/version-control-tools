@@ -336,3 +336,17 @@ ul#graphnodes li .info {
 #doc {
     margin: 0 8px;
 }
+
+div.firefoxreleasecsetdetails {
+    font-family: monospace;
+    padding-left: 5px;
+}
+
+div.firefoxreleasecsetentry {
+    display: flex;
+    justify-content: space-between;
+}
+
+.firefoxreleasefixed {
+    font-family: monospace;
+}

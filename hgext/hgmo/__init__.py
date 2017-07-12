@@ -594,6 +594,7 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
             ui.setconfig('extensions', name,
                          os.path.join(ROOT, 'hgext', *paths))
 
+        setconfig('firefoxreleases', ['firefoxreleases'])
         setconfig('pushlog', ['pushlog'])
         setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
 

@@ -54,7 +54,12 @@ changeset |
 {if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers%reviewerlink, ", ")}</td></tr>')}
 {if(bugs, '<tr><td>bugs</td><td>{join(bugs%bughyperlink, ", ")}</td></tr>')}
 {if(milestone, '<tr><td>milestone</td><td>{milestone|escape}</td></tr>')}
-{if(backsoutnodes, '<tr><td>backs out</td><td>{join(backsoutnodes%backedoutnodelink, ", ")}</td></tr>')}
+{if(backsoutnodes, '<tr><td>backs out</td><td>{join(backsoutnodes%backedoutnodelink, "<br />")}</td></tr>')}
+{if(have_first_and_last_firefox_releases, '
+  <tr><td>first release with</td><td><div>{firefox_releases_first % firefox_release_entry}</div></td></tr>
+  <tr><td>last release without</td><td><div>{firefox_releases_last % firefox_release_entry}</div></td></tr>
+  ')}
+{if(firefox_releases_here, '<tr><td>releases</td><td><div>{firefox_releases_here % firefox_release_entry_here}</div></td></tr>')}
 </table></div>
 
 {desc|strip|escape|mozlink|addbreaks}

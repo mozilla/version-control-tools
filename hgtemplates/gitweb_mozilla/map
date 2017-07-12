@@ -339,3 +339,37 @@ pushlog = pushlog.tmpl
 bughyperlink = '<a href="{url}">{no|escape}</a>'
 reviewerlink = '<a href="{url|urlescape}log?rev={revset|urlescape}&revcount=50">{name|escape}</a>'
 backedoutnodelink = '<a style="font-family: monospace" href="{url|urlescape}rev/{node|short}">{node|short}</a>'
+
+firefoxreleases = firefoxreleases.tmpl
+firefoxreleasetableentry = '<tr id="{anchor|escape}" class="parity{parity}">
+  <td class="firefoxreleasefixed"><a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a></td>
+  <td class="firefoxreleasefixed">{build_id|escape}</td>
+  <td>{channel|escape}</td>
+  <td>{platform|escape}</td>
+  <td>{app_version|escape}</td>
+  <td><a href="{artifacts_url}">files</a></td>
+  </tr>'
+
+# Render a first and last release build entry on the changeset page.
+firefox_release_entry = '<div class="firefoxreleasecsetentry">
+    <div>{channel|escape} {platform|escape}</div>
+    <div class="firefoxreleasecsetdetails">
+      {ifeq(revision, node, '{revision|short}', '<a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a>')}
+      /
+      {app_version|escape}
+      /
+      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
+      /
+      <a href="{artifacts_url}">files</a>
+    </div></div>'
+
+# Render a release build for this changeset.
+firefox_release_entry_here = '<div class="firefoxreleasecsetentry">
+    <div>{channel|escape} {platform|escape}</div>
+    <div class="firefoxreleasecsetdetails">
+      {app_version|escape}
+      /
+      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
+      {if(previousnode, '/
+      <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
+    </div></div>'
