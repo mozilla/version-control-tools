@@ -95,6 +95,7 @@ from mercurial.i18n import _
 from mercurial.node import (
     bin,
     hex,
+    nullrev,
     short,
 )
 
@@ -607,6 +608,8 @@ def reposetup(ui, repo):
             if not data:
                 return trees
 
+            cl = self.changelog
+
             for line in data.splitlines():
                 line = line.strip()
                 if not line:
@@ -618,7 +621,18 @@ def reposetup(ui, repo):
                 if tree in TRY_TREES:
                     continue
 
-                trees[tree] = bin(hexnode)
+                binnode = bin(hexnode)
+
+                # Filter out unknown nodes. Since this function is used as part
+                # of writing, it means that unknown nodes will silently be
+                # dropped on next write.
+                try:
+                    if cl.rev(binnode) == nullrev:
+                        continue
+                except error.LookupError:
+                    continue
+
+                trees[tree] = binnode
 
             return trees
 

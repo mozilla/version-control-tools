@@ -23,8 +23,8 @@ Add an entry for a missing node
   > EOF
 
   $ hg log -r 'fxheads()' -T '{node}\n'
-  abort: unknown revision '0000000000111111111122222222223333333333'!
-  [255]
+  994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
+  1b348279b0e9b3c29568b6abc8a1776a68d39261
 
   $ cd ..
 
@@ -48,5 +48,4 @@ Prune the changeset associated with inbound
   $ hg debugobsolete 1b348279b0e9b3c29568b6abc8a1776a68d39261
 
   $ hg log -r 'fxheads()' -T '{node}\n'
-  abort: unknown revision '1b348279b0e9b3c29568b6abc8a1776a68d39261'!
-  [255]
+  994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
