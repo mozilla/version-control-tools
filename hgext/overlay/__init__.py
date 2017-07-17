@@ -10,6 +10,8 @@ unrelated repository into a sub-directory of another.
 from __future__ import absolute_import
 
 import os
+import shlex
+import subprocess
 
 from mercurial.i18n import _
 from mercurial.node import bin, hex, short
@@ -83,23 +85,33 @@ def _summarise_changed(summary, repo_name, repo, last_ctx, prefix, files):
 
 
 def _report_mismatch(ui, sourcerepo, lastsourcectx, destrepo, lastdestctx,
-                     prefix, files, error_message, hint=None):
-    if files:
-        prefixed_file_set = set('%s%s' % (prefix, f) for f in files)
-    else:
-        prefixed_file_set = set()
+                     prefix, files, error_message, hint=None, notify=None):
+    if notify:
+        if files:
+            prefixed_file_set = set('%s%s' % (prefix, f) for f in files)
+        else:
+            prefixed_file_set = set()
 
-    summary = [error_message.rstrip()]
-    _summarise_changed(summary, _('Source'), sourcerepo, lastsourcectx,
-                       prefix, prefixed_file_set)
-    _summarise_changed(summary, _('Destination'), destrepo, lastdestctx,
-                       prefix, prefixed_file_set)
+        summary = [error_message.rstrip()]
+        _summarise_changed(summary, _('Source'), sourcerepo, lastsourcectx,
+                           prefix, prefixed_file_set)
+        _summarise_changed(summary, _('Destination'), destrepo, lastdestctx,
+                           prefix, prefixed_file_set)
+        summary_str = ('%s\n' % '\n'.join(summary))
+
+        cmd = shlex.split(notify)
+        cmd[0] = os.path.expanduser(os.path.expandvars(cmd[0]))
+        try:
+            proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+            proc.communicate(summary_str)
+        except OSError as ex:
+            ui.write('notify command "%s" failed: %s\n' % (cmd[0], ex))
 
     raise error.Abort(error_message, hint=hint)
 
 
 def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
-                          prefix, lastsourcectx, lastdestctx):
+                          prefix, lastsourcectx, lastdestctx, notify=None):
     assert prefix.endswith('/')
 
     sourceman = sourcectx.manifest()
@@ -115,7 +127,9 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
             (_('files mismatch between source and destination: %s')
              % ', '.join(sorted(destfiles ^ sourcefiles))),
             'destination must match previously imported changeset (%s) exactly'
-            % short(sourcectx.node()))
+            % short(sourcectx.node()),
+            notify=notify
+        )
 
     # The set of paths is the same. Now verify the contents are identical.
     for sourcepath, sourcenode, sourceflags in sourceman.iterentries():
@@ -128,7 +142,8 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
                 [sourcepath],
                 (_('file flags mismatch between source and destination for '
                    '%s: %s != %s') % (sourcepath, sourceflags or _('(none)'),
-                                      destflags or _('(none)'))))
+                                      destflags or _('(none)'))),
+                notify=notify)
 
         # We can't just compare the nodes because they are derived from
         # content that may contain file paths in metadata, causing divergence
@@ -143,7 +158,8 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
                 [sourcepath],
                 _('content mismatch between source (%s) and destination (%s) '
                   'in %s') % (short(sourcectx.node()), short(destctx.node()),
-                              destpath))
+                              destpath),
+                notify=notify)
 
         sourcetext = sourcefl.revision(sourcenode)
         desttext = destfl.revision(destnode)
@@ -167,7 +183,8 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
                 ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
                 [sourcepath],
                 (_('metadata mismatch for file %s between source and dest: '
-                   '%s != %s') % (destpath, sourcemeta, destmeta)))
+                   '%s != %s') % (destpath, sourcemeta, destmeta)),
+                notify=notify)
 
 
 def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
@@ -210,7 +227,7 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
 
 
 def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
-               noncontiguous):
+               noncontiguous, notify=None):
     """Overlay changesets from one repository into another.
 
     ``sourcerevs`` (iterable of revs) from ``sourcerepo`` will effectively
@@ -334,7 +351,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
             comparectx = sourcerepo[sourcerevs[0]].p1()
 
         _verifymanifestsequal(ui, sourcerepo, comparectx, destrepo, destctx,
-                              prefix, lastsourcectx, lastdestctx)
+                              prefix, lastsourcectx, lastdestctx, notify)
 
     # All the validation is done. Proceed with the data conversion.
     with destrepo.lock():
@@ -379,9 +396,10 @@ def _mirrorrepo(ui, repo, url):
                         'changesets')),
     ('', 'into', '', _('directory in destination in which to add files')),
     ('', 'noncontiguous', False, _('allow non continuous dag heads')),
+    ('', 'notify', '', _('application to handle error notifications'))
 ], _('[-d REV] SOURCEURL [REVS]'))
 def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
-            noncontiguous=False):
+            noncontiguous=False, notify=None):
     """Integrate contents of another repository.
 
     This command essentially replays changesets from another repository into
@@ -412,6 +430,10 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
     if the file content in the destination did not match the source, then
     the ``hg diff`` output for the next overlayed changeset would differ from
     the source.
+
+    This command supports sending human readable notifications in the event
+    that an overlay failed. Set --notify to an command that handles delivery
+    of these errors. The message will be piped to the command via STDIN.
     """
     # We could potentially support this later.
     if not into:
@@ -435,4 +457,4 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
     sourceurl = ui.config('overlay', 'sourceurl', sourceurl)
 
     _dooverlay(sourcerepo, sourceurl, sourcerevs, repo, destctx, into,
-               noncontiguous)
+               noncontiguous, notify)

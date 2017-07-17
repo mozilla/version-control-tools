@@ -120,3 +120,40 @@ Metadata mismatch between source and dest fails precondition testing
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
   abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
   [255]
+
+Notification
+
+  $ hg overlay http://localhost:$HGPORT --into subdir --notify 'sed "s/^/notify: /"'
+  notify: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  notify: 
+  notify: Destination Repository:
+  notify: 
+  notify: Last overlaid revision:
+  notify: 
+  notify: changeset: 4930b59d998731eedd4a01b6f3f671af0c080e36
+  notify: user:      Test User <someone@example.com>
+  notify: date:      Thu Jan 01 00:00:00 1970 +0000
+  notify: summary:   copy foo-copy to foo-copy2
+  notify: 
+  notify: Revisions that require investigation:
+  notify: 
+  notify: changeset: 5d9084d79cc3074ae45081dcb64e3473b2f55d70
+  notify: user:      Test User <someone@example.com>
+  notify: date:      Thu Jan 01 00:00:00 1970 +0000
+  notify: summary:   remove foo-copy2
+  notify: 
+  notify: changeset: 83b0c8a8cf2f5b0db017e4efab8726b722ff9d00
+  notify: user:      Test User <someone@example.com>
+  notify: date:      Thu Jan 01 00:00:00 1970 +0000
+  notify: summary:   create foo-copy2 from different source
+  0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  [255]
+
+Bad notification switch shouldn't prevent normal errors
+
+  $ hg overlay http://localhost:$HGPORT --into subdir --notify this-command-is-bad
+  0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
+  notify command "this-command-is-bad" failed: [Errno 2] No such file or directory
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  [255]
