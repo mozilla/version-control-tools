@@ -62,9 +62,7 @@ changeset |
 {if(firefox_releases_here, '<tr><td>releases</td><td><div>{firefox_releases_here % firefox_release_entry_here}</div></td></tr>')}
 </table></div>
 
-<div class="page_body description">
-{desc|strip|escape|mozlink|addbreaks}
-</div>
+<div class="page_body description">{desc|strip|escape|mozlink}</div>
 <div class="list_head"></div>
 <div class="title_text">
 <table cellspacing="0">
