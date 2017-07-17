@@ -1,0 +1,49 @@
+#!/usr/bin/env python2
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# Simple wrapper around aws-cli to publish messages to a SNS topic.
+#
+# This wrapper exists to support passing in the message via STDIN, and removes
+# the requirement to specify the AWS region explicitly (as it can be extracted
+# from the topic's ARN).
+#
+# Requires AWS credentials to already be configured in the environment
+# (environmental vars, ~/.aws/credentials, instance profile credentials, etc).
+
+import argparse
+import sys
+import subprocess
+
+# Parse arguments.
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--topic-arn',
+                    required=True,
+                    help='ARN of SNS topic to publish to.')
+parser.add_argument('--subject',
+                    required=True,
+                    help='Email subject.')
+parser.add_argument('--message',
+                    help='Message to publish.')
+args = parser.parse_args()
+
+if not args.message:
+    args.message = sys.stdin.read()
+
+# Extract region from topic ARN.
+
+arn = args.topic_arn.split(':')
+if len(arn) < 6 or not args.topic_arn.startswith('arn:aws:sns:'):
+    raise Exception('"%s" is not a valid AWS SNS ARN' % args.topic_arn)
+
+# Publish, consuming and discarding the JSON response.
+
+subprocess.check_output([
+    'aws', 'sns', 'publish',
+    '--topic-arn', args.topic_arn,
+    '--region', arn[3],
+    '--subject', args.subject,
+    '--message', args.message,
+])
