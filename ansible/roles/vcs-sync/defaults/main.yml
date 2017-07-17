@@ -17,7 +17,7 @@ backout_integration_url: https://hg.mozilla.org/integration/autoland
 backout_github_name: servo/servo
 # Author of all backout PRs.
 backout_author: "Gecko Backout <gecko-backout@mozilla.org>"
-# S3 url to persist tracking data
+# S3 url to persist backout tracking data.
 backout_s3_upload_url: "s3://moz-vcssync-servo-commitmap/backout-tracking"
 
 # URL of Mercurial converted Servo repo to overlay into a Firefox repo.
@@ -28,5 +28,8 @@ servo_overlay_dest_url: https://hg.mozilla.org/integration/autoland
 servo_overlay_result_push_url: ssh://hg.mozilla.org/integration/autoland
 # Name of the tree on treestatus.mozilla.org.
 servo_overlay_push_tree: autoland
+# SNS topic ARN to publish overlay failures to.
+servo_overlay_error_topic: arn:aws:sns:us-west-2:699292812394:vcssync-servo-errors
 
+# S3 url to persist overlay tracking data.
 servo_shamap_s3_upload_url: "s3://moz-vcssync-servo-commitmap/shamap"

@@ -17,7 +17,8 @@ ExecStart=/home/servo-sync/venv/bin/servo-overlay \
   --result-push-url $OVERLAY_RESULT_PUSH_URL \
   --push-tree $OVERLAY_PUSH_TREE \
   --hg /home/servo-sync/venv/bin/hg \
-  --overlay-hg-repos /home/servo-sync/venv/bin/overlay-hg-repos
+  --overlay-hg-repos /home/servo-sync/venv/bin/overlay-hg-repos \
+  --notify '~/publish-to-sns --subject "Servo Overlay Failure" --topic-arn $OVERLAY_ERROR_TOPIC'
 
 User=servo-sync
 Group=servo-sync
