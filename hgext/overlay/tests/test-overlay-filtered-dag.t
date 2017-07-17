@@ -70,7 +70,7 @@ Incremental conversion with --noncontiguous works
   $ hg commit -m 'out of band change simulating commit 5'
 
   $ hg overlay http://localhost:$HGPORT1 'not desc("FILTERED")' --into prefix
-  pulling http://localhost:$HGPORT1 into $TESTTMP/dest/.hg/localhost~3a20123
+  pulling http://localhost:$HGPORT1 into $TESTTMP/dest/.hg/localhost~3a* (glob)
   searching for changes
   adding changesets
   adding manifests
