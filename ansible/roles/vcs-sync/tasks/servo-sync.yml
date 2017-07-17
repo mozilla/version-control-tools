@@ -84,6 +84,14 @@
         mode=0640
   become_user: servo-sync
 
+- name: copy sns notification handler
+  copy: src={{ vct }}/scripts/publish-to-sns
+        dest=/home/servo-sync/publish-to-sns
+        owner=servo-sync
+        group=servo-sync
+        mode=0755
+  become_user: servo-sync
+
 - name: seed Servo Git clone with existing conversion
   command: /usr/bin/git clone --mirror {{ servo_linear_git_push_url | mandatory }} /home/servo-sync/servo.git creates=/home/servo-sync/servo.git
   become_user: servo-sync
