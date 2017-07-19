@@ -135,20 +135,22 @@ def autoland():
     cursor = dbconn.cursor()
 
     query = """
-        SELECT created, request->>'ldap_username'
+        SELECT created, landed, request->>'ldap_username'
           FROM Transplant
-         WHERE landed IS NULL
+         WHERE (landed IS NULL or NOT landed)
                AND request->>'rev' = %s
                AND request->>'destination' = %s
     """
     cursor.execute(query, (request.json['rev'], request.json['destination']))
-    in_flight = cursor.fetchone()
-    if in_flight:
-        error = ('Bad request: a request to land revision %s to %s is already '
-                 'in progress'
-                 % (request.json['rev'], request.json['destination']))
+    duplicate = cursor.fetchone()
+    if duplicate:
+        if duplicate[1]:
+            message = 'revision % has already landed on %s'
+        else:
+            message = 'landing revision %s to %s is already in progress'
+        error = message % (request.json['rev'], request.json['destination'])
         app.logger.warn(
-            '%s from %s at %s' % (error, in_flight[0], in_flight[1]))
+            '%s from %s at %s' % (error, duplicate[2], duplicate[1]))
         return make_response(jsonify({'error': error}), 400)
 
     app.logger.info('received transplant request: %s' %
