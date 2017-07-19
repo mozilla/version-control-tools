@@ -237,7 +237,10 @@ def backout_servo_pr(integration_repo_url, integration_repo_path,
         f.write(b'%s\n' % remote_tip)
 
     # TODO so hacky. Relies on credentials in the environment.
-    # Disabled to unblock deployment.
-    #if tracking_s3_upload_url:
-    #    subprocess.check_call([
-    #        b'aws', b's3', b'cp', tracking_file, tracking_s3_upload_url])
+    if tracking_s3_upload_url:
+        try:
+            cmd = [b'aws', b's3', b'cp', tracking_file, tracking_s3_upload_url]
+            logger.info('executing %s' % cmd)
+            subprocess.check_call(cmd)
+        except subprocess.CalledProcessError as e:
+            logger.warn(e.output)
