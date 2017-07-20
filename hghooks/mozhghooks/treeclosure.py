@@ -22,7 +22,7 @@ import re
 import json
 
 magicwords = "CLOSED TREE"
-treestatus_base_url = "https://api.pub.build.mozilla.org/treestatus/trees/%s"
+treestatus_base_url = "https://treestatus.mozilla-releng.net/trees/%s"
 
 
 def printError(message):
