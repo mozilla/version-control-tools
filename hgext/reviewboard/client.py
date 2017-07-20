@@ -1137,12 +1137,13 @@ def run_android_checkstyle(repo, nodes):
         # We run gradle directly (rather than the mach wrapper) to save
         # (granted, very little) time on the python interpreter start-up.
         import subprocess
-        binary = repo.root + '/gradlew'
+        cmd = ['bash', '%s/gradlew' % repo.root, '--quiet', '--project-dir',
+               repo.root, 'app:checkstyle']
         try:
-            subprocess.check_output([binary, '--quiet', '--project-dir',
-                                     repo.root, 'app:checkstyle'],
-                                     stderr=subprocess.STDOUT)
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT)
             repo.ui.write(' success!\n')
+        except OSError as e:
+            repo.ui.write(' failed to run %s: %s\n' % (cmd, e))
         except subprocess.CalledProcessError as e:
             # Users may not have Java installed, don't have front-end builds
             # set up, etc. so we can't force all changes to be run through
