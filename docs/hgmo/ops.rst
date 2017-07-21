@@ -600,12 +600,12 @@ are running::
 
 If any of the processes aren't in the ``active (running)`` state, the
 consumer for that partition has crashed for some reason. Try to start it
-back up:
+back up::
 
    $ systemctl start vcsreplicator@*.service
 
 You might want to take a look at the logs in the journal to make sure the
-process is happy:
+process is happy::
 
    $ journalctl -f --unit vcsreplicator@*.service
 
@@ -960,7 +960,7 @@ Then we can execute the data reassignment::
      --reassignment-json-file reassignments.json
 
 Data reassignment can take up to several minutes. We can see the status
-of the reassignment by running:
+of the reassignment by running::
 
    $ /opt/kafka/bin/kafka-reassign-partitions.sh \
      --zookeeper <hosts> \
