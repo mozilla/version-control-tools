@@ -54,7 +54,7 @@ destination directory
   hg> adding file changes
   hg> added 1 changesets with 1 changes to 1 files
   hg> d92cc0ff6f1a already processed as 1467125e7dd1; skipping 2/3 revisions
-  hg> abort: files mismatch between source and destiation: unwanted-file
+  hg> abort: files mismatch between source and destination: unwanted-file
   hg> (destination must match previously imported changeset (d92cc0ff6f1a) exactly)
   abort: hg command failed
   [1]

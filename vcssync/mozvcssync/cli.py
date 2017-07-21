@@ -228,6 +228,8 @@ def overlay_hg_repos_cli():
                         help='URL where to push the overlayed result')
     parser.add_argument('--noncontiguous', action='store_true',
                         help='Allow a non-contiguous source_revs')
+    parser.add_argument('--notify',
+                        help='Application to handle error notifications')
 
     args = parser.parse_args()
 
@@ -249,7 +251,8 @@ def overlay_hg_repos_cli():
                 source_rev=args.source_revs,
                 dest_prefix=args.into,
                 result_push_url=args.result_push_url,
-                noncontiguous=args.noncontiguous)
+                noncontiguous=args.noncontiguous,
+                notify=args.notify)
             sys.exit(0)
         except PushRaceError:
             logger.warn('likely push race on attempt %d/%d' % (
