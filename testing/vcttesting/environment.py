@@ -230,6 +230,16 @@ def create_vcssync():
     return venv
 
 
+def create_xchannel():
+    """Create an environment used for testing VCSSync."""
+    venv = create_virtualenv('cross-channel-l10n')
+    process_pip_requirements(venv, 'cross-channel-l10n/test-requirements.txt')
+    install_editable(venv, 'testing')
+    install_editable(venv, 'cross-channel-l10n')
+
+    return venv
+
+
 if __name__ == '__main__':
     import sys
 

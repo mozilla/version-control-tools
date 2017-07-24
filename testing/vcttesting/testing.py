@@ -54,6 +54,9 @@ UNIT_TEST_DIRS = {
     'vcssync/tests': {
         'venvs': {'vcssync'},
     },
+    'cross-channel-l10n/tests': {
+        'venvs': {'cross-channel-l10n',},
+    }
 }
 
 # Directories whose Python unit tests we should ignore.

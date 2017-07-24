@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(HERE, 'testing'))
 from vcttesting.environment import (
     create_hgdev,
     create_vcssync,
+    create_xchannel,
 )
 
 
@@ -30,6 +31,10 @@ def main():
     sp = subparsers.add_parser('vcssync',
                                help='Version control synchronization')
 
+
+    sp = subparsers.add_parser('xchannel',
+                               help='Cross-channel Localization')
+
     args = parser.parse_args()
 
     env = args.environment
@@ -38,6 +43,8 @@ def main():
         info = create_hgdev(docker_bmo=args.docker_bmo)
     elif env == 'vcssync':
         info = create_vcssync()
+    elif env == 'xchannel':
+        info = create_xchannel()
     else:
         raise Exception('unhandled environment: %s' % env)
 
