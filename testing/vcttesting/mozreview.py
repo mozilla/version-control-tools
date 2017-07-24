@@ -358,7 +358,8 @@ class MozReview(object):
                                  'mozreview-%s' % os.path.basename(self._path)],
                                 stdout=devnull, stderr=subprocess.STDOUT)
 
-    def refresh(self, verbose=False, refresh_reviewboard=False):
+    def refresh(self, verbose=False, refresh_reviewboard=False,
+                autoland_only=False):
         """Refresh a running cluster with latest version of code.
 
         This only updates code from the v-c-t repo. Not all containers
@@ -385,11 +386,12 @@ class MozReview(object):
                                     'all' if refresh_reviewboard else ''])
 
             with futures.ThreadPoolExecutor(4) as e:
-                e.submit(refresh, 'rbweb', self.rbweb_id)
-                e.submit(refresh, 'hgrb', self.hgrb_id)
-                # TODO add hgweb support for refreshing.
-                e.submit(execute, 'bmoweb', self.bmoweb_id,
-                         ['/usr/bin/supervisorctl', 'restart', 'httpd'])
+                if not autoland_only:
+                    e.submit(refresh, 'rbweb', self.rbweb_id)
+                    e.submit(refresh, 'hgrb', self.hgrb_id)
+                    e.submit(execute, 'bmoweb', self.bmoweb_id,
+                             ['/usr/bin/supervisorctl', 'restart', 'httpd'])
+                e.submit(refresh, 'autoland', self.autoland_id)
 
     def start_autorefresh(self):
         """Enable auto refreshing of the cluster when changes are made.

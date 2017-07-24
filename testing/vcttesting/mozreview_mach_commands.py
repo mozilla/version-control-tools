@@ -156,9 +156,12 @@ class MozReviewCommands(object):
                      help='Directory of MozReview instance')
     @CommandArgument('--refresh-reviewboard', action='store_true',
                      help='Refresh changes from reviewboard-fork')
-    def refresh(self, where, refresh_reviewboard):
+    @CommandArgument('--autoland-only', action='store_true',
+                     help='Only refresh Autoland')
+    def refresh(self, where, refresh_reviewboard, autoland_only):
         mr = self._get_mozreview(where)
-        mr.refresh(verbose=True, refresh_reviewboard=refresh_reviewboard)
+        mr.refresh(verbose=True, refresh_reviewboard=refresh_reviewboard,
+                   autoland_only=autoland_only)
 
     @Command('autorefresh', category='mozreview',
              description='Automatically refresh containers when files change')

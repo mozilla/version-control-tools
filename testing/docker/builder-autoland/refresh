@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# autoland runs out of the VCT directory directly, so we can't --delete
+/usr/bin/rsync -rlpt --chown root:root $1 $VCT_HOME
+
+/start-autoland.sh
+echo 'refreshed autoland container successfully'

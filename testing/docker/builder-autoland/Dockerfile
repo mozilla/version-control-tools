@@ -14,7 +14,7 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 autoland
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
   apache2 curl gcc libapache2-mod-wsgi openssh-client postgresql-client \
-  python2.7-dev python-pip libffi6 libffi-dev libpq-dev ca-certificates
+  python2.7-dev python-pip libffi6 libffi-dev libpq-dev ca-certificates rsync
 
 # Python
 # %include autoland/requirements.txt
@@ -31,6 +31,7 @@ RUN ${AUTOLAND_HOME}/venv/bin/pip install -r ${AUTOLAND_HOME}/requirements.txt
 RUN a2enmod headers
 RUN rm /etc/apache2/sites-enabled/*
 ADD autoland.conf /etc/apache2/sites-enabled/autoland.conf
+RUN echo "ServerName autoland" >> /etc/apache2/apache2.conf
 EXPOSE 80
 
 # Hg
@@ -50,6 +51,7 @@ RUN chmod 600 -R /root/.ssh
 ADD config.json ${AUTOLAND_HOME}/autoland/config.json
 ADD clone-repo /clone-repo
 ADD start-autoland.sh /start-autoland.sh
+ADD refresh /refresh
 CMD ["/start-autoland.sh"]
 
 # %include autoland/autoland/
