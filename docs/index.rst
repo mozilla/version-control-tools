@@ -47,6 +47,7 @@ Table of Contents
    hgmo/index
    githubwebhooks
    vcssync/index
+   cross-channel-l10n/index
 
 
 Indices and tables

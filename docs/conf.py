@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.join(ROOT, 'pylib', 'reviewboardmods'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
+    'sphinx.ext.graphviz',
 ]
 
 templates_path = ['_templates']

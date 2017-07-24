@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
+SPHINXOPTS    = -D graphviz_output_format=png
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
