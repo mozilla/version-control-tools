@@ -15,5 +15,11 @@
   },
   "pingback_allow": [
     "example.com"
-  ]
+  ],
+  "patch_url_buckets": {
+    "example-bucket": {
+      "aws_access_key_id": "DEADBEEFF00D",
+      "aws_secret_access_key": "secret"
+    }
+  }
 }

@@ -10,5 +10,11 @@
   "repos" : {{ repos | to_nice_json }},
   "pingback_allow": [
     "reviewboard.mozilla.org"
-  ]
+  ],
+  "patch_url_buckets": {
+    "to-be-determined": {
+      "aws_access_key_id": "{{ secrets.lando_aws_access_key_id }}",
+      "aws_secret_access_key": "{{ secrets.lando_aws_secret_access_key }}"
+    }
+  }
 }

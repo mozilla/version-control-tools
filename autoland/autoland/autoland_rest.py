@@ -72,6 +72,40 @@ def check_pingback_url(pingback_url):
     return False
 
 
+def check_patch_url(patch_url):
+    try:
+        url = urlparse.urlparse(patch_url)
+    except ValueError:
+        logging.error('invalid patch_url "%s": malformed url' % patch_url)
+        return False
+
+    # http is only supported when using loopback and private IPs (for dev/test)
+    if url.scheme in ('http', 'https'):
+        if url.hostname == 'localhost':
+            return True
+        try:
+            ip = ipaddress.ip_address(url.hostname)
+            if ip.is_loopback or ip.is_private:
+                return True
+        except ValueError:
+            # Ignore hostnames and invalid addresses.
+            pass
+        logging.error('invalid patch_url "%s": public http url' % patch_url)
+
+    # Deployed environments must use the s3 scheme.  s3://bucket/path/to/file
+    if url.scheme != 's3':
+        logging.error('invalid patch_url "%s": not a s3:// url' % patch_url)
+        return False
+
+    # Allow patches only from buckets configured in config.json.
+    if url.hostname not in config.get('patch_url_buckets', {}):
+        logging.error('invalid patch_url "%s": not whitelisted by config'
+                      % patch_url)
+        return False
+
+    return True
+
+
 def validate_request(request):
     if request.json is None:
         raise ValueError('missing json')
@@ -122,6 +156,11 @@ def validate_request(request):
 
     if not check_pingback_url(request_json['pingback_url']):
         raise ValueError('bad pingback_url')
+
+    if is_patch:
+        for patch_url in request_json['patch_urls']:
+            if not check_patch_url(patch_url):
+                raise ValueError('bad patch_url')
 
 
 @app.route('/autoland', methods=['POST'])
