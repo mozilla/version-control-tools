@@ -57,7 +57,7 @@ Open the tree
 
   $ treestatus set-status $TREESTATUS_URL try open
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
-  (200, u'{\n  "commit_descriptions": "", \n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "*", \n  "rev": "f363e17530eb", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
+  (200, u'{\n  "destination": "try", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "*", \n  "rev": "f363e17530eb", \n  "tree": "test-repo", \n  "trysyntax": "stuff"\n}') (glob)
 
   $ mozreview stop
   stopped 9 containers

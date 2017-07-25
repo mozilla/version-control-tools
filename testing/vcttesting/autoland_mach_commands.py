@@ -61,19 +61,20 @@ class AutolandCommands(object):
                           commit_descriptions=None, ldap_username=None,
                           user=None, password=None):
 
-        if commit_descriptions:
-            commit_descriptions = json.loads(commit_descriptions)
-
         data = {
-            'ldap_username': ldap_username,
             'tree': tree,
             'rev': rev,
             'destination': destination,
-            'trysyntax': trysyntax,
-            'push_bookmark': push_bookmark,
-            'commit_descriptions': commit_descriptions,
             'pingback_url': pingback_url
         }
+        if trysyntax:
+            data['trysyntax'] = trysyntax
+        if push_bookmark:
+            data['push_bookmark'] = push_bookmark
+        if commit_descriptions:
+            data['commit_descriptions'] = json.loads(commit_descriptions)
+        if ldap_username:
+            data['ldap_username'] = ldap_username
 
         host = host.rstrip('/')
         r = requests.post(host + '/autoland', data=json.dumps(data),

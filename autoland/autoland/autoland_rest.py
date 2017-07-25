@@ -74,20 +74,54 @@ def check_pingback_url(pingback_url):
 
 def validate_request(request):
     if request.json is None:
-        raise ValueError('Bad request: missing json')
+        raise ValueError('missing json')
+    request_json = request.json
 
-    for field in ['ldap_username', 'tree', 'rev', 'destination',
-                  'pingback_url']:
-        if field not in request.json:
-            raise ValueError('missing json field: %s' % field)
+    required = {'ldap_username', 'tree', 'rev', 'pingback_url', 'destination'}
+    optional = set()
 
-    if not check_pingback_url(request.json['pingback_url']):
-        raise ValueError('bad pingback_url')
+    is_try = 'trysyntax' in request_json
+    is_patch = 'patch_urls' in request_json
 
-    if not (request.json.get('trysyntax') or
-            request.json.get('commit_descriptions')):
+    if (not is_patch) and not ('trysyntax' in request_json or
+                               'commit_descriptions' in request_json):
         raise ValueError('one of trysyntax or commit_descriptions must be '
-                         'specified.')
+                         'specified')
+
+    if not is_try and not is_patch:
+        # Repo transplant.
+        required.add('commit_descriptions')
+        optional.add('push_bookmark')
+
+    elif not is_try and is_patch:
+        # Patch transplant.
+        required.add('patch_urls')
+        optional.add('push_bookmark')
+
+    elif is_try and not is_patch:
+        # Repo try.
+        required.add('trysyntax')
+
+    elif is_try and is_patch:
+        # Patch try.
+        raise ValueError('trysyntax is not supported with patch_urls')
+
+    request_fields = set(request_json.keys())
+
+    missing = required - request_fields
+    if missing:
+        raise ValueError('missing required field%s: %s' % (
+            '' if len(missing) == 1 else 's',
+            ', '.join(sorted(missing))))
+
+    extra = request_fields - (required | optional)
+    if extra:
+        raise ValueError('unexpected field%s: %s' % (
+            '' if len(extra) == 1 else 's',
+            ', '.join(sorted(extra))))
+
+    if not check_pingback_url(request_json['pingback_url']):
+        raise ValueError('bad pingback_url')
 
 
 @app.route('/autoland', methods=['POST'])
@@ -95,21 +129,49 @@ def autoland():
     """
     Autoland a patch from one tree to another.
 
-    Example request json:
+    Example repository based landing request:
+    (All fields are required except for push_bookmark)
+
+    {
+      "ldap_username": "cthulhu@mozilla.org",
+      "tree": "mozilla-central",
+      "rev": "9cc25f7ac50a",
+      "destination": "gecko",
+      "commit_descriptions": {"9cc25f7ac50a": "bug 1 - did stuff r=gps"},
+      "pingback_url": "http://localhost/",
+      "push_bookmark": "@"
+    }
+
+    Example repository based try request:
+    (All fields are required)
 
     {
       "ldap_username": "cthulhu@mozilla.org",
       "tree": "mozilla-central",
       "rev": "9cc25f7ac50a",
       "destination": "try",
-      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none",
-      "push_bookmark": "@",
-      "commit_descriptions": {"9cc25f7ac50a": "bug 1 - did stuff r=gps"},
-      "pingback_url": "http://localhost/"
+      "pingback_url": "http://localhost/",
+      "trysyntax": "try: -b o -p linux -u mochitest-1 -t none"
     }
 
-    The trysyntax, push_bookmark and commit_descriptions fields are
-    optional, but one of trysyntax or commit_descriptions must be specified.
+    Example patch based landing request:
+
+    {
+      "ldap_username": "cthulhu@mozilla.org",
+      "tree": "mozilla-central",
+      "rev": "1235",
+      "patch_urls": ["https://example.com/123456789.patch"],
+      "destination": "gecko",
+      "pingback_url": "http://localhost/",
+      "push_bookmark": "@"
+    }
+
+    Patch based try requests are not supported.
+
+    Differences between repository and patch based requests:
+      "rev" changes from sha of source tree to unique ID
+      "patch_urls" added with URLs to the patch files
+      "commit_descriptions" removed
 
     Returns an id which can be used to get the status of the autoland
     request.
@@ -128,7 +190,11 @@ def autoland():
     try:
         validate_request(request)
     except ValueError as e:
+        app.logger.warn('Bad Request from %s: %s' % (request.remote_addr, e))
         return make_response(jsonify({'error': 'Bad request: %s' % e}), 400)
+
+    if 'patch_urls' in request.json:
+        raise NotImplementedError('patch based landings not implemented')
 
     dbconn = get_dbconn()
     cursor = dbconn.cursor()

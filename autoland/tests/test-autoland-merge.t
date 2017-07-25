@@ -44,7 +44,7 @@ Post a job
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 1\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "3bce87fd55d0", \n  "rev": "e2507be7827c", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "3bce87fd55d0", \n  "rev": "e2507be7827c", \n  "tree": "test-repo"\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public
 
@@ -85,7 +85,7 @@ Post a job with a bad merge
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - more stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "5d8686a5858e": "Bug 1 - more stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\n\\nhg error in cmd: hg rebase -s 1fa31b8c94db -d 3bce87fd55d0: rebasing 4:1fa31b8c94db \\"Bug 1 - more stuff; r=cthulhu\\" (tip)\\nmerging foo\\nwarning: conflicts while merging foo! (edit, then use \'hg resolve --mark\')\\nunresolved conflicts (see hg resolve, then hg rebase --continue)\\n", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "", \n  "result": "", \n  "rev": "5d8686a5858e", \n  "tree": "test-repo", \n  "trysyntax": ""\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "5d8686a5858e": "Bug 1 - more stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\n\\nhg error in cmd: hg rebase -s 1fa31b8c94db -d 3bce87fd55d0: rebasing 4:1fa31b8c94db \\"Bug 1 - more stuff; r=cthulhu\\" (tip)\\nmerging foo\\nwarning: conflicts while merging foo! (edit, then use \'hg resolve --mark\')\\nunresolved conflicts (see hg resolve, then hg rebase --continue)\\n", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "result": "", \n  "rev": "5d8686a5858e", \n  "tree": "test-repo"\n}')
 
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public
