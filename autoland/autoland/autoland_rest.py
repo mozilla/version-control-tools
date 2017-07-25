@@ -72,6 +72,24 @@ def check_pingback_url(pingback_url):
     return False
 
 
+def validate_request(request):
+    if request.json is None:
+        raise ValueError('Bad request: missing json')
+
+    for field in ['ldap_username', 'tree', 'rev', 'destination',
+                  'pingback_url']:
+        if field not in request.json:
+            raise ValueError('missing json field: %s' % field)
+
+    if not check_pingback_url(request.json['pingback_url']):
+        raise ValueError('bad pingback_url')
+
+    if not (request.json.get('trysyntax') or
+            request.json.get('commit_descriptions')):
+        raise ValueError('one of trysyntax or commit_descriptions must be '
+                         'specified.')
+
+
 @app.route('/autoland', methods=['POST'])
 def autoland():
     """
@@ -107,29 +125,10 @@ def autoland():
             auth.username, request.remote_addr))
         return Response('Login required', 401, auth_response)
 
-    if request.json is None:
-        error = 'Bad request: missing json'
-        return make_response(jsonify({'error': error}), 400)
-
-    for field in ['ldap_username', 'tree', 'rev', 'destination',
-                  'pingback_url']:
-        if field not in request.json:
-            error = 'Bad request: missing json field: %s' % field
-            return make_response(jsonify({'error': error}), 400)
-
-    if not check_pingback_url(request.json['pingback_url']):
-        error = 'Bad request: bad pingback_url'
-        return make_response(jsonify({'error': error}), 400)
-
-    if not request.json.get('ldap_username'):
-        error = 'Bad request: ldap_username must be specified'
-        return make_response(jsonify({'error': error}), 400)
-
-    if not (request.json.get('trysyntax') or
-            request.json.get('commit_descriptions')):
-        error = ('Bad request: one of trysyntax or commit_descriptions must '
-                 'be specified.')
-        return make_response(jsonify({'error': error}), 400)
+    try:
+        validate_request(request)
+    except ValueError as e:
+        return make_response(jsonify({'error': 'Bad request: %s' % e}), 400)
 
     dbconn = get_dbconn()
     cursor = dbconn.cursor()
@@ -144,7 +143,7 @@ def autoland():
     cursor.execute(query, (request.json['rev'], request.json['destination']))
     in_flight = cursor.fetchone()
     if in_flight:
-        error = ('Bad request: a request to land revision %s to %s is already '
+        error = ('Bad Request: a request to land revision %s to %s is already '
                  'in progress'
                  % (request.json['rev'], request.json['destination']))
         app.logger.warn(
