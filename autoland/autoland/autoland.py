@@ -96,6 +96,9 @@ def handle_pending_transplants(dbconn):
         trysyntax = request.get('trysyntax', '')
         push_bookmark = request.get('push_bookmark', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
+        patch_urls = map(lambda u: u.encode('ascii'),
+                         request.get('patch_urls', []))
+
         repo_config = config.get_repo(tree)
         if not repo_config['tree']:
             # Trees not present on treestatus cannot be closed.
@@ -119,6 +122,11 @@ def handle_pending_transplants(dbconn):
             logger.info('initiating transplant from tree: %s rev: %s '
                         'to destination: %s, attempt %s' % (
                             tree, rev, destination, attempts + 1))
+
+            if patch_urls:
+                result = 'patch based landings not implemented'
+                landed = False
+                break
 
             # TODO: We should break the transplant call into two steps, one
             #       to pull down the commits to transplant, and another

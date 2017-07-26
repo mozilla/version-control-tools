@@ -37,7 +37,7 @@ class AutolandCommands(object):
                 print('timed out')
 
     @Command('post-autoland-job', category='autoland',
-        description='Post a job to autoland')
+             description='Post a job to autoland')
     @CommandArgument('host', help='Host to which to post the job')
     @CommandArgument('tree', help='Source tree of the revision')
     @CommandArgument('rev', help='Revision to land')
@@ -56,10 +56,12 @@ class AutolandCommands(object):
                      help='Autoland user')
     @CommandArgument('--password', required=False, default='autoland',
                      help='Autoland password')
+    @CommandArgument('--patch-url', required=False, default='',
+                     help='URL of patch [optional]')
     def post_autoland_job(self, host, tree, rev, destination, pingback_url,
                           trysyntax=None, push_bookmark=None,
                           commit_descriptions=None, ldap_username=None,
-                          user=None, password=None):
+                          user=None, password=None, patch_url=None):
 
         data = {
             'tree': tree,
@@ -75,6 +77,8 @@ class AutolandCommands(object):
             data['commit_descriptions'] = json.loads(commit_descriptions)
         if ldap_username:
             data['ldap_username'] = ldap_username
+        if patch_url:
+            data['patch_urls'] = [patch_url]
 
         host = host.rstrip('/')
         r = requests.post(host + '/autoland', data=json.dumps(data),

@@ -232,9 +232,6 @@ def autoland():
         app.logger.warn('Bad Request from %s: %s' % (request.remote_addr, e))
         return make_response(jsonify({'error': 'Bad request: %s' % e}), 400)
 
-    if 'patch_urls' in request.json:
-        raise NotImplementedError('patch based landings not implemented')
-
     dbconn = get_dbconn()
     cursor = dbconn.cursor()
 
