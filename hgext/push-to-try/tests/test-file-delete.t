@@ -28,10 +28,9 @@ Test pushing with outstanding changes that delete a file works.
   R file1.txt
 
   $ hg push-to-try -m 'try: syntax' -s ../remote
-  The following will be pushed to ../remote:
+  Creating temporary commit for remote...
   M file2.txt
   R file1.txt
-  Creating temporary commit for remote...
   pushing to ../remote
   searching for changes
   adding changesets

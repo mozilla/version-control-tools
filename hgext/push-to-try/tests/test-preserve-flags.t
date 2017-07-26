@@ -28,9 +28,8 @@ Test pushing an outstanding change preserves executable bits.
   @@ -0,0 +1,1 @@
   +line1
   $ hg push-to-try -m 'try: syntax' -s ../remote
-  The following will be pushed to ../remote:
-  A file2.txt
   Creating temporary commit for remote...
+  A file2.txt
   pushing to ../remote
   searching for changes
   adding changesets

@@ -24,15 +24,20 @@ def push_to_try(ui, repo, server, message=None):
 
     nodate = ui.configbool('push-to-try', 'nodate')
 
-    if not message or 'try:' not in message:
-        ui.status("STOP! A commit message with try syntax is required.\n")
+    if not message:
+        ui.status("STOP! A commit message is required.\n")
         return
 
     cctx = context.workingctx(repo)
-    status = repo.status()
+    if 'try_task_config.json' not in cctx and 'try:' not in message:
+        ui.status("STOP! Either try_task_config.json must be added or the commit "
+                  "message must contain try syntax.\n")
+        return
 
+    # Invent a temporary commit with our message.
+    ui.status("Creating temporary commit for remote...\n")
+    status = repo.status()
     if status.modified + status.added + status.removed:
-        ui.status('The following will be pushed to %s:\n' % server)
         # TODO: Achieve this by re-using the status call above to avoid the
         # cost of running it twice.
         commands.status(ui, repo)
@@ -43,8 +48,6 @@ def push_to_try(ui, repo, server, message=None):
             return preserve_ctx(repo, memctx, path)
         return None
 
-    # Invent a temporary commit with our message.
-    ui.status("Creating temporary commit for remote...\n")
     mctx = context.memctx(repo,
                           repo.dirstate.parents(),
                           message,
