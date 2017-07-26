@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
                                                              'pylib',
                                                              'mozautomation')))
 
-from transplant import Transplant
+from transplant import RepoTransplant
 import treestatus
 
 
@@ -128,21 +128,16 @@ def handle_pending_transplants(dbconn):
                 landed = False
                 break
 
-            # TODO: We should break the transplant call into two steps, one
-            #       to pull down the commits to transplant, and another
-            #       one to rebase it and attempt to push so we don't
-            #       duplicate work unnecessarily if we have to rebase more
-            #       than once.
             os.environ['AUTOLAND_REQUEST_USER'] = requester
             try:
-                with Transplant(tree, destination, rev) as tp:
+                with RepoTransplant(tree, destination, rev,
+                                    commit_descriptions) as tp:
                     if trysyntax:
                         result = tp.push_try(str(trysyntax))
                     elif push_bookmark:
-                        result = tp.push_bookmark(commit_descriptions,
-                                                  push_bookmark)
+                        result = tp.push_bookmark(push_bookmark)
                     else:
-                        result = tp.push(commit_descriptions)
+                        result = tp.push()
                 landed = True
             except Exception as e:
                 result = str(e)

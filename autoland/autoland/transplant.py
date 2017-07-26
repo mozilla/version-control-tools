@@ -2,7 +2,6 @@ import config
 import hglib
 import json
 import logging
-import os
 import re
 import tempfile
 
@@ -48,7 +47,9 @@ class Transplant(object):
         # Don't let unicode leak into command arguments.
         assert isinstance(trysyntax, str), "trysyntax arg is not str"
 
-        self.update_repo()
+        remote_tip = self.update_repo()
+
+        self.apply_changes(remote_tip)
 
         if not trysyntax.startswith("try: "):
             trysyntax = "try: %s" % trysyntax
@@ -65,13 +66,13 @@ class Transplant(object):
 
         return rev
 
-    def push_bookmark(self, commit_descriptions, bookmark):
+    def push_bookmark(self, bookmark):
         # Don't let unicode leak into command arguments.
         assert isinstance(bookmark, str), "bookmark arg is not str"
 
         remote_tip = self.update_repo()
 
-        rev = self.apply_changes(remote_tip, commit_descriptions)
+        rev = self.apply_changes(remote_tip)
         self.run_hg_cmds([
             ['bookmark', bookmark],
             ['push', '-B', bookmark, self.destination],
@@ -79,10 +80,10 @@ class Transplant(object):
 
         return rev
 
-    def push(self, commit_descriptions):
+    def push(self):
         remote_tip = self.update_repo()
 
-        rev = self.apply_changes(remote_tip, commit_descriptions)
+        rev = self.apply_changes(remote_tip)
         self.run_hg_cmds([
             ['push', '-r', 'tip', self.destination]
         ])
@@ -101,15 +102,8 @@ class Transplant(object):
 
         return remote_tip
 
-    def apply_changes(self, remote_tip, commit_descriptions):
-        base_revision = self.rewrite_commit_descriptions(commit_descriptions)
-        logger.info('base revision: %s' % base_revision)
-
-        base_revision = self.rebase(base_revision, remote_tip)
-        logger.info('rebased (tip) revision: %s' % base_revision)
-
-        self.validate_descriptions(commit_descriptions)
-        return base_revision
+    def apply_changes(self, remote_tip):
+        raise NotImplemented('abstract method call: apply_changes')
 
     def run_hg(self, args):
         logger.info('rev: %s: executing: %s' % (self.source_rev, args))
@@ -151,54 +145,21 @@ class Transplant(object):
         return remote_tip
 
     def update_from_upstream(self, remote_rev):
-        # Pull "upstream" and update to remote tip. Pull revisions to land and
-        # update to them.
+        # Pull "upstream" and update to remote tip.
         cmds = [['pull', 'upstream'],
                 ['rebase', '--abort', '-r', remote_rev],
-                ['update', '--clean', '-r', remote_rev],
-                ['pull', self.tree, '-r', self.source_rev],
-                ['update', self.source_rev]]
+                ['update', '--clean', '-r', remote_rev]]
 
         for cmd in cmds:
             try:
                 self.run_hg(cmd)
             except hglib.error.CommandError as e:
                 output = e.out
-                if 'no changes found' in output:
-                    # we've already pulled this revision
-                    continue
-                elif 'abort: no rebase in progress' in output:
+                if 'abort: no rebase in progress' in output:
                     # there was no rebase in progress, nothing to see here
                     continue
                 else:
                     raise HgCommandError(cmd, e.out)
-
-    def rewrite_commit_descriptions(self, commit_descriptions):
-        # Rewrite commit descriptions as per the mapping provided.  Returns the
-        # revision of the base commit.
-        assert commit_descriptions
-
-        with tempfile.NamedTemporaryFile() as f:
-            json.dump(commit_descriptions, f)
-            f.flush()
-
-            cmd_output = self.run_hg_cmds([
-                ['rewritecommitdescriptions', '--descriptions=%s' % f.name,
-                 self.source_rev]
-            ])
-
-            base_revision = None
-            for line in cmd_output.splitlines():
-                m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
-                if m and m.groups():
-                    base_revision = m.groups()[0]
-                    break
-
-            if not base_revision:
-                raise Exception('Could not determine base revision for '
-                                'rebase: %s' % cmd_output)
-
-            return base_revision
 
     def rebase(self, base_revision, remote_tip):
         # Perform rebase if necessary. Returns tip revision.
@@ -222,12 +183,74 @@ class Transplant(object):
             ['log', '-r', 'tip', '-T', '{node|short}']
         ])
 
-    def validate_descriptions(self, commit_descriptions):
+
+class RepoTransplant(Transplant):
+    def __init__(self, tree, destination, rev, commit_descriptions):
+        self.commit_descriptions = commit_descriptions
+
+        super(RepoTransplant, self).__init__(tree, destination, rev)
+
+    def apply_changes(self, remote_tip):
+        # Pull in changes from the source repo.
+        cmds = [['pull', self.tree, '-r', self.source_rev],
+                ['update', self.source_rev]]
+        for cmd in cmds:
+            try:
+                self.run_hg(cmd)
+            except hglib.error.CommandError as e:
+                output = e.out
+                if 'no changes found' in output:
+                    # we've already pulled this revision
+                    continue
+                else:
+                    raise HgCommandError(cmd, e.out)
+
+        # try runs don't have commit descriptions.
+        if not self.commit_descriptions:
+            return
+
+        base_revision = self.rewrite_commit_descriptions()
+        logger.info('base revision: %s' % base_revision)
+
+        base_revision = self.rebase(base_revision, remote_tip)
+        logger.info('rebased (tip) revision: %s' % base_revision)
+
+        self.validate_descriptions()
+        return base_revision
+
+    def rewrite_commit_descriptions(self):
+        # Rewrite commit descriptions as per the mapping provided.  Returns the
+        # revision of the base commit.
+
+        with tempfile.NamedTemporaryFile() as f:
+            json.dump(self.commit_descriptions, f)
+            f.flush()
+
+            cmd_output = self.run_hg_cmds([
+                ['rewritecommitdescriptions', '--descriptions=%s' % f.name,
+                 self.source_rev]
+            ])
+
+            base_revision = None
+            for line in cmd_output.splitlines():
+                m = re.search(r'^rev: [0-9a-z]+ -> ([0-9a-z]+)', line)
+                if m and m.groups():
+                    base_revision = m.groups()[0]
+                    break
+
+            if not base_revision:
+                raise Exception('Could not determine base revision for '
+                                'rebase: %s' % cmd_output)
+
+            return base_revision
+
+    def validate_descriptions(self):
         # Match outgoing commit descriptions against incoming commit
         # descriptions. If these don't match exactly, prevent the landing
         # from occurring.
-        incoming_descriptions = set([c.encode(self.hg_repo.encoding)
-                                     for c in commit_descriptions.values()])
+        incoming_descriptions = set(
+            [c.encode(self.hg_repo.encoding)
+             for c in self.commit_descriptions.values()])
         outgoing = self.hg_repo.outgoing('tip', self.destination)
         outgoing_descriptions = set([commit[5] for commit in outgoing])
 
