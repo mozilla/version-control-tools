@@ -41,6 +41,7 @@ Create a commit to test on Try
   
   (review requests lack reviewers; visit review url to assign reviewers)
   (visit review url to publish these review requests so others can see them)
+  $ REV=`hg log -r . --template "{node|short}"`
 
 Close the tree
 
@@ -48,7 +49,7 @@ Close the tree
 
 Post a job
 
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --trysyntax "stuff"
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
   (200, u'{\n  "request_id": 1\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
   timed out

@@ -37,6 +37,7 @@ Create a commit to test on Try
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
+  $ REV=`hg log -r . --template "{node|short}"`
 
 Ensure Autoland started without errors
 
@@ -46,7 +47,7 @@ Ensure Autoland started without errors
 
 Posting a job with bad credentials should fail
 
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo `hg log -r . --template "{node|short}"` try http://localhost:9898 --user blah --password blah
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --user blah --password blah
   (401, u'Login required')
   $ mozreview exec autoland tail -n1 /var/log/apache2/error.log
   * WARNING:root:Failed authentication for "blah" from * (glob)
@@ -65,7 +66,6 @@ Posting a job with an unknown revision should fail
 
 Post a job
 
-  $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
@@ -109,8 +109,8 @@ Post a job using a bookmark
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
-
   $ REV=`hg log -r . --template "{node|short}"`
+
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --push-bookmark "bookmark" --commit-descriptions "{\"$REV\": \"Bug 1 - more goodness; r=cthulhu\"}"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
@@ -149,6 +149,7 @@ Post a job with unicode commit descriptions to be rewritten
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
   $ REV=`hg log -r . --template "{node|short}"`
+
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu\"}"
   (200, u'{\n  "request_id": 5\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
@@ -183,7 +184,6 @@ Getting status for an unknown job should return a 404
 Test pingback url whitelist.  localhost, private IPs, and example.com are in
 the whitelist. example.org is not.
 
-  $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound1 http://example.com:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 6\n}')
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound2 http://localhost --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
@@ -206,7 +206,6 @@ guarentee the first request is still in the queue when the second is submitted.
 
   $ PID=`mozreview exec autoland ps x | grep autoland.py | grep -v grep | awk '{ print $1 }'`
   $ mozreview exec autoland kill $PID
-  $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
   (200, u'{\n  "request_id": 12\n}')
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"

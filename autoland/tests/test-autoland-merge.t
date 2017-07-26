@@ -37,10 +37,10 @@ Create a commit to test on Try
   review id:  bz://1/mynick
   review url: http://$DOCKER_HOSTNAME:$HGPORT1/r/1 (draft)
   (visit review url to publish these review requests so others can see them)
+  $ REV=`hg log -r . --template "{node|short}"`
 
 Post a job
 
-  $ REV=`hg log -r . --template "{node|short}"`
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 1\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
