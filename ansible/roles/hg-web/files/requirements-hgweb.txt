@@ -1,8 +1,8 @@
 ipaddress==1.0.16 \
     --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
 
-Mercurial==4.2 \
-    --hash=sha256:23a412308fc9c2b354a0e91a89588a4af2af061b47da80bc4233ccb0cceef47d
+Mercurial==4.2.2 \
+    --hash=sha256:b20132dec5ae6d27ee43a133144069895befe09f7e454bfa9e39950a185f0afe
 
 mod-wsgi==4.5.14 \
     --hash=sha256:8e6d0ccdea6872b71da2ba0fe5d46ca38a6219becc521dcdc4516992c9fe3247

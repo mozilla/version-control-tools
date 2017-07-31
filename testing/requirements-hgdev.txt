@@ -17,8 +17,8 @@ ipaddress==1.0.16 \
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
 
-Mercurial==4.2 \
-    --hash=sha256:23a412308fc9c2b354a0e91a89588a4af2af061b47da80bc4233ccb0cceef47d
+Mercurial==4.2.2 \
+    --hash=sha256:b20132dec5ae6d27ee43a133144069895befe09f7e454bfa9e39950a185f0afe
 
 mock==1.0.1 \
     --hash=sha256:b839dd2d9c117c701430c149956918a423a9863b48b09c90e30a6013e7d2f44f \
