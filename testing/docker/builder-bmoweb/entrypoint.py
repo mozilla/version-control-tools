@@ -113,6 +113,17 @@ with open(answers, 'wb') as fh:
     writeanswer(fh, 'ADMIN_PASSWORD', admin_password)
     writeanswer(fh, 'urlbase', bmo_url)
 
+# There is a weird interaction between Docker, filesystems, and MySQL where
+# a subsequent container invocation can't access MySQL data from a previous
+# one. It is suspected this has something to do with overlayfs and accessing
+# data from previous layers. This can produce failures like ``Fatal error: Can't
+# open and lock privilege tables: Table storage engine for 'db' doesn't have
+# this option``.
+#
+# We work around it by chowning everything in /var/lib/mysql, which effectively
+# copies the file to the current filesystem layer.
+subprocess.check_call(['/bin/chown', '-R', 'mysql:mysql', '/var/lib/mysql'])
+
 # Start a MySQL process. mysqld_safe restarts the process when it
 # terminates, so don't use that.
 mysqld = subprocess.Popen([
