@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
                                                              'pylib',
                                                              'mozautomation')))
 
-from transplant import RepoTransplant
+from transplant import (RepoTransplant, PatchTransplant)
 import treestatus
 
 
@@ -96,8 +96,7 @@ def handle_pending_transplants(dbconn):
         trysyntax = request.get('trysyntax', '')
         push_bookmark = request.get('push_bookmark', '').encode('ascii')
         commit_descriptions = request.get('commit_descriptions')
-        patch_urls = map(lambda u: u.encode('ascii'),
-                         request.get('patch_urls', []))
+        patch_urls = [u.encode('ascii') for u in request.get('patch_urls', [])]
 
         repo_config = config.get_repo(tree)
         if not repo_config['tree']:
@@ -123,15 +122,14 @@ def handle_pending_transplants(dbconn):
                         'to destination: %s, attempt %s' % (
                             tree, rev, destination, attempts + 1))
 
-            if patch_urls:
-                result = 'patch based landings not implemented'
-                landed = False
-                break
-
             os.environ['AUTOLAND_REQUEST_USER'] = requester
             try:
-                with RepoTransplant(tree, destination, rev,
-                                    commit_descriptions) as tp:
+                if patch_urls:
+                    tp = PatchTransplant(tree, destination, rev, patch_urls)
+                else:
+                    tp = RepoTransplant(tree, destination, rev,
+                                        commit_descriptions)
+                with tp:
                     if trysyntax:
                         result = tp.push_try(str(trysyntax))
                     elif push_bookmark:

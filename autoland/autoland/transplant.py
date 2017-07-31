@@ -263,3 +263,23 @@ class RepoTransplant(Transplant):
                             "rewriting or rebasing your commits. The commits "
                             "being pushed no longer match what was requested. "
                             "Please file a bug.")
+
+
+class PatchTransplant(Transplant):
+    def __init__(self, tree, destination, rev, patch_urls):
+        self.patch_urls = patch_urls
+
+        super(PatchTransplant, self).__init__(tree, destination, rev)
+
+    def apply_changes(self, remote_tip):
+        assert self.patch_urls, 'patch_urls not provided'
+
+        for patch_url in self.patch_urls:
+            if patch_url.startswith('s3://'):
+                # Download patch to temp file and import
+                raise Exception('importing patches from s3 not implemented')
+
+            else:
+                self.run_hg(['update', remote_tip])
+                output = self.run_hg(['import', patch_url])
+                logger.info(output)
