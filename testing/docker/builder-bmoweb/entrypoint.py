@@ -127,6 +127,11 @@ time_start = time.time()
 while True:
     try:
         print('attempting to connect to database...')
+
+        if mysqld.poll() is not None:
+            print('mysqld process exited %d' % mysqld.returncode)
+            sys.exit(1)
+
         # There appear to be race conditions between MySQL opening the socket
         # and MySQL actually responding. So we wait on a successful MySQL
         # connection before continuing.
