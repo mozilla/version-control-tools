@@ -288,7 +288,7 @@ The user should now have an associated ldap_username with appropriate logs
   $ rbmanage dump-user-ldap user4
   ldap username: user4@example.com
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
-  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user4@example.com with ldap_username: user4@example.com (glob)
+  ????-??-?? ??:??:??,??? - INFO -  - root - Associating user: user4@example.com with ldap_username: user4@example.com (glob)
 
 Create another user, where their username is different from their Bugzilla address
 
@@ -303,7 +303,7 @@ Trigger automatic association
   $ rbmanage associate-employee-ldap --email user5@example.com
   user5@example.com associated with me@example.org
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
-  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user5@example.com with ldap_username: me@example.org (glob)
+  ????-??-?? ??:??:??,??? - INFO -  - root - Associating user: user5@example.com with ldap_username: me@example.org (glob)
 
 Update Bugzilla address and reassociate
 
@@ -312,7 +312,7 @@ Update Bugzilla address and reassociate
   $ rbmanage associate-employee-ldap --email user5@example.com
   user5@example.com associated with you@example.org
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
-  ????-??-?? ??:??:??,??? - INFO -  - Existing ldap association 'me@example.org' replaced by 'you@example.org' (glob)
+  ????-??-?? ??:??:??,??? - INFO -  - root - Existing ldap association 'me@example.org' replaced by 'you@example.org' (glob)
 
 Create two users with the same Bugzilla address
 
@@ -334,7 +334,7 @@ Trigger automatic association and check the logs
   $ rbmanage associate-employee-ldap --email conflict@example.com
   LDAP association failed.
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
-  ????-??-?? ??:??:??,??? - INFO -  - Could not update ldap association: More than one match for conflict@example.com (glob)
+  ????-??-?? ??:??:??,??? - INFO -  - mozreview.ldap.resources - Could not update ldap association: More than one match for conflict@example.com (glob)
 
 Ensure automatic association doesn't overwrite existing valid associations.
 
@@ -347,7 +347,7 @@ Ensure automatic association doesn't overwrite existing valid associations.
   $ rbmanage associate-employee-ldap --email user7@example.com
   user7@example.com already associated with uSeven@example.org
   $ mozreview exec rbweb grep -i ldap /reviewboard/logs/reviewboard.log | tail -n 1
-  ????-??-?? ??:??:??,??? - INFO -  - Associating user: user7@example.com already associated with ldap_username: uSeven@example.org (glob)
+  ????-??-?? ??:??:??,??? - INFO -  - root - Associating user: user7@example.com already associated with ldap_username: uSeven@example.org (glob)
 
 Cleanup
 
