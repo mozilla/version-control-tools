@@ -210,7 +210,7 @@ guarentee the first request is still in the queue when the second is submitted.
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
   (200, u'{\n  "request_id": 12\n}')
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --trysyntax "stuff"
-  (400, u'{\n  "error": "Bad request: a request to land revision e7f4a0f07be3 to try is already in progress"\n}')
+  (400, u'{\n  "error": "landing revision e7f4a0f07be3 to try is already in progress"\n}')
 
   $ mozreview stop
   stopped 9 containers
