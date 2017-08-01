@@ -16,8 +16,7 @@ class HgCommandError(Exception):
         # we want to strip out any sensitive --config options
         hg_args = map(lambda x: x if not x.startswith('bugzilla') else 'xxx',
                       hg_args)
-        message = 'hg error in cmd: hg %s: %s' % (' '.join(hg_args),
-                                                  out.getvalue())
+        message = 'hg error in cmd: hg %s: %s' % (' '.join(hg_args), out)
         super(self.__class__, self).__init__(message)
 
 
@@ -117,9 +116,12 @@ class Transplant(object):
         out = hglib.util.BytesIO()
         out_channels = {b'o': out.write, b'e': out.write}
         ret = self.hg_repo.runcommand(args, {}, out_channels)
+        out = out.getvalue()
         if ret:
-            raise hglib.error.CommandError(args, ret, out, None)
-        return out.getvalue()
+            if out:
+                logging.error(out.rstrip())
+            raise hglib.error.CommandError(args, ret, out, '')
+        return out
 
     def run_hg_cmds(self, cmds):
         last_result = ''
@@ -161,7 +163,7 @@ class Transplant(object):
             try:
                 self.run_hg(cmd)
             except hglib.error.CommandError as e:
-                output = e.out.getvalue()
+                output = e.out
                 if 'no changes found' in output:
                     # we've already pulled this revision
                     continue
@@ -213,7 +215,7 @@ class Transplant(object):
         try:
             self.run_hg(cmd)
         except hglib.error.CommandError as e:
-            if 'nothing to rebase' not in e.out.getvalue():
+            if 'nothing to rebase' not in e.out:
                 raise HgCommandError(cmd, e.out)
 
         return self.run_hg_cmds([
