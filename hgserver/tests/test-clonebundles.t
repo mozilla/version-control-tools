@@ -88,10 +88,21 @@ An index.html and bundles.json document should be produced
   mozilla-central
   repos
 
-Create a clonebundles manifest
+The clonebundles.manifest file should exist though
+
+  $ hgmo exec hgssh ls /repo/hg/mozilla/mozilla-central/.hg/ | grep clonebundles
+  clonebundles.manifest
+
+Now do a fully working run
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_tools/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+A subsequent bundle generation should produce a backup clonebundles.manifest.old file
+
+  $ hgmo exec hgssh ls /repo/hg/mozilla/mozilla-central/.hg/ | grep clonebundles
+  clonebundles.manifest
+  clonebundles.manifest.old
 
 Cloning will fetch bundle
 

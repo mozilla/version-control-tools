@@ -198,6 +198,12 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         dest_repo = os.path.join('/repo/hg/mozilla', repo)
         source = os.path.join(source_repo, '.hg', 'clonebundles.manifest')
         dest = os.path.join(dest_repo, '.hg', 'clonebundles.manifest')
+        backup = os.path.join(dest_repo, '.hg', 'clonebundles.manifest.last')
+
+        # Create a backup of the last manifest so it can be restored easily.
+        if os.path.exists(dest):
+            print('copying %s -> %s' % (dest, backup))
+            shutil.copy2(dest, backup)
 
         print('copying %s -> %s' % (source, dest))
 
@@ -345,7 +351,13 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                 host, bucket, remote_path, params, name)
             clonebundles_manifest.append(entry)
 
+    backup_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest.old')
     clonebundles_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest')
+
+    if os.path.exists(clonebundles_path):
+        print('Copying %s -> %s' % (clonebundles_path, backup_path))
+        shutil.copy2(clonebundles_path, backup_path)
+
     with open(clonebundles_path, 'wb') as fh:
         fh.write('\n'.join(clonebundles_manifest))
 
