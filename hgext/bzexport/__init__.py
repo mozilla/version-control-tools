@@ -1000,7 +1000,17 @@ def bzexport(ui, repo, *args, **opts):
     if context:
         diffopts.context = int(context)
     description_from_patch = None
-    if hasattr(repo, 'mq'):
+
+    revs = scmutil.revrange(repo, [rev])
+    if revs:
+        ctx = repo[revs.last()]
+        description_from_patch = encoding.tolocal(ctx.description())
+        if hasattr(cmdutil, "export"):
+            cmdutil.export(repo, [ctx.hex()], fp=contents, opts=diffopts)
+        else:
+            # Support older hg versions
+            patch.export(repo, [ctx.hex()], fp=contents, opts=diffopts)
+    elif util.safehasattr(repo, 'mq'):
         q = repo.mq
         try:
             contents = q.opener(q.lookup(rev), "r")
@@ -1011,14 +1021,7 @@ def bzexport(ui, repo, *args, **opts):
             pass
 
     if description_from_patch is None:
-        ctx = scmutil.revsingle(repo, rev)
-        rev = node.hex(ctx.node())
-        description_from_patch = encoding.tolocal(ctx.description())
-        if hasattr(cmdutil, "export"):
-            cmdutil.export(repo, [rev], fp=contents, opts=diffopts)
-        else:
-            # Support older hg versions
-            patch.export(repo, [rev], fp=contents, opts=diffopts)
+        raise error.Abort(_('unable to find %s') % rev)
 
     filename = opts['patch_id'] or patch_id(ui, repo, rev)
 
