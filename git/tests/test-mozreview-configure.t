@@ -25,6 +25,7 @@ Create autoreview repo manifest
   $ cat > .git/hgrc << EOF
   > [ui]
   > interactive = true
+  > promptecho = true
   > EOF
 
   $ configure << EOF
