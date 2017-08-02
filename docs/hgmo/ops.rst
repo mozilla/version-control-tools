@@ -232,6 +232,40 @@ by performing dummy merges. The procedure for this is as follows::
    # Do the merge by invoking `hg debugsetparents` repeatedly
    for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
 
+Corrupted fncache File
+======================
+
+In rare circumstances, a ``.hg/store/fncache`` file can become corrupt.
+This file is essentially a cache of all known files in the ``.hg/store``
+directory tree.
+
+If this file becomes corrupt, symptoms often manifest as *stream clones*
+being unable to find a file. e.g. during working directory update there
+will be an error::
+
+   abort: No such file or directory: '<path>'
+
+You can test the theory that the fncache file is corrupt by grepping for
+the missing path in the ``.hg/store/fncache`` file. There should be a
+``<path>.i`` entry in the ``fncache`` file. If it is missing, the fncache
+file is corrupt.
+
+To rebuild the ``fncache`` file::
+
+   $ sudo -u <user> /var/hg/venv_tools/bin/hg -R <repo> debugrebuildfncache
+
+Where ``<user>`` is the user that owns the repo (typically ``hg``) and
+``<repo>`` is the local filesystem path to the repo to repair.
+
+``hg debugrebuildfncache`` should be harmless to run at any time. Worst
+case, it effectively no-ops. If you are paranoid. make a backup copy of
+``.hg/store/fncache`` before running the command.
+
+.. important::
+
+   Under no circumstances should ``.hg/store/fncache`` be removed or
+   altered by hand. Doing so may result in further repository damage.
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services
