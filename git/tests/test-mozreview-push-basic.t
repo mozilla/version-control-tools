@@ -36,11 +36,11 @@ Create some commits to review
 mozreview push will submit for code review
 
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 2 changesets with 2 changes to 1 files
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 1 files
+  recorded push in pushlog
   
   submitting 2 commits for review
   
@@ -78,6 +78,7 @@ Reviews should be published and Bugzilla attachments should be present
       3]]'
     p2rb.discard_on_publish_rids: '[]'
     p2rb.first_public_ancestor: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c
+    p2rb.has_commit_message_filediff: true
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: true
     p2rb.unpublished_rids: '[]'
@@ -115,12 +116,15 @@ Reviews should be published and Bugzilla attachments should be present
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
+    p2rb.author: test <test@example.com>
     p2rb.commit_id: f7ac6c88ab11801e6f7e22b2de292ed6bd1932a4
+    p2rb.commit_message_filediff_ids: '{"1": 2}'
+    p2rb.commit_message_filename: commit-message-96ee1
     p2rb.first_public_ancestor: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
-  - id: 2
+  - id: 3
     revision: 1
     base_commit_id: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c
     name: diff
@@ -167,7 +171,8 @@ Reviews should be published and Bugzilla attachments should be present
       text: ''
     - author: default@example.com
       id: 2
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 1
       - Bug 1 - Foo 1
@@ -176,7 +181,8 @@ Reviews should be published and Bugzilla attachments should be present
       - 'See other reviews: http://$DOCKER_HOSTNAME:$HGPORT1/r/2/'
     - author: default@example.com
       id: 3
-      tags: []
+      tags:
+      - mozreview-request
       text:
       - Created attachment 2
       - Bug 1 - Foo 2
@@ -195,10 +201,10 @@ Pushing from a subdirectory works
 
   $ mkdir subdir
   $ cd subdir && git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   
@@ -210,7 +216,7 @@ Pushing from a subdirectory works
   
   (review requests lack reviewers; visit review url to assign reviewers)
   
-  publish these review requests now (Yn)? y
+  publish these review requests now (Yn)?  y
   (published review request 1)
 
 Pushing from a worktree works
@@ -219,10 +225,10 @@ Pushing from a worktree works
   Preparing subdir/../worktree (identifier worktree)
   HEAD is now at f6c6fd8 Bug 1 - Foo 2
   $ cd ../worktree && git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   
@@ -241,10 +247,10 @@ hg:// URLs work
 
   $ git config mozreview.remote hg://${DOCKER_HOSTNAME}:${HGPORT}:http/test-repo
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   
@@ -264,10 +270,10 @@ Old configuration using an actual git remote works gracefully
   $ git config mozreview.remote review
   $ git remote add review hg::http://$DOCKER_HOSTNAME:$HGPORT/test-repo
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   
@@ -286,10 +292,10 @@ No "mozreview.remote" defaults to "review"
 
   $ git config --unset mozreview.remote
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   

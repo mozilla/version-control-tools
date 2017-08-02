@@ -31,11 +31,11 @@ Single commit on topic branch will submit 1 commit
    1 file changed, 1 insertion(+)
 
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  recorded push in pushlog
   
   submitting 1 commits for review
   
@@ -55,11 +55,11 @@ Additional commit on topic branch will submit 2 commits
    1 file changed, 1 insertion(+), 1 deletion(-)
 
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  recorded push in pushlog
   
   submitting 2 commits for review
   
@@ -86,11 +86,11 @@ branch-based development model a bit better)
    1 file changed, 1 insertion(+), 1 deletion(-)
 
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  recorded push in pushlog
   
   submitting 3 commits for review
   
@@ -118,11 +118,11 @@ Submitting commits referencing multiple bugs is refused
    1 file changed, 1 insertion(+), 1 deletion(-)
 
   $ git mozreview push
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files (+1 heads)
+  recorded push in pushlog
   
   error: cannot submit reviews referencing multiple bugs
   hint: limit reviewed commits by specifying a commit or revrange as an argument
@@ -131,10 +131,10 @@ Submitting commits referencing multiple bugs is refused
 Specifying a refspec to review works
 
   $ git mozreview push HEAD~3..HEAD~1
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 2 commits for review
   
@@ -153,10 +153,10 @@ Specifying a refspec to review works
 Specifying a single commit on bottom of stack works
 
   $ git mozreview push e42bea0
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 1 commits for review
   
@@ -171,10 +171,10 @@ Specifying a single commit on bottom of stack works
 Specifying a single commit in middle of stack works
 
   $ git mozreview push d79633b
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 0 changesets with 0 changes to 1 files
+  adding changesets
+  adding manifests
+  adding file changes
+  added 0 changesets with 0 changes to 1 files
   
   submitting 1 commits for review
   
@@ -193,11 +193,11 @@ Specifying a single commit on top of stack works
   [topic1 fa60885] Bug 2 - Commit 2
    1 file changed, 1 insertion(+), 1 deletion(-)
   $ git mozreview push HEAD
-  remote: adding changesets
-  remote: adding manifests
-  remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  recorded push in pushlog
   
   submitting 1 commits for review
   
@@ -234,7 +234,9 @@ We don't review merge commits
    create mode 100644 bar
 
   $ git mozreview push
-  abort: error performing cinnabar push: Pushing merges is not supported yet
+  fatal: 'cinnabar' appears to be a git command, but we were not
+  able to execute it. Maybe git-cinnabar is broken?
+  abort: error performing cinnabar push; please report this bug
   [1]
 
 Cleanup
