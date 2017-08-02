@@ -45,9 +45,9 @@ Construct an obsolescence graph
   $ hg debugobsolete $base $split1 $split2
   $ hg debugobsolete $split1 $join
   $ hg debugobsolete $split2 $join
-  $ hg id -r "basechange(init)"
+  $ hg id -r "bzbasechange(init)"
   63f3804db80c init
-  $ cat << EOF | while read rev expect expect_name; do hg log --hidden -r "basechange($rev)" -T "base of $rev is {bookmarks}\n"; done
+  $ cat << EOF | while read rev expect expect_name; do hg log --hidden -r "bzbasechange($rev)" -T "base of $rev is {bookmarks}\n"; done
   > init $init init
   > base $base base
   > split1 $base base
