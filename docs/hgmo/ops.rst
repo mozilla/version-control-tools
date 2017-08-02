@@ -232,6 +232,84 @@ by performing dummy merges. The procedure for this is as follows::
    # Do the merge by invoking `hg debugsetparents` repeatedly
    for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
 
+Clonebundles Management
+=======================
+
+Various repositories have their content *snapshotted* and uploaded to S3.
+These snapshots (*bundles* in Mercurial parlance) are advertised via the
+Mercurial server to clients and are used to seed initial clones. See
+:ref:`hgmo_bundleclone` for more.
+
+From an operational perspective, bundle generation is triggered by the
+``hg-bundle-generate.service`` and ``hg-bundle-generate.timer`` systemd
+units on the master server. This essentially runs the
+``generate-hg-s3-bundles`` script. Its configuration lives in the script
+itself as well as ``/repo/hg/bundles/repos`` (which lists the repos to
+operate on and their bundle generation settings).
+
+The critical output of periodic bundle generation are the objects uploaded
+to S3 (to multiple buckets in various AWS regions) and the advertisement
+of these URLs in per-repo ``.hg/clonebundles.manifest`` files. Essentially
+for each repo:
+
+1. Bundles are generated
+2. Bundles are uploaded to multiple S3 buckets
+3. ``clonebundles.manifest`` is updated to advertise newly-uploaded URLs
+4. ``clonebundles.manifest`` is replicated from hgssh to hgweb mirrors
+5. Clients access ``clonebundles.manifest`` as part of ``hg clone`` and
+   start requesting referenced URLs.
+
+If bundle generation fails, it isn't the end of the world: the old
+bundles just aren't as up to date as they could be.
+
+.. important::
+
+   The S3 buckets have automatic 7 day expiration of objects. The
+   assumption is that bundle generation completes successfully at
+   least once a week. If bundle generation doesn't run for 7 days,
+   the objects referenced in ``clonebundles.manifest`` files will
+   expire and clients will encounter HTTP 404 errors.
+
+In the event that a bundle is *corrupted*, manual intervention may be
+required to mitigate to problem.
+
+As a convenience, a backup of the ``.hg/clonebundles.manifest`` file
+is created during bundle generation. It lives at
+``.hg/clonebundles.manifest.old``. If a new bundle is corrupt but an
+old one is valid, the mitigation is to restore from backup::
+
+   $ cp .hg/clonebundles.manifest.old .hg/clonebundles.manifest
+   $ /var/hg/venv_tools/bin/hg replicatesync
+
+If a single bundle or type of bundle is corrupted or causing problems,
+it can be removed from the ``clonebundles.manifest`` file so clients
+stop seeing it.
+
+Inside the ``clonebundles.manifest`` file are *N* types of bundles
+uploaded to *M* S3 buckets (plus a CDN URL). The bundle types can be
+identified by the ``BUNDLESPEC`` value of each entry. For example,
+if *stream clone* bundles are causing problems, the entries with
+a ``BUNDLESPEC`` containing ``none-packed`` could be removed.
+
+.. danger::
+
+   Removing entries from a ``clonebundles.manifest`` can be dangerous.
+
+   The removal of entries could shift a lot of traffic from S3/CDN to
+   the hgweb servers themselves - possibly overloading them.
+
+   The removal of a particular entry type could have performance
+   implications for Firefox CI. For example, removing *stream clone*
+   bundles will make ``hg clone`` take several minutes longer. This
+   is often acceptable as a short-term workaround and is preferred to
+   removing *clone bundles* entirely.
+
+.. important::
+
+   If modifying a ``.hg/clonebundles.manifest`` file, remember to run
+   ``/repo/hg/venv_tools/bin/hg replicatesync`` to trigger the replication
+   of that file to hgweb mirrors. Otherwise clients won't see the changes!
+
 Corrupted fncache File
 ======================
 
