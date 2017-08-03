@@ -154,8 +154,7 @@ This means that the pushlog will see everything because all changesets are publi
   ID: 4; user: hguser; Date: \d+; Rev: 3; Node: a129f82339bb933c4d72353c44bb29eb685f3d1e (re)
 
 If we work around the Mercurial bug not preserving phases, the pushlog entries
-for hidden changesets should still be fetched. But they won't be applied
-locally.
+for hidden changesets should still be fetched.
 
 (This test can be deleted once Mercurial is not buggy.)
 
@@ -173,20 +172,7 @@ locally.
   pulling from ssh://user@dummy/$TESTTMP/server
   searching for changes
   no changes found
-  received pushlog entry for unknown changeset; ignoring
-  added 2 pushes
-
-  $ dumppushlog clone-phasehack
-  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
-  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
-
-But if we operate on a hidden repo, we'll receive the pushlog entries
-
-  $ hg -R clone-phasehack --hidden --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
-  pulling from ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  no changes found
-  added 2 pushes
+  added 4 pushes
 
   $ dumppushlog clone-phasehack
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
@@ -236,23 +222,10 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   adding file changes
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
-  received pushlog entry for unknown changeset; ignoring
-  added 2 pushes
+  added 4 pushes
   (run 'hg update' to get a working copy)
 
-We won't receive the pushlog for the locally-known but now-hidden changeset
-
-  $ dumppushlog incremental-pull
-  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
-  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
-
-But we can force that if we operate on a hidden repo
-
-  $ hg -R incremental-pull --hidden --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
-  pulling from ssh://user@dummy/$TESTTMP/server
-  searching for changes
-  no changes found
-  added 2 pushes
+We'll apply the pushlog for the locally-known but now-hidden changeset
 
   $ dumppushlog incremental-pull
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)

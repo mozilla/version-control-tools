@@ -111,6 +111,7 @@ def exchangepullpushlog(orig, pullop):
 
     pullop.stepsdone.add('pushlog')
     repo = pullop.repo
+    urepo = repo.unfiltered()
     fetchfrom = repo.pushlog.lastpushid() + 1
     lines = pullop.remote._call('pushlog', firstpush=str(fetchfrom))
     lines = iter(lines.splitlines())
@@ -135,14 +136,18 @@ def exchangepullpushlog(orig, pullop):
         # didn't request or were pushed since the client started pulling.
         #
         # If the remote repo contains obsolete changesets, we may see a
-        # reference to a hidden changeset.
+        # reference to a hidden changeset that was never transferred locally.
         #
-        # This is arguably not the desirable behavior: pushlog replication
-        # should be robust. However, doing things this way helps defend
-        # against pushlog "corruption" since inserting references to unknown
-        # changesets into the database is dangerous.
+        # The important thing we want to prevent is a reference to a locally
+        # unknown changeset appearing in the pushlog.
+        #
+        # On hg.mo, there is a hack that transfers hidden changesets during
+        # pulls. So when operating in mirror mode on that server, we should
+        # never have locally unknown changesets.
         try:
-            [repo[n] for n in nodes]
+            # Test against unfiltered repo so we can record entries for hidden
+            # changesets.
+            [urepo[n] for n in nodes]
         except error.RepoLookupError:
             repo.ui.warn('received pushlog entry for unknown changeset; ignoring\n')
             break
@@ -286,12 +291,16 @@ class pushlog(object):
 
         c = self._getconn(tr=self.repo._transref())
 
+        # Operate against unfiltered repo so we can insert entries for hidden
+        # changesets.
+        repo = self.repo.unfiltered()
+
         # Now that the hooks are installed, any exceptions will result in db
         # close via one of our abort handlers.
         res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)', (user, when))
         pushid = res.lastrowid
         for e in nodes:
-            ctx = self.repo[e]
+            ctx = repo[e]
             rev = ctx.rev()
             node = ctx.hex()
 
@@ -316,6 +325,10 @@ class pushlog(object):
         """
         c = self._getconn(tr=tr)
 
+        # Operate against unfiltered repo so we can insert entries for hidden
+        # changesets.
+        repo = self.repo.unfiltered()
+
         for pushid, user, when, nodes in pushes:
             if not isinstance(user, str):
                 raise TypeError('Expected a str user. Got %s' % str(type(user)))
@@ -325,7 +338,7 @@ class pushlog(object):
             c.execute('INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)',
                 (pushid, user, when))
             for n in nodes:
-                ctx = self.repo[n]
+                ctx = repo[n]
                 rev = ctx.rev()
                 node = ctx.hex()
 
