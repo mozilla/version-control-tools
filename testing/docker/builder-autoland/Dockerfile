@@ -35,7 +35,7 @@ RUN echo "ServerName autoland" >> /etc/apache2/apache2.conf
 EXPOSE 80
 
 # Hg
-RUN pip install Mercurial==3.6.2
+RUN pip install Mercurial==4.2.2
 RUN cd /home/autoland && hg clone -r 4140d680784e https://bitbucket.org/marmoute/mutable-history
 RUN mkdir /repos && hg init /repos/try
 ADD try-hgrc /repos/try/.hg/hgrc
