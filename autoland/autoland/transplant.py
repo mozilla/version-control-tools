@@ -199,8 +199,17 @@ class Transplant(object):
             return base_revision
 
     def rebase(self, base_revision, remote_tip):
-        # Perform rebase if necessary.  Returns tip revision.
+        # Perform rebase if necessary. Returns tip revision.
         cmd = ['rebase', '-s', base_revision, '-d', remote_tip]
+
+        assert len(remote_tip) == 12
+
+        # If rebasing onto the null revision, force the merge policy to take
+        # our content, as there is no content in the destination to conflict
+        # with us.
+        if remote_tip == '0' * 12:
+            cmd.extend(['--tool', ':other'])
+
         try:
             self.run_hg(cmd)
         except hglib.error.CommandError as e:
