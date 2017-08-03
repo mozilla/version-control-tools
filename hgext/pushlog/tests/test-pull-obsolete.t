@@ -87,6 +87,11 @@ Server pushlog should have 4 pushes and push from hidden changeset (80c2c663cb83
   ID: 3; user: hguser; Date: \d+; Rev: 2; Node: 80c2c663cb8364f6898662a8379cb25df3ebe719 (re)
   ID: 4; user: hguser; Date: \d+; Rev: 3; Node: a129f82339bb933c4d72353c44bb29eb685f3d1e (re)
 
+  $ hg -R server log -T '{rev} {node} {phase}\n'
+  3 a129f82339bb933c4d72353c44bb29eb685f3d1e draft
+  1 ae13d9da6966307c98b60987fb4fedc2e2f29736 draft
+  0 96ee1d7354c4ad7372047672c36a1f561e3a6a4c draft
+
 Cloning normally will receive obsolete data
 
   $ hg clone -U ssh://user@dummy/$TESTTMP/server clone-obsolete1
@@ -124,7 +129,17 @@ An uncompressed clone transfers obsolete changesets and markers
   no changes found
   1 new obsolescence markers
 
-The pushlog should pull cleanly because hidden changesets are present locally
+  $ hg -R clone-obsolete2 debugobsolete
+  80c2c663cb8364f6898662a8379cb25df3ebe719 a129f82339bb933c4d72353c44bb29eb685f3d1e 0 (* +0000) {'user': 'test'} (glob)
+
+There is a bug in Mercurial where the phase isn't preserved as part of stream clone.
+This means that the pushlog will see everything because all changesets are public.
+
+  $ hg -R clone-obsolete2 log -T '{rev} {node} {phase}\n'
+  3 a129f82339bb933c4d72353c44bb29eb685f3d1e public
+  2 80c2c663cb8364f6898662a8379cb25df3ebe719 public
+  1 ae13d9da6966307c98b60987fb4fedc2e2f29736 public
+  0 96ee1d7354c4ad7372047672c36a1f561e3a6a4c public
 
   $ hg -R clone-obsolete2 --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
   pulling from ssh://user@dummy/$TESTTMP/server
@@ -133,6 +148,113 @@ The pushlog should pull cleanly because hidden changesets are present locally
   added 4 pushes
 
   $ dumppushlog clone-obsolete2
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
+  ID: 3; user: hguser; Date: \d+; Rev: 2; Node: 80c2c663cb8364f6898662a8379cb25df3ebe719 (re)
+  ID: 4; user: hguser; Date: \d+; Rev: 3; Node: a129f82339bb933c4d72353c44bb29eb685f3d1e (re)
+
+If we work around the Mercurial bug not preserving phases, the pushlog entries
+for hidden changesets should still be fetched. But they won't be applied
+locally.
+
+(This test can be deleted once Mercurial is not buggy.)
+
+  $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
+  streaming all changes
+  5 files to transfer, 1.19 KB of data
+  transferred 1.19 KB in * seconds (*/sec) (glob)
+  searching for changes
+  no changes found
+  1 new obsolescence markers
+
+  $ hg -R clone-phasehack phase --draft --force -r 0:tip
+
+  $ hg -R clone-phasehack --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
+  pulling from ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  received pushlog entry for unknown changeset; ignoring
+  added 2 pushes
+
+  $ dumppushlog clone-phasehack
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
+
+But if we operate on a hidden repo, we'll receive the pushlog entries
+
+  $ hg -R clone-phasehack --hidden --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
+  pulling from ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  added 2 pushes
+
+  $ dumppushlog clone-phasehack
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
+  ID: 3; user: hguser; Date: \d+; Rev: 2; Node: 80c2c663cb8364f6898662a8379cb25df3ebe719 (re)
+  ID: 4; user: hguser; Date: \d+; Rev: 3; Node: a129f82339bb933c4d72353c44bb29eb685f3d1e (re)
+
+Pulling into an empty repo should receive pushlog entries for locally known changesets.
+Hidden changesets aren't transferred, so we can't apply the pushlog data.
+
+  $ hg init pull-empty
+  $ hg -R pull-empty --config extensions.pushlog=$TESTDIR/hgext/pushlog pull ssh://user@dummy/$TESTTMP/server
+  pulling from ssh://user@dummy/$TESTTMP/server
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 3 changesets with 3 changes to 3 files
+  1 new obsolescence markers
+  received pushlog entry for unknown changeset; ignoring
+  added 2 pushes
+  (run 'hg update' to get a working copy)
+
+  $ dumppushlog pull-empty
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
+
+Now do a similar test where we simulate an incremental pull after obsolescence has
+been introduced on the server. Here, remote-hidden changesets are known locally.
+
+  $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
+  streaming all changes
+  5 files to transfer, 1.19 KB of data
+  transferred 1.19 KB in * seconds (*/sec) (glob)
+  searching for changes
+  no changes found
+  1 new obsolescence markers
+  $ rm incremental-pull/.hg/store/obsstore
+  $ hg -R incremental-pull --config extensions.strip= strip -r a129f82339bb --no-backup
+  $ hg -R incremental-pull phase --force --draft -r 0:tip
+
+  $ hg -R incremental-pull --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
+  pulling from ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 0 changes to 1 files
+  1 new obsolescence markers
+  received pushlog entry for unknown changeset; ignoring
+  added 2 pushes
+  (run 'hg update' to get a working copy)
+
+We won't receive the pushlog for the locally-known but now-hidden changeset
+
+  $ dumppushlog incremental-pull
+  ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
+  ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
+
+But we can force that if we operate on a hidden repo
+
+  $ hg -R incremental-pull --hidden --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
+  pulling from ssh://user@dummy/$TESTTMP/server
+  searching for changes
+  no changes found
+  added 2 pushes
+
+  $ dumppushlog incremental-pull
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
   ID: 2; user: hguser; Date: \d+; Rev: 1; Node: ae13d9da6966307c98b60987fb4fedc2e2f29736 (re)
   ID: 3; user: hguser; Date: \d+; Rev: 2; Node: 80c2c663cb8364f6898662a8379cb25df3ebe719 (re)
