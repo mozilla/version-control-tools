@@ -15,7 +15,8 @@ execfile(os.path.join(OUR_DIR, '..', '..', 'hgext', 'bootstrap.py'))
 
 from mozhg import rewrite
 
-testedwith = '3.5'
+minimumhgversion = '4.1'
+testedwith = '4.1 4.2'
 
 cmdtable = {}
 command = cmdutil.command(cmdtable)
