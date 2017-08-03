@@ -109,6 +109,7 @@ def exchangepullpushlog(orig, pullop):
     if 'pushlog' in pullop.stepsdone or not pullop.remote.capable('pushlog'):
         return res
 
+    pullop.stepsdone.add('pushlog')
     repo = pullop.repo
     fetchfrom = repo.pushlog.lastpushid() + 1
     lines = pullop.remote._call('pushlog', firstpush=str(fetchfrom))
