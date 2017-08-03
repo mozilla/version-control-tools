@@ -3,15 +3,15 @@
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download Mercurial package (CentOS 6)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.1.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.1.2-1.x86_64.rpm
-           sha256sum=cd3993cd4ade7f6eabbde26cbd4b614ead9a3677d42c714cc0f48d4091c82169
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.2-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.2.2-1.x86_64.rpm
+           sha256sum=3c0fe0d99db58910e1741c36329b79341ff0b86a5f5085efafd0fcdc41ba89b4
   when: ansible_distribution_major_version == '6'
 
 - name: download Mercurial package (CentOS 7)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.1.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.1.2-1.x86_64.rpm
-           sha256sum=123f3cbdce712b7097c14ba09533c8cb625ef731cd3acfd26c11981e55eaa255
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.2-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.2.2-1.x86_64.rpm
+           sha256sum=cc549c07b31b96c4dcb21ac5319ab55ca50cc4aafa5708a6aca6fa30b73c3828
   when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
@@ -19,4 +19,4 @@
 
 # The yum module is slow. Run commands manually.
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.1.2-1.x86_64.rpm
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.2-1.x86_64.rpm
