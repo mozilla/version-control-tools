@@ -91,10 +91,10 @@ Create initial repo content
 Verify pushlog state on hgweb machine
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {pushid} {pushuser}\n'
-  0:77538e1ce4be 1 user@example.com
-  1:ba1c6c2be69c 1 user@example.com
-  2:a9e729deb87c 1 user@example.com
+  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  0:77538e1ce4be draft 1 user@example.com
+  1:ba1c6c2be69c draft 1 user@example.com
+  2:a9e729deb87c draft 1 user@example.com
 
   $ cd ..
 
@@ -156,11 +156,11 @@ Obsolescence markers should have gotten pulled on hgweb mirror
 
 The pushlog should have new push
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {pushid} {pushuser}\n'
-  0:77538e1ce4be 1 user@example.com
-  1:ba1c6c2be69c 1 user@example.com
-  2:a9e729deb87c 1 user@example.com
-  3:5217e2ac5b15 2 user@example.com
+  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  0:77538e1ce4be draft 1 user@example.com
+  1:ba1c6c2be69c draft 1 user@example.com
+  2:a9e729deb87c draft 1 user@example.com
+  3:5217e2ac5b15 draft 2 user@example.com
 
 Pushing a changeset then hiding it works
 
@@ -223,14 +223,14 @@ Pushing a changeset then hiding it works
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
   6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {pushid} {pushuser}\n'
-  0:77538e1ce4be 1 user@example.com
-  1:ba1c6c2be69c 1 user@example.com
-  2:a9e729deb87c 1 user@example.com
-  3:5217e2ac5b15 2 user@example.com
-  4:8713015ee6f2 3 user@example.com
-  5:6ddbc9389e71 4 user@example.com
-  6:042a67bdbae8 5 user@example.com
+  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  0:77538e1ce4be draft 1 user@example.com
+  1:ba1c6c2be69c draft 1 user@example.com
+  2:a9e729deb87c draft 1 user@example.com
+  3:5217e2ac5b15 draft 2 user@example.com
+  4:8713015ee6f2 draft 3 user@example.com
+  5:6ddbc9389e71 draft 4 user@example.com
+  6:042a67bdbae8 draft 5 user@example.com
 
 Blowing away the repo on hgweb and re-cloning should retain pushlog and hidden changesets
 
@@ -242,14 +242,14 @@ Blowing away the repo on hgweb and re-cloning should retain pushlog and hidden c
   wrote synchronization message into replication log
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {pushid} {pushuser}\n'
-  0:77538e1ce4be 1 user@example.com
-  1:ba1c6c2be69c 1 user@example.com
-  2:a9e729deb87c 1 user@example.com
-  3:5217e2ac5b15 2 user@example.com
-  4:8713015ee6f2 3 user@example.com
-  5:6ddbc9389e71 4 user@example.com
-  6:042a67bdbae8 5 user@example.com
+  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  0:77538e1ce4be draft 1 user@example.com
+  1:ba1c6c2be69c draft 1 user@example.com
+  2:a9e729deb87c draft 1 user@example.com
+  3:5217e2ac5b15 draft 2 user@example.com
+  4:8713015ee6f2 draft 3 user@example.com
+  5:6ddbc9389e71 draft 4 user@example.com
+  6:042a67bdbae8 draft 5 user@example.com
 
   $ cd ..
 
