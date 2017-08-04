@@ -61,6 +61,8 @@
   vcsreplicator.consumer processing hg-repo-sync-1 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 0000000000000000000000000000000000000000 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
 
   $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/hgrc

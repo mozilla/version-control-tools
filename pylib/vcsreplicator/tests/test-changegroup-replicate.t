@@ -59,6 +59,8 @@ Pushing the initial commit will result in replication messages
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
@@ -85,6 +87,8 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
 
 Pushing multiple commits results in sane behavior
@@ -129,6 +133,8 @@ Pushing multiple commits results in sane behavior
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 3 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
@@ -161,11 +167,15 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 4
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central
 
 Pushing multiple heads results in appropriate behavior
@@ -216,6 +226,8 @@ Pushing multiple heads results in appropriate behavior
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 4c9443886fe84db9a4a5f29a5777517d2890d308 -r 4b11352745a6b3eb429ca8cd486dfdc221a4bc62 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 4 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg log -R $TESTTMP/repos/mozilla-central -T '{rev}:{node}\n'
@@ -252,16 +264,22 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 4
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 7
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4c9443886fe84db9a4a5f29a5777517d2890d308 -r 4b11352745a6b3eb429ca8cd486dfdc221a4bc62 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 4 changesets into /repo/hg/mozilla/mozilla-central
 
 Cleanup

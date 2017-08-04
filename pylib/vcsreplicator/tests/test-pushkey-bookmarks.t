@@ -53,6 +53,8 @@ Phases should be updated on normal push
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
 Creating a bookmark will write a pushkey message
@@ -92,7 +94,8 @@ Consuming the pushkey message will create a bookmark
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 6
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
-  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
+  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central bookmarks my-bookmark '' 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  vcsreplicator.consumer   [0]
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               0:77538e1ce4be
@@ -138,6 +141,8 @@ Mirror gets bookmark updates when pulling the changegroup.
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 1 heads (2777163b593873bfa63c7129e02a21becc299ff0) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 2777163b593873bfa63c7129e02a21becc299ff0 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
@@ -195,6 +200,8 @@ the bookmark.
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 12
   vcsreplicator.consumer pulling 1 heads (031adcaa8ee7e23dd05ce5900645e771a3637682) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r 031adcaa8ee7e23dd05ce5900645e771a3637682 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
@@ -209,6 +216,8 @@ But processing the next changegroup message should advance the bookmark by 1
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 15
   vcsreplicator.consumer pulling 1 heads (e20ecd72ffa991598a1b26333788345377318231) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r e20ecd72ffa991598a1b26333788345377318231 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
@@ -246,7 +255,8 @@ Now test bookmark divergence
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 18
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[divergent]
-  vcsreplicator.consumer finished pushkey on $TESTTMP/repos/mozilla-central for bookmarks[divergent]
+  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central bookmarks divergent '' e20ecd72ffa991598a1b26333788345377318231
+  vcsreplicator.consumer   [0]
 
   $ hg -q up 0
   $ echo diverge > foo
@@ -287,6 +297,8 @@ Now test bookmark divergence
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 21
   vcsreplicator.consumer pulling 1 heads (e84fdf206e79496713b3a56eae2e16c490475cc8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r e84fdf206e79496713b3a56eae2e16c490475cc8 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks

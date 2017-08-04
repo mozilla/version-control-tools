@@ -4,9 +4,11 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import io
 import json
 import logging
 import os
+import pipes
 import signal
 import sys
 import time
@@ -205,7 +207,11 @@ def process_hg_changegroup(config, path, source, node_count, heads):
         logger.warn('pulling %d heads (%s) and %d nodes from %s into %s' % (
             len(heads), ', '.join(heads), node_count, url, local_path))
 
-        c.pull(source=url or 'default', rev=heads)
+        args = hglib.util.cmdbuilder('pull', url or 'default', r=heads)
+        res, out, err = run_command(c, args)
+        if res:
+            raise Exception('unexpected exit code during pull: %d' % res)
+
         newtip = int(c.log('tip')[0].rev)
 
         # This logic isn't always accurate. For example, if the real tip is
@@ -224,17 +230,13 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
     with get_hg_client(path) as c:
         logger.warn('executing pushkey on %s for %s[%s]' %
                     (path, namespace, key))
-        try:
-            c.rawcommand(['debugpushkey', path, namespace, key, old, new])
-            logger.warn('finished pushkey on %s for %s[%s]' %
-                        (path, namespace, key))
 
-        except hglib.error.CommandError as e:
-            if e.ret != ret:
-                logger.warn('unexpected exit code from pushkey on %s for '
-                            '%s[%s]: %s' %
-                            (path, namespace, key, e.ret))
-                raise
+        res, out, err = run_command(c, ['debugpushkey', path, namespace,
+                                        key, old, new])
+
+        if res and res != ret:
+            raise Exception('unexpected exit code from pushkey on %s for '
+                            '%s[%s]: %s' % (path, namespace, key, res))
 
 
 def process_hg_sync(config, path, requirements, hgrc, heads):
@@ -255,7 +257,10 @@ def process_hg_sync(config, path, requirements, hgrc, heads):
 
         logger.warn('pulling %d heads into %s' % (
             len(heads), local_path))
-        c.pull(source=url or 'default', rev=heads)
+        args = hglib.util.cmdbuilder('pull', url or 'default', r=heads)
+        res, out, err = run_command(c, args)
+        if res not in (0, 1):
+            raise Exception('unexpected exit code from pull: %d' % res)
 
         newtip = int(c.log('tip')[0].rev)
 
@@ -269,6 +274,57 @@ def get_hg_client(path):
     configs = ['extensions.vcsreplicatorconsumer=%s' % CONSUMER_EXT]
 
     return hglib.open(path, encoding='UTF-8', configs=configs)
+
+
+def run_command(client, args):
+    """Run a Mercurial command through a client.
+
+    This is kind of like ``client.rawcommand()`` except it performs logging
+    and doesn't do fancy error handling.
+    """
+    combined = io.BytesIO()
+    out = io.BytesIO()
+    err = io.BytesIO()
+
+    def log_combined():
+        v = combined.getvalue()
+
+        if not v or b'\n' not in v:
+            return
+
+        lines = v.splitlines()
+        for line in lines:
+            logger.info(b'  > %s' % line)
+
+        # Truncate the stream.
+        combined.seek(0)
+        combined.truncate()
+
+        # Restore the final line fragment if there is one.
+        if not v.endswith(b'\n'):
+            combined.write(lines[-1])
+
+    def write_out(s):
+        out.write(s)
+        combined.write(s)
+        log_combined()
+
+    def write_err(s):
+        err.write(s)
+        combined.write(s)
+        log_combined()
+
+    channels = {
+        b'o': write_out,
+        b'e': write_err,
+    }
+
+    logger.warn('  $ %s' % ' '.join(
+        map(pipes.quote, [hglib.HGPATH] + args)))
+    ret = client.runcommand(args, {}, channels)
+    logger.warn('  [%d]' % ret)
+
+    return ret, out.getvalue(), err.getvalue()
 
 
 def update_hgrc(repo_path, content):
