@@ -243,12 +243,53 @@ class pushlog(object):
 
             create = True
 
+        # A note on SQLite connection behavior.
+        #
+        # Most "modern" SQLite databases use the Write-Ahead Log (WAL). This
+        # is a superior storage mechanism because it is faster and allows
+        # concurrent readers and writers.
+        #
+        # Unfortunately, the WAL doesn't work well with network filesystems
+        # like NFS because the WAL index relies on shared memory (which is
+        # machine specific). It is possible to not use shared memory by setting
+        # the locking_mode to EXCLUSIVE. However, this prevents concurrent
+        # readers, which is obviously not desirable.
+        #
+        # Use of the WAL for the pushlog is not possible if network filesystem
+        # or concurrent access are a requirement.
+        #
+        # Non-use of the WAL means that there will be reader and writer
+        # contention. e.g. an active reader can block a writer.
+        #
+        # By default, SQLite defers obtaining a RESERVED (write) lock until
+        # commit time. This can be moved to ``BEGIN TRANSACTION`` by using
+        # IMMEDIATE. However, this will prevent new readers from connecting.
+        # Since we want the database to be available to readers as much as
+        # possible, deferring the lock until COMMIT time is desirable.
+        #
+        # If a Mercurial transaction is passed to this function, the SQLite
+        # implicit/active transaction will be tied to that Mercurial
+        # transaction. If Mercurial's transaction aborts, the SQLite transaction
+        # is rolled back. If Mercurial's transaction closes, the SQLite
+        # transaction is committed. If the database handle is closed without
+        # an explicit Mercurial transaction close or abort, the default SQLite
+        # behavior is to roll back the transaction.
+        #
+        # Note that the SQLite commit occurs *after* Mercurial's transaction
+        # has been committed. There is the potential for Mercurial's transaction
+        # to commit but SQLite's to fail. This is obviously not desirable.
+        # However, without the ability to easily roll back the last committed
+        # transaction in either Mercurial or SQLite, our hands are tied as
+        # to how to achieve atomic changes. Our hacky solution is to increase
+        # the busy timeout before commit to maximize the chances for a
+        # successful SQLite commit.
+
         if readonly:
             option = 'timeoutro'
-            default = 5000
+            default = 10000
         else:
             option = 'timeoutrw'
-            default = 5000
+            default = 30000
 
         timeout = self.repo.ui.configint('pushlog', option, default)
         timeout = float(timeout) / 1000.0
@@ -261,17 +302,6 @@ class pushlog(object):
                 "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
             if res.fetchone()[0] != 1:
                 create = True
-
-        # WARNING low-level hacks applied.
-        #
-        # The active transaction object provides various instance-specific
-        # internal callbacks. When we run, the transaction object comes from
-        # localrepository.transaction().
-        #
-        # The code here essentially ties transaction close/commit to DB
-        # commit + close and transaction abort/rollback to DB close.
-        # If the database is closed without a commit, the active database
-        # transaction (our changes) will be rolled back.
 
         if tr:
             tr.addpostclose('pushlog', make_post_close(self.repo, conn))
