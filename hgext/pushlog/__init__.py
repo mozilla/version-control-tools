@@ -183,6 +183,26 @@ def commonentry(orig, repo, ctx):
 Push = collections.namedtuple('Push', ('pushid', 'user', 'when', 'nodes'))
 
 
+def make_post_close(repo, conn):
+    """Make a function to be called when a Mercurial transaction closes."""
+    def pushlog_tr_post_close(tr):
+        conn.commit()
+        conn.close()
+
+    return pushlog_tr_post_close
+
+
+def make_abort(repo, conn):
+    """Make a function to be called when a Mercurial transaction aborts."""
+    def pushlog_tr_abort(tr):
+        if tr:
+            tr.report('rolling back pushlog\n')
+
+        conn.close()
+
+    return pushlog_tr_abort
+
+
 class pushlog(object):
     '''An interface to pushlog data.'''
 
@@ -242,18 +262,9 @@ class pushlog(object):
         # If the database is closed without a commit, the active database
         # transaction (our changes) will be rolled back.
 
-        def onpostclose(tr):
-            conn.commit()
-            conn.close()
-
-        def onabort(tr):
-            if tr:
-                tr.report('rolling back pushlog\n')
-            conn.close()
-
         if tr:
-            tr.addpostclose('pushlog', onpostclose)
-            tr.addabort('pushlog', onabort)
+            tr.addpostclose('pushlog', make_post_close(self.repo, conn))
+            tr.addabort('pushlog', make_abort(self.repo, conn))
 
         if create:
             for sql in SCHEMA:
