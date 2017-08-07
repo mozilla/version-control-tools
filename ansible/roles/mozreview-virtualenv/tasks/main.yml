@@ -77,5 +77,8 @@
         owner=root
         group=root
 
+# TODO only needed as long as we're using a custom Mercurial build.
+- include: ../../../tasks/download-mercurial.yml
+
 - name: populate virtualenv
   command: "{{ venv }}/bin/pip install --require-hashes -r {{ venv }}/requirements.txt"

@@ -1,8 +1,10 @@
+--find-links /var/tmp/pip
+
 ipaddress==1.0.16 \
     --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
 
-Mercurial==4.2.2 \
-    --hash=sha256:b20132dec5ae6d27ee43a133144069895befe09f7e454bfa9e39950a185f0afe
+Mercurial==4.2.2+13-943c91326b23 \
+    --hash=sha256:ed78963c42780ad9b592c8b95c30b45ab78b6129730e228259b2ed20b687ae6a
 
 mod-wsgi==4.5.14 \
     --hash=sha256:8e6d0ccdea6872b71da2ba0fe5d46ca38a6219becc521dcdc4516992c9fe3247

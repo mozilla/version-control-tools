@@ -25,6 +25,12 @@ ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 #RUN curl -SL 'https://bootstrap.pypa.io/get-pip.py' | python2
 RUN pip install virtualenv
 RUN virtualenv ${AUTOLAND_HOME}/venv
+
+# TODO we can remove this once we're back to not using a custom Mercurial
+# package.
+# %include mercurial-4.2.2+13-943c91326b23.tar.gz
+COPY extra/vct/mercurial-4.2.2+13-943c91326b23.tar.gz /var/tmp/pip/mercurial-4.2.2+13-943c91326b23.tar.gz
+
 RUN ${AUTOLAND_HOME}/venv/bin/pip install -r ${AUTOLAND_HOME}/requirements.txt
 
 # Apache

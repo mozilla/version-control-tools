@@ -3,15 +3,25 @@
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download Mercurial package (CentOS 6)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.2.2-1.x86_64.rpm
-           sha256sum=3c0fe0d99db58910e1741c36329b79341ff0b86a5f5085efafd0fcdc41ba89b4
+#  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.2-1%2B943c91326b23.x86_64.rpm
+#           dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
+#           sha256sum=7c43baff94c096d0db0772e4f6e01b15d2dc81f57ee0e563eb7f0550e9a4a27a
+  copy: src={{ vct }}/mercurial-4.2.2-1+943c91326b23.x86_64.centos6.rpm
+        dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
+        owner=root
+        group=root
+        mode=0640
   when: ansible_distribution_major_version == '6'
 
 - name: download Mercurial package (CentOS 7)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.2.2-1.x86_64.rpm
-           sha256sum=cc549c07b31b96c4dcb21ac5319ab55ca50cc4aafa5708a6aca6fa30b73c3828
+#  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.2-1%2B943c91326b23.x86_64.rpm
+#           dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
+#           sha256sum=62d470cd7482ca9dbda37f7ee8d077b614a4c0c7aff2c6813ec38ab28de16db2
+  copy: src={{ vct }}/mercurial-4.2.2-1+943c91326b23.x86_64.centos7.rpm
+        dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
+        owner=root
+        group=root
+        mode=0640
   when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
@@ -19,4 +29,4 @@
 
 # The yum module is slow. Run commands manually.
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.2-1.x86_64.rpm
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm

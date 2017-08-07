@@ -94,6 +94,9 @@
 - name: User repository directories are present
   file: path=/repo/hg/mozilla/users state=directory mode=0775 owner=hg group=scm_level_1
 
+# TODO only needed as long as we're using a custom Mercurial build.
+- include: ../../../tasks/download-mercurial.yml
+
 - name: create virtualenv for tools
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_tools
