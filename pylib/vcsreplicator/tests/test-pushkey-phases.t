@@ -67,6 +67,12 @@ There should be no pushkey on a push with a draft changeset
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -107,6 +113,7 @@ Locally bumping changeset to public will trigger a pushkey
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 7
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central phases 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 1 0
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 public
@@ -159,6 +166,13 @@ accurate)
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (fde0c41176556d1ec1bcf85e66706e5e76012508) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r fde0c41176556d1ec1bcf85e66706e5e76012508 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 2 changesets with 2 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/mozilla-central
 
@@ -212,6 +226,13 @@ Pulling first changegroup will find its phase
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 13
   vcsreplicator.consumer pulling 1 heads (58017affcc6559ab3237457a5fb1e0e3bde306b1) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 58017affcc6559ab3237457a5fb1e0e3bde306b1 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -231,6 +252,13 @@ Similar behavior for second changegroup
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 16
   vcsreplicator.consumer pulling 1 heads (601c8c0d17b02057475d528f022cf5d85da89825) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 601c8c0d17b02057475d528f022cf5d85da89825 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 

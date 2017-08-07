@@ -294,7 +294,7 @@ def run_command(client, args):
 
         lines = v.splitlines()
         for line in lines:
-            logger.info(b'  > %s' % line)
+            logger.warn(b'  > %s' % line)
 
         # Truncate the stream.
         combined.seek(0)

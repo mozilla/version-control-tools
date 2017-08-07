@@ -62,6 +62,12 @@
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
 
@@ -93,6 +99,13 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (11bec8a6b2a30ac170575ecfd7a06af5a75e2d77) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 2 changesets with 2 changes to 2 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
 
@@ -157,12 +170,21 @@ Changegroup message written
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (67b45555a21f4d9d470adc4f1ed3af63918f6414) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 67b45555a21f4d9d470adc4f1ed3af63918f6414 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 2 changesets with 1 changes to 2 files (+1 heads)
+  vcsreplicator.consumer   > 1 new obsolescence markers
+  vcsreplicator.consumer   > (run 'hg heads' to see heads)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 11
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
 
 Obsolescence marker should have been replicated to hgweb
@@ -203,6 +225,7 @@ Creating obsolescence marker directly on server will result in replication
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 14
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -248,6 +271,13 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 17
   vcsreplicator.consumer pulling 1 heads (de9a6dc9203d34261c1e2bea219bdd6053d74dda) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r de9a6dc9203d34261c1e2bea219bdd6053d74dda ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads)
+  vcsreplicator.consumer   > (run 'hg heads' to see heads)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer mismatch between expected and actual changeset count: expected 1, got 2
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -298,12 +328,21 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 20
   vcsreplicator.consumer pulling 1 heads (33e52188e17750dee7ec7a6b05b5f707ebc2cba9) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 33e52188e17750dee7ec7a6b05b5f707ebc2cba9 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 0 changes to 1 files (+1 heads)
+  vcsreplicator.consumer   > 1 new obsolescence markers
+  vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 21
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
   $ consumer --onetime
   $ consumer --onetime
@@ -412,6 +451,13 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 24
   vcsreplicator.consumer pulling 1 heads (3694f932529eff9a4b78fafab6097f27f3c37daa) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 3694f932529eff9a4b78fafab6097f27f3c37daa ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
@@ -422,6 +468,13 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 27
   vcsreplicator.consumer pulling 1 heads (63d556ea5b9faf08c8c41864c1fcaf3d57f986c8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 63d556ea5b9faf08c8c41864c1fcaf3d57f986c8 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
@@ -432,6 +485,13 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 30
   vcsreplicator.consumer pulling 1 heads (87d2d20529e71d92b847f1bad94c8ebb00203230) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 87d2d20529e71d92b847f1bad94c8ebb00203230 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 2 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
 
@@ -443,12 +503,21 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 33
   vcsreplicator.consumer pulling 1 heads (27eddb78301f686b0894dadaa2deb6dfbb080123) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 27eddb78301f686b0894dadaa2deb6dfbb080123 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 2 changesets with 0 changes to 1 files (+1 heads)
+  vcsreplicator.consumer   > 2 new obsolescence markers
+  vcsreplicator.consumer   > (run 'hg heads .' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 34
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 35
@@ -458,12 +527,21 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 37
   vcsreplicator.consumer pulling 1 heads (84b66e579087f83fdd8ea21456fe68a1c9b60cbe) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
   vcsreplicator.consumer   $ hg pull -r 84b66e579087f83fdd8ea21456fe68a1c9b60cbe ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 2 changesets with 0 changes to 2 files (+1 heads)
+  vcsreplicator.consumer   > 2 new obsolescence markers
+  vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 38
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1
   vcsreplicator.consumer   [0]
 
   $ consumer --dump --partition 2

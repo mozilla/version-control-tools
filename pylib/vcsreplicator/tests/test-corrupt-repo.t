@@ -26,6 +26,12 @@
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > adding file changes
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
@@ -57,6 +63,13 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 0c6b2090d458675af812e445c8ab9b809e321f57 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > transaction abort!
+  vcsreplicator.consumer   > rollback completed
+  vcsreplicator.consumer   > abort: index 00manifest.i unknown format 29298!
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
@@ -90,6 +103,13 @@ We should get the same failure if we try again
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r 0c6b2090d458675af812e445c8ab9b809e321f57 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   > searching for changes
+  vcsreplicator.consumer   > adding changesets
+  vcsreplicator.consumer   > adding manifests
+  vcsreplicator.consumer   > transaction abort!
+  vcsreplicator.consumer   > rollback completed
+  vcsreplicator.consumer   > abort: index 00manifest.i unknown format 29298!
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
