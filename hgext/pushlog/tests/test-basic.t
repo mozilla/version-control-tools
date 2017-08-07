@@ -132,7 +132,7 @@ Pushing to a locked DB errors out (bug 508863)
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files
-  error recording into pushlog; please retry your push
+  error recording into pushlog (database is locked); please retry your push
   transaction abort!
   rolling back pushlog
   rollback completed

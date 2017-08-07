@@ -53,7 +53,7 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: error recording into pushlog; please retry your push
+  remote: error recording into pushlog (attempt to write a readonly database); please retry your push
   remote: transaction abort!
   remote: rolling back pushlog
   remote: rollback completed

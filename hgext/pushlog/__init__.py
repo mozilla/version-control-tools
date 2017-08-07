@@ -628,8 +628,9 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         repo.pushlog.recordpush(revs, pushuser, t)
         ui.write('recorded push in pushlog\n')
         return 0
-    except Exception:
-        ui.write('error recording into pushlog; please retry your push\n')
+    except Exception as e:
+        ui.write('error recording into pushlog (%s); please retry your '
+                 'push\n' % e)
 
     return 1
 
