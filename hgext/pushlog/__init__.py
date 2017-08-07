@@ -243,8 +243,19 @@ class pushlog(object):
 
             create = True
 
-        conn = sqlite3.connect(path)
+        if readonly:
+            option = 'timeoutro'
+            default = 5000
+        else:
+            option = 'timeoutrw'
+            default = 5000
+
+        timeout = self.repo.ui.configint('pushlog', option, default)
+        timeout = float(timeout) / 1000.0
+
+        conn = sqlite3.connect(path, timeout=timeout)
         conn.text_factory = str
+
         if not create:
             res = conn.execute(
                 "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")

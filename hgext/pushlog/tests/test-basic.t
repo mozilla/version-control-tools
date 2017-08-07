@@ -125,7 +125,7 @@ Pushing to a locked DB errors out (bug 508863)
   $ python lockdb.py ../locked/.hg/pushlog2.db unlock &
   $ pid=$!
   $ echo $pid >> $DAEMON_PIDS
-  $ hg push ../locked
+  $ hg push ../locked --config pushlog.timeoutrw=100
   pushing to ../locked
   searching for changes
   adding changesets
