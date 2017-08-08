@@ -1,0 +1,77 @@
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
+
+from __future__ import absolute_import
+
+
+from ..checks import (
+    PreTxnChangegroupCheck,
+    print_banner,
+)
+
+
+SUBREPO_NOT_ALLOWED = """
+{node} contains subrepositories.
+
+Subrepositories are not allowed on this repository.
+
+Please remove .hgsub and/or .hgsubstate files from the repository and try your
+push again.
+"""
+
+
+SUBREPO_WARNING = """
+{node} contains subrepositories.
+
+Subrepositories are an advanced Mercurial feature. Subrepositories are not
+allowed by default on non-user repositories. Attempting to push this changeset
+to a non-user repository on this server will result in rejection.
+
+Please consider not using subrepositories.
+"""
+
+
+class PreventSubReposCheck(PreTxnChangegroupCheck):
+    """Prevents sub-repos from being committed.
+
+    Sub-repos are a power user feature. They make it difficult to convert repos
+    to and from Git. We also tend to prefer vendoring into a repo instead of
+    creating a "symlink" to another repo.
+
+    This check prevents the introduction of sub-repos on incoming changesets
+    for non-user repos. For user repos, it prints a non-fatal warning
+    discouraging their use.
+    """
+    @property
+    def name(self):
+        return 'prevent_subrepos'
+
+    def relevant(self):
+        return True
+
+    def pre(self):
+        self.fatal = not self.repo_metadata['user_repo']
+        self.done = False
+
+    def check(self, ctx):
+        # Since the check can be non-fatal and since it requires a manifest
+        # (which can be expensive to obtain), no-op if there is no work to do.
+        if self.done:
+            return True
+
+        if '.hgsub' not in ctx and '.hgsubstate' not in ctx:
+            return True
+
+        self.done = True
+
+        if self.fatal:
+            print_banner(self.ui, 'error', SUBREPO_NOT_ALLOWED.format(
+                node=ctx.hex()[0:12]))
+            return False
+        else:
+            print_banner(self.ui, 'warning', SUBREPO_WARNING.format(
+                node=ctx.hex()[0:12]))
+            return True
+
+    def post_check(self):
+        return True
