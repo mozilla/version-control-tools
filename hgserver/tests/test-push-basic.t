@@ -59,7 +59,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com @0000000000000000000000000000000000000000 (*)> serve --stdio (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnopen: hgext_vcsreplicator.pretxnopenhook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-prechangegroup: hgext_readonly.prechangegrouphook finished in * seconds (glob)
-  * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: mozhghooks.single_root.hook finished in * seconds (glob)
+  * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_mozhooks.pretxnchangegroup finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_pushlog.pretxnchangegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_vcsreplicator.pretxnchangegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> updated base branch cache in * seconds (glob)

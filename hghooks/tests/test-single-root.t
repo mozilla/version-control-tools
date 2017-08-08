@@ -1,13 +1,6 @@
-  $ cat >> $HGRCPATH << EOF
-  > [mozilla]
-  > repo_root = $TESTTMP
-  > EOF
-
+  $ . $TESTDIR/hghooks/tests/common.sh
   $ hg init server
-  $ cat >> server/.hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
-  > EOF
+  $ configurehooks server
 
 Pushing to an empty repository works
 
@@ -76,13 +69,54 @@ Pushing new root should be rejected
   intended.
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.single_root hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
+
+Can force disable check via config
+
+  $ hg init ../server-force-disable
+  $ configurehooks ../server-force-disable
+
+  $ hg push -f ../server-force-disable
+  pushing to ../server-force-disable
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 4 changesets with 4 changes to 2 files (+1 heads)
+  *** pushing unrelated repository ***
+  
+  Changeset 884385885a43 introduces a new root changeset into this repository. This
+  almost certainly means you accidentally force pushed to the wrong
+  repository and/or URL.
+  
+  Your push is being rejected because this is almost certainly not what you
+  intended.
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+  $ cat >> ../server-force-disable/.hg/hgrc << EOF
+  > [mozilla]
+  > check.single_root = disable
+  > EOF
+
+  $ hg push -f ../server-force-disable
+  pushing to ../server-force-disable
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 4 changesets with 4 changes to 2 files (+1 heads)
+  (single_root check disabled per config override)
+
 
 But it works on repos in users/
 
   $ mkdir ../users
   $ hg init ../users/server
+  $ configurehooks ../users/server
   $ hg push -f ../users/server
   pushing to ../users/server
   searching for changes
@@ -96,10 +130,7 @@ But it works on repos in users/
 New allowed roots can be defined in the hgrc
 
   $ hg init allowedroots
-  $ cat > allowedroots/.hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
-  > EOF
+  $ configurehooks allowedroots
 
 List an unknown root
 
@@ -127,7 +158,7 @@ List an unknown root
   intended.
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.single_root hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Whitelist the new root
@@ -197,5 +228,5 @@ Pushing new root as part of multiple commits will be rejected
   intended.
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.single_root hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]

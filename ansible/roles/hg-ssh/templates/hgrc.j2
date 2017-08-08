@@ -20,7 +20,6 @@ changegroup.z_advertize_upgrade = python:mozhghooks.advertise_upgrade.hook
 # Disabled because too many people are running into issues. Need more
 # granular checking for now. Bug 787620.
 #pretxnchangegroup.author_format = python:mozhghooks.author_format.hook
-pretxnchangegroup.single_root = python:mozhghooks.single_root.hook
 
 pretxnclose.populate_caches = python:mozhghooks.populate_caches.hook
 
@@ -28,6 +27,7 @@ pretxnclose.populate_caches = python:mozhghooks.populate_caches.hook
 blackbox =
 clonebundles =
 
+mozhooks = /var/hg/version-control-tools/hghooks/mozhghooks/extension.py
 obsolescencehacks = /var/hg/version-control-tools/hgext/obsolescencehacks
 pushlog = /var/hg/version-control-tools/hgext/pushlog
 serverlog = /var/hg/version-control-tools/hgext/serverlog
