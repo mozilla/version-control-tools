@@ -59,11 +59,13 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
     # TODO come up with a mechanism for automatically discovering checks
     # so we don't have to enumerate them all.
     from mozhghooks.check import (
+        prevent_symlinks,
         single_root,
         try_task_config_file,
     )
 
     CHECKS = (
+        prevent_symlinks.PreventSymlinksCheck,
         single_root.SingleRootCheck,
         try_task_config_file.TryConfigCheck,
     )
