@@ -200,8 +200,9 @@ def share(orig, ui, source, *args, **kwargs):
     destwvfs = vfs(dest, realpath=True)
     r = hg.repository(ui, destwvfs.base)
 
-    with r.vfs('shared', 'ab') as fh:
-        fh.write('firefoxtrees\n')
+    with r.wlock():
+        with r.vfs('shared', 'ab') as fh:
+            fh.write('firefoxtrees\n')
 
     return res
 
