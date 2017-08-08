@@ -25,6 +25,12 @@ backports.ssl-match-hostname==3.5.0.1 \
 beautifulsoup4==4.3.2 \
     --hash=sha256:a2b29bd048ca2fe54a046b29770964738872a9747003a371344a93eedf7ad58e
 
+boto3==1.4.1 \
+    --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
+
+botocore==1.4.78 \
+    --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7
+
 boto==2.40.0 \
     --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
 
@@ -56,18 +62,21 @@ django-multiselectfield==0.1.3 \
 django-pipeline==1.3.27 \
     --hash=sha256:71add26f682c2e7652c43d01ab6ac1b1c693d869f663142f5f7c37b00788d162
 
+django-storages==1.4.1 \
+    --hash=sha256:0ad7049caa7148b846906a7e114e5d245dba714a7a1ef895150234ae25788c46
+
 dnspython==1.15.0 \
     --hash=sha256:861e6e58faa730f9845aaaa9c6c832851fbf89382ac52915a51f89c71accdd31 \
     --hash=sha256:40f563e1f7a7b80dc5a4e76ad75c23da53d62f1e15e6e517293b04e1f84ead7c
-
-django-storages==1.4.1 \
-    --hash=sha256:0ad7049caa7148b846906a7e114e5d245dba714a7a1ef895150234ae25788c46
 
 docker==2.5.1 \
     --hash=sha256:7b587fa841218b0f27e41d1f1ec61398bd0a8a0cc364f3ab3c08290fa8d59e71
 
 docker-pycreds==0.2.1 \
     --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9
+
+docutils==0.12 \
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 
 enum34==1.1.1 \
     --hash=sha256:9d4a9220e4ebabd7ff60d853e69c3dd89debad5ddeb9ac5e768af811ece7708e
@@ -78,13 +87,19 @@ factory-boy==2.7.0 \
 fake-factory==0.7.2 \
     --hash=sha256:62a9b211c1eea951f63c992de305c31977768f042210df443885444683528173
 
-flake8==2.6.2 \
-    --hash=sha256:7ac3bbaac27174d95bc4734ed23a07de567ffbcf4fc7e316854b4f3015d4fd15
-
 feedparser==5.1.3 \
     --hash=sha256:7f6507d400d07edfd1ea8205da36808009b0c539f5b8a6e0ab54337b955e6dc3 \
     --hash=sha256:ad543639e89d43685e2f1d3b6e48711562eec3be379e6958a920fbeaf4c63bce \
     --hash=sha256:a49ec89ebdb4234de473ad36792bf8da3a8640b8a263afda2eac510ff4908c92
+
+flake8==2.6.2 \
+    --hash=sha256:7ac3bbaac27174d95bc4734ed23a07de567ffbcf4fc7e316854b4f3015d4fd15
+
+futures==3.0.5 \
+    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
+
+jmespath==0.9.0 \
+    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815
 
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
@@ -170,6 +185,9 @@ pytest==3.0.2 \
 pytest-django==2.9.1 \
     --hash=sha256:743d0056e127ef424850ea76d93d45c92c313da0e56765806a59fc7680c25ab7
 
+python-dateutil==2.5.3 \
+    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
+
 python-hglib==1.7 \
     --hash=sha256:0dc087d15b774cda82d3c8096fb0e514caeb2ddb60eed38e9056b16e279ba3c5
 
@@ -195,6 +213,9 @@ requests==2.10.0 \
 responses==0.3.0 \
     --hash=sha256:6c5eb915bcf763b677b8e51cdb68c8474127a9b60e49e6e240b05ec5e449c43b
 
+s3transfer==0.1.9 \
+    --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
+
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
 
@@ -212,3 +233,4 @@ websocket-client==0.37.0 \
 
 Whoosh==2.6.0 \
     --hash=sha256:7de7bc4d00a6d051dbb360b48eb7f3cd002373d87252fb0b284a3c9c453a7677
+
