@@ -46,8 +46,8 @@ import pb
 import scp
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qimportbz'
-testedwith = '3.8 3.9 4.0 4.1 4.2'
-minimumhgversion = '3.8'
+testedwith = '3.9 4.0 4.1 4.2'
+minimumhgversion = '3.9'
 
 
 def extsetup(ui):

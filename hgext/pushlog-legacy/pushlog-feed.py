@@ -30,7 +30,7 @@ with demandimport.deactivated():
 xmlescape = templatefilters.xmlescape
 
 testedwith = '4.1 4.2'
-minimumhgversion = '4.1 4.2'
+minimumhgversion = '4.1'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10

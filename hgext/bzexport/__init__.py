@@ -76,8 +76,8 @@ import bz
 from mozautomation.commitparser import BUG_RE
 from mozhg.rewrite import newparents, replacechangesets
 
-testedwith = '3.8 3.9 4.0 4.1 4.2'
-minimumhgversion = '3.7'
+testedwith = '3.9 4.0 4.1 4.2'
+minimumhgversion = '3.9'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
 
 cmdtable = {}
