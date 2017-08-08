@@ -119,6 +119,10 @@ cd pylib/mozansible
 python setup.py develop
 cd ../..
 
+cd pylib/mozhg
+python setup.py develop
+cd ../..
+
 cd pylib/mozhginfo
 python setup.py develop
 cd ../..

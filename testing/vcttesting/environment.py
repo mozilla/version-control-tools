@@ -203,6 +203,7 @@ def create_hgdev(docker_bmo=False):
     process_pip_requirements(venv, reqs)
     install_editable(venv, 'hghooks')
     install_editable(venv, 'pylib/Bugsy')
+    install_editable(venv, 'pylib/mozhg')
     install_editable(venv, 'pylib/mozhginfo')
     install_editable(venv, 'pylib/mozautomation')
     install_editable(venv, 'testing')
