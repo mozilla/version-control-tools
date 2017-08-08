@@ -31,16 +31,22 @@ from mercurial import (
     extensions,
     cmdutil,
     hg,
+    registrar,
     scmutil,
     util,
 )
 
-testedwith = '3.7 3.8 3.9 4.0 4.1 4.2'
+testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3'
 minimumhgversion = '3.7'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
 
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 # Mercurial 4.2 introduced the vfs module and deprecated the symbol in
 # scmutil.
