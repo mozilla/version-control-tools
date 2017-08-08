@@ -9,6 +9,10 @@ from mercurial.node import (
     short,
 )
 
+from mozhg.util import (
+    identify_repo,
+)
+
 MESSAGE = '''
 *** pushing unrelated repository ***
 
@@ -24,14 +28,15 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
-    # Don't apply hook to repos outside the repo root directory.
-    repos_root = ui.config('hgmo', 'repo_root', '/repo/hg/mozilla')
-    if not repo.root.startswith(repos_root):
+    info = identify_repo(repo)
+
+    # Only apply to hosted repos since we don't want hook to affect one-off
+    # repos on disk.
+    if not info['hosted']:
         return 0
 
     # Don't apply hook to user repos, since user repos are the wild west.
-    repo_name = repo.root[len(repos_root) + 1:]
-    if repo_name.startswith('users/'):
+    if info['user_repo']:
         return 0
 
     newroots = set()

@@ -1,18 +1,17 @@
 #!/usr/bin/env python
-import os
-from mercurial.node import short
+
+from mozhg.util import (
+    identify_repo,
+)
 
 
 def hook(ui, repo, node, hooktype, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
-    root = ui.config('hgmo', 'repo_root', '/repo/hg/mozilla')
-
-    if not repo.root.startswith(root):
+    info = identify_repo(repo)
+    if not info['hosted']:
         return 0
-
-    repo_name = repo.root[len(root) + 1:]
 
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo.changectx(node).rev()
@@ -21,7 +20,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
     tip_node = tipctx.hex()
 
     num_changes = tip + 1 - rev
-    url = 'https://hg.mozilla.org/%s/' % repo_name
+    url = 'https://hg.mozilla.org/%s/' % info['path']
 
     if num_changes <= 10:
         plural = 's' if num_changes > 1 else ''

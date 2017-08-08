@@ -4,7 +4,7 @@
   > [hooks]
   > pretxnchangegroup.push_printurls = python:mozhghooks.push_printurls.hook
   > 
-  > [hgmo]
+  > [mozilla]
   > repo_root = $TESTTMP
   > EOF
 

@@ -1,5 +1,5 @@
   $ cat >> $HGRCPATH << EOF
-  > [hgmo]
+  > [mozilla]
   > repo_root = $TESTTMP
   > EOF
 
