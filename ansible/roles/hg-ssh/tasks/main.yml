@@ -123,6 +123,8 @@
   with_items:
     - { venv: venv_pash, path: hghooks, pth: mozhghooks }
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
+    - { venv: venv_pash, path: pylib/mozhg, pth: mozhg }
+    - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_pash, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_pash, path: pylib/mozautomation, pth: mozautomation }

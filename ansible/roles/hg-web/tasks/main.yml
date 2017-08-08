@@ -197,15 +197,17 @@
 # Various hgrc files reference hooks via "python:mozhghooks.*". Install
 # a link in the replication virtualenv to the path to these hooks inside
 # the version-control-tools checkout.
-- name: add mozhghooks to virtualens
-  copy: dest=/var/hg/{{ item }}/lib/python2.7/site-packages/mozhghooks.pth
-        content=/var/hg/version-control-tools/hghooks
+- name: add packages to virtualens
+  copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
+        content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
         group=root
         mode=0644
   with_items:
-    - venv_replication
-    - venv_tools
+    - { venv: venv_replication, path: hghooks, pth: mozhghooks }
+    - { venv: venv_tools, path: hghooks, pth: mozhghooks }
+    - { venv: venv_replication, path: pylib/mozhg, pth: mozhg }
+    - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
 
 # Settings from this file are inherited by every hg command run on the
 # system.
