@@ -10,6 +10,16 @@ import re
 RE_VALID_NAME = re.compile('^[a-zA-Z0-9_]+$')
 
 
+def print_banner(ui, level, message):
+    width = max(len(l) for l in message.splitlines())
+    banner = [
+        ' {} '.format(level.upper()).center(width, '*'),
+        message.strip(),
+        '*' * width,
+    ]
+    ui.write('\n' + '\n'.join(banner) + '\n\n')
+
+
 class PreTxnChangegroupCheck(object):
     """A check that operates as a pretxnchangegroup hook.
 

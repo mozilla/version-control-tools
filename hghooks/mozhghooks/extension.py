@@ -60,10 +60,12 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
     # so we don't have to enumerate them all.
     from mozhghooks.check import (
         single_root,
+        try_task_config_file,
     )
 
     CHECKS = (
         single_root.SingleRootCheck,
+        try_task_config_file.TryConfigCheck,
     )
 
     # Never apply hooks at pull time or when re-applying from strips.

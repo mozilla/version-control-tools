@@ -30,6 +30,10 @@ def identify_repo(repo):
 
     firefox
        Bool indicating if the repo is a Firefox repo.
+    firefox_releasing
+       Bool if this is a Firefox repo where released Firefoxen could come
+       from. These repos have more stringent requirements than a typical
+       Firefox repo.
     hosted
        Bool indicating if the repo is hosted. (In a path used by servers.)
     user_repo
@@ -58,5 +62,12 @@ def identify_repo(repo):
         d['hosted'] = False
         d['path'] = repo.root
         d['user_repo'] = False
+
+    # We could potentially exclude more Firefox repos from this list. For now,
+    # be liberal in what we apply this label to.
+    d['firefox_releasing'] = (
+        d['firefox']
+        and d['publishing']
+        and not d['user_repo'])
 
     return d

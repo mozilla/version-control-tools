@@ -1,8 +1,42 @@
+  $ . $TESTDIR/hghooks/tests/common.sh
+
+try_task_config.json is allowed on normal repos
+
+  $ hg init normal
+  $ configurehooks normal
+  $ hg -q clone normal client-normal
+  $ cd client-normal
+  $ touch file0
+  $ hg -q commit -A -m initial
+  $ touch try_task_config.json
+  $ hg -q commit -A -m 'add try_task_config.json'
+  $ hg push
+  pushing to $TESTTMP/normal
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 2 files
+  $ cd ..
+
+try_task_config.json is allowed on Firefox user repos
+
+  $ mkdir -p users/someuser
+  $ hg init users/someuser/firefox
+  $ configurehooks users/someuser/firefox
+  $ touch users/someuser/firefox/.hg/IS_FIREFOX_REPO
+
+  $ hg -R client-normal push $TESTTMP/users/someuser/firefox
+  pushing to $TESTTMP/users/someuser/firefox
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 2 files
+
   $ hg init server
-  $ cat > server/.hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.prevent_try_config = python:mozhghooks.prevent_try_config.hook
-  > EOF
+  $ configurehooks server
+  $ touch server/.hg/IS_FIREFOX_REPO
 
   $ hg -q clone server client
   $ cd client
@@ -41,7 +75,7 @@ Can't push try_task_config.json
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_try_config hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Multiple changesets handled properly
@@ -67,5 +101,17 @@ Multiple changesets handled properly
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_try_config hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
+
+Making repo non-publishing will allow the push
+
+  $ hg --config phases.publish=false push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 3 changesets with 3 changes to 3 files
+
+  $ cd ..
