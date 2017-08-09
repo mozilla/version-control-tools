@@ -149,7 +149,9 @@ def exchangepullpushlog(orig, pullop):
             # changesets.
             [urepo[n] for n in nodes]
         except error.RepoLookupError:
-            repo.ui.warn('received pushlog entry for unknown changeset; ignoring\n')
+            missing = [hex(n) for n in nodes if n not in urepo]
+            repo.ui.warn('received pushlog entry for unknown changeset %s; '
+                         'ignoring\n' % ', '.join(missing))
             break
 
         pushes.append((int(pushid), who, int(when), nodes))

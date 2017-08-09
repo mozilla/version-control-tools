@@ -142,7 +142,7 @@ Pulling an old changeset only pulls relevant changesets
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  received pushlog entry for unknown changeset; ignoring
+  received pushlog entry for unknown changeset 2e70e96c7d550e541406a47d87df354309fe9a72; ignoring
   added 1 pushes
   (run 'hg update' to get a working copy)
 

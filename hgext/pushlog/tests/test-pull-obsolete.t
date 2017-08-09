@@ -110,7 +110,7 @@ pushlog will stop replicating when it encounters a hidden changeset.
   pulling from ssh://user@dummy/$TESTTMP/server
   searching for changes
   no changes found
-  received pushlog entry for unknown changeset; ignoring
+  received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
 
 Pushlog stops at 80c2c663cb83 because it is hidden
@@ -192,7 +192,7 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
   adding file changes
   added 3 changesets with 3 changes to 3 files
   1 new obsolescence markers
-  received pushlog entry for unknown changeset; ignoring
+  received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
   (run 'hg update' to get a working copy)
 
