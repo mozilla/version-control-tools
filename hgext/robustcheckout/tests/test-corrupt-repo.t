@@ -32,7 +32,7 @@ Corrupt the manifest
   (repo corruption: index 00manifest.i is corrupted; deleting shared store)
   ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  (shared store does not exist; deleting)
+  (shared store does not exist; deleting destination)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
   adding changesets
@@ -62,7 +62,7 @@ Now check corruption is handled during clone
   (repo corruption: index 00manifest.i is corrupted; deleting shared store)
   ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at dest1
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  (shared store does not exist; deleting)
+  (shared store does not exist; deleting destination)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
   adding changesets

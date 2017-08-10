@@ -210,11 +210,11 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         ui.write('(existing repository shared store: %s)\n' % storepath)
 
         if not os.path.exists(storepath):
-            ui.warn('(shared store does not exist; deleting)\n')
+            ui.warn('(shared store does not exist; deleting destination)\n')
             destvfs.rmtree(forcibly=True)
         elif not re.search('[a-f0-9]{40}/\.hg$', storepath.replace('\\', '/')):
             ui.warn('(shared store does not belong to pooled storage; '
-                    'deleting to improve efficiency)\n')
+                    'deleting destination to improve efficiency)\n')
             destvfs.rmtree(forcibly=True)
 
         # FUTURE when we require generaldelta, this is where we can check
