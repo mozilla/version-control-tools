@@ -193,7 +193,23 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     ui.write('ensuring %s@%s is available at %s\n' % (url, revision or branch,
                                                       dest))
 
+    # We assume that we're the only process on the machine touching the
+    # repository paths that we were told to use. This means our recovery
+    # scenario when things aren't "right" is to just nuke things and start
+    # from scratch. This is easier to implement than verifying the state
+    # of the data and attempting recovery. And in some scenarios (such as
+    # potential repo corruption), it is probably faster, since verifying
+    # repos can take a while.
+
     destvfs = getvfs()(dest, audit=False, realpath=True)
+
+    def deletesharedstore(path=None):
+        storepath = path or destvfs.read('.hg/sharedpath').strip()
+        if storepath.endswith('.hg'):
+            storepath = os.path.dirname(storepath)
+
+        storevfs = getvfs()(storepath, audit=False)
+        storevfs.rmtree(forcibly=True)
 
     if destvfs.exists() and not destvfs.exists('.hg'):
         raise error.Abort('destination exists but no .hg directory')
@@ -217,16 +233,23 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                     'deleting destination to improve efficiency)\n')
             destvfs.rmtree(forcibly=True)
 
+        storevfs = getvfs()(storepath, audit=False)
+        if storevfs.isfileorlink('store/lock'):
+            ui.warn('(shared store has an active lock; assuming it is left '
+                    'over from a previous process and that the store is '
+                    'corrupt; deleting store and destination just to be '
+                    'sure)\n')
+            destvfs.rmtree(forcibly=True)
+            deletesharedstore(storepath)
+
         # FUTURE when we require generaldelta, this is where we can check
         # for that.
 
-    def deletesharedstore():
-        storepath = destvfs.read('.hg/sharedpath').strip()
-        if storepath.endswith('.hg'):
-            storepath = os.path.dirname(storepath)
-
-        storevfs = getvfs()(storepath, audit=False)
-        storevfs.rmtree(forcibly=True)
+    if destvfs.isfileorlink('.hg/wlock'):
+        ui.warn('(dest has an active working directory lock; assuming it is '
+                'left over from a previous process and that the destination '
+                'is corrupt; deleting it just to be sure)\n')
+        destvfs.rmtree(forcibly=True)
 
     def handlerepoerror(e):
         if e.message == _('abandoned transaction found'):
