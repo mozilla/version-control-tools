@@ -1,3 +1,5 @@
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+
 coverage==4.3.4 \
     --hash=sha256:ca36d83cd591d027952e5019149c4386e7058cd674bf8cb52dc622f768d689e9 \
     --hash=sha256:36407249a0b6669c6ad4425b0f29685579df745480c03afa70f101f09f4eead3 \
@@ -17,8 +19,8 @@ ipaddress==1.0.16 \
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
 
-Mercurial==4.2.2 \
-    --hash=sha256:b20132dec5ae6d27ee43a133144069895befe09f7e454bfa9e39950a185f0afe
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 mock==1.0.1 \
     --hash=sha256:b839dd2d9c117c701430c149956918a423a9863b48b09c90e30a6013e7d2f44f \

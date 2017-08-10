@@ -1,3 +1,5 @@
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+
 ansible==1.9.0.1 \
     --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
 
@@ -34,8 +36,8 @@ mach==0.5.1 \
 MarkupSafe==0.23 \
     --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 
-Mercurial==4.2.2 \
-    --hash=sha256:b20132dec5ae6d27ee43a133144069895befe09f7e454bfa9e39950a185f0afe
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 mozfile==1.1 \
     --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e

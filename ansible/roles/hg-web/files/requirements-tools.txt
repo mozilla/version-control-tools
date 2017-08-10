@@ -1,4 +1,4 @@
---find-links /var/tmp/pip
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
 certifi==2017.4.17 \
     --hash=sha256:f4318671072f030a33c7ca6acaef720ddd50ff124d1388e50c1bda4cbd6d7010
@@ -15,8 +15,8 @@ futures==3.0.3 \
 idna==2.5 \
     --hash=sha256:cc19709fd6d0cbfed39ea875d29ba6d4e22c0cebc510a76d6302a28385e8bb70
 
-Mercurial==4.2.2+13-943c91326b23 \
-    --hash=sha256:ed78963c42780ad9b592c8b95c30b45ab78b6129730e228259b2ed20b687ae6a
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 python-hglib==1.9 \
     --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce

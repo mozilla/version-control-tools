@@ -26,11 +26,6 @@ ADD extra/vct/autoland/requirements.txt ${AUTOLAND_HOME}/requirements.txt
 RUN pip install virtualenv
 RUN virtualenv ${AUTOLAND_HOME}/venv
 
-# TODO we can remove this once we're back to not using a custom Mercurial
-# package.
-# %include mercurial-4.2.2+13-943c91326b23.tar.gz
-COPY extra/vct/mercurial-4.2.2+13-943c91326b23.tar.gz /var/tmp/pip/mercurial-4.2.2+13-943c91326b23.tar.gz
-
 RUN ${AUTOLAND_HOME}/venv/bin/pip install -r ${AUTOLAND_HOME}/requirements.txt
 
 # Apache
@@ -41,7 +36,7 @@ RUN echo "ServerName autoland" >> /etc/apache2/apache2.conf
 EXPOSE 80
 
 # Hg
-RUN pip install Mercurial==4.2.2
+RUN pip install Mercurial==4.2.3 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 RUN cd /home/autoland && hg clone -r 4140d680784e https://bitbucket.org/marmoute/mutable-history
 RUN mkdir /repos && hg init /repos/try
 ADD try-hgrc /repos/try/.hg/hgrc

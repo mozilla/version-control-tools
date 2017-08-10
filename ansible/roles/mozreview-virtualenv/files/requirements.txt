@@ -7,7 +7,6 @@
 # We require hash verification everywhere, so plain text is still safe.
 --find-links http://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --trusted-host s3-us-west-2.amazonaws.com
---find-links /var/tmp/pip
 
 amqp==1.4.8 \
     --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e
@@ -68,8 +67,8 @@ kombu==3.0.30 \
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
-Mercurial==4.2.2+13-943c91326b23 \
-    --hash=sha256:ed78963c42780ad9b592c8b95c30b45ab78b6129730e228259b2ed20b687ae6a
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 mimeparse==0.1.3 \
     --hash=sha256:534ff6feefe1cd03984f444e6415aacc79c0a85f3b868ec41a2fd5003004c31e

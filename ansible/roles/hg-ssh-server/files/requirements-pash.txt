@@ -1,5 +1,5 @@
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
---find-links /var/tmp/pip
 
 # Kafka is in this virtualenv to support replication on the hg leader server.
 # It isn't needed on a standalone hg server. But installing it doesn't really
@@ -7,8 +7,8 @@
 kafka-python==0.9.4 \
     --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
 
-Mercurial==4.2.2+13-943c91326b23 \
-    --hash=sha256:ed78963c42780ad9b592c8b95c30b45ab78b6129730e228259b2ed20b687ae6a
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 python-ldap==2.4.20 \
     --hash=sha256:4b8891539a3171d993cf7896b632ff088a4c707ae85ac3c77db1454f7949f3e2

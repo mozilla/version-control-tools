@@ -100,9 +100,6 @@
     - /repo/hg/mozilla
     - /var/hg
 
-# TODO only needed as long as we're using a custom Mercurial build.
-- include: ../../../tasks/download-mercurial.yml
-
 - name: create virtualenv for pash
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_pash

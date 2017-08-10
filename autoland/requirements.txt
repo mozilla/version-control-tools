@@ -1,4 +1,4 @@
---find-links /var/tmp/pip
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
 amqp==1.4.9 \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
@@ -42,8 +42,8 @@ kombu==3.0.37 \
 MarkupSafe==0.23 \
     --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 
-Mercurial==4.2.2+13-943c91326b23 \
-    --hash=sha256:ed78963c42780ad9b592c8b95c30b45ab78b6129730e228259b2ed20b687ae6a
+Mercurial==4.2.3 \
+    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 
 mozillapulse==1.2.2 \
     --hash=sha256:750ce5a2b4bd225bd00b339e1ac533c16b187c0804695bb3d878c699ee2b3228

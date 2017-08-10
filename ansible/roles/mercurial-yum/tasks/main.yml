@@ -3,25 +3,15 @@
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
 - name: download Mercurial package (CentOS 6)
-#  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.2-1%2B943c91326b23.x86_64.rpm
-#           dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
-#           sha256sum=7c43baff94c096d0db0772e4f6e01b15d2dc81f57ee0e563eb7f0550e9a4a27a
-  copy: src={{ vct }}/mercurial-4.2.2-1+943c91326b23.x86_64.centos6.rpm
-        dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
-        owner=root
-        group=root
-        mode=0640
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.2.3-1.x86_64.rpm
+           sha256sum=ec8bf321c161c9c3389ac4c6bc21f3ccc2e0ea5e1dd158d33e3e7fd93ce64395
   when: ansible_distribution_major_version == '6'
 
 - name: download Mercurial package (CentOS 7)
-#  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.2-1%2B943c91326b23.x86_64.rpm
-#           dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
-#           sha256sum=62d470cd7482ca9dbda37f7ee8d077b614a4c0c7aff2c6813ec38ab28de16db2
-  copy: src={{ vct }}/mercurial-4.2.2-1+943c91326b23.x86_64.centos7.rpm
-        dest=/var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
-        owner=root
-        group=root
-        mode=0640
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.2.3-1.x86_64.rpm
+           sha256sum=8c713baf1a62d2e10030558d36cd8480190d548b14c37230baea626433df6417
   when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
@@ -29,4 +19,4 @@
 
 # The yum module is slow. Run commands manually.
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.2-1+943c91326b23.x86_64.rpm
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.3-1.x86_64.rpm
