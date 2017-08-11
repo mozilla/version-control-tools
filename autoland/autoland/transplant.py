@@ -1,9 +1,16 @@
-import config
-import hglib
+import io
 import json
 import logging
 import re
 import tempfile
+import urlparse
+
+import boto3
+import hglib
+import requests
+from botocore.exceptions import ClientError
+
+import config
 
 REPO_CONFIG = {}
 
@@ -35,12 +42,12 @@ class Transplant(object):
         self.path = config.get_repo(tree)['path']
 
     def __enter__(self):
-        configs = ['ui.interactive=False']
+        configs = ['ui.interactive=False', 'extensions.purge=']
         self.hg_repo = hglib.open(self.path, encoding='utf-8', configs=configs)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.strip_drafts()
+        self.clean_repo()
         self.hg_repo.close()
 
     def push_try(self, trysyntax):
@@ -94,8 +101,8 @@ class Transplant(object):
         # Obtain remote tip. We assume there is only a single head.
         remote_tip = self.get_remote_tip()
 
-        # Strip any lingering draft changesets.
-        self.strip_drafts()
+        # Strip any lingering changes.
+        self.clean_repo()
 
         # Pull from "upstream".
         self.update_from_upstream(remote_tip)
@@ -126,12 +133,25 @@ class Transplant(object):
                 raise HgCommandError(cmd, e.out)
         return last_result
 
-    def strip_drafts(self):
+    def clean_repo(self):
         # Strip any lingering draft changesets.
         try:
             self.run_hg(['strip', '--no-backup', '-r', 'not public()'])
         except hglib.error.CommandError:
             pass
+        # Clean working directory.
+        try:
+            self.run_hg(['--quiet', 'revert', '--no-backup', '--all'])
+        except hglib.error.CommandError:
+            pass
+        try:
+            self.run_hg(['purge', '--all'])
+        except hglib.error.CommandError:
+            pass
+
+    def dirty_files(self):
+        return self.run_hg(['status', '--modified', '--added', '--removed',
+                            '--deleted', '--unknown', '--ignored'])
 
     def get_remote_tip(self):
         # Obtain remote tip. We assume there is only a single head.
@@ -274,12 +294,77 @@ class PatchTransplant(Transplant):
     def apply_changes(self, remote_tip):
         assert self.patch_urls, 'patch_urls not provided'
 
+        dirty_files = self.dirty_files()
+        if dirty_files:
+            logger.error('repo is not clean: %s' % ' '.join(dirty_files))
+            raise Exception("We're sorry - something has gone wrong while "
+                            "landing your commits. The repository contains "
+                            "unexpected changes. "
+                            "Please file a bug.")
+
+        self.run_hg(['update', remote_tip])
+
         for patch_url in self.patch_urls:
             if patch_url.startswith('s3://'):
-                # Download patch to temp file and import
-                raise Exception('importing patches from s3 not implemented')
+                # Download patch from s3 to a temp file.
+                io_buf = self._download_from_s3(patch_url)
 
             else:
-                self.run_hg(['update', remote_tip])
-                output = self.run_hg(['import', patch_url])
-                logger.info(output)
+                # Download patch directly from url.  Using a temp file here
+                # instead of passing the url to 'hg import' to make
+                # testing's code path closer to production's.
+                io_buf = self._download_from_url(patch_url)
+
+            with tempfile.NamedTemporaryFile() as temp_file:
+                temp_file.write(io_buf.getvalue())
+                temp_file.flush()
+
+                # Apply the patch, with file rename detection (similarity).
+                # Using 95 as the similarity to match automv's default.
+                logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
+
+    @staticmethod
+    def _download_from_s3(patch_url):
+        # Download from s3 url specified in self.patch_url, returns io.BytesIO.
+        url = urlparse.urlparse(patch_url)
+        bucket = url.hostname
+        key = url.path[1:]
+
+        buckets_config = config.get('patch_url_buckets')
+        if bucket not in buckets_config:
+            logging.error('bucket "%s" not configured in patch_url_buckets'
+                          % bucket)
+            raise Exception('invalid patch_url')
+        bucket_config = buckets_config[bucket]
+
+        if ('aws_access_key_id' not in bucket_config or
+                'aws_secret_access_key' not in bucket_config):
+            logging.error('bucket "%s" is missing aws_access_key_id or '
+                          'aws_secret_access_key' % bucket)
+            raise Exception('invalid patch_url')
+
+        try:
+            s3 = boto3.client(
+                's3',
+                aws_access_key_id=bucket_config['aws_access_key_id'],
+                aws_secret_access_key=bucket_config['aws_secret_access_key'])
+
+            buf = io.BytesIO
+            s3.download_fileobj(bucket, key, buf)
+            return buf
+        except ClientError as e:
+            error_code = int(e.response['Error']['Code'])
+            if error_code == 404:
+                raise Exception('unable to download %s: file not found'
+                                % patch_url)
+            if error_code == 403:
+                raise Exception('unable to download %s: permission denied'
+                                % patch_url)
+            raise
+
+    @staticmethod
+    def _download_from_url(patch_url):
+        # Download from patch_url, returns io.BytesIO.
+        r = requests.get(patch_url, stream=True)
+        r.raise_for_status()
+        return io.BytesIO(r.content)
