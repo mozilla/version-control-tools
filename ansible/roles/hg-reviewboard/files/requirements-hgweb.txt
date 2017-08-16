@@ -4,8 +4,8 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
 
-Mercurial==4.2.3 \
-    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
+Mercurial==4.2.3-388d39276ecf \
+    --hash=sha256:e6adcc3a2222a978aaafb991f6feefe7ca4ff1cdacb81b4ccaac397dd681f588
 
 mod-wsgi==4.5.14 \
     --hash=sha256:8e6d0ccdea6872b71da2ba0fe5d46ca38a6219becc521dcdc4516992c9fe3247
