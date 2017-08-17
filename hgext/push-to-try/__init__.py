@@ -3,7 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-from mercurial import commands, context, cmdutil
+from mercurial import (
+    commands,
+    context,
+    cmdutil,
+)
 from mercurial.i18n import _
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))

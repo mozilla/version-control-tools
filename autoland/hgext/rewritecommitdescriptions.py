@@ -3,12 +3,14 @@
 import json
 import os
 
-from mercurial import (context,
-                       cmdutil,
-                       encoding,
-                       error,
-                       extensions,
-                       phases)
+from mercurial import (
+    context,
+    cmdutil,
+    encoding,
+    error,
+    extensions,
+    phases,
+)
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', '..', 'hgext', 'bootstrap.py'))

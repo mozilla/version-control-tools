@@ -4,16 +4,22 @@ This is a port of mak's mercurial backout script from
 https://wiki.mozilla.org/User:Mak77 to a mercurial extension.'''
 
 import gc
-
-from mercurial import scmutil, commands, cmdutil, patch, mdiff, util
-from mercurial.i18n import _
-from mercurial.node import nullid, short
-from hgext import mq
-
-
-import StringIO
 import os
 import re
+import StringIO
+
+from mercurial.i18n import _
+from mercurial.node import nullid, short
+from mercurial import (
+    cmdutil,
+    commands,
+    mdiff,
+    patch,
+    scmutil,
+    util,
+)
+from hgext import mq
+
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))

@@ -91,7 +91,17 @@ import urllib2
 
 from mercurial.i18n import _
 from mercurial.node import short
-from mercurial import commands, util, cmdutil, mdiff, error, url, patch, extensions, scmutil
+from mercurial import (
+    commands,
+    cmdutil,
+    error,
+    extensions,
+    mdiff,
+    patch,
+    scmutil,
+    url,
+    util,
+)
 
 from hgext import mq
 from collections import Counter
