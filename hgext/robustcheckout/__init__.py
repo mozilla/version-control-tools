@@ -342,6 +342,28 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             destvfs.rmtree(forcibly=True)
         storevfs.rmtree(forcibly=True)
 
+    if storevfs.exists() and not storevfs.exists('.hg/requires'):
+        ui.warn('(shared store missing requires file; this is a really '
+                'odd failure; deleting store and destination)\n')
+        if destvfs.exists():
+            destvfs.rmtree(forcibly=True)
+        storevfs.rmtree(forcibly=True)
+
+    if storevfs.exists('.hg/requires'):
+        requires = set(storevfs.read('.hg/requires').splitlines())
+        # FUTURE when we require generaldelta, this is where we can check
+        # for that.
+        required = {'dotencode', 'fncache'}
+
+        missing = required - requires
+        if missing:
+            ui.warn('(shared store missing requirements: %s; deleting '
+                    'store and destination to ensure optimal behavior)\n' %
+                    ', '.join(sorted(missing)))
+            if destvfs.exists():
+                destvfs.rmtree(forcibly=True)
+            storevfs.rmtree(forcibly=True)
+
     created = False
 
     if not destvfs.exists():
