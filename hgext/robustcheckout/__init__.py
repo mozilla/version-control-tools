@@ -144,7 +144,26 @@ def purgewrapper(orig, ui, *args, **kwargs):
     norepo=True)
 def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
                    purge=False, sharebase=None, networkattempts=None):
-    """Ensure a working copy has the specified revision checked out."""
+    """Ensure a working copy has the specified revision checked out.
+
+    Repository data is automatically pooled into the common directory
+    specified by ``--sharebase``, which is a required argument. It is required
+    because pooling storage prevents excessive cloning, which makes operations
+    complete faster.
+
+    One of ``--revision`` or ``--branch`` must be specified. ``--revision``
+    is preferred, as it is deterministic and there is no ambiguity as to which
+    revision will actually be checked out.
+
+    If ``--upstream`` is used, the repo at that URL is used to perform the
+    initial clone instead of cloning from the repo where the desired revision
+    is located.
+
+    ``--purge`` controls whether to removed untracked and ignored files from
+    the working directory. If used, the end state of the working directory
+    should only contain files explicitly under version control for the requested
+    revision.
+    """
     if not revision and not branch:
         raise error.Abort('must specify one of --revision or --branch')
 
