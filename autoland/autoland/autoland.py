@@ -10,6 +10,7 @@ import psycopg2
 import sys
 import time
 import traceback
+import urlparse
 
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.normpath(
                 os.path.abspath(os.path.dirname(__file__))), '..',
@@ -257,28 +258,53 @@ def handle_pending_mozreview_updates(dbconn):
     """
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
 
-    bugzilla_auth = mozreview.instantiate_authentication()
+    mozreview_pingback = mozreview.MozReviewPingback()
 
     updated = []
     all_posted = True
     for row in cursor.fetchall():
         update_id, transplant_id, request, data = row
+
+        # Validate the pingback hostname is still present in config.json.
         pingback_url = request.get('pingback_url')
+        hostname = urlparse.urlparse(pingback_url).hostname
 
-        logger.info('trying to post mozreview update to: %s for request: %s' %
-                    (pingback_url, transplant_id))
+        if hostname == 'localhost':
+            # localhost pingbacks are always a NO-OP; used during development
+            # and testing.
+            pingback_url = None
 
-        # We allow empty pingback_urls as they make testing easier. We can
-        # always check the logs for misconfigured pingback_urls.
+        else:
+            if hostname not in config.get('pingback', {}):
+                logging.error('ignoring pingback to %s: unconfigured'
+                              % hostname)
+                pingback_url = None
+
+        # Use the appropriate handler for this pingback.
         if pingback_url:
-            status_code, text = mozreview.update_review(bugzilla_auth,
-                                                        pingback_url, data)
+            pingback_config = config.get('pingback').get(hostname)
+
+            if pingback_config['type'] == 'mozreview':
+                pingback = mozreview_pingback
+
+            else:
+                logging.warning('ignoring pinback to %s: not supported'
+                                % hostname)
+                pingback_url = None
+
+        # Update the requester if required.
+        if pingback_url:
+            logger.info('trying to post %s update to: %s for request: %s' %
+                        (pingback.name, pingback_url, transplant_id))
+
+            status_code, text = pingback.update(pingback_url, data)
             if status_code == 200:
                 updated.append([update_id])
             else:
                 logger.info('failed: %s - %s' % (status_code, text))
                 all_posted = False
                 break
+
         else:
             updated.append([update_id])
 

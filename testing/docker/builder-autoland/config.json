@@ -1,9 +1,5 @@
 {
   "testing": true,
-  "bugzilla": {
-    "user": "admin@example.com",
-    "passwd": "password"
-  },
   "auth": {
     "autoland": "autoland"
   },
@@ -13,9 +9,13 @@
       "tree": "test"
     }
   },
-  "pingback_allow": [
-    "example.com"
-  ],
+  "pingback": {
+    "example.com": {
+      "type": "mozreview",
+      "user": "admin@example.com",
+      "password": "password"
+    }
+  },
   "patch_url_buckets": {
     "example-bucket": {
       "aws_access_key_id": "DEADBEEFF00D",

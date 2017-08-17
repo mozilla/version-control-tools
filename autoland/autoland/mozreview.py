@@ -19,6 +19,7 @@ API_KEY_LOGIN_PATH = ('/api/extensions/mozreview.extension.MozReviewExtension/'
 #       "passwd": "password",
 #   }
 
+
 class BugzillaAuthException(Exception):
     pass
 
@@ -44,7 +45,7 @@ class BugzillaAuthPassword(BugzillaAuth):
     """Username/password authentication.  Used in dev and test."""
 
     def http_auth(self):
-        return self._config['user'], self._config['passwd']
+        return self._config['user'], self._config['password']
 
 
 class BugzillaAuthApiKey(BugzillaAuth):
@@ -76,28 +77,39 @@ class BugzillaAuthApiKey(BugzillaAuth):
         return headers
 
 
-def instantiate_authentication():
-    """Return the appropriate BugzillaAuth object."""
-    bugzilla_config = config.get('bugzilla')
-    if 'api-key' in bugzilla_config:
-        return BugzillaAuthApiKey(bugzilla_config)
-    else:
-        return BugzillaAuthPassword(bugzilla_config)
+class MozReviewPingback(object):
+    """Handle updating MozReview/RB requests."""
 
+    def __init__(self):
+        self.name = 'mozreview'
+        self.auth = {}
 
-def update_review(bugzilla_auth, pingback_url, data):
-    """Sends the 'data' to the 'pingback_url', handing auth and errors"""
-    try:
-        res = requests.post(pingback_url,
-                            data=data,
-                            headers=bugzilla_auth.headers(pingback_url),
-                            auth=bugzilla_auth.http_auth())
-        if res.status_code == 401:
-            raise BugzillaAuthException('Login failure')
-        return res.status_code, res.text
-    except BugzillaAuthException as e:
-        return None, 'Failed to connect authenticate with MozReview: %s' % e
-    except requests.exceptions.ConnectionError as e:
-        return None, 'Failed to connect to MozReview: %s' % e
-    except requests.exceptions.RequestException as e:
-        return None, 'Failed to update MozReview: %s' % e
+    def _auth_for(self, pingback_url):
+        hostname = urlparse.urlparse(pingback_url).hostname
+
+        if hostname not in self.auth:
+            auth_config = config.get('pingback').get(hostname)
+            if 'api-key' in auth_config:
+                self.auth[hostname] = BugzillaAuthApiKey(auth_config)
+            else:
+                self.auth[hostname] = BugzillaAuthPassword(auth_config)
+
+        return self.auth[hostname]
+
+    def update(self, pingback_url, data):
+        """Sends the 'data' to the 'pingback_url', handing auth and errors"""
+        try:
+            auth = self._auth_for(pingback_url)
+            res = requests.post(pingback_url,
+                                data=data,
+                                headers=auth.headers(pingback_url),
+                                auth=auth.http_auth())
+            if res.status_code == 401:
+                raise BugzillaAuthException('Login failure')
+            return res.status_code, res.text
+        except BugzillaAuthException as e:
+            return None, 'Failed to connect authenticate with MozReview: %s' % e
+        except requests.exceptions.ConnectionError as e:
+            return None, 'Failed to connect to MozReview: %s' % e
+        except requests.exceptions.RequestException as e:
+            return None, 'Failed to update MozReview: %s' % e

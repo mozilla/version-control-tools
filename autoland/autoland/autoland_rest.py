@@ -65,11 +65,7 @@ def check_pingback_url(pingback_url):
         pass
 
     # Allow pingbacks to whitelisted hosts from config.json
-    for allowed_host in config.get('pingback_allow', []):
-        if url.hostname == allowed_host:
-            return True
-
-    return False
+    return url.hostname in config.get('pingback', {})
 
 
 def check_patch_url(patch_url):
