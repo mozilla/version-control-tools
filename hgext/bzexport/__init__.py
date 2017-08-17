@@ -58,10 +58,10 @@ from mercurial import (
     context,
     encoding,
     error,
-    extensions,
     node,
     obsolete,
     patch,
+    registrar,
     revset,
     scmutil,
     util,
@@ -81,7 +81,13 @@ minimumhgversion = '3.9'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 

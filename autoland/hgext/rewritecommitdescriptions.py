@@ -10,6 +10,8 @@ from mercurial import (
     error,
     extensions,
     phases,
+    registrar,
+    util,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
@@ -21,7 +23,13 @@ minimumhgversion = '4.1'
 testedwith = '4.1 4.2'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 
 @command('rewritecommitdescriptions',

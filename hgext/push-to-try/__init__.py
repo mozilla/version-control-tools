@@ -7,6 +7,8 @@ from mercurial import (
     commands,
     context,
     cmdutil,
+    registrar,
+    util,
 )
 from mercurial.i18n import _
 
@@ -16,7 +18,13 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 from mozhg.rewrite import preservefilectx
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 testedwith = '3.9 4.0 4.1 4.2'
 

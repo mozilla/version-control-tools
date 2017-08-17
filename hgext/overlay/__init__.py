@@ -22,6 +22,7 @@ from mercurial import (
     exchange,
     filelog,
     hg,
+    registrar,
     scmutil,
     store,
     util,
@@ -31,7 +32,13 @@ from mercurial import (
 testedwith = '4.1 4.2'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 
 REVISION_KEY = 'subtree_revision'

@@ -8,7 +8,8 @@ import os
 
 from mercurial import (
     cmdutil,
-    commands,
+    registrar,
+    util,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -17,7 +18,14 @@ execfile(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py'))
 from mozhg.auth import getbugzillaauth
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
+
 
 @command('bzauth', [
     ('', 'require', False, 'Require auth'),

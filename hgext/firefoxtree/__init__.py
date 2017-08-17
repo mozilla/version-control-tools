@@ -84,6 +84,7 @@ from mercurial import (
     extensions,
     hg,
     namespaces,
+    registrar,
     revset,
     scmutil,
     templatekw,
@@ -117,7 +118,13 @@ MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
 COMM_ROOT_REV = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 shorttemplate = ''.join([
     '{label("log.changeset", rev)}',

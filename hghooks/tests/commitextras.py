@@ -10,10 +10,18 @@ from mercurial import (
     cmdutil,
     commands,
     extensions,
+    registrar,
+    util,
 )
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 
 def extsetup(ui):

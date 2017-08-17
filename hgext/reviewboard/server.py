@@ -28,6 +28,7 @@ from mercurial import (
     demandimport,
     extensions,
     hg,
+    registrar,
     util,
     wireproto,
 )
@@ -57,8 +58,13 @@ testedwith = '4.1 4.2'
 minimumhgversion = '4.1'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
 
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 # Capabilities the server requires in clients.
 #

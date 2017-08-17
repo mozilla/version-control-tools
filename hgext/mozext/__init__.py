@@ -290,7 +290,6 @@ from mercurial.node import (
     short,
 )
 from mercurial import (
-    commands,
     cmdutil,
     demandimport,
     encoding,
@@ -298,6 +297,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    registrar,
     revset,
     scmutil,
     sshpeer,
@@ -342,7 +342,13 @@ minimumhgversion = '3.9'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
 cmdtable = {}
-command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced registrar.command as a replacement for
+# cmdutil.command.
+if util.safehasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+else:
+    command = cmdutil.command(cmdtable)
 
 colortable = {
     'buildstatus.success': 'green',
