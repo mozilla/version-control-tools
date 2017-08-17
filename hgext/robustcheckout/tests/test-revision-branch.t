@@ -33,6 +33,7 @@ It can't be more than 40 characters
 Specifying branch argument will checkout branch
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@default is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -51,6 +52,7 @@ Specifying branch argument will checkout branch
 Specifying branch argument will always attempt to pull because branch revisions can change
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)
@@ -62,6 +64,7 @@ Specifying branch argument will always attempt to pull because branch revisions 
 Updating to another branch works
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch branch1
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@branch1 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain branch1)
@@ -73,6 +76,7 @@ Updating to another branch works
 Specifying revision will switch away from branch
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -89,6 +93,7 @@ updating to it
   $ cd ..
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision abcdef0123456
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@abcdef0123456 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   abort: --revision argument is ambiguous
@@ -110,6 +115,7 @@ revision
   6f89935a511842d2a7393cad33ef93bf793b1db2
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)

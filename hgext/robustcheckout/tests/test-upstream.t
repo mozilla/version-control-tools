@@ -3,6 +3,7 @@
 Specifying an upstream repo will clone from it and pull from normal repo
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --upstream http://localhost:$HGPORT/repo0-upstream --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (cloning from upstream repo http://localhost:$HGPORT/repo0-upstream)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)

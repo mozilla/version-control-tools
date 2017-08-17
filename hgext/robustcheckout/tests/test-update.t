@@ -1,6 +1,7 @@
   $ . $TESTDIR/hgext/robustcheckout/tests/helpers.sh
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -23,6 +24,7 @@ Modifications to a tracked file should get lost during update
   > EOF
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -38,6 +40,7 @@ Modifications should also get lost when updating to new revision
   > EOF
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision b8b78f0253d8
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@b8b78f0253d8 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -54,6 +57,7 @@ Added and copied files will be lost during update
   $ cd ..
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -64,6 +68,7 @@ Added and copied files will be lost during update
   ? baz
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --purge
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (purging working directory)

@@ -1,6 +1,7 @@
   $ . $TESTDIR/hgext/robustcheckout/tests/helpers.sh
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -17,6 +18,7 @@ Attempting to pull/checkout an unrelated repo will blow away the destination
 
   $ touch dest/file0
   $ hg robustcheckout http://localhost:$HGPORT/repo1 dest --revision 7d5b54cb09e1
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain 7d5b54cb09e1)
@@ -40,6 +42,7 @@ Attempting to pull/checkout an unrelated repo will blow away the destination
 And again for safe measure
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg)
   (pulling to obtain 5d6cdc75a09b)

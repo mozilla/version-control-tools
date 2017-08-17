@@ -162,6 +162,8 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
         raise error.Abort('share base directory not defined; refusing to operate',
                           hint='define share.pool config option or pass --sharebase')
 
+    ui.warn('(using Mercurial %s)\n' % util.version())
+
     # worker.backgroundclose only makes things faster if running anti-virus,
     # which our automation doesn't. Disable it.
     ui.setconfig('worker', 'backgroundclose', False)

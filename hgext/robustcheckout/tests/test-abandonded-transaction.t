@@ -1,6 +1,7 @@
   $ . $TESTDIR/hgext/robustcheckout/tests/helpers.sh
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -22,6 +23,7 @@ Simulate an abandonded transaction
 Pulling when there is an abandoned transaction should automatically recover
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision aada1b3e573f
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain aada1b3e573f)
@@ -47,6 +49,7 @@ Now simulate an abandoned transaction on an initial checkout
   $ touch $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/store/journal
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest2 --revision aada1b3e573f
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at dest2
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   searching for changes

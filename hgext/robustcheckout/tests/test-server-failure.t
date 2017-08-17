@@ -3,6 +3,7 @@
 Extension works with default config
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server good-clone --revision 94086d65796f
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/bad-server@94086d65796f is available at good-clone
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   requesting all changes
@@ -18,6 +19,7 @@ Extension works with default config
 Connecting to non-running server fails
 
   $ hg robustcheckout http://localhost:$HGPORT1/repo0 no-server --revision 94086d65796f --networkattempts 2
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT1/repo0@94086d65796f is available at no-server
   socket error: [Errno 111] Connection refused
   (retrying after network failure on attempt 1 of 2)
@@ -38,6 +40,7 @@ Server abort part way through response results in retries
   > EOF
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server-bytelimit byte-limit --revision 94086d65796f --sharebase $TESTTMP/bad-server-share
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   requesting all changes
@@ -61,6 +64,7 @@ Server abort part way through response results in retries
 Adjusting the network limit works
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server-bytelimit byte-limit --networkattempts 2 --revision 94086d65796f --sharebase $TESTTMP/bad-server-share
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   requesting all changes
@@ -80,6 +84,7 @@ Recovering server will result in good clone
   $ echo 6 > server/bad-server-bytelimit/.hg/badserveruntilgood
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server-bytelimit byte-limit --revision 94086d65796f --sharebase $TESTTMP/bad-server-share
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   requesting all changes

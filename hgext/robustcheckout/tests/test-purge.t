@@ -3,6 +3,7 @@
 Not specifying --purge won't purge checkout
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -17,6 +18,7 @@ Not specifying --purge won't purge checkout
 
   $ touch dest/file0
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -29,6 +31,7 @@ Not specifying --purge won't purge checkout
 Specifying purge will delete files
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --purge
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (purging working directory)
@@ -50,6 +53,7 @@ Ignored files are also purged when requested
   $ cd ..
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
@@ -60,6 +64,7 @@ Ignored files are also purged when requested
   foo.pyc
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --purge
+  (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (purging working directory)
