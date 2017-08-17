@@ -133,3 +133,16 @@ Simulate a held lock on the store for a pull plus working directory update.
   no changes found
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to fca136d824dac41b19345549edfda68fe63213c4
+
+Simulate a held lock on the store without a working directory
+
+  $ hg -R storelock acquirestorelock
+  $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
+  dummyhost:* (glob)
+
+  $ hg --config ui.timeout=1 robustcheckout http://localhost:$HGPORT/repo1 storelock-nowdir --revision 7d5b54cb09e1
+  ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-nowdir
+  (sharing from existing pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
+  waiting for lock on repository storelock-nowdir held by * (glob)
+  abort: repository storelock-nowdir: timed out waiting for lock held by * (glob)
+  [255]
