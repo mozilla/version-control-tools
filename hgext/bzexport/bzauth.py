@@ -29,9 +29,8 @@ except:
 import bz
 
 # requests doesn't like lazy importing
-demandimport.disable()
-import requests
-demandimport.enable()
+with demandimport.deactivated():
+    import requests
 
 from mozhg.auth import (
     getbugzillaauth,

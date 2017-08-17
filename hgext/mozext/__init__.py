@@ -314,10 +314,7 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
-demandenabled = demandimport.isenabled()
-try:
-    demandimport.disable()
-
+with demandimport.deactivated():
     from mozautomation.changetracker import (
         ChangeTracker,
     )
@@ -337,9 +334,6 @@ try:
         treeherder_url,
         TREE_ALIASES,
     )
-finally:
-    if demandenabled:
-        demandimport.enable()
 
 bz_available = False
 
@@ -451,33 +445,31 @@ def exchangepullpushlog(orig, pullop):
 
 def critique(ui, repo, entire=False, node=None, **kwargs):
     """Perform a critique of a changeset."""
-    demandimport.disable()
+    with demandimport.deactivated():
+        from flake8.engine import get_style_guide
+        from pycodestyle import DiffReport, parse_udiff
 
-    from flake8.engine import get_style_guide
-    from pycodestyle import DiffReport, parse_udiff
+        style = get_style_guide(parse_argv=False, ignore='E128')
 
-    style = get_style_guide(parse_argv=False, ignore='E128')
+        ctx = repo[node]
 
-    ctx = repo[node]
+        if not entire:
+            diff = ''.join(ctx.diff())
+            style.options.selected_lines = {}
+            for k, v in parse_udiff(diff).items():
+                if k.startswith('./'):
+                    k = k[2:]
 
-    if not entire:
-        diff = ''.join(ctx.diff())
-        style.options.selected_lines = {}
-        for k, v in parse_udiff(diff).items():
-            if k.startswith('./'):
-                k = k[2:]
+                style.options.selected_lines[k] = v
 
-            style.options.selected_lines[k] = v
+            style.options.report = DiffReport(style.options)
 
-        style.options.report = DiffReport(style.options)
-
-    deleted = repo.status(ctx.p1().node(), ctx.node())[2]
-    files = [f for f in ctx.files() if f.endswith('.py') and f not in deleted]
-    for f in files:
-        data = ctx.filectx(f).data()
-        style.input_file(f, lines=data.splitlines())
-
-    demandimport.enable()
+        deleted = repo.status(ctx.p1().node(), ctx.node())[2]
+        files = [f for f in ctx.files()
+                 if f.endswith('.py') and f not in deleted]
+        for f in files:
+            data = ctx.filectx(f).data()
+            style.input_file(f, lines=data.splitlines())
 
 
 @command('moztrees', [], _('hg moztrees'), norepo=True)

@@ -68,9 +68,9 @@ OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 # requests doesn't like lazy module loading.
-demandimport.disable()
-from bugsy import Bugsy
-demandimport.enable()
+with demandimport.deactivated():
+    from bugsy import Bugsy
+
 from mozautomation.commitparser import parse_bugs
 from mozautomation import repository
 from mozhg.auth import getbugzillaauth
