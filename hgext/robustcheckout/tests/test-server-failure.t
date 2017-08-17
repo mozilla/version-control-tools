@@ -77,7 +77,7 @@ Adjusting the network limit works
 
 Recovering server will result in good clone
 
-  $ echo 5 > server/bad-server-bytelimit/.hg/badserveruntilgood
+  $ echo 6 > server/bad-server-bytelimit/.hg/badserveruntilgood
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server-bytelimit byte-limit --revision 94086d65796f --sharebase $TESTTMP/bad-server-share
   ensuring http://localhost:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit

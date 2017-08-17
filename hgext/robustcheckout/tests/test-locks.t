@@ -140,9 +140,16 @@ Simulate a held lock on the store without a working directory
   $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
   dummyhost:* (glob)
 
-  $ hg --config ui.timeout=1 robustcheckout http://localhost:$HGPORT/repo1 storelock-nowdir --revision 7d5b54cb09e1
+  $ hg robustcheckout http://localhost:$HGPORT/repo1 storelock-nowdir --revision 7d5b54cb09e1
   ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-nowdir
-  (sharing from existing pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
-  waiting for lock on repository storelock-nowdir held by * (glob)
-  abort: repository storelock-nowdir: timed out waiting for lock held by * (glob)
-  [255]
+  (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
+  (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 3 changesets with 3 changes to 2 files
+  searching for changes
+  no changes found
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
