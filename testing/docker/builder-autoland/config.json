@@ -14,6 +14,10 @@
       "type": "mozreview",
       "user": "admin@example.com",
       "password": "password"
+    },
+    "lando.example.com": {
+      "type": "lando",
+      "api-key": "WinnerWinnerChickenDinner"
     }
   },
   "patch_url_buckets": {

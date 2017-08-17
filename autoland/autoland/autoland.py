@@ -3,6 +3,7 @@ import argparse
 import config
 import datetime
 import json
+import lando
 import logging
 import mozreview
 import os
@@ -259,6 +260,7 @@ def handle_pending_mozreview_updates(dbconn):
     cursor.execute(query, {'limit': MOZREVIEW_COMMENT_LIMIT})
 
     mozreview_pingback = mozreview.MozReviewPingback()
+    lando_pingback = lando.LandoPingback()
 
     updated = []
     all_posted = True
@@ -286,6 +288,9 @@ def handle_pending_mozreview_updates(dbconn):
 
             if pingback_config['type'] == 'mozreview':
                 pingback = mozreview_pingback
+
+            elif pingback_config['type'] == 'lando':
+                pingback = lando_pingback
 
             else:
                 logging.warning('ignoring pinback to %s: not supported'
