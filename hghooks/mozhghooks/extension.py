@@ -9,19 +9,52 @@ from mozhg.util import (
     identify_repo,
 )
 
-import mozhghooks.checks as checksmod
-
-
 testedwith = '4.2 4.3'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
 
-def get_checks(ui, repo, info, classes):
+def get_check_classes(hook):
+    # TODO come up with a mechanism for automatically discovering checks
+    # so we don't have to enumerate them all.
+    from mozhghooks.check import (
+        prevent_subrepos,
+        prevent_symlinks,
+        single_root,
+        try_task_config_file,
+    )
+
+    # TODO check to hook mapping should also be automatically discovered.
+    if hook == 'pretxnchangegroup':
+        return (
+            prevent_subrepos.PreventSubReposCheck,
+            prevent_symlinks.PreventSymlinksCheck,
+            single_root.SingleRootCheck,
+            try_task_config_file.TryConfigCheck,
+        )
+
+    elif hook == 'changegroup':
+        return (
+        )
+
+
+def get_checks(ui, repo, source, classes):
     """Loads checks from classes.
 
     Returns a list of check instances that are active for the given repo.
     """
+
+    # Never apply hooks at pull time or when re-applying from strips.
+    if source in ('pull', 'strip'):
+        return []
+
+    info = identify_repo(repo)
+
+    # Don't apply to non-hosted repos.
+    if not info['hosted']:
+        ui.write('(not running mozilla hooks on non-hosted repo)\n')
+        return []
+
     checks = []
 
     for cls in classes:
@@ -56,34 +89,8 @@ def get_checks(ui, repo, info, classes):
 
 
 def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
-    # TODO come up with a mechanism for automatically discovering checks
-    # so we don't have to enumerate them all.
-    from mozhghooks.check import (
-        prevent_subrepos,
-        prevent_symlinks,
-        single_root,
-        try_task_config_file,
-    )
-
-    CHECKS = (
-        prevent_subrepos.PreventSubReposCheck,
-        prevent_symlinks.PreventSymlinksCheck,
-        single_root.SingleRootCheck,
-        try_task_config_file.TryConfigCheck,
-    )
-
-    # Never apply hooks at pull time or when re-applying from strips.
-    if source in ('pull', 'strip'):
-        return 0
-
-    info = identify_repo(repo)
-
-    # Don't apply to non-hosted repos.
-    if not info['hosted']:
-        ui.write('(not running mozilla hooks on non-hosted repo)\n')
-        return 0
-
-    checks = get_checks(ui, repo, info, CHECKS)
+    checks = get_checks(ui, repo, source,
+                        get_check_classes('pretxnchangegroup'))
 
     for check in checks:
         check.pre()
@@ -102,5 +109,16 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
     return 0
 
 
+def changegroup(ui, repo, source=None, **kwargs):
+    checks = get_checks(ui, repo, source, get_check_classes('changegroup'))
+
+    for check in checks:
+        if not check.check(**kwargs):
+            return 1
+
+    return 0
+
+
 def reposetup(ui, repo):
     ui.setconfig('hooks', 'pretxnchangegroup.mozhooks', pretxnchangegroup)
+    ui.setconfig('hooks', 'changegroup.mozhooks', changegroup)

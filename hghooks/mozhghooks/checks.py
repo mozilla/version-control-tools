@@ -88,3 +88,48 @@ class PreTxnChangegroupCheck(object):
 
         Returns True if the check passes. False otherwise.
         """
+
+
+class ChangeGroupCheck(object):
+    """A check that operates as a changegroup hook."""
+
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, ui, repo, info):
+        if not RE_VALID_NAME.match(self.name):
+            raise Exception('check name is invalid: %s' % self.name)
+
+        self.ui = ui
+        self.repo = repo
+        self.repo_metadata = info
+
+    @abc.abstractproperty
+    def name(self):
+        """Name of this check.
+
+        This is used to facilitate force enabling or disabling the check on a
+        per-repo basis. It may also be displayed in logging or user output.
+        """
+
+    @abc.abstractmethod
+    def relevant(self):
+        """Allows checks to declare if they are relevant.
+
+        Implementations can look at the repo or its metadata to see if they
+        should be run.
+
+        Returns True if the check should run. False otherwise.
+
+        The return value of this method is tightly validated to help prevent
+        logic bugs.
+        """
+
+    @abc.abstractmethod
+    def check(self, **kwargs):
+        """Verifies a single changeset.
+
+        **kwargs contains additional args passed into changegroup.
+
+        Returns True if the check passes. False otherwise.
+        """
+
