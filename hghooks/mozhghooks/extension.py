@@ -18,6 +18,7 @@ def get_check_classes(hook):
     # TODO come up with a mechanism for automatically discovering checks
     # so we don't have to enumerate them all.
     from mozhghooks.check import (
+        advertise_upgrade,
         prevent_subrepos,
         prevent_symlinks,
         single_root,
@@ -35,6 +36,7 @@ def get_check_classes(hook):
 
     elif hook == 'changegroup':
         return (
+            advertise_upgrade.AdvertiseUpgradeCheck,
         )
 
 

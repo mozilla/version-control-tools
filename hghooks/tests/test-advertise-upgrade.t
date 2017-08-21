@@ -1,16 +1,15 @@
+  $ . $TESTDIR/hghooks/tests/common.sh
+
   $ hg init server
-  $ cat > server/.hg/hgrc << EOF
-  > [hooks]
-  > changegroup.advertise_upgrade = python:mozhghooks.advertise_upgrade.hook
-  > EOF
+  $ configurehooks server
 
   $ hg -q clone --pull server client
   $ cd client
-  $ touch foo
-  $ hg -q commit -A -m initial
 
 Modern hg with bundle2 doesn't see advertisement
-#if hg35+
+
+  $ touch foo
+  $ hg -q commit -A -m initial
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -20,8 +19,10 @@ Modern hg with bundle2 doesn't see advertisement
   added 1 changesets with 1 changes to 1 files
 
 Old client without bundle2 does
-#else
-  $ hg push
+
+  $ echo out-of-date > foo
+  $ hg -q commit -A -m out-of-date
+  $ hg push --config devel.legacy.exchange=bundle1
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
@@ -29,11 +30,14 @@ Old client without bundle2 does
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  *************************************** WARNING ****************************************
   YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
-  newer versions are faster and have numerous bug fixes
-  upgrade instructions are at the following URL:
+  
+  Newer versions are faster and have numerous bug fixes.
+  Upgrade instructions are at the following URL:
   https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
-#endif
+  ****************************************************************************************
+  
 
 Modern hg without bundle2 gets message
 (this is a bit sub-optimal, but we should never see this in the wild, so
@@ -49,7 +53,11 @@ it's acceptable)
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  *************************************** WARNING ****************************************
   YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
-  newer versions are faster and have numerous bug fixes
-  upgrade instructions are at the following URL:
+  
+  Newer versions are faster and have numerous bug fixes.
+  Upgrade instructions are at the following URL:
   https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
+  ****************************************************************************************
+  
