@@ -80,7 +80,7 @@ Specifying a sparse profile uses it
   searching for changes
   no changes found
   (setting sparse config to profile profiles/python)
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  0 files added, 0 files dropped, 0 files conflicting
   (sparse refresh complete)
   warning: sparse profile 'profiles/python' not found in rev 000000000000 - ignoring it
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -117,7 +117,7 @@ Specifying a new sparse profile will replace existing profile
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-simple
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (replacing existing sparse config with profile profiles/dir0)
-  2 files updated, 2 files merged, 0 files removed, 0 files unresolved
+  2 files added, 2 files dropped, 0 files conflicting
   (sparse refresh complete)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 6af47298a235491213679cd4f91881d22c735c72
@@ -134,7 +134,7 @@ Specifying a new sparse profile and updating the revision works
   ensuring http://localhost:$HGPORT/repo0@4916c5373fd6 is available at sparse-simple
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (replacing existing sparse config with profile profiles/dir1)
-  2 files updated, 3 files merged, 0 files removed, 0 files unresolved
+  2 files added, 3 files dropped, 0 files conflicting
   (sparse refresh complete)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 4916c5373fd67aca0412e74b0ffeeb0291a86bfd
@@ -205,7 +205,7 @@ Purge with update to different revision and profile
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (purging working directory)
   (replacing existing sparse config with profile profiles/dir1)
-  3 files updated, 3 files merged, 0 files removed, 0 files unresolved
+  3 files added, 3 files dropped, 0 files conflicting
   (sparse refresh complete)
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   updated to 6af47298a235491213679cd4f91881d22c735c72

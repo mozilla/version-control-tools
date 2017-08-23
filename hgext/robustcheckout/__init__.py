@@ -594,10 +594,8 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 fcounts = map(len, sparsemod._updateconfigandrefreshwdir(
                     repo, [], [], [sparse_profile], force=True))
 
-                fcounts = tuple(list(fcounts) + [0])
-                repo.ui.status(_('%d files updated, %d files merged, '
-                                 '%d files removed, %d files unresolved\n') %
-                               fcounts)
+                repo.ui.status('%d files added, %d files dropped, '
+                               '%d files conflicting\n' % tuple(fcounts))
 
             ui.write('(sparse refresh complete)\n')
 
