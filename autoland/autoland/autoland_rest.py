@@ -137,7 +137,7 @@ def autoland():
     query = """
         SELECT created, landed, request->>'ldap_username'
           FROM Transplant
-         WHERE (landed IS NULL or landed)
+         WHERE (landed IS NULL or NOT landed)
                AND request->>'rev' = %s
                AND request->>'destination' = %s
     """
