@@ -1,5 +1,9 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
+# mach dependency.
+blessings==1.6 \
+    --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007
+
 coverage==4.3.4 \
     --hash=sha256:ca36d83cd591d027952e5019149c4386e7058cd674bf8cb52dc622f768d689e9 \
     --hash=sha256:36407249a0b6669c6ad4425b0f29685579df745480c03afa70f101f09f4eead3 \
@@ -11,6 +15,9 @@ feedparser==5.1.3 \
     --hash=sha256:ad543639e89d43685e2f1d3b6e48711562eec3be379e6958a920fbeaf4c63bce \
     --hash=sha256:a49ec89ebdb4234de473ad36792bf8da3a8640b8a263afda2eac510ff4908c92
 
+futures==3.1.1 \
+    --hash=sha256:c4884a65654a7c45435063e14ae85280eb1f111d94e542396717ba9828c4337f
+
 # For hgmo extension.
 ipaddress==1.0.16 \
     --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
@@ -18,6 +25,9 @@ ipaddress==1.0.16 \
 # mozbuild dependency.
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
+
+mach==0.5.1 \
+    --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
 
 Mercurial==4.2.3 \
     --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
@@ -30,9 +40,17 @@ mock==1.0.1 \
 mozbuild==0.2 \
     --hash=sha256:24227608fc3c735fbb5c629d0540a600368c1d5e57013dd39272a0a5c9cccb13
 
+# mozprocess dependency.
+mozinfo==0.7 \
+    --hash=sha256:d27f75b668614f28df2e61b8aa4beb6f68f3c9936fc9139fae755728f2b4844a
+
 # mozbuild dependency.
 mozfile==1.1 \
     --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e
+
+# mach dependency.
+mozprocess==0.22 \
+    --hash=sha256:2d56e015a3594f06130e8c015f7ca87f3f8d83d9c4bf54588f077ce9bad9a08b
 
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
@@ -45,3 +63,11 @@ pytest==3.0.2 \
 
 redo==1.6 \
     --hash=sha256:69ea97e4d934806475fe86f93e4f74da2994acab20c2e3cfe0d3ca6380e3f907
+
+requests==2.10.0 \
+    --hash=sha256:09bc1b5f3a56cd8c48d433213a8cba51a67d12936568f73b5f1793fcb0c0979e \
+    --hash=sha256:63f1815788157130cee16a933b2ee184038e975f0017306d723ac326b5525b54
+
+PyYAML==3.11 \
+    --hash=sha256:c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8 \
+    --hash=sha256:19bb3ac350ef878dda84a62d37c7d5c17a137386dde9c2ce7249c7a21d7f6ac9
