@@ -139,7 +139,7 @@ if __name__ == '__main__':
     test_files = get_test_files(extensions, venv_name)
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
-    hook_tests = test_files['hook']
+    hg_tests = test_files['hg']
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     # All tests unless we got an argument that is a test.
     if not requested_tests:
         run_hg_tests.extend(extension_tests)
-        run_hg_tests.extend(hook_tests)
+        run_hg_tests.extend(hg_tests)
         run_unit_tests.extend(unit_tests)
     else:
         for t in requested_tests:
@@ -278,7 +278,7 @@ if __name__ == '__main__':
             normdirver = '.'.join(dirver.split('.')[0:2])
 
             tests = versions.setdefault(dirver, set())
-            tests |= set(hook_tests)
+            tests |= set(hg_tests)
 
             for m in extensions:
                 for extver in m['testedwith']:
@@ -327,7 +327,7 @@ if __name__ == '__main__':
             all_hg_tests = []
             for m in extensions:
                 all_hg_tests.extend(sorted(m['tests']))
-            all_hg_tests.extend(hook_tests)
+            all_hg_tests.extend(hg_tests)
             run_hg_tests('@', all_hg_tests)
 
 

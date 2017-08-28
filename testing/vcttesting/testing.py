@@ -96,6 +96,10 @@ def is_test_filename(f):
 
 
 def get_extension_dirs():
+    """Obtain directories with Mercurial extensions.
+
+    yields 2-tuples of (base dir, directory to scan for extension files).
+    """
     # Directories under hgext/ are extensions.
     for d in os.listdir(os.path.join(ROOT, 'hgext')):
         full = os.path.join(ROOT, 'hgext', d)
@@ -103,7 +107,11 @@ def get_extension_dirs():
         if d.startswith('.') or not os.path.isdir(full):
             continue
 
-        yield full
+        yield full, full
+
+    # Add other well-known directories.
+    yield os.path.join(ROOT, 'hghooks'), os.path.join(ROOT, 'hghooks',
+                                                      'mozhghooks')
 
 
 def get_extensions():
@@ -113,7 +121,7 @@ def get_extensions():
     """
     extensions = []
 
-    for ext_dir in get_extension_dirs():
+    for ext_dir, compat_dir in get_extension_dirs():
         e = {'tests': set(), 'testedwith': set()}
 
         # Find test files.
@@ -127,11 +135,11 @@ def get_extensions():
                     e['tests'].add(os.path.join(test_dir, f))
 
         # Look for compatibility info.
-        for f in os.listdir(ext_dir):
+        for f in os.listdir(compat_dir):
             if f.startswith('.') or not f.endswith('.py'):
                 continue
 
-            with open(os.path.join(ext_dir, f), 'rb') as fh:
+            with open(os.path.join(compat_dir, f), 'rb') as fh:
                 lines = fh.readlines()
 
             for line in lines:
@@ -157,8 +165,8 @@ def get_test_files(extensions, venv):
 
     extension
        Related to Mercurial extensions
-    hook
-       Related to Mercurial hooks
+    hg
+       Mercurial tests not associated with extensions
     unit
        Generic Python unit tests (to be executed with a Python test harness)
     all
@@ -182,14 +190,7 @@ def get_test_files(extensions, venv):
         for e in extensions:
             extension_tests.extend(e['tests'])
 
-    hook_tests = []
-
-    if venv in ('global', 'hgdev'):
-        hooks_test_dir = os.path.join(ROOT, 'hghooks', 'tests')
-        hook_tests = [os.path.join(hooks_test_dir, f)
-                       for f in os.listdir(hooks_test_dir)
-                       if is_test_filename(f)]
-
+    hg_tests = []
     unit_tests = []
     for base, settings in sorted(UNIT_TEST_DIRS.items()):
         # Only add tests from path if marked as compatible with the
@@ -207,15 +208,13 @@ def get_test_files(extensions, venv):
                 if f.startswith('test') and f.endswith('.py'):
                     unit_tests.append(os.path.join(root, f))
                 elif f.startswith('test') and f.endswith('.t'):
-                    # These aren't technically hooks. But it satifies the
-                    # requirement of putting .t tests elsewhere easily.
-                    hook_tests.append(os.path.join(root, f))
+                    hg_tests.append(os.path.join(root, f))
 
     return {
         'extension': sorted(extension_tests),
-        'hook': sorted(hook_tests),
+        'hg': sorted(hg_tests),
         'unit': sorted(unit_tests),
-        'all': set(extension_tests) | set(hook_tests) | set(unit_tests),
+        'all': set(extension_tests) | set(hg_tests) | set(unit_tests),
     }
 
 
