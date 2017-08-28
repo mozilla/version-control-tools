@@ -263,11 +263,16 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
                 if bmnode == oldnode:
                     bmchanges.append((mark, repo[newrev].node()))
 
-        for mark, newnode in bmchanges:
-            repo._bookmarks[mark] = newnode
-
         if bmchanges:
-            repo._bookmarks.recordchange(tr)
+            # TODO unconditionally call applychanges() when support for
+            # Mercurial 4.1 is dropped.
+            if util.safehasattr(repo._bookmarks, 'applychanges'):
+                repo._bookmarks.applychanges(repo, tr, bmchanges)
+            else:
+                for mark, newnode in bmchanges:
+                    repo._bookmarks[mark] = newnode
+
+                repo._bookmarks.recordchange(tr)
 
         # Update references to rewritten MQ patches.
         if hasattr(repo, 'mq'):
