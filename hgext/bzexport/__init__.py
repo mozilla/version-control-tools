@@ -113,6 +113,18 @@ newbug_opts = [
      'Name of Firefox profile to pull bugzilla cookies from'),
 ]
 
+
+# Mercurial 4.3 introduced obsutil and moved some functionality there.
+# TODO remove this once support for Mercurial 4.2 is dropped.
+def obsmod():
+    try:
+        from mercurial import obsutil
+        obsutil.marker
+        return obsutil
+    except ImportError:
+        return obsolete
+
+
 def _basechange(repo, subset):
     repo = repo.unfiltered()
 
@@ -120,7 +132,8 @@ def _basechange(repo, subset):
     for n in subset:
         base = repo[n].node()
         while True:
-            precursors = [obsolete.marker(repo, m)
+            mod = obsmod()
+            precursors = [mod.marker(repo, m)
                           for m in repo.obsstore.precursors.get(base, ())]
             if len(precursors) == 0:
                 break
