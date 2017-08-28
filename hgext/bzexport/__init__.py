@@ -66,7 +66,7 @@ from mercurial import (
     scmutil,
     util,
 )
-from hgext import mq, histedit
+from hgext import mq
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
