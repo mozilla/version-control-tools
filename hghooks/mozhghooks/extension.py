@@ -9,7 +9,7 @@ from mozhg.util import (
     identify_repo,
 )
 
-testedwith = '4.2 4.3'
+testedwith = '4.2'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
