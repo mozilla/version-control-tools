@@ -282,17 +282,24 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
 
-testedwith = '3.9 4.0 4.1 4.2'
+testedwith = '3.9 4.0 4.1 4.2 4.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
 
 # We want the extension to load on ancient versions of Mercurial.
 # cmdutil.command was introduced in 1.9.
+# registrar.command was introduced in 4.3 as a replacement for cmdutil.command.
+# The registrar module itself was introduced around Mercurial 4.0.
 try:
-    command = cmdutil.command(cmdtable)
-except AttributeError:
-    command = None
+    from mercurial import registrar
+    command = registrar.command(cmdtable)
+except (ImportError, AttributeError):
+    try:
+        command = cmdutil.command(cmdtable)
+    except AttributeError:
+        command = None
+
 
 wizardsteps = set([
     'hgversion',
