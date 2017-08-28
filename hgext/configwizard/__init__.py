@@ -49,7 +49,7 @@ To begin, press the enter/return key.
 
 MINIMUM_SUPPORTED_VERSION = (3, 5, 0)
 
-OLDEST_NON_LEGACY_VERSION = (3, 7, 3)
+OLDEST_NON_LEGACY_VERSION = (4, 2, 3)
 
 VERSION_TOO_OLD = '''
 Your version of Mercurial (%d.%d) is too old to run `hg configwizard`.

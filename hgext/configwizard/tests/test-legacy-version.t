@@ -4,7 +4,7 @@ Should not get legacy version message when running on supported version
 
   $ cat > fakeversion.py << EOF
   > from mercurial import util
-  > util.version = lambda: '3.7.3'
+  > util.version = lambda: '4.2.3'
   > EOF
 
   $ FAKEVERSION='--config extensions.fakeversion=fakeversion.py'
@@ -23,7 +23,7 @@ Old version will print legacy message and prompt
 
   $ rm fakeversion.pyc
   $ cat >> fakeversion.py << EOF
-  > util.version = lambda: '3.7.2'
+  > util.version = lambda: '4.2.2'
   > EOF
 
   $ hg $FAKEVERSION --config configwizard.steps=hgversion configwizard
@@ -34,7 +34,7 @@ Old version will print legacy message and prompt
   
   To begin, press the enter/return key.
    <RETURN>
-  You are running an out of date Mercurial client (3.7.2).
+  You are running an out of date Mercurial client (4.2.2).
   
   For a faster and better Mercurial experience, we HIGHLY recommend you
   upgrade.
@@ -58,7 +58,7 @@ Old version will print legacy message and prompt
   
   To begin, press the enter/return key.
    <RETURN>
-  You are running an out of date Mercurial client (3.7.2).
+  You are running an out of date Mercurial client (4.2.2).
   
   For a faster and better Mercurial experience, we HIGHLY recommend you
   upgrade.
