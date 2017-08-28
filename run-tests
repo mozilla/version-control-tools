@@ -17,7 +17,6 @@ import sys
 # anyway.
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
-EXTDIR = os.path.join(HERE, 'hgext')
 
 
 if __name__ == '__main__':
@@ -136,8 +135,7 @@ if __name__ == '__main__':
     hg_harness_args.extend(['--xunit',
         os.path.join(HERE, 'coverage', 'results.xml')])
 
-    extensions = get_extensions(EXTDIR)
-
+    extensions = get_extensions()
     test_files = get_test_files(extensions, venv_name)
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
@@ -282,7 +280,7 @@ if __name__ == '__main__':
             tests = versions.setdefault(dirver, set())
             tests |= set(hook_tests)
 
-            for e, m in sorted(extensions.items()):
+            for m in extensions:
                 for extver in m['testedwith']:
                     normever = '.'.join(extver.split('.')[0:2])
 
@@ -327,7 +325,7 @@ if __name__ == '__main__':
         # with the bleeding edge of development.
         if not options.no_hg_tip:
             all_hg_tests = []
-            for e, m in extensions.items():
+            for m in extensions:
                 all_hg_tests.extend(sorted(m['tests']))
             all_hg_tests.extend(hook_tests)
             run_hg_tests('@', all_hg_tests)

@@ -95,19 +95,25 @@ def is_test_filename(f):
     return f.startswith('test-') and f.endswith(('.py', '.t'))
 
 
-def get_extensions(extdir):
-    """Obtain information about extensions.
+def get_extension_dirs():
+    # Directories under hgext/ are extensions.
+    for d in os.listdir(os.path.join(ROOT, 'hgext')):
+        full = os.path.join(ROOT, 'hgext', d)
 
-    Returns a dict mapping extension name to metadata.
-    """
-    m = {}
-
-    for d in os.listdir(extdir):
-        ext_dir = os.path.join(extdir, d)
-
-        if d.startswith('.') or not os.path.isdir(ext_dir):
+        if d.startswith('.') or not os.path.isdir(full):
             continue
 
+        yield full
+
+
+def get_extensions():
+    """Obtain information about extensions.
+
+    Returns a list of dicts with extension metadata.
+    """
+    extensions = []
+
+    for ext_dir in get_extension_dirs():
         e = {'tests': set(), 'testedwith': set()}
 
         # Find test files.
@@ -136,9 +142,9 @@ def get_extensions(extdir):
                 value = value.strip().strip("'").strip('"').strip()
                 e['testedwith'] = set(value.split())
 
-        m[d] = e
+        extensions.append(e)
 
-    return m
+    return extensions
 
 
 def get_test_files(extensions, venv):
@@ -173,7 +179,7 @@ def get_test_files(extensions, venv):
     extension_tests = []
 
     if venv in ('global', 'hgdev'):
-        for e in extensions.values():
+        for e in extensions:
             extension_tests.extend(e['tests'])
 
     hook_tests = []
