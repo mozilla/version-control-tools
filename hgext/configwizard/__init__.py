@@ -366,7 +366,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkdiffsettings(ui, cw)
 
     if 'color' in runsteps:
-        _promptnativeextension(ui, cw, 'color', 'Enable color output to your terminal')
+        _checkcolor(ui, cw)
 
     if 'pager' in runsteps:
         _checkpager(ui, cw)
@@ -570,6 +570,11 @@ def _promptvctextension(ui, cw, ext, msg):
         return
 
     _enableext(cw, ext, ext_path)
+
+
+def _checkcolor(ui, cw):
+    _promptnativeextension(ui, cw, 'color',
+                           'Enable color output to your terminal')
 
 
 def _checkpager(ui, cw):
