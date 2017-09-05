@@ -6,7 +6,7 @@ Firefox Workflow
 
 This article outlines the **recommended** workflow for interacting
 with the Firefox repository
-(`mozilla-unified <https://hg.mozilla.org/mozilla-unified>`_.
+(`mozilla-unified <https://hg.mozilla.org/mozilla-unified>`_).
 
 Optimally Configure Mercurial
 =============================
