@@ -12,6 +12,9 @@ HERE = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append(os.path.split(HERE)[0])
 
 
+from cgi import escape
+
+
 from mozautomation.commitparser import (
     add_hyperlinks,
     parse_backouts,
@@ -577,3 +580,54 @@ class TestAddHyperlinks(unittest.TestCase):
             b'This fixes <a href="https://github.com/mozilla/foo/issues/9000">#9000</a> and '
             b'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=324521">bug 324521</a>\n\n'
             b'Source-Repo: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>\n')
+
+    def test_link_xchannel(self):
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Active-Revision: a1234567890123456789'),
+            b'X-Channel-Active-Revision: a1234567890123456789')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Revision: a1234567890123456789'),
+            b'X-Channel-Revision: a1234567890123456789')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Revision: a1234567890123456789'),
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Revision: a1234567890123456789')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Converted-Revision: a1234567890123456789'),
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Converted-Revision: '
+            b'<a href="https://hg.mozilla.org/mozilla-central/rev/a1234567890123456789">a1234567890123456789</a>')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Repo: releases/mozilla-esr-59_0.1\n'
+            b'X-Channel-Converted-Revision: a1234567890123456789'),
+            b'X-Channel-Repo: releases/mozilla-esr-59_0.1\n'
+            b'X-Channel-Converted-Revision: '
+            b'<a href="https://hg.mozilla.org/releases/mozilla-esr-59_0.1/rev/a1234567890123456789">a1234567890123456789</a>')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Revision: b1234567890123456789\n'
+            b'X-Channel-Repo: releases/mozilla-beta\n'
+            b'X-Channel-Converted-Revision: a1234567890123456789'),
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Revision: b1234567890123456789\n'
+            b'X-Channel-Repo: releases/mozilla-beta\n'
+            b'X-Channel-Converted-Revision: '
+            b'<a href="https://hg.mozilla.org/releases/mozilla-beta/rev/a1234567890123456789">a1234567890123456789</a>')
+        self.assertEqual(add_hyperlinks(
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Converted-Revision: b1234567890123456789\n'
+            b'X-Channel-Repo: releases/mozilla-beta\n'
+            b'X-Channel-Revision: a1234567890123456789'),
+            b'X-Channel-Repo: mozilla-central\n'
+            b'X-Channel-Converted-Revision: '
+            b'<a href="https://hg.mozilla.org/mozilla-central/rev/b1234567890123456789">b1234567890123456789</a>\n'
+            b'X-Channel-Repo: releases/mozilla-beta\n'
+            b'X-Channel-Revision: a1234567890123456789')
+        # try html through |escape|mozlink
+        self.assertEqual(add_hyperlinks(escape(
+            b'X-Channel-Repo: mozilla-&\n'
+            b'X-Channel-Revision: a1234567890123456789')),
+            b'X-Channel-Repo: mozilla-&amp;\n'
+            b'X-Channel-Revision: a1234567890123456789')

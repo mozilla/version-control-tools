@@ -286,6 +286,22 @@ RE_SOURCE_REPO = re.compile('^Source-Repo: (https?:\/\/.*)$',
                             re.MULTILINE)
 RE_SOURCE_REVISION = re.compile('^Source-Revision: (.*)$', re.MULTILINE)
 
+RE_XCHANNEL_REVISION = re.compile(
+    '^X-Channel-Repo: (?P<repo>[a-zA-Z0-9/\-._]+?)\n'
+    'X-Channel-Converted-Revision: (?P<revision>[a-fA-F0-9]{12,40}?)$',
+    re.MULTILINE)
+
+
+def xchannel_link(m):
+    s = m.group()[:(m.start('revision') - m.start())]
+    l = '<a href="https://hg.mozilla.org/{repo}/rev/{revision}">{revision}</a>'
+    s += l.format(
+        repo=m.group('repo'),
+        revision=m.group('revision'),
+    )
+    s += m.group()[(m.end('revision') - m.start()):]
+    return s
+
 
 def add_hyperlinks(s,
                    bugzilla_url='https://bugzilla.mozilla.org/show_bug.cgi?id='):
@@ -339,5 +355,8 @@ def add_hyperlinks(s,
     bugzilla_re = BUG_CONSERVATIVE_RE if github_repo else BUG_RE
     bugzilla_link = r'<a href="%s\2">\1</a>' % bugzilla_url
     s = bugzilla_re.sub(bugzilla_link, s)
+
+    # l10n cross channel linking
+    s = RE_XCHANNEL_REVISION.sub(xchannel_link, s)
 
     return s
