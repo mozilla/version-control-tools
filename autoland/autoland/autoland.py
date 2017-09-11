@@ -171,8 +171,10 @@ def handle_pending_transplants(dbconn):
                                   destination, trysyntax)
                 continue
 
-            elif 'abort: push creates new remote head' in result:
+            elif ('abort: push creates new remote head' in result or
+                  'repository changed while pushing' in result):
                 logger.info('transplant failed: we lost a push race')
+                logger.info(result)
                 retry_revisions.append((now, transplant_id))
                 continue
 
