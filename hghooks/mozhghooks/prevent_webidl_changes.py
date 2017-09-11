@@ -88,7 +88,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'dvander',           # David Anderson
         'bsmedberg',         # Benjamin Smedberg
         'bent',              # Ben Turner
-        'jed',               # Jed Davis
+        'jld',               # Jed Davis
         'kanru',             # Kan-Ru Chen
     ]
     IPC_authors = [
