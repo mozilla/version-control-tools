@@ -512,20 +512,17 @@ class Docker(object):
         # data.
         buf.seek(0)
 
-        # The API here is wonky, possibly due to buggy behavior in
-        # docker.client always setting stream=True if version > 1.8.
-        # We assume this is a bug that will change behavior later and work
-        # around it by ensuring consistent behavior.
-        for stream in self.client.build(fileobj=buf, custom_context=True,
-                                        rm=True, stream=True):
-            s = json.loads(stream)
+        for s in self.client.build(fileobj=buf, custom_context=True, rm=True,
+                                   decode=True):
             if 'stream' not in s:
                 continue
 
             s = s['stream']
+
             if verbose:
                 for l in s.strip().splitlines():
                     sys.stdout.write('%s> %s\n' % (name, l))
+
             match = re.match('^Successfully built ([a-f0-9]{12})$', s.rstrip())
             if match:
                 image = match.group(1)
@@ -542,6 +539,7 @@ class Docker(object):
                                 have_tag = True
 
                         break
+
                 if not have_tag:
                     self.client.tag(full_image, name, str(uuid.uuid1()))
 
