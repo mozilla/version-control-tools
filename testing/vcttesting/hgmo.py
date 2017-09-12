@@ -397,13 +397,12 @@ class HgCluster(object):
 
         Containers will be shut down gracefully.
         """
-        c = self._d.client
         with futures.ThreadPoolExecutor(5) as e:
-            e.submit(c.stop, self.master_id)
-            e.submit(c.stop, self.ldap_id)
-            e.submit(c.stop, self.pulse_id)
+            e.submit(self._dc.stop, self.master_id)
+            e.submit(self._dc.stop, self.ldap_id)
+            e.submit(self._dc.stop, self.pulse_id)
             for i in self.web_ids:
-                e.submit(c.stop, i)
+                e.submit(self._dc.stop, i)
 
     def clean(self):
         """Clean the cluster.
@@ -411,19 +410,20 @@ class HgCluster(object):
         Containers will be shut down and removed. The state file will
         destroyed.
         """
-        c = self._d.client
-
-        state = c.inspect_container(self.master_id)
+        state = self._dc.inspect_container(self.master_id)
 
         with futures.ThreadPoolExecutor(4) as e:
-            e.submit(c.remove_container, self.master_id, force=True, v=True)
-            e.submit(c.remove_container, self.ldap_id, force=True, v=True)
-            e.submit(c.remove_container, self.pulse_id, force=True, v=True)
+            e.submit(self._dc.remove_container, self.master_id, force=True,
+                     v=True)
+            e.submit(self._dc.remove_container, self.ldap_id, force=True,
+                     v=True)
+            e.submit(self._dc.remove_container, self.pulse_id, force=True,
+                     v=True)
             for i in self.web_ids:
-                e.submit(c.remove_container, i, force=True, v=True)
+                e.submit(self._dc.remove_container, i, force=True, v=True)
 
         for network in state['NetworkSettings']['Networks'].values():
-            c.remove_network(network['NetworkID'])
+            self._dc.remove_network(network['NetworkID'])
 
         try:
             os.unlink(self.state_path)
