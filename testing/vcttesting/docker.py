@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import
 
-import base64
 from collections import deque
 import docker
 import errno
@@ -206,7 +205,8 @@ class Docker(object):
             self.state.setdefault(k, None)
 
         try:
-            self.client = docker.Client(base_url=url, tls=tls, version='auto')
+            self.client = docker.APIClient(base_url=url, tls=tls,
+                                           version='auto')
         except DockerException:
             self.client = None
             return

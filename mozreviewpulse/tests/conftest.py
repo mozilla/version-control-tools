@@ -24,7 +24,7 @@ def wait_for_connection(url, retries=5):
 
 @pytest.fixture(scope='session')
 def docker():
-    client = docker_py.Client(os.environ.get('DOCKER_HOST', None))
+    client = docker_py.APIClient(os.environ.get('DOCKER_HOST', None))
 
     # client readiness check
     try:
