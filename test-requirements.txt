@@ -63,8 +63,8 @@ dnspython==1.15.0 \
 django-storages==1.4.1 \
     --hash=sha256:0ad7049caa7148b846906a7e114e5d245dba714a7a1ef895150234ae25788c46
 
-docker==2.0.2 \
-    --hash=sha256:3c58606390858913bef001ba03bc3173aa646236c979e9ba95ab25d204eee0ce
+docker==2.5.1 \
+    --hash=sha256:7b587fa841218b0f27e41d1f1ec61398bd0a8a0cc364f3ab3c08290fa8d59e71
 
 docker-pycreds==0.2.1 \
     --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9

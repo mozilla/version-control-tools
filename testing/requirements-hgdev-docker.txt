@@ -6,8 +6,8 @@ backports.lzma==0.0.8 \
 backports.ssl-match-hostname==3.5.0.1 \
     --hash=sha256:502ad98707319f4a51fa2ca1c677bd659008d27ded9f6380c79e8932e38dcdf2
 
-docker==2.0.2 \
-    --hash=sha256:3c58606390858913bef001ba03bc3173aa646236c979e9ba95ab25d204eee0ce
+docker==2.5.1 \
+    --hash=sha256:7b587fa841218b0f27e41d1f1ec61398bd0a8a0cc364f3ab3c08290fa8d59e71
 
 docker-pycreds==0.2.1 \
     --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9
