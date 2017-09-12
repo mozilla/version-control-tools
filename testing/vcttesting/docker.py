@@ -207,25 +207,29 @@ class Docker(object):
         try:
             self.client = docker.APIClient(base_url=url, tls=tls,
                                            version='auto')
+            self.api_client = self.client
         except DockerException:
             self.client = None
+            self.api_client = None
             return
 
         # We need API 1.22+ for some networking APIs.
-        if docker.utils.compare_version('1.22', self.client.api_version) < 0:
+        if docker.utils.compare_version('1.22',
+                                        self.api_client.api_version) < 0:
             warnings.warn('Warning: unable to speak to Docker servers older '
                           'than Docker 1.10.x')
             self.client = None
+            self.api_client = None
             return
 
         # Try to obtain a network hostname for the Docker server. We use this
         # for determining where to look for opened ports.
         # This is a bit complicated because Docker can be running from a local
         # socket or or another host via something like boot2docker.
-        docker_url = urlparse.urlparse(self.client.base_url)
+        docker_url = urlparse.urlparse(self.api_client.base_url)
         self.docker_hostname = docker_url.hostname
         if docker_url.hostname in ('localunixsocket', 'localhost', '127.0.0.1'):
-            networks = self.client.networks()
+            networks = self.api_client.networks()
             for network in networks:
                 if network['Name'] == 'bridge':
                     ipam = network['IPAM']
@@ -239,6 +243,7 @@ class Docker(object):
                                       'tcp://127.0.0.1:4243 in your docker '
                                       'configuration file.')
                         self.client = None
+                        self.api_client = None
                         break
 
                     self.docker_hostname = addr
@@ -251,7 +256,7 @@ class Docker(object):
 
         # This is a layering violation with docker.client, but meh.
         try:
-            self.client._get(self.client._url('/version'), timeout=5)
+            self.api_client._get(self.api_client._url('/version'), timeout=5)
             return True
         except requests.exceptions.RequestException:
             return False
@@ -378,7 +383,7 @@ class Docker(object):
             if url.endswith('.xz'):
                 fh = lzma.decompress(fh.read())
 
-            res = self.client.import_image_from_data(
+            res = self.api_client.import_image_from_data(
                 fh, repository=repository, tag=tag)
             # docker-py doesn't parse the JSON response in what is almost
             # certainly a bug. Do it ourselves.
@@ -512,8 +517,8 @@ class Docker(object):
         # data.
         buf.seek(0)
 
-        for s in self.client.build(fileobj=buf, custom_context=True, rm=True,
-                                   decode=True):
+        for s in self.api_client.build(fileobj=buf, custom_context=True,
+                                       rm=True, decode=True):
             if 'stream' not in s:
                 continue
 
@@ -531,7 +536,7 @@ class Docker(object):
 
                 # We only tag the image once to avoid redundancy.
                 have_tag = False
-                for i in self.client.images():
+                for i in self.api_client.images():
                     if i['Id'] == full_image:
                         for repotag in i['RepoTags']:
                             repo, tag = repotag.split(':')
@@ -541,7 +546,7 @@ class Docker(object):
                         break
 
                 if not have_tag:
-                    self.client.tag(full_image, name, str(uuid.uuid1()))
+                    self.api_client.tag(full_image, name, str(uuid.uuid1()))
 
                 return full_image
 
@@ -716,7 +721,7 @@ class Docker(object):
         # base image to the first image built with Ansible. This ensures
         # some cache hits and continuation and prevents us from brushing into
         # the limit.
-        history = self.client.history(start_image)
+        history = self.api_client.history(start_image)
         if len(history) > 120:
             # Newest to oldest.
             for base in history:
@@ -726,20 +731,21 @@ class Docker(object):
         with self.vct_container(image=vct_image, cid=vct_cid, verbose=verbose) \
                 as vct_state:
             cmd = ['/sync-and-build', '%s.yml' % playbook]
-            host_config = self.client.create_host_config(
+            host_config = self.api_client.create_host_config(
                 volumes_from=[vct_state['Name']])
-            with self.create_container(start_image, command=cmd, host_config=host_config) as cid:
+            with self.create_container(start_image, command=cmd,
+                                       host_config=host_config) as cid:
                 output = deque(maxlen=20)
-                self.client.start(cid)
+                self.api_client.start(cid)
 
-                for s in self.client.attach(cid, stream=True, logs=True):
+                for s in self.api_client.attach(cid, stream=True, logs=True):
                     for line in s.splitlines():
                         if line != '':
                             output.append(line)
                             if verbose:
                                 print('%s> %s' % (repository, line))
 
-                state = self.client.inspect_container(cid)
+                state = self.api_client.inspect_container(cid)
                 if state['State']['ExitCode']:
                     # This should arguably be part of the exception.
                     for line in output:
@@ -749,8 +755,8 @@ class Docker(object):
 
                 tag = str(uuid.uuid1())
 
-                iid = self.client.commit(cid['Id'], repository=repository,
-                                         tag=tag)['Id']
+                iid = self.api_client.commit(cid['Id'], repository=repository,
+                                             tag=tag)['Id']
                 iid = self.get_full_image(iid)
                 return iid, repository, tag
 
@@ -897,10 +903,10 @@ class Docker(object):
         if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
             web_environ['FETCH_BMO'] = '1'
 
-        host_config = self.client.create_host_config(
+        host_config = self.api_client.create_host_config(
             port_bindings={80: None})
 
-        web_id = self.client.create_container(
+        web_id = self.api_client.create_container(
             web_image,
             environment=web_environ,
             host_config=host_config,
@@ -923,10 +929,10 @@ class Docker(object):
         # Docker will forget the repository name if a name image has only a
         # repository name as well.
 
-        web_bootstrap = self.client.commit(
+        web_bootstrap = self.api_client.commit(
             web_id, repository='bmoweb-bootstrapped', tag=web_unique_id)['Id']
 
-        self.client.remove_container(web_id, v=True)
+        self.api_client.remove_container(web_id, v=True)
 
         return web_bootstrap
 
@@ -946,20 +952,20 @@ class Docker(object):
         containers = self.state['containers'].setdefault(cluster, [])
 
         network_name = 'bmo-%s' % uuid.uuid4()
-        self.client.create_network(network_name, driver='bridge')
+        self.api_client.create_network(network_name, driver='bridge')
 
         bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
-        bmo_host_config = self.client.create_host_config(
+        bmo_host_config = self.api_client.create_host_config(
             port_bindings={80: http_port})
-        web_id = self.client.create_container(
+        web_id = self.api_client.create_container(
             web_image,
             environment={'BMO_URL': bmo_url},
             host_config=bmo_host_config,
             networking_config=self.network_config(network_name, 'web'),
             labels=['bmoweb'])['Id']
         containers.append(web_id)
-        self.client.start(web_id)
-        web_state = self.client.inspect_container(web_id)
+        self.api_client.start(web_id)
+        web_state = self.api_client.inspect_container(web_id)
 
         self.save_state()
 
@@ -1057,7 +1063,7 @@ class Docker(object):
 
         network_name = 'mozreview-%s' % uuid.uuid4()
 
-        with docker_rollback_on_error(self.client) as client:
+        with docker_rollback_on_error(self.api_client) as client:
             client.create_network(network_name, driver='bridge')
 
             with limited_threadpoolexecutor(10, max_workers) as e:
@@ -1375,17 +1381,18 @@ class Docker(object):
         with futures.ThreadPoolExecutor(max(1, len(ids))) as e:
             for container in reversed(ids):
                 if count == 0:
-                    state = self.client.inspect_container(container)
+                    state = self.api_client.inspect_container(container)
                     for network in state['NetworkSettings']['Networks'].values():
                         networks.add(network['NetworkID'])
 
                 count += 1
-                e.submit(self.client.remove_container, container, force=True,
+                e.submit(self.api_client.remove_container, container,
+                         force=True,
                          v=True)
 
         # There should only be 1, so don't use a ThreadPoolExecutor.
         for network in networks:
-            self.client.remove_network(network)
+            self.api_client.remove_network(network)
 
         print('stopped %d containers' % count)
 
@@ -1397,9 +1404,9 @@ class Docker(object):
 
     def network_config(self, network_name, alias):
         """Obtain a networking config object."""
-        return self.client.create_networking_config(
+        return self.api_client.create_networking_config(
             endpoints_config={
-                network_name: self.client.create_endpoint_config(
+                network_name: self.api_client.create_endpoint_config(
                     aliases=[alias],
                 )
             }
@@ -1468,7 +1475,7 @@ class Docker(object):
         return mr_result, hgmo_result, bmo_result
 
     def get_full_image(self, image):
-        for i in self.client.images():
+        for i in self.api_client.images():
             iid = i['Id']
             if iid.startswith('sha256:'):
                 iid = iid[7:]
@@ -1481,7 +1488,7 @@ class Docker(object):
     def prune_images(self):
         """Prune images that are old and likely unused."""
         running = set(self.get_full_image(c['Image'])
-                      for c in self.client.containers())
+                      for c in self.api_client.containers())
 
         ignore_images = set([
             self.state['last-autoland-id'],
@@ -1517,7 +1524,7 @@ class Docker(object):
 
         to_delete = {}
 
-        for i in self.client.images():
+        for i in self.api_client.images():
             iid = i['Id']
 
             # Don't do anything with images attached to running containers -
@@ -1543,7 +1550,7 @@ class Docker(object):
         with futures.ThreadPoolExecutor(8) as e:
             for image, repo in to_delete.items():
                 print('Pruning old %s image %s' % (repo, image))
-                e.submit(self.client.remove_image, image)
+                e.submit(self.api_client.remove_image, image)
 
         self.state['images'] = retained
         self.save_state()
@@ -1554,7 +1561,7 @@ class Docker(object):
 
     def all_docker_images(self):
         """Obtain the set of all known Docker image IDs."""
-        return {i['Id'] for i in self.client.images(all=True)}
+        return {i['Id'] for i in self.api_client.images(all=True)}
 
     @contextmanager
     def start_container(self, cid, **kwargs):
@@ -1566,13 +1573,13 @@ class Docker(object):
         The context manager receives the inspected state of the container,
         immediately after it is started.
         """
-        self.client.start(cid, **kwargs)
+        self.api_client.start(cid, **kwargs)
         try:
-            state = self.client.inspect_container(cid)
+            state = self.api_client.inspect_container(cid)
             yield state
         finally:
             try:
-                self.client.stop(cid, timeout=20)
+                self.api_client.stop(cid, timeout=20)
             except DockerAPIError as e:
                 # Silently ignore failures if the container doesn't exist, as
                 # the container is obviously stopped.
@@ -1589,11 +1596,12 @@ class Docker(object):
         This context manager is useful for temporary containers that shouldn't
         outlive the life of the process.
         """
-        s = self.client.create_container(image, **kwargs)
+        s = self.api_client.create_container(image, **kwargs)
         try:
             yield s
         finally:
-            self.client.remove_container(s['Id'], force=True, v=remove_volumes)
+            self.api_client.remove_container(s['Id'], force=True,
+                                             v=remove_volumes)
 
     @contextmanager
     def vct_container(self, image=None, cid=None, verbose=False):
@@ -1619,7 +1627,7 @@ class Docker(object):
         # If we're going to use an existing container, verify it exists.
         if not cid and existing_cid:
             try:
-                state = self.client.inspect_container(existing_cid)
+                state = self.api_client.inspect_container(existing_cid)
             except DockerAPIError:
                 existing_cid = None
                 self.state['vct-cid'] = None
@@ -1631,7 +1639,7 @@ class Docker(object):
         start = False
 
         if cid:
-            state = self.client.inspect_container(cid)
+            state = self.api_client.inspect_container(cid)
             if not state['State']['Running']:
                 raise RuntimeError(
                     "Container '%s' should have been started by the calling "
@@ -1640,20 +1648,20 @@ class Docker(object):
             cid = existing_cid
             start = True
         else:
-            host_config = self.client.create_host_config(
+            host_config = self.api_client.create_host_config(
                 port_bindings={873: None})
 
-            cid = self.client.create_container(image,
-                                               volumes=['/vct-mount'],
-                                               ports=[873],
-                                               host_config=host_config,
-                                               labels=['vct'])['Id']
+            cid = self.api_client.create_container(image,
+                                                   volumes=['/vct-mount'],
+                                                   ports=[873],
+                                                   host_config=host_config,
+                                                   labels=['vct'])['Id']
             start = True
 
         try:
             if start:
-                self.client.start(cid)
-                state = self.client.inspect_container(cid)
+                self.api_client.start(cid)
+                state = self.api_client.inspect_container(cid)
                 ports = state['NetworkSettings']['Ports']
                 port = ports['873/tcp'][0]['HostPort']
                 url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname, port)
@@ -1681,7 +1689,7 @@ class Docker(object):
             yield state
         finally:
             if start:
-                self.client.stop(cid)
+                self.api_client.stop(cid)
 
     @contextmanager
     def auto_clean_orphans(self):
@@ -1689,27 +1697,27 @@ class Docker(object):
             yield
             return
 
-        containers = {c['Id'] for c in self.client.containers(all=True)}
-        images = {i['Id'] for i in self.client.images(all=True)}
-        networks = {n['Id'] for n in self.client.networks()}
+        containers = {c['Id'] for c in self.api_client.containers(all=True)}
+        images = {i['Id'] for i in self.api_client.images(all=True)}
+        networks = {n['Id'] for n in self.api_client.networks()}
         try:
             yield
         finally:
             with futures.ThreadPoolExecutor(8) as e:
-                for c in self.client.containers(all=True):
+                for c in self.api_client.containers(all=True):
                     if c['Id'] not in containers:
-                        e.submit(self.client.remove_container, c['Id'],
+                        e.submit(self.api_client.remove_container, c['Id'],
                                  force=True, v=True)
 
             with futures.ThreadPoolExecutor(8) as e:
-                for i in self.client.images(all=True):
+                for i in self.api_client.images(all=True):
                     if i['Id'] not in images:
-                        e.submit(self.client.remove_image, c['Id'])
+                        e.submit(self.api_client.remove_image, c['Id'])
 
             with futures.ThreadPoolExecutor(8) as e:
-                for n in self.client.networks():
+                for n in self.api_client.networks():
                     if n['Id'] not in networks:
-                        e.submit(self.client.remove_network, n['Id'])
+                        e.submit(self.api_client.remove_network, n['Id'])
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
                 detach=False):
@@ -1720,12 +1728,12 @@ class Docker(object):
         This mimics the old docker.execute() API, which was removed in
         docker-py 1.3.0.
         """
-        r = self.client.exec_create(cid, cmd, stdout=stdout, stderr=stderr)
-        return self.client.exec_start(r['Id'], stream=stream, detach=detach)
+        r = self.api_client.exec_create(cid, cmd, stdout=stdout, stderr=stderr)
+        return self.api_client.exec_start(r['Id'], stream=stream, detach=detach)
 
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""
-        r, stat = self.client.get_archive(cid, path)
+        r, stat = self.api_client.get_archive(cid, path)
         buf = BytesIO(r.read())
         buf.seek(0)
         t = tarfile.open(mode='r', fileobj=buf)
@@ -1831,7 +1839,7 @@ class Docker(object):
         stops."""
         def assert_running():
             try:
-                info = self.client.inspect_container(cid)
+                info = self.api_client.inspect_container(cid)
             except DockerAPIError as e:
                 if e.response.status_code == 404:
                     raise Exception('Container does not exist '
@@ -1845,5 +1853,5 @@ class Docker(object):
         return assert_running
 
     def _get_sorted_images(self):
-        return sorted(self.client.images(), key=lambda x: x['Created'],
+        return sorted(self.api_client.images(), key=lambda x: x['Created'],
                       reverse=True)

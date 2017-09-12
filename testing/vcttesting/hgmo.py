@@ -37,13 +37,14 @@ def get_hgweb_mozbuild_chroot(d):
     # The chroot archive contains a copy of version-control-tools. Need to
     # attach a vct container so we can rsync it over.
     with d.vct_container(verbose=True) as vct_state:
-        host_config = d.client.create_host_config(volumes_from=[vct_state['Name']])
+        host_config = d.api_client.create_host_config(
+            volumes_from=[vct_state['Name']])
         with d.create_container(image, labels=['hgweb-chroot'],
                                 host_config=host_config) as state:
             cid = state['Id']
-            d.client.start(cid)
+            d.api_client.start(cid)
 
-            for s in d.client.attach(cid, stream=True, logs=True):
+            for s in d.api_client.attach(cid, stream=True, logs=True):
                 print(s, end='')
 
             tarball = d.get_file_content(state['Id'], '/chroot.tar.gz')
@@ -72,7 +73,7 @@ class HgCluster(object):
     def __init__(self, docker, state_path=None, ldap_image=None,
                  master_image=None, web_image=None, pulse_image=None):
         self._d = docker
-        self._dc = docker.client
+        self._dc = docker.api_client
         self.state_path = state_path
 
         if state_path and os.path.exists(state_path):
