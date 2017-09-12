@@ -205,9 +205,9 @@ class Docker(object):
             self.state.setdefault(k, None)
 
         try:
-            self.client = docker.APIClient(base_url=url, tls=tls,
-                                           version='auto')
-            self.api_client = self.client
+            self.client = docker.DockerClient(base_url=url, tls=tls,
+                                              version='auto')
+            self.api_client = self.client.api
         except DockerException:
             self.client = None
             self.api_client = None
