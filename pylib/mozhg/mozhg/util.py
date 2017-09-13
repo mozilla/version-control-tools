@@ -9,6 +9,7 @@ from mercurial import (
 
 
 FIREFOX_ROOT_NODE = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
+THUNDERBIRD_ROOT_NODE = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 
 def is_firefox_repo(repo):
@@ -21,6 +22,18 @@ def is_firefox_repo(repo):
 
     # Backdoor for testing.
     return repo.vfs.exists('IS_FIREFOX_REPO')
+
+
+def is_thunderbird_repo(repo):
+    """Determine if a repository is a Thunderbird repository."""
+    try:
+        if len(repo) and repo[0].hex() == THUNDERBIRD_ROOT_NODE:
+            return True
+    except error.FilteredRepoLookupError:
+        pass
+
+    # Backdoor for testing.
+    return repo.vfs.exists('IS_THUNDERBIRD_REPO')
 
 
 def identify_repo(repo):
@@ -50,6 +63,7 @@ def identify_repo(repo):
 
     d = {
         'firefox': is_firefox_repo(repo),
+        'thunderbird': is_thunderbird_repo(repo),
         'publishing': repo.ui.configbool('phases', 'publish', True),
     }
 
