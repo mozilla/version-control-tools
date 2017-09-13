@@ -93,3 +93,52 @@ Can't push with X-Channel- message
   rollback completed
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
+  $ cd ..
+
+Thunderbird repos need this hook, too
+
+
+  $ hg init comm-server
+  $ configurehooks comm-server
+  $ touch comm-server/.hg/IS_THUNDERBIRD_REPO
+
+  $ hg -q clone comm-server comm-client
+  $ cd comm-client
+
+Regular commit messages work
+
+  $ touch file0
+  $ hg -q commit -A -m "initial"
+
+  $ hg push
+  pushing to $TESTTMP/comm-server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+Can't push with X-Channel- message
+
+  $ echo a >> file0
+  $ hg ci -m 'X-Channel-'
+  $ hg push
+  pushing to $TESTTMP/comm-server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  **************************** ERROR ****************************
+  You are trying to commit with a message that conflicts with
+  cross-channel localization.
+  Please adjust your commit messages to avoid lines starting with
+  X-Channel-.
+  ***************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+  $ cd ..

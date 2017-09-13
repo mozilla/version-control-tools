@@ -31,7 +31,9 @@ class XChannelMessageCheck(PreTxnChangegroupCheck):
         return 'x_channel_message'
 
     def relevant(self):
-        return self.repo_metadata['firefox']
+        return (
+            self.repo_metadata['firefox']
+            or self.repo_metadata['thunderbird'])
 
     def pre(self):
         pass
