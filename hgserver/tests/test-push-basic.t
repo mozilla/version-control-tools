@@ -73,7 +73,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-txnclose: hgext_vcsreplicator.txnclosehook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> exthook-changegroup.a_recordlogs: /var/hg/version-control-tools/scripts/record-pushes.sh finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-changegroup: mozhghooks.push_printurls.hook finished in * seconds (glob)
-  * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-changegroup: mozhghooks.advertise_upgrade.hook finished in * seconds (glob)
+  * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-changegroup: hgext_mozhooks.changegroup finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-changegroup: hgext_vcsreplicator.changegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> 1 incoming changes - new heads: 77538e1ce4be (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> -R /repo/hg/mozilla/mozilla-central serve --stdio exited 0 after * seconds (glob)
@@ -143,11 +143,15 @@ Upgrade notice is advertised to clients not running bundle2
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/425a9d45c43d833916e3c803300ba4488374ac0e
   remote: 
+  remote: *************************************** WARNING ****************************************
   remote: YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
-  remote: newer versions are faster and have numerous bug fixes
-  remote: upgrade instructions are at the following URL:
+  remote: 
+  remote: Newer versions are faster and have numerous bug fixes.
+  remote: Upgrade instructions are at the following URL:
   remote: https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
-  remote: recorded changegroup in replication log in \d+\.\d+s (re)
+  remote: ****************************************************************************************
+  remote: 
+  remote: recorded changegroup in replication log in 0.021s
 
 Cleanup
 
