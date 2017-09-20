@@ -40,7 +40,10 @@ class GitCommand(object):
             if self.secret:
                 command_str = command_str.replace(self.secret, 'xxx')
             self.logger.info('$ %s' % command_str)
-        subprocess.check_call(command, cwd=self.repo_path)
+
+        subprocess.check_call(
+            command,
+            cwd=self.repo_path if os.path.exists(self.repo_path) else None)
 
     def get(self, *command):
         """ Run the specified command with git and return the result.

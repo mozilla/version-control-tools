@@ -117,6 +117,8 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
 
         # Set up commit and PR metadata.
 
+        branch_name = 'gecko-backout'
+
         if pull_request_author:
             author = pull_request_author
         else:
@@ -131,6 +133,11 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
         # correct file contents.
         hg_repo.update(rev=commit.node)
 
+        # If there's a PR in flight, this commit should be appended to it.
+        open_pr = github_pr.pr_from_branch(branch_name, state='open')
+        if open_pr:
+            logger.info('updating existing pr: %s' % open_pr.html_url)
+
         # Apply changes by copying files; this sidesteps any diff
         # issues.
         def apply_patch(_):
@@ -139,8 +146,8 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
 
         # Create/update the pull request.
         pr = github_pr.create_pr_from_patch(
-            branch_name='gecko-backout',
-            reuse_branch=True,
+            branch_name=branch_name,
+            reset_branch=open_pr is None,
             description=desc,
             author=author,
             pr_body=desc,

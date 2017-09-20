@@ -62,8 +62,13 @@ class GitHubPR(object):
         return self._upstream_repo
 
     @staticmethod
-    def previous_pr(repo, head):
-        return next(repo.iter_pulls(head=head), None)
+    def _previous_pr(repo, head, state='all'):
+        return next(repo.iter_pulls(head=head, state=state), None)
+
+    def pr_from_branch(self, branch_name, state='all'):
+        return self._previous_pr(self.upstream_repo(),
+                                 '%s:%s' % (self.user, branch_name),
+                                 state=state)
 
     def update_or_create_pr(self, repo, user, branch, title, body,
                             title_multiple=None):
@@ -71,7 +76,7 @@ class GitHubPR(object):
 
         try:
             # Find existing pull request.
-            pr = self.previous_pr(repo, head)
+            pr = self._previous_pr(repo, head)
 
             if pr:
                 logger.info('updating pull request %s' % pr.html_url)
@@ -108,7 +113,7 @@ class GitHubPR(object):
         return pr
 
     def create_pr_from_patch(self,
-                             branch_name=None, reuse_branch=False,
+                             branch_name=None, reset_branch=False,
                              description=None, author=None,
                              pr_title=None, pr_title_multiple=None,
                              pr_body=None,
@@ -117,10 +122,8 @@ class GitHubPR(object):
 
         :param branch_name: Name of the branch to create the pull request in.
             The branch will be created if required.
-        :param reuse_branch: When False (the default), `branch_name` will be
-            treated as the unique branch for the PR.  If it already exists it
-            will be reset.  When True an existing branch will be reused, with
-            these changes stacked on top.
+        :param reset_branch: When True, the branch will be deleted and recreated
+            to ensure it is clean prior to PR creation.
         :param description: The commit description for this change.
         :param author: The author of this commit.
         :param pr_title: The title of the pull request.  If not provided the
@@ -154,10 +157,9 @@ class GitHubPR(object):
         git.cmd('fetch', upstream_repo.clone_url,
                 '+master:refs/upstream/master')
 
-        # If we're not reusing branches we expect a unique branch for each
-        # pull request.  This is much easier to manage if we start with a
-        # clean branch each time.
-        if not reuse_branch and git.get('branch', '--list', branch_name):
+        # It's simpler to just delete and recreate the branch to reset it.
+        if reset_branch and git.get('branch', '--list', branch_name):
+            git.cmd('checkout', 'master', '--force')
             git.cmd('branch', '--delete', '--force', branch_name)
             # noinspection PyBroadException
             try:
