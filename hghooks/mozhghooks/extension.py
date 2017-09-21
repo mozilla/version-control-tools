@@ -20,6 +20,7 @@ def get_check_classes(hook):
     from mozhghooks.check import (
         advertise_upgrade,
         prevent_cross_channel_messages,
+        prevent_ftl_changes,
         prevent_subrepos,
         prevent_symlinks,
         single_root,
@@ -30,6 +31,7 @@ def get_check_classes(hook):
     if hook == 'pretxnchangegroup':
         return (
             prevent_cross_channel_messages.XChannelMessageCheck,
+            prevent_ftl_changes.FTLCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
             single_root.SingleRootCheck,
