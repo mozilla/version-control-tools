@@ -42,23 +42,11 @@ renaming ``foo`` to ``FOO`` would be disallowed.
 
 This hooks exists to prevent issues with case-insensitive filesystems.
 
-prevent_idl_change_without_uuid_change.py
------------------------------------------
-
-This hook prevents non-comment changes to IDL interfaces without accompanying
-UUID bumps.
-
 prevent_string_changes.py
 -------------------------
 
 This hook is used to prevent changes to strings in string frozen release
 heads without the explicit approval from l10n-drivers.
-
-prevent_uuid_changes.py
------------------------
-
-This hook prevents changes to IDL IIDs or UUIDs when they shouldn't be made.
-This hook helps ensure binary compatibility of Firefox as it is released.
 
 prevent_webidl_changes.py
 -------------------------
