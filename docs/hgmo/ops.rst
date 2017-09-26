@@ -741,7 +741,13 @@ We don't yet know of correctable conditions causing endless loops. So,
 for now the best we can do is skip the message and hope the condition
 doesn't come back::
 
-   $ /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --skip
+   $ /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --skip --partition N
+
+.. note::
+
+   The ``--partition`` argument is semi-important: it says which Kafka partition
+   to pull the to-be-skipped message from. The number should be the value
+   from the systemd service that is failing / reporting lag.
 
 .. important::
 
