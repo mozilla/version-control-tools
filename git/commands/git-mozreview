@@ -331,6 +331,10 @@ def push_command(args):
                          'speak to this server; upgrade it by fetching the '
                          'repo at %s' % ROOT)
 
+    # Ensure Lint is run and passes
+    if not args.skip_lint and not run_lint(remote_name):
+        raise AbortError('Lint run failed (if you really need to you can --skip-lint)')
+
     # Do the Git push.
 
     # We have a Python script that calls the internal cinnabar APIs to get the
@@ -561,6 +565,24 @@ def push_command(args):
         else:
             ui.write('(visit review url to publish these review requests so others '
                   'can see them)\n')
+
+
+def run_lint(remote_name):
+    source_dir = subprocess.check_output(
+        ['git', 'rev-parse', '--no-flags', '--show-toplevel']).rstrip('\n')
+
+    source_hook = os.path.join(source_dir, 'tools', 'lint', 'hooks.py')
+
+    if not os.path.exists(source_hook):
+        # Allow it to pass, this repository might not be gecko.
+        return True
+
+    try:
+        subprocess.check_call([source_hook])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
 
 def fetch_command(args):
     ui = gethgui()
@@ -818,6 +840,10 @@ def main(args):
     sp.add_argument(
             '--reviewid',
             help='Review identifier for patch series')
+    sp.add_argument(
+            '--skip-lint',
+            help='Skip running lint checks.',
+            action='store_true')
     sp.add_argument(
             'revisions',
             help='commit-ish to review',
