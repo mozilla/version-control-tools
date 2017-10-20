@@ -76,7 +76,7 @@ class GitHubPR(object):
 
         try:
             # Find existing pull request.
-            pr = self._previous_pr(repo, head)
+            pr = self._previous_pr(repo, head, state='open')
 
             if pr:
                 logger.info('updating pull request %s' % pr.html_url)
