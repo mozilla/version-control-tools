@@ -27,7 +27,7 @@
 # Make it conditional because it takes a long time to run, making building
 # painfully slow.
 - name: install Node packages
-  command: /usr/bin/npm install -g less uglify-js
+  command: /usr/bin/npm install -g less@^2.7.0 uglify-js@^3.1.0
            creates=/usr/bin/lessc
 
 # TODO all this code can change to use virtualenv.yml once we switch to
