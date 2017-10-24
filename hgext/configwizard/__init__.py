@@ -34,7 +34,7 @@ HOST_FINGERPRINTS = {
 
 MODERN_FINGERPRINTS = {
     'bitbucket.org': 'sha256:4e:65:3e:76:0f:81:59:85:5b:50:06:0c:c2:4d:3c:56:53:8b:83:3e:9b:fa:55:26:98:9a:ca:e2:25:03:92:47',
-    'bugzilla.mozilla.org': 'sha256:10:95:a8:c1:e1:c3:18:fa:e4:95:40:99:11:07:6d:e3:79:ab:e5:b0:29:50:ff:40:e8:e8:63:c4:fd:f3:9f:cb',
+    'bugzilla.mozilla.org': 'sha256:95:BA:0F:F2:C4:28:75:9D:B5:DB:4A:50:5F:29:46:A3:A9:4E:1B:56:A5:AE:10:50:C3:DD:3A:AC:73:BF:4A:D9',
     'hg.mozilla.org': 'sha256:8e:ad:f7:6a:eb:44:06:15:ed:f3:e4:69:a6:64:60:37:2d:ff:98:88:37:bf:d7:b8:40:84:01:48:9c:26:ce:d9',
 }
 
