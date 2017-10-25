@@ -100,8 +100,9 @@ class LDAP(object):
 
     def delete_user(self, email):
         """ Deletes the specified user from LDAP. """
+        dn = 'mail=%s,o=com,dc=mozilla' % email
 
-        # Remove from all groups.
+        # Remove from posix groups.
         results = self.c.search_s(
             'ou=groups,dc=mozilla', ldap.SCOPE_SUBTREE,
             '(memberUid=%s)' % email, [b'cn'])
@@ -109,8 +110,16 @@ class LDAP(object):
             self.c.modify_s(result[0],
                             [(ldap.MOD_DELETE, b'memberUid', email)])
 
+        # Remove from ldap groups.
+        results = self.c.search_s(
+            'ou=groups,dc=mozilla', ldap.SCOPE_SUBTREE,
+            '(member=%s)' % dn, [b'cn'])
+        for result in results:
+            self.c.modify_s(result[0],
+                            [(ldap.MOD_DELETE, b'member', dn)])
+
         # Delete the user entry.
-        self.c.delete_s('mail=%s,o=com,dc=mozilla' % email)
+        self.c.delete_s(dn)
 
     def create_vcs_sync_login(self, pubkey):
         dn = 'uid=vcs-sync,ou=logins,dc=mozilla'
@@ -156,13 +165,21 @@ class LDAP(object):
 
         self.c.modify_s(dn, modlist)
 
-    def add_user_to_group(self, member, group):
+    def add_user_to_group(self, email, group):
         """Add a user to the specified LDAP group.
 
         The ``group`` is defined in terms of its ``cn`` under
-        ``ou=groups,dc=mozilla`. e.g. ``scml_level_3``.
+        ``ou=groups,dc=mozilla`. e.g. ``scm_level_3``.
         """
-        dn = 'cn=%s,ou=groups,dc=mozilla' % group
+        dn = 'mail=%s,o=com,dc=mozilla' % email
 
-        modlist = [(ldap.MOD_ADD, b'memberUid', member)]
-        self.c.modify_s(dn, modlist)
+        group_dn = 'cn=%s,ou=groups,dc=mozilla' % group
+        modlist = [(ldap.MOD_ADD, b'memberUid', email)]
+        self.c.modify_s(group_dn, modlist)
+
+        # MoCo LDAP has an active_* for each scm_level_* group, which we need
+        # to emulate here.
+        if group.startswith('scm_level_'):
+            group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group
+            modlist = [(ldap.MOD_ADD, b'member', str(dn))]
+            self.c.modify_s(group_dn, modlist)

@@ -48,6 +48,10 @@ def query_scm_group(username, group, ldap_connection=None):
     For scm_* groups, the ldap users mail attribute is added
     as a memberUid of the group, so check that.
 
+    When a user's access expires they are not actually removed from the scm_*
+    group; instead they are added to an expired_scm_* group.  For sanity
+    there's a set of active_scm_* which provides real group membership.
+
     We are cautious and will return false in cases where we
     failed to actually query ldap for the group membership.
     """
@@ -58,13 +62,18 @@ def query_scm_group(username, group, ldap_connection=None):
 
     try:
         ldap_connection.search('dc=mozilla', ldap.SCOPE_SUBTREE,
-                               filterstr='cn=%s' % group)
+                               filterstr='cn=active_%s' % group)
         result = ldap_connection.result(timeout=LDAP_QUERY_TIMEOUT)
 
-        # The memberUid attribute will only exist if there is
+        # The member attribute will only exist if there is
         # at least one member of the group.
-        members = result[1][0][1].get('memberUid') or []
-        return username in members
+        members = result[1][0][1].get('member') or []
+
+        # `members` contains the DN of the user, which we don't have.
+        # Because the mail attribute is unique across ldap (it's what's used
+        # as the `memberUid` in `scm_level_*` groups, just checking that
+        # a DN start with `mail=$user,` is sufficient.
+        return any(m.startswith('mail=%s,' % username) for m in members)
     except ldap.LDAPError as e:
         logger.error('Failed to query ldap for group membership: %s' % e)
         return False
