@@ -82,7 +82,7 @@ from mozhg.rewrite import (
     replacechangesets,
 )
 
-testedwith = '4.1 4.2'
+testedwith = '4.1 4.2 4.3'
 minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
