@@ -108,7 +108,7 @@ class LDAP(object):
             '(memberUid=%s)' % email, [b'cn'])
         for result in results:
             self.c.modify_s(result[0],
-                            [(ldap.MOD_DELETE, b'memberUid', email)])
+                            [(ldap.MOD_DELETE, b'memberUid', str(email))])
 
         # Remove from ldap groups.
         results = self.c.search_s(
@@ -116,7 +116,7 @@ class LDAP(object):
             '(member=%s)' % dn, [b'cn'])
         for result in results:
             self.c.modify_s(result[0],
-                            [(ldap.MOD_DELETE, b'member', dn)])
+                            [(ldap.MOD_DELETE, b'member', str(dn))])
 
         # Delete the user entry.
         self.c.delete_s(dn)
