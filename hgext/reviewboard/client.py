@@ -82,8 +82,8 @@ from mozhg.rewrite import (
     replacechangesets,
 )
 
-testedwith = '3.9 4.0 4.1 4.2'
-minimumhgversion = '3.9'
+testedwith = '4.1 4.2'
+minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
 cmdtable = {}
