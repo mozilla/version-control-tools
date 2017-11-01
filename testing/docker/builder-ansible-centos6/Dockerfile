@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-FROM secure:mozsecure:centos6:sha256 ce74b52232c2b4e3f88d54cc5ea1f91f93003f09bf79087b40eda774a58a887e:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-6-20160818-docker.tar.xz
+FROM secure:mozsecure:centos6:sha256 b102bf1f050742033c6255c6877283a0dcc169b40da3a0c96a630df440760c52:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-6-20171101-docker.tar.xz
 
 RUN yum update -y && yum install -y gcc libyaml-devel python-devel rsync tar && yum clean all
 
