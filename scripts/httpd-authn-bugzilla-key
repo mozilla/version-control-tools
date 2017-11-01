@@ -27,7 +27,7 @@ import requests
 from requests.packages.urllib3.poolmanager import PoolManager
 
 USER_AGENT = 'MozReview API Key Validator'
-BMO_FINGERPRINT = '7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17'
+BMO_FINGERPRINT = '73:d3:33:52:d6:8c:21:51:c6:af:f3:da:aa:1d:e9:b3:e8:d1:68:ab'
 
 
 class FingerprintAdaptor(requests.adapters.HTTPAdapter):
