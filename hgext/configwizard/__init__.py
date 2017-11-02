@@ -366,7 +366,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkdiffsettings(ui, cw)
 
     if 'color' in runsteps:
-        _checkcolor(ui, cw)
+        _checkcolor(ui, cw, hgversion)
 
     if 'pager' in runsteps:
         _checkpager(ui, cw)
@@ -572,9 +572,21 @@ def _promptvctextension(ui, cw, ext, msg):
     _enableext(cw, ext, ext_path)
 
 
-def _checkcolor(ui, cw):
-    _promptnativeextension(ui, cw, 'color',
-                           'Enable color output to your terminal')
+def _checkcolor(ui, cw, hg_version):
+    # Mercurial 4.2 has color built-in and enabled by default. We only enable
+    # the extension on old versions. And we remove the extension on modern
+    # versions.
+    color_builtin = hg_version >= (4, 2, 0)
+
+    if color_builtin:
+        ext = cw.c.get('extensions', {})
+        if 'color' in ext:
+            ui.write('Removing extensions.color because color is enabled '
+                     'by default in Mercurial 4.2+\n')
+            del ext['color']
+    else:
+        _promptnativeextension(ui, cw, 'color',
+                               'Enable color output to your terminal')
 
 
 def _checkpager(ui, cw):
