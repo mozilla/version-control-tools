@@ -534,6 +534,7 @@ Unrecognized reviewers should be ignored
   $ hg commit -m 'Bug 2 - different stuff; r?cthulhu'
   $ hg push --reviewid 2
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -543,7 +544,7 @@ Unrecognized reviewers should be ignored
   submitting 1 changesets for review
   unrecognized reviewer: cthulhu
   
-  changeset:  27:e0c35a6f9fc6
+  changeset:  28:c0f7a0ead8a3
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   
@@ -561,8 +562,9 @@ Reviewer identification should be case insensitive.
 
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - better stuff; r?ryanvm'
-  $ hg push -c 28
+  $ hg push -c .
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -571,7 +573,7 @@ Reviewer identification should be case insensitive.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  28:dce90596f792
+  changeset:  30:d78ae37a43e4
   summary:    Bug 2 - better stuff; r?ryanvm
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/14 (draft)
   
@@ -588,8 +590,9 @@ Reviewer deduction can be disabled with a config option.
 
   $ echo blah >> foo
   $ hg commit -m 'Bug 2 - awesome stuff; r?remus'
-  $ hg push -c 29 --config reviewboard.deduce-reviewers=false
+  $ hg push -c . --config reviewboard.deduce-reviewers=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -598,7 +601,7 @@ Reviewer deduction can be disabled with a config option.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  29:df9e974cc15e
+  changeset:  32:8156d1d4e67f
   summary:    Bug 2 - awesome stuff; r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/15 (draft)
   

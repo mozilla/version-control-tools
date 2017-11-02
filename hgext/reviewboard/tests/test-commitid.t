@@ -14,18 +14,12 @@
   $ touch foo
   $ hg -q commit -A -m initial
 
-Commit IDs are only added for repos known to be associated with
-MozReview. Install a dummy review URL to fake it out.
-
-  $ cat >> .hg/reviews << EOF
-  > u https://dummy1/
-  > r https://dummy2/
-  > EOF
-
-Commit ID should be present after review URL is defined.
-
   $ echo c1 > foo
-  $ hg commit -m 'commit 1'
+  $ hg commit -l - <<EOF
+  > commit 1
+  > 
+  > MozReview-Commit-ID: 124Bxg
+  > EOF
 
   $ hg log -T '{rev}:{node|short} {desc}\n'
   1:306d1563179b commit 1
@@ -37,7 +31,11 @@ Verify commit IDs survive rebasing
 
   $ hg -q up -r 0
   $ touch bar
-  $ hg -q commit -A -m 'head 2'
+  $ hg -q commit -A -l - <<EOF
+  > head 2
+  > 
+  > MozReview-Commit-ID: 5ijR9k
+  > EOF
 
   $ hg rebase -s 1 -d 2
   rebasing 1:306d1563179b "commit 1"
@@ -57,13 +55,25 @@ Histedit should preserve commit ids when changesets are updated
 
   $ hg -q up -r 0
   $ echo 1 > bar
-  $ hg commit -A -m histedit1
+  $ hg commit -A -l - <<EOF
+  > histedit1
+  > 
+  > MozReview-Commit-ID: APOgLo
+  > EOF
   adding bar
   created new head
   $ echo 2 > bar
-  $ hg commit -m histedit2
+  $ hg commit -l - <<EOF
+  > histedit2
+  > 
+  > MozReview-Commit-ID: F63vXs
+  > EOF
   $ echo 3 > baz
-  $ hg commit -A -m histedit3
+  $ hg commit -A -l - <<EOF
+  > histedit3
+  > 
+  > MozReview-Commit-ID: JmjAjw
+  > EOF
   adding baz
 
   $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
@@ -117,7 +127,11 @@ Graft will preserve commit id.
 
   $ hg -q up -r 0
   $ echo empty > foo
-  $ hg -q commit -m 'foo: empty'
+  $ hg -q commit -l - <<EOF
+  > foo: empty
+  > 
+  > MozReview-Commit-ID: OTOPw0
+  > EOF
 
 "key: value *" on a line doesn't get interpretted as metadata
 
@@ -126,6 +140,8 @@ Graft will preserve commit id.
   > topic: foo
   > 
   > foo: bar baz
+  > 
+  > MozReview-Commit-ID: TA3f84
   > EOF
   $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
   @  8:0d95b59bce48 topic: foo

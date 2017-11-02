@@ -55,6 +55,8 @@ Adding a reviewer with emoji in name string who is not accepting reviews
   $ hg commit -m 'Bug 1 - awesome stuff again; r?uni'
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c531f3f06e81-7dca74aa-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

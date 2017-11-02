@@ -96,7 +96,7 @@ data, filename should remain the same.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:ecfec372b48c
+  changeset:  1:b649587d0bcc
   summary:    Bug 1 - Foo 2 - amended
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -120,14 +120,14 @@ data, filename should remain the same.
   description:
   - Bug 1 - Foo 2 - amended
   - ''
-  - 'MozReview-Commit-ID: APOgLo'
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: ecfec372b48ce7b49eccf655e422acb4283283e0
+    p2rb.commit_id: b649587d0bcc3c194fe76d91bf1329a1f7590e28
     p2rb.commit_message_filediff_ids: '{"1": 2, "2": 5}'
     p2rb.commit_message_filename: commit-message-df673
     p2rb.first_public_ancestor: df67364c205763de5ad1d2c33fa78f87f6618289

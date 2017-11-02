@@ -54,6 +54,8 @@ Adding commits to old reviews should create new reviews
   $ hg commit -m 'Bug 1 - Foo 3'
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ecd598733446-e31a960e-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -147,6 +149,8 @@ rids to be strings and then pushing a new commit.
   $ hg commit -m 'Bug 1 - Foo 4'
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/201fa84c0f22-9173ea58-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

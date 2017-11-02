@@ -111,7 +111,7 @@ Ammending commit should not create a commit message FileDiff
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  1:9d4207e39e13
+  changeset:  1:1677aa2f30f2
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
@@ -135,14 +135,14 @@ Ammending commit should not create a commit message FileDiff
   description:
   - Bug 1 - Foo 2
   - ''
-  - 'MozReview-Commit-ID: APOgLo'
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: 9d4207e39e136eb5965ae29c2014e6334861b4db
+    p2rb.commit_id: 1677aa2f30f2071c46bd008be11b401675803676
     p2rb.first_public_ancestor: df67364c205763de5ad1d2c33fa78f87f6618289
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
@@ -183,6 +183,8 @@ FileDiff.
   adding bar.txt
   $ hg push -y
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/70dc6201428b-74f41091-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -191,11 +193,11 @@ FileDiff.
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  1:9d4207e39e13
+  changeset:  1:1677aa2f30f2
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2
   
-  changeset:  2:fda2e193ec23
+  changeset:  2:dc2971575b0d
   summary:    Bug 1 - Bar
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
@@ -219,21 +221,21 @@ FileDiff.
   description:
   - Bug 1 - Bar
   - ''
-  - 'MozReview-Commit-ID: F63vXs'
+  - 'MozReview-Commit-ID: APOgLo'
   target_people: []
   extra_data:
     calculated_trophies: true
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: fda2e193ec23a353558ab5b384277e8e9c21fe83
+    p2rb.commit_id: dc2971575b0de9214b29406e986ff8a666f7d396
     p2rb.first_public_ancestor: df67364c205763de5ad1d2c33fa78f87f6618289
     p2rb.identifier: bz://1/mynick
     p2rb.is_squashed: false
   diffs:
   - id: 7
     revision: 1
-    base_commit_id: 9d4207e39e136eb5965ae29c2014e6334861b4db
+    base_commit_id: 1677aa2f30f2071c46bd008be11b401675803676
     name: diff
     extra: {}
     patch:

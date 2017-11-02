@@ -237,6 +237,8 @@ Ensure r? in the commit description sets a review flag when pushing
   $ hg commit -m 'Bug 2 - Foo 1 r?reviewer'
   $ hg push --config reviewboard.autopublish=true -c .
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/12f973a4cce5-aff74ce2-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -245,7 +247,7 @@ Ensure r? in the commit description sets a review flag when pushing
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  2:b1aa746bcb39
+  changeset:  2:f9979978463c
   summary:    Bug 2 - Foo 1 r?reviewer
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   

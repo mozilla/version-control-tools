@@ -1041,25 +1041,6 @@ def reposetup(ui, repo):
         def reviews(self):
             return reviewstore(self)
 
-        def commit(self, *args, **kwargs):
-            """Override commit to generate a unique commit identifier.
-
-            The commit identifier is used to track a logical commits across
-            history rewrites, including grafting. This is used as an index
-            of sorts in the review tool.
-            """
-            msg = ''
-            if args:
-                msg = args[0]
-            elif kwargs and 'text' in kwargs:
-                msg = kwargs['text']
-                del kwargs['text']
-
-            if self.reviews.remoteurl and msg:
-                msg, changed = addcommitid(msg, repo=self)
-
-            return super(reviewboardrepo, self).commit(msg, *args[1:], **kwargs)
-
     repo.__class__ = reviewboardrepo
     repo.noreviewboardpush = False
     repo.reviewid = None

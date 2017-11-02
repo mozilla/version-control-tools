@@ -89,6 +89,28 @@ Check rewriting when submitter == reviewer
   $ exportbzauth l3author@example.com password
   $ hg --verbose --config bugzilla.username=l3author@example.com --config bugzilla.apikey=$l3key push -c .
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  committing files:
+  foo
+  committing manifest
+  committing changelog
+  resolving manifests
+  1 changesets found
+  uncompressed size of bundle content:
+       218 (changelog)
+       165 (manifests)
+       135  foo
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ee66baf1dbbf-77ce5791-addcommitid.hg (glob)
+  1 changesets found
+  uncompressed size of bundle content:
+       247 (changelog)
+       165 (manifests)
+       135  foo
+  adding branch
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
   searching for changes
   1 changesets found
   uncompressed size of bundle content:

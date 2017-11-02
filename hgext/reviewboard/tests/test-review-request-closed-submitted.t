@@ -191,6 +191,8 @@ TODO Fix the error output (bug 1169664)
   $ hg commit -m 'Bug 1 - Foo 3'
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/ecd598733446-e31a960e-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

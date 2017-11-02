@@ -146,6 +146,8 @@ Pushing patches from mq will result in a warning
   $ hg qnew -m 'mq patch' -d '0 0' patch1
   $ hg push -r . --reviewid 2 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/7458cff9569f-a12db42c-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -269,20 +271,22 @@ Prepare for multi changeset tests
   $ echo newhead > foo
   $ hg commit -m 'Unrelated head'
   created new head
-  $ hg -q up -r 946b2ccfbcc1
+  $ hg -q up -r 84e8a1584aad
 
 A dirty working copy of a reviewed node will abort because of potential rewriting
 
   $ echo dirty > foo
-  $ hg push -r 8::10 --reviewid 7
+  $ hg push -r ::b55f2b9937c7 --reviewid 7
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 4 changesets)
   abort: uncommitted changes
   [255]
 
 A dirty working copy of a child of a review node will abort
 
-  $ hg push -r 8::9 --reviewid 7
+  $ hg push -r 84e8a1584aad::ae66c8223052 --reviewid 7
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 2 changesets)
   abort: uncommitted changes
   [255]
 
@@ -290,8 +294,10 @@ A dirty working copy of a child of a review node will abort
 
 Specifying a base revision limits reviewed changesets
 
-  $ hg push -r 8::10 --reviewid 7 --config reviewboard.autopublish=false
+  $ hg push -r 84e8a1584aad::b55f2b9937c7 --reviewid 7 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 3 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9b775dfe71c8-8ceb7cd1-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -300,15 +306,15 @@ Specifying a base revision limits reviewed changesets
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  8:29cc7959baba
+  changeset:  8:8115cfda01b9
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/14 (draft)
   
-  changeset:  9:6d5a65ca7a91
+  changeset:  9:1b934b086d87
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/15 (draft)
   
-  changeset:  10:946b2ccfbcc1
+  changeset:  10:2af788c5bc5e
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/16 (draft)
   
@@ -320,21 +326,21 @@ Specifying a base revision limits reviewed changesets
 
 Specifying multiple -r arguments selects base and tip
 
-  $ hg push -r 8 -r 10 --reviewid 8 --config reviewboard.autopublish=false
+  $ hg push -r 8115cfda01b9 -r 2af788c5bc5e --reviewid 8 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:29cc7959baba
+  changeset:  8:8115cfda01b9
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/18 (draft)
   
-  changeset:  9:6d5a65ca7a91
+  changeset:  9:1b934b086d87
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/19 (draft)
   
-  changeset:  10:946b2ccfbcc1
+  changeset:  10:2af788c5bc5e
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/20 (draft)
   
@@ -347,21 +353,21 @@ Specifying multiple -r arguments selects base and tip
 
 Specifying multiple -r in reverse order still works
 
-  $ hg push -r 10 -r 8 --reviewid 9 --config reviewboard.autopublish=false
+  $ hg push -r 2af788c5bc5e -r 8115cfda01b9 --reviewid 9 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 3 changesets for review
   
-  changeset:  8:29cc7959baba
+  changeset:  8:8115cfda01b9
   summary:    Review base
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/22 (draft)
   
-  changeset:  9:6d5a65ca7a91
+  changeset:  9:1b934b086d87
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/23 (draft)
   
-  changeset:  10:946b2ccfbcc1
+  changeset:  10:2af788c5bc5e
   summary:    Review tip
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/24 (draft)
   
@@ -374,19 +380,19 @@ Specifying multiple -r in reverse order still works
 
 -r and -c are mutually exclusive
 
-  $ hg push -c 8 -r 9
+  $ hg push -c 8115cfda01b9 -r 1b934b086d87
   abort: cannot specify both -r and -c
   [255]
 
 -c can be used to select a single changeset to review
 
-  $ hg push -c 9 --reviewid 11 --config reviewboard.autopublish=false
+  $ hg push -c 1b934b086d87 --reviewid 11 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
   no changes found
   submitting 1 changesets for review
   
-  changeset:  9:6d5a65ca7a91
+  changeset:  9:1b934b086d87
   summary:    Middle commit
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/26 (draft)
   
@@ -407,13 +413,15 @@ Reviewing merge commits is rejected
   $ echo merge2 > foo
   $ hg commit -m 'Bug 1 - Merge B'
   created new head
-  $ hg merge --tool internal:other 47aed783df21
+  $ hg merge --tool internal:other 63170dd88642
   0 files updated, 1 files merged, 0 files removed, 0 files unresolved
   (branch merge, don't forget to commit)
   $ hg commit -m 'Bug 1 - Do merge'
 
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 3 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b21a68e5d0e0-20fc94c0-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -421,7 +429,7 @@ Reviewing merge commits is rejected
   remote: added 3 changesets with 3 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   submitting 3 changesets for review
-  abort: cannot review merge commits (abd430935a8b)
+  abort: cannot review merge commits (1ea610ba7399)
   [255]
 
 We disallow completely empty revisions.
@@ -430,7 +438,7 @@ We disallow completely empty revisions.
   $ hg qnew -m 'mq patch' -d '0 0' empty-patch
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
-  abort: cannot review empty changeset e3b1b495a7d2
+  abort: cannot review empty changeset 72a12b75c815
   (add files to or remove changeset)
   [255]
 
@@ -440,7 +448,7 @@ Check for empty commits not at the tip
   $ hg qnew -m 'Bug 1 - after empty' -d '0 0' after-empty
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
-  abort: cannot review empty changeset e3b1b495a7d2
+  abort: cannot review empty changeset 72a12b75c815
   (add files to or remove changeset)
   [255]
 

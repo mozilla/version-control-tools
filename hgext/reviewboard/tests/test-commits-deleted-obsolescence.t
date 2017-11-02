@@ -789,6 +789,7 @@ because the new commit is logically different
   $ hg -q commit -A -m 'Bug 1 - Foo 6'
   $ hg --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -801,7 +802,7 @@ because the new commit is logically different
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3
   
-  changeset:  14:3b99865d1bab
+  changeset:  15:3b99865d1bab
   summary:    Bug 1 - Foo 6
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/7 (draft)
   

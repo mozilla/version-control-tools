@@ -146,6 +146,8 @@ Put some wonky byte sequences in the diff
 
   $ hg --config bugzilla.username=author@example.com --config bugzilla.apikey=${authorkey} --config reviewboard.autopublish=false push -r 2::
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/3aef4f4bb0d9-c7f01cb3-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

@@ -69,10 +69,10 @@
 
   $ cat > commands << EOF
   > pick 0b3e14fe3ff1 Foo 1
-  > fold 713878e22d95 Foo 3
+  > fold b6ef165d96cf Foo 3
   > pick bce658a3f6d6 Foo 2
-  > fold 4d0f846364eb Foo 4
-  > pick 4e50148c492d Foo 5
+  > fold 803c58c4e82d Foo 4
+  > pick 08ef3d87dc2e Foo 5
   > EOF
   $ hg histedit 0b3e14fe3ff1 --commands commands | grep -v 'files updated'
   [1]
@@ -80,23 +80,24 @@
   $ rbmanage publish 1
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 3 changesets with 3 changes to ? files (+1 heads) (glob)
+  remote: added 3 changesets with 3 changes to 5 files (+1 heads)
   remote: recorded push in pushlog
   submitting 3 changesets for review
   
-  changeset:  9:0a7aec47f105
+  changeset:  9:6e03977d9469
   summary:    Bug 1 - Foo 1
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  12:88139569a7a8
+  changeset:  12:8a9d02dd9f4b
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  13:6e19c778ea00
+  changeset:  14:7345f147ad06
   summary:    Bug 1 - Foo 5
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/4 (draft)
   

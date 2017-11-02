@@ -65,6 +65,7 @@ Splitting the changeset results in multiple reviews
   $ rbmanage publish 1
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 2 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -73,11 +74,11 @@ Splitting the changeset results in multiple reviews
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:8cfe623ffa82
+  changeset:  5:8cfe623ffa82
   summary:    Bug 1 - Foo 2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
-  changeset:  4:02a9514408b7
+  changeset:  6:02a9514408b7
   summary:    Bug 1 - Foo 3
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   

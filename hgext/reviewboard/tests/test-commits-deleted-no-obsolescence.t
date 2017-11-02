@@ -710,6 +710,8 @@ recycling behavior when commit IDs are present.
   $ hg -q commit -A -m 'Bug 1 - Foo 6'
   $ hg --config reviewboard.autopublish=false push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/abb8d26c0311-418bd058-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

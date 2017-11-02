@@ -840,7 +840,7 @@ Review requests created by L3 users
   description:
   - Bug 2 - initial commit to review
   - ''
-  - 'MozReview-Commit-ID: F63vXs'
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people:
   - level1a
   - level1b
@@ -849,7 +849,7 @@ Review requests created by L3 users
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
+    p2rb.commit_id: 8d040df91cf3c26975d93bda40dd09ed91866737
     p2rb.commit_message_filediff_ids: '{"1": 8}'
     p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
@@ -889,7 +889,7 @@ Even a ship-it from an L1 user will give approval to an L3 author
   description:
   - Bug 2 - initial commit to review
   - ''
-  - 'MozReview-Commit-ID: F63vXs'
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people:
   - level1a
   - level1b
@@ -898,7 +898,7 @@ Even a ship-it from an L1 user will give approval to an L3 author
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: b366ef9913208b4030857319aa20520f229a74f3
+    p2rb.commit_id: 8d040df91cf3c26975d93bda40dd09ed91866737
     p2rb.commit_message_filediff_ids: '{"1": 8}'
     p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf
@@ -951,7 +951,7 @@ ship-its. Posting a new diff should not clear approval
   description:
   - Bug 2 - initial commit to review
   - ''
-  - 'MozReview-Commit-ID: F63vXs'
+  - 'MozReview-Commit-ID: 5ijR9k'
   target_people:
   - level1a
   - level1b
@@ -960,7 +960,7 @@ ship-its. Posting a new diff should not clear approval
   commit_extra_data:
     p2rb: true
     p2rb.author: test
-    p2rb.commit_id: bedcf57f515ad540f582962e37ecd424d82424fd
+    p2rb.commit_id: 8b63e5a1962062c91912d9d7628e3b9c191d3e25
     p2rb.commit_message_filediff_ids: '{"1": 8, "2": 11}'
     p2rb.commit_message_filename: commit-message-3a9f6
     p2rb.first_public_ancestor: 3a9f6899ef84c99841f546030b036d0124a863cf

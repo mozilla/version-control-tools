@@ -57,6 +57,7 @@ Now create a new head and push a rebase
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg push --reviewid 1 --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -65,11 +66,11 @@ Now create a new head and push a rebase
   remote: recorded push in pushlog
   submitting 2 changesets for review
   
-  changeset:  3:696cdea118f5
+  changeset:  5:696cdea118f5
   summary:    bar
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/3 (draft)
   
-  changeset:  4:d699fd7a906a
+  changeset:  6:d699fd7a906a
   summary:    foo2
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/2 (draft)
   
