@@ -149,9 +149,20 @@ def calljsoncommand(ui, remote, command, data=None, httpcap=None, httpcommand=No
     if (httpcap and httpcommand and httpcap in getreviewcaps(remote) and
         isinstance(remote, httppeer.httppeer)):
         url = '%s/%s' % (remote._url, httpcommand)
-        request = remote.requestbuilder(url, data=data,
-                                        headers={'Content-Type': 'application/json'})
-        fh = remote.urlopener.open(request)
+
+        # TRACKING hg44: 4.4 renamed requestbuilder to _requestbuilder and
+        # urlopener to _urlopener.
+        if util.safehasattr(remote, '_requestbuilder'):
+            requestbuilder = remote._requestbuilder
+            opener = remote._urlopener
+        else:
+            requestbuilder = remote.requestbuilder
+            opener = remote.urlopener
+
+        request = requestbuilder(url,
+                                 data=data,
+                                 headers={'Content-Type': 'application/json'})
+        fh = opener.open(request)
         res = fh.read()
     else:
         res = remote._call(command, data=data)
