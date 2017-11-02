@@ -1,4 +1,4 @@
-#require hg41+
+#require hg41
 
   $ . $TESTDIR/vcssync/tests/helpers.sh
 

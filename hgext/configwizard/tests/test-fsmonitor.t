@@ -31,7 +31,7 @@ Rejecting fsmonitor doesn't enable it
   
   Would you like to enable fsmonitor (Yn)?  n
 
-#if hg38+
+#if hg38
 
 No prompt if extensions already enabled
 

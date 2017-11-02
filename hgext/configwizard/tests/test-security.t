@@ -1,6 +1,6 @@
   $ . $TESTDIR/hgext/configwizard/tests/helpers.sh
 
-#if sslcontext hg39+
+#if sslcontext hg39
 Modern Mercurial doesn't need to pin fingerprints
 
   $ hg --config configwizard.steps=security,configchange configwizard
@@ -13,7 +13,7 @@ Modern Mercurial doesn't need to pin fingerprints
    <RETURN>
 #endif
 
-#if no-sslcontext no-hg39+
+#if no-sslcontext no-hg39
 [hostfingerprints] get set on Mercurial <3.9 if modern SSL not supported
 
   $ hg --config configwizard.steps=security,configchange configwizard
@@ -38,7 +38,7 @@ Modern Mercurial doesn't need to pin fingerprints
 
 #endif
 
-#if no-sslcontext hg39+
+#if no-sslcontext hg39
 [hostsecurity] set on Mercurial 3.9+ when no modern SSL
 
   $ hg --config configwizard.steps=security,configchange configwizard
@@ -63,7 +63,7 @@ Modern Mercurial doesn't need to pin fingerprints
 
 #endif
 
-#if no-hg39+
+#if no-hg39
 [hostfingerprints] updated on Mercurial <3.9 when they are already pinned
 
   $ cat > .hgrc << EOF
@@ -92,7 +92,7 @@ Modern Mercurial doesn't need to pin fingerprints
 
 #endif
 
-#if hg39+
+#if hg39
 [hostfingerprints] deleted and converted to [hostsecurity]
 (Note: no new fingerprints are added)
 

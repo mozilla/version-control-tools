@@ -1,5 +1,5 @@
 graft -f wasn't added until 3.2
-#require hg32+
+#require hg32
 
   $ cat >> $HGRCPATH << EOF
   > [extensions]

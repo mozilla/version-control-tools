@@ -106,7 +106,7 @@ A subsequent bundle generation should produce a backup clonebundles.manifest.old
 
 Cloning will fetch bundle
 
-#if hg36+
+#if hg36
 
   $ hg --config experimental.clonebundles=true --config ui.clonebundlefallback=true clone -U ${HGWEB_0_URL}mozilla-central clonebundles-no-advertise
   applying clone bundle from https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.*.hg (glob)

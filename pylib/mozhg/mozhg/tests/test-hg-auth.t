@@ -1,4 +1,4 @@
-#require hg31+
+#require hg31
 
 This test covers the logic in mozhg.auth.getbugzillauth() from a
 generic Mercurial perspective.

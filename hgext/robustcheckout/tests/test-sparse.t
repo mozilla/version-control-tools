@@ -25,7 +25,7 @@ Add some files to server repo to test sparseness
   $ hg -q commit -A -m 'add dir1/baz.py'
   $ cd ../..
 
-#if no-hg43+
+#if no-hg43
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --sparseprofile foo
   abort: sparse profile support only available for Mercurial 4.3 (using *) (glob)
@@ -33,7 +33,7 @@ Add some files to server repo to test sparseness
 
 #endif
 
-#if hg43+
+#if hg43
 
 Attempting a sparse checkout without sparse extension results in error
 
