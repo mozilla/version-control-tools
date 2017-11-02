@@ -13,6 +13,31 @@ from mercurial import config, util
 from mercurial.i18n import _
 
 
+def register_config_items(configitem):
+    """Registers config items with Mercurial's registrar.
+
+    The argument is a ``registrar.configitem`` instance.
+    """
+    from mercurial import configitems
+
+    configitem('bugzilla', 'username',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'apikey',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'password',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'userid',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'cookie',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'firefoxprofile',
+               default=configitems.dynamicdefault)
+    configitem('bugzilla', 'url',
+               default=configitems.dynamicdefault)
+    configitem('mozilla', 'trustedbmoapikeyservices',
+               default=configitems.dynamicdefault)
+
+
 class BugzillaAuth(object):
     """Holds Bugzilla authentication credentials."""
 
@@ -56,11 +81,11 @@ def getbugzillaauth(ui, require=False, profile=None):
     order.
     """
 
-    username = ui.config('bugzilla', 'username')
-    apikey = ui.config('bugzilla', 'apikey')
-    password = ui.config('bugzilla', 'password')
-    userid = ui.config('bugzilla', 'userid')
-    cookie = ui.config('bugzilla', 'cookie')
+    username = ui.config('bugzilla', 'username', None)
+    apikey = ui.config('bugzilla', 'apikey', None)
+    password = ui.config('bugzilla', 'password', None)
+    userid = ui.config('bugzilla', 'userid', None)
+    cookie = ui.config('bugzilla', 'cookie', None)
     profileorder = ui.configlist('bugzilla', 'firefoxprofile', [])
 
     if username and apikey:
@@ -298,8 +323,8 @@ def configureautobmoapikeyauth(ui):
         ui.debug('no trusted services to auto define credentials on\n')
         return
 
-    username = ui.config('bugzilla', 'username')
-    apikey = ui.config('bugzilla', 'apikey')
+    username = ui.config('bugzilla', 'username', None)
+    apikey = ui.config('bugzilla', 'apikey', None)
     if not username:
         ui.debug('Bugzilla username not defined; cannot define credentials\n')
         return

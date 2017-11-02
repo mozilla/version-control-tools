@@ -88,7 +88,7 @@ def genid(repo=None, fakeidpath=None):
     # testing purposes because tests want constant output. And since
     # commit IDs go into the commit and are part of the SHA-1, they need
     # to be deterministic.
-    if repo and repo.ui.configbool('reviewboard', 'fakeids'):
+    if repo and repo.ui.configbool('reviewboard', 'fakeids', False):
         fakeidpath = repo.vfs.join('genid')
 
     if fakeidpath:

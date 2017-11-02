@@ -32,6 +32,13 @@ from mercurial import (
     util,
     wireproto,
 )
+
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 from mercurial.i18n import _
 from mercurial.node import (
     hex,
@@ -66,13 +73,26 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
-# Mercurial 4.3 started defining config items using a central registrar.
-# Mercurial 4.4 finished this transition.
-try:
-    from mercurial import configitems
-    have_config_registrar = True
-except ImportError:
-    have_config_registrar = False
+# Mercurial 4.4 requires config items to be registered.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('bugzilla', 'url',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'isdiscoveryrepo',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'password',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'repobasepath',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'repoid',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'url',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'username',
+               default=configitems.dynamicdefault)
+
 
 # Capabilities the server requires in clients.
 #
@@ -219,7 +239,7 @@ def wrappedwireprotoheads(orig, repo, proto, *args, **kwargs):
        server doesn't know if the client supports bundle2 until it reads the
        header from the bundle submission!
     """
-    if not repo.ui.configbool('reviewboard', 'isdiscoveryrepo'):
+    if not repo.ui.configbool('reviewboard', 'isdiscoveryrepo', False):
         return orig(repo, proto, *args, **kwargs)
 
     return wireproto.ooberror(nopushdiscoveryrepos)
@@ -384,7 +404,7 @@ def reposetup(ui, repo):
         return
 
     if (not ui.configint('reviewboard', 'repoid', None) and
-            not ui.configbool('reviewboard', 'isdiscoveryrepo')):
+            not ui.configbool('reviewboard', 'isdiscoveryrepo', False)):
         raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
 
@@ -405,7 +425,7 @@ def reposetup(ui, repo):
             'Bugzilla instance to talk to.'))
 
     # TRACKING hg33+
-    if have_config_registrar:
+    if configitems:
         publish = ui.configbool('phases', 'publish')
     else:
         publish = ui.configbool('phases', 'publish', True)
@@ -419,6 +439,6 @@ def reposetup(ui, repo):
     # This shouldn't be needed to prevent pushes, as the "heads" wireproto
     # wrapping should kill them. However, this is defense in depth and will
     # kill all changegroup additions, even if the server operator is dumb.
-    if ui.configbool('reviewboard', 'isdiscoveryrepo'):
+    if ui.configbool('reviewboard', 'isdiscoveryrepo', False):
         ui.setconfig('hooks', 'pretxnchangegroup.disallowpush',
                      disallowpushhook)

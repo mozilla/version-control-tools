@@ -49,6 +49,13 @@ from mercurial import (
     templatekw,
     util,
 )
+
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 from mercurial.i18n import _
 from mercurial.node import bin, hex
 
@@ -76,6 +83,7 @@ from mozautomation.commitparser import (
 from mozhg.auth import (
     getbugzillaauth,
     configureautobmoapikeyauth,
+    register_config_items,
 )
 from mozhg.rewrite import (
     newparents,
@@ -94,6 +102,28 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# Mercurial 4.3 introduced the config registrar. 4.4 requires config
+# items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    # Imports get evaluated in block scope. So the if above has no impact.
+
+
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    # Register bugzilla.* options via shared auth module.
+    register_config_items(configitem)
+
+    configitem('mozilla', 'ircnick',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'autopublish',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'deduce-reviewers',
+               default=configitems.dynamicdefault)
+    configitem('reviewboard', 'fakeids',
+               default=configitems.dynamicdefault)
+
 
 clientcapabilities = {
     'proto1',
@@ -686,7 +716,7 @@ def doreview(repo, ui, remote, nodes):
                                         'requests now (Yn)? '
                                         '$$ &Yes $$ &No')) == 0
         else:
-            publish = ui.configbool('reviewboard', 'autopublish')
+            publish = ui.configbool('reviewboard', 'autopublish', False)
 
         if publish:
             publishreviewrequests(ui, remote, bzauth, [newparentid])
