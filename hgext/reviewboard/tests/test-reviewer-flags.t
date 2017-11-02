@@ -63,7 +63,7 @@ There are no warnings for reviewers who haved granted a ship-it when using r=
   > 
   > MozReview-Commit-ID: 124Bxg
   > EOF
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9131d64aca84-c977e83b-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/9131d64aca84-*.hg (glob)
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
@@ -102,7 +102,7 @@ using r=.
   > 
   > MozReview-Commit-ID: APOgLo
   > EOF
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/f6ca9a9341fc-3ca96401-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/f6ca9a9341fc-*.hg (glob)
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes

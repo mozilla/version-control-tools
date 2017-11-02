@@ -98,7 +98,7 @@ remove commit message entries from database.
 Ammending commit should not create a commit message FileDiff
   $ echo foo2 > foo.h
   $ hg commit --amend -m 'Bug 1 - Foo 2'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/4a9cf7e91820-a2ac3612-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/4a9cf7e91820-*.hg (glob)
   $ hg push -y
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)

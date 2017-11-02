@@ -41,7 +41,7 @@ Verify commit IDs survive rebasing
 
   $ hg rebase -s 1 -d 2
   rebasing 1:306d1563179b "commit 1"
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/*-backup.hg (glob)
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/*.hg (glob)
 
   $ hg log -G -T '{rev}:{node|short} {desc}\n'
   o  2:ae4a1eb0e7a0 commit 1
@@ -86,7 +86,7 @@ Histedit should preserve commit ids when changesets are updated
   > EOF
 
   $ hg histedit -r 4a17019033eb --commands commands | grep -v 'files updated'
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/bb89e4592815-c4460a5c-backup.hg (glob)
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/bb89e4592815-c4460a5c-*.hg (glob)
 
   $ hg log -G -T '{rev}:{node|short} {desc}\n' -r '::.'
   @  5:986c4bf069fe histedit2

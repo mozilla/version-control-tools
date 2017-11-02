@@ -83,7 +83,7 @@ Amended commit message should result with a changed commit message ids extra
 data, filename should remain the same.
 
   $ hg commit --amend -m 'Bug 1 - Foo 2 - amended'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/4a9cf7e91820-f76b5126-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/4a9cf7e91820-f76b5126-*.hg (glob)
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)

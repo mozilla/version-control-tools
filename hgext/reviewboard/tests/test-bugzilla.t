@@ -101,7 +101,7 @@ published.
 
   $ echo foo1 >> foo
   $ hg commit --amend
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/98467d80785e-96ff1ede-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/98467d80785e-*.hg (glob)
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes

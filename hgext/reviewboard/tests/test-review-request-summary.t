@@ -307,7 +307,7 @@ Create a draft with different diffstats
   $ echo "more foo" >> foo
   $ echo "and even more" >> foo
   $ hg commit --amend
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/*-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/*.hg (glob)
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
