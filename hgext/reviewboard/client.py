@@ -284,14 +284,22 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         repo.ui.status(_('redirecting push to %s\n') % newurl)
 
         if isinstance(remote, httppeer.httppeer):
+            # TRACKING various attributes renamed in Mercurial 4.4.
             remote._url = str(newurl)
 
             newurl.user = oldurl.user
             newurl.passwd = oldurl.passwd
-            remote.path = str(newurl)
+
+            if util.safehasattr(remote, '_path'):
+                remote._path = str(newurl)
+            else:
+                remote.path = str(newurl)
 
             # Wipe out cached capabilities.
-            remote.caps = None
+            if util.safehasattr(remote, '_caps'):
+                remote._caps = None
+            else:
+                remote.caps = None
 
             newremote = remote
 
