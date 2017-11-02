@@ -66,6 +66,14 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
+# Mercurial 4.3 started defining config items using a central registrar.
+# Mercurial 4.4 finished this transition.
+try:
+    from mercurial import configitems
+    have_config_registrar = True
+except ImportError:
+    have_config_registrar = False
+
 # Capabilities the server requires in clients.
 #
 # Add to this and add a corresponding entry in the client extension to force
@@ -396,7 +404,13 @@ def reposetup(ui, repo):
         raise util.Abort(_('Please set bugzilla.url to the URL of the '
             'Bugzilla instance to talk to.'))
 
-    if ui.configbool('phases', 'publish', True):
+    # TRACKING hg33+
+    if have_config_registrar:
+        publish = ui.configbool('phases', 'publish')
+    else:
+        publish = ui.configbool('phases', 'publish', True)
+
+    if publish:
         raise util.Abort(_('reviewboard server extension is only compatible '
             'with non-publishing repositories.'))
 
