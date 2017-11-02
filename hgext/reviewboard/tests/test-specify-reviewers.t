@@ -313,7 +313,7 @@ code path.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  22:47ac4d7af91f
+  changeset:  (21|22):47ac4d7af91f (re)
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -375,7 +375,7 @@ again.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  22:47ac4d7af91f
+  changeset:  (21|22):47ac4d7af91f (re)
   summary:    Bug 1 - Even more stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -445,7 +445,7 @@ and pushed with no reviewers specified.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  24:cf273a4d0f27
+  changeset:  (22|24):cf273a4d0f27 (re)
   summary:    Bug 1 - Amended stuff
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -513,7 +513,7 @@ those specified in the commit summary.
   summary:    Bug 1 - More stuff; [r?remus, r?romulus]
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/10
   
-  changeset:  26:7a590575b558
+  changeset:  (23|26):7a590575b558 (re)
   summary:    Bug 1 - Amended stuff; r?romulus, r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/11 (draft)
   
@@ -544,7 +544,7 @@ Unrecognized reviewers should be ignored
   submitting 1 changesets for review
   unrecognized reviewer: cthulhu
   
-  changeset:  28:c0f7a0ead8a3
+  changeset:  (25|28):c0f7a0ead8a3 (re)
   summary:    Bug 2 - different stuff; r?cthulhu
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/13 (draft)
   
@@ -573,7 +573,7 @@ Reviewer identification should be case insensitive.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  30:d78ae37a43e4
+  changeset:  (27|30):d78ae37a43e4 (re)
   summary:    Bug 2 - better stuff; r?ryanvm
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/14 (draft)
   
@@ -601,7 +601,7 @@ Reviewer deduction can be disabled with a config option.
   remote: recorded push in pushlog
   submitting 1 changesets for review
   
-  changeset:  32:8156d1d4e67f
+  changeset:  (29|32):8156d1d4e67f (re)
   summary:    Bug 2 - awesome stuff; r?remus
   review:     http://$DOCKER_HOSTNAME:$HGPORT1/r/15 (draft)
   
