@@ -179,36 +179,4 @@ def has_43_plus():
     v = tuple(hgversion()[0:2])
     return v >= (4, 3)
 
-# Now we reimplement the command line syntax of the CLI hghave script.
-failures = 0
-
-def error(msg):
-    global failures
-    sys.stderr.write('%s\n' % msg)
-    failures += 1
-
-for feature in sys.argv[1:]:
-    negate = feature.startswith('no-')
-    if negate:
-        feature = feature[3:]
-
-    if feature not in checks:
-        error('skipped: unknown feature: ' + feature)
-        sys.exit(2)
-
-    check, desc = checks[feature]
-    try:
-        available = check()
-    except Exception as e:
-        error('hghave check failed: %s' % feature)
-        continue
-
-    if not negate and not available:
-        error('skipped: missing feature: %s' % desc)
-    elif negate and available:
-        error('skipped: system supports %s' % desc)
-
-if failures:
-    sys.exit(1)
-
-sys.exit(0)
+require(sys.argv[1:])
