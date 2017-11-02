@@ -68,6 +68,7 @@ hg pull does not require authentication
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets 96ee1d7354c4 (?)
   (run 'hg update' to get a working copy)
   $ hg up -r tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
