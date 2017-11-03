@@ -20,17 +20,6 @@ push again.
 """
 
 
-SUBREPO_WARNING = """
-{node} contains subrepositories.
-
-Subrepositories are an advanced Mercurial feature. Subrepositories are not
-allowed by default on non-user repositories. Attempting to push this changeset
-to a non-user repository on this server will result in rejection.
-
-Please consider not using subrepositories.
-"""
-
-
 class PreventSubReposCheck(PreTxnChangegroupCheck):
     """Prevents sub-repos from being committed.
 
@@ -50,7 +39,6 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
         return True
 
     def pre(self):
-        self.fatal = not self.repo_metadata['user_repo']
         self.done = False
 
     def check(self, ctx):
@@ -64,14 +52,9 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
 
         self.done = True
 
-        if self.fatal:
-            print_banner(self.ui, 'error', SUBREPO_NOT_ALLOWED.format(
-                node=ctx.hex()[0:12]))
-            return False
-        else:
-            print_banner(self.ui, 'warning', SUBREPO_WARNING.format(
-                node=ctx.hex()[0:12]))
-            return True
+        print_banner(self.ui, 'error', SUBREPO_NOT_ALLOWED.format(
+            node=ctx.hex()[0:12]))
+        return False
 
     def post_check(self):
         return True

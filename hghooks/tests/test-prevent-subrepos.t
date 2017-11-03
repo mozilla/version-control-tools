@@ -1,6 +1,6 @@
   $ . $TESTDIR/hghooks/tests/common.sh
 
-We can create subrepos on user repos (but a warning is printed)
+We cannot create subrepos on user repos (but a warning is printed)
 
   $ mkdir -p users/someuser
   $ hg init users/someuser/repo
@@ -42,16 +42,19 @@ We can create subrepos on user repos (but a warning is printed)
   adding file changes
   added 1 changesets with 2 changes to 2 files
   
-  ********************************** WARNING ***********************************
+  *********************************** ERROR ************************************
   5e42dc5815d5 contains subrepositories.
   
-  Subrepositories are an advanced Mercurial feature. Subrepositories are not
-  allowed by default on non-user repositories. Attempting to push this changeset
-  to a non-user repository on this server will result in rejection.
+  Subrepositories are not allowed on this repository.
   
-  Please consider not using subrepositories.
+  Please remove .hgsub and/or .hgsubstate files from the repository and try your
+  push again.
   ******************************************************************************
   
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
   $ cd ..
 
 We cannot create subrepos on non-user repos
