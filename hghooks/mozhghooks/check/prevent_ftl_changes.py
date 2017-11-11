@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 from mozautomation.commitparser import (
     parse_requal_reviewers,
+    is_backout,
 )
 
 from ..checks import (
@@ -52,6 +53,14 @@ class FTLCheck(PreTxnChangegroupCheck):
         pass
 
     def check(self, ctx):
+        if len(ctx.parents()) > 1:
+            # Skip merge changesets
+            return True
+
+        if is_backout(ctx.description()):
+            # Ignore backouts
+            return True
+
         if any(f.endswith('.ftl') for f in ctx.files()):
             requal = parse_requal_reviewers(ctx.description())
             reviewers = [nick for (name, nick) in FTL_DRIVERS]
