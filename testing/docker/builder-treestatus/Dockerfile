@@ -14,9 +14,7 @@ RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 ubuntu
 RUN apt-get update && apt-get --no-install-recommends -y install \
   ca-certificates git python2.7-dev python-pip sqlite3
 
-RUN git clone https://github.com/mozilla/treestatus.git ${TREESTATUS_HOME}
-RUN cd ${TREESTATUS_HOME} && git checkout cc3fb83f41cb65da3595275f39ec6448f4816dff \
-    && git submodule update --init vendor
+RUN git clone https://github.com/globau/treestatus-legacy.git ${TREESTATUS_HOME}
 
 RUN pip install -r ${TREESTATUS_HOME}/requirements/compiled.txt
 
