@@ -95,6 +95,12 @@ HTML_INDEX = '''
       representation of this data.
     </p>
     <p>
+      <strong>
+        Mercurial 4.1 or newer is required to unbundle zstd.
+        Please use gzip or stream for older versions.
+      </strong>
+    </p>
+    <p>
        For more, see
        <a href="https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/bundleclone.html">the official docs</a>.
     </p>
