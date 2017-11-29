@@ -1,4 +1,5 @@
 ---
 dependencies:
+  - ius-repo
   - ldap-system-auth
   - mercurial-yum

@@ -35,6 +35,8 @@
     # Needed to build python-ldap package for virtualenv.
     - openldap-devel
     - python-devel
+    - python36u
+    - python36u-pip
     - rsyslog
 
 - name: mercurial config directory is present

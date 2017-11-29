@@ -27,6 +27,8 @@
     # To compile hg-experimental extensions.
     - openssl-devel
     - python-devel
+    - python36u
+    - python36u-pip
     - rsync
     # Needed for hg user to execute mozbuild-eval as root.
     - rsyslog
