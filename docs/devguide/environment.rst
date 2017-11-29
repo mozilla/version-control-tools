@@ -32,6 +32,7 @@ installed:
 
 * python-dev
 * npm
+* libcurl4-openssl-dev
 * libffi-dev
 * liblzma-dev
 * libsasl2-dev
@@ -45,8 +46,8 @@ extensions that are part of the virtualenv.
 You can install these dependencies by running::
 
    $ sudo apt-get install python-dev npm \
-     libffi-dev liblzma-dev libsasl2-dev \
-     libldap2-dev libssl-dev mercurial
+     libcurl4-openssl-dev libffi-dev liblzma-dev \
+     libsasl2-dev libldap2-dev libssl-dev mercurial
 
 You will also need to install Docker for a number of test and dev
 environments to work. See the
