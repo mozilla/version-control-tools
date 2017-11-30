@@ -146,6 +146,12 @@
            venv=/var/hg/venv_tools
            requirements=../roles/hg-web/files/requirements-tools.txt
 
+- name: create virtualenv for Python 3 tools
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
+           venv=/var/hg/venv_tools_py3
+           requirements=../roles/hg-web/files/requirements-tools-py3.txt
+
 - name: set up version-control-tools repo (server only)
   hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
       dest=/var/hg/version-control-tools

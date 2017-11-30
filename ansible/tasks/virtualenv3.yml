@@ -1,0 +1,10 @@
+- name: create Python 3 virtualenv in {{ venv }}
+  command: "{{ python }} -m venv {{ venv }} creates={{ venv }}"
+
+- name: copy requirements.txt for {{ venv }}
+  copy: src={{ requirements }}
+        dest={{ venv }}/requirements.txt
+        mode=0644
+
+- name: populate virtualenv {{ venv }}
+  command: "{{ venv }}/bin/pip install --require-hashes -r {{ venv }}/requirements.txt"
