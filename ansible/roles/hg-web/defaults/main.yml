@@ -17,3 +17,9 @@ mirror_private_key: "undefined"
 # Assume the chroot files aren't available unless told otherwise (since
 # it is uncommon to deploy them).
 chroot_mozbuild_exists: False
+
+# Bloxtool connection settings (so we can retrieve Mozilla office IPs).
+# Actual values will get pulled in from secrets.
+bloxtool_user: bloxtool_user
+bloxtool_password: bloxtool_password
+bloxtool_url: https://bloxtool

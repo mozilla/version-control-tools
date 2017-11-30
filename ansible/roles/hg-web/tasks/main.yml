@@ -220,6 +220,13 @@
         owner=root
         group=root
 
+- name: write bloxtool config file
+  template: src=bloxtool.ini.j2
+            dest=/etc/mercurial/bloxtool.ini
+            mode=0400
+            owner=hg
+            group=hg
+
 # Needed to sniff clients as coming from AWS.
 - name: install AWS IP ranges file
   copy: src=files/aws-ip-ranges.json

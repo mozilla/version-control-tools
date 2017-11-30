@@ -45,6 +45,11 @@
       run_once: true
 
 - hosts: hgweb-prod
+  pre_tasks:
+    - name: capture bloxtool config
+      slurp: src=/etc/mercurial/bloxtool.json
+      register: bloxtool_config
+
   roles:
     - { role: hg-web,
         # We have to use hostvars to reference variables on other hosts.
@@ -56,6 +61,9 @@
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
         chroot_mozbuild_exists: "{{ hostvars['localhost'].chroot_mozbuild.stat.exists }}",
+        bloxtool_user: "{{ (bloxtool_config.content | b64decode | from_json).user }}",
+        bloxtool_password: "{{ (bloxtool_config.content | b64decode | from_json).password }}",
+        bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}",
       }
 
 - hosts: hgssh-prod
