@@ -64,8 +64,7 @@ if __name__ == '__main__':
         # Write data to a temp file, atomically rewrite the the IP ranges file
         temp_file_path = IP_RANGES_FILE.with_suffix('.tmp')
         with temp_file_path.open(mode='w') as temp_file:
-            ip_ranges = (i['network'] for i in output_as_dict)
-            temp_file.writelines(ip_ranges)
+            temp_file.write('\n'.join(i['network'] for i in output_as_dict))
 
         temp_file_path.rename(IP_RANGES_FILE)
 
