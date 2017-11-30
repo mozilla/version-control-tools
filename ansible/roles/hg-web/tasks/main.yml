@@ -494,6 +494,26 @@
            state=started
   when: vct_dir.stat.exists == False
 
+
+- name: systemd service files for Mozilla IP scraper
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - mozilla-ip-scraper.service
+    - mozilla-ip-scraper.timer
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: Mozilla IP scraper service enabled (server only)
+  service: name=mozilla-ip-scraper.timer
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
+
 - name: copy vcsreplicator config
   template: src=vcsreplicator.ini.j2
             dest=/etc/mercurial/vcsreplicator.ini
