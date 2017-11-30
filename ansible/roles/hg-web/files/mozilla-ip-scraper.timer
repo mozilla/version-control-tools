@@ -4,7 +4,7 @@ After=network.target remote-fs.target nss-lookup.target
 
 [Timer]
 # Once a day, midday
-OnCalendar=*-*-* 18:00:00 UTC
+OnCalendar=*-*-* 18:00:00
 
 [Install]
 WantedBy=multi-user.target
