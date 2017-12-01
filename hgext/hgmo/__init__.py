@@ -787,7 +787,7 @@ def processbundlesmanifest(orig, repo, proto):
                 mozdata = fh.read().splitlines()
 
             for ipentry in mozdata:
-                network = ipaddress.IPv4Network(ipentry)
+                network = ipaddress.IPv4Network(ipentry.decode('ascii'))
 
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
