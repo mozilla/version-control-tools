@@ -714,14 +714,29 @@ def processbundlesmanifest(orig, repo, proto):
     # developer machines.
     import ipaddress
 
+    # Call original fxn wireproto.clonebundles
     manifest = orig(repo, proto)
 
     if not isinstance(proto, webproto):
         return manifest
 
+    # Get path for Mozilla, AWS network prefixes. Return if missing
+    mozpath = repo.ui.config('hgmo', 'mozippath')
     awspath = repo.ui.config('hgmo', 'awsippath')
-    if not awspath:
+    if not awspath and not mozpath:
         return manifest
+
+    else:
+        def stream_clone_cmp(a, b):
+            '''Comparison function to prioritize stream bundles'''
+            packed = 'BUNDLESPEC=none-packed1'
+
+            if packed in a and packed not in b:
+                return -1
+            if packed in b and packed not in a:
+                return 1
+
+            return 0
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
     # actual source IP, so prefer it.
@@ -729,56 +744,62 @@ def processbundlesmanifest(orig, repo, proto):
                                  proto.req.env.get('REMOTE_ADDR'))
     if not sourceip:
         return manifest
-
-    origlines = [l for l in manifest.splitlines()]
-    # ec2 region not listed in any manifest entries. This is weird but it means
-    # there is nothing for us to do.
-    if not any('ec2region=' in l for l in origlines):
-        return manifest
-
-    try:
-        # constructor insists on unicode instances.
+    else:
         sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
 
-        with open(awspath, 'rb') as fh:
-            awsdata = json.load(fh)
+    origlines = manifest.splitlines()
 
-        for ipentry in awsdata['prefixes']:
-            network = ipaddress.IPv4Network(ipentry['ip_prefix'])
+    # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
+    # we will check if the request came from AWS to server optimized bundles.
+    if awspath and any('ec2region=' in l for l in origlines):
+        try:
+            with open(awspath, 'rb') as fh:
+                awsdata = json.load(fh)
 
-            if sourceip not in network:
-                continue
+            for ipentry in awsdata['prefixes']:
+                network = ipaddress.IPv4Network(ipentry['ip_prefix'])
 
-            region = ipentry['region']
+                if sourceip not in network:
+                    continue
 
-            filtered = [l for l in origlines if 'ec2region=%s' % region in l]
-            # No manifest entries for this region. Ignore match and try others.
-            if not filtered:
-                continue
+                region = ipentry['region']
 
-            # We prioritize stream clone bundles to AWS clients because they are
-            # the fastest way to clone and we want our automation to be fast.
-            def mancmp(a, b):
-                packed = 'BUNDLESPEC=none-packed1'
+                filtered = [l for l in origlines if 'ec2region=%s' % region in l]
+                # No manifest entries for this region. Ignore match and try others.
+                if not filtered:
+                    continue
 
-                if packed in a and packed not in b:
-                    return -1
-                if packed in b and packed not in a:
-                    return 1
+                # We prioritize stream clone bundles to AWS clients because they are
+                # the fastest way to clone and we want our automation to be fast.
+                filtered = sorted(filtered, cmp=stream_clone_cmp)
 
-                return 0
+                # We got a match. Write out the filtered manifest (with a trailing newline).
+                filtered.append('')
+                return '\n'.join(filtered)
 
-            filtered = sorted(filtered, cmp=mancmp)
+        except Exception as e:
+            repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
 
-            # We got a match. Write out the filtered manifest (with a trailing newline).
-            filtered.append('')
-            return '\n'.join(filtered)
+    # Determine if source IP is in a Mozilla network, as we stream results to those addresses
+    if mozpath:
+        try:
+            with open(mozpath, 'rb') as fh:
+                mozdata = fh.read().splitlines()
 
-        return manifest
+            for ipentry in mozdata:
+                network = ipaddress.IPv4Network(ipentry)
 
-    except Exception as e:
-        repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
-        return manifest
+                # If the source IP is from a Mozilla network, prioritize stream bundles
+                if sourceip in network:
+                    origlines = sorted(origlines, cmp=stream_clone_cmp)
+                    origlines.append('')
+                    return '\n'.join(origlines)
+
+        except Exception as e:
+            repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
+            return manifest
+
+    return manifest
 
 
 def filelog(orig, web, req, tmpl):

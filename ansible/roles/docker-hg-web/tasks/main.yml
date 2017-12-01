@@ -16,6 +16,9 @@
     - entrypoint-solo
     - set-mirror-key.py
 
+- name: Install Mozilla IP Address Test Document
+  copy: src=moz-ip-ranges.txt dest=/var/hg/moz-ip-ranges.txt owner=root group=root mode=0644
+
 # We have an additional virtualenv in Docker to run moz.build info
 # directly from hgweb without the secure execution environment we
 # run in production. We do this because we can't execute the secure
