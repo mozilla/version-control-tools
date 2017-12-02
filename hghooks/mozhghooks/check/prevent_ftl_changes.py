@@ -62,7 +62,9 @@ class FTLCheck(PreTxnChangegroupCheck):
             return True
 
         if any(f.endswith('.ftl') for f in ctx.files()):
-            requal = parse_requal_reviewers(ctx.description())
+            requal = [
+                r.lower() for r in parse_requal_reviewers(ctx.description())
+            ]
             reviewers = [nick for (name, nick) in FTL_DRIVERS]
             if any(nick in reviewers for nick in requal):
                 return True

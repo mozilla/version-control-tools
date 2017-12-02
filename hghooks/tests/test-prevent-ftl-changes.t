@@ -56,3 +56,15 @@ Commit adding an FTL file with appropriate reviewer works
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+
+Commit adding an FTL file with appropriate reviewer works, case-independent
+
+  $ touch test3.ftl
+  $ hg -q commit -A -m 'add test3.ftl. r=Pike'
+  $ hg push
+  pushing to $TESTTMP/normal
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
