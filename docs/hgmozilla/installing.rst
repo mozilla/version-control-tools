@@ -23,7 +23,7 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
-**As of April 2017, the latest stable release is 4.1.**
+**As of December 2017, the latest stable release is 4.4.**
 
 .. danger::
 
