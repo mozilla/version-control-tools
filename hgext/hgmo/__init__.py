@@ -696,7 +696,7 @@ def pull(orig, repo, remote, *args, **kwargs):
             repo.vfs.unlink('clonebundles.manifest')
         return res
 
-    with repo.lock():
+    with repo.wlock():
         repo.ui.status(_('pulling clonebundles manifest\n'))
         manifest = remote._call('clonebundles')
         repo.vfs.write('clonebundles.manifest', manifest)
