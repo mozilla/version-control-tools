@@ -691,6 +691,9 @@ def pull(orig, repo, remote, *args, **kwargs):
         return res
 
     if not remote.capable('clonebundles'):
+        if repo.vfs.exists('clonebundles.manifest'):
+            repo.ui.status(_('deleting local clonebundles.manifest\n'))
+            repo.vfs.unlink('clonebundles.manifest')
         return res
 
     lock = repo.lock()

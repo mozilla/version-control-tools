@@ -112,19 +112,18 @@ enabling config option pulls the manifest
   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
 
 A missing manifest results in the local file being deleted
-TODO not implemented
 
   $ rm -f ../server/.hg/clonebundles.manifest
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
   pulling from http://localhost:$HGPORT/
   searching for changes
   no changes found
+  deleting local clonebundles.manifest
 
   $ ls .hg
   00changelog.i
   branch
   cache
-  clonebundles.manifest
   dirstate
   hgrc
   requires
