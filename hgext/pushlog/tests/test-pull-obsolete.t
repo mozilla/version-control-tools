@@ -51,6 +51,7 @@
   remote: added 1 changesets with 0 changes to 1 files
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets (?)
 
   $ hg --hidden log -G
   @  changeset:   3:a129f82339bb
@@ -223,6 +224,7 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
   added 4 pushes
+  obsoleted 1 changesets (?)
   (run 'hg update' to get a working copy)
 
 We'll apply the pushlog for the locally-known but now-hidden changeset

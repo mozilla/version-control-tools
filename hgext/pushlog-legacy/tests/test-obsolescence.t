@@ -64,6 +64,7 @@
   added 2 changesets with 0 changes to 2 files
   recorded push in pushlog
   2 new obsolescence markers
+  obsoleted 2 changesets (?)
 
 Hidden changesets exposed as list under obsoletechangesets in version 1
 
