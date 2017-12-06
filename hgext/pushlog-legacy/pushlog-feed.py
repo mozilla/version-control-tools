@@ -29,7 +29,7 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.1 4.2'
+testedwith = '4.1 4.2 4.3'
 minimumhgversion = '4.1'
 
 cal = pdt.Calendar()
@@ -522,8 +522,8 @@ def pushes_worker(query, repo, full):
 
             # Only expose obsolescence metadata if the repo has some.
             if haveobs:
-                precursors = obsolete.precursormarkers(ctx)
-                precursors = [hex(m.precnode()) for m in precursors]
+                precursors = repo.obsstore.precursors.get(ctx.node(), ())
+                precursors = [hex(m[0]) for m in precursors]
                 if precursors:
                     node['precursors'] = precursors
 
