@@ -94,7 +94,7 @@ if [ ! -d ${VENV}/node ]; then
 fi
 cd ${VENV}/node
 npm init -y >/dev/null
-npm install less uglifyjs
+npm install less@^2.7.0 uglify-js@^3.1.0
 cd ${VENV}
 for FN in lessc uglifyjs; do
     if [ ! -e bin/${FN} ]; then
