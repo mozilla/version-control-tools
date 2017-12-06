@@ -33,7 +33,7 @@ Obsolescence should not be enabled by installing the extension
   $ hg -q commit -A -m commit1
   $ hg rebase -s 1 -d 2
   rebasing 1:b560492eed23 "commit0"
-  saved backup bundle to $TESTTMP/repo0/.hg/strip-backup/b560492eed23-664682ca-backup.hg (glob)
+  saved backup bundle to $TESTTMP/repo0/.hg/strip-backup/b560492eed23-664682ca-*.hg (glob)
   $ hg debugobsolete
 
   $ hg log -G
