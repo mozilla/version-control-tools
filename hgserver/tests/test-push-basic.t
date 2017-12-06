@@ -151,7 +151,7 @@ Upgrade notice is advertised to clients not running bundle2
   remote: https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/installing.html
   remote: ****************************************************************************************
   remote: 
-  remote: recorded changegroup in replication log in 0.021s
+  remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
 Cleanup
 
