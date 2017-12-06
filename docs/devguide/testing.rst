@@ -69,7 +69,7 @@ Run a test in debug mode (see progress, interact with a debugger)::
 
 Run tests against all supported Mercurial versions::
 
-  $ ./run-tests --all-versions
+  $ ./run-tests --all-hg-versions
 
 Run tests with a specific Mercurial installation::
 

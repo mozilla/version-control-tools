@@ -58,8 +58,8 @@ if __name__ == '__main__':
     parser.add_argument('--with-hg')
     parser.add_argument('-C', '--cover', action='store_true')
     parser.add_argument('-j', '--jobs', type=int)
-    parser.add_argument('--all-versions', action='store_true',
-        help='Test against all marked compatible versions')
+    parser.add_argument('--all-hg-versions', action='store_true',
+        help='Test against all marked compatible Mercurial versions')
     parser.add_argument('--no-hg-tip', action='store_true',
         help='Do not run tests against the @ bookmark of hg')
     parser.add_argument('--no-unit', action='store_true',
@@ -79,13 +79,13 @@ if __name__ == '__main__':
 
     # This is somewhat arbitrary. It makes version management logic a bit
     # more complicated and isn't worth supporting.
-    if options.all_versions and options.with_hg:
-        print('abort: --all-versions and --with-hg are mutually exclusive')
+    if options.all_hg_versions and options.with_hg:
+        print('abort: --all-hg-versions and --with-hg are mutually exclusive')
         sys.exit(1)
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     filter_args = {
-        '--all-versions',
+        '--all-hg-versions',
         '--no-hg-tip',
         '--use-last-images',
         '--headless',
@@ -218,10 +218,10 @@ if __name__ == '__main__':
 
     res = 0
 
-    # Don't run with main Mercurial if --all-versions is used because
-    # --all-versions should run the same version that is installed in the
+    # Don't run with main Mercurial if --all-hg-versions is used because
+    # --all-hg-versions should run the same version that is installed in the
     # virtualenv.
-    if run_hg_tests and not options.all_versions:
+    if run_hg_tests and not options.all_hg_versions:
         # The Mercurial test harness has been observed to not remove the .err
         # files after execution. This is probably a result of us using
         # separate directories. Manually remove .err files.
@@ -253,7 +253,7 @@ if __name__ == '__main__':
 
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
-    if options.all_versions:
+    if options.all_hg_versions:
         # No need to grab code coverage for legacy versions - it just slows
         # us down.
         # Assertion: we have no tests that only work on legacy Mercurial
