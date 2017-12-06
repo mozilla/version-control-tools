@@ -86,20 +86,23 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     IPC_peers = [
         'billm',             # Bill McCloskey
         'dvander',           # David Anderson
-        'bsmedberg',         # Benjamin Smedberg
-        'bent',              # Ben Turner
         'jld',               # Jed Davis
         'kanru',             # Kan-Ru Chen
+        'bkelly',            # Ben Kelly
+        'froydnj',           # Nathan Froyd
+        'mccr8',             # Andrew McCreight
     ]
     IPC_authors = [
         'billm@mozilla.com',       # Bill McCloskey,
         'danderson@mozilla.com',   # David Anderson
         'dvander@alliedmods.net',  # David Anderson
-        'benjamin@smedbergs.us',   # Benjamin Smedberg
-        'bent.mozilla@gmail.com',  # Ben Turner
         'jld@mozilla.com',         # Jed Davis
         'kchen@mozilla.com',       # Kan-Ru Chen
         'kanru@kanru.info',        # Kan-Ru Chen
+        'bkelly@mozilla.com',      # Ben Kelly
+        'ben@wanderview.com',      # Ben Kelly
+        'nfroyd@mozilla.com',      # Nathan Froyd
+        'continuation@gmail.com',  # Andrew McCreight
     ]
 
     error = ""
