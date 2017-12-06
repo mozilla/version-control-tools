@@ -118,7 +118,7 @@ import mozautomation.commitparser as commitparser
 
 
 minimumhgversion = '4.1'
-testedwith = '4.1 4.2'
+testedwith = '4.1 4.2 4.3'
 
 cmdtable = {}
 

@@ -57,6 +57,7 @@ Create some obsolete changesets
   remote: added 2 changesets with 0 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   remote: 2 new obsolescence markers
+  remote: obsoleted 2 changesets (?)
 
   $ cd ../server
 
