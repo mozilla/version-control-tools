@@ -2,6 +2,12 @@
 
 # yum will incur network traffic when URLs are specified. Download the
 # package locally first so we can run offline after initial bootstrap.
+#
+# Mercurial 4.3 dropped support for Python 2.6, which CentOS 6 uses.
+# Mercurial can build a self-contained RPM (containing Python 2.7) for CentOS 6.
+# We don't really use CentOS 6 any more (the only thing in this Ansible install
+# still using it is MozReview, which is going away), so we keep CentOS 6 on
+# the last Python 2.6-supported Mercurial.
 - name: download Mercurial package (CentOS 6)
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS6/mercurial-4.2.3-1.x86_64.rpm
            dest=/var/tmp/mercurial-4.2.3-1.x86_64.rpm
@@ -9,9 +15,9 @@
   when: ansible_distribution_major_version == '6'
 
 - name: download Mercurial package (CentOS 7)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.2.3-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.2.3-1.x86_64.rpm
-           sha256sum=8c713baf1a62d2e10030558d36cd8480190d548b14c37230baea626433df6417
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.3.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.3.3-1.x86_64.rpm
+           sha256sum=4f8a56e0759bf6e07a1c1d9c72cb07f4f1469b43152ce7f801c85ace8c0d262a
   when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
@@ -20,3 +26,8 @@
 # The yum module is slow. Run commands manually.
 - name: installed Mercurial
   command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.2.3-1.x86_64.rpm
+  when: ansible_distribution_major_version == '6'
+
+- name: installed Mercurial
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.3.3-1.x86_64.rpm
+  when: ansible_distribution_major_version == '7'
