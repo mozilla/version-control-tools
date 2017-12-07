@@ -9,10 +9,31 @@ import pwd
 from mercurial import (
     error,
     obsolete,
+    registrar,
+    util,
 )
 
-testedwith = '4.1 4.2 4.3'
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
+
+testedwith = '4.1 4.2 4.3 4.4'
 minimumhgversion = '4.1'
+
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
+# config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitems'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('obshacks', 'obsolescenceexchangeusers',
+               default=configitems.dynamicdefault)
+    configitem('obshacks', 'userfromenv',
+               default=configitems.dynamicdefault)
 
 
 def enableevolutionexchange(repo):
@@ -30,7 +51,7 @@ def enableevolutionexchange(repo):
         return
 
     # Enable exchange if the current user is in the allow list.
-    exchangeusers = ui.configlist('obshacks', 'obsolescenceexchangeusers')
+    exchangeusers = ui.configlist('obshacks', 'obsolescenceexchangeusers', [])
     if not exchangeusers:
         return
 

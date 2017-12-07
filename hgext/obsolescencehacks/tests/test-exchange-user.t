@@ -65,7 +65,7 @@ Enabling obsolescence won't enable marker exchange since the user doesn't match
   rebasing 2:f63449cbe54b "commit0" (tip)
 
   $ hg debugobsolete
-  f63449cbe54b827336a7f1ffc693d3bae1ade0a7 e5c676115f5fcffb7934901030505da37e515075 0 (*) {'user': 'test'} (glob)
+  f63449cbe54b827336a7f1ffc693d3bae1ade0a7 e5c676115f5fcffb7934901030505da37e515075 0 (*) {*'user': 'test'} (glob)
 
   $ hg log -G
   o  changeset:   3:e5c676115f5f
@@ -109,4 +109,4 @@ Setting the USER to one in the list will enable marker exchange
   [1]
 
   $ hg -R ../repo1 debugobsolete
-  f63449cbe54b827336a7f1ffc693d3bae1ade0a7 e5c676115f5fcffb7934901030505da37e515075 0 (*) {'user': 'test'} (glob)
+  f63449cbe54b827336a7f1ffc693d3bae1ade0a7 e5c676115f5fcffb7934901030505da37e515075 0 (*) {*'user': 'test'} (glob)
