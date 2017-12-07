@@ -30,6 +30,12 @@ from mercurial.hgweb import (
     webutil,
 )
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
@@ -39,12 +45,29 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
+# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
 # cmdutil.command.
 if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
+# config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('pushlog', 'autolanduser',
+               default=configitems.dynamicdefault)
+    configitem('pushlog', 'remoteuserprefix',
+               default=None)
+    configitem('pushlog', 'timeoutro',
+               default=configitems.dynamicdefault)
+    configitem('pushlog', 'timeoutrw',
+               default=configitems.dynamicdefault)
+    configitem('pushlog', 'userprefix',
+               default=None)
 
 
 revsetpredicate = registrar.revsetpredicate()
