@@ -74,6 +74,7 @@ Unless --hidden is used
   changeset:   4:3208166ea109
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
+  obsolete:    rewritten using rebase as 6:22296b97e5de (?)
   summary:     file1 2
   
 
@@ -81,11 +82,13 @@ Unless --hidden is used
   changeset:   3:11743f808184
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
+  obsolete:    rewritten using rebase as 5:4449a0888729 (?)
   summary:     file1 1
   
   changeset:   4:3208166ea109
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
+  obsolete:    rewritten using rebase as 6:22296b97e5de (?)
   summary:     file1 2
   
 
