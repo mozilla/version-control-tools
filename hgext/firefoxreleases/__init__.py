@@ -10,12 +10,20 @@ from mercurial.i18n import _
 from mercurial import (
     error,
     extensions,
+    registrar,
     revset,
+    util,
 )
 from mercurial.hgweb import (
     webcommands,
     webutil,
 )
+
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -27,8 +35,16 @@ from mozhg.util import (
 )
 
 minimumhgversion = '4.1'
-testedwith = '4.1 4.2 4.3'
+testedwith = '4.1 4.2 4.3 4.4'
 
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem  = registrar.configitem(configtable)
+
+    configitem('mozilla', 'enablefirefoxreleases',
+               default=configitems.dynamicdefault)
+    configitem('mozilla', 'firefoxreleasesdb',
+               default=configitems.dynamicdefault)
 
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
