@@ -61,13 +61,18 @@ annotate |
 </table>
 </div>
 
-<div class="page_path description">
-{desc|strip|escape|websub|addbreaks|nonempty}
-</div>
+<div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
 <div class="page_body">
 <table>
+<tbody class="sourcelines"
+       data-logurl="{url|urlescape}log/{symrev}/{file|urlescape}"
+       data-selectabletag="TR"
+       data-ishead="{ishead}">
 {annotate%annotateline}
+</tbody>
 </table>
 </div>
+
+<script type="text/javascript" src="{staticurl|urlescape}followlines.js"></script>
 
 {footer}
