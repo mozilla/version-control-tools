@@ -31,6 +31,7 @@ Introducing changesets via pulling does not run the pushlog hook
   added 1 changesets with 1 changes to 1 files
   calling hook pretxnchangegroup.pushlog: hgext_pushlog.pretxnchangegrouphook
   (not updating pushlog since changesets come from pull)
+  new changesets 96ee1d7354c4 (?)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog client2

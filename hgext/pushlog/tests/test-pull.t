@@ -69,6 +69,7 @@ Pulling from a remote that has pushlog will fetch pushlog data
   adding file changes
   added 3 changesets with 3 changes to 1 files
   added 2 pushes
+  new changesets d0fddd3a3fb5:77a9042f9faf (?)
   (run 'hg update' to get a working copy)
   $ dumppushlog client
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)
@@ -113,6 +114,7 @@ Incremental pushlog fetch works over SSH
   adding file changes
   added 1 changesets with 1 changes to 1 files
   added 1 pushes
+  new changesets f77647c7d4e3 (?)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog clone-ssh
@@ -144,6 +146,7 @@ Pulling an old changeset only pulls relevant changesets
   added 1 changesets with 1 changes to 1 files
   received pushlog entry for unknown changeset 2e70e96c7d550e541406a47d87df354309fe9a72; ignoring
   added 1 pushes
+  new changesets 1a68e4eb4da6 (?)
   (run 'hg update' to get a working copy)
 
   $ hg --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
@@ -154,6 +157,7 @@ Pulling an old changeset only pulls relevant changesets
   adding file changes
   added 1 changesets with 1 changes to 1 files
   added 1 pushes
+  new changesets 2e70e96c7d55 (?)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog clone-ssh

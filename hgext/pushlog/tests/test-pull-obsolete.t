@@ -65,6 +65,7 @@
   | |  parent:      0:96ee1d7354c4
   | |  user:        test
   | |  date:        Thu Jan 01 00:00:00 1970 +0000
+  | |  obsolete:    rewritten using rebase as 3:a129f82339bb (?)
   | |  summary:     file1
   | |
   o |  changeset:   1:ae13d9da6966
@@ -102,6 +103,7 @@ Cloning normally will receive obsolete data
   adding file changes
   added 3 changesets with 3 changes to 3 files
   1 new obsolescence markers
+  new changesets 96ee1d7354c4:a129f82339bb (?)
 
 Default behavior of pushlog is to stop applying incoming push data when it sees
 an unknown changeset. Since hidden changesets aren't transferred normally,
@@ -131,7 +133,7 @@ An uncompressed clone transfers obsolete changesets and markers
   1 new obsolescence markers
 
   $ hg -R clone-obsolete2 debugobsolete
-  80c2c663cb8364f6898662a8379cb25df3ebe719 a129f82339bb933c4d72353c44bb29eb685f3d1e 0 (* +0000) {'user': 'test'} (glob)
+  80c2c663cb8364f6898662a8379cb25df3ebe719 a129f82339bb933c4d72353c44bb29eb685f3d1e 0 (* +0000) {*'user': 'test'} (glob)
 
 There is a bug in Mercurial where the phase isn't preserved as part of stream clone.
 This means that the pushlog will see everything because all changesets are public.
@@ -195,6 +197,7 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
   1 new obsolescence markers
   received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
+  new changesets 96ee1d7354c4:a129f82339bb (?)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog pull-empty
@@ -225,6 +228,7 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   1 new obsolescence markers
   added 4 pushes
   obsoleted 1 changesets (?)
+  new changesets a129f82339bb (?)
   (run 'hg update' to get a working copy)
 
 We'll apply the pushlog for the locally-known but now-hidden changeset

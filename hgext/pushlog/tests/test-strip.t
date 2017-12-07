@@ -51,6 +51,7 @@ Stripping changesets should result in pushlog getting stripped
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: d0fddd3a3fb51076c33010ecf66692621f989a2c (glob)
   * --config 'extensions.mq=' strip -r 1 --no-backup exited 0 after * (glob)
+  * log exited 0 after * seconds (glob) (?)
 #else
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: d0fddd3a3fb51076c33010ecf66692621f989a2c (glob)
@@ -123,9 +124,11 @@ Note the missing push ID 2!
 
 #if hg42
   $ cat .hg/blackbox.log
+  * log -T '{rev} {node} {desc}\n' exited 0 after * seconds (glob) (?)
   * deleted 1 changesets from pushlog: 919c29ac42c0b25851d19be2d9d3883c45ba2ce4 (glob)
   * reordered 2 changesets in pushlog (glob)
   * --config 'extensions.mq=' strip -r 2 --no-backup exited 0 after * (glob)
+  * log -T '{rev} {node} {desc}\n' exited 0 after * seconds (glob) (?)
 #else
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: 919c29ac42c0b25851d19be2d9d3883c45ba2ce4 (glob)
