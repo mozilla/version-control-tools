@@ -349,7 +349,7 @@ class PatchTransplant(Transplant):
                 aws_access_key_id=bucket_config['aws_access_key_id'],
                 aws_secret_access_key=bucket_config['aws_secret_access_key'])
 
-            buf = io.BytesIO
+            buf = io.BytesIO()
             s3.download_fileobj(bucket, key, buf)
             return buf
         except ClientError as e:
