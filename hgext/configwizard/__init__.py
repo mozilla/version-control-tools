@@ -369,7 +369,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkcolor(ui, cw, hgversion)
 
     if 'pager' in runsteps:
-        _checkpager(ui, cw)
+        _checkpager(ui, cw, hgversion)
 
     if 'curses' in runsteps:
         _checkcurses(ui, cw)
@@ -589,56 +589,82 @@ def _checkcolor(ui, cw, hg_version):
                                'Enable color output to your terminal')
 
 
-def _checkpager(ui, cw):
-    haveext = ui.hasconfig('extensions', 'pager')
-    attends = set([
-        'help',
-        'incoming',
-        'outgoing',
-        'status',
-    ])
-
-    haveattends = all(ui.hasconfig('pager', 'attend-%s' % a) for a in attends)
-    haveconfig = ui.hasconfig('pager', 'pager')
-
-    if haveext and haveattends and haveconfig:
-        return
-
-    answer = uipromptchoice(ui, PAGER_INFO, default=0) + 1
-    if answer == 3:
-        return
-
-    cw.c.setdefault('extensions', {})
-    cw.c['extensions']['pager'] = ''
-
-    if answer == 2:
-        return
-
-    cw.c.setdefault('pager', {})
-
-    # Set the pager invocation to a more reasonable default than Mercurial's.
-    # Don't overwrite user-specified value.
+def _checkpager(ui, cw, hg_version):
+    # Mercurial 4.2 has pager built-in and enabled by default. Furthermore,
+    # the ``pager.attend-*`` config options are no longer needed on 4.2+ because
+    # paging is enabled on a per-command basis.
     #
-    # -F quit if one screen
-    # -R raw control chars
-    # -S chop long lines instead of wrap
-    # -Q quiet (no terminal bell)
-    # -X no termcap init/deinit (won't clear screen afterwards)
-    if not haveconfig:
-        # Pager on Windows doesn't like passing environment variables as
-        # part of the arguments. So pass explicit arguments there.
-        # TODO justify merits of using ``LESS`` at all. Does it provide
-        # any advantages?
-        if sys.platform.startswith(('win32', 'msys')):
-            value = 'less -FRSXQ'
-        else:
-            value = 'LESS=FRSXQ less'
+    # Presence of the legacy extension or config values triggers old behaviors.
+    # So, when running on 4.2+ we delete old configs.
+    #
+    # The only config options that users may set in 4.2+ are ``pager.pager`` and
+    # ``pager.ignore``. We don't remove these.
+    pager_builtin = hg_version >= (4, 2, 0)
 
-        cw.c['pager']['pager'] = value
+    if pager_builtin:
+        ext = cw.c.get('extensions', {})
+        if 'pager' in ext:
+            ui.write('Removing extensions.pager because pager is built-in in '
+                     'Mercurial 4.2+\n')
+            del ext['pager']
 
-    for a in sorted(attends):
-        if not ui.hasconfig('pager', 'attend-%s' % a):
-            cw.c['pager']['attend-%s' % a] = 'true'
+        for k in list(cw.c.get('pager', {})):
+            if not k.startswith('attend'):
+                continue
+
+            ui.write('Removing pager.%s because it is no longer necessary in '
+                     'Mercurial 4.2+\n' % k)
+            del cw.c['pager'][k]
+    else:
+        haveext = ui.hasconfig('extensions', 'pager')
+        attends = set([
+            'help',
+            'incoming',
+            'outgoing',
+            'status',
+        ])
+
+        haveattends = all(ui.hasconfig('pager', 'attend-%s' % a) for a in attends)
+        haveconfig = ui.hasconfig('pager', 'pager')
+
+        if haveext and haveattends and haveconfig:
+            return
+
+        answer = uipromptchoice(ui, PAGER_INFO, default=0) + 1
+        if answer == 3:
+            return
+
+        cw.c.setdefault('extensions', {})
+        cw.c['extensions']['pager'] = ''
+
+        if answer == 2:
+            return
+
+        cw.c.setdefault('pager', {})
+
+        # Set the pager invocation to a more reasonable default than Mercurial's.
+        # Don't overwrite user-specified value.
+        #
+        # -F quit if one screen
+        # -R raw control chars
+        # -S chop long lines instead of wrap
+        # -Q quiet (no terminal bell)
+        # -X no termcap init/deinit (won't clear screen afterwards)
+        if not haveconfig:
+            # Pager on Windows doesn't like passing environment variables as
+            # part of the arguments. So pass explicit arguments there.
+            # TODO justify merits of using ``LESS`` at all. Does it provide
+            # any advantages?
+            if sys.platform.startswith(('win32', 'msys')):
+                value = 'less -FRSXQ'
+            else:
+                value = 'LESS=FRSXQ less'
+
+            cw.c['pager']['pager'] = value
+
+        for a in sorted(attends):
+            if not ui.hasconfig('pager', 'attend-%s' % a):
+                cw.c['pager']['attend-%s' % a] = 'true'
 
 
 def _checkcurses(ui, cw):
@@ -770,8 +796,10 @@ def _checkwip(ui, cw):
         cw.c['experimental'] = {}
     cw.c['experimental']['graphshorten'] = 'true'
 
-    # Ensure pager is configured for wip alias if pager is configured.
-    if ui.hasconfig('extensions', 'pager') or 'pager' in cw.c.get('extensions', {}):
+    # wip is paged automatically if pager is built-in... unless the pager
+    # extension is enabled. So we set ``pager.attend-wip`` iff the pager
+    # extension is present.
+    if 'pager' in cw.c.get('extensions', {}):
         cw.c.setdefault('pager', {})
         cw.c['pager']['attend-wip'] = 'true'
 
