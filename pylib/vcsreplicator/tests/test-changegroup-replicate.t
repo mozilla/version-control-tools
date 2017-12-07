@@ -101,6 +101,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
@@ -196,6 +197,7 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
@@ -211,6 +213,7 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 3 changesets with 3 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets e325efa1b1fb:4f52aeca631d (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central
@@ -316,6 +319,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
@@ -331,6 +335,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 3 changesets with 3 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets e325efa1b1fb:4f52aeca631d (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 3 changesets into /repo/hg/mozilla/mozilla-central
@@ -346,6 +351,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 4 changesets with 4 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > new changesets 5d9ed3f8efff:4b11352745a6 (?)
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 4 changesets into /repo/hg/mozilla/mozilla-central
