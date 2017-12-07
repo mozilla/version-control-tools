@@ -19,6 +19,7 @@ Blow out content of .hg directory to simulate a rolled back repo or something
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -48,6 +49,7 @@ Test a variation where the local repo still exists
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

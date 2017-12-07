@@ -76,6 +76,7 @@ directory update.
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets a7c4155bc8eb (?)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to a7c4155bc8eb86ecec78c91f744f597e7c9a3ff3
 
@@ -102,6 +103,7 @@ to be acquired.
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -137,6 +139,7 @@ Simulate a held lock on the store for a pull plus working directory update.
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 2 files
+  new changesets 65cd4e3b46a3:fca136d824da (?)
   searching for changes
   no changes found
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -158,6 +161,7 @@ Simulate a held lock on the store without a working directory
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 2 files
+  new changesets 65cd4e3b46a3:fca136d824da (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

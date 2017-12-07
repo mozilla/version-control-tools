@@ -41,6 +41,7 @@ Specifying branch argument will checkout branch
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
   (pulling to obtain default)

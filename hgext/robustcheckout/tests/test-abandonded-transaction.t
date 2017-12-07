@@ -9,6 +9,7 @@
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -39,6 +40,7 @@ Pulling when there is an abandoned transaction should automatically recover
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
+  new changesets aada1b3e573f (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
 
@@ -64,5 +66,6 @@ Now simulate an abandoned transaction on an initial checkout
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
+  new changesets aada1b3e573f (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44

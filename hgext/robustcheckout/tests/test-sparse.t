@@ -28,7 +28,7 @@ Add some files to server repo to test sparseness
 #if no-hg43
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --sparseprofile foo
-  abort: sparse profile support only available for Mercurial 4.3 (using *) (glob)
+  abort: sparse profile support only available for Mercurial versions greater than 4.3 (using *) (glob)
   [255]
 
 #endif

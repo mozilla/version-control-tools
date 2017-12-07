@@ -9,6 +9,7 @@
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -31,6 +32,7 @@ Attempting to pull/checkout an unrelated repo will blow away the destination
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
