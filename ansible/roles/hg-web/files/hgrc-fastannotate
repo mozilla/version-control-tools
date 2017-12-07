@@ -10,4 +10,4 @@ linkrevcache = /var/hg/hg-experimental/hgext3rd/linkrevcache.py
 mainbranch = default
 
 # Enable integration with hgweb.
-hgweb = true
+modes = hgweb

@@ -174,7 +174,7 @@
 - name: set up hg-experimental repo, with 3rd party extensions
   hg: repo=https://bitbucket.org/facebook/hg-experimental
       dest=/var/hg/hg-experimental
-      revision=8af0e065c0099abfd17321c41351b2aacad7668d
+      revision=96a2689c228369c52904dc46aa124787090195d7
       force=yes
       purge=yes
       executable=/var/hg/venv_hgweb/bin/hg
@@ -183,7 +183,7 @@
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/hg-experimental purge --all
 
 - name: build C extensions from hg-experimental repo
-  command: /var/hg/venv_tools/bin/python setup.py build_ext -i chdir=/var/hg/hg-experimental
+  command: /var/hg/venv_tools/bin/python setup.py build_py -c -d . build_clib build_ext -i chdir=/var/hg/hg-experimental
 
 - name: install linelog C extension into hgweb virtualenv
   command: cp -a /var/hg/hg-experimental/linelog.so /var/hg/venv_hgweb/lib/python2.7/site-packages/linelog.so
