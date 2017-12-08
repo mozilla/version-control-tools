@@ -150,8 +150,9 @@ differs from that used to generate the hash.'''
             '-fix')),
             ['ehsan'])
 
-
     def test_requal_reviewers(self):
+        # empty
+        self.assertEqual(list(parse_requal_reviewers('')), [])
 
         # first with r? reviewer request syntax
         self.assertEqual(list(parse_requal_reviewers('Bug 1 - some stuff; r?romulus')), [])
@@ -212,6 +213,8 @@ differs from that used to generate the hash.'''
             ['bsmedberg'])
 
     def test_rquestion_reviewers(self):
+        # empty
+        self.assertEqual(list(parse_rquestion_reviewers('')), [])
 
         # first with r? reviewer request syntax
         self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - some stuff; r?romulus')), ['romulus'])
@@ -265,6 +268,9 @@ differs from that used to generate the hash.'''
             [])
 
     def test_replace_reviewers(self):
+        # empty
+        self.assertEqual(replace_reviewers('', ['remus']), 'r=remus')
+
         # first with r? reviewer request syntax
         self.assertEqual(replace_reviewers('Bug 1 - some stuff; r?romulus', ['remus']), 'Bug 1 - some stuff; r=remus')
         self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, r?remus', ['remus']), 'Bug 1 - More stuff; r=remus')

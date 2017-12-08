@@ -125,6 +125,9 @@ def filter_reviewers(s):
 
 
 def parse_reviewers(commit_description, flag_re=None):
+    if commit_description == '':
+        return
+
     commit_summary = commit_description.splitlines().pop(0)
     for match in re.finditer(REVIEWERS_RE, commit_summary):
         if not match.group(3):
@@ -154,6 +157,9 @@ def replace_reviewers(commit_description, reviewers):
         reviewers_str = ''
     else:
         reviewers_str = 'r=' + ','.join(reviewers)
+
+    if commit_description == '':
+        return reviewers_str
 
     commit_description = commit_description.splitlines()
     commit_summary = commit_description.pop(0)
