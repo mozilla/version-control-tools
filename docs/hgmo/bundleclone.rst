@@ -168,6 +168,13 @@ than gzip bundles).
    in your region is cheaper than paying the cross-region transfer costs
    (intra-region transfer is free).
 
+Manifest Advertisements to Mozilla Offices
+------------------------------------------
+
+If the client request appears to originate from a Mozilla office network,
+we make the assumption that the network speed and bandwidth are sufficient
+to always prefer the high-speed streamed clone bundles. 
+
 Which Repositories Have Bundles Available
 =========================================
 
