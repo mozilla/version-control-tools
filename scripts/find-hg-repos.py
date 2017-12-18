@@ -6,6 +6,7 @@
 """Find Mercurial repositories under a specified path."""
 
 import argparse
+import errno
 import grp
 import os
 import sys
@@ -23,6 +24,10 @@ def find_hg_repos(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--group', help='Group owner to search for')
+    parser.add_argument('--requirement',
+                        help='Repository requirement to search for')
+    parser.add_argument('--no-requirement',
+                        help='Missing repository requirement to search for')
     parser.add_argument('paths', nargs='+')
 
     args = parser.parse_args()
@@ -40,6 +45,22 @@ if __name__ == '__main__':
         if gid is not None:
             st = os.stat(path)
             if st.st_gid != gid:
+                return False
+
+        if args.requirement or args.no_requirement:
+            try:
+                with open(os.path.join(path, '.hg', 'requires'), 'rb') as fh:
+                    requirements = set(fh.read().split())
+            except IOError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+
+                requirements = set()
+
+            if args.requirement and args.requirement not in requirements:
+                return False
+
+            if args.no_requirement and args.no_requirement in requirements:
                 return False
 
         return True
