@@ -28,6 +28,9 @@ if __name__ == '__main__':
                         help='Repository requirement to search for')
     parser.add_argument('--no-requirement',
                         help='Missing repository requirement to search for')
+    parser.add_argument('--upgrade-backup', action='store_true',
+                        help='Find repositories that have a backup repo from '
+                             'an upgrade')
     parser.add_argument('paths', nargs='+')
 
     args = parser.parse_args()
@@ -61,6 +64,11 @@ if __name__ == '__main__':
                 return False
 
             if args.no_requirement and args.no_requirement in requirements:
+                return False
+
+        if args.upgrade_backup:
+            entries = os.listdir(os.path.join(path, '.hg'))
+            if not any(e.startswith('upgradebackup.') for e in entries):
                 return False
 
         return True
