@@ -36,11 +36,17 @@ if __name__ == '__main__':
             print('group %s is not known' % args.group)
             sys.exit(1)
 
+    def fltr(path):
+        if gid is not None:
+            st = os.stat(path)
+            if st.st_gid != gid:
+                return False
+
+        return True
+
     for d in args.paths:
         for path in find_hg_repos(d):
-            if gid is not None:
-                st = os.stat(path)
-                if st.st_gid != gid:
-                    continue
+            if not fltr(path):
+                continue
 
             print(path[len(d):])
