@@ -53,6 +53,7 @@ HOSTS = (
     # cheaper.
     ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
     ('s3-us-west-1.amazonaws.com', 'moz-hg-bundles-us-west-1', 'us-west-1'),
+    ('s3-us-east-2.amazonaws.com', 'moz-hg-bundles-us-east-2', 'us-east-2'),
     ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
     ('s3-eu-central-1.amazonaws.com', 'moz-hg-bundles-eu-central-1', 'eu-central-1'),
 )
@@ -174,6 +175,7 @@ def bundle_paths(root, repo, tag, typ):
     remote_path = '%s/%s' % (repo, basename)
 
     return final_path, remote_path
+
 
 def generate_bundle(repo, temp_path, final_path, extra_args):
     """Generate a single bundle from arguments.
