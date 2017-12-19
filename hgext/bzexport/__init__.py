@@ -1068,8 +1068,8 @@ def bzexport(ui, repo, *args, **opts):
         # Failing that try looking in the commit description for a bug number,
         # since orig_desc could have come from the command line instead.
         if not desc_bug_number:
-            commit_firstline = description_from_patch.split('\n', 1)[0]
-            desc_bug_number, __ = extract_bug_num_and_desc(commit_firstline)
+            firstline = description_from_patch.split('\n', 1)[0]
+            desc_bug_number, __ = extract_bug_num_and_desc(firstline)
 
         if desc_bug_number:
             if bug and bug != desc_bug_number:
@@ -1083,6 +1083,12 @@ def bzexport(ui, repo, *args, **opts):
         # if the original was something like "bug NNN - "
         if desc[0] in ['-', ':', '.']:
             desc = desc[1:].lstrip()
+
+        # ...except use the original description if we are creating a new bug,
+        # in case the user wishes to proceed after being warned that a bug
+        # number was already detected.
+        if opts['new']:
+            desc = firstline
 
         # Next strip off review and approval annotations, grabbing the
         # reviewers from the patch comments only if -r auto was given
@@ -1189,7 +1195,9 @@ def bzexport(ui, repo, *args, **opts):
 
     if opts["new"]:
         if bug is not None:
-            raise util.Abort("Bug %s given but creation of new bug requested!" % bug)
+            ui.write("Bug %s given but creation of new bug requested.\n" % bug)
+            if ui.prompt("Continue and create a new bug anyway? (y/n)") != "y":
+                raise util.Abort("User aborted")
 
         if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") %
                                              (values['PRODUCT'], values['COMPONENT'])) != 'y':
