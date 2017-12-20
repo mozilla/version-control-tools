@@ -1,6 +1,6 @@
 {
-  "syncToken": "1512067332",
-  "createDate": "2017-11-30-18-42-12",
+  "syncToken": "1513723334",
+  "createDate": "2017-12-19-22-42-14",
   "prefixes": [
     {
       "ip_prefix": "13.32.0.0/15",
@@ -1538,6 +1538,21 @@
       "service": "AMAZON"
     },
     {
+      "ip_prefix": "52.144.192.0/26",
+      "region": "us-east-1",
+      "service": "AMAZON"
+    },
+    {
+      "ip_prefix": "52.144.192.64/26",
+      "region": "us-east-1",
+      "service": "AMAZON"
+    },
+    {
+      "ip_prefix": "52.144.192.128/26",
+      "region": "us-east-1",
+      "service": "AMAZON"
+    },
+    {
       "ip_prefix": "52.192.0.0/15",
       "region": "ap-northeast-1",
       "service": "AMAZON"
@@ -1644,6 +1659,11 @@
     },
     {
       "ip_prefix": "52.219.80.0/20",
+      "region": "us-east-2",
+      "service": "AMAZON"
+    },
+    {
+      "ip_prefix": "52.219.96.0/20",
       "region": "us-east-2",
       "service": "AMAZON"
     },
@@ -3129,6 +3149,11 @@
     },
     {
       "ip_prefix": "52.219.80.0/20",
+      "region": "us-east-2",
+      "service": "S3"
+    },
+    {
+      "ip_prefix": "52.219.96.0/20",
       "region": "us-east-2",
       "service": "S3"
     },
@@ -4775,6 +4800,11 @@
     {
       "ip_prefix": "13.112.191.184/29",
       "region": "ap-northeast-1",
+      "service": "CODEBUILD"
+    },
+    {
+      "ip_prefix": "13.124.145.16/29",
+      "region": "ap-northeast-2",
       "service": "CODEBUILD"
     },
     {
