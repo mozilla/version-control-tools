@@ -6,14 +6,14 @@ amqp==1.4.9 \
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
 
-botocore==1.4.78 \
-    --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7
+botocore==1.8.17 \
+    --hash=sha256:fb68fc9f90c28ea8a3e855e154989b15ac810b1a261c6f0b893a064a9d6a81f2
 
-boto3==1.4.1 \
-    --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
+boto3==1.5.3 \
+    --hash=sha256:5f0e6f5c4e70bd226946073caef9b7e6fb715ed9af6887a77f3de3d8530514d7
 
-boto==2.38.0 \
-    --hash=sha256:758498c77f16e26b8b61af26f8d0dbb119b713f2d8d166681ec892311f3520c4
+boto==2.48.0 \
+    --hash=sha256:13be844158d1bd80a94c972c806ec8381b9ea72035aa06123c5db6bc6a6f3ead
 
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
@@ -39,8 +39,8 @@ python-dateutil==2.5.3 \
 python-hglib==1.9 \
     --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
 
-s3transfer==0.1.9 \
-    --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
+s3transfer==0.1.12 \
+    --hash=sha256:23c156ca4d64b022476c92c44bf938bef71af9ce0dcd8fd6585e7bce52f66e47
 
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
