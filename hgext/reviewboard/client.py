@@ -1042,7 +1042,7 @@ def template_reviews(repo, ctx, revcache, **args):
     # Mercurial 4.2+ take mapping as a positional argument. Older versions
     # take mapping as **kwargs.
     if 'mapping' in inspect.getargspec(templatekw.showlist).args:
-       return templatekw.showlist('review', revcache['reviews'], {})
+        return templatekw.showlist('review', revcache['reviews'], {})
     else:
         return templatekw.showlist('review', revcache['reviews'])
 
