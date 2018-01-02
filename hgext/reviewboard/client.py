@@ -1028,8 +1028,14 @@ class reviewstore(object):
 def template_reviews(repo, ctx, revcache, **args):
     """:reviews: List. Objects describing each review for this changeset."""
     if 'reviews' not in revcache:
+        rids = set()
+        unfi = repo.unfiltered()
+        for node in obsolete.allprecursors(unfi.obsstore, [ctx.node()]):
+            rids.update(repo.reviews.findnodereviews(node))
+
         reviews = []
-        for rid in sorted(repo.reviews.findnodereviews(ctx.node())):
+        # Sort in reverse order, so the newest review is listed first
+        for rid in sorted(rids, reverse=True):
             r = repo.reviews.getreviewrequest(rid)
             # Bug 1065022 add parent review info to this data structure.
             reviews.append({
