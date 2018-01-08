@@ -323,6 +323,8 @@ class PatchTransplant(Transplant):
                 # Using 95 as the similarity to match automv's default.
                 logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
 
+        return self.run_hg(['log', '-r', '.', '-T', '{node}'])
+
     @staticmethod
     def _download_from_s3(patch_url):
         # Download from s3 url specified in self.patch_url, returns io.BytesIO.
