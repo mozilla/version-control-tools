@@ -52,7 +52,7 @@ We handle having no commits to rewrite properly
   > {"$REV": "bug 1 - more stuff"}
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
-  rev: 10f03055d22c -> 10f03055d22c
+  rev: 10f03055d22c06f845293434e34419fb5ba53e11 -> 10f03055d22c06f845293434e34419fb5ba53e11
   $ hg --encoding utf-8 log
   changeset:   2:10f03055d22c
   tag:         tip
@@ -78,8 +78,8 @@ We handle unicode commit descriptions properly
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
   saved backup bundle to $TESTTMP/clone/.hg/strip-backup/10f03055d22c-f5e0148f-replacing.hg (glob)
-  rev: 599eee383634 -> a1dea3050632
-  rev: 10f03055d22c -> 99d16379ed19
+  rev: 599eee38363483a76601b414529bfa11973eb87b -> a1dea3050632c11ccc4dbbb5a9519d44744f3b96
+  rev: 10f03055d22c06f845293434e34419fb5ba53e11 -> 99d16379ed198d7494b7e60e2edf0696d7a16fdf
 
   $ hg --encoding utf-8 log
   changeset:   2:99d16379ed19
@@ -107,7 +107,7 @@ We handle long sha1s properly
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
   saved backup bundle to $TESTTMP/clone/.hg/strip-backup/99d16379ed19-6e1da412-replacing.hg (glob)
-  rev: 99d16379ed19 -> 2c6f2ddf672a
+  rev: 99d16379ed198d7494b7e60e2edf0696d7a16fdf -> 2c6f2ddf672a914719a61fd3158c791c52a469d9
 
   $ hg --encoding utf-8 log
   changeset:   2:2c6f2ddf672a
@@ -160,8 +160,8 @@ We handle partial rewrites properly
   > EOF
   $ hg rewritecommitdescriptions --descriptions descriptions.json .
   saved backup bundle to $TESTTMP/clone/.hg/strip-backup/cf50de63cf42-a795aa5f-replacing.hg (glob)
-  rev: a1dea3050632 -> a1dea3050632
-  rev: 2c6f2ddf672a -> 515eca0c4333
+  rev: a1dea3050632c11ccc4dbbb5a9519d44744f3b96 -> a1dea3050632c11ccc4dbbb5a9519d44744f3b96
+  rev: 2c6f2ddf672a914719a61fd3158c791c52a469d9 -> 515eca0c4333b08596f1f46247e645705438c371
 
   $ hg --encoding utf-8 log
   changeset:   3:404a56cc02c8

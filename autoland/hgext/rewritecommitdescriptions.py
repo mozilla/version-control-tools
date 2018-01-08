@@ -38,8 +38,11 @@ else:
          'hg rewritecommitdescriptions')
 def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
 
-    def sha1_of(node):
+    def sha1_short(node):
         return repo[node].hex()[:12]
+
+    def sha1_full(node):
+        return repo[node].hex()
 
     # Rewriting fails if the evolve extension is enabled.
     try:
@@ -50,6 +53,8 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
         pass
 
     # Read commit descriptions map.
+    # MozReview passes in short SHA1 (12 chars), so we have to use [:12] here
+    # and in `add_node`.
     description_map = {}
     with open(descriptions, 'rb') as f:
         raw_descriptions = json.load(f)
@@ -62,7 +67,7 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
 
     def add_node(ctx):
         node = ctx.node()
-        if sha1_of(node) in description_map:
+        if sha1_short(node) in description_map:
             nodes.append(node)
 
     ctx = repo[base_node]
@@ -80,7 +85,7 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
     # look them up once they are rewritten.
     original_sha1s = {}
     for node in nodes:
-        original_sha1s[node] = sha1_of(node)
+        original_sha1s[node] = sha1_full(node)
 
     # Update changed nodes.
     def create_func(repo, ctx, revmap, filectxfn):
@@ -104,4 +109,4 @@ def rewrite_commit_descriptions(ui, repo, base_node, descriptions=None):
     # Output result.
     for node in nodes:
         ui.write('rev: %s -> %s\n' % (original_sha1s[node],
-                                      sha1_of(node_map[node])))
+                                      sha1_full(node_map[node])))
