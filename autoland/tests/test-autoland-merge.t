@@ -21,7 +21,7 @@ Create a commit to test on Try
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   (adding commit id to 1 changesets)
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18-25aef645-addcommitid.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/633b0929fc18*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -56,6 +56,8 @@ Post a job with a bad merge
   $ hg commit -m 'Bug 1 - more stuff; r?cthulhu'
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 2 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/06b6682411fd*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests

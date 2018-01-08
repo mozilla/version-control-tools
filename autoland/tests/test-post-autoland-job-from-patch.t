@@ -74,6 +74,8 @@ Post a job using a bookmark
   $ hg commit -m 'Bug 1 - more goodness; r?cthulhu'
   $ hg push --config reviewboard.autopublish=false -c .
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/c7c7993427e0*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -105,6 +107,8 @@ Post a job with unicode
   $ hg commit --encoding utf-8 -m 'Bug 1 - こんにちは; r?cthulhu'
   $ hg push --config reviewboard.autopublish=false -c .
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/935cf8007c21*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -136,6 +140,8 @@ Create a commit to test on Try
   $ hg commit -m 'Bug 1 - some stuff; r?cthulhu'
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
+  (adding commit id to 1 changesets)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b7116c4231a0*-addcommitid.hg (glob)
   searching for changes
   remote: adding changesets
   remote: adding manifests
