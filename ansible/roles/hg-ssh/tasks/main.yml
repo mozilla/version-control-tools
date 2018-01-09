@@ -11,6 +11,15 @@
   with_items:
     - sudo
     - tar
+    - yum-plugin-versionlock
+
+- name: ensure critical system packages are locked so they aren't auto-upgraded
+  command: /usr/bin/yum versionlock add {{ item }}
+  with_items:
+    # Important server functionality uses Python 2 and upgrading the Python
+    # package can be sensitive. So we lock the package version so it isn't
+    # upgraded as part of upgrading other system packages.
+    - python-2.7.*
 
 - name: install global ssh config
   copy: src=ssh_config
