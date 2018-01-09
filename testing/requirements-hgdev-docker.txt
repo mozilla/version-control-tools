@@ -15,5 +15,8 @@ docker-pycreds==0.2.1 \
 mechanize==0.2.5 \
     --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766
 
+six==1.10.0 \
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+
 websocket-client==0.37.0 \
     --hash=sha256:678b246d816b94018af5297e72915160e2feb042e0cde1a9397f502ac3a52f41
