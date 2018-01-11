@@ -85,6 +85,13 @@ acceptable.
 (Relevant config option: ui.username)
 '''.lstrip()
 
+MISSING_IRCNICK = '''
+You don't have a Mozilla IRC nickname defined in your Mercurial config file.
+You will need to add your nick in order to push commits to MozReview.
+
+(Relevant config option: mozilla.ircnick)
+'''
+
 BAD_DIFF_SETTINGS = '''
 Mercurial is not configured to produce diffs in a more readable format.
 
@@ -902,14 +909,6 @@ def _checkcodereview(ui, cw):
         ui.write(BUGZILLA_API_KEY_INSTRUCTIONS)
         bzapikey = ui.prompt('Please enter a Bugzilla API Key: (optional)', default='')
 
-    if bzuser or bzapikey:
-        if 'bugzilla' not in cw.c:
-            cw.c['bugzilla'] = {}
-
-    if bzuser:
-        cw.c['bugzilla']['username'] = bzuser
-    if bzapikey:
-        cw.c['bugzilla']['apikey'] = bzapikey
 
     if any(ui.hasconfig('bugzilla', c) for c in ('password', 'userid', 'cookie')):
         ui.write(LEGACY_BUGZILLA_CREDENTIALS_DETECTED)
@@ -926,7 +925,20 @@ def _checkcodereview(ui, cw):
         cw.c.setdefault('paths', {})
         cw.c['paths']['review'] = 'https://reviewboard-hg.mozilla.org/autoreview'
 
-    # TODO configure mozilla.ircnick
+    if not ui.config('mozilla', 'ircnick'):
+        ircnick = ui.prompt('What is your IRC nick? ', default=None)
+        if ircnick:
+            cw.c.setdefault('mozilla', {})
+            cw.c['mozilla']['ircnick'] = ircnick
+
+    if bzuser or bzapikey:
+        if 'bugzilla' not in cw.c:
+            cw.c['bugzilla'] = {}
+
+    if bzuser:
+        cw.c['bugzilla']['username'] = bzuser
+    if bzapikey:
+        cw.c['bugzilla']['apikey'] = bzapikey
 
 
 def _checkmultiplevct(ui, cw):

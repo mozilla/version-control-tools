@@ -59,6 +59,7 @@ reviewboard is enabled when requested
   You should only need to configure a Bugzilla API Key once.
   What is your Bugzilla email address? (optional) 
   Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
+  What is your IRC nick?  
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
@@ -86,6 +87,7 @@ only bzexport can be enabled when requested
   > someone@example.com
   > apikey
   > y
+  > mynick
   > y
   > y
   > EOF
@@ -127,21 +129,25 @@ only bzexport can be enabled when requested
     3) Copy the generated key and paste it here
   Please enter a Bugzilla API Key: (optional) apikey
   Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
+  What is your IRC nick?  mynick
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,4 +1,8 @@
+  @@ -1,4 +1,10 @@
    [extensions]
    reviewboard = */hgext/reviewboard/client.py (glob)
   +bzexport = */hgext/bzexport (glob)
    [paths]
    review = https://reviewboard-hg.mozilla.org/autoreview
+  +[mozilla]
+  +ircnick = mynick
   +[bugzilla]
   +username = someone@example.com
   +apikey = apikey
   
   Write changes to hgrc file (Yn)?  y
+
 
   $ cat .hgrc
   [extensions]
@@ -149,9 +155,12 @@ only bzexport can be enabled when requested
   bzexport = */hgext/bzexport (glob)
   [paths]
   review = https://reviewboard-hg.mozilla.org/autoreview
+  [mozilla]
+  ircnick = mynick
   [bugzilla]
   username = someone@example.com
   apikey = apikey
+
 
 Legacy credentials are removed from config file
 
@@ -166,6 +175,7 @@ Legacy credentials are removed from config file
   > someone2@example.com
   > apikey2
   > y
+  > mynick
   > y
   > y
   > EOF
@@ -214,13 +224,14 @@ Legacy credentials are removed from config file
   For security reasons, the legacy credentials are being removed from the
   config.
   Configure the "review" path so you can `hg push review` commits to Mozilla for review (Yn)?  y
+  What is your IRC nick?  mynick
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -4,6 +4,5 @@
-   [paths]
-   review = https://reviewboard-hg.mozilla.org/autoreview
+  @@ -6,6 +6,5 @@
+   [mozilla]
+   ircnick = mynick
    [bugzilla]
   -username = someone@example.com
   -apikey = apikey
