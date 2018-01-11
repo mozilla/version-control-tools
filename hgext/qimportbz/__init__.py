@@ -155,20 +155,26 @@ def extsetup(ui):
         # and the rest are stored in the global delayed_imports. The imported
         # patches have dumb filenames because there's no way to tell mq to pick the
         # patch name *after* download.
+        patches = []
+        bzhandler.set_patch_container(patches)
         ret = orig(ui, repo, *files, **opts)
-        if ret or bzhandler.last_imported_patch() is None:
+        bzhandler.set_patch_container()
+
+        if ret or not patches:
             return ret
+
+        # The first patch in the list is the one we just imported.
+        patch = patches.pop(0)
 
         # If the user passed a name, then mq used that so we don't need to rename
         if not opts['name']:
             # cache the lookup of the name. findcmd is not fast.
             qrename = cmdutil.findcmd("qrename", commands.table)[1][0]
 
-            # Rename the already imported patch. If there are multiple patches, the
-            # rest will be in bzhandler.delayed_imports, which we'll name correctly
-            # in the first place.
+            # Rename the already imported patch. Any other patches will be
+            # processed later and given their correct names during the import.
             oldpatchname = q.fullseries[q.fullseriesend()]
-            newpatchname = checkpatchname(bzhandler.last_imported_patch(), current_filename=oldpatchname)
+            newpatchname = checkpatchname(patch, current_filename=oldpatchname)
             if newpatchname != oldpatchname:
                 if newpatchname in q.series:
                     q.delete(repo, [newpatchname], {})
@@ -191,7 +197,7 @@ def extsetup(ui):
         # here. Each one of these pushes an unapplied patch onto the beginning of
         # the queue, and unapplied patches are ignored when importing them, so do
         # these in reverse order.
-        for patch in reversed(list(bzhandler.delayed_imports)):
+        for patch in reversed(patches):
             newopts['name'] = checkpatchname(patch)
             path = makebzurl(patch.bug.num, patch.id)
 

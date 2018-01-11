@@ -10,16 +10,12 @@ from itertools import cycle
 from mercurial.util import Abort
 import bz
 
-# Patch list
-delayed_imports = []
-
-# The patch that got imported
-imported_patch = None
-
-
-def last_imported_patch():
-    return imported_patch
-
+# Default behavior is to return all patches smushed together. hg import will
+# separate them back out. But for mq, we need a side-channel to transmit them
+# separately. The caller will use set_patch_container(somelist), and the import
+# process will append all patches to that list.
+def set_patch_container(container=None):
+    Handler.patch_container = container
 
 class ObjectResponse(object):
 
@@ -31,6 +27,8 @@ class ObjectResponse(object):
 
 
 class Handler(urllib2.BaseHandler):
+
+    patch_container = None
 
     def __init__(self, ui, passmgr):
         self.ui = ui
@@ -87,8 +85,18 @@ class Handler(urllib2.BaseHandler):
         attachid = req.get_selector()[1:]
         if not patch and attachid:
             patch = bug.get_patch(attachid)
+            if patch is None:
+                # Try interpreting attachid as the number of a nonobsolete patch.
+                try:
+                    patches = [p for p in bug.patches if not p.obsolete]
+                    num = int(attachid)
+                    patch = patches[num - 1]
+                except ValueError, IndexError:
+                    pass
 
-        if not patch:
+        patches = [] if patch is None else [patch]
+
+        if not patches:
             if not bug.patches:
                 raise Abort("No patches found for this bug")
             patches = [p for p in bug.patches if not p.obsolete]
@@ -96,17 +104,18 @@ class Handler(urllib2.BaseHandler):
                 if 'y' != self.ui.prompt("Only obsolete patches found. Import anyway? [Default is 'y']", default='y'):
                     raise Abort("Nothing to import")
                 patches = bug.patches
-            if len(patches) == 1:
-                patch = patches[0]
-            else:
-                delayed_imports.extend(self.choose_patches(patches))
-                patch = delayed_imports.pop()
 
-        # and finally return the response
-        if patch:
-            global imported_patch
-            imported_patch = patch
-            return PatchResponse(patch)
+        if len(patches) > 1:
+            patches = self.choose_patches(patches)
+
+        if len(patches) == 0:
+            return
+
+        if Handler.patch_container is None:
+            return PatchResponse(patches)
+        else:
+            Handler.patch_container.extend(patches)
+            return PatchResponse([patches[0]])
 
     def choose_patches(self, patches):
         if self.autoChoose:
@@ -116,15 +125,18 @@ class Handler(urllib2.BaseHandler):
         valid_patch_choices = range(1, len(patches) + 1)
         self.list_patches(patches)
         while True:
+            allstr = "1-%d" % len(patches)
             choicestr = self.ui.prompt("\nWhich patches do you want to import, and in which order? [Default is all]\n"
                                        "(eg '1-3,5', or 's' to toggle the sort order between id & patch description)",
-                                       default="1-%d" % len(patches))
+                                       default=allstr)
             if choicestr == "s":
                 new_sort_type = sort_types.next()
                 self.ui.write("\nSorted by %s:\n" % new_sort_type)
                 patches.sort(key=lambda p: getattr(p, new_sort_type))
                 self.list_patches(patches)
                 continue
+            elif choicestr == "all":
+                choicestr = allstr
             selected_patches = []
             try:
                 for choice in map(str.strip, choicestr.split(',')):
@@ -160,14 +172,35 @@ class Handler(urllib2.BaseHandler):
 # interface reverse engineered from urllib.addbase
 class PatchResponse(object):
 
-    def __init__(self, p):
-        self.patch = p
+    def __init__(self, patches):
         # utf-8: convert from internal (16/32-bit) Unicode to 8-bit encoding.
         # NB: Easier output to deal with, as most (code) patches are ASCII only.
-        self.fp = StringIO.StringIO(unicode(p).encode('utf-8'))
-        self.read = self.fp.read
-        self.readline = self.fp.readline
-        self.close = self.fp.close
+        self.fps = [StringIO.StringIO(unicode(p).encode('utf-8')) for p in patches]
+
+    def read(self, size=-1):
+        if size < 0:
+            return ''.join(p.read() for p in self.fps)
+        data = ''
+        while size > 0 and self.fps:
+            subdata = self.fps[0].read(size)
+            if len(subdata) == 0:
+                self.fps.pop(0)
+                continue
+            data += subdata
+            size -= len(subdata)
+        return data
+
+    def readline(self):
+        while self.fps:
+            line = self.fps[0].readline()
+            if line != '':
+                return line
+            self.fps.pop(0)
+        return ''
+
+    def close(self):
+        for fp in self.fps:
+            fp.close()
 
     def fileno(self):
         return None
