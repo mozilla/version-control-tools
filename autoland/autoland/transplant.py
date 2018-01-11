@@ -286,14 +286,13 @@ class RepoTransplant(Transplant):
 
 
 class PatchTransplant(Transplant):
-    def __init__(self, tree, destination, rev, patch_urls):
+    def __init__(self, tree, destination, rev, patch_urls, patch=None):
         self.patch_urls = patch_urls
+        self.patch = patch
 
         super(PatchTransplant, self).__init__(tree, destination, rev)
 
     def apply_changes(self, remote_tip):
-        assert self.patch_urls, 'patch_urls not provided'
-
         dirty_files = self.dirty_files()
         if dirty_files:
             logger.error('repo is not clean: %s' % ' '.join(dirty_files))
@@ -304,26 +303,34 @@ class PatchTransplant(Transplant):
 
         self.run_hg(['update', remote_tip])
 
-        for patch_url in self.patch_urls:
-            if patch_url.startswith('s3://'):
-                # Download patch from s3 to a temp file.
-                io_buf = self._download_from_s3(patch_url)
+        if config.testing() and self.patch:
+            # Dev/Testing permits passing in a patch within the request.
+            self._apply_patch_from_io_buff(io.BytesIO(self.patch))
 
-            else:
-                # Download patch directly from url.  Using a temp file here
-                # instead of passing the url to 'hg import' to make
-                # testing's code path closer to production's.
-                io_buf = self._download_from_url(patch_url)
+        else:
+            for patch_url in self.patch_urls:
+                if patch_url.startswith('s3://'):
+                    # Download patch from s3 to a temp file.
+                    io_buf = self._download_from_s3(patch_url)
 
-            with tempfile.NamedTemporaryFile() as temp_file:
-                temp_file.write(io_buf.getvalue())
-                temp_file.flush()
+                else:
+                    # Download patch directly from url.  Using a temp file here
+                    # instead of passing the url to 'hg import' to make
+                    # testing's code path closer to production's.
+                    io_buf = self._download_from_url(patch_url)
 
-                # Apply the patch, with file rename detection (similarity).
-                # Using 95 as the similarity to match automv's default.
-                logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
+                self._apply_patch_from_io_buff(io_buf)
 
         return self.run_hg(['log', '-r', '.', '-T', '{node}'])
+
+    def _apply_patch_from_io_buff(self, io_buf):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(io_buf.getvalue())
+            temp_file.flush()
+
+            # Apply the patch, with file rename detection (similarity).
+            # Using 95 as the similarity to match automv's default.
+            logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
 
     @staticmethod
     def _download_from_s3(patch_url):

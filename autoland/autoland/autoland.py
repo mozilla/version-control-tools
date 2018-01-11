@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import base64
 import config
 import datetime
 import json
@@ -126,11 +127,17 @@ def handle_pending_transplants(dbconn):
 
             os.environ['AUTOLAND_REQUEST_USER'] = requester
             try:
-                if patch_urls:
+                if config.testing() and request.get('patch'):
+                    tp = PatchTransplant(tree, destination, rev, None,
+                                         base64.b64decode(request.get('patch')))
+
+                elif patch_urls:
                     tp = PatchTransplant(tree, destination, rev, patch_urls)
+
                 else:
                     tp = RepoTransplant(tree, destination, rev,
                                         commit_descriptions)
+
                 with tp:
                     if trysyntax:
                         result = tp.push_try(str(trysyntax))
@@ -349,6 +356,10 @@ def main():
                         level=logging.DEBUG)
     stdout_handler = logging.StreamHandler(sys.stdout)
     logger.addHandler(stdout_handler)
+
+    # boto's debug logging is rather verbose.
+    logging.getLogger('botocore').setLevel(logging.INFO)
+
     logger.info('starting autoland')
 
     dbconn = get_dbconn(args.dsn)

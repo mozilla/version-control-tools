@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import base64
 import hmac
 import json
 import logging
@@ -112,6 +113,8 @@ def validate_request(request):
 
     is_try = 'trysyntax' in request_json
     is_patch = 'patch_urls' in request_json
+    if config.testing() and not is_patch:
+        is_patch = 'patch' in request_json
 
     if (not is_patch) and not ('trysyntax' in request_json or
                                'commit_descriptions' in request_json):
@@ -125,7 +128,11 @@ def validate_request(request):
 
     elif not is_try and is_patch:
         # Patch transplant.
-        required.add('patch_urls')
+        if config.testing():
+            optional.add('patch_urls')
+            optional.add('patch')
+        else:
+            required.add('patch_urls')
         optional.add('push_bookmark')
 
     elif is_try and not is_patch:
@@ -154,9 +161,20 @@ def validate_request(request):
         raise ValueError('bad pingback_url')
 
     if is_patch:
-        for patch_url in request_json['patch_urls']:
-            if not check_patch_url(patch_url):
-                raise ValueError('bad patch_url')
+        if config.testing() and ('patch_urls' in request_json
+                                 and 'patch' in request_json):
+            raise ValueError('cannot specify both patch_urls and patch')
+
+        if 'patch_urls' in request_json:
+            for patch_url in request_json['patch_urls']:
+                if not check_patch_url(patch_url):
+                    raise ValueError('bad patch_url')
+
+        if 'patch' in request_json:
+            try:
+                base64.b64decode(request_json['patch'])
+            except TypeError:
+                raise ValueError('malformed base64 in patch')
 
 
 @app.route('/autoland', methods=['POST'])
@@ -195,7 +213,20 @@ def autoland():
       "ldap_username": "cthulhu@mozilla.org",
       "tree": "mozilla-central",
       "rev": "1235",
-      "patch_urls": ["https://example.com/123456789.patch"],
+      "patch_urls": ["s3://bucket/123456789.patch"],
+      "destination": "gecko",
+      "pingback_url": "http://localhost/",
+      "push_bookmark": "@"
+    }
+
+    When "testing" is set to `true` in config.json, patches can be provided
+    inline, base64 encoded:
+
+    {
+      "ldap_username": "cthulhu@mozilla.org",
+      "tree": "mozilla-central",
+      "rev": "1235",
+      "patch": "dGhpcyBpcyBub3QgYSByZWFsIHBhdGNoCg==",
       "destination": "gecko",
       "pingback_url": "http://localhost/",
       "push_bookmark": "@"
