@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import base64
 import json
 import requests
 
@@ -58,10 +59,13 @@ class AutolandCommands(object):
                      help='Autoland password')
     @CommandArgument('--patch-url', required=False, default='',
                      help='URL of patch [optional]')
+    @CommandArgument('--patch-file', required=False, default='',
+                     help='Patch file to inline into request [optional]')
     def post_autoland_job(self, host, tree, rev, destination, pingback_url,
                           trysyntax=None, push_bookmark=None,
                           commit_descriptions=None, ldap_username=None,
-                          user=None, password=None, patch_url=None):
+                          user=None, password=None, patch_url=None,
+                          patch_file=None):
 
         data = {
             'tree': tree,
@@ -79,6 +83,9 @@ class AutolandCommands(object):
             data['ldap_username'] = ldap_username
         if patch_url:
             data['patch_urls'] = [patch_url]
+        if patch_file:
+            with open(patch_file) as f:
+                data['patch'] = base64.b64encode(f.read())
 
         host = host.rstrip('/')
         r = requests.post(host + '/autoland', data=json.dumps(data),
