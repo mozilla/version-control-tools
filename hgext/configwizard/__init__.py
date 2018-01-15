@@ -49,6 +49,9 @@ To begin, press the enter/return key.
 
 MINIMUM_SUPPORTED_VERSION = (3, 5, 0)
 
+# Upgrade Mercurial older than this.
+# This should match MODERN_MERCURIAL_VERSION from
+# mozilla-central/python/mozboot/mozboot/base.py
 OLDEST_NON_LEGACY_VERSION = (4, 2, 3)
 
 VERSION_TOO_OLD = '''
