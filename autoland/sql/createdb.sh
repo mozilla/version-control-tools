@@ -16,4 +16,5 @@ dropdb -h $HOST -p $PORT -U postgres autoland
 dropuser -h $HOST -p $PORT -U postgres autoland
 createuser -h $HOST -p $PORT -U postgres autoland -S -D -R
 createdb -h $HOST -p $PORT -U postgres autoland
+psql -h $HOST -p $PORT -U postgres autoland -c "alter user autoland with password 'autoland'"
 psql -h $HOST -p $PORT -U postgres autoland -f schema.sql

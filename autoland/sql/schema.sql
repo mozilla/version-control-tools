@@ -1,5 +1,3 @@
-alter user autoland with password 'autoland';
-
 create sequence request_sequence;
 grant usage, select on sequence request_sequence to autoland;
 
