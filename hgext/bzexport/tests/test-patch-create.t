@@ -32,7 +32,7 @@ Uploading a simple patch to a bug works
         \ -r ac5453011ddd foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n+++ b/foo\t\
         Thu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
       description: First patch
-      file_name: first-patch
+      file_name: bug-1-first-patch
       flags: []
       id: 1
       is_obsolete: false
@@ -64,7 +64,7 @@ Updating the patch works
   $ echo first2 > foo
   $ hg qref -m 'Bug 1 - First patch again'
   $ hg bzexport
-  first-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=2&action=edit
+  bug-1-first-patch uploaded as http://$DOCKER_HOSTNAME:$HGPORT/attachment.cgi?id=2&action=edit
 
   $ bugzilla dump-bug 1
   Bug 1:
@@ -77,7 +77,7 @@ Updating the patch works
         \ -r ac5453011ddd foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n+++ b/foo\t\
         Thu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first\n"
       description: First patch
-      file_name: first-patch
+      file_name: bug-1-first-patch
       flags: []
       id: 1
       is_obsolete: true
@@ -91,7 +91,7 @@ Updating the patch works
         \ -r 96ee1d7354c4 -r 126f93d96a11 foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n\
         +++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+first2\n"
       description: First patch again
-      file_name: first-patch
+      file_name: bug-1-first-patch
       flags: []
       id: 2
       is_obsolete: false
@@ -149,7 +149,7 @@ Uploading a new patch will reassign bug to you
         \ 96ee1d7354c4 -r cecfd1775240 foo\n--- a/foo\tThu Jan 01 00:00:00 1970 +0000\n\
         +++ b/foo\tThu Jan 01 00:00:00 1970 +0000\n@@ -0,0 +1,1 @@\n+initial-author\n"
       description: Initial author
-      file_name: some-patch
+      file_name: bug-2-some-patch
       flags: []
       id: 3
       is_obsolete: false

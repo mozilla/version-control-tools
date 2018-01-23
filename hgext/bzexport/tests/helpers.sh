@@ -19,6 +19,8 @@ bzexport = $TESTDIR/hgext/bzexport
 
 [bzexport]
 bugzilla = ${BUGZILLA_URL}/
+update-patch = True
+rename-patch = True
 
 [bugzilla]
 username = ${USERNAME}
