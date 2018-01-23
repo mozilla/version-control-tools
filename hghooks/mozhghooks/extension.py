@@ -23,6 +23,7 @@ def get_check_classes(hook):
         prevent_ftl_changes,
         prevent_subrepos,
         prevent_symlinks,
+        prevent_wptsync_changes,
         single_root,
         try_task_config_file,
     )
@@ -34,6 +35,7 @@ def get_check_classes(hook):
             prevent_ftl_changes.FTLCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
+            prevent_wptsync_changes.WPTSyncCheck,
             single_root.SingleRootCheck,
             try_task_config_file.TryConfigCheck,
         )
