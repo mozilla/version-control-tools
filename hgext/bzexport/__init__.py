@@ -82,6 +82,12 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 
 cmdtable = {}
 
+try:
+    # Mercurial 4.3+
+    alldiffopts = cmdutil.diffopts + cmdutil.diffopts2
+except AttributeError:
+    alldiffopts = commands.diffopts + commands.diffopts2
+
 # Mercurial 4.3 introduced registrar.command as a replacement for
 # cmdutil.command.
 if util.safehasattr(registrar, 'command'):
@@ -985,11 +991,9 @@ def patch_id(ui, repo, rev):
          ('', 'number', '',
           'When posting, prefix the patch description with "Patch <number> - "'),
          # The following option is passed through directly to patch.diffopts
-         ('w', 'ignore_all_space', False,
-          'Generate a diff that ignores whitespace changes'),
          ('f', 'force', False,
           'Proceed even if the working directory contains changes'),
-         ] + newbug_opts,
+         ] + newbug_opts + alldiffopts,
         _('hg bzexport [options] [REV] [BUG]'))
 def bzexport(ui, repo, *args, **opts):
     """
@@ -1014,10 +1018,13 @@ def bzexport(ui, repo, *args, **opts):
                 ui.write("Warning: ignoring --%s option when not creating a bug\n" % o)
 
     contents = StringIO()
-    diffopts = patch.diffopts(ui, opts)
-    context = ui.config("bzexport", "unified", ui.config("diff", "unified", None))
-    if context:
-        diffopts.context = int(context)
+    o = {
+        'context': ui.configint("bzexport", "unified", 8),
+        'showfunc': ui.configbool("bzexport", "showfunc", True),
+        'git': ui.configbool("bzexport", "git", True),
+    }
+    o.update(opts)
+    diffopts = patch.diffopts(ui, o)
     description_from_patch = None
 
     revs = scmutil.revrange(repo, [rev])
