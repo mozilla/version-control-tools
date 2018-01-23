@@ -1410,5 +1410,4 @@ def newbug(ui, repo, *args, **opts):
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
 
 def reposetup(ui, repo):
-    if obsolete.isenabled(repo, 'bzexport'):
-        revset.symbols['bzbasechange'] = revset_bzbasechange
+    revset.symbols['bzbasechange'] = revset_bzbasechange
