@@ -1,29 +1,32 @@
-import config
 import logging
+import os
+
 import requests
 
-TREESTATUS_URL = 'https://treestatus.mozilla-releng.net/trees/'
+import config
+
+# treestatus running in dev/CI is an older version, with slightly
+# different request and response structures.
+TREESTATUS_PROD_URL = 'https://treestatus.mozilla-releng.net/trees/%s'
+TREESTATUS_TEST_URL = 'http://treestatus/%s?format=json'
 
 logger = logging.getLogger('autoland')
 
 
 def tree_is_open(tree):
-    # treestatus running in dev/CI is an older version, with slightly
-    # different request and response structures.
-    is_test_env = config.testing()
+    treestatus_url = os.getenv(
+        'TREESTATUS_URL', TREESTATUS_TEST_URL if config.testing()
+        else TREESTATUS_PROD_URL)
 
     r = None
     try:
-        if is_test_env:
-            r = requests.get('http://treestatus/%s?format=json' % tree)
-        else:
-            r = requests.get(TREESTATUS_URL + tree)
+        r = requests.get(treestatus_url % tree)
 
         if r.status_code == 200:
-            if is_test_env:
-                return r.json()['status'] == 'open'
-            else:
-                return r.json()['result']['status'] == 'open'
+            res = r.json()
+            if 'result' in res:
+                res = res['result']
+            return res['status'] == 'open'
 
         elif r.status_code == 404:
             # We assume unrecognized trees are open
