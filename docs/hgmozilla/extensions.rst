@@ -183,20 +183,3 @@ Are you a Git user learning Mercurial for the first time? The
 adds a ``hg githelp`` command that suggests Mercurial equivalent
 commands from Git commands. Just type a Git command and learn how to
 use Mercurial!
-
-Mozilla Centric Extensions
-==========================
-
-In addition to the many :ref:`extensions <hgmods_extensions>` in this
-repository, you should also consider the following.
-
-trychooser
-----------
-
-The `trychooser extension <https://bitbucket.org/sfink/trychooser>`_ helps
-with the process of submitting to Try (Mozilla's special repository that
-kicks off automation build and test jobs from submitted code).
-
-In addition to helping you select a trychooser syntax, this extension also
-manages the temporary commit required to hold that syntax. This means
-less typing to get your repository in order to send things to Try.
