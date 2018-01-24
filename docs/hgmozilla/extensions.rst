@@ -8,6 +8,19 @@ A vanilla install of Mercurial does not have many features. This is an
 intentional choice by Mercurial to keep the base install simple and free
 of foot guns.
 
+Guided Installation of Extensions
+=================================
+
+If you have a copy of the Firefox source repository, you can run
+`./mach mercurial-setup` to run an interactive wizard that will
+guide you through the process of configuring Mercurial.
+
+.. important::
+
+   `mach mercurial-setup` is the recommended way to configure Mercurial
+   for use at Mozilla. The sections below effectively duplicate the
+   work that `mach mercurial-setup` does for you.
+
 Installing Extensions
 =====================
 
