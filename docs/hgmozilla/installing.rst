@@ -141,7 +141,7 @@ out the version you wish to install::
 
   $ hg clone https://www.mercurial-scm.org/repo/hg
   $ cd hg
-  $ hg up 4.1.2
+  $ hg up 4.4.2
 
 Once you have the source code, run ``make`` to install Mercurial::
 
