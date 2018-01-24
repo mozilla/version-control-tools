@@ -50,9 +50,6 @@ Core Extensions That Almost Everyone Wants
 Mercurial ships with a number of built-in extensions. Of these, every
 user will almost always want to install the following extensions:
 
-color
-   This extension adds colorized output to commands, making output
-   easier to read.
 fsmonitor
    Monitor the filesystem for changes using so operations querying
    filesystem state complete faster.
@@ -62,20 +59,11 @@ fsmonitor
    fsmonitor is highly recommended when interacting with the Firefox
    repository. It will make Mercurial commands faster.
 
-pager
-   Enable command output to go to a pager (such as less).
-progress
-   Show progress bars during long-running operations.
-
-   (``progress`` was moved to Mercurial's core and is enabled by default
-   in Mercurial 3.5+.)
-
 Since core extensions are bundled with Mercurial, they have a special
 syntax that makes them easier to install::
 
   [extensions]
-  color=
-  pager=
+  fsmonitor=
 
 Core Extensions to Perform History Rewriting
 ============================================
