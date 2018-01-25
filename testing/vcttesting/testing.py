@@ -171,6 +171,9 @@ def get_test_files(extensions, venv):
        Generic Python unit tests (to be executed with a Python test harness)
     all
        Union of all of the above
+    docker_requirements
+       Dict of test path to set of Docker requirements. The set is empty
+       if Docker is not required.
 
     Essentially, the tests are segmented by whether they are executed by
     Mercurial's test harness (``run-tests.py``) or a Python test harness
@@ -210,11 +213,15 @@ def get_test_files(extensions, venv):
                 elif f.startswith('test') and f.endswith('.t'):
                     hg_tests.append(os.path.join(root, f))
 
+    all_tests = set(extension_tests) | set(hg_tests) | set(unit_tests)
+
     return {
         'extension': sorted(extension_tests),
         'hg': sorted(hg_tests),
         'unit': sorted(unit_tests),
-        'all': set(extension_tests) | set(hg_tests) | set(unit_tests),
+        'all': all_tests,
+        'docker_requirements': {t: docker_requirements_for_test(t)
+                                for t in all_tests}
     }
 
 
