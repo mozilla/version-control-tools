@@ -169,11 +169,13 @@ if __name__ == '__main__':
     if not requested_tests:
         run_hg_tests.extend(extension_tests)
         run_hg_tests.extend(hg_tests)
-        run_unit_tests.extend(unit_tests)
+        if not options.no_unit:
+            run_unit_tests.extend(unit_tests)
     else:
         for t in requested_tests:
             if t in unit_tests:
-                run_unit_tests.append(t)
+                if not options.no_unit:
+                    run_unit_tests.append(t)
             else:
                 run_hg_tests.append(t)
 
@@ -236,9 +238,6 @@ if __name__ == '__main__':
                 res = run()
         else:
             res = run()
-
-    if options.no_unit:
-        run_unit_tests = []
 
     if run_unit_tests:
         run = lambda: run_nose_tests(run_unit_tests, options.jobs, verbose=verbose)
