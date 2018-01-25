@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import argparse
 import errno
+import contextlib
 import os
 import subprocess
 import sys
@@ -17,6 +18,11 @@ import sys
 # anyway.
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
+
+
+@contextlib.contextmanager
+def noop_contextmanager():
+    yield
 
 
 if __name__ == '__main__':
@@ -206,6 +212,8 @@ if __name__ == '__main__':
                                  verbose=verbose,
                                  use_last=options.use_last_images))
 
+    auto_clean_orphans = docker.auto_clean_orphans if have_docker else noop_contextmanager
+
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
     hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
@@ -232,20 +240,13 @@ if __name__ == '__main__':
         # We should ideally not leak containers and images. But until
         # the Mercurial test harness allows tests to register cleanup
         # actions, there is only so much we can do.
-        run = lambda: subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
-        if have_docker:
-            with docker.auto_clean_orphans():
-                res = run()
-        else:
-            res = run()
+        with auto_clean_orphans():
+            res = subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
 
     if run_unit_tests:
-        run = lambda: run_nose_tests(run_unit_tests, options.jobs, verbose=verbose)
-        if have_docker:
-            with docker.auto_clean_orphans():
-                noseres = run()
-        else:
-            noseres = run()
+        with auto_clean_orphans():
+            noseres = run_nose_tests(run_unit_tests, options.jobs,
+                                     verbose=verbose)
 
         if noseres:
             res = noseres
@@ -306,12 +307,8 @@ if __name__ == '__main__':
                 version, real_version))
             sys.stdout.flush()
             os.environ['HGVERSION'] = real_version
-            run = lambda: subprocess.call(args, cwd=HERE)
-            if have_docker:
-                with docker.auto_clean_orphans():
-                    run()
-            else:
-                run()
+            with auto_clean_orphans():
+                subprocess.call(args, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
