@@ -108,4 +108,16 @@ def has_bmodocker():
     return has_docker() and have_docker_images(['bmoweb'])
 
 
+@check('internet', 'Require internet connectivity')
+def has_internet():
+    try:
+        import socket
+        host = socket.gethostbyname('www.mozilla.org')
+        socket.create_connection((host, 80,), 2)
+        return True
+
+    except OSError:
+        return False
+
+
 require(sys.argv[1:])

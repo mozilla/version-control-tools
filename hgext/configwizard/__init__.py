@@ -15,10 +15,16 @@ from mercurial import (
     cmdutil,
     demandimport,
     error,
+    hg,
+    localrepo,
     ui as uimod,
     util,
 )
 from mercurial.i18n import _
+from mercurial.commands import (
+    pull as hgpull,
+    update as hgupdate,
+)
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -268,6 +274,43 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+
+EVOLVE_INFO_WARNING = '''
+The evolve extension is an experimental extension for faster and
+safer mutable history. It implements the changeset evolution concept
+for Mercurial, allowing for safe and simple history re-writing. It
+includes some new commands such as fold, prune and amend which may
+improve your user experience with Mercurial.
+
+The evolve extension is recommended but is still experimental.
+Although its goal is to improve stability, usage may result in weird
+project states and complicate certain workflows.
+
+(Relevant config option: extensions.evolve)
+
+Would you like to enable the evolve extension? (Yn) $$ &Yes $$ &No
+'''
+
+EVOLVE_UPDATE_PROMPT = '''
+It looks like the setup wizard has already installed a copy of the
+evolve extension on your machine, at {evolve_dir}.
+
+(Relevant config option: extensions.evolve)
+
+Would you like to update evolve to the latest version?  (Yn) $$ &Yes $$ &No
+'''
+
+EVOLVE_CLONE_ERROR = '''
+Could not clone the evolve extension for installation.
+You can install evolve yourself with
+
+  $ pip install --user hg-evolve
+
+and then enable the extension via
+
+  $ hg config -e
+'''
+
 MULTIPLE_VCT = '''
 *** WARNING ***
 
@@ -319,6 +362,7 @@ wizardsteps = set([
     'pager',
     'curses',
     'historyediting',
+    'evolve',
     'fsmonitor',
     'blackbox',
     'security',
@@ -386,6 +430,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'historyediting' in runsteps:
         _checkhistoryediting(ui, cw)
+
+    if 'evolve' in runsteps:
+        _checkevolve(ui, cw)
 
     if 'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
@@ -534,6 +581,15 @@ def _promptnativeextension(ui, cw, ext, msg):
             cw.c['extensions'] = {}
 
         cw.c['extensions'][ext] = ''
+
+
+def _vcthome():  # Returns the directory where the vct clone is located
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.path.normpath(os.path.join(here, '..'))
+    vct_dir = os.path.normpath(os.path.join(ext_dir, '..'))
+    vcthome_dir = os.path.normpath(os.path.join(vct_dir, '..'))
+
+    return vcthome_dir
 
 
 def _vctextpath(ext, path=None):
@@ -692,7 +748,7 @@ def _checkcurses(ui, cw):
             except Exception:
                 return
 
-    if ui.promptchoice(CURSES_INFO):
+    if uipromptchoice(ui, CURSES_INFO):
         return
 
     cw.c.setdefault('ui', {})
@@ -711,6 +767,53 @@ def _checkhistoryediting(ui, cw):
 
     cw.c['extensions']['histedit'] = ''
     cw.c['extensions']['rebase'] = ''
+
+
+def _checkevolve(ui, cw):
+    remote_evolve_path = 'https://www.mercurial-scm.org/repo/evolve/'
+    # Install to the same dir as v-c-t, unless the mozbuild directory path is passed (testing)
+    evolve_clone_dir = ui.config('mozilla', 'mozbuild_state_path', _vcthome())
+
+    local_evolve_path = '{evolve_clone_dir}/evolve'.format(evolve_clone_dir=evolve_clone_dir)
+    evolve_config_value = '{evolve_path}/hgext3rd/evolve'.format(evolve_path=local_evolve_path)
+
+    # If evolve is not installed, install it
+    if not ui.hasconfig('extensions', 'evolve'):
+        if uipromptchoice(ui, EVOLVE_INFO_WARNING):
+            return
+
+        try:
+            # Clone the evolve extension and enable
+            hg.clone(ui, {}, remote_evolve_path, branch=('stable',), dest=local_evolve_path)
+            _enableext(cw, 'evolve', evolve_config_value)
+
+            ui.write('Evolve was downloaded successfully.\n')
+
+        except error.Abort as hg_err:
+            ui.write(str(hg_err))
+            ui.write(EVOLVE_CLONE_ERROR)
+
+    # If evolve is installed and managed by this wizard,
+    # update it via pull/update
+    elif ui.config('extensions', 'evolve') == evolve_config_value:
+        if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT.format(evolve_dir=local_evolve_path)):
+            return
+
+        try:
+            local_evolve_repo = localrepo.localrepository(ui, local_evolve_path)
+
+            # Pull the latest stable, update to tip
+            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=('stable',))
+            hgupdate(ui, local_evolve_repo, rev='stable')
+
+            ui.write('Evolve was updated successfully.\n')
+
+        except error.Abort as hg_err:
+            ui.write(EVOLVE_CLONE_ERROR)
+
+    # If evolve is not managed by this wizard, do nothing
+    else:
+        return
 
 
 def _checkfsmonitor(ui, cw, hgversion):
@@ -748,7 +851,7 @@ def _checkfsmonitor(ui, cw, hgversion):
 def _checkwip(ui, cw):
     havewip = ui.hasconfig('alias', 'wip')
 
-    if not havewip and ui.promptchoice(WIP_INFO):
+    if not havewip and uipromptchoice(ui, WIP_INFO):
         return
 
     # The wip configuration changes over time. Ensure it is up to date.
