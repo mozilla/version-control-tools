@@ -9,7 +9,6 @@ import inspect
 import mercurial.bookmarks as bookmarks
 import mercurial.cmdutil as cmdutil
 import mercurial.context as context
-import mercurial.error as error
 import mercurial.hg as hg
 import mercurial.lock as lockmod
 import mercurial.obsolete as obsolete
