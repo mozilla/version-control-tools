@@ -6,15 +6,17 @@
 from collections import OrderedDict
 import inspect
 
-import mercurial.bookmarks as bookmarks
-import mercurial.cmdutil as cmdutil
-import mercurial.context as context
-import mercurial.hg as hg
-import mercurial.lock as lockmod
-import mercurial.obsolete as obsolete
-import mercurial.phases as phases
-import mercurial.repair as repair
-import mercurial.util as util
+from mercurial import (
+    bookmarks,
+    cmdutil,
+    context,
+    hg,
+    lock as lockmod,
+    obsolete,
+    phases,
+    repair,
+    util,
+)
 
 
 # Mercurial 3.5 renamed bookmarks.readcurrent to bookmarks.readactive.
