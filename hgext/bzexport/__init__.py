@@ -928,14 +928,11 @@ def create_attachment(ui, api_server, auth, bug,
 
 def patch_id(ui, repo, rev):
     """The patch_id is used for determining whether to obsolete an existing patch
-    in bugzilla. For mq, you want this to be the patch name. Otherwise, if
-    obsolescence markers are available, use them to track back to a unique base
+    in bugzilla. For mq, you want this to be the patch name. Otherwise, use
+    obsolescence markers to track back to a unique base
     changeset. This isn't completely guaranteed (eg if you split a patch, it
     makes assumptions about which patch is the "original"), but it ought to be
-    a good default for evolve users. If obsolescence markers are unavailable,
-    use a bookmark name if given (under the assumption you're doing
-    bookmark-based feature branches and the common case is one patch per
-    feature). Failing all that, use the hash.
+    a good default for evolve users.
     """
 
     try:
@@ -949,18 +946,8 @@ def patch_id(ui, repo, rev):
     ctx = scmutil.revsingle(repo, rev)
     fullrepo = repo.unfiltered()
 
-    if repo.obsstore.precursors.get(ctx.node()):
-        base = scmutil.revsingle(fullrepo, 'bzbasechange(%s)' % rev)
-        return 'base-' + node.short(base.node())
-
-    try:
-        bookmarks = repo.names['bookmarks'].names(repo, ctx.node())
-        if len(bookmarks) > 0:
-            return 'book-' + bookmarks[0]
-    except error.RepoLookupError:
-        ui.debug("revision is not a bookmark\n")
-
-    return 'base-' + node.short(ctx.node())
+    base = scmutil.revsingle(fullrepo, 'bzbasechange(%s)' % rev)
+    return 'base-' + node.short(base.node())
 
 @command('bzexport', [
          ('d', 'description', '', 'Bugzilla attachment description'),
