@@ -4,6 +4,7 @@
 """Utility functions for rewriting changesets."""
 
 from collections import OrderedDict
+import inspect
 
 import mercurial.bookmarks as bookmarks
 import mercurial.cmdutil as cmdutil
@@ -70,11 +71,22 @@ def preservefilectx(oldctx):
             # isexec and islink didn't exist until Mercurial 3.2.
             islink = 'l' in fctx.flags()
             isexec = 'x' in fctx.flags()
-            return context.memfilectx(repo, path, fctx.data(),
-                                      islink=islink,
-                                      isexec=isexec,
-                                      copied=copied,
-                                      memctx=memctx)
+
+            # TRACKING hg45 memctx argument was renamed to changectx and
+            # converted from a named argument to positional argument in 4.5.
+            spec = inspect.getargspec(context.memfilectx.__init__)
+
+            if 'changectx' in spec.args:
+                return context.memfilectx(repo, memctx, path, fctx.data(),
+                                          islink=islink,
+                                          isexec=isexec,
+                                          copied=copied)
+            else:
+                return context.memfilectx(repo, path, fctx.data(),
+                                          islink=islink,
+                                          isexec=isexec,
+                                          copied=copied,
+                                          memctx=memctx)
         except KeyError:
             return None
 
