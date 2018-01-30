@@ -269,8 +269,8 @@ def handle_pending_mozreview_updates(dbconn):
     mozreview_pingback = mozreview.MozReviewPingback()
     lando_pingback = lando.LandoPingback()
 
-    updated = []
-    all_posted = True
+    completed = []
+    failed = False
     for row in cursor.fetchall():
         update_id, transplant_id, request, data = row
 
@@ -310,25 +310,35 @@ def handle_pending_mozreview_updates(dbconn):
                         (pingback.name, pingback_url, transplant_id))
 
             status_code, text = pingback.update(pingback_url, data)
+
             if status_code == 200:
-                updated.append([update_id])
-            else:
+                # Success.
+                completed.append([update_id])
+
+            elif status_code == 404:
+                # Submitting system "forgot" about this request; delete it
+                # so we can continuing processing pending updates.
                 logger.info('failed: %s - %s' % (status_code, text))
-                all_posted = False
+                completed.append([update_id])
+
+            else:
+                # Treat anything else as a transient failure.
+                logger.info('failed: %s - %s' % (status_code, text))
+                failed = True
                 break
 
         else:
-            updated.append([update_id])
+            completed.append([update_id])
 
-    if updated:
+    if completed:
         query = """
             delete from MozreviewUpdate
             where id=%s
         """
-        cursor.executemany(query, updated)
+        cursor.executemany(query, completed)
         dbconn.commit()
 
-    return all_posted
+    return not failed
 
 
 def get_dbconn(dsn):
