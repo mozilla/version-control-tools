@@ -9,6 +9,7 @@ unrelated repository into a sub-directory of another.
 
 from __future__ import absolute_import
 
+import inspect
 import os
 import shlex
 import subprocess
@@ -224,14 +225,29 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
         sourcefl = sourcerepo.file(sourcepath)
         data = sourcefl.read(node)
 
+        islink = 'l' in flags
+        isexec = 'x' in flags
+
         copied = None
         renamed = sourcefl.renamed(node)
         if renamed:
             copied = '%s%s' % (prefix, renamed[0])
 
-        return context.memfilectx(repo, path, data, islink='l' in flags,
-                                  isexec='x' in flags, copied=copied,
-                                  memctx=memctx)
+        # TRACKING hg45 Mercurial 4.5 renamed memctx to changectx and made
+        # the argument positional instead of named.
+        spec = inspect.getargspec(context.memfilectx.__init__)
+
+        if 'changectx' in spec.args:
+            return context.memfilectx(repo, memctx, path, data,
+                                      islink=islink,
+                                      isexec=isexec,
+                                      copied=copied)
+        else:
+            return context.memfilectx(repo, path, data,
+                                      islink=islink,
+                                      isexec=isexec,
+                                      copied=copied,
+                                      memctx=memctx)
 
     parents = [destctx.node(), None]
     files = ['%s%s' % (prefix, f) for f in sourcectx.files()]
