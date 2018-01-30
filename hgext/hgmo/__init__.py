@@ -674,6 +674,8 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
         setconfig('pushlog', ['pushlog'])
         setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
 
+        ui.setconfig('web', 'logoimg', 'moz-logo-bw-rgb.svg')
+
         # Since new extensions may have been flagged for loading, we need
         # to obtain a new repo instance to a) trigger loading of these
         # extensions b) force extensions' reposetup function to run.
