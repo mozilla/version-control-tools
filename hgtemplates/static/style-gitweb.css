@@ -78,6 +78,16 @@ div#hint {
   border-radius: 5px;
 }
 
+.logo {
+    position: relative;
+    float: right;
+    display: block;
+    direction: ltr;
+    overflow: hidden;
+    width: 78px;
+    height: 25px;
+}
+
 #searchform:hover div#hint { display: block; }
 
 tr.thisrev a { color:#999999; text-decoration: none; }

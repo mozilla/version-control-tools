@@ -43,7 +43,7 @@ Page showing table of Firefox releases is available
   <body>
   
   <div class="page_header">
-  <a href="https://mercurial-scm.org/" title="Mercurial" style="float: right;">Mercurial</a>
+  <div class="logo">        <a href="https://mercurial-scm.org/">            <img src="/static/hglogo.png" alt="mercurial" />        </a>    </div>
   <a href="/">Mercurial</a>  / firefoxreleases
   </div>
   

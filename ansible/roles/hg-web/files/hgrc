@@ -11,6 +11,7 @@ hg.mozilla.org:fingerprints = sha256:8E:AD:F7:6A:EB:44:06:15:ED:F3:E4:69:A6:64:6
 
 [web]
 logourl = https://developer.mozilla.org/en/docs/Mercurial
+logoimg = moz-logo-bw-rgb.svg
 style = gitweb_mozilla
 allow_archive = bz2 gz zip
 templates = /repo_local/mozilla/hg_templates/
