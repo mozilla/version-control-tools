@@ -35,7 +35,7 @@ if util.safehasattr(registrar, 'configitem'):
     configitem('push-to-try', 'nodate',
                default=False)
 
-testedwith = '3.9 4.0 4.1 4.2'
+testedwith = '4.1 4.2 4.3 4.4'
 
 @command('push-to-try', [
     ('m', 'message', '', 'commit message to use', 'MESSAGE'),
