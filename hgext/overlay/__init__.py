@@ -28,6 +28,11 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
 
 testedwith = '4.1 4.2'
 
@@ -40,6 +45,14 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('overlay', 'sourceurl',
+               default=configitems.dynamicdefault)
 
 REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
