@@ -1426,7 +1426,8 @@ def reposetup(ui, repo):
                 except KeyError:
                     pass
 
-            self.remoterefs.write()
+            with self.wlock():
+                self.remoterefs.write()
 
         def _revision_milestone(self, rev):
             """Look up the Gecko milestone of a revision."""
@@ -1536,13 +1537,12 @@ def reposetup(ui, repo):
                 with self.transaction('prunerelbranch') as tr:
                     self._bookmarks.recordchange(tr)
 
-            todelete = [ref for ref in self.remoterefs.keys()
-                        if ref.endswith('RELBRANCH')]
-            for ref in todelete:
-                del self.remoterefs[ref]
+                todelete = [ref for ref in self.remoterefs.keys()
+                            if ref.endswith('RELBRANCH')]
+                for ref in todelete:
+                    del self.remoterefs[ref]
 
-            self.remoterefs.write()
-
+                self.remoterefs.write()
 
 
     repo.__class__ = remotestrackingrepo
