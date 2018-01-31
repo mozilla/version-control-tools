@@ -40,6 +40,12 @@ if util.safehasattr(policy, 'importmod'):
 else:
     from mercurial import base85
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 testedwith = '4.1 4.2'
 
 cmdtable = {}
@@ -50,6 +56,29 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('replicationproducer', 'hosts',
+               default=[])
+    configitem('replicationproducer', 'clientid',
+               default=None)
+    configitem('replicationproducer', 'connecttimeout',
+               default=configitems.dynamicdefault)
+    configitem('replicationproducer', 'topic',
+               default=None)
+    configitem('replicationproducer', 'reqacks',
+               default=configitems.dynamicdefault)
+    configitem('replicationproducer', 'acktimeout',
+               default=0)
+    configitem('replicationproducer', 'producermap.*',
+               default=configitems.dynamicdefault)
+    configitem('replication', 'unfiltereduser',
+               default=None)
 
 
 def precommithook(ui, repo, **kwargs):
