@@ -353,6 +353,31 @@ except (ImportError, AttributeError):
     except AttributeError:
         command = None
 
+try:
+    from mercurial import registrar
+except ImportError:
+    registrar = None
+
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
+if registrar and util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    # TODO some of these are registered elsewhere. This can produce a warning
+    # for duplicate registration. We should ideally call a shared function
+    # that only registers once.
+    configitem('configwizard', 'steps',
+               default=[])
+    configitem('bugzilla', 'username',
+               default=None)
+    configitem('bugzilla', 'apikey',
+               default=None)
+    configitem('mozilla', 'ircnick',
+               default=None)
 
 wizardsteps = set([
     'hgversion',
