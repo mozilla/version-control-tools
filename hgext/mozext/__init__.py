@@ -1533,9 +1533,17 @@ def reposetup(ui, repo):
                 with self.transaction('prunerelbranch') as tr:
                     for bm in todelete:
                         ui.warn('Removing bookmark %s\n' % bm)
-                        del self._bookmarks[bm]
 
-                    self._bookmarks.recordchange(tr)
+                    # TRACKING hg43 __delitem__ + recordchange() are deprecated
+                    # in favor of applychanges(), which was introduced in 4.3.
+
+                    if util.safehasattr(self._bookmarks, 'applychanges'):
+                        changes = [(bm, None) for bm in todelete]
+                        self._bookmarks.applychanges(self, tr, changes)
+                    else:
+                        for bm in todelete:
+                            del self._bookmarks[bm]
+                        self._bookmarks.recordchange(tr)
 
                 todelete = [ref for ref in self.remoterefs.keys()
                             if ref.endswith('RELBRANCH')]
