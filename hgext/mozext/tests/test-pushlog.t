@@ -49,6 +49,7 @@ Pull via http:// will fetch pushlog
   adding file changes
   added 1 changesets with 1 changes to 1 files
   added 1 pushes
+  new changesets 96ee1d7354c4 (?)
 
 Pull via ssh:// will not fetch pushlog
 
@@ -59,3 +60,4 @@ Pull via ssh:// will not fetch pushlog
   adding file changes
   added 1 changesets with 1 changes to 1 files
   cannot fetch pushlog when pulling via ssh://; you should be pulling via https://
+  new changesets 96ee1d7354c4 (?)
