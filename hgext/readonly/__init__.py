@@ -19,11 +19,24 @@ as read only.
 import errno
 
 from mercurial.i18n import _
-from mercurial import util
+from mercurial import (
+    registrar,
+    util,
+)
 
 testedwith = '4.1 4.2'
 minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('readonly', 'globalreasonfile',
+               default=None)
+
 
 def prechangegrouphook(ui, repo, **kwargs):
     return checkreadonly(ui, repo, 'add changesets')
