@@ -146,6 +146,9 @@ if __name__ == '__main__':
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
     hg_tests = test_files['hg']
+    # Tests requiring Docker in some form.
+    docker_tests = {t for t, reqs in test_files['docker_requirements'].items()
+                    if reqs}
 
     possible_tests = [os.path.normpath(os.path.abspath(a))
                       for a in extra[1:] if not a.startswith('-')]
@@ -186,6 +189,11 @@ if __name__ == '__main__':
                 run_hg_tests.append(t)
 
     run_all_tests = run_hg_tests + run_unit_tests
+
+    run_hg_tests_docker = [t for t in run_hg_tests if t in docker_tests]
+    run_hg_tests_no_docker = [t for t in run_hg_tests if t not in docker_tests]
+    run_unit_tests_docker = [t for t in run_unit_tests if t in docker_tests]
+    run_unit_tests_no_docker = [t for t in run_unit_tests if t not in docker_tests]
 
     if not options.jobs and len(run_all_tests) > 1:
         print('WARNING: Not running tests optimally. Specify -j to run tests '
@@ -237,19 +245,42 @@ if __name__ == '__main__':
         # separate directories. Manually remove .err files.
         remove_err_files(run_hg_tests)
 
+        # Docker tests are a bit heavyweight and tend to fail more than
+        # non-Docker tests. We perform multiple invocations. First without
+        # Docker. Then with.
+
+        print('Running non-Docker Mercurial tests')
+        res = subprocess.call(hg_harness_args + run_hg_tests_no_docker,
+                              cwd=HERE)
+
         # We should ideally not leak containers and images. But until
         # the Mercurial test harness allows tests to register cleanup
         # actions, there is only so much we can do.
+        print('Running Docker Mercurial tests')
         with auto_clean_orphans():
-            res = subprocess.call(hg_harness_args + run_hg_tests, cwd=HERE)
+            res2 = subprocess.call(hg_harness_args + run_hg_tests_docker,
+                                   cwd=HERE)
+
+        if res2:
+            res = res2
 
     if run_unit_tests:
-        with auto_clean_orphans():
-            noseres = run_nose_tests(run_unit_tests, options.jobs,
-                                     verbose=verbose)
+        nose_res = 0
 
-        if noseres:
-            res = noseres
+        if run_unit_tests_no_docker:
+            print('Running non-Docker unit tests')
+            nose_res = run_nose_tests(run_unit_tests_no_docker, options.jobs,
+                                      verbose=verbose)
+            if nose_res:
+                res = nose_res
+
+        if run_unit_tests_docker:
+            print('Running Docker unit tests')
+            with auto_clean_orphans():
+                nose_res2 = run_nose_tests(run_unit_tests_docker, options.jobs,
+                                           verbose=verbose)
+            if nose_res2:
+                res = nose_res2
 
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
@@ -298,8 +329,11 @@ if __name__ == '__main__':
 
             hg_path = os.path.join(mercurials_dir, version, 'bin', 'hg')
 
-            args = list(orig_args) + ['--with-hg', hg_path] + sorted(tests)
-            args[0] = RUNTESTS
+            common_args = list(orig_args) + ['--with-hg', hg_path]
+            common_args[0] = RUNTESTS
+
+            tests_docker = sorted(t for t in tests if t in docker_tests)
+            tests_no_docker = sorted(t for t in tests if t not in docker_tests)
 
             real_version = get_hg_version(hg_path)
 
@@ -307,8 +341,15 @@ if __name__ == '__main__':
                 version, real_version))
             sys.stdout.flush()
             os.environ['HGVERSION'] = real_version
+
+            print('Running non-Docker Mercurial tests')
+            subprocess.call(common_args + tests_no_docker, cwd=HERE)
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+            print('Running Docker Mercurial tests')
             with auto_clean_orphans():
-                subprocess.call(args, cwd=HERE)
+                subprocess.call(common_args + tests_docker, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
