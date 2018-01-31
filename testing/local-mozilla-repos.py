@@ -14,6 +14,11 @@ to answer true to "is a Mozilla repository."
 import os
 import sys
 
+from mercurial import (
+    registrar,
+    util,
+)
+
 try:
     from mozautomation import repository
 except ImportError:
@@ -21,6 +26,17 @@ except ImportError:
     sys.path.insert(0, os.path.normpath(os.path.join(root, 'pylib', 'mozautomation')))
 
     from mozautomation import repository
+
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
+# config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('localmozrepo', 'readuri', default=None)
+    configitem('localmozrepo', 'writeuri', default=None)
+
 
 def extsetup(ui):
     read_uri = ui.config('localmozrepo', 'readuri')
