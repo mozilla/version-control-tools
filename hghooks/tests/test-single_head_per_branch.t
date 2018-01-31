@@ -139,6 +139,7 @@ Hidden changesets should not impact head detection.
   adding manifests
   adding file changes
   added 9 changesets with 8 changes to 1 files (+1 heads)
+  new changesets c234df62ae3d:befc484a90fb (?)
   updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd client3
