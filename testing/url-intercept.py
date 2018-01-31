@@ -15,14 +15,28 @@ needed.
 import urllib2
 from StringIO import StringIO
 
-from mercurial import util
+from mercurial import (
+    registrar,
+    util,
+)
+
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('urlintercept', 'path',
+               default=None)
+
 
 class URLInterceptor(object):
     def __init__(self, ui):
         self.ui = ui
 
     def open(self, url, data=None, timeout=None):
-        path = self.ui.config('urlintercept', 'path', None)
+        path = self.ui.config('urlintercept', 'path')
         if not path:
             raise util.Abort('no urlintercept path defined!')
 
