@@ -26,6 +26,15 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('push-to-try', 'nodate',
+               default=False)
+
 testedwith = '3.9 4.0 4.1 4.2'
 
 @command('push-to-try', [
