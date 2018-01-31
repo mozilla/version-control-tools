@@ -1,5 +1,8 @@
+  $ . $TESTDIR/hghooks/tests/common.sh
+
   $ mkdir integration
   $ hg init integration/mozilla-inbound
+  $ configurehooks integration/mozilla-inbound
   $ cat >> integration/mozilla-inbound/.hg/hgrc << EOF
   > [hooks]
   > pretxnchangegroup.push_printurls = python:mozhghooks.push_printurls.hook
