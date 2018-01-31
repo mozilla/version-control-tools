@@ -15,7 +15,10 @@ from mercurial import (
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py'))
 
-from mozhg.auth import getbugzillaauth
+from mozhg.auth import (
+    getbugzillaauth,
+    register_config_items,
+)
 
 cmdtable = {}
 
@@ -25,6 +28,14 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    register_config_items(configitem)
 
 
 @command('bzauth', [
