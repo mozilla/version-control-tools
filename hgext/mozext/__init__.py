@@ -1529,16 +1529,17 @@ def reposetup(ui, repo):
         def prune_relbranch_refs(self):
             todelete = [bm for bm in self._bookmarks.keys()
                         if bm.endswith('RELBRANCH')]
-            for bm in todelete:
-                ui.warn('Removing bookmark %s\n' % bm)
-                del self._bookmarks[bm]
-
             with self.wlock(), self.lock():
                 with self.transaction('prunerelbranch') as tr:
+                    for bm in todelete:
+                        ui.warn('Removing bookmark %s\n' % bm)
+                        del self._bookmarks[bm]
+
                     self._bookmarks.recordchange(tr)
 
                 todelete = [ref for ref in self.remoterefs.keys()
                             if ref.endswith('RELBRANCH')]
+
                 for ref in todelete:
                     del self.remoterefs[ref]
 
