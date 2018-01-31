@@ -36,6 +36,7 @@ if util.safehasattr(registrar, 'configitem'):
                default=False)
 
 testedwith = '4.1 4.2 4.3 4.4'
+minimumhgversion = '4.1'
 
 @command('push-to-try', [
     ('m', 'message', '', 'commit message to use', 'MESSAGE'),
