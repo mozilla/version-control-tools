@@ -54,12 +54,14 @@ Activating the hook causes tags cache to get populated
 
   $ tail -10 ../server/.hg/blackbox.log
   *> 1 incoming changes - new heads: 5e849d85a748 (glob)
-  *> updated base branch cache in * seconds (glob)
-  *> wrote base branch cache with 1 labels and 1 nodes (glob)
+  *> updated base branch cache in * seconds (glob) (?)
+  *> wrote base branch cache with 1 labels and 1 nodes (glob) (?)
   *> writing 72 bytes to cache/hgtagsfnodes1 (glob)
   *> 0/1 cache hits/lookups in * seconds (glob)
   *> writing .hg/cache/tags2-served with 2 tags (glob)
   *> 1/1 cache hits/lookups in * seconds (glob)
   *> writing .hg/cache/tags2 with 2 tags (glob)
   *> pythonhook-pretxnclose: mozhghooks.populate_caches.hook finished in * seconds (glob)
+  *> updated base branch cache in * seconds (glob) (?)
+  *> wrote base branch cache with 1 labels and 1 nodes (glob) (?)
   *> 1 incoming changes - new heads: cf120f74c0ec (glob)
