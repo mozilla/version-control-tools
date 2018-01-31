@@ -1532,7 +1532,7 @@ def reposetup(ui, repo):
                 ui.warn('Removing bookmark %s\n' % bm)
                 del self._bookmarks[bm]
 
-            with self.lock():
+            with self.wlock(), self.lock():
                 with self.transaction('prunerelbranch') as tr:
                     self._bookmarks.recordchange(tr)
 
