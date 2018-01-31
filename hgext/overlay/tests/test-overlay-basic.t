@@ -27,6 +27,7 @@
   adding manifests
   adding file changes
   added 2 changesets with 3 changes to 3 files
+  new changesets 44791c369f4c:afdf9d98d53c (?)
   44791c369f4c -> c129882b47be: add dir0/file0 and dir0/file1
   afdf9d98d53c -> 3c931698b680: add dir1/file0
 

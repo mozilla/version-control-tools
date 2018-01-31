@@ -27,6 +27,7 @@
   adding manifests
   adding file changes
   added 2 changesets with 3 changes to 3 files
+  new changesets 44791c369f4c:3b2a19679264 (?)
   3b2a19679264 -> e9b986f72c98: add dir1/file0
 
   $ hg log -p --debug

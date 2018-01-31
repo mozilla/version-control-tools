@@ -29,6 +29,7 @@ First overlay works fine
   adding manifests
   adding file changes
   added 4 changesets with 4 changes to 4 files
+  new changesets bd685f66c1fc:0f7e081c425c (?)
   bd685f66c1fc -> 81fcbcf78f0a: add foo
   13a44cc39ddc -> 0aac34b31cb4: add bar
   2bb8fd7676d0 -> 645c9fffdee6: copy foo to foo-copy
@@ -53,6 +54,7 @@ Addition of file in destination fails precondition testing
   adding manifests
   adding file changes
   added 1 changesets with 2 changes to 2 files
+  new changesets * (glob) (?)
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
   abort: files mismatch between source and destination: extra-file
   (destination must match previously imported changeset (0f7e081c425c) exactly)

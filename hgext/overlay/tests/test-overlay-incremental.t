@@ -22,6 +22,7 @@
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 00f6e41c0e85:c71ec8379b05 (?)
   00f6e41c0e85 -> 680a5f65e0c3: source commit 0
   c71ec8379b05 -> 81f80944e32d: source commit 1
 
@@ -44,6 +45,7 @@ New changeset in source should get applied as expected
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets 60f2998d907d (?)
   c71ec8379b05 already processed as 81f80944e32d; skipping 2/3 revisions
   60f2998d907d -> 50fab12f8664: source commit 2
 
@@ -75,6 +77,7 @@ New changeset in source and dest results in being applied on latest in dest
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets 2d54a6016dfe (?)
   60f2998d907d already processed as 50fab12f8664; skipping 3/4 revisions
   2d54a6016dfe -> 3b62843da7a4: source commit 3
 

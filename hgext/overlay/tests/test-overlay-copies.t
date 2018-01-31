@@ -26,6 +26,7 @@
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 3 files
+  new changesets 6e554f89d70b:120fa44d9d88 (?)
   6e554f89d70b -> b7adb4318010: add file-original
   abfabb8b7304 -> fb3553af8eea: copy to file-copy
   120fa44d9d88 -> 5159eec60fc8: rename file-original to file-renamed

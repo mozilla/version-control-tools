@@ -43,6 +43,7 @@ A non-contiguous dag range will fail to overlay.
   adding manifests
   adding file changes
   added 5 changesets with 5 changes to 1 files
+  new changesets af1e0a150cd4:eebf284459b0 (?)
   abort: source revisions must be part of contiguous DAG range
   [255]
 
@@ -76,6 +77,7 @@ Incremental conversion with --noncontiguous works
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 3637e5af7e77:8c4d7f24662e (?)
   abort: source revisions must be part of contiguous DAG range
   [255]
 

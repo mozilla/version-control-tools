@@ -74,6 +74,7 @@ Non-contiguous revision range is an error
   adding manifests
   adding file changes
   added 7 changesets with 7 changes to 1 files
+  new changesets af1e0a150cd4:775588bbd687 (?)
   abort: source revisions must be part of contiguous DAG range
   [255]
 
