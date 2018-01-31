@@ -47,7 +47,7 @@ Running Tests
 
 To run the vcssync tests, run::
 
-   $ ./run-tests -j4
+   $ ./run-tests
 
 Using Betamax for HTTP Request Replaying
 ========================================

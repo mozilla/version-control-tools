@@ -9,6 +9,8 @@ from __future__ import print_function
 
 import argparse
 import errno
+import math
+import multiprocessing
 import os
 import subprocess
 import sys
@@ -189,9 +191,18 @@ if __name__ == '__main__':
     run_unit_tests_docker = [t for t in run_unit_tests if t in docker_tests]
     run_unit_tests_no_docker = [t for t in run_unit_tests if t not in docker_tests]
 
-    if not options.jobs and len(run_all_tests) > 1:
-        print('WARNING: Not running tests optimally. Specify -j to run tests '
-                'in parallel.', file=sys.stderr)
+    # By default, run 1.25 * CPU count non-Docker tests in parallel.
+    # Docker tests are much more expensive. So give them 2 cores each.
+    # Memory constrained environments may not be able to handle the Docker
+    # default. We may want to consider taking memory capacity into account
+    # as well.
+    no_docker_jobs = max(int(math.floor(float(multiprocessing.cpu_count()) * 1.25)),
+                         1)
+    docker_jobs = max(multiprocessing.cpu_count() / 2, 1)
+
+    if options.jobs:
+        no_docker_jobs = options.jobs
+        docker_jobs = options.jobs
 
     # Enable tests to interact with our Docker controlling script.
     have_docker = False
@@ -213,6 +224,10 @@ if __name__ == '__main__':
                 get_docker_state(docker, venv_name, run_all_tests,
                                  verbose=verbose,
                                  use_last=options.use_last_images))
+
+    print('Will run %d non-Docker tests concurrently' % no_docker_jobs)
+    if have_docker:
+        print('Will run %d Docker tests concurrently' % docker_jobs)
 
     # Our custom HGHAVE introduces a check for running Mercurial version.
     # This is done by consulting a HGVERSION environment variable.
@@ -242,8 +257,8 @@ if __name__ == '__main__':
         # Docker. Then with.
 
         print('Running non-Docker Mercurial tests')
-        res = subprocess.call(hg_harness_args + run_hg_tests_no_docker,
-                              cwd=HERE)
+        args = hg_harness_args + ['-j', str(no_docker_jobs)] + run_hg_tests_no_docker
+        res = subprocess.call(args, cwd=HERE)
 
         if have_docker and run_hg_tests_docker:
             # We should ideally not leak containers and images. But until
@@ -251,8 +266,8 @@ if __name__ == '__main__':
             # actions, there is only so much we can do.
             print('Running Docker Mercurial tests')
             with docker.auto_clean_orphans():
-                res2 = subprocess.call(hg_harness_args + run_hg_tests_docker,
-                                       cwd=HERE)
+                args = hg_harness_args + ['-j', str(docker_jobs)] + run_hg_tests_docker
+                res2 = subprocess.call(args, cwd=HERE)
                 if res2:
                     res = res2
         elif run_hg_tests_docker:
@@ -264,7 +279,7 @@ if __name__ == '__main__':
 
         if run_unit_tests_no_docker:
             print('Running non-Docker unit tests')
-            nose_res = run_nose_tests(run_unit_tests_no_docker, options.jobs,
+            nose_res = run_nose_tests(run_unit_tests_no_docker, no_docker_jobs,
                                       verbose=verbose)
             if nose_res:
                 res = nose_res
@@ -272,7 +287,7 @@ if __name__ == '__main__':
         if have_docker and run_unit_tests_docker:
             print('Running Docker unit tests')
             with docker.auto_clean_orphans():
-                nose_res2 = run_nose_tests(run_unit_tests_docker, options.jobs,
+                nose_res2 = run_nose_tests(run_unit_tests_docker, docker_jobs,
                                            verbose=verbose)
             if nose_res2:
                 res = nose_res2
@@ -341,14 +356,16 @@ if __name__ == '__main__':
             os.environ['HGVERSION'] = real_version
 
             print('Running non-Docker Mercurial tests')
-            subprocess.call(common_args + tests_no_docker, cwd=HERE)
+            args = common_args + ['-j', str(no_docker_jobs)] + tests_no_docker
+            subprocess.call(args, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
             if have_docker and tests_docker:
                 print('Running Docker Mercurial tests')
                 with docker.auto_clean_orphans():
-                    subprocess.call(common_args + tests_docker, cwd=HERE)
+                    args = common_args + ['-j', str(docker_jobs)] + tests_docker
+                    subprocess.call(args, cwd=HERE)
                 sys.stdout.flush()
                 sys.stderr.flush()
             elif tests_docker:

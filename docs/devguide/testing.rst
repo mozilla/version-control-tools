@@ -43,10 +43,6 @@ testing harness.
 
 Common tasks are described below.
 
-Run all tests, 4 at a time::
-
-  $ ./run-tests -j4
-
 Obtain code coverage results (makes tests run slower)::
 
   $ ./run-tests --cover
@@ -82,6 +78,10 @@ Do not run Selenium tests::
 Do not run tests that require Docker::
 
   $ ./run-tests --no-docker
+
+Run tests 1 at a time::
+
+  $ ./run-tests -j1
 
 Authoring Tests
 ===============
