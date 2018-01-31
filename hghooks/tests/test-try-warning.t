@@ -57,7 +57,7 @@ Pushing a changeset with '-p none' should error out
 Pushing a changeset with try syntax on the tip should be allowed
 
   $ hg commit --amend -m 'try: -b do -p all'
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/0eb01296232e-7764c983-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/0eb01296232e-7764c983-amend*.hg (glob)
   $ hg push ../server
   pushing to ../server
   searching for changes

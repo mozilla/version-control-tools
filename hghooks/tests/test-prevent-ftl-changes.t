@@ -36,7 +36,7 @@ Commit adding an FTL file without appropriate reviewer errors
 Commit adding an FTL file with appropriate reviewer works
 
   $ hg commit --amend -m 'add test.ftl. r=flod'
-  saved backup bundle to $TESTTMP/client-normal/.hg/strip-backup/caf1d529f784-2085d403-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client-normal/.hg/strip-backup/caf1d529f784-2085d403-amend*.hg (glob)
   $ hg push
   pushing to $TESTTMP/normal
   searching for changes

@@ -595,7 +595,7 @@ Messages without "Source-Revision: " aren't excluded
   > Source-Repo: https://github.com/servo/servo
   > Source-Revision: 287b02e21fa2c81d58b070be36add5e951512679
   > EOF
-  saved backup bundle to $TESTTMP/striptest/client-vendor/.hg/strip-backup/4d8b899b5483-3f97f200-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/striptest/client-vendor/.hg/strip-backup/4d8b899b5483-3f97f200-amend*.hg (glob)
 
   $ hg push
   pushing to $TESTTMP/striptest/server-vendor

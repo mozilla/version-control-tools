@@ -72,7 +72,7 @@ Can't push with X-Channel- message
   > more content
   > EOF
   $ hg commit --amend -l message
-  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b84e8cc669bf-844947f5-amend-backup.hg (glob)
+  saved backup bundle to $TESTTMP/client/.hg/strip-backup/b84e8cc669bf-844947f5-amend*.hg (glob)
   $ rm message
   $ hg push
   pushing to $TESTTMP/server
