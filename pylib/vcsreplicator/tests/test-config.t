@@ -11,6 +11,12 @@ No config with extension installed should cause immediate abort
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.hosts config option not set') (?)
+  Abort: replicationproducer.hosts config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.hosts config option not set
 #else
   $ hg st
@@ -27,6 +33,12 @@ Missing clientid
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.clientid config option not set') (?)
+  Abort: replicationproducer.clientid config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.clientid config option not set
 #else
   $ hg st
@@ -42,6 +54,12 @@ Missing topic
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.topic config option not set') (?)
+  Abort: replicationproducer.topic config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.topic config option not set
 #else
   $ hg st
@@ -57,6 +75,12 @@ No partition map
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.partitionmap.* config options not set') (?)
+  Abort: replicationproducer.partitionmap.* config options not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.partitionmap.* config options not set
 #else
   $ hg st
@@ -72,6 +96,12 @@ No reqacks
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1') (?)
+  Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
   $ hg st
@@ -87,6 +117,12 @@ Bad reqacks value
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1') (?)
+  Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
   $ hg st
@@ -102,6 +138,12 @@ No acktimeout
 
 #if hg43
   $ hg st
+  Traceback (most recent call last): (?)
+    File "* (glob) (?)
+      uisetup(ui) (?)
+    File "* (glob) (?)
+      raise util.Abort('replicationproducer.acktimeout config option not set') (?)
+  Abort: replicationproducer.acktimeout config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.acktimeout config option not set
 #else
   $ hg st
