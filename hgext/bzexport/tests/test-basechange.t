@@ -42,9 +42,13 @@ Construct an obsolescence graph
   (leaving bookmark split2)
   created new head
   $ hg debugobsolete $orig $base
+  obsoleted 1 changesets (?)
   $ hg debugobsolete $base $split1 $split2
+  obsoleted 1 changesets (?)
   $ hg debugobsolete $split1 $join
+  obsoleted 1 changesets (?)
   $ hg debugobsolete $split2 $join
+  obsoleted 1 changesets (?)
   $ hg id -r "bzbasechange(init)"
   63f3804db80c init
   $ cat << EOF | while read rev expect expect_name; do hg log --hidden -r "bzbasechange($rev)" -T "base of $rev is {bookmarks}\n"; done
