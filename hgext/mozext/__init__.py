@@ -337,7 +337,7 @@ with demandimport.deactivated():
 
 bz_available = False
 
-testedwith = '4.1 4.2'
+testedwith = '4.1 4.2 4.3'
 minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
