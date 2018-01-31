@@ -23,6 +23,7 @@ Create a unified repository with tags
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets b772b099dda6:994ec05999da (?)
   (run 'hg update' to get a working copy)
   $ hg pull http://localhost:$HGPORT/integration/mozilla-inbound
   pulling from http://localhost:$HGPORT/integration/mozilla-inbound
@@ -31,6 +32,7 @@ Create a unified repository with tags
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 01d6e2d31f88:1b348279b0e9 (?)
   (run 'hg update' to get a working copy)
   $ hg pull http://localhost:$HGPORT/integration/fx-team
   pulling from http://localhost:$HGPORT/integration/fx-team
@@ -39,6 +41,7 @@ Create a unified repository with tags
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
+  new changesets 3057abf99ee2 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 
   $ cd ../..
@@ -58,6 +61,7 @@ Pulling from the unified repo will pull the Firefox tree tags
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  new changesets b772b099dda6:3057abf99ee2 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ cat .hg/firefoxtrees
   central 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d
@@ -89,6 +93,7 @@ Doing an incremental pull will print commit count change
   added 3 changesets with 3 changes to 1 files
   updated firefox tree tag fx-team (+1 commits)
   updated firefox tree tag inbound (+2 commits)
+  new changesets 3c626f0c790e:a4521c375045 (?)
   (run 'hg update' to get a working copy)
 
   $ cat .hg/firefoxtrees
@@ -112,6 +117,7 @@ Local filesystem pull should retrieve tree tags
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  new changesets b772b099dda6:a4521c375045 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 
   $ cat .hg/firefoxtrees
@@ -148,6 +154,7 @@ Serve firefoxtree tags from bookmarks
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  new changesets b772b099dda6:a4521c375045 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 
   $ cat .hg/firefoxtrees

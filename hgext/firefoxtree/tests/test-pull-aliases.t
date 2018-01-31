@@ -21,6 +21,7 @@ We can pull from the special multiple tree aliases
   adding manifests
   adding file changes
   added 4 changesets with 4 changes to 1 files
+  new changesets b772b099dda6:1b348279b0e9 (?)
   (run 'hg update' to get a working copy)
   pulling from fx-team
   searching for changes
@@ -28,6 +29,7 @@ We can pull from the special multiple tree aliases
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
+  new changesets 3057abf99ee2 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   pulling from autoland
   searching for changes

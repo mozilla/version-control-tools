@@ -29,6 +29,7 @@ localtags entries for fxtrees should get pruned on next firefoxtrees write
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets 01d6e2d31f88:1b348279b0e9 (?)
   (run 'hg update' to get a working copy)
 
   $ cat .hg/localtags

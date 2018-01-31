@@ -19,6 +19,7 @@
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
+  new changesets b772b099dda6:994ec05999da (?)
   (run 'hg update' to get a working copy)
   $ hg up central
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
