@@ -162,6 +162,7 @@ A bookmark not a firefox tree should still come through
 
 Local bookmarks matching incoming firefox tree tags should be deleted
 
+  $ rm .hg/firefoxtrees
   $ hg book -r 994ec05999daf04fb3c01a8cb0dea1458a7d4d3d central
   $ hg book -r a4521c3750458afd82406ac87977b3fdc2fdc62a fx-team
   $ hg book -r 388ff24b5456e83175491ae321bceb89aad2259f inbound
