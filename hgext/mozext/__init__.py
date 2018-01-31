@@ -307,6 +307,12 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -349,6 +355,25 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
+# config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('mozext', 'headless',
+               default=configitems.dynamicdefault)
+    configitem('mozext', 'ircnick',
+               default=None)
+    configitem('mozext', 'critic_merges',
+               default=None)
+    configitem('mozext', 'disable_local_database',
+               default=False)
+    configitem('mozext', 'noautocritic',
+               default=False)
+    configitem('mozext', 'reject_pushes_with_repo_names',
+               default=False)
 
 colortable = {
     'buildstatus.success': 'green',
@@ -1560,7 +1585,7 @@ def reposetup(ui, repo):
         ui.setconfig('hooks', 'commit.critic', critic_hook)
         ui.setconfig('hooks', 'qrefresh.critic', critic_hook)
 
-    if ui.configbool('mozext', 'reject_pushes_with_repo_names', default=False):
+    if ui.configbool('mozext', 'reject_pushes_with_repo_names'):
         ui.setconfig('hooks', 'prepushkey.reject_repo_names',
             reject_repo_names_hook)
 
