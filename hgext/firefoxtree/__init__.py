@@ -100,6 +100,12 @@ from mercurial.node import (
     short,
 )
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
@@ -119,12 +125,24 @@ COMM_ROOT_REV = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
+# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
 # cmdutil.command.
 if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
+# config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('firefoxtree', 'servetags',
+               default=configitems.dynamicdefault)
+    configitem('firefoxtree', 'servetagsfrombookmarks',
+               default=configitems.dynamicdefault)
+
 
 shorttemplate = ''.join([
     '{label("log.changeset", rev)}',
@@ -275,7 +293,7 @@ def get_firefoxtrees(repo):
 def firefoxtrees(repo, proto):
     lines = []
 
-    if repo.ui.configbool('firefoxtree', 'servetagsfrombookmarks'):
+    if repo.ui.configbool('firefoxtree', 'servetagsfrombookmarks', False):
         for name, hnode in sorted(bookmarks.listbookmarks(repo).items()):
             tree, uri = resolve_trees_to_uris([name])[0]
             if not uri:
