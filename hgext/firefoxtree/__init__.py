@@ -110,8 +110,8 @@ from mozautomation.repository import (
     TRY_TREES,
 )
 
-testedwith = '3.9 4.0 4.1 4.2'
-minimumhgversion = '3.9'
+testedwith = '4.1 4.2'
+minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
 MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
