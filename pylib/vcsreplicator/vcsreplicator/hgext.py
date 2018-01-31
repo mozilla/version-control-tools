@@ -22,17 +22,23 @@ import vcsreplicator.producer as vcsrproducer
 from mercurial.i18n import _
 from mercurial.node import hex
 from mercurial import (
-    base85,
     cmdutil,
     commands,
     error,
     extensions,
     hg,
     obsolete,
+    policy,
     registrar,
     util,
     wireproto,
 )
+
+# TRACKING hg43 4.3 imports variable modules with policy.importmod().
+if util.safehasattr(policy, 'importmod'):
+    base85 = policy.importmod('base85')
+else:
+    from mercurial import base85
 
 testedwith = '4.1 4.2'
 
