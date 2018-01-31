@@ -110,7 +110,7 @@ from mozautomation.repository import (
     TRY_TREES,
 )
 
-testedwith = '4.1 4.2'
+testedwith = '4.1 4.2 4.3'
 minimumhgversion = '4.1'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
@@ -358,6 +358,7 @@ def wrappedpullobsolete(orig, pullop):
         for tag, node, tree, uri in get_firefoxtrees(repo):
             oldtags[tag] = node
         newtags = {}
+        changes = []
         for line in lines:
             tag, node = line.split()
             newtags[tag] = node
@@ -370,8 +371,13 @@ def wrappedpullobsolete(orig, pullop):
                 oldtags[tag] = bmstore[tag]
                 repo.ui.status('(removing bookmark on %s matching firefoxtree %s)\n' %
                                (short(bmstore[tag]), tag))
-                del bmstore[tag]
-                bmstore.recordchange(pullop.trmanager.transaction())
+
+                # TRACKING hg43 applychanges() introduced in Mercurial 4.3.
+                if util.safehasattr(bmstore, 'applychanges'):
+                    changes.append((tag, None))
+                else:
+                    del bmstore[tag]
+                    bmstore.recordchange(pullop.trmanager.transaction())
 
                 if bmstore.active == tag:
                     repo.ui.status('(deactivating bookmark %s)\n' % tag)
@@ -394,6 +400,10 @@ def wrappedpullobsolete(orig, pullop):
                 msg += _(' (+%d commits)') % between
             msg += '\n'
             repo.ui.status(msg)
+
+        # TRACKING hg43
+        if changes and util.safehasattr(bmstore, 'applychanges'):
+            bmstore.applychanges(repo, pullop.gettransaction(), changes)
 
         writefirefoxtrees(repo)
 
