@@ -454,12 +454,14 @@ Obsolescence, not stripping, should occur when enabled
   x  changeset:   13:7ceaf29d1ae9
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  obsolete:    rewritten as 15:fa1584f69cf7 (?)
   |  summary:     obsolete 2
   |
   x  changeset:   12:da0a718bed60
   |  parent:      0:96ee1d7354c4
   ~  user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
+     obsolete:    rewritten as 14:bc9e3a9b7283 (?)
      summary:     obsolete 1
   
   o  changeset:   11:c8bb49e22bd1
