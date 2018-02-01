@@ -68,7 +68,7 @@ class Transplant(object):
                 '-m', trysyntax
             ],
             ['push', '-r', '.', '-f', 'try'],
-            ['log', '-r', 'tip', '-T', '{node|short}'],
+            ['log', '-r', 'tip', '-T', '{node}'],
         ])
 
         return rev
@@ -200,7 +200,7 @@ class Transplant(object):
                 raise HgCommandError(cmd, e.out)
 
         return self.run_hg_cmds([
-            ['log', '-r', 'tip', '-T', '{node|short}']
+            ['log', '-r', 'tip', '-T', '{node}']
         ])
 
 

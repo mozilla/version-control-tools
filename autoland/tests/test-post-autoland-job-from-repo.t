@@ -69,7 +69,7 @@ Post a job
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 2\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 2 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "3bce87fd55d0", \n  "rev": "e2507be7827c", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "3bce87fd55d0ce593bb9e270fc8ce6f46e16119f", \n  "rev": "e2507be7827c", \n  "tree": "test-repo"\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public
 
@@ -116,7 +116,7 @@ Post a job using a bookmark
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --push-bookmark "bookmark" --commit-descriptions "{\"$REV\": \"Bug 1 - more goodness; r=cthulhu\"}"
   (200, u'{\n  "request_id": 4\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 4 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "373b6ff60965": "Bug 1 - more goodness; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "bookmark", \n  "result": "aba7cf08f2e4", \n  "rev": "373b6ff60965", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "373b6ff60965": "Bug 1 - more goodness; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "push_bookmark": "bookmark", \n  "result": "aba7cf08f2e45e017592a9291edfbd36159966e0", \n  "rev": "373b6ff60965", \n  "tree": "test-repo"\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   1:Bug 1 - more goodness; r=cthulhu:public
   0:Bug 1 - some stuff; r=cthulhu:public
@@ -157,7 +157,7 @@ Post a job with unicode commit descriptions to be rewritten
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu\"}"
   (200, u'{\n  "request_id": 5\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 5 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "e7f4a0f07be3": "Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "8ec6d9d32147", \n  "rev": "e7f4a0f07be3", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e7f4a0f07be3": "Bug 1 - \\u3053\\u3093\\u306b\\u3061\\u306f; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "8ec6d9d3214777bf242df17f059db99a582bef98", \n  "rev": "e7f4a0f07be3", \n  "tree": "test-repo"\n}')
 
   $ mozreview exec autoland hg log --encoding=utf-8 /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   2:Bug 1 - \xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf; r=cthulhu:public (esc)

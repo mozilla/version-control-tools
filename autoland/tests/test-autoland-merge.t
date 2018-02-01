@@ -44,7 +44,7 @@ Post a job
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV inbound http://localhost:9898 --commit-descriptions "{\"$REV\": \"Bug 1 - some stuff; r=cthulhu\"}"
   (200, u'{\n  "request_id": 1\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 1 --poll
-  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "3bce87fd55d0", \n  "rev": "e2507be7827c", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "commit_descriptions": {\n    "e2507be7827c": "Bug 1 - some stuff; r=cthulhu"\n  }, \n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "result": "3bce87fd55d0ce593bb9e270fc8ce6f46e16119f", \n  "rev": "e2507be7827c", \n  "tree": "test-repo"\n}')
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   0:Bug 1 - some stuff; r=cthulhu:public
 
