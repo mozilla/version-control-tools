@@ -104,6 +104,12 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg43
+try:
+    from mercurial import configitems
+except ImportError:
+    configitems = None
+
 from hgext import mq
 from collections import Counter
 
@@ -121,6 +127,28 @@ except:
         from mercurial.scmutil import canonpath
     except:
         from mercurial.util import canonpath
+
+# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
+# requires config items to be registered to avoid a devel warning.
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    # TRACKING hg44 generic argument added in 4.4.
+    try:
+        configitem('reviewers', '.*',
+                   generic=True)
+    except TypeError:
+        pass
+
+    configitem('bugzilla', 'jsonrpc-url',
+               default=None)
+    configitem('bugzilla', 'url',
+               default=None)
+    configitem('mqext', 'qcommit',
+               default=configitems.dynamicdefault)
+    configitem('mqext', 'allowexchangewithapplied',
+               default=False)
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
@@ -441,9 +469,9 @@ def bzcomponents(ui, repo, patchfile=None, **opts):
         return
 
     components = Counter()
-    url = ui.config('bugzilla', 'jsonrpc-url', None)
+    url = ui.config('bugzilla', 'jsonrpc-url')
     if url is None:
-        url = ui.config('bugzilla', 'url', None)
+        url = ui.config('bugzilla', 'url')
         if url is None:
             url = bugzilla_jsonrpc_url
         else:
@@ -931,7 +959,7 @@ def prechangegroup_hook(ui, repo, source=None, **kwargs):
     if source not in ('push', 'pull'):
         return
 
-    if ui.configbool('mqext', 'allowexchangewithapplied', False):
+    if ui.configbool('mqext', 'allowexchangewithapplied'):
         return
 
     ui.warn(_('cannot %s with MQ patches applied\n') % source)
