@@ -99,6 +99,7 @@ from mercurial import (
     extensions,
     mdiff,
     patch,
+    pathutil,
     registrar,
     scmutil,
     url,
@@ -119,15 +120,6 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.commitparser import BUG_RE
 
-try:
-    # hg 3.0.1+
-    from mercurial.pathutil import canonpath
-except:
-    try:
-        # hg 1.9+
-        from mercurial.scmutil import canonpath
-    except:
-        from mercurial.util import canonpath
 
 # TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
 # requires config items to be registered to avoid a devel warning.
@@ -230,7 +222,7 @@ def qshow(ui, repo, patchspec=None, **opts):
 
 def fullpaths(ui, repo, paths):
     cwd = os.getcwd()
-    return [ canonpath(repo.root, cwd, path) for path in paths ]
+    return [pathutil.canonpath(repo.root, cwd, path) for path in paths]
 
 def patch_changes(ui, repo, patchfile=None, **opts):
     '''Given a patch, look at what files it changes, and map a function over
