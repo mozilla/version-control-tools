@@ -82,7 +82,8 @@ following config option::
   allowexchangewithapplied = true
 '''
 
-testedwith = '3.9 4.0 4.1 4.2'
+testedwith = '4.1 4.2'
+minimumhgversion = '4.1'
 
 import os
 import re
