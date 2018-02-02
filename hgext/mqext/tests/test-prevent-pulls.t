@@ -42,6 +42,7 @@ Default behavior can be changed via config option.
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files (+1 heads)
+  new changesets 7d048dab3be9 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 
 Strip operations are allowed (because they aren't push or pull)
