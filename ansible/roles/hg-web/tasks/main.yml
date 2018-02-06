@@ -242,13 +242,6 @@
             owner=hg
             group=hg
 
-# Needed to sniff clients as coming from AWS.
-- name: install AWS IP ranges file
-  copy: src=files/aws-ip-ranges.json
-        dest=/etc/mercurial/aws-ip-ranges.json
-        mode=0644
-        owner=root
-        group=root
 
 # We control httpd.conf for features like server-status
 - name: install httpd.conf file
@@ -518,6 +511,31 @@
 
 - name: Mozilla IP scraper service enabled (server only)
   service: name=mozilla-ip-scraper.timer
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
+
+- name: systemd service files for AWS IP scraper
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - aws-ip-scraper.service
+    - aws-ip-scraper.timer
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: AWS IP scraper service enabled (server only)
+  service: name=aws-ip-scraper.timer
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
+- name: Run AWS IP scrape to get latest (server only)
+  service: name=aws-ip-scraper.service
            enabled=yes
            state=started
   when: vct_dir.stat.exists == False

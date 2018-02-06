@@ -16,8 +16,11 @@
     - entrypoint-solo
     - set-mirror-key.py
 
-- name: Install Mozilla IP Address Test Document
-  copy: src=moz-ip-ranges.txt dest=/var/hg/moz-ip-ranges.txt owner=root group=root mode=0644
+- name: Install IP address documents for prioritizing streamed clone bundles
+  copy: src={{ item }} dest=/var/hg/{{ item }} owner=hg group=hg mode=0644
+  with_items:
+    - moz-ip-ranges.txt
+    - aws-ip-ranges.json
 
 # We have an additional virtualenv in Docker to run moz.build info
 # directly from hgweb without the secure execution environment we

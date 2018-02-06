@@ -1,0 +1,13 @@
+[Unit]
+Description=Scrape AWS IP address ranges
+Before=mail-unit-output@%n.service
+Wants=mail-unit-output@%n.service
+After=network.target
+OnFailure=mail-unit-output@%n.service
+
+[Service]
+ExecStart=/var/hg/venv_tools_py3/bin/python -u /var/hg/version-control-tools/scripts/scrape-manifest-ip-ranges.py aws
+Type=oneshot
+User=hg
+Group=hg
+Nice=10

@@ -104,7 +104,7 @@ def get_mozilla_office_ips():
 def get_aws_ips():
     try:
         # Grab the new data from Amazon
-        amazon_ip_ranges_file = Path('/etc/mercurial/aws-ip-ranges.json')
+        amazon_ip_ranges_file = Path('/var/hg/aws-ip-ranges.json')
         ip_ranges_response = requests.get('https://ip-ranges.amazonaws.com/ip-ranges.json')
 
         # Ensure 200 OK response code

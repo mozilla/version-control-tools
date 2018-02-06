@@ -75,7 +75,7 @@ obsolescenceexchangeusers = hg
 
 [hgmo]
 mozbuildinfowrapper = /usr/bin/sudo /usr/local/bin/mozbuild-eval %repo%
-awsippath = /etc/mercurial/aws-ip-ranges.json
+awsippath = /var/hg/aws-ip-ranges.json
 mozippath = /var/hg/moz-ip-ranges.txt
 pullclonebundlesmanifest = true
 
