@@ -4,7 +4,7 @@ After=network.target
 OnFailure=mail-unit-output@%n.service
 
 [Service]
-ExecStart=/var/hg/venv_tools_py3/bin/python -u /var/hg/version-control-tools/scripts/scrape-mozilla-ip-ranges.py
+ExecStart=/var/hg/venv_tools_py3/bin/python -u /var/hg/version-control-tools/scripts/scrape-manifest-ip-ranges.py moz-offices
 Type=oneshot
 User=hg
 Group=hg

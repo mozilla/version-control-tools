@@ -1,2 +1,20 @@
+certifi==2018.1.18 \
+    --hash=sha256:14131608ad2fd56836d33a71ee60fa1c82bc9d2c8d98b7bdbc631fe1b3cd1296
+
+chardet==3.0.4 \
+    --hash=sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691
+
+datadiff==2.0.0 \
+    --hash=sha256:54049440a896de5247ee2e7b7aa5425f939ac832c37edb2101f8d3036e89caa8
+
+idna==2.6 \
+    --hash=sha256:8c7309c718f94b3a625cb648ace320157ad16ff131ae0af362c9f21b80ef6ec4
+
+requests==2.18.4 \
+    --hash=sha256:6a1b267aa90cac58ac3a765d067950e7dbbf75b1da07e895d1f594193a40a38b
+
+urllib3==1.22 \
+    --hash=sha256:06330f386d6e4b195fbfc736b297f58c5a892e4440e54d294d7004e3a9bbea1b
+
 voluptuous==0.10.5 \
     --hash=sha256:7a7466f8dc3666a292d186d1d871a47bf2120836ccb900d5ba904674957a2396
