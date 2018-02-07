@@ -15,7 +15,7 @@ allowed_paths = re.compile("testing/web-platform/(?:moz\.build|meta/.*|tests/.*)
 
 INVALID_PATH_FOUND = """
 wptsync@mozilla.com can only make changes to
-the following paths on mozilla-inbound:
+the following paths on {}:
 testing/web-platform/moz.build
 testing/web-platform/meta
 testing/web-platform/tests
@@ -27,6 +27,10 @@ Illegal paths found:
 ILLEGAL_REPO = """
 wptsync@mozilla.com cannot push to {}
 """
+
+
+def legal_repo(path):
+    return path == "integration/mozilla-inbound" or path == "try"
 
 
 class WPTSyncCheck(PreTxnChangegroupCheck):
@@ -50,13 +54,14 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
 
     def check(self, ctx):
         success = True
-        if self.repo_metadata['path'] == "integration/mozilla-inbound":
+        if legal_repo(self.repo_metadata['path']):
             invalid_paths = [path for path in ctx.files()
                              if not allowed_paths.match(path)]
 
             if invalid_paths:
                 invalid_paths = set(invalid_paths)
                 print_banner(self.ui, 'error', INVALID_PATH_FOUND.format(
+                    self.repo_metadata['path'],
                     "\n".join(item for item in sorted(invalid_paths)[:20]),
                     "\n..." if len(invalid_paths) > 20 else ""
                 ))
