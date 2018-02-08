@@ -49,7 +49,7 @@ parlance) and add it to the DAG::
 
    $ hg commit -m A
 
-(``-m A`` says to use ``A`` for the commit message.
+(``-m A`` says to use ``A`` for the commit message).
 
 Now let's take a look a the DAG::
 
@@ -335,7 +335,7 @@ additional semantics, so try not to confuse a *DAG branch* with
 a *Mercurial branch*.)
 
 The *created new head* message was Mercurial telling us that we
-created not only a a new *DAG head* but also a new *DAG branch*.
+created not only a new *DAG head* but also a new *DAG branch*.
 
 Because your commit is taking the repository in a different
 *direction* (very non-scientific word), this act of creating new

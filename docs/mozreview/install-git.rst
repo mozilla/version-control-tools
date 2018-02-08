@@ -65,7 +65,7 @@ To clone version-control-tools manually::
 
 Next, tell Git to find Git commands located in the ``git/commands`` directory
 of this repository by updating your ``PATH`` environment variable (likely
-in your ``~/.profile`` or similar shell init script):
+in your ``~/.profile`` or similar shell init script)::
 
    $ export PATH=/path/to/vct/git/commands:$PATH
 

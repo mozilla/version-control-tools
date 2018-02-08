@@ -38,7 +38,7 @@ For post-build actions, you have a number of options.
 You can *Publish Cobertura Coverage Report* by using
 ``**/coverage/coverage.xml`` for the *Cobertura xml report pattern*.
 
-You can *Publish JUnit test result report*s by using
+You can *Publish JUnit test result reports* by using
 ``coverage/results.xml`` as the *Test Reports XML* value.
 
 You can *Publish coverage.py HTML reports* by setting
