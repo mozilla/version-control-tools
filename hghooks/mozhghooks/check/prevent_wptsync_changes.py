@@ -29,10 +29,6 @@ wptsync@mozilla.com cannot push to {}
 """
 
 
-def legal_repo(path):
-    return path == "integration/mozilla-inbound" or path == "try"
-
-
 class WPTSyncCheck(PreTxnChangegroupCheck):
     """
     Prevents changes to files outside of testing/web-platform
@@ -53,23 +49,23 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
         pass
 
     def check(self, ctx):
-        success = True
-        if legal_repo(self.repo_metadata['path']):
-            invalid_paths = [path for path in ctx.files()
-                             if not allowed_paths.match(path)]
-
-            if invalid_paths:
+        success = False
+        if self.repo_metadata['path'] == 'try':
+            success = True
+        elif self.repo_metadata['path'] == 'integration/mozilla-inbound':
+            invalid_paths = [path for path in ctx.files() if not allowed_paths.match(path)]
+            if not invalid_paths:
+                success = True
+            else:
                 invalid_paths = set(invalid_paths)
                 print_banner(self.ui, 'error', INVALID_PATH_FOUND.format(
                     self.repo_metadata['path'],
                     "\n".join(item for item in sorted(invalid_paths)[:20]),
                     "\n..." if len(invalid_paths) > 20 else ""
                 ))
-                success = False
         else:
             print_banner(self.ui, 'error',
                          ILLEGAL_REPO.format(self.repo_metadata['path']))
-            success = False
         return success
 
     def post_check(self):

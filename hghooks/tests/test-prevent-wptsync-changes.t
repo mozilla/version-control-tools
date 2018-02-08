@@ -8,7 +8,7 @@
   $ mkdir testing/web-platform/meta
   $ mkdir other
 
-Regular user can push changes both in and out of testing/web-platform
+Regular user can push changes both in and beyond testing/web-platform
 
   $ touch file0
   $ touch other/file1
@@ -131,81 +131,26 @@ Test pushes to try
   $ cd client
   $ mkdir -p testing/web-platform/tests
   $ mkdir testing/web-platform/meta
+  $ mkdir -p taskcluster/ci
   $ mkdir other
 
 
-wptsync user cannot push changes beyond testing/web-platform/tests or meta
+wptsync user can push changes beyond testing/web-platform on try
 
-  $ touch file0a
+  $ touch try_task_config.json
+  $ touch taskcluster/ci/config.yml
   $ touch other/file1a
   $ touch testing/web-platform/moz_build
   $ touch testing/web-platform/meta/file3a
   $ touch testing/web-platform/tests/file4a
-  $ hg -q commit -A -m mix-of-legal-illegal-changes
+  $ hg -q commit -A -m mix-of-changes
   $ USER=wptsync@mozilla.com hg push
   pushing to $TESTTMP/try
   searching for changes
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 5 changes to 5 files
-  
-  ****************** ERROR *******************
-  wptsync@mozilla.com can only make changes to
-  the following paths on try:
-  testing/web-platform/moz.build
-  testing/web-platform/meta
-  testing/web-platform/tests
-  
-  Illegal paths found:
-  file0a
-  other/file1a
-  testing/web-platform/moz_build
-  ********************************************
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
-  [255]
-
-wptsync user cannot push changes beyond testing/web-platform, multiple
-
-  $ touch file1a
-  $ hg -q commit -A -m illegal-changes  
-  $ USER=wptsync@mozilla.com hg push
-  pushing to $TESTTMP/try
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 6 changes to 6 files
-  
-  ****************** ERROR *******************
-  wptsync@mozilla.com can only make changes to
-  the following paths on try:
-  testing/web-platform/moz.build
-  testing/web-platform/meta
-  testing/web-platform/tests
-  
-  Illegal paths found:
-  file0a
-  other/file1a
-  testing/web-platform/moz_build
-  ********************************************
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
-  [255]
-
-Test legal changes for wptsync user on try
-
-  $ cd ..
-  $ rm -rf client
-  $ hg -q clone try client
-  $ cd client
-  $ mkdir -p testing/web-platform/tests
-  $ mkdir -p testing/web-platform/meta
+  added 1 changesets with 6 changes to 6 files
 
 wptsync user can push changes to testing/web-platform/moz.build on try
 
