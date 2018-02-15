@@ -7,7 +7,7 @@
 
   $ echo "interface Foo{};" > original.webidl
   $ echo "foo" > dummy
-  $ hg commit -A -m 'original repo commit; r=jst'
+  $ hg commit -A -m 'original repo commit; r=baku'
   adding dummy
   adding original.webidl
 
@@ -38,7 +38,7 @@ Editing a .webidl file without any review should fail
   
   ************************** ERROR ****************************
   
-  WebIDL file original.webidl altered in changeset 35f6fa5728fb without DOM peer review
+  WebIDL file original.webidl altered in changeset 743ef64f8a38 without DOM peer review
   
   
   Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
@@ -66,7 +66,7 @@ Editing a .webidl file without /DOM/ peer review should fail
   
   ************************** ERROR ****************************
   
-  WebIDL file original.webidl altered in changeset 17ac6dbbb5f7 without DOM peer review
+  WebIDL file original.webidl altered in changeset 0cfb912b8138 without DOM peer review
   
   
   Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
@@ -82,7 +82,7 @@ Editing a .webidl file without /DOM/ peer review should fail
 
 Editing a .webidl file by DOM peers without review should pass
 
-  $ hg -q commit --amend -u 'Johnny Stenback <JST@mozilla.com>' -m 'Bug 123 - Add Bar'
+  $ hg -q commit --amend -u 'Andrea Marchesini <amarchesini@mozilla.com>' -m 'Bug 123 - Add Bar'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -123,7 +123,7 @@ WebIDL change after release uplift fails
   
   ************************** ERROR ****************************
   
-  WebIDL file original.webidl altered in changeset 151d6e119242 without DOM peer review
+  WebIDL file original.webidl altered in changeset 3043c2c5e650 without DOM peer review
   
   
   Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
@@ -142,17 +142,17 @@ WebIDL change after release uplift fails
 Multiple reviewers, one of which is a DOM peer, should be allowed
 
   $ echo "interface MultipleReviewers1{};" >> original.webidl
-  $ hg commit -m 'Bug 123; r=foobar,jst'
+  $ hg commit -m 'Bug 123; r=foobar,baku'
   $ echo "interface MultipleReviewers2{};" >> original.webidl
-  $ hg commit -m 'Bug 123; r=foobar r=jst'
+  $ hg commit -m 'Bug 123; r=foobar r=baku'
   $ echo "interface MultipleReviewers3{};" >> original.webidl
-  $ hg commit -m 'Bug 123; r=foobar r=lumpy,jst'
+  $ hg commit -m 'Bug 123; r=foobar r=lumpy,baku'
   $ echo "interface MultipleReviewers4{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar,jst'
+  $ hg commit -m 'Bug 123; sr=foobar,baku'
   $ echo "interface MultipleReviewers5{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar sr=jst'
+  $ hg commit -m 'Bug 123; sr=foobar sr=baku'
   $ echo "interface MultipleReviewers6{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar sr=lumpy,jst'
+  $ hg commit -m 'Bug 123; sr=foobar sr=lumpy,baku'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -165,7 +165,7 @@ Multiple reviewers, one of which is a DOM peer, should be allowed
 A merge commit touching a .webidl file with proper DOM peer review is allowed
 
   $ echo "interface Merge{};" >> original.webidl
-  $ hg commit -m 'Bug 123; r=foobar,jst'
+  $ hg commit -m 'Bug 123; r=foobar,baku'
   $ mergerev=`hg log --template {rev} -r .`
   $ hg up -r 'last(public())'
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -262,7 +262,7 @@ Hook should not run when stripping
   $ echo initial > foo
   $ hg -q commit -A -m initial
   $ echo 'interface Bar{};' > original.webidl
-  $ hg -q commit -A -m 'Add original.idl; r=jst'
+  $ hg -q commit -A -m 'Add original.idl; r=baku'
   $ hg -q up -r 0
   $ echo 'interface Foo{};' > original.webidl
   $ hg -q commit -A -m 'Bad commit'
@@ -296,7 +296,7 @@ Hook should not run when stripping
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (39da47648c3c modifies servo/interface.webidl from Servo; not enforcing peer review)
+  (79921ab00c00 modifies servo/interface.webidl from Servo; not enforcing peer review)
 
 Editing the sync-messages.ini file without any review should fail
 
@@ -315,7 +315,7 @@ Editing the sync-messages.ini file without any review should fail
   
   ************************** ERROR ****************************
   
-  sync-messages.ini altered in changeset 16cdc3b1cc9a without IPC peer review
+  sync-messages.ini altered in changeset 89b6b37b743f without IPC peer review
   
   
   Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
@@ -343,7 +343,7 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   
   ************************** ERROR ****************************
   
-  sync-messages.ini altered in changeset f7893fe7f220 without IPC peer review
+  sync-messages.ini altered in changeset da03659ab1db without IPC peer review
   
   
   Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...

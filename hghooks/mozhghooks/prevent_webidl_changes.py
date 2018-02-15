@@ -39,49 +39,36 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         return 0
 
     DOM_peers = [
-        'jst',               # Johnny Stenback
-        'peterv',            # Peter Van der Beken
-        'bz', 'bzbarsky',    # Boris Zbarsky
-        'sicking', 'jonas',  # Jonas Sicking
-        'smaug',             # Olli Pettay
-        'bent',              # Ben Turner
-        'mounir',            # Mounir Lamouri
-        'khuey',             # Kyle Huey
-        'jlebar',            # Justin Lebar
-        'hsivonen',          # Henri Sivonen
-        'mrbkap',            # Blake Kaplan
-        'bholley',           # Bobby Holley
-        'baku',              # Andrea Marchesini
-        'ehsan',             # Ehsan Akhgari
-        'bkelly',            # Ben Kelly
-        'billm',             # Bill McCloskey
-        'qdot', 'kmachulis', # Kyle Machulis
-
-        # Non-DOM peers who can review some WebIDL changes
-        'hsinyi', 'htsai',   # Hsin-Yi Tsai for RIL APIs
+        'peterv',             # Peter Van der Beken
+        'bz', 'bzbarsky',     # Boris Zbarsky
+        'smaug',              # Olli Pettay
+        'hsivonen',           # Henri Sivonen
+        'mrbkap',             # Blake Kaplan
+        'bholley',            # Bobby Holley
+        'baku',               # Andrea Marchesini
+        'ehsan',              # Ehsan Akhgari
+        'bkelly',             # Ben Kelly
+        'qdot', 'kmachulis',  # Kyle Machulis
+        'mccr8',              # Andrew McCreight
+        'mystor',             # Nika Layzell
     ]
     DOM_authors = [
-        'jst@mozilla.com',         # Johnny Stenback
-        'peterv@propagandism.org', # Peter Van der Beken
-        'bzbarsky@mit.edu',        # Boris Zbarsky
-        'jonas@sicking.cc',        # Jonas Sicking
-        'olli.pettay@helsinki.fi', # Olli Pettay
-        'bugs@pettay.fi',          # Olli Pettay
-        'bent.mozilla@gmail.com',  # Ben Turner
-        'mounir@lamouri.fr',       # Mounir Lamouri
-        'khuey@kylehuey.com',      # Kyle Huey
-        'justin.lebar@gmail.com',  # Justin Lebar
-        'hsivonen@hsivonen.fi',    # Henri Sivonen
-        'mrbkap@gmail.com',        # Blake Kaplan
-        'amarchesini@mozilla.com', # Andrea Marchesini
-        'ehsan@mozilla.com',       # Ehsan Akhgari
-        'ehsan.akhgari@gmail.com', # Ehsan Akhgari
-        'bkelly@mozilla.com',      # Ben Kelly
-        'ben@wanderview.com',      # Ben Kelly
-        'billm@mozilla.com',       # Bill McCloskey,
-        'qdot@mozilla.com',        # Kyle Machulis
-        'kmachulis@mozilla.com',   # Kyle Machulis
-        'kyle@nonpolynomial.com',  # Kyle Machulis
+        'peterv@propagandism.org',  # Peter Van der Beken
+        'bzbarsky@mit.edu',         # Boris Zbarsky
+        'olli.pettay@helsinki.fi',  # Olli Pettay
+        'bugs@pettay.fi',           # Olli Pettay
+        'hsivonen@hsivonen.fi',     # Henri Sivonen
+        'mrbkap@gmail.com',         # Blake Kaplan
+        'amarchesini@mozilla.com',  # Andrea Marchesini
+        'ehsan@mozilla.com',        # Ehsan Akhgari
+        'ehsan.akhgari@gmail.com',  # Ehsan Akhgari
+        'bkelly@mozilla.com',       # Ben Kelly
+        'ben@wanderview.com',       # Ben Kelly
+        'qdot@mozilla.com',         # Kyle Machulis
+        'kmachulis@mozilla.com',    # Kyle Machulis
+        'kyle@nonpolynomial.com',   # Kyle Machulis
+        'continuation@gmail.com',   # Andrew McCreight
+        'nika@thelayzells.com',     # Nika Layzell
     ]
     IPC_peers = [
         'billm',             # Bill McCloskey
