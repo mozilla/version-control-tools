@@ -9,6 +9,11 @@ from = hg@hg.mozilla.org
 [hostsecurity]
 hg.mozilla.org:fingerprints = sha256:8E:AD:F7:6A:EB:44:06:15:ED:F3:E4:69:A6:64:60:37:2D:FF:98:88:37:BF:D7:B8:40:84:01:48:9C:26:CE:D9, sha256:81:3D:75:69:E3:76:F8:5B:31:1E:92:C9:CF:56:23:F6:4B:C2:82:77:E3:63:FB:7F:28:65:D0:9A:88:FB:BE:B7
 
+[hooks]
+sorthooks = True
+precommit.prevent_changes = python:mozhghooks.prevent_hgweb_changes.precommit
+pretxnchangegroup.prevent_changes = python:mozhghooks.prevent_hgweb_changes.pretxnchangegroup
+
 [web]
 logourl = https://developer.mozilla.org/en/docs/Mercurial
 logoimg = moz-logo-bw-rgb.svg
