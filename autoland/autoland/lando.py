@@ -24,9 +24,14 @@ class LandoPingback(object):
                 auth_config = config.get('pingback').get(hostname)
                 self.auth[hostname] = auth_config['api-key']
 
-            res = requests.post(pingback_url,
-                                data=data,
-                                headers={'API-Key': self.auth[hostname]})
+            res = requests.post(
+                pingback_url,
+                data=data,
+                headers={
+                    'API-Key': self.auth[hostname],
+                    'Content-Type': 'application/json',
+                }
+            )
 
             if res.status_code != 200:
                 return None, res.text
