@@ -306,6 +306,8 @@ def firefoxtrees(repo, proto):
 
     return '\n'.join(lines)
 
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['firefoxtrees'] = 'pull'
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
