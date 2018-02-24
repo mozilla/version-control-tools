@@ -27,6 +27,21 @@
 - name: Repository directories present
   file: path=/repo/hg/webroot_wsgi state=directory mode=0755
 
+# Stage custom Mercurial 4.4 distribution
+
+- name: directory for offline pip packages
+  file: path=/var/tmp/pip
+        state=directory
+        owner=root
+        group=root
+        mode=0750
+
+- name: copy Mercurial source package from local machine
+  copy: src={{ vct }}/extra-files/mercurial-4.4.2+8-7cf827e5f8af.tar.gz
+        dest=/var/tmp/pip/mercurial-4.4.2+8-7cf827e5f8af.tar.gz
+        owner=root
+        group=root
+
 - name: create virtualenv for hgweb
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_hgweb
