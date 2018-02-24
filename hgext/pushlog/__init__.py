@@ -125,6 +125,11 @@ def pushlogwireproto(repo, proto, firstpush):
     except Exception as e:
         return '\n'.join(['0', str(e)])
 
+
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['pushlog'] = 'pull'
+
+
 def exchangepullpushlog(orig, pullop):
     """This is called during pull to fetch pushlog data.
 
