@@ -14,6 +14,7 @@ from mercurial import (
     mdiff,
     patch,
     phases,
+    util,
     wireproto,
 )
 
@@ -184,6 +185,10 @@ def pushreviewwireprotocommand(repo, proto, args=None):
 
     res = _processpushreview(repo, req, ldap_username)
     return json.dumps(res, sort_keys=True)
+
+
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['pushreview'] = 'push'
 
 
 def _processpushreview(repo, req, ldap_username):
@@ -434,6 +439,10 @@ def pullreviews(repo, proto, args=None):
     return json.dumps(res, sort_keys=True)
 
 
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['pullreviews'] = 'pull'
+
+
 @wireproto.wireprotocommand('publishreviewrequests', '*')
 def publishreviewseries(repo, proto, args=None):
     """Publish review requests.
@@ -449,6 +458,10 @@ def publishreviewseries(repo, proto, args=None):
     req = parsejsonpayload(proto, args)
     res = _processpublishreview(repo, req)
     return json.dumps(res, sort_keys=True)
+
+
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['publishreviewrequests'] = 'push'
 
 
 def _processpublishreview(repo, req):
@@ -493,3 +506,7 @@ def listreviewrepos(repo, proto, args=None):
         urls = urls.split(' ')
         d[node] = urls
     return json.dumps(d, sort_keys=True)
+
+
+if util.safehasattr(wireproto, 'permissions'):
+    wireproto.permissions['listreviewrepos'] = 'pull'
