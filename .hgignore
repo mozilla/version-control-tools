@@ -1,5 +1,6 @@
 coverage/
 docs/_build/
+extra-files/
 testing/bmoserver/.vagrant
 testing/puppet/files/Mozilla-Bugzilla-Public*
 testing/unifiedserver/.vagrant

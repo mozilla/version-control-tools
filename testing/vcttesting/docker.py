@@ -283,6 +283,14 @@ class Docker(object):
                 for f in fork_files:
                     files.append(os.path.join('reviewboard-fork', f))
 
+        # Add untracked files from extra-files directory. This can be used
+        # as a means to add files that aren't tracked by version control for
+        # whatever reason.
+        extra_files_path = os.path.join(ROOT, 'extra-files')
+        if os.path.exists(extra_files_path):
+            for p in os.listdir(extra_files_path):
+                files.append(os.path.join('extra-files', p))
+
         paths = {}
         for f in files:
             full = os.path.join(ROOT, f)
