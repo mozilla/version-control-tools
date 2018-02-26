@@ -5,6 +5,7 @@ integration/b2g-inbound
 releases/mozilla-release
 releases/mozilla-aurora
 releases/mozilla-beta
+releases/mozilla-esr60
 releases/mozilla-esr52
 releases/mozilla-esr45
 releases/mozilla-esr38
