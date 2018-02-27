@@ -18,6 +18,7 @@ import datetime
 from email.mime.text import MIMEText
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -51,9 +52,25 @@ def get_unit_journal_output(unit):
     return items
 
 
+def is_noop_unit_output(journal_output):
+    # This function checks if every entry in the journalctl output is started by systemd
+    # (ie PID == 1) and is simply a message indicating the service is started/being started.
+    noop_regex = re.compile(r'^Start(ing|ed).*\.$')
+
+    if all(noop_regex.match(message) and int(pid) == 1 for _, pid, message in journal_output):
+        return True
+
+    return False
+
+
 def send_email(unit, hostname, email_from, email_to):
     body_lines = []
-    for dt, pid, message in get_unit_journal_output(unit):
+    journal_output = get_unit_journal_output(unit)
+
+    if is_noop_unit_output(journal_output):
+        return 0
+
+    for dt, pid, message in journal_output:
         body_lines.append('%s [%s] %s' % (dt.isoformat(), pid, message))
 
     msg = MIMEText('\n'.join(body_lines), _charset='utf-8')
