@@ -36,11 +36,11 @@ reftest analyzer is a special snowflake
 
   $ http ${HGWEB_0_URL}mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml --no-body --header content-security-policy
   200
-  content-security-policy: default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+  content-security-policy: default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/ https://taskcluster-artifacts.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 
   $ http "${HGWEB_0_URL}mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml#logurl=https://queue.taskcluster.net/v1/task/KQYN-Sa9TBmXR3m8GaXXwg/runs/0/artifacts/public/logs/live_backing.log&only_show_unexpected=1" --no-body --header content-security-policy
   200
-  content-security-policy: default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+  content-security-policy: default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/ https://taskcluster-artifacts.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 
 No CSP if HG user-agent
 
