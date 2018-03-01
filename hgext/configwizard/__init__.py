@@ -107,6 +107,13 @@ Mercurial is not configured to produce diffs in a more readable format.
 Would you like to change this (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+TWEAKDEFAULTS_INFO = '''
+Mercurial has implemented some functionality that most users would like by
+default, but would break some workflows due to backwards compatibility issues.
+
+Would you like to enable these features (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 PAGER_INFO = '''
 The "pager" extension transparently redirects command output to a pager
 program (like "less") so command output can be more easily consumed
@@ -382,6 +389,7 @@ if registrar and util.safehasattr(registrar, 'configitem'):
 wizardsteps = set([
     'hgversion',
     'username',
+    'tweakdefaults',
     'diff',
     'color',
     'pager',
@@ -440,6 +448,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'username' in runsteps:
         _checkusername(ui, cw)
+
+    if 'tweakdefaults' in runsteps:
+        _checktweakdefaults(ui, cw)
 
     if 'diff' in runsteps:
         _checkdiffsettings(ui, cw)
@@ -595,6 +606,17 @@ def _checkdiffsettings(ui, cw):
 
         cw.c['diff']['git'] = 'true'
         cw.c['diff']['showfunc'] = 'true'
+
+
+def _checktweakdefaults(ui, cw):
+    if ui.configbool('ui', 'tweakdefaults'):
+        return
+
+    if not uipromptchoice(ui, TWEAKDEFAULTS_INFO):
+        if 'ui' not in cw.c:
+            cw.c['ui'] = {}
+
+        cw.c['ui']['tweakdefaults'] = 'true'
 
 
 def _promptnativeextension(ui, cw, ext, msg):
