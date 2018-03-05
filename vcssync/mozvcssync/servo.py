@@ -238,9 +238,7 @@ def vendor_rust(repo_path, push_url):
         # modified by |mach vendor rust|.
         vendor_paths = [
             b'third_party/rust',
-            b'toolkit/library/rust/Cargo.lock',
-            b'toolkit/library/gtest/rust/Cargo.lock',
-            b'js/src/Cargo.lock',
+            b'Cargo.lock',
         ]
         with hglib.open(repo_path, 'utf-8') as repo:
             run_hg(logger, repo,
