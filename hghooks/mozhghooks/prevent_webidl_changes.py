@@ -92,6 +92,10 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'continuation@gmail.com',  # Andrew McCreight
     ]
 
+    # The root directory for WebIDL files which contain only ChromeOnly
+    # interfaces, and do not require DOM peer review.
+    chrome_webidl_root = 'dom/chrome-webidl/'
+
     error = ""
     note = ""
     changesets = list(repo.changelog.revs(repo[node].rev()))
@@ -138,11 +142,18 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
             # Only check WebIDL files here.
             if file.endswith('.webidl'):
-                if webidlReviewed is None:
-                    webidlReviewed = search(DOM_authors, DOM_peers)
-                if not webidlReviewed:
-                    error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
-                    note = "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
+                if file.startswith(chrome_webidl_root):
+                    print ("Not enforcing DOM peer review for WebIDL file %s "
+                           "in changeset %s since it is in the chrome WebIDL "
+                           "root. Please make sure that it does not contain "
+                           "any web-visible binding definitions."
+                           % (file, short(c.node())))
+                else:
+                    if webidlReviewed is None:
+                        webidlReviewed = search(DOM_authors, DOM_peers)
+                    if not webidlReviewed:
+                        error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
+                        note = "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
             # Only check the IPDL sync-messages.ini here.
             elif file.endswith('ipc/ipdl/sync-messages.ini'):
                 if syncIPCReviewed is None:

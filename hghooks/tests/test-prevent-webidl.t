@@ -337,6 +337,21 @@ Hook should not run when stripping
   added 1 changesets with 1 changes to 1 files
   (79921ab00c00 modifies servo/interface.webidl from Servo; not enforcing peer review)
 
+Editing a .webidl file that isn't in a web root should pass
+
+  $ mkdir -p dom/chrome-webidl
+  $ echo "[ChromeOnly] interface MozFoo{};" > dom/chrome-webidl/MozFoo.webidl
+  $ hg add dom/chrome-webidl/MozFoo.webidl
+  $ hg commit -m 'Bug 123 - Add MozFoo'
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  Not enforcing DOM peer review for WebIDL file dom/chrome-webidl/MozFoo.webidl in changeset e4bbe117b4fe since it is in the chrome WebIDL root. Please make sure that it does not contain any web-visible binding definitions.
+
 Editing the sync-messages.ini file without any review should fail
 
   $ mkdir -p ipc/ipdl
@@ -354,7 +369,7 @@ Editing the sync-messages.ini file without any review should fail
   
   ************************** ERROR ****************************
   
-  sync-messages.ini altered in changeset 89b6b37b743f without IPC peer review
+  sync-messages.ini altered in changeset d6b9948481a3 without IPC peer review
   
   
   Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
@@ -382,7 +397,7 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   
   ************************** ERROR ****************************
   
-  sync-messages.ini altered in changeset da03659ab1db without IPC peer review
+  sync-messages.ini altered in changeset e5a374f9bf9b without IPC peer review
   
   
   Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
@@ -406,4 +421,4 @@ Editing the sync-messages.ini file with /IPC/ peer review should pass
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  You've received proper review from an IPC peer on the sync-messages.ini change(s) in commit b1e0bcac4341, thanks for paying enough attention.
+  You've received proper review from an IPC peer on the sync-messages.ini change(s) in commit b571eaaf6a18, thanks for paying enough attention.
