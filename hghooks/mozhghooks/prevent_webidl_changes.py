@@ -94,8 +94,6 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
     error = ""
     note = ""
-    webidlReviewed = False
-    syncIPCReviewed = False
     changesets = list(repo.changelog.revs(repo[node].rev()))
     if 'a=release' in repo.changectx(changesets[-1]).description().lower():
         # Accept the entire push for code uplifts.
@@ -107,6 +105,9 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         if len(c.parents()) > 1:
             # Skip merge changesets
             continue
+
+        webidlReviewed = None
+        syncIPCReviewed = None
 
         # Loop through each file for the current changeset
         for file in c.files():
@@ -137,16 +138,27 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
             # Only check WebIDL files here.
             if file.endswith('.webidl'):
-                webidlReviewed = search(DOM_authors, DOM_peers)
+                if webidlReviewed is None:
+                    webidlReviewed = search(DOM_authors, DOM_peers)
                 if not webidlReviewed:
                     error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
                     note = "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
             # Only check the IPDL sync-messages.ini here.
             elif file.endswith('ipc/ipdl/sync-messages.ini'):
-                syncIPCReviewed = search(IPC_authors, IPC_peers)
+                if syncIPCReviewed is None:
+                    syncIPCReviewed = search(IPC_authors, IPC_peers)
                 if not syncIPCReviewed:
                     error += "sync-messages.ini altered in changeset %s without IPC peer review\n" % (short(c.node()))
                     note = "\nChanges to sync-messages.ini in this repo require review from a IPC peer in the form of r=...\nThis is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..\n"
+
+        if webidlReviewed:
+            print ("You've received proper review from a DOM peer on the "
+                   "WebIDL change(s) in changeset %s, thanks for paying "
+                   "enough attention." % short(c.node()))
+        if syncIPCReviewed:
+            print ("You've received proper review from an IPC peer on the "
+                   "sync-messages.ini change(s) in commit %s, thanks for "
+                   "paying enough attention." % short(c.node()))
     # Check if an error occured in any of the files that were changed
     if error != "":
         print "\n\n************************** ERROR ****************************"
@@ -155,10 +167,5 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         print "*************************************************************\n\n"
         # Reject the changesets
         return 1
-    else:
-        if webidlReviewed:
-            print "You've received proper review from a DOM peer on the WebIDL change(s) in your push, thanks for paying enough attention."
-        if syncIPCReviewed:
-            print "You've received proper review from an IPC peer on the sync-messages.ini change(s) in your push, thanks for paying enough attention."
     # Accept the changesets
     return 0
