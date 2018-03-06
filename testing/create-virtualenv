@@ -34,7 +34,7 @@ ${ROOT}/scripts/download-verify https://s3-us-west-2.amazonaws.com/moz-packages/
     ${VENV}/virtualenv-15.1.0/virtualenv_support/six-1.10.0-py2.py3-none-any.whl \
     0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
 
-${VENV}/virtualenv-15.1.0/virtualenv.py --no-download ${VENV}
+${VENV}/virtualenv-15.1.0/virtualenv.py --no-download --python=python2.7 ${VENV}
 
 # The wheelhouse is shared between VENVs
 mkdir -p ${ROOT}/venv/wheelhouse
