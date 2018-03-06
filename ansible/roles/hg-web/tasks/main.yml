@@ -176,24 +176,29 @@
            venv=/var/hg/venv_tools_py3
            requirements=../roles/hg-web/files/requirements-tools-py3.txt
 
-- name: set up version-control-tools repo (server only)
-  hg: repo=https://hg.mozilla.org/hgcustom/version-control-tools
-      dest=/var/hg/version-control-tools
-      revision={{ lookup('file', '../../../../.vctnode') }}
-      force=yes
-      purge=yes
-      executable=/var/hg/venv_hgweb/bin/hg
+# We have a chicken and egg problem with the prevent_hgweb_changes hook, which
+# is globally installed. If the hook isn't present, Mercurial won't allow
+# incoming changes. But the hook is part of v-c-t. How can we run a hook that
+# may not be present? Our solution is to disable the hook when interacting
+# with the v-c-t repo.
+- name: clone version-control-tools repo (server only)
+  command: /var/hg/venv_hgweb/bin/hg --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
   when: vct_dir.stat.exists == False
 
-# The hg module's purge doesn't delete ignored files. Boo. Force that
-# because old .pyc files may cause chaos.
-- name: delete ignored files from version-control-tools repo
-  command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
+- name: pull version-control-tools (server only)
+  command: /var/hg/venv_hgweb/bin/hg --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
+  when: vct_dir.stat.exists == False
+
+- name: update version-control-tools revision (server only)
+  command: /var/hg/venv_hgweb/bin/hg -R /var/hg/version-control-tools up -C {{ lookup('file', '../../../../.vctnode') }}
   when: vct_dir.stat.exists == False
 
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -rlpt --delete-after /vct/ /var/hg/version-control-tools/
   when: vct_dir.stat.exists == True
+
+- name: delete ignored files from version-control-tools repo (server only)
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
 
 - name: set up hg-experimental repo, with 3rd party extensions
   hg: repo=https://bitbucket.org/facebook/hg-experimental
