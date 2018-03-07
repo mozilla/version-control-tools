@@ -506,6 +506,11 @@ def outgoingcommand(orig, ui, repo, dest=None, **opts):
     low-level API used by discovery. Manipulating it could lead to unintended
     consequences.
     """
+    # Note: this behavior varies from upstream Mercurial. Mercurial will use
+    # the :pushurl [paths] option for the `hg outgoing` URL. We use the
+    # read-only URL. Not all users will have access to the ssh:// server.
+    # And the HTTP service should be in sync with the canonical ssh://
+    # service. So we choose to use the endpoint that is always available.
     tree, uri = resolve_trees_to_uris([dest])[0]
     rev = opts.get('rev')
     if uri and not rev:
