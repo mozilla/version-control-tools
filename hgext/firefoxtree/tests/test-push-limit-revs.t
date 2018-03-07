@@ -37,7 +37,7 @@ Outgoing with no -r argument will limit to .
 
   $ hg out central
   no revisions specified; using . to avoid inspecting multiple heads
-  comparing with central
+  comparing with http://localhost:$HGPORT/mozilla-central
   searching for changes
   changeset:   3:d455de7ec717
   tag:         tip
@@ -62,7 +62,7 @@ Outgoing should be limited, so no output expected
 
   $ hg out central
   no revisions specified; using . to avoid inspecting multiple heads
-  comparing with central
+  comparing with http://localhost:$HGPORT/mozilla-central
   searching for changes
   no changes found
   [1]

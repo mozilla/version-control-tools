@@ -512,6 +512,8 @@ def outgoingcommand(orig, ui, repo, dest=None, **opts):
         ui.status(_('no revisions specified; '
             'using . to avoid inspecting multiple heads\n'))
         opts['rev'] = '.'
+    if uri:
+        dest = uri
 
     return orig(ui, repo, dest=dest, **opts)
 
