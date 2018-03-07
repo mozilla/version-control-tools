@@ -19,3 +19,9 @@ repos:
 
   version-control-tools:
     path: "/repos/version-control-tools"
+
+  phabricator-qa-dev:
+    path: "/repos/phabricator-qa-dev"
+
+  phabricator-qa-stage:
+    path: "/repos/phabricator-qa-stage"
