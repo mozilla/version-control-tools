@@ -80,17 +80,11 @@ def _find_backed_out_urls(hg_repo, github_url, commit_desc, commit_node):
 
 
 def _get_touched_files(hg_repo, commit_node):
-    # Build list of files touched by this commit.
-
-    def strip_servo(filename):
-        assert filename.startswith('servo/')
-        return filename[len('servo/'):]
-
     # Grab a list of files under the servo/ directory touched by this
-    # change.
-    args = cmdbuilder('log', template='{join(files,"\n")}',
-                      r=commit_node, I='path:servo/')
-    return map(strip_servo, hg_repo.rawcommand(args).split('\n'))
+    # change, stripping the leading servo/ prefix.
+    args = cmdbuilder('log', template='{join(files,"\n")}', r=commit_node)
+    files = hg_repo.rawcommand(args).split('\n')
+    return [fn[len('servo/'):] for fn in files if fn.startswith('servo/')]
 
 
 def _build_commit_desc(commit_desc, backed_out_urls):
@@ -114,6 +108,10 @@ def _create_pr_from_backout(integration_repo_path, hg_repo, github_pr,
             commit.desc, commit.node)
 
         touched_files = _get_touched_files(hg_repo, commit.node)
+        if not touched_files:
+            logger.info('backout %s does not modify servo files, ignoring'
+                        % commit.node[:12])
+            return
 
         # Set up commit and PR metadata.
 
