@@ -167,6 +167,7 @@ mixed up.
 
 from __future__ import absolute_import
 
+import gc
 import inspect
 import os
 import resource
@@ -277,6 +278,12 @@ class hgwebwrapped(hgweb_mod.hgweb):
                     logsyslog(sl, 'WRITE_PROGRESS', '%d' % sl['writecount'])
                     lastlogamount = sl['writecount']
         finally:
+            # It is easy to introduce cycles in localrepository instances.
+            # Versions of Mercurial up to and including 4.5 leak repo instances
+            # in hgwebdir. We force a GC on every request to help mitigate
+            # these leaks.
+            gc.collect()
+
             endtime = time.time()
             endusage = resource.getrusage(resource.RUSAGE_SELF)
             endcpu = endusage.ru_utime + endusage.ru_stime
