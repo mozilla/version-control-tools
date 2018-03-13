@@ -169,6 +169,13 @@ Post a job with unicode
   1:Bug 1 - some more stuff; r?cthulhu:public
   0:Bug 1 - some stuff; r?cthulhu:public
 
+Bad Merge (using the now obsolete inline-patch created earlier)
+
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p4 inbound http://localhost:9898 --push-bookmark "bookmark" --patch-file $TESTTMP/patch
+  (200, u'{\n  "request_id": 6\n}')
+  $ ottoland autoland-job-status $AUTOLAND_URL 6 --poll
+  (200, u'{\n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\n\\n(255, \'applying /tmp/tmptFXzBx\\\\npatching file foo\\\\nHunk #1 FAILED at 0\\\\n1 out of 1 hunks FAILED -- saving rejects to file foo.rej\\\\nabort: patch failed to apply\', \'\')", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "patch": "IyBIRyBjaGFuZ2VzZXQgcGF0Y2gKIyBVc2VyIHRlc3QKIyBEYXRlIDAgMAojICAgICAgVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCiMgTm9kZSBJRCAxOGMzOWY0ODdjM2U5MmQ2ZTZmNTFhNzY5MGRlZjA5YWZiMzViZDczCiMgUGFyZW50ICA0YjQ0NGI0ZTI1NTI0MzQ5MWY4NTk5NTYzNmIyNjhjZTlkMzI4OWU1CkJ1ZyAxIC0gc29tZSBtb3JlIHN0dWZmOyByP2N0aHVsaHUKCmRpZmYgLXIgNGI0NDRiNGUyNTUyIC1yIDE4YzM5ZjQ4N2MzZSBmb28KLS0tIGEvZm9vCVRodSBKYW4gMDEgMDA6MDA6MDAgMTk3MCArMDAwMAorKysgYi9mb28JVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCkBAIC0xLDEgKzEsMSBAQAotaW5pdGlhbAorZm9vMgo=", \n  "push_bookmark": "bookmark", \n  "result": "", \n  "rev": "p4", \n  "tree": "test-repo"\n}')
+
 Create a commit to test on Try
 
   $ echo try > foo
@@ -212,7 +219,7 @@ Create a commit to test on Try
 
 Post a job with try syntax
 
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p7 try http://localhost:9898 --trysyntax "stuff" --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p8 try http://localhost:9898 --trysyntax "stuff" --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (400, u'{\n  "error": "Bad request: trysyntax is not supported with patch_urls"\n}')
 
 Getting status for an unknown job should return a 404
@@ -223,33 +230,33 @@ Getting status for an unknown job should return a 404
 Ensure unexpected files in the repo path are not landed.
 
   $ mozreview exec autoland touch /repos/test-repo/rogue
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p8 inbound http://localhost:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
-  (200, u'{\n  "request_id": 6\n}')
-  $ ottoland autoland-job-status $AUTOLAND_URL 6 --poll
-  (200, u'{\n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "patch_urls": [\n    "http://$DOCKER_HOSTNAME:$HGPORT/test-repo/raw-rev/fb3b5e8e45d7"\n  ], \n  "result": "cc4a56042bb7ce25317256ed4cb3d9fbe9286214", \n  "rev": "p8", \n  "tree": "test-repo"\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p9 inbound http://localhost:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  (200, u'{\n  "request_id": 7\n}')
+  $ ottoland autoland-job-status $AUTOLAND_URL 7 --poll
+  (200, u'{\n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "patch_urls": [\n    "http://$DOCKER_HOSTNAME:$HGPORT/test-repo/raw-rev/fb3b5e8e45d7"\n  ], \n  "result": "cc4a56042bb7ce25317256ed4cb3d9fbe9286214", \n  "rev": "p9", \n  "tree": "test-repo"\n}')
   $ mozreview exec autoland hg files --cwd /repos/test-repo
   foo
 
 Test pingback url whitelist.  localhost, private IPs, and example.com are in
 the whitelist. example.org is not.
 
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p9 inbound http://example.com:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
-  (200, u'{\n  "request_id": 7\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p10 inbound http://localhost --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p10 inbound http://example.com:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 8\n}')
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo p11 inbound http://localhost --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 9\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p12 inbound http://127.0.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p12 inbound http://localhost --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 10\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p13 inbound http://192.168.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p13 inbound http://127.0.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 11\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p14 inbound http://172.16.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p14 inbound http://192.168.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 12\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p15 inbound http://10.0.0.1:443 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p15 inbound http://172.16.0.1 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (200, u'{\n  "request_id": 13\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p16 inbound http://8.8.8.8:443 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p16 inbound http://10.0.0.1:443 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  (200, u'{\n  "request_id": 14\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p17 inbound http://8.8.8.8:443 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p17 inbound http://example.org:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p18 inbound http://example.org:9898 --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
   (400, u'{\n  "error": "Bad request: bad pingback_url"\n}')
 
 Post the same job twice.  Start with stopping the autoland service to
@@ -257,10 +264,10 @@ guarentee the first request is still in the queue when the second is submitted.
 
   $ PID=`mozreview exec autoland ps x | grep autoland.py | grep -v grep | awk '{ print $1 }'`
   $ mozreview exec autoland kill $PID
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p18 inbound http://localhost:9898 --trysyntax "stuff"
-  (200, u'{\n  "request_id": 14\n}')
-  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p18 inbound http://localhost:9898 --trysyntax "stuff"
-  (400, u'{\n  "error": "Bad Request: a request to land revision p18 to inbound is already in progress"\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p19 inbound http://localhost:9898 --trysyntax "stuff"
+  (200, u'{\n  "request_id": 15\n}')
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p19 inbound http://localhost:9898 --trysyntax "stuff"
+  (400, u'{\n  "error": "Bad Request: a request to land revision p19 to inbound is already in progress"\n}')
 
   $ mozreview stop
   stopped 9 containers

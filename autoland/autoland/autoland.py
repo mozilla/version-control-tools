@@ -188,7 +188,8 @@ def handle_pending_transplants(dbconn):
                 retry_revisions.append((now, transplant_id))
                 continue
 
-            elif 'unresolved conflicts (see hg resolve' in result:
+            elif ('unresolved conflicts (see hg resolve' in result or
+                    'hunks FAILED -- saving rejects to file' in result):
                 logger.info('transplant failed - manual rebase required: '
                             'tree: %s rev: %s destination: %s error: %s' %
                             (tree, rev, destination, result))
