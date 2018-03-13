@@ -199,6 +199,7 @@
 
 - name: delete ignored files from version-control-tools repo (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
+  when: vct_dir.stat.exists == False
 
 - name: set up hg-experimental repo, with 3rd party extensions
   hg: repo=https://bitbucket.org/facebook/hg-experimental
