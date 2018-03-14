@@ -20,8 +20,8 @@ argparse==1.3.0 \
 boto==2.40.0 \
     --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
 
-Django==1.6.11.3 \
-    --hash=sha256:49161983509d84668ed9972db15d89d455a7bb79bb93290749f087f08923eaaf
+Django==1.6.11.7 \
+    --hash=sha256:8ebe9b30cb8e6c9c6ebb644b6ce921b65780e592ccc3998d5efff362d303baaa
 
 django-pipeline==1.3.27 \
     --hash=sha256:71add26f682c2e7652c43d01ab6ac1b1c693d869f663142f5f7c37b00788d162
