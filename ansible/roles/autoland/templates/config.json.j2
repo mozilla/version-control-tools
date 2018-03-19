@@ -8,11 +8,11 @@
     "reviewboard.mozilla.org": {
       "type": "mozreview",
       "user": "{{ secrets.bugzilla_user }}",
-      "password": "{{ secrets.bugzilla_password  }}"
+      "password": "{{ secrets.bugzilla_password }}"
     },
     "api-private.lando.devsvcprod.mozaws.net": {
       "type": "lando",
-      "api-key": "secrets.lando_pingback_api_key"
+      "api-key": "{{ secrets.lando_pingback_api_key }}"
     }
   },
   "{{ secrets.lando_bucket }}": {
