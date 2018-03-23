@@ -43,7 +43,7 @@ try:
 except ImportError:
     configitems = None
 
-testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4'
+testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5'
 minimumhgversion = '3.7'
 
 cmdtable = {}
@@ -222,7 +222,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
     # However, given that sparse has performance implications, we want to fail
     # fast if we can't satisfy the desired checkout request.
     if sparseprofile:
-        if util.versiontuple(n=2) not in ((4, 3), (4, 4)):
+        if util.versiontuple(n=2) not in ((4, 3), (4, 4), (4, 5)):
             raise error.Abort('sparse profile support only available for '
                               'Mercurial versions greater than 4.3 (using %s)' % util.version())
 
@@ -561,7 +561,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         try:
             old_sparse_fn = getattr(repo.dirstate, '_sparsematchfn', None)
             if old_sparse_fn is not None:
-                assert util.versiontuple(n=2) in ((4, 3), (4, 4))
+                assert util.versiontuple(n=2) in ((4, 3), (4, 4), (4, 5))
                 repo.dirstate._sparsematchfn = lambda: matchmod.always(repo.root, '')
 
             if purgeext.purge(ui, repo, all=True, abort_on_err=True,
