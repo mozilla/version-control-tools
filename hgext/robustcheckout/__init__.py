@@ -397,6 +397,12 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 ui.warn('socket error: %s\n' % e.reason)
                 handlenetworkfailure()
                 return True
+            else:
+                ui.warn('unhandled URLError; reason type: %s; value: %s' % (
+                    e.reason.__class__.__name__, e.reason))
+        else:
+            ui.warn('unhandled exception during network operation; type: %s; '
+                    'value: %s' % (e.__class__.__name__, e))
 
         return False
 
