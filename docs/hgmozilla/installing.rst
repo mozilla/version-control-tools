@@ -23,7 +23,7 @@ Recommended Versions
 Mozilla recommends running the latest stable release of Mercurial. The
 latest stable release is always listed at
 `https://www.mercurial-scm.org/ <https://www.mercurial-scm.org/>`_.
-**As of December 2017, the latest stable release is 4.4.**
+**As of March 2018, the latest stable release is 4.5.2.**
 
 .. danger::
 
@@ -141,7 +141,7 @@ out the version you wish to install::
 
   $ hg clone https://www.mercurial-scm.org/repo/hg
   $ cd hg
-  $ hg up 4.4.2
+  $ hg up 4.5.2
 
 Once you have the source code, run ``make`` to install Mercurial::
 
