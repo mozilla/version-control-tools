@@ -37,7 +37,8 @@ github3.py==1.0.0a1 \
     --hash=sha256:ba06337e59f47bbac4d39db8e84604f62b9ef04b80be07d621e1bf56f95554bb
 
 idna==2.1 \
-    --hash=sha256:f28df695e9bede8a19b18a8e4429b4bad4d664e8e98aff27bc39b630f1ae2b42
+    --hash=sha256:f28df695e9bede8a19b18a8e4429b4bad4d664e8e98aff27bc39b630f1ae2b42 \
+    --hash=sha256:4cfe64db2804351249d8d13ec1f3a2b0be9dc84b409b65c2a646c4d673fa55bc
 
 ipaddress==1.0.17 \
     --hash=sha256:a42764805223838ec9d04eee7fe699083bf5321001792b6076322784c5b994a5
@@ -97,7 +98,8 @@ uritemplate.py==3.0.2 \
     --hash=sha256:a0c459569e80678c473175666e0d1b3af5bc9a13f84463ec74f808f3dd12ca47
 
 uritemplate==3.0.0 \
-    --hash=sha256:1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd
+    --hash=sha256:1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd \
+    --hash=sha256:01c69f4fe8ed503b2951bef85d996a9d22434d2431584b5b107b2981ff416fbd
 
 Werkzeug==0.11.11 \
     --hash=sha256:eb3108af06aed08fb2f4fc883f2adf04c8f4997f6368517591b2becf15ae0da2
