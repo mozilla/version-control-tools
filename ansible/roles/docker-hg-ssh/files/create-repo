@@ -41,7 +41,3 @@ if [ -n "${NONPUBLISHING}" ]; then
 publish = False
 EOF
 fi
-
-# Ensure repo exists on mirrors.
-# TODO this can go away once vcsreplicator is deployed by default.
-sudo -u hg /usr/local/bin/repo-push.sh ${REPO}
