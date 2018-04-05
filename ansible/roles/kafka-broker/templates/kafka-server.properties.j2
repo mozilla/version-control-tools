@@ -39,3 +39,6 @@ broker.id={{ kafka_broker_id | mandatory }}
 advertised.host.name={{ kafka_host_name | mandatory }}
 advertised.port={{ kafka_advertised_port | default(9092) }}
 zookeeper.connect={{ kafka_zookeeper_connect | mandatory }}
+
+inter.broker.protocol.version=0.8.2.2
+log.message.format.version=0.8.2.2
