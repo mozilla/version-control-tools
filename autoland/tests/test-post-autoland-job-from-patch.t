@@ -45,6 +45,10 @@ Posting a job with bad credentials should fail
   (401, u'Login required')
   $ mozreview exec autoland tail -n1 /var/log/apache2/error.log
   * WARNING:root:Failed authentication for "blah" from * (glob)
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo p0 try http://localhost:9898 --user blah --password '' --patch-url ${MERCURIAL_URL}test-repo/raw-rev/$REV
+  (401, u'Login required')
+  $ mozreview exec autoland tail -n1 /var/log/apache2/error.log
+  * WARNING:root:Failed authentication for "blah" from * (glob)
 
 Post a job from http url should fail
 
@@ -96,7 +100,7 @@ Post a job using an inline patch
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo p4 inbound http://localhost:9898 --push-bookmark "bookmark" --patch-file $TESTTMP/patch
   (200, u'{\n  "request_id": 3\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 3 --poll
-  (200, u'{\n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "patch": "IyBIRyBjaGFuZ2VzZXQgcGF0Y2gKIyBVc2VyIHRlc3QKIyBEYXRlIDAgMAojICAgICAgVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCiMgTm9kZSBJRCAxOGMzOWY0ODdjM2U5MmQ2ZTZmNTFhNzY5MGRlZjA5YWZiMzViZDczCiMgUGFyZW50ICA0YjQ0NGI0ZTI1NTI0MzQ5MWY4NTk5NTYzNmIyNjhjZTlkMzI4OWU1CkJ1ZyAxIC0gc29tZSBtb3JlIHN0dWZmOyByP2N0aHVsaHUKCmRpZmYgLXIgNGI0NDRiNGUyNTUyIC1yIDE4YzM5ZjQ4N2MzZSBmb28KLS0tIGEvZm9vCVRodSBKYW4gMDEgMDA6MDA6MDAgMTk3MCArMDAwMAorKysgYi9mb28JVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCkBAIC0xLDEgKzEsMSBAQAotaW5pdGlhbAorZm9vMgo=", \n  "push_bookmark": "bookmark", \n  "result": "18c39f487c3e92d6e6f51a7690def09afb35bd73", \n  "rev": "p4", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "destination": "inbound", \n  "error_msg": "", \n  "landed": true, \n  "ldap_username": "autolanduser@example.com", \n  "patch": "*", \n  "push_bookmark": "bookmark", \n  "result": "18c39f487c3e92d6e6f51a7690def09afb35bd73", \n  "rev": "p4", \n  "tree": "test-repo"\n}') (glob)
   $ mozreview exec autoland hg log /repos/inbound-test-repo/ --template '{rev}:{desc\|firstline}:{phase}\\n'
   1:Bug 1 - some more stuff; r?cthulhu:public
   0:Bug 1 - some stuff; r?cthulhu:public
@@ -174,7 +178,7 @@ Bad Merge (using the now obsolete inline-patch created earlier)
   $ ottoland post-autoland-job $AUTOLAND_URL test-repo p4 inbound http://localhost:9898 --push-bookmark "bookmark" --patch-file $TESTTMP/patch
   (200, u'{\n  "request_id": 6\n}')
   $ ottoland autoland-job-status $AUTOLAND_URL 6 --poll
-  (200, u'{\n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.\\n\\n(255, \'applying /tmp/tmptFXzBx\\\\npatching file foo\\\\nHunk #1 FAILED at 0\\\\n1 out of 1 hunks FAILED -- saving rejects to file foo.rej\\\\nabort: patch failed to apply\', \'\')", \n  "landed": false, \n  "ldap_username": "autolanduser@example.com", \n  "patch": "IyBIRyBjaGFuZ2VzZXQgcGF0Y2gKIyBVc2VyIHRlc3QKIyBEYXRlIDAgMAojICAgICAgVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCiMgTm9kZSBJRCAxOGMzOWY0ODdjM2U5MmQ2ZTZmNTFhNzY5MGRlZjA5YWZiMzViZDczCiMgUGFyZW50ICA0YjQ0NGI0ZTI1NTI0MzQ5MWY4NTk5NTYzNmIyNjhjZTlkMzI4OWU1CkJ1ZyAxIC0gc29tZSBtb3JlIHN0dWZmOyByP2N0aHVsaHUKCmRpZmYgLXIgNGI0NDRiNGUyNTUyIC1yIDE4YzM5ZjQ4N2MzZSBmb28KLS0tIGEvZm9vCVRodSBKYW4gMDEgMDA6MDA6MDAgMTk3MCArMDAwMAorKysgYi9mb28JVGh1IEphbiAwMSAwMDowMDowMCAxOTcwICswMDAwCkBAIC0xLDEgKzEsMSBAQAotaW5pdGlhbAorZm9vMgo=", \n  "push_bookmark": "bookmark", \n  "result": "", \n  "rev": "p4", \n  "tree": "test-repo"\n}')
+  (200, u'{\n  "destination": "inbound", \n  "error_msg": "We\'re sorry, Autoland could not rebase your commits for you automatically. Please manually rebase your commits and try again.*}') (glob)
 
 Create a commit to test on Try
 

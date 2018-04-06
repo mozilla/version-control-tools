@@ -51,6 +51,10 @@ Posting a job with bad credentials should fail
   (401, u'Login required')
   $ mozreview exec autoland tail -n1 /var/log/apache2/error.log
   * WARNING:root:Failed authentication for "blah" from * (glob)
+  $ ottoland post-autoland-job $AUTOLAND_URL test-repo $REV try http://localhost:9898 --user blah --password ''
+  (401, u'Login required')
+  $ mozreview exec autoland tail -n1 /var/log/apache2/error.log
+  * WARNING:root:Failed authentication for "blah" from * (glob)
 
 Posting a job with without both trysyntax and commit_descriptions should fail
 

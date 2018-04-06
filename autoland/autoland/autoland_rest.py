@@ -41,7 +41,9 @@ compare_digest = getattr(hmac, 'compare_digest', compare_digest_backport)
 
 def check_auth(user, passwd):
     auth = config.get('auth')
-    return compare_digest(auth.get(user, '').encode('utf8'),
+    if user not in auth:
+        return False
+    return compare_digest(auth[user].encode('utf8'),
                           passwd.encode('utf8'))
 
 
