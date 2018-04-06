@@ -485,3 +485,80 @@ ack_group
    daemon will use to record which messages it has copied.
 aggregate_topic
    The Kafka topic that messages from ``monitor_topic`` will be copied to.
+
+
+Upgrading Kafka
+===============
+
+It is generally desirable to keep Kafka on an up-to-date version, to
+benefit from bugfixes and performance improvements. Upgrading the
+hg.mozilla.org Kafka instances can be done via a rolling upgrade,
+allowing the replication system to continue working with no downtime.
+Kafka also uses Apache Zookeeper as a distributed configuration service,
+and you may wish to upgrade Zookeeper at the same time as Kafka. The steps
+to do so are as follows:
+
+.. note::
+
+   While these steps will likely cover all upgrade requirements, there is no
+   guarantee that Apache will not change the upgrade process in the future.
+   Make sure to check the release notes for any breaking changes to both
+   application code and the upgrade procedure before moving forward.
+
+.. note::
+
+   You should perform the Zookeeper and Kafka upgrades independently, to
+   minimize the risk of failure and avoid debugging two applications
+   if something goes wrong. See https://kafka.apache.org/documentation/#upgrade
+   and https://wiki.apache.org/hadoop/ZooKeeper/FAQ#A6
+
+Steps for both applications
+---------------------------
+
+Both Kafka and Zookeeper are deployed from a tarball which is uploaded to
+a Mozilla owned Amazon S3 bucket. We need to upload our new Kafka/Zookeeper
+tarballs to this bucket and keep their SHA 256 hashsum to ensure the correct
+file is downloaded.
+
+1. Upload new package archives to
+      https://s3-us-west-2.amazonaws.com/moz-packages/<package name>
+2. Calculate the sha256 hash of the uploaded archives.
+3. Update version-control-tools/ansible/roles/kafka-broker/tasks/main.yml
+   with the new package names and hashes.
+
+Zookeeper
+---------
+
+To upgrade Zookeeper, simply deploy the updated code to hg.mozilla.org and then run
+`systemctl restart zookeeper` serially on each host to perform the upgrade. Easy!
+
+Kafka
+-----
+
+To upgrade Kafka, some additional steps must be performed if message
+format or wire protocol changes have been made between your current
+and updated versions. For example, when upgrading from 0.8.2 to
+1.1.0, both message formats and wire protocol changes were made, so
+all of the following changes must be made.
+
+4. Before updating the code, advertise the message format and protocol
+   versions used by the current Kafka instance in the server config
+   (kafka-server.properties) using the following properties:
+   - inter.broker.protocol.version=CURRENT_KAFKA_VERSION
+   - log.message.format.version=CURRENT_MESSAGE_FORMAT_VERSION
+
+5. Deploy code in the previously updated archive to hg.mozilla.org.
+
+6. Serially run `systemctl restart kafka.service` on each broker
+   to update the code.
+
+7. Update inter.broker.protocol.version to the version of Kafka you are
+   upgrading to and run `systemctl restart kafka.service` serially once again.
+
+8. Update log.message.format.version to the version of Kafka you are
+   upgrading to and run `systemctl restart kafka.service` serially once again.
+
+.. note::
+    After running each of the restart commands, you should `tail` the Kafka logs
+    on the newly updated server, as well as a server that has yet to be updated,
+    to make sure everything is working smoothly.
