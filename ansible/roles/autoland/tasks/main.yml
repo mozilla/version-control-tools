@@ -48,8 +48,6 @@
             owner=autoland
             group=autoland
             mode=0600
-  notify:
-    - restart autoland
 
 - name: link config.json
   file: src=/home/autoland/version-control-tools/autoland/autoland/config.json
@@ -82,14 +80,12 @@
 
 - name: enable autoland service
   service: name=autoland
-           state=started
+           state=restarted
            enabled=yes
 
 - name: setup main conf file
   copy: src=httpd.conf
         dest=/etc/httpd/conf/httpd.conf
-  notify:
-    - restart apache
 
 - name: remove conf.d
   file: path=/etc/httpd/conf.d/
@@ -98,11 +94,9 @@
 - name: install autoland site
   copy: src=../files/autoland_httpd.conf
         dest=/etc/httpd/conf/autoland.conf
-  notify:
-    - restart apache
 
-- name: start apache
+- name: start/reload apache
   service: name=httpd
-           state=started
+           state=reloaded
            enabled=yes
 

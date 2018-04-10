@@ -1,11 +1,3 @@
 ---
 - name: reload systemd
   command: systemctl daemon-reload
-
-- name: restart autoland
-  service: name=autoland
-           state=restarted
-
-- name: restart apache
-  service: name=httpd
-           state=restarted

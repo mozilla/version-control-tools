@@ -9,6 +9,7 @@ import logging
 import mozreview
 import os
 import psycopg2
+import signal
 import sys
 import time
 import traceback
@@ -372,11 +373,23 @@ def main():
     logging.getLogger('botocore').setLevel(logging.INFO)
 
     logger.info('starting autoland')
-
     dbconn = get_dbconn(args.dsn)
+
+    # Set up signal handling to ensure we aren't cancelled mid-transplant.
+    global running
+    running = True
+
+    def handle_term(signal, frame):
+        logger.info('stopping autoland')
+        global running
+        running = False
+
+    signal.signal(signal.SIGTERM, handle_term)
+    signal.signal(signal.SIGINT, handle_term)
+
     last_error_msg = None
     next_mozreview_update = datetime.datetime.now()
-    while True:
+    while running:
         try:
             handle_pending_transplants(dbconn)
 
@@ -392,8 +405,6 @@ def main():
                     next_mozreview_update += MOZREVIEW_RETRY_DELAY
 
             time.sleep(0.1)
-        except KeyboardInterrupt:
-            break
         except psycopg2.InterfaceError:
             dbconn = get_dbconn(args.dsn)
         except:
