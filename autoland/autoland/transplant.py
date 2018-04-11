@@ -11,6 +11,7 @@ import requests
 from botocore.exceptions import ClientError
 
 import config
+from patch_helper import PatchHelper
 
 REPO_CONFIG = {}
 
@@ -324,13 +325,39 @@ class PatchTransplant(Transplant):
         return self.run_hg(['log', '-r', '.', '-T', '{node}'])
 
     def _apply_patch_from_io_buff(self, io_buf):
-        with tempfile.NamedTemporaryFile() as temp_file:
-            temp_file.write(io_buf.getvalue())
-            temp_file.flush()
+        patch = PatchHelper(io_buf)
 
-            # Apply the patch, with file rename detection (similarity).
-            # Using 95 as the similarity to match automv's default.
-            logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
+        if patch.header('Diff Start Line'):
+            with tempfile.NamedTemporaryFile() as desc_temp, \
+                    tempfile.NamedTemporaryFile() as diff_temp:
+                patch.write_commit_description(desc_temp)
+                desc_temp.flush()
+                patch.write_diff(diff_temp)
+                diff_temp.flush()
+
+                # Import then commit to ensure correct parsing of the
+                # commit description.
+
+                # Apply the patch, with file rename detection (similarity).
+                # Using 95 as the similarity to match automv's default.
+                logger.info(self.run_hg([
+                    'import', '-s', '95', '--no-commit', diff_temp.name]))
+
+                # Commit using the extracted date, user, and commit desc.
+                logger.info(self.run_hg([
+                    'commit',
+                    '--date', patch.header('Date'),
+                    '--user', patch.header('User'),
+                    '--logfile', desc_temp.name]))
+
+        else:
+            with tempfile.NamedTemporaryFile() as temp_file:
+                patch.write(temp_file)
+                temp_file.flush()
+
+                # Apply the patch, with file rename detection (similarity).
+                # Using 95 as the similarity to match automv's default.
+                logger.info(self.run_hg(['import', '-s', '95', temp_file.name]))
 
     @staticmethod
     def _download_from_s3(patch_url):
