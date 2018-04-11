@@ -15,7 +15,7 @@
            sha256sum={{ item.sha256 }}
   with_items:
     - { path: zookeeper-3.4.11.tar.gz, sha256: f6bd68a1c8f7c13ea4c2c99f13082d0d71ac464ffaf3bf7a365879ab6ad10e84 }
-    - { path: kafka_2.10-0.8.2.2.tgz, sha256: 3ba1967ee88c7f364964c8a8fdf6f5075dcf7572f8c9eb74f0285b308363ecab }
+    - { path: kafka_2.11-1.1.0.tgz, sha256: 124861011a849b1cf63d2fccee5e79303cea32987f37890d1848948edfcc18ca }
 
 - name: uncompress ZooKeeper and Kafka
   unarchive: src=/var/tmp/{{ item.src }}
@@ -26,7 +26,7 @@
              group=root
   with_items:
     - { src: zookeeper-3.4.11.tar.gz, creates: zookeeper-3.4.11 }
-    - { src: kafka_2.10-0.8.2.2.tgz, creates: kafka_2.10-0.8.2.2 }
+    - { src: kafka_2.11-1.1.0.tgz, creates: kafka_2.11-1.1.0 }
 
 - user: name=zookeeper
         uid=2321
@@ -58,7 +58,7 @@
     - /var/log/zookeeper
 
 - name: create Kafka symlink
-  file: src=/opt/kafka_2.10-0.8.2.2
+  file: src=/opt/kafka_2.11-1.1.0
         path=/opt/kafka
         state=link
 

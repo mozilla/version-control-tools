@@ -107,30 +107,11 @@ for hostname in hostnames:
 
             time.sleep(0.1)
 
-command = [
-    '/usr/bin/java',
-    '-Xmx1G',
-    '-Xms1G',
-    '-server',
-    '-XX:+UseParNewGC',
-    '-XX:+UseConcMarkSweepGC',
-    '-XX:+CMSClassUnloadingEnabled',
-    '-XX:+CMSScavengeBeforeRemark',
-    '-XX:+DisableExplicitGC',
-    '-Djava.awt.headless=true',
-    '-Xloggc:/var/log/kafka/server-gc.log',
-    '-verbose:gc',
-    '-XX:+PrintGCDetails',
-    '-XX:+PrintGCDateStamps',
-    '-XX:+PrintGCTimeStamps',
-    '-Dcom.sun.management.jmxremote',
-    '-Dcom.sun.management.jmxremote.authenticate=false',
-    '-Dcom.sun.management.jmxremote.ssl=false',
-    '-Dlog4j.configuration=file:/etc/kafka/log4j.properties',
-    '-cp',
-    ':/opt/kafka/libs/jopt-simple-3.2.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-javadoc.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-scaladoc.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-sources.jar:/opt/kafka/libs/kafka_2.10-0.8.2.2-test.jar:/opt/kafka/libs/kafka-clients-0.8.2.2.jar:/opt/kafka/libs/log4j-1.2.16.jar:/opt/kafka/libs/lz4-1.2.0.jar:/opt/kafka/libs/metrics-core-2.2.0.jar:/opt/kafka/libs/scala-library-2.10.4.jar:/opt/kafka/libs/slf4j-api-1.7.6.jar:/opt/kafka/libs/slf4j-log4j12-1.6.1.jar:/opt/kafka/libs/snappy-java-1.1.1.6.jar:/opt/kafka/libs/zkclient-0.3.jar:/opt/kafka/libs/zookeeper-3.4.6.jar:/opt/kafka/core/build/libs/kafka_2.10*.jar',
-    'kafka.Kafka',
-    '/etc/kafka/server.properties',
-]
+env = dict(os.environ)
+env.update({
+    'KAFKA_GC_LOG_OPTS': '-Xloggc:/var/log/kafka/server-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M',
+    'KAFKA_LOG4J_OPTS': '-Dlog4j.configuration=file:/etc/kafka/log4j.properties',
+})
 
-os.execl(command[0], *command)
+# -daemon here causes same Java process to be executed with "nohup"
+os.execle('/opt/kafka/bin/kafka-server-start.sh', '-daemon', '/etc/kafka/server.properties', env)

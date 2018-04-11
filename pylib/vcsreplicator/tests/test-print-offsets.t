@@ -6,6 +6,8 @@
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
 
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------

@@ -81,6 +81,7 @@ Adding node back in should result in being able to push again
   kafka: started
   $ hgmo exec hgweb1 /usr/bin/supervisorctl start kafka
   kafka: started
+  $ sleep 3
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   sending heartbeat to partition 1
