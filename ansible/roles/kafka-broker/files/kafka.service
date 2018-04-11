@@ -13,8 +13,7 @@ PrivateTmp=true
 Environment="KAFKA_GC_LOG_OPTS=-Xloggc:/var/log/kafka/server-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M"
 Environment="KAFKA_LOG4J_OPTS=-Dlog4j.configuration=file:/etc/kafka/log4j.properties"
 
-# -daemon here causes same Java process to be executed with "nohup"
-ExecStart=/opt/kafka/bin/kafka-server-start.sh -daemon /etc/kafka/server.properties
+ExecStart=/opt/kafka/bin/kafka-server-start.sh /etc/kafka/server.properties
 
 Type=simple
 Restart=always
