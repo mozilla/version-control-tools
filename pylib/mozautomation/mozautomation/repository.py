@@ -44,14 +44,14 @@ TREE_ALIASES = {
     'c-r': ('comm-release',),
     'cr': ('comm-release',),
 
-    'releases': ('esr52', 'esr45', 'release', 'beta', 'aurora', 'central'),
+    'releases': ('esr60', 'esr52', 'release', 'beta', 'aurora', 'central'),
     'integration': ('inbound', 'fx-team', 'autoland'),
     'twigs': ('alder', 'ash', 'birch', 'cedar', 'cypress', 'date', 'elm',
               'fig', 'gum', 'holly', 'jamun', 'larch', 'maple', 'oak', 'pine',
               'stylo'),
     'obsolete': ('esr10', 'esr17', 'b2ginbound', 'b2g18', 'esr24', 'esr31',
-                 'esr38', 'b2g26', 'b2g28', 'b2g30', 'b2g32', 'b2g34', 'b2g37',
-                 'b2g44', 'b2g-ota'),
+                 'esr38', 'esr45', 'b2g26', 'b2g28', 'b2g30', 'b2g32', 'b2g34',
+                 'b2g37', 'b2g44', 'b2g-ota'),
 }
 
 # Aliases that map to multiple repositories.
@@ -146,6 +146,7 @@ OFFICIAL_MAP = {
     'esr38': 'mozilla-esr38',
     'esr45': 'mozilla-esr45',
     'esr52': 'mozilla-esr52',
+    'esr60': 'mozilla-esr60',
 }
 
 RELEASE_TREES = set([
@@ -163,6 +164,7 @@ RELEASE_TREES = set([
     'esr38',
     'esr45',
     'esr52',
+    'esr60',
     'b2g32',
     'b2g34',
     'b2g37',
