@@ -387,6 +387,7 @@ class PatchTransplant(Transplant):
 
             buf = io.BytesIO()
             s3.download_fileobj(bucket, key, buf)
+            buf.seek(0)  # Seek to the start for consumers.
             return buf
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])

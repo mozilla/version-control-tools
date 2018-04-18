@@ -39,6 +39,7 @@ class PatchHelper(object):
 
     def _parse_header(self):
         """Extract header values specified by HEADER_NAMES."""
+        self.patch.seek(0)
         try:
             for line in self.patch:
                 if not line.startswith('# '):
