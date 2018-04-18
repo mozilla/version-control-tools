@@ -1,9 +1,10 @@
+
+  $ . $TESTDIR/hghooks/tests/common.sh
+
   $ hg init server
+  $ configurehooks server
+  $ touch server/.hg/IS_FIREFOX_REPO
   $ cd server
-  $ cat >> .hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.prevent_webidl = python:mozhghooks.prevent_webidl_changes.hook
-  > EOF
 
   $ echo "interface Foo{};" > original.webidl
   $ echo "foo" > dummy
@@ -35,21 +36,28 @@ Editing a .webidl file without any review should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  ******************************* ERROR *******************************
+  Changeset 743ef64f8a38 alters WebIDL file(s) without DOM peer review:
+  original.webidl
   
-  ************************** ERROR ****************************
-  
-  WebIDL file original.webidl altered in changeset 743ef64f8a38 without DOM peer review
-  
-  
-  Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
-  This is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrea Marchesini (:baku)
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Blake Kaplan (:mrbkap)
+    - Bobby Holley (:bholley)
+    - Boris Zbarsky (:bz)
+    - Ehsan Akhgari (:ehsan)
+    - Henri Sivonen (:hsivonen)
+    - Kyle Machulis (:qdot)
+    - Nika Layzell (:mystor)
+    - Olli Pettay (:smaug)
+    - Peter Van der Beken (:peterv)
+  *********************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Editing a .webidl file without /DOM/ peer review should fail
@@ -63,21 +71,28 @@ Editing a .webidl file without /DOM/ peer review should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  ******************************* ERROR *******************************
+  Changeset 0cfb912b8138 alters WebIDL file(s) without DOM peer review:
+  original.webidl
   
-  ************************** ERROR ****************************
-  
-  WebIDL file original.webidl altered in changeset 0cfb912b8138 without DOM peer review
-  
-  
-  Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
-  This is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrea Marchesini (:baku)
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Blake Kaplan (:mrbkap)
+    - Bobby Holley (:bholley)
+    - Boris Zbarsky (:bz)
+    - Ehsan Akhgari (:ehsan)
+    - Henri Sivonen (:hsivonen)
+    - Kyle Machulis (:qdot)
+    - Nika Layzell (:mystor)
+    - Olli Pettay (:smaug)
+    - Peter Van der Beken (:peterv)
+  *********************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Editing a .webidl file by DOM peers without review should pass
@@ -90,7 +105,6 @@ Editing a .webidl file by DOM peers without review should pass
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 4d1f9038e38b, thanks for paying enough attention.
 
 Editing a .webidl file without /DOM/ peer review in the same push as a commit with review should fail
 
@@ -105,23 +119,29 @@ Editing a .webidl file without /DOM/ peer review in the same push as a commit wi
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 7d680ea3e6a8, thanks for paying enough attention.
   
+  ******************************* ERROR *******************************
+  Changeset a9b3d7778cda alters WebIDL file(s) without DOM peer review:
+  original.webidl
   
-  ************************** ERROR ****************************
-  
-  WebIDL file original.webidl altered in changeset a9b3d7778cda without DOM peer review
-  
-  
-  Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
-  This is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrea Marchesini (:baku)
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Blake Kaplan (:mrbkap)
+    - Bobby Holley (:bholley)
+    - Boris Zbarsky (:bz)
+    - Ehsan Akhgari (:ehsan)
+    - Henri Sivonen (:hsivonen)
+    - Kyle Machulis (:qdot)
+    - Nika Layzell (:mystor)
+    - Olli Pettay (:smaug)
+    - Peter Van der Beken (:peterv)
+  *********************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
   $ hg -q strip '.^'
@@ -154,21 +174,28 @@ WebIDL change after release uplift fails
   adding file changes
   added 2 changesets with 2 changes to 2 files
   
+  ******************************* ERROR *******************************
+  Changeset 3043c2c5e650 alters WebIDL file(s) without DOM peer review:
+  original.webidl
   
-  ************************** ERROR ****************************
-  
-  WebIDL file original.webidl altered in changeset 3043c2c5e650 without DOM peer review
-  
-  
-  Changes to WebIDL files in this repo require review from a DOM peer in the form of r=...
-  This is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrea Marchesini (:baku)
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Blake Kaplan (:mrbkap)
+    - Bobby Holley (:bholley)
+    - Boris Zbarsky (:bz)
+    - Ehsan Akhgari (:ehsan)
+    - Henri Sivonen (:hsivonen)
+    - Kyle Machulis (:qdot)
+    - Nika Layzell (:mystor)
+    - Olli Pettay (:smaug)
+    - Peter Van der Beken (:peterv)
+  *********************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
   $ hg strip -r 'draft()' > /dev/null
@@ -181,25 +208,13 @@ Multiple reviewers, one of which is a DOM peer, should be allowed
   $ hg commit -m 'Bug 123; r=foobar r=baku'
   $ echo "interface MultipleReviewers3{};" >> original.webidl
   $ hg commit -m 'Bug 123; r=foobar r=lumpy,baku'
-  $ echo "interface MultipleReviewers4{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar,baku'
-  $ echo "interface MultipleReviewers5{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar sr=baku'
-  $ echo "interface MultipleReviewers6{};" >> original.webidl
-  $ hg commit -m 'Bug 123; sr=foobar sr=lumpy,baku'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
   adding manifests
   adding file changes
-  added 6 changesets with 6 changes to 1 files
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset dad5c7baef94, thanks for paying enough attention.
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset b1646a4a9618, thanks for paying enough attention.
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 38a76e7d36bc, thanks for paying enough attention.
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 036d459fcf08, thanks for paying enough attention.
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset c51ae3035d1a, thanks for paying enough attention.
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 5d988e01757f, thanks for paying enough attention.
+  added 3 changesets with 3 changes to 1 files
 
 A merge commit touching a .webidl file with proper DOM peer review is allowed
 
@@ -222,7 +237,6 @@ A merge commit touching a .webidl file with proper DOM peer review is allowed
   adding manifests
   adding file changes
   added 3 changesets with 2 changes to 2 files
-  You've received proper review from a DOM peer on the WebIDL change(s) in changeset 06ad41d11f80, thanks for paying enough attention.
 
 Editing a .webidl file in a backout without proper DOM peer review is allowed
 
@@ -262,17 +276,6 @@ Editing a .webidl file in a backout without proper DOM peer review is allowed
   $ echo "interface Test{};" > backout4.webidl
   $ hg commit -A -m 'backout 68941:5b8ade677818'
   adding backout4.webidl
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-
-  $ echo "interface Test{};" > backout5.webidl
-  $ hg commit -A -m 'Revert to changeset a87ee7550f6a due to incomplete backout'
-  adding backout5.webidl
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
@@ -335,7 +338,8 @@ Hook should not run when stripping
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  (79921ab00c00 modifies servo/interface.webidl from Servo; not enforcing peer review)
+  -- Not enforcing DOM peer review for WebIDL files within Servo.
+  -- Please make sure changes do not contain any web-visible binding definitions.
 
 Editing a .webidl file that isn't in a web root should pass
 
@@ -350,75 +354,44 @@ Editing a .webidl file that isn't in a web root should pass
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  Not enforcing DOM peer review for WebIDL file dom/chrome-webidl/MozFoo.webidl in changeset e4bbe117b4fe since it is in the chrome WebIDL root. Please make sure that it does not contain any web-visible binding definitions.
+  -- Not enforcing DOM peer review for WebIDL files within the chrome WebIDL root.
+  -- Please make sure changes do not contain any web-visible binding definitions.
 
-Editing the sync-messages.ini file without any review should fail
+Editing multiple .webidl files without review should fail
 
-  $ mkdir -p ipc/ipdl
-  $ echo "foo" > ipc/ipdl/sync-messages.ini
-  $ hg add ipc/ipdl/sync-messages.ini
-  $ hg commit -m 'Bug 123 - Add sync-messages.ini'
+  $ echo "interface Foo{};" >> dom/file1.webidl
+  $ echo "interface Bar{};" >> dom/file2.webidl
+  $ hg commit -q -A -m 'Bug 123 - Add Foo and Bar'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 2 changes to 2 files
   
+  ******************************* ERROR *******************************
+  Changeset 4cc0a6ce2e87 alters WebIDL file(s) without DOM peer review:
+  dom/file1.webidl
+  dom/file2.webidl
   
-  ************************** ERROR ****************************
-  
-  sync-messages.ini altered in changeset d6b9948481a3 without IPC peer review
-  
-  
-  Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
-  This is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrea Marchesini (:baku)
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Blake Kaplan (:mrbkap)
+    - Bobby Holley (:bholley)
+    - Boris Zbarsky (:bz)
+    - Ehsan Akhgari (:ehsan)
+    - Henri Sivonen (:hsivonen)
+    - Kyle Machulis (:qdot)
+    - Nika Layzell (:mystor)
+    - Olli Pettay (:smaug)
+    - Peter Van der Beken (:peterv)
+  *********************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
-
-Editing the sync-messages.ini file without /IPC/ peer review should fail
-
-  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=foobar'
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-  
-  
-  ************************** ERROR ****************************
-  
-  sync-messages.ini altered in changeset e5a374f9bf9b without IPC peer review
-  
-  
-  Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
-  This is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..
-  
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
-  [255]
-
-Editing the sync-messages.ini file with /IPC/ peer review should pass
-
-  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=billm'
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-  You've received proper review from an IPC peer on the sync-messages.ini change(s) in commit b571eaaf6a18, thanks for paying enough attention.
+ 

@@ -38,38 +38,6 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
-    DOM_peers = [
-        'peterv',             # Peter Van der Beken
-        'bz', 'bzbarsky',     # Boris Zbarsky
-        'smaug',              # Olli Pettay
-        'hsivonen',           # Henri Sivonen
-        'mrbkap',             # Blake Kaplan
-        'bholley',            # Bobby Holley
-        'baku',               # Andrea Marchesini
-        'ehsan',              # Ehsan Akhgari
-        'bkelly',             # Ben Kelly
-        'qdot', 'kmachulis',  # Kyle Machulis
-        'mccr8',              # Andrew McCreight
-        'mystor',             # Nika Layzell
-    ]
-    DOM_authors = [
-        'peterv@propagandism.org',  # Peter Van der Beken
-        'bzbarsky@mit.edu',         # Boris Zbarsky
-        'olli.pettay@helsinki.fi',  # Olli Pettay
-        'bugs@pettay.fi',           # Olli Pettay
-        'hsivonen@hsivonen.fi',     # Henri Sivonen
-        'mrbkap@gmail.com',         # Blake Kaplan
-        'amarchesini@mozilla.com',  # Andrea Marchesini
-        'ehsan@mozilla.com',        # Ehsan Akhgari
-        'ehsan.akhgari@gmail.com',  # Ehsan Akhgari
-        'bkelly@mozilla.com',       # Ben Kelly
-        'ben@wanderview.com',       # Ben Kelly
-        'qdot@mozilla.com',         # Kyle Machulis
-        'kmachulis@mozilla.com',    # Kyle Machulis
-        'kyle@nonpolynomial.com',   # Kyle Machulis
-        'continuation@gmail.com',   # Andrew McCreight
-        'nika@thelayzells.com',     # Nika Layzell
-    ]
     IPC_peers = [
         'billm',             # Bill McCloskey
         'dvander',           # David Anderson
@@ -92,10 +60,6 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         'continuation@gmail.com',  # Andrew McCreight
     ]
 
-    # The root directory for WebIDL files which contain only ChromeOnly
-    # interfaces, and do not require DOM peer review.
-    chrome_webidl_root = 'dom/chrome-webidl/'
-
     error = ""
     note = ""
     changesets = list(repo.changelog.revs(repo[node].rev()))
@@ -110,7 +74,6 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             # Skip merge changesets
             continue
 
-        webidlReviewed = None
         syncIPCReviewed = None
 
         # Loop through each file for the current changeset
@@ -140,32 +103,14 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
               return False
 
-            # Only check WebIDL files here.
-            if file.endswith('.webidl'):
-                if file.startswith(chrome_webidl_root):
-                    print ("Not enforcing DOM peer review for WebIDL file %s "
-                           "in changeset %s since it is in the chrome WebIDL "
-                           "root. Please make sure that it does not contain "
-                           "any web-visible binding definitions."
-                           % (file, short(c.node())))
-                else:
-                    if webidlReviewed is None:
-                        webidlReviewed = search(DOM_authors, DOM_peers)
-                    if not webidlReviewed:
-                        error += "WebIDL file %s altered in changeset %s without DOM peer review\n" % (file, short(c.node()))
-                        note = "\nChanges to WebIDL files in this repo require review from a DOM peer in the form of r=...\nThis is to ensure that we behave responsibly with exposing new Web APIs. We appreciate your understanding..\n"
             # Only check the IPDL sync-messages.ini here.
-            elif file.endswith('ipc/ipdl/sync-messages.ini'):
+            if file.endswith('ipc/ipdl/sync-messages.ini'):
                 if syncIPCReviewed is None:
                     syncIPCReviewed = search(IPC_authors, IPC_peers)
                 if not syncIPCReviewed:
                     error += "sync-messages.ini altered in changeset %s without IPC peer review\n" % (short(c.node()))
                     note = "\nChanges to sync-messages.ini in this repo require review from a IPC peer in the form of r=...\nThis is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..\n"
 
-        if webidlReviewed:
-            print ("You've received proper review from a DOM peer on the "
-                   "WebIDL change(s) in changeset %s, thanks for paying "
-                   "enough attention." % short(c.node()))
         if syncIPCReviewed:
             print ("You've received proper review from an IPC peer on the "
                    "sync-messages.ini change(s) in commit %s, thanks for "

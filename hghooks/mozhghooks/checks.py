@@ -20,6 +20,11 @@ def print_banner(ui, level, message):
     ui.write('\n' + '\n'.join(banner) + '\n\n')
 
 
+def print_notice(ui, message):
+    for l in message.strip().splitlines():
+        ui.write('-- %s\n' % l)
+
+
 class PreTxnChangegroupCheck(object):
     """A check that operates as a pretxnchangegroup hook.
 
