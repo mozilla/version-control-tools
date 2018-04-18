@@ -1,11 +1,9 @@
   $ . $TESTDIR/hghooks/tests/common.sh
 
   $ hg init server
+  $ configurehooks server
+  $ touch server/.hg/IS_FIREFOX_REPO
   $ cd server
-  $ cat >> .hg/hgrc << EOF
-  > [hooks]
-  > pretxnchangegroup.prevent_webidl = python:mozhghooks.prevent_webidl_changes.hook
-  > EOF
 
   $ echo "foo" > dummy
   $ hg commit -A -m 'original repo commit; r=baku'
@@ -37,21 +35,22 @@ Editing the sync-messages.ini file without any review should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  ******************************** ERROR *********************************
+  Changeset 8fb3e82ba334 alters sync-messages.ini without IPC peer review.
   
-  ************************** ERROR ****************************
-  
-  sync-messages.ini altered in changeset 8fb3e82ba334 without IPC peer review
-  
-  
-  Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
-  This is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Bill McCloskey (:billm)
+    - David Anderson (:dvander)
+    - Jed David (:jld)
+    - Kan-Ru Chen (:kanru)
+    - Nathan Froyd (:froydnj)
+  ************************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Editing the sync-messages.ini file without /IPC/ peer review should fail
@@ -65,21 +64,22 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   adding file changes
   added 1 changesets with 1 changes to 1 files
   
+  ******************************** ERROR *********************************
+  Changeset d970a5c85d15 alters sync-messages.ini without IPC peer review.
   
-  ************************** ERROR ****************************
-  
-  sync-messages.ini altered in changeset d970a5c85d15 without IPC peer review
-  
-  
-  Changes to sync-messages.ini in this repo require review from a IPC peer in the form of r=...
-  This is to ensure that we behave responsibly by not adding sync IPC messages that cause performance issues needlessly. We appreciate your understanding..
-  
-  *************************************************************
-  
+  Please, request review from either:
+    - Andrew McCreight (:mccr8)
+    - Ben Kelly (:bkelly)
+    - Bill McCloskey (:billm)
+    - David Anderson (:dvander)
+    - Jed David (:jld)
+    - Kan-Ru Chen (:kanru)
+    - Nathan Froyd (:froydnj)
+  ************************************************************************
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.prevent_webidl hook failed
+  abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
 Editing the sync-messages.ini file with /IPC/ peer review should pass
@@ -92,4 +92,3 @@ Editing the sync-messages.ini file with /IPC/ peer review should pass
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  You've received proper review from an IPC peer on the sync-messages.ini change(s) in commit 62716423067e, thanks for paying enough attention.
