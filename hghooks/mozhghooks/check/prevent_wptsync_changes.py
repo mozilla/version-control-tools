@@ -45,7 +45,7 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
     def relevant(self):
         return os.environ['USER'] == 'wptsync@mozilla.com'
 
-    def pre(self):
+    def pre(self, node):
         pass
 
     def check(self, ctx):

@@ -49,7 +49,7 @@ class FTLCheck(PreTxnChangegroupCheck):
     def relevant(self):
         return self.repo_metadata['firefox_releasing']
 
-    def pre(self):
+    def pre(self, node):
         pass
 
     def check(self, ctx):

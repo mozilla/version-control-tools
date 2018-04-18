@@ -43,7 +43,7 @@ class SingleRootCheck(PreTxnChangegroupCheck):
     def relevant(self):
         return not self.repo_metadata['user_repo']
 
-    def pre(self):
+    def pre(self, node):
         self.new_roots = set()
 
     def check(self, ctx):

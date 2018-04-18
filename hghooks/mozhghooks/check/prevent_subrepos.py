@@ -38,7 +38,7 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
     def relevant(self):
         return True
 
-    def pre(self):
+    def pre(self, node):
         self.done = False
 
     def check(self, ctx):

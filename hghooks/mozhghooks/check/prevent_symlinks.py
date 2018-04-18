@@ -37,7 +37,7 @@ class PreventSymlinksCheck(PreTxnChangegroupCheck):
     def relevant(self):
         return not self.repo_metadata['user_repo']
 
-    def pre(self):
+    def pre(self, node):
         pass
 
     def check(self, ctx):

@@ -62,11 +62,14 @@ class PreTxnChangegroupCheck(object):
         """
 
     @abc.abstractmethod
-    def pre(self):
+    def pre(self, node):
         """Called once before any changesets are examined.
 
         Allows derived classes to set additional instance state without having
         to call parent methods.
+
+        `node` - the first changeset in the group that was added (as per
+                 pretxnchangegroup).
 
         Return value is ignored.
         """
@@ -74,6 +77,8 @@ class PreTxnChangegroupCheck(object):
     @abc.abstractmethod
     def check(self, ctx):
         """Verifies a single changeset.
+
+        `ctx` - changectx object.
 
         Returns True if the check passes. False otherwise.
         """

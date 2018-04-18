@@ -129,7 +129,7 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
                         get_check_classes('pretxnchangegroup'))
 
     for check in checks:
-        check.pre()
+        check.pre(node)
 
     for rev in repo.changelog.revs(repo[node].rev()):
         ctx = repo[rev]
