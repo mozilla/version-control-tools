@@ -49,8 +49,6 @@ def clone_or_pull(rel, path, requires, url, user, group):
         if not os.path.exists(path):
             is_clone = True
             args = [HG, 'init', path]
-            if 'generaldelta' in requires:
-                args.extend(['--config', 'format.generaldelta=true'])
 
             print('creating empty repo: %s' % path)
             subprocess.check_output(args, cwd='/', stderr=subprocess.STDOUT)
