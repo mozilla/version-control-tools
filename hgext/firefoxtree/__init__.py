@@ -109,6 +109,11 @@ with demandimport.deactivated():
 
     # TRACKING hg46
     try:
+        from mercurial import logcmdutil
+    except ImportError:
+        logcmdutil = None
+
+    try:
         from mercurial import wireprotov1server as wireproto
     except ImportError:
         from mercurial import wireproto
@@ -557,7 +562,11 @@ def fxheads(ui, repo, **opts):
     if not isfirefoxrepo(repo):
         raise util.Abort(_('fxheads is only available on Firefox repos'))
 
-    displayer = cmdutil.show_changeset(ui, repo, opts)
+    if logcmdutil:
+        displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
+    else:
+        displayer = cmdutil.show_changeset(ui, repo, opts)
+
     seen = set()
     for tag, node, tree, uri in get_firefoxtrees(repo):
         if node in seen:
