@@ -25,3 +25,6 @@ repos:
 
   phabricator-qa-stage:
     path: "/repos/phabricator-qa-stage"
+
+  build-tools:
+    path: "/repos/build-tools"
