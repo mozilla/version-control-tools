@@ -372,7 +372,7 @@ def prepushoutgoinghook(*args):
         return
 
     if len(outgoing.missingheads) > 1:
-        raise util.Abort(_('cannot push multiple heads to a Firefox tree; '
+        raise error.Abort(_('cannot push multiple heads to a Firefox tree; '
             'limit pushed revisions using the -r argument'))
 
 def wrappedpullobsolete(orig, pullop):
@@ -571,7 +571,7 @@ def fxheads(ui, repo, **opts):
     data is current.
     """
     if not isfirefoxrepo(repo):
-        raise util.Abort(_('fxheads is only available on Firefox repos'))
+        raise error.Abort(_('fxheads is only available on Firefox repos'))
 
     if logcmdutil:
         displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
