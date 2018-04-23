@@ -73,6 +73,7 @@ list of the last-known commits for the Firefox repositories.
 """
 
 import errno
+import inspect
 import os
 
 from mercurial import (
@@ -301,7 +302,6 @@ def get_firefoxtrees(repo):
         yield tag, node, tree, uri
 
 
-@wireproto.wireprotocommand('firefoxtrees', '')
 def firefoxtrees(repo, proto):
     lines = []
 
@@ -318,8 +318,19 @@ def firefoxtrees(repo, proto):
 
     return '\n'.join(lines)
 
-if util.safehasattr(wireproto, 'permissions'):
-    wireproto.permissions['firefoxtrees'] = 'pull'
+# Mercurial 4.5.2 added a "permissions" dict. 4.6 moved this into the
+# @wireprotocommand decorator.
+
+# TRACKING hg46
+if 'permission' in inspect.getargspec(wireproto.wireprotocommand).args:
+    firefoxtrees = wireproto.wireprotocommand('firefoxtrees', '',
+                                              permission='pull')(firefoxtrees)
+else:
+    firefoxtrees = wireproto.wireprotocommand('firefoxtrees', '')(firefoxtrees)
+
+    # TRACKING hg45
+    if util.safehasattr(wireproto, 'permissions'):
+        wireproto.permissions['firefoxtrees'] = 'pull'
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
