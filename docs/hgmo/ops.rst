@@ -344,6 +344,29 @@ case, it effectively no-ops. If you are paranoid. make a backup copy of
    Under no circumstances should ``.hg/store/fncache`` be removed or
    altered by hand. Doing so may result in further repository damage.
 
+Mirrors in ``pushdataaggregator_groups`` File
+=============================================
+
+On the SSH servers, the ``/etc/mercurial/pushdataaggregator_groups`` file
+lists all hgweb mirrors that must have acknowledged replication of a message
+before that message is re-published to ``replicatedpushdata`` Kafka topic.
+This topic is then used to publish events to Pulse, SNS, etc.
+
+When adding or removing hgweb machines from active service, this file
+needs to be **manually** updated to reflect the current set of active
+mirrors.
+
+If an hgweb machine is removed and the ``pushdataaggregator_groups`` file
+is not updated, messages won't be re-published to the ``replicatedpushdata``
+Kafka topic. This should eventually result in an alert for lag of that
+Kafka topic.
+
+If an hgweb machine is added and the ``pushdataaggregator_groups`` file
+is not updated, messages could be re-published to the ``replicatedpushdata``
+Kafka topic before the message has been acknowledged by all replicas. This
+could result in clients seeing inconsistent repository state depending on
+which hgweb server they access.
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services
