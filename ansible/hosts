@@ -8,7 +8,7 @@ reviewboard[1:2].webapp.scl3.mozilla.com ansible_ssh_user=root
 hgweb[11:16].dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-prod]
-hgssh[4:5].dmz.scl3.mozilla.com ansible_sudo=yes
+hgssh[4:6].dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-prod-master]
 hgssh4.dmz.scl3.mozilla.com
