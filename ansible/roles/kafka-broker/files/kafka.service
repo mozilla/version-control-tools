@@ -13,6 +13,11 @@ PrivateTmp=true
 Environment="KAFKA_GC_LOG_OPTS=-Xloggc:/var/log/kafka/server-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M"
 Environment="KAFKA_LOG4J_OPTS=-Dlog4j.configuration=file:/etc/kafka/log4j.properties"
 
+# kafka-run-class.sh prepends `-Dkafka.logs.dir=$LOG_DIR` to KAFKA_LOG4J_OPTS and
+# defines LOG_DIR to $base_dir if not set. So we need to set LOG_DIR so logs
+# end up where we want them.
+Environment="LOG_DIR=/var/log/kafka"
+
 ExecStart=/opt/kafka/bin/kafka-server-start.sh /etc/kafka/server.properties
 
 Type=simple
