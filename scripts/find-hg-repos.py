@@ -31,6 +31,9 @@ if __name__ == '__main__':
     parser.add_argument('--upgrade-backup', action='store_true',
                         help='Find repositories that have a backup repo from '
                              'an upgrade')
+    parser.add_argument('--obsstore', action='store_true',
+                        help='Find repositories that have an obsolescence '
+                             'store')
     parser.add_argument('paths', nargs='+')
 
     args = parser.parse_args()
@@ -69,6 +72,11 @@ if __name__ == '__main__':
         if args.upgrade_backup:
             entries = os.listdir(os.path.join(path, '.hg'))
             if not any(e.startswith('upgradebackup.') for e in entries):
+                return False
+
+        if args.obsstore:
+            p = os.path.join(path, '.hg', 'store', 'obsstore')
+            if not os.path.exists(p):
                 return False
 
         return True
