@@ -115,6 +115,15 @@ class Transplant(object):
 
     def run_hg(self, args):
         logger.info('rev: %s: executing: %s' % (self.source_rev, args))
+        if any([arg.count('\x00') for arg in args]):
+            logger.error(
+                'Attempt to run hg with arguments '
+                'containing null bytes: %s' % (
+                    [["%02X" % ord(c) for c in arg] for arg in args]
+                )
+            )
+            raise HgCommandError(args, 'Null bytes present')
+
         out = hglib.util.BytesIO()
         out_channels = {b'o': out.write, b'e': out.write}
         ret = self.hg_repo.runcommand(args, {}, out_channels)
