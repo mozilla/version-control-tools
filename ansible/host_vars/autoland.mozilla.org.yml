@@ -28,3 +28,6 @@ repos:
 
   build-tools:
     path: "/repos/build-tools"
+
+  fluent-migration:
+    path: "/repos/fluent-migration"
