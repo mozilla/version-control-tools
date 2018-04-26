@@ -76,6 +76,7 @@ REPOS = {
     'esr38': 'releases/mozilla-esr38',
     'esr45': 'releases/mozilla-esr45',
     'esr52': 'releases/mozilla-esr52',
+    'esr60': 'releases/mozilla-esr60',
     'b2g18': 'releases/mozilla-b2g18',
     'b2g26': 'releases/mozilla-b2g26_v1_2',
     'b2g28': 'releases/mozilla-b2g28_v1_3',
