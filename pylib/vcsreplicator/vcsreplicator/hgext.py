@@ -103,8 +103,9 @@ def pretxnopenhook(ui, repo, **kwargs):
             vcsrproducer.send_heartbeat(ui.replicationproducer,
                                         partition=repo.replicationpartition)
             repo.producerlog('PRETXNOPEN_HEARTBEATSENT')
-        except Exception:
-            repo.producerlog('EXCEPTION', traceback.format_exc())
+        except Exception as e:
+            repo.producerlog('EXCEPTION', '%s: %s' % (
+                             e, traceback.format_exc()))
             ui.warn('replication log not available; all writes disabled\n')
             return 1
 
@@ -162,8 +163,9 @@ def pretxnclosehook(ui, repo, **kwargs):
             vcsrproducer.send_heartbeat(ui.replicationproducer,
                                         repo.replicationpartition)
             repo.producerlog('PRETXNCLOSE_HEARTBEATSENT')
-        except Exception:
-            repo.producerlog('EXCEPTION', traceback.format_exc())
+        except Exception as e:
+            repo.producerlog('EXCEPTION', '%s: %s' % (
+                e, traceback.format_exc()))
             ui.warn('replication log not available; cannot close transaction\n')
             return True
 
@@ -341,7 +343,8 @@ def sendheartbeat(ui):
                 vcsrproducer.send_heartbeat(ui.replicationproducer,
                                             partition=partition)
         except kafkacommon.KafkaError as e:
-            ui.producerlog('<unknown>', 'EXCEPTION', traceback.format_exc())
+            ui.producerlog('<unknown>', 'EXCEPTION', '%s: %s' % (
+                e, traceback.format_exc()))
             raise error.Abort('error sending heartbeat: %s' % e.message)
 
     ui.status(_('wrote heartbeat message into %d partitions\n') %
@@ -515,8 +518,8 @@ def uisetup(ui):
             try:
                 yield
             except kafkacommon.KafkaError as e:
-                self.producerlog('<unknown>', 'KAFKA_EXCEPTION',
-                        traceback.format_exc())
+                self.producerlog('<unknown>', 'KAFKA_EXCEPTION', '%s: %s' % (
+                    e, traceback.format_exc()))
                 raise
 
         def producerlog(self, repo, action, *args):
