@@ -1,9 +1,9 @@
 ---
 
 - name: download Node rpm setup script
-  get_url: url=https://raw.githubusercontent.com/nodesource/distributions/9021c9def5fbbf81f610cb61c171f97cb9755542/rpm/setup
+  get_url: url=https://raw.githubusercontent.com/nodesource/distributions/dd31448fd0697b235749fd32843d4d934cfbee9f/rpm/setup_8.x
            dest=/var/tmp/node-setup
-           sha256sum=982db69277a23d5be5e8de6524dad85178b682c6e54c9dbe674cb3fa705e22a8
+           sha256sum=84a5142c2208b6f249c3e8bede7a60ecc500cce7439ce2492474d869f7cc7c07
 
 - name: configure Node sources
   command: /bin/bash /var/tmp/node-setup
@@ -16,7 +16,6 @@
     - libjpeg-turbo-devel
     - mysql-devel
     - nodejs
-    - npm
     - python-devel
     - openldap-devel
     - python27
