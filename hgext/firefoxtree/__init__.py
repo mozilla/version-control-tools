@@ -79,6 +79,7 @@ from mercurial import (
     bookmarks,
     cmdutil,
     commands,
+    demandimport,
     error,
     exchange,
     extensions,
@@ -89,7 +90,6 @@ from mercurial import (
     scmutil,
     templatekw,
     util,
-    wireproto,
 )
 from mercurial.error import RepoError
 from mercurial.i18n import _
@@ -100,11 +100,18 @@ from mercurial.node import (
     short,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
+with demandimport.deactivated():
+    # TRACKING hg43
+    try:
+        from mercurial import configitems
+    except ImportError:
+        configitems = None
+
+    # TRACKING hg46
+    try:
+        from mercurial import wireprotov1server as wireproto
+    except ImportError:
+        from mercurial import wireproto
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
