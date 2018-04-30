@@ -29,6 +29,8 @@ CONSUMER_EXT = os.path.join(HERE, 'consumerext.py')
 
 logger = logging.getLogger('vcsreplicator.consumer')
 
+MIN_BUFFER_SIZE = 1048576  # 1 MB
+
 MAX_BUFFER_SIZE = 104857600 # 100 MB
 
 MESSAGE_HEADER_V1 = b'1\n'
@@ -46,6 +48,7 @@ class Consumer(SimpleConsumer):
         super(Consumer, self).__init__(
             client, group, topic, partitions=partitions,
             auto_commit=False,
+            buffer_size=MIN_BUFFER_SIZE,
             max_buffer_size=MAX_BUFFER_SIZE)
 
         self.fetch_last_known_offsets(partitions)
