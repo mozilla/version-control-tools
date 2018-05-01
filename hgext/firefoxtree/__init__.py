@@ -101,24 +101,6 @@ from mercurial.node import (
     short,
 )
 
-with demandimport.deactivated():
-    # TRACKING hg43
-    try:
-        from mercurial import configitems
-    except ImportError:
-        configitems = None
-
-    # TRACKING hg46
-    try:
-        from mercurial import logcmdutil
-    except ImportError:
-        logcmdutil = None
-
-    try:
-        from mercurial import wireprotov1server as wireproto
-    except ImportError:
-        from mercurial import wireproto
-
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
@@ -128,6 +110,17 @@ from mozautomation.repository import (
     resolve_uri_to_tree,
     TRY_TREES,
 )
+from mozhg.util import import_module
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
+
+# TRACKING hg46
+logcmdutil = import_module('mercurial.logcmdutil')
+
+wireproto = import_module('mercurial.wireprotov1server')
+if not wireproto:
+    wireproto = import_module('mercurial.wireproto')
 
 testedwith = '4.2 4.3 4.4 4.5'
 minimumhgversion = '4.2'

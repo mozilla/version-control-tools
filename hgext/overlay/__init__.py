@@ -29,11 +29,13 @@ from mercurial import (
     util,
 )
 
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import import_module
+
 # TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
+configitems = import_module('mercurial.configitems')
 
 testedwith = '4.1 4.2 4.3 4.4 4.5'
 

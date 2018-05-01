@@ -30,11 +30,13 @@ from mercurial.hgweb import (
     webutil,
 )
 
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import import_module
+
 # TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
+configitems = import_module('mercurial.configitems')
 
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError

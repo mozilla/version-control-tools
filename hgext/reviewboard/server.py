@@ -33,12 +33,6 @@ from mercurial import (
     wireproto,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
 from mercurial.i18n import _
 from mercurial.node import (
     hex,
@@ -53,6 +47,11 @@ from mercurial.hgweb.common import (
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import import_module
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 with demandimport.deactivated():
     try:

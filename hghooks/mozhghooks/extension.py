@@ -9,15 +9,13 @@ from mercurial import (
     registrar,
     util,
 )
-
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
 from mozhg.util import (
     identify_repo,
+    import_module,
 )
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 testedwith = '4.2 4.3 4.4'
 minimumhgversion = '4.2'

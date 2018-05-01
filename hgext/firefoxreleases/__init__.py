@@ -19,20 +19,18 @@ from mercurial.hgweb import (
     webutil,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.releasedb as releasedb
 
 from mozhg.util import (
+    import_module,
     is_firefox_repo,
 )
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 minimumhgversion = '4.1'
 testedwith = '4.1 4.2 4.3 4.4'

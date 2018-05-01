@@ -12,13 +12,16 @@ import urlparse
 from mercurial import config, util
 from mercurial.i18n import _
 
+from util import import_module
+
 
 def register_config_items(configitem):
     """Registers config items with Mercurial's registrar.
 
     The argument is a ``registrar.configitem`` instance.
     """
-    from mercurial import configitems
+    # TRACKING hg43
+    configitems = import_module('mercurial.configitems')
 
     configitem('bugzilla', 'username',
                default=configitems.dynamicdefault)

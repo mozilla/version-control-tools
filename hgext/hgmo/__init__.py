@@ -109,18 +109,15 @@ from mercurial.hgweb.protocol import (
     webproto,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
 OUR_DIR = os.path.dirname(__file__)
 ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.commitparser as commitparser
+from mozhg.util import import_module
 
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 minimumhgversion = '4.1'
 testedwith = '4.1 4.2 4.3 4.4'

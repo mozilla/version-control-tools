@@ -2,17 +2,35 @@
 # GNU General Public License version 2 or any later version.
 
 from __future__ import absolute_import
+import importlib
 
 from mercurial import (
     error,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
 
+def import_module(name):
+    """Mercurial's demandimport makes checking for a module's existence tricky.
+
+    As demandimport lazyloads even invalid modules, you cannot use a normal
+    `import` catching ImportErrors. Performing the import inside a
+    `demandimport.disabled()` block will work, however this will also disable
+    lazyloading of dependent modules.
+
+    The correct method is to load with demandimport enabled then query an
+    attribute of the method."""
+    try:
+        module = importlib.import_module(name)
+        # __name__ will throw if the module cannot be imported; wrapped in an
+        # `if` to avoid "useless statement" warnings.
+        if module.__name__:
+            return module
+    except ImportError:
+        return None
+
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 FIREFOX_ROOT_NODE = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
 THUNDERBIRD_ROOT_NODE = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
@@ -97,3 +115,4 @@ def identify_repo(repo):
         and not d['user_repo'])
 
     return d
+

@@ -307,16 +307,13 @@ from mercurial import (
     util,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
-
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
+from mozhg.util import import_module
+
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.

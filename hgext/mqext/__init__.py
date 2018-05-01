@@ -106,12 +106,6 @@ from mercurial import (
     util,
 )
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
-
 from hgext import mq
 from collections import Counter
 
@@ -119,7 +113,10 @@ OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.commitparser import BUG_RE
+from mozhg.util import import_module
 
+# TRACKING hg43
+configitems = import_module('mercurial.configitems')
 
 # TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
 # requires config items to be registered to avoid a devel warning.
