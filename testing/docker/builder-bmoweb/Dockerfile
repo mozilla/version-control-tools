@@ -16,11 +16,9 @@
 #
 #   docker build -t bmoweb .
 #
-# The container takes a long time to build. The two long poles are
-# installing the numerous required system packages and CPAN packages
-# required by Bugzilla. Run time can balloon significantly if you are on
-# a slow internet connection. Build times of 10 minutes on modern
-# machines are expected.
+# The container takes a long time to build, mostly due to numerous required
+# system packages.   Run time can balloon significantly if you are on a slow
+# internet connection, or have high latency to archive.ubuntu.com.
 #
 # Running
 # =======
@@ -57,10 +55,8 @@
 # Known Issues
 # ============
 #
-# Our base image is Ubuntu. We should be using CentOS or Fedora for maximum
+# Our base image is bizarrely Ubuntu.  We should be using CentOS for maximum
 # compatibility with Mozilla's actual deployment.
-#
-# We hard-code use of MySQL. Bugzilla supports other database engines.
 #
 # We blow away the Bugzilla data directory during container start.
 
@@ -74,57 +70,62 @@ ENV ADMIN_EMAIL admin@example.com
 ENV ADMIN_PASSWORD password
 ENV BMO_URL http://localhost:80/
 
-RUN /usr/sbin/groupadd -g 1000 bugzilla
-RUN /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
+# Pin to an ancient version of BMO as our bmo-on-ubuntu mess presents issues
+# with running the latest BMO.  In particular Ubuntu's mod_perl removes methods
+# that are present on CentOS and in the authorative version of mod_perl CPAN.
+# The version we're pinning to doesn't call those methods.
+ENV BMO_COMMIT 2f310fba9800f9d106ad8090cbbfb628c53599a1
 
-RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys A4A9406876FCBD3C456770C88C718D3B5072E1F5
-RUN echo "deb http://repo.mysql.com/apt/ubuntu/ trusty mysql-5.6" > /etc/apt/sources.list.d/mysql.list
+RUN /usr/sbin/groupadd -g 1000 bugzilla \
+    && /usr/sbin/useradd --no-create-home -u 1000 -g 1000 bugzilla
 
-RUN apt-get update && apt-get --no-install-recommends -y install \
-  apache2 build-essential cpanminus cvs g++ git graphviz \
-  libapache2-mod-perl2 libmysqlclient18 \
-  libgd-dev libssl-dev \
-  mysql-client mysql-server \
-  patchutils pkg-config python3-mysql.connector \
-  python-psutil supervisor unzip wget
+RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys A4A9406876FCBD3C456770C88C718D3B5072E1F5 \
+    && echo "deb http://repo.mysql.com/apt/ubuntu/ trusty mysql-5.6" > /etc/apt/sources.list.d/mysql.list \
+    && apt-get update \
+    && apt-get --no-install-recommends -y install \
+       apache2 build-essential cpanminus cvs g++ git graphviz \
+       libapache2-mod-perl2 libmysqlclient18 libgd-dev libssl-dev mysql-client \
+       mysql-server patchutils pkg-config python3-mysql.connector python-psutil \
+       supervisor unzip wget
 
-RUN git clone https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla
-
-# BMO packages its dependencies in a carton bundle.  See
-# https://github.com/mozilla-bteam/carton-bundles for details.
-RUN cd $BUGZILLA_HOME/bugzilla && wget -q -O vendor.tar.gz http://s3.amazonaws.com/moz-devservices-bmocartons/mozreview/vendor.tar.gz && tar zxf vendor.tar.gz --transform 's/mozreview\///'
+# Clone and install BMO
+# BMO packages its dependencies in a carton bundle.
+# See https://github.com/mozilla-bteam/bmo-systems for details.
+RUN git clone https://github.com/mozilla-bteam/bmo.git $BUGZILLA_HOME/bugzilla \
+    && cd $BUGZILLA_HOME/bugzilla \
+    && git checkout $BMO_COMMIT \
+    && wget -q -O vendor.tar.gz http://s3.amazonaws.com/moz-devservices-bmocartons/mozreview/vendor.tar.gz \
+    && tar zxf vendor.tar.gz --transform 's/mozreview\///'
 
 ADD checksetup_answers.txt $BUGZILLA_HOME/checksetup_answers.txt
-RUN cd $BUGZILLA_HOME/bugzilla && perl checksetup.pl --check-modules
+RUN cd $BUGZILLA_HOME/bugzilla \
+    && perl checksetup.pl --check-modules
 
 # Configure MySQL
-RUN rm -rf /var/lib/mysql
 ADD my.cnf /etc/mysql/my.cnf
-RUN chmod a-w /etc/mysql/my.cnf
 ADD mysql-init.sh /tmp/mysql-init.sh
-RUN /usr/bin/mysql_install_db --user=mysql --datadir=/var/lib/mysql
-RUN chown -R mysql:mysql /var/lib/mysql
+RUN rm -rf /var/lib/mysql \
+    && chmod a-w /etc/mysql/my.cnf \
+    && /usr/bin/mysql_install_db --user=mysql --datadir=/var/lib/mysql \
+    && chown -R mysql:mysql /var/lib/mysql
 
 # Configure Apache
-RUN rm /etc/apache2/sites-enabled/*
-RUN /usr/sbin/a2dismod mpm_event && /usr/sbin/a2enmod mpm_prefork
-RUN /usr/sbin/a2enmod expires
-RUN /usr/sbin/a2enmod headers
-RUN /usr/sbin/a2enmod rewrite
+RUN rm /etc/apache2/sites-enabled/* \
+    && /usr/sbin/a2dismod mpm_event \
+    && /usr/sbin/a2enmod mpm_prefork \
+    && /usr/sbin/a2enmod expires \
+    && /usr/sbin/a2enmod headers \
+    && /usr/sbin/a2enmod rewrite
 
 ADD bugzilla.conf /etc/apache2/sites-enabled/25-bugzilla.conf
 ADD prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 
+# entrypoint and docker helpers
 ADD set-urls /set-urls
 ADD entrypoint.py /bmoweb_entrypoint.py
 ADD run-apache.sh /run-apache.sh
-
 ADD supervisord.conf /etc/supervisor/conf.d/docker.conf
 
 EXPOSE 80
-
 ENTRYPOINT ["/bmoweb_entrypoint.py"]
 CMD ["/usr/bin/supervisord"]
-
-# Temporarily pin commit until bug 1311165 is resolved.
-ENV BMO_COMMIT 2f310fba9800f9d106ad8090cbbfb628c53599a1
