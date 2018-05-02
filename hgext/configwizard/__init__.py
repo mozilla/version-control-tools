@@ -108,8 +108,10 @@ Would you like to change this (Yn)? $$ &Yes $$ &No
 '''.strip()
 
 TWEAKDEFAULTS_INFO = '''
-Mercurial has implemented some functionality that most users would like by
-default, but would break some workflows due to backwards compatibility issues.
+Mercurial has implemented some functionality behind ui.tweakdefaults config,
+that most users would like by default, but would break some workflows due to
+backwards compatibility issues.
+You can find more info here: https://www.mercurial-scm.org/wiki/FriendlyHGPlan
 
 Would you like to enable these features (Yn)? $$ &Yes $$ &No
 '''.strip()

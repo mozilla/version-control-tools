@@ -13,8 +13,10 @@ Rejecting tweakdefaults doesn't enable it
   
   To begin, press the enter/return key.
    <RETURN>
-  Mercurial has implemented some functionality that most users would like by
-  default, but would break some workflows due to backwards compatibility issues.
+  Mercurial has implemented some functionality behind ui.tweakdefaults config,
+  that most users would like by default, but would break some workflows due to
+  backwards compatibility issues.
+  You can find more info here: https://www.mercurial-scm.org/wiki/FriendlyHGPlan
   
   Would you like to enable these features (Yn)?  n
 
@@ -39,8 +41,10 @@ Accepting prompt enables tweakdefaults
   
   To begin, press the enter/return key.
    <RETURN>
-  Mercurial has implemented some functionality that most users would like by
-  default, but would break some workflows due to backwards compatibility issues.
+  Mercurial has implemented some functionality behind ui.tweakdefaults config,
+  that most users would like by default, but would break some workflows due to
+  backwards compatibility issues.
+  You can find more info here: https://www.mercurial-scm.org/wiki/FriendlyHGPlan
   
   Would you like to enable these features (Yn)?  y
   Your config file needs updating.
