@@ -165,7 +165,7 @@ def resolve_patchfile(ui, repo, patchspec):
     try:
         p = q.lookup(patchspec, strict=True)
         return q.opener(p, "r")
-    except util.Abort, e:
+    except error.Abort, e:
         pass
 
     try:
@@ -188,7 +188,7 @@ def qshow(ui, repo, patchspec=None, **opts):
         if patchspec is None:
             patchspec = '.'
         if patchspec not in repo and not repo.revs(patchspec).first():
-            raise util.Abort(_("Unknown patch '%s'") % patchspec)
+            raise error.Abort(_("Unknown patch '%s'") % patchspec)
 
         # the built-in export command does not label the diff for color
         # output, and the patch header generation is not reusable
@@ -240,7 +240,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     elif opts['rev']:
         revs = scmutil.revrange(repo, opts['rev'])
         if not revs:
-            raise util.Abort("no changes found")
+            raise error.Abort("no changes found")
         filesInRevs = set()
         for rev in revs:
             for f in repo[rev].files():
@@ -262,10 +262,10 @@ def patch_changes(ui, repo, patchfile=None, **opts):
                 try:
                     commands.diff(ui, repo, change="qtip", git=True)
                 except error.RepoLookupError, e:
-                    raise util.Abort("no current diff, no mq patch to use")
+                    raise error.Abort("no current diff, no mq patch to use")
                 diff = ui.popbuffer()
             else:
-                raise util.Abort("no changes found")
+                raise error.Abort("no changes found")
         else:
             try:
                 diff = url.open(ui, patchfile).read()
@@ -425,7 +425,8 @@ def fetch_bugs(url, ui, bugs):
                 parts = [ bs[i:len(bugs):nparts] for i in range(0,nparts) ]
             return reduce(lambda bs,p: bs + fetch_bugs(url, ui, p), parts, [])
 
-        raise util.Abort("Failed to retrieve bugs, last buginfo=%r" % (buginfo,))
+        raise error.Abort("Failed to retrieve bugs, last buginfo=%r" % (
+            buginfo,))
 
     return buginfo['result']['bugs']
 
@@ -532,7 +533,7 @@ def touched(ui, repo, sourcefile=None, **opts):
     q = repo.mq
 
     if opts['patch'] and opts['applied']:
-        raise util.Abort(_('Cannot use both -a and -p options'))
+        raise error.Abort(_('Cannot use both -a and -p options'))
 
     if opts['patch']:
         patches = [ q.lookup(opts['patch']) ]
@@ -560,22 +561,22 @@ def qrevert(ui, repo, rev, **opts):
     '''
     q = repo.mq
     if not q or not q.qrepo():
-        raise util.Abort(_("No revisioned patch queue found"))
+        raise error.Abort(_("No revisioned patch queue found"))
     p = q.qrepo()[q.qrepo().lookup(rev)]
 
     desc = p.description()
     m = qparent_re.search(desc)
     if not m:
-        raise util.Abort(_("mq commit is missing needed metadata in comment"))
+        raise error.Abort(_("mq commit is missing needed metadata in comment"))
     qparent = m.group(1)
     m = top_re.search(desc)
     if not m:
-        raise util.Abort(_("mq commit is missing needed metadata in comment"))
+        raise error.Abort(_("mq commit is missing needed metadata in comment"))
     top = m.group(1)
 
     # Check the main checkout before updating the mq checkout
     if repo[None].dirty(merge=False, branch=False):
-        raise util.Abort(_("uncommitted local changes"))
+        raise error.Abort(_("uncommitted local changes"))
 
     # Pop everything first
     q.pop(repo, None, force=False, all=True, nobackup=True, keepchanges=False)
@@ -614,10 +615,11 @@ def mqcommit_info(ui, repo, opts):
 
     q = repo.mq
     if q is None:
-        raise util.Abort("-Q option given but mq extension not installed")
+        raise error.Abort("-Q option given but mq extension not installed")
     r = q.qrepo()
     if r is None:
-        raise util.Abort("-Q option given but patch directory is not versioned")
+        raise error.Abort("-Q option given but patch directory is not "
+                          "versioned")
 
     return mqcommit, q, r
 
@@ -626,7 +628,8 @@ def mqmessage_rep(ch, repo, values):
         r = values[ch]
         return r(repo, values) if callable(r) else r
     else:
-        raise util.Abort("Invalid substitution %%%s in mqmessage template" % ch)
+        raise error.Abort("Invalid substitution %%%s in mqmessage template" %
+                          ch)
 
 def queue_info_string(repo, values):
     qparent_str = ''
@@ -685,7 +688,7 @@ def qrefresh_wrapper(orig, self, repo, *pats, **opts):
     if mqcommit and len(q.applied) > 0:
         patch = q.applied[-1].name
         if r is None:
-            raise util.Abort("no patch repository found when using -Q option")
+            raise error.Abort("no patch repository found when using -Q option")
         mqmessage = substitute_mqmessage(mqmessage, repo, { 'p': patch,
                                                             'a': 'UPDATE',
                                                             's': diffstat })
