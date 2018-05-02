@@ -94,6 +94,8 @@ from mozhg.util import import_module
 
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
+# TRACKING hg46
+templateutil = import_module('mercurial.templateutil')
 
 testedwith = '4.2 4.3 4.4 4.5'
 minimumhgversion = '4.2'
@@ -1042,7 +1044,11 @@ def template_reviews(repo, ctx, revcache, **args):
 
         revcache['reviews'] = reviews
 
-    return templatekw.showlist('review', revcache['reviews'], {})
+    # TRACKING hg46 templateutil.compatlist added in 4.6.
+    if templateutil:
+        return templateutil.compatlist(ctx, {}, 'review', revcache['reviews'])
+    else:
+        return templatekw.showlist('review', revcache['reviews'], {})
 
 
 @command('fetchreviews', [], _('hg fetchreviews'))
