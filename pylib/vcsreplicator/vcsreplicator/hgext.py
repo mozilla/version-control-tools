@@ -34,13 +34,12 @@ from mercurial import (
     wireproto,
 )
 
-OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
-
-from mozhg.util import import_module
-
 # TRACKING hg43
-configitems = import_module('mercurial.configitems')
+try:
+    from mercurial import configitems
+    getattr(configitems, r'configitem', None)
+except ImportError:
+    configitems = None
 
 # TRACKING hg43 4.3 imports variable modules with policy.importmod().
 if util.safehasattr(policy, 'importmod'):
