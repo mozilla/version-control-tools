@@ -88,8 +88,8 @@ from mozhg.util import import_module
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
 
-testedwith = '4.1 4.2 4.3 4.4'
-minimumhgversion = '4.1'
+testedwith = '4.2 4.3 4.4 4.5'
+minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
 cmdtable = {}
