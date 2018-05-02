@@ -20,7 +20,12 @@ import time
 import urllib
 import urllib2
 import json
-from mercurial import config, demandimport, util
+from mercurial import (
+    config,
+    demandimport,
+    error,
+    util,
+)
 from mercurial.i18n import _
 try:
     import cPickle as pickle
@@ -119,7 +124,7 @@ class bzAuth:
             res = s.get('%s/rest/login' % self._url, params=params)
             j = res.json()
             if 'token' not in j:
-                raise util.Abort(_('failed to login to Bugzilla'))
+                raise error.Abort(_('failed to login to Bugzilla'))
 
             s.params['token'] = j['token']
 
@@ -182,7 +187,7 @@ def load_global_cache(ui, api_server, filename):
     except IOError, e:
         global_cache = {api_server: {'real_names': {}}}
     except Exception, e:
-        raise util.Abort("Error loading user cache: " + str(e))
+        raise error.Abort("Error loading user cache: " + str(e))
 
     return global_cache
 
@@ -225,7 +230,7 @@ def load_configuration(ui, api_server, filename):
     try:
         cache['configuration'] = json.load(urllib2.urlopen(bz.get_configuration(api_server), timeout=30))
     except Exception, e:
-        raise util.Abort("Error loading bugzilla configuration: " + str(e))
+        raise error.Abort("Error loading bugzilla configuration: " + str(e))
 
     cache['configuration_timestamp'] = now
     store_global_cache(filename)
