@@ -16,6 +16,7 @@ import urllib2
 from StringIO import StringIO
 
 from mercurial import (
+    error,
     registrar,
     util,
 )
@@ -38,14 +39,14 @@ class URLInterceptor(object):
     def open(self, url, data=None, timeout=None):
         path = self.ui.config('urlintercept', 'path')
         if not path:
-            raise util.Abort('no urlintercept path defined!')
+            raise error.Abort('no urlintercept path defined!')
 
         with open(path, 'rb') as fh:
             expected = fh.readline().rstrip()
             response = fh.read()
 
         if url != expected:
-            raise util.Abort('Incorrect URL. Got %s; expected %s' % (
+            raise error.Abort('Incorrect URL. Got %s; expected %s' % (
                 url, expected))
 
         self.ui.write('intercepting url\n')
