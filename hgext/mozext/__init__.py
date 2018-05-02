@@ -387,7 +387,7 @@ def get_ircnick(ui):
     headless = ui.configbool('mozext', 'headless')
     ircnick = ui.config('mozext', 'ircnick')
     if not ircnick and not headless:
-        raise util.Abort(_('Set "[mozext] ircnick" in your hgrc to your '
+        raise error.Abort(_('Set "[mozext] ircnick" in your hgrc to your '
             'Mozilla IRC nickname to enable additional functionality.'))
     return ircnick
 
@@ -574,7 +574,7 @@ def treestatus(ui, *trees, **opts):
         for k in set(status.keys()) - set(trees):
             del status[k]
     if not status:
-        raise util.Abort('No status info found.')
+        raise error.Abort('No status info found.')
 
     longest = max(len(s) for s in status)
 
@@ -596,21 +596,21 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
     repositories.
     """
     if not tree:
-        raise util.Abort('A tree must be specified.')
+        raise error.Abort('A tree must be specified.')
 
     if not rev:
-        raise util.Abort('A revision must be specified.')
+        raise error.Abort('A revision must be specified.')
 
     tree, repo_url = resolve_trees_to_uris([tree])[0]
     if not repo_url:
-        raise util.Abort("Don't know about tree: %s" % tree)
+        raise error.Abort("Don't know about tree: %s" % tree)
 
     r = MercurialRepository(repo_url)
     node = repo[rev].hex()
     push = r.push_info_for_changeset(node)
 
     if not push:
-        raise util.Abort("Could not find push info for changeset %s" % node)
+        raise error.Abort("Could not find push info for changeset %s" % node)
 
     push_node = push.last_node
 
@@ -927,7 +927,7 @@ def revset_me(repo, subset, x):
 
     me = repo.ui.config('ui', 'username')
     if not me:
-        raise util.Abort(_('"[ui] username" must be set to use me()'))
+        raise error.Abort(_('"[ui] username" must be set to use me()'))
 
     ircnick = get_ircnick(repo.ui)
 
@@ -962,7 +962,7 @@ def revset_tree(repo, subset, x):
 
     tree, uri = resolve_trees_to_uris([tree])[0]
     if not uri:
-        raise util.Abort(_("Don't know about tree: %s") % tree)
+        raise error.Abort(_("Don't know about tree: %s") % tree)
 
     ref = '%s/default' % tree
 
@@ -1000,7 +1000,7 @@ def revset_firstpushtree(repo, subset, x):
 
     tree, uri = resolve_trees_to_uris([tree])[0]
     if not uri:
-        raise util.Abort(_("Don't know about tree: %s") % tree)
+        raise error.Abort(_("Don't know about tree: %s") % tree)
 
     def fltr(x):
         pushes = list(repo.changetracker.pushes_for_changeset(
@@ -1057,7 +1057,7 @@ def revset_pushhead(repo, subset, x):
         tree, uri = resolve_trees_to_uris([tree])[0]
 
         if not uri:
-            raise util.Abort(_("Don't know about tree: %s") % tree)
+            raise error.Abort(_("Don't know about tree: %s") % tree)
 
         def pushheads():
             for push_id, head_changeset in repo.changetracker.tree_push_head_changesets(tree):
@@ -1418,7 +1418,7 @@ def reposetup(ui, repo):
             try:
                 return ChangeTracker(self.vfs.join('changetracker.db'))
             except Exception as e:
-                raise util.Abort(e.message)
+                raise error.Abort(e.message)
 
         def _update_remote_refs(self, remote, tree):
             existing_refs = set()
