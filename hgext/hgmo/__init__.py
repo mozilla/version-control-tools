@@ -603,7 +603,7 @@ def revset_automationrelevant(repo, subset, x):
     """
     s = revset.getset(repo, revset.fullreposet(repo), x)
     if len(s) > 1:
-        raise util.Abort('can only evaluate single changeset')
+        raise error.Abort('can only evaluate single changeset')
 
     ctx = repo[s.first()]
     revs = set([ctx.rev()])
@@ -888,7 +888,8 @@ def extsetup(ui):
     wrapper = ui.config('hgmo', 'mozbuildinfowrapper')
     if wrapper:
         if '"' in wrapper or "'" in wrapper:
-            raise util.Abort('quotes may not appear in hgmo.mozbuildinfowrapper')
+            raise error.Abort('quotes may not appear in '
+                              'hgmo.mozbuildinfowrapper')
 
     setattr(webcommands, 'mozbuildinfo', mozbuildinfowebcommand)
     webcommands.__all__.append('mozbuildinfo')
