@@ -289,7 +289,7 @@ def initcommand(orig, ui, dest, **opts):
         # can only get here if we created a repo.
         path = os.path.normpath(os.path.abspath(os.path.expanduser(dest)))
         if not os.path.exists(path):
-            raise util.Abort('could not find created repo at %s' % path)
+            raise error.Abort('could not find created repo at %s' % path)
 
         repo = hg.repository(ui, path)
         gd = 'generaldelta' in repo.requirements
@@ -442,17 +442,17 @@ def uisetup(ui):
     # support enabled. Validate required config options are present.
     hosts = ui.configlist('replicationproducer', 'hosts')
     if not hosts:
-        raise util.Abort('replicationproducer.hosts config option not set')
+        raise error.Abort('replicationproducer.hosts config option not set')
 
     clientid = ui.config('replicationproducer', 'clientid')
     if not clientid:
-        raise util.Abort('replicationproducer.clientid config option not set')
+        raise error.Abort('replicationproducer.clientid config option not set')
 
     timeout = ui.configint('replicationproducer', 'connecttimeout', 10)
 
     topic = ui.config('replicationproducer', 'topic')
     if not topic:
-        raise util.Abort('replicationproducer.topic config option not set')
+        raise error.Abort('replicationproducer.topic config option not set')
 
     def havepartitionmap():
         for k, v in ui.configitems('replicationproducer'):
@@ -461,15 +461,18 @@ def uisetup(ui):
         return False
 
     if not havepartitionmap():
-        raise util.Abort('replicationproducer.partitionmap.* config options not set')
+        raise error.Abort('replicationproducer.partitionmap.* config options '
+                          'not set')
 
     reqacks = ui.configint('replicationproducer', 'reqacks', default=999)
     if reqacks not in (-1, 0, 1):
-        raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1')
+        raise error.Abort('replicationproducer.reqacks must be set to -1, 0, '
+                          'or 1')
 
     acktimeout = ui.configint('replicationproducer', 'acktimeout')
     if not acktimeout:
-        raise util.Abort('replicationproducer.acktimeout config option not set')
+        raise error.Abort('replicationproducer.acktimeout config option not '
+                          'set')
 
     class replicatingui(ui.__class__):
         """Custom ui class that provides access to replication primitives."""
@@ -595,8 +598,8 @@ def reposetup(ui, repo):
                 if lower.startswith(source):
                     return dest + self.root[len(source):]
 
-            raise util.Abort('repository path not configured for replication',
-                             hint='add entry to [replicationpathrewrites]')
+            raise error.Abort('repository path not configured for replication',
+                              hint='add entry to [replicationpathrewrites]')
 
         @property
         def replicationpartition(self):
