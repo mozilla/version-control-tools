@@ -297,24 +297,34 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         repo.ui.status(_('redirecting push to %s\n') % newurl)
 
         if isinstance(remote, httppeer.httppeer):
-            # TRACKING various attributes renamed in Mercurial 4.4.
-            remote._url = str(newurl)
-
-            newurl.user = oldurl.user
-            newurl.passwd = oldurl.passwd
-
-            if util.safehasattr(remote, '_path'):
-                remote._path = str(newurl)
+            # TRACK hg46 code for peers was significantly overhauled.
+            if util.safehasattr(httppeer, 'makepeer'):
+                # It is a bit difficult to hack up the peer instance. So we
+                # just construct a new one.
+                newremote = httppeer.makepeer(
+                    remote.ui,
+                    bytes(newurl),
+                    opener=remote._urlopener,
+                    requestbuilder=remote._requestbuilder)
             else:
-                remote.path = str(newurl)
+                # TRACKING hg44 various attributes renamed
+                remote._url = str(newurl)
 
-            # Wipe out cached capabilities.
-            if util.safehasattr(remote, '_caps'):
-                remote._caps = None
-            else:
-                remote.caps = None
+                newurl.user = oldurl.user
+                newurl.passwd = oldurl.passwd
 
-            newremote = remote
+                if util.safehasattr(remote, '_path'):
+                    remote._path = str(newurl)
+                else:
+                    remote.path = str(newurl)
+
+                # Wipe out cached capabilities.
+                if util.safehasattr(remote, '_caps'):
+                    remote._caps = None
+                else:
+                    remote.caps = None
+
+                newremote = remote
 
         elif isinstance(remote, sshpeertype):
             newurl.user = oldurl.user
