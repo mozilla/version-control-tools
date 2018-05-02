@@ -15,11 +15,16 @@ from mercurial import (
     patch,
     phases,
     util,
-    wireproto,
 )
 
 from mozautomation import commitparser
+from mozhg.util import import_module
 from hgrb.util import ReviewID
+
+# TRACKING hg46
+wireproto = import_module('mercurial.wireprotov1server')
+if not wireproto:
+    wireproto = import_module('mercurial.wireproto')
 
 
 API_KEY_NEEDED = (
