@@ -97,6 +97,12 @@ configitems = import_module('mercurial.configitems')
 # TRACKING hg46
 templateutil = import_module('mercurial.templateutil')
 
+# TRACKING hg46
+try:
+    sshpeertype = sshpeer.sshv1peer
+except AttributeError:
+    sshpeertype = sshpeer.sshpeer
+
 testedwith = '4.2 4.3 4.4 4.5'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
@@ -310,12 +316,20 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
 
             newremote = remote
 
-        elif isinstance(remote, sshpeer.sshpeer):
+        elif isinstance(remote, sshpeertype):
             newurl.user = oldurl.user
 
-            # SSH remotes establish processes. We can't simply monkeypatch
-            # the instance.
-            newremote = type(remote)(remote.ui, str(newurl))
+            # SSH remotes establish processes tied to a specific repo. So we
+            # can't simply monkeypatch an instance: we need to instantiate a
+            # new remote.
+
+            # TRACKING hg46 the API for creating an SSH remote changed
+            # substantially.
+            if util.safehasattr(sshpeer, 'sshv1peer'):
+                newremote = sshpeer.instance(remote.ui, bytes(newurl),
+                                             create=False)
+            else:
+                newremote = type(remote)(remote.ui, bytes(newurl))
         else:
             raise error.Abort(_('do not know how to talk to this remote '
                                 'type\n'))
