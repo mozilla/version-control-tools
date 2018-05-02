@@ -6,7 +6,10 @@ import random
 import re
 import time
 
-from mercurial import util
+from mercurial import (
+    error,
+    util,
+)
 from mercurial.i18n import _
 
 class ReviewID(object):
@@ -24,26 +27,27 @@ class ReviewID(object):
             rid = 'bz://%s' % rid
 
         if rid and not rid.startswith('bz://'):
-            raise util.Abort(_('review identifier must begin with bz://'))
+            raise error.Abort(_('review identifier must begin with bz://'))
 
         full = rid
         paths = rid[5:].split('/')
         if not paths[0]:
-            raise util.Abort(_('review identifier must not be bz://'))
+            raise error.Abort(_('review identifier must not be bz://'))
 
         bug = paths[0]
         if not bug.isdigit():
-            raise util.Abort(_('first path component of review identifier must be a bug number'))
+            raise error.Abort(_('first path component of review identifier '
+                                'must be a bug number'))
         self.bug = int(bug)
 
         if bug == 0:
-            raise util.Abort(_('bug number must not be zero'))
+            raise error.Abort(_('bug number must not be zero'))
 
         if len(paths) > 1:
             self.user = paths[1]
 
         if len(paths) > 2:
-            raise util.Abort(_('unrecognized review id: %s') % rid)
+            raise error.Abort(_('unrecognized review id: %s') % rid)
 
     def __nonzero__(self):
         if self.bug or self.user:
@@ -114,8 +118,8 @@ def genid(repo=None, fakeidpath=None):
         now = int(time.time())
         # May 5, 2015 sometime.
         if now < 1430860700:
-            raise util.Abort('your system clock is wrong; fix your system '
-                             'clock')
+            raise error.Abort('your system clock is wrong; fix your system '
+                              'clock')
         seconds = now - EPOCH
         rnd = random.SystemRandom().getrandbits(32)
 

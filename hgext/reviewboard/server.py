@@ -26,6 +26,7 @@ import sys
 from mercurial import (
     cmdutil,
     demandimport,
+    error,
     extensions,
     hg,
     registrar,
@@ -286,7 +287,7 @@ def createrepomanifest(ui, repo, search=None, replace=None):
             continue
 
         if not url.startswith(('http://', 'https://')):
-            raise util.Abort('Expected http:// or https:// repo: %s' % url)
+            raise error.Abort('Expected http:// or https:// repo: %s' % url)
 
         sshurl = url.replace(search, replace)
 
@@ -409,23 +410,23 @@ def reposetup(ui, repo):
 
     if (not ui.configint('reviewboard', 'repoid', None) and
             not ui.configbool('reviewboard', 'isdiscoveryrepo', False)):
-        raise util.Abort(_('Please set reviewboard.repoid to the numeric ID '
+        raise error.Abort(_('Please set reviewboard.repoid to the numeric ID '
             'of the repository this repo is associated with.'))
 
     if not ui.config('reviewboard', 'url', None):
-        raise util.Abort(_('Please set reviewboard.url to the URL of the '
+        raise error.Abort(_('Please set reviewboard.url to the URL of the '
             'Review Board instance to talk to.'))
 
     if not ui.config('reviewboard', 'username', None):
-        raise util.Abort(_('Please set reviewboard.username to the username '
+        raise error.Abort(_('Please set reviewboard.username to the username '
             'for priveleged communications with Review Board.'))
 
     if not ui.config('reviewboard', 'password', None):
-        raise util.Abort(_('Please set reviewboard.password to the password '
+        raise error.Abort(_('Please set reviewboard.password to the password '
             'for priveleged communications with Review Board.'))
 
     if not ui.config('bugzilla', 'url', None):
-        raise util.Abort(_('Please set bugzilla.url to the URL of the '
+        raise error.Abort(_('Please set bugzilla.url to the URL of the '
             'Bugzilla instance to talk to.'))
 
     # TRACKING hg33+
@@ -435,7 +436,7 @@ def reposetup(ui, repo):
         publish = ui.configbool('phases', 'publish', True)
 
     if publish:
-        raise util.Abort(_('reviewboard server extension is only compatible '
+        raise error.Abort(_('reviewboard server extension is only compatible '
             'with non-publishing repositories.'))
 
     ui.setconfig('hooks', 'changegroup.reviewboard', changegrouphook)

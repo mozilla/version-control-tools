@@ -191,7 +191,7 @@ def getreviewcaps(remote):
     if isinstance(requires, str):
         requires = set(requires.split(','))
         if requires - clientcapabilities:
-            raise util.Abort(
+            raise error.Abort(
                 _('reviewboard client extension is too old to speak to this '
                   'server'),
                 hint=_('upgrade your extension by running `hg -R %s pull -u`') %
@@ -210,7 +210,7 @@ def pushcommand(orig, ui, repo, *args, **kwargs):
     ReviewID(kwargs['reviewid'])
 
     if kwargs['rev'] and kwargs['changeset']:
-        raise util.Abort(_('cannot specify both -r and -c'))
+        raise error.Abort(_('cannot specify both -r and -c'))
 
     # There isn't a good way to send custom arguments to the push api. So, we
     # inject some temporary values on the repo. This may fail in many
@@ -256,7 +256,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
                 newurls = urls
                 break
         else:
-            raise util.Abort(_('no review repository found'))
+            raise error.Abort(_('no review repository found'))
 
         oldurl = util.url(remote._url)
 
@@ -265,7 +265,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         elif oldurl.scheme == 'ssh':
             newurl = newurls[1]
         else:
-            raise util.Abort('can only use autoreview repos over HTTP or SSH')
+            raise error.Abort('can only use autoreview repos over HTTP or SSH')
 
         newurl = util.url(newurl)
 
@@ -276,7 +276,7 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
         # If this ever changes, watch out for credential copying when modifying
         # the remote below.
         if newurl.host != oldurl.host:
-            raise util.Abort(_('refusing to redirect due to URL mismatch: %s' %
+            raise error.Abort(_('refusing to redirect due to URL mismatch: %s' %
                 newurl))
 
         repo.ui.status(_('redirecting push to %s\n') % newurl)
@@ -308,14 +308,15 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
             # the instance.
             newremote = type(remote)(remote.ui, str(newurl))
         else:
-            raise util.Abort(_('do not know how to talk to this remote type\n'))
+            raise error.Abort(_('do not know how to talk to this remote '
+                                'type\n'))
 
         return wrappedpush(orig, repo, newremote, force=False, revs=revs,
                            newbranch=False, **kwargs)
 
     ircnick = repo.ui.config('mozilla', 'ircnick', None)
     if not ircnick:
-        raise util.Abort(_('you must set mozilla.ircnick in your hgrc config '
+        raise error.Abort(_('you must set mozilla.ircnick in your hgrc config '
             'file to your IRC nickname in order to perform code reviews'))
 
     # We filter the "extension isn't installed" message from the server.
@@ -460,7 +461,7 @@ def wrappedpushdiscovery(orig, pushop):
 
     nodes = [n for n in nodes if n not in publicnodes]
     if not nodes:
-        raise util.Abort(
+        raise error.Abort(
             _('no non-public changesets left to review'),
             hint=_('add or change the -r argument to include draft changesets'))
 
@@ -468,7 +469,7 @@ def wrappedpushdiscovery(orig, pushop):
     for node in nodes:
         ctx = repo[node]
         if not ctx.files():
-            raise util.Abort(
+            raise error.Abort(
                     _('cannot review empty changeset %s') % ctx.hex()[:12],
                     hint=_('add files to or remove changeset'))
 
@@ -597,9 +598,9 @@ def doreview(repo, ui, remote, nodes):
                 identifiers.add(identifier)
 
         if len(identifiers) > 1:
-            raise util.Abort('cannot submit reviews referencing multiple '
-                             'bugs', hint='limit reviewed changesets '
-                             'with "-c" or "-r" arguments')
+            raise error.Abort('cannot submit reviews referencing multiple '
+                              'bugs', hint='limit reviewed changesets '
+                              'with "-c" or "-r" arguments')
 
     identifier = ReviewID(identifier)
 
@@ -769,8 +770,8 @@ def publishreviewrequests(ui, remote, bzauth, rrids):
 def _pullreviews(repo):
     reviews = repo.reviews
     if not reviews.remoteurl:
-        raise util.Abort(_("We don't know of any review servers. Try "
-                           "creating a review first."))
+        raise error.Abort(_("We don't know of any review servers. Try "
+                            "creating a review first."))
 
     reviewdata = _pullreviewidentifiers(repo, sorted(reviews.identifiers))
     repo.ui.write(_('updated %d reviews\n') % len(reviewdata))
@@ -792,8 +793,8 @@ def _pullreviewidentifiers(repo, identifiers):
     remote = hg.peer(repo, {}, reviews.remoteurl)
     caps = getreviewcaps(remote)
     if 'pullreviews' not in caps:
-        raise util.Abort('cannot pull code review metadata; '
-                         'server lacks necessary features')
+        raise error.Abort('cannot pull code review metadata; '
+                          'server lacks necessary features')
 
     req = commonrequestdict(repo.ui)
     req['identifiers'] = [str(i) for i in identifiers]
@@ -1119,7 +1120,7 @@ def reposetup(ui, repo):
                 realmissingheads = local.revs('heads(%ln)',
                                               outgoing.missingheads)
                 if len(realmissingheads) > 1:
-                    raise util.Abort(_('cannot push multiple heads to remote; '
+                    raise error.Abort(_('cannot push multiple heads to remote; '
                         'limit pushed revisions using the -r argument.'))
 
     repo.prepushoutgoinghooks.add('reviewboard', prepushoutgoinghook)
