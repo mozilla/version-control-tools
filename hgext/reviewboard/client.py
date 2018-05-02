@@ -50,6 +50,13 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg46
+try:
+    from mercurial import obsutil
+    allpredecessors = obsutil.allpredecessors
+except (AttributeError, ImportError):
+    allpredecessors = obsolete.allprecursors
+
 from mercurial.i18n import _
 from mercurial.node import bin, hex
 
@@ -640,7 +647,7 @@ def doreview(repo, ui, remote, nodes):
     # Include obsolescence data so server can make intelligent decisions.
     obsstore = repo.obsstore
     for node in nodes:
-        precursors = [hex(n) for n in obsolete.allprecursors(obsstore, [node])]
+        precursors = [hex(n) for n in allpredecessors(obsstore, [node])]
         req['changesets'].append({
             'node': hex(node),
             'precursors': precursors,
@@ -1029,7 +1036,7 @@ def template_reviews(repo, ctx, revcache, **args):
     if 'reviews' not in revcache:
         rids = set()
         unfi = repo.unfiltered()
-        for node in obsolete.allprecursors(unfi.obsstore, [ctx.node()]):
+        for node in allpredecessors(unfi.obsstore, [ctx.node()]):
             rids.update(repo.reviews.findnodereviews(node))
 
         reviews = []
