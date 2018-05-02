@@ -13,6 +13,7 @@ from mercurial.node import nullid, short
 from mercurial import (
     cmdutil,
     commands,
+    error,
     mdiff,
     patch,
     registrar,
@@ -108,7 +109,8 @@ def qbackout(ui, repo, rev, **opts):
     def compute_patch_name(action, force_name, node=None, revisions=None):
         if force_name:
             if name_used[0]:
-                raise util.Abort('option "-n" not valid when backing out multiple changes')
+                raise error.Abort('option "-n" not valid when backing out '
+                                  'multiple changes')
             name_used[0] = True
             return force_name
         else:
@@ -160,7 +162,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
 
     rev = scmutil.revrange(repo, rev)
     if len(rev) == 0:
-        raise util.Abort('at least one revision required')
+        raise error.Abort('at least one revision required')
 
     csets = [repo[r] for r in rev]
     csets.sort(reverse=reverse_order, key=lambda cset: cset.rev())
@@ -185,7 +187,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
     def apply_change(node, reverse, push_patch=True, name=None):
         p1, p2 = repo.changelog.parents(node)
         if p2 != nullid:
-            raise util.Abort('cannot %s a merge changeset' % desc['action'])
+            raise error.Abort('cannot %s a merge changeset' % desc['action'])
 
         opts = mdiff.defaultopts
         opts.git = True
