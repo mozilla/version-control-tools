@@ -83,6 +83,7 @@ Popping the last commit truncates the review set
 
   $ hg strip -r 4e50148c492d --no-backup
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
+  1 new orphan changesets (?)
   $ hg push --config reviewboard.autopublish=false
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT6/test-repo
   searching for changes
