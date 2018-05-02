@@ -363,16 +363,11 @@ def wrappedpush(orig, repo, remote, force=False, revs=None, newbranch=False,
     repo.ui.__class__ = repofilteringwrite
     remote.ui.__class__ = remotefilteringwrite
     try:
-        # FUTURE can be made unconditional once support for 4.0 is dropped.
-        try:
-            configoverride = repo.ui.configoverride
-        except AttributeError:
-            configoverride = dummycontextmanager
-
         # This has the side-effect of obtaining a repo.wlock(), which prevents
         # a lock ordering issue if subsequent code executing during push obtains
         # a wlock.
-        with configoverride({('experimental', 'bundle2.pushback'): 'true'}):
+        with repo.ui.configoverride({
+            ('experimental', 'bundle2.pushback'): 'true'}):
             # We always do force push because we don't want users to need to
             # specify it. The big danger here is pushing multiple heads or
             # branches or mq patches. We check the former above and we don't
