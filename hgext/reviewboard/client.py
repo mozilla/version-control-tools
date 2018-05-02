@@ -855,11 +855,7 @@ class reviewstore(object):
     def __init__(self, repo):
         self._repo = repo
 
-        # Mercurial 4.2 introduced the vfs module and deprecated scmutil.vfs.
-        try:
-            from mercurial.vfs import vfs
-        except ImportError:
-            vfs = scmutil.vfs
+        from mercurial.vfs import vfs
 
         self._vfs = vfs(repo.vfs.join('reviewboard'), audit=False)
 
@@ -1046,12 +1042,8 @@ def template_reviews(repo, ctx, revcache, **args):
 
         revcache['reviews'] = reviews
 
-    # Mercurial 4.2+ take mapping as a positional argument. Older versions
-    # take mapping as **kwargs.
-    if 'mapping' in inspect.getargspec(templatekw.showlist).args:
-        return templatekw.showlist('review', revcache['reviews'], {})
-    else:
-        return templatekw.showlist('review', revcache['reviews'])
+    return templatekw.showlist('review', revcache['reviews'], {})
+
 
 @command('fetchreviews', [], _('hg fetchreviews'))
 def fetchreviews(ui, repo, **opts):
