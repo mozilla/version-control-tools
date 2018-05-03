@@ -41,6 +41,21 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
     def pre(self, node):
         self.done = False
 
+        # Subrepos are defined by .hgsub and .hgsubstate files under version
+        # control. Since resolving a manifest can be expensive and since
+        # Mercurial indexes tracked paths, we can avoid a bit of work by testing
+        # whether there is *any* versioned data for these tracked files. If not,
+        # we can short circuit the check and avoid manifest lookups.
+        seen = False
+        for p in ('.hgsub', '.hgsubstate'):
+            fl = self.repo.file(p)
+            if len(fl):
+                seen = True
+                break
+
+        if not seen:
+            self.done = True
+
     def check(self, ctx):
         # Since the check can be non-fatal and since it requires a manifest
         # (which can be expensive to obtain), no-op if there is no work to do.
