@@ -1,14 +1,17 @@
 ---
-# WSGI processes are typically CPU bound. So run as many as we have
-# virtual CPUs.
-wsgi_processes: "{{ ansible_processor_vcpus }}"
+# In the worst case, WSGI processes are CPU bound. Running more workers than
+# available CPU cores could cause excessive context switching / thrashing
+# and lower overall server throughput. However, our CPU utilization data shows
+# that servers are nowhere close to CPU capacity when WSGI process count is
+# equivalent to CPU core count. So, we run more WSGI processes than cores.
+wsgi_processes: "{{ ansible_processor_vcpus * 2 }}"
 httpd_start_servers: 8
 httpd_min_spare_servers: 5
 httpd_max_spare_servers: 20
 # Run a few more httpd workers than WSGI workers so requests are available
 # to be serviced once a WSGI worker is free.
-httpd_server_limit: "{{ (ansible_processor_vcpus * 1.2)|round|int }}"
-httpd_max_clients: "{{ (ansible_processor_vcpus * 1.2)|round|int }}"
+httpd_server_limit: "{{ (ansible_processor_vcpus * 2.2)|round|int }}"
+httpd_max_clients: "{{ (ansible_processor_vcpus * 2.2)|round|int }}"
 httpd_max_requests_per_child: 4000
 
 # Used for replication
