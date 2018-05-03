@@ -35,6 +35,9 @@ from mercurial import (
 with demandimport.deactivated():
     from kafka import SimpleClient
     import kafka.common as kafkacommon
+    # kafka.codec does module sniffing via imports. Import it explicitly
+    # to force it to import now.
+    import kafka.codec as kafkacodec
 
 # TRACKING hg43
 try:
