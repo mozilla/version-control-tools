@@ -4,6 +4,9 @@
 from __future__ import absolute_import
 import importlib
 
+import contextlib
+import time
+
 from mercurial import (
     error,
 )
@@ -116,3 +119,32 @@ def identify_repo(repo):
 
     return d
 
+
+class timers(object):
+    """Logs times to blackbox logger."""
+    def __init__(self, ui, facility, prefix):
+        self._ui = ui
+        self._facility = facility
+        self._prefix = prefix
+        self._times = {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        for name in sorted(self._times):
+            self._ui.log(self._facility,
+                         '%s%s took %.3f seconds\n',
+                         self._prefix,
+                         name,
+                         self._times[name])
+
+    @contextlib.contextmanager
+    def timeit(self, name):
+        self._times.setdefault(name, 0.0)
+        t0 = time.time()
+
+        try:
+            yield
+        finally:
+            self._times[name] += time.time() - t0

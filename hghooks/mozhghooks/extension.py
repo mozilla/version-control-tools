@@ -12,6 +12,7 @@ from mercurial import (
 from mozhg.util import (
     identify_repo,
     import_module,
+    timers,
 )
 
 # TRACKING hg43
@@ -132,31 +133,37 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
     checks = get_checks(ui, repo, source,
                         get_check_classes('pretxnchangegroup'))
 
-    for check in checks:
-        check.pre(node)
+    with timers(ui, 'mozhooks', 'mozhooks.pretxnchangegroup.') as times:
+        for check in checks:
+            with times.timeit(check.name):
+                check.pre(node)
 
-    for rev in repo.changelog.revs(repo[node].rev()):
-        ctx = repo[rev]
+        for rev in repo.changelog.revs(repo[node].rev()):
+            ctx = repo[rev]
+
+            for check in checks:
+                with times.timeit(check.name):
+                    if not check.check(ctx):
+                        return 1
 
         for check in checks:
-            if not check.check(ctx):
-                return 1
+            with times.timeit(check.name):
+                if not check.post_check():
+                    return 1
 
-    for check in checks:
-        if not check.post_check():
-            return 1
-
-    return 0
+        return 0
 
 
 def changegroup(ui, repo, source=None, **kwargs):
     checks = get_checks(ui, repo, source, get_check_classes('changegroup'))
 
-    for check in checks:
-        if not check.check(**kwargs):
-            return 1
+    with timers(ui, 'mozhooks', 'mozhooks.changegroup.') as times:
+        for check in checks:
+            with times.timeit(check.name):
+                if not check.check(**kwargs):
+                    return 1
 
-    return 0
+        return 0
 
 
 def reposetup(ui, repo):

@@ -18,7 +18,11 @@ dumppushlog () {
 configurehooks () {
   cat >> $1/.hg/hgrc << EOF
 [extensions]
+blackbox =
 mozhooks = $TESTDIR/hghooks/mozhghooks/extension.py
+
+[blackbox]
+track = *
 
 [mozilla]
 repo_root = $TESTTMP
