@@ -117,12 +117,12 @@ def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
 def wait_for_kafka(hostport, timeout=60):
     """Wait for Kafka to start responding on the specified host:port string."""
     # Delay import to facilitate module use in limited virtualenvs.
-    from kafka.client import KafkaClient
+    from kafka import SimpleClient
 
     start = time.time()
     while True:
         try:
-            KafkaClient(hostport, client_id=b'dummy', timeout=1)
+            SimpleClient(hostport, client_id=b'dummy', timeout=1)
             return
         except Exception:
             pass
@@ -136,10 +136,10 @@ def wait_for_kafka(hostport, timeout=60):
 def wait_for_kafka_topic(hostport, topic, timeout=60):
     """Wait for a Kafka topic to become available."""
     # Delay import to facilitate module use in limited virtualenvs.
-    from kafka.client import KafkaClient
+    from kafka import SimpleClient
 
     start = time.time()
-    client = KafkaClient(hostport, client_id=b'dummy', timeout=1)
+    client = SimpleClient(hostport, client_id=b'dummy', timeout=1)
     while not client.has_metadata_for_topic(topic):
         if time.time() - start > timeout:
             raise Exception('timeout reached waiting for topic')

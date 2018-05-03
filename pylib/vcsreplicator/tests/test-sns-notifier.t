@@ -59,8 +59,8 @@ An SNS message should be sent with the event details
 
   $ paconsumer --wait-for-n 15
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
   got a heartbeat-1 message
+  got a hg-repo-init-2 message
   got a hg-repo-init-2 message
   got a hg-hgrc-update-1 message
   got a heartbeat-1 message
@@ -78,10 +78,11 @@ An SNS message should be sent with the event details
 
   $ hgmo exec hgssh tail -n 39 /var/log/snsnotifier.log
   vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
-  vcsreplicator.snsnotifier processing message 1: newrepo.1 for https://hg.mozilla.org/mozilla-central
-  vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000001-*.json (glob)
+  vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
+  vcsreplicator.snsnotifier processing message 2: newrepo.1 for https://hg.mozilla.org/mozilla-central
+  vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000002-*.json (glob)
   vcsreplicator.snsnotifier sending SNS notification to arn:aws:sns:us-east-1:123456789012:hgmo-events
-  vcsreplicator.snsnotifier finished processing message 1
+  vcsreplicator.snsnotifier finished processing message 2
   vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
   vcsreplicator.snsnotifier processing message 3: newrepo.1 for https://hg.mozilla.org/try
   vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000003-*.json (glob)

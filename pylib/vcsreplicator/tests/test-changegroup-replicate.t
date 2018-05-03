@@ -69,15 +69,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
@@ -165,15 +157,7 @@ Pushing multiple commits results in sane behavior
   1:e325efa1b1fb7cb9e7f231851436db4de63e0a26
   0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
@@ -287,15 +271,7 @@ Pushing multiple heads results in appropriate behavior
   1:e325efa1b1fb7cb9e7f231851436db4de63e0a26
   0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)

@@ -4,8 +4,8 @@
 # Kafka is in this virtualenv to support replication on the hg leader server.
 # It isn't needed on a standalone hg server. But installing it doesn't really
 # hurt.
-kafka-python==0.9.4 \
-    --hash=sha256:6cd463b688d98fec1c1f602e316eb7745aef0e55dc57fe9ff2f203cf0865c8c7
+kafka-python==1.4.2 \
+    --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 
 Mercurial==4.2.3-388d39276ecf \
     --hash=sha256:e6adcc3a2222a978aaafb991f6feefe7ca4ff1cdacb81b4ccaac397dd681f588

@@ -94,7 +94,6 @@ Stopping the replication on an active mirror should result in no message copy
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ paconsumer --dump --start-from 6
-  No handlers could be found for logger "kafka.consumer.simple"
   []
 
 Starting the replication consumer should result in the message being written

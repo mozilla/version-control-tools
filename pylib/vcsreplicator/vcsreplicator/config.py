@@ -8,7 +8,7 @@ from ConfigParser import RawConfigParser
 import os
 import time
 
-from kafka.client import KafkaClient
+from kafka import SimpleClient
 from kafka.common import KafkaUnavailableError
 
 
@@ -94,7 +94,7 @@ class Config(object):
         start = time.time()
         while True:
             try:
-                return KafkaClient(hosts, client_id=client_id,
+                return SimpleClient(hosts, client_id=client_id,
                                    timeout=connect_timeout)
             except KafkaUnavailableError:
                 if timeout == -1:

@@ -10,7 +10,7 @@ import logging
 import subprocess
 import sys
 
-from kafka.client import KafkaClient
+from kafka import SimpleClient
 from kafka.common import KafkaError
 import vcsreplicator.producer as vcsrproducer
 
@@ -47,7 +47,7 @@ except (KeyError, ValueError):
     sys.exit(2)
 
 try:
-    client = KafkaClient(hosts, client_id=client_id, timeout=10)
+    client = SimpleClient(hosts, client_id=client_id, timeout=10)
     producer = vcsrproducer.Producer(
         client, topic, batch_send=False, req_acks=req_acks,
         ack_timeout=ack_timeout

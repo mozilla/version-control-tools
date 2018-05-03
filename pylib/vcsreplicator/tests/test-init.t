@@ -16,6 +16,8 @@ Creating a repository should record an event saying so
   revlogv1
   store
 
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ consumer --dump
   - _created: \d+\.\d+ (re)
     name: heartbeat-1
@@ -30,15 +32,7 @@ Creating a repository should record an event saying so
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)

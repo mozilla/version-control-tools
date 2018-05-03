@@ -38,15 +38,7 @@
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
-  No handlers could be found for logger "kafka.conn"
+  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)

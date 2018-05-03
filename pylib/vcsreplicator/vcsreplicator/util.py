@@ -6,7 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import time
 
-from kafka.common import OffsetRequest
+from kafka.common import OffsetRequestPayload as OffsetRequest
 from kafka.consumer.base import Consumer
 
 

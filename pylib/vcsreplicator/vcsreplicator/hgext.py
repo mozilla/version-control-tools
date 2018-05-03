@@ -15,8 +15,6 @@ import syslog
 import time
 import traceback
 
-import kafka.client as kafkaclient
-import kafka.common as kafkacommon
 import vcsreplicator.producer as vcsrproducer
 
 from mercurial.i18n import _
@@ -24,6 +22,7 @@ from mercurial.node import hex
 from mercurial import (
     cmdutil,
     commands,
+    demandimport,
     error,
     extensions,
     hg,
@@ -33,6 +32,9 @@ from mercurial import (
     util,
     wireproto,
 )
+with demandimport.deactivated():
+    from kafka import SimpleClient
+    import kafka.common as kafkacommon
 
 # TRACKING hg43
 try:
@@ -480,7 +482,7 @@ def uisetup(ui):
         def replicationproducer(self):
             """Obtain a ``Producer`` instance to write to the replication log."""
             if not getattr(self, '_replicationproducer', None):
-                client = kafkaclient.KafkaClient(hosts, client_id=clientid,
+                client = SimpleClient(hosts, client_id=clientid,
                                                  timeout=timeout)
                 self._replicationproducer = vcsrproducer.Producer(
                     client, topic, batch_send=False,
