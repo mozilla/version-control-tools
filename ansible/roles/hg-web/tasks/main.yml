@@ -243,6 +243,7 @@
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
     - { venv: venv_replication, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
+    - { venv: venv_replication, path: hgserver/hgmolib, pth: hgmolib }
 
 # Settings from this file are inherited by every hg command run on the
 # system.
