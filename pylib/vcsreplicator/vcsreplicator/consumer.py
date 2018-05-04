@@ -242,14 +242,17 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
                             '%s[%s]: %s' % (path, namespace, key, res))
 
 
-def process_hg_sync(config, path, requirements, hgrc, heads):
+def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
     local_path = config.parse_wire_repo_path(path)
     url = config.get_pull_url_from_repo_path(path)
 
-    # TODO create repo when missing.
     if not os.path.exists(local_path):
         logger.warn('repository does not exist: %s' % local_path)
-        return
+        if not create:
+            return
+
+        init_repo(local_path)
+
 
     # TODO set or warn about different requirements.
 
