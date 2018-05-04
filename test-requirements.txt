@@ -2,19 +2,14 @@
 --find-links https://downloads.reviewboard.org/releases/django-evolution/0.7/
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.6/
 
+-r docs-requirements.txt
 -r deploy-requirements.txt
-
-alabaster==0.7.3 \
-    --hash=sha256:0703c1ea5a6af0bb6d0cec24708301334949d56ebc7f95c64028d9c66f9d8d5d
 
 amqp==1.4.8 \
     --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e
 
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
-
-Babel==1.3 \
-    --hash=sha256:9f02d0357184de1f093c10012b52e7454a1008be6a5c185ab7a3307aceb1d12e
 
 backports.lzma==0.0.3 \
     --hash=sha256:bac58aec8d39ac3d22250840fb24830d0e4a0ef05ad8f3f09172dc0cc80cdbca
@@ -74,9 +69,6 @@ docker==2.5.1 \
 
 docker-pycreds==0.2.1 \
     --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9
-
-docutils==0.12 \
-    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 
 enum34==1.1.1 \
     --hash=sha256:9d4a9220e4ebabd7ff60d853e69c3dd89debad5ddeb9ac5e768af811ece7708e
@@ -147,14 +139,6 @@ ndg-httpsclient==0.4.0 \
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
 
-Pillow==2.7.0 \
-    --hash=sha256:01047449bc6e46792217fe62deba683979a60b33de7efd99ed564cf43907021b \
-    --hash=sha256:26e9320e73f5821826b6b2408a3bff0a8c29e45159530069a117efd39ef619f8 \
-    --hash=sha256:33a5d0145e82326e781ddee1ad375f92cb84f8cfafea56e9504682adff64a5ee
-
-pillowfight==0.2 \
-    --hash=sha256:15bce1925a3d66940ceb9a33c3c55de8d95462ce136c4d46e8673f2919b401d6
-
 py==1.4.31 \
     --hash=sha256:4a3e4f3000c123835ac39cab5ccc510642153bc47bc1f13e2bbb53039540ae69
 
@@ -172,9 +156,6 @@ pycparser==2.14 \
 
 pyflakes==1.5.0 \
     --hash=sha256:cc5eadfb38041f8366128786b4ca12700ed05bbf1403d808e89d57d67a3875a7
-
-Pygments==2.1.1 \
-    --hash=sha256:05aee25c433d6155defbfbcb6c2e2b0ebf29d28138604867b62a304bd6bbb41d
 
 pyOpenSSL==0.15.1 \
     --hash=sha256:88e45e6bb25dfed272a1ef2e728461d44b634c2cd689e989b6e56a349c5a3ae5
@@ -197,9 +178,6 @@ python-ldap==2.4.19 \
 python-memcached==1.54 \
     --hash=sha256:67e1c18b6b99ca4c2c8e4a02e0a96174bf7068919a5aff52836600974c1ef4d8
 
-pytz==2015.7 \
-    --hash=sha256:3ede470d3d17ba3c07638dfa0d10452bc1b6e5ad326127a65ba77e6aaeb11bec
-
 RBTools==0.7.5 \
     --hash=sha256:28809def27e530ba5c13d37be8eb9ca31a24786cc0d0bd6d682f0009d94891a4
 
@@ -218,15 +196,6 @@ s3transfer==0.1.9 \
 
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
-
-snowballstemmer==1.2.0 \
-    --hash=sha256:6d54f350e7a0e48903a4e3b6b2cabd1b43e23765fbc975065402893692954191
-
-Sphinx==1.3.3 \
-    --hash=sha256:3ad4cb89ab4baa5f9bb99548a9a1fb5127b3ee83a5213b83da4de7578afdc891
-
-sphinx-rtd-theme==0.1.9 \
-    --hash=sha256:3c38d037713bd78043486eea5bf771d71ed697ec25c09e16f49e44887f7fe184
 
 websocket-client==0.37.0 \
     --hash=sha256:678b246d816b94018af5297e72915160e2feb042e0cde1a9397f502ac3a52f41

@@ -13,6 +13,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
+    'sphinxcontrib.blockdiag',
+    'sphinxcontrib.nwdiag',
+    'sphinxcontrib.seqdiag',
 ]
 
 templates_path = ['_templates']
