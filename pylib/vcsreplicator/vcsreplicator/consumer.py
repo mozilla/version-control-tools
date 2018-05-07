@@ -36,6 +36,15 @@ MAX_BUFFER_SIZE = 104857600 # 100 MB
 MESSAGE_HEADER_V1 = b'1\n'
 
 
+def value_deserializer(value):
+    '''Deserializes vcsreplicator Kafka message values'''
+    if not value.startswith(MESSAGE_HEADER_V1):
+        raise ValueError('unrecognized message payload. this is bad')
+
+    payload = json.loads(value[2:])
+    return payload
+
+
 class Consumer(SimpleConsumer):
     """A Kafka Consumer with sane defaults.
 
@@ -74,10 +83,8 @@ class Consumer(SimpleConsumer):
         partition, message = res
 
         d = message.message.value
-        if not d.startswith(MESSAGE_HEADER_V1):
-            raise ValueError('unrecognized message payload. this is bad')
+        payload = value_deserializer(d)
 
-        payload = json.loads(d[2:])
         return partition, message, payload
 
 
