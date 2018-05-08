@@ -8,17 +8,12 @@ sphinx-rtd-theme==0.1.9
 # TODO unpin most of these.
 alabaster==0.7.3
 Babel==1.3
-blockdiag==1.5.3
 docutils==0.12
-funcparserlib==0.3.6
 Jinja2==2.7.3
 MarkupSafe==0.23
-nwdiag==1.0.4
 Pillow==2.7.0
 pillowfight==0.2
 Pygments==2.1.1
 pytz==2015.7
-seqdiag==0.9.5
 six==1.10.0
 snowballstemmer==1.2.0
-webcolors==1.8.1
