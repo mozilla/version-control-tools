@@ -29,18 +29,10 @@ botocore==1.4.78 \
 boto==2.40.0 \
     --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
 
-cffi==1.6.0 \
-    --hash=sha256:8bda493420381be722ef68a9e100983f5e45d278d08ca244f450e76867592979 \
-    --hash=sha256:a7f75c4ef2362c0a0e54657add0a6c509fecbfa3b3807bc0925f5cb1c9f927db
-
 coverage==4.3.4 \
     --hash=sha256:ca36d83cd591d027952e5019149c4386e7058cd674bf8cb52dc622f768d689e9 \
     --hash=sha256:36407249a0b6669c6ad4425b0f29685579df745480c03afa70f101f09f4eead3 \
     --hash=sha256:f99066d76274800145a2e658026b30962eb5079346249197e88b55c9a7855e6a
-
-cryptography==1.3.1 \
-    --hash=sha256:9840d12d642192e416650c002cb3837a88838a4a5bd0c9d33872e6683ae70e1b \
-    --hash=sha256:b4b36175e0f95ddc88435c26dbe3397edce48e2ff5fe41d504cdb3beddcd53e2
 
 Django==1.6.11.7 \
     --hash=sha256:8ebe9b30cb8e6c9c6ebb644b6ce921b65780e592ccc3998d5efff362d303baaa
@@ -69,9 +61,6 @@ docker==2.5.1 \
 
 docker-pycreds==0.2.1 \
     --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9
-
-enum34==1.1.1 \
-    --hash=sha256:9d4a9220e4ebabd7ff60d853e69c3dd89debad5ddeb9ac5e768af811ece7708e
 
 factory-boy==2.7.0 \
     --hash=sha256:36c949d5c7adefb02d25323b7a5a97dc698e58ef84c4654845ecb2e34bee9a23
@@ -133,9 +122,6 @@ mozbuild==0.2 \
 mozlog==2.2 \
     --hash=sha256:01008861cca0afb69cd30dcd389843feb817e7b9d146d5345029544cf03bde72
 
-ndg-httpsclient==0.4.0 \
-    --hash=sha256:e8c155fdebd9c4bcb0810b4ed01ae1987554b1ee034dd7532d7b8fdae38a6274
-
 nose==1.3.4 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
 
@@ -151,14 +137,8 @@ pyasn1==0.1.9 \
 pycodestyle==2.2.0 \
     --hash=sha256:60c4e1c36f301ac539a550a29e9d16862069ec240472d86e5e71c4fc645829cb
 
-pycparser==2.14 \
-    --hash=sha256:7959b4a74abdc27b312fed1c21e6caf9309ce0b29ea86b591fd2e99ecdf27f73
-
 pyflakes==1.5.0 \
     --hash=sha256:cc5eadfb38041f8366128786b4ca12700ed05bbf1403d808e89d57d67a3875a7
-
-pyOpenSSL==0.15.1 \
-    --hash=sha256:88e45e6bb25dfed272a1ef2e728461d44b634c2cd689e989b6e56a349c5a3ae5
 
 pytest==3.0.2 \
     --hash=sha256:4b0872d00159dd8d7a27c4a45a2be77aac8a6e70c3af9a7c76c040c3e3715b9d
