@@ -94,6 +94,7 @@ Evolve repo cloned and enabled if requested
   adding manifests
   adding file changes
   added \d+ changesets with \d+ changes to \d+ files (re)
+  new changesets *:* (glob) (?)
   updating to branch stable
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   Evolve was downloaded successfully.
@@ -166,6 +167,7 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   adding file changes
   added \d+ changesets with \d+ changes to \d+ files (re)
   \d+ new obsolescence markers (re) (?)
+  new changesets * (glob) (?)
   (run 'hg update' to get a working copy)
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   Evolve was updated successfully.
