@@ -137,6 +137,12 @@ by using the popular "curses" library.
 Would you like to enable "curses" interfaces (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+EVOLVE_INCOMPATIBLE = '''
+Evolve requires Mercurial 4.3+. Your Mercurial is too old to run evolve.
+
+Please upgrade Mercurial to use evolve.
+'''.lstrip()
+
 WATCHMAN_NOT_FOUND = '''
 The "watchman" filesystem watching tool could not be found or isn't
 working.
@@ -470,7 +476,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkhistoryediting(ui, cw)
 
     if 'evolve' in runsteps:
-        _checkevolve(ui, cw)
+        _checkevolve(ui, cw, hgversion)
 
     if 'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
@@ -818,7 +824,11 @@ def _checkhistoryediting(ui, cw):
     cw.c['extensions']['rebase'] = ''
 
 
-def _checkevolve(ui, cw):
+def _checkevolve(ui, cw, hg_version):
+    if hg_version < (4, 3, 0):
+        ui.warn(EVOLVE_INCOMPATIBLE)
+        return
+
     remote_evolve_path = 'https://www.mercurial-scm.org/repo/evolve/'
     # Install to the same dir as v-c-t, unless the mozbuild directory path is passed (testing)
     evolve_clone_dir = ui.config('mozilla', 'mozbuild_state_path', _vcthome())
