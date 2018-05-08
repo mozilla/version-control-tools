@@ -350,7 +350,7 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
 
-testedwith = '3.9 4.0 4.1 4.2 4.3 4.4'
+testedwith = '3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
