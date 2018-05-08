@@ -378,6 +378,16 @@ try:
 except ImportError:
     configitems = None
 
+
+def _vcthome():  # Returns the directory where the vct clone is located
+    here = os.path.dirname(os.path.abspath(__file__))
+    ext_dir = os.path.normpath(os.path.join(here, '..'))
+    vct_dir = os.path.normpath(os.path.join(ext_dir, '..'))
+    vcthome_dir = os.path.normpath(os.path.join(vct_dir, '..'))
+
+    return vcthome_dir
+
+
 if registrar and util.safehasattr(registrar, 'configitem'):
     configtable = {}
     configitem = registrar.configitem(configtable)
@@ -393,6 +403,8 @@ if registrar and util.safehasattr(registrar, 'configitem'):
                default=None)
     configitem('mozilla', 'ircnick',
                default=None)
+    configitem('mozilla', 'mozbuild_state_path',
+               default=_vcthome())
 
 wizardsteps = set([
     'hgversion',
@@ -636,15 +648,6 @@ def _promptnativeextension(ui, cw, ext, msg):
             cw.c['extensions'] = {}
 
         cw.c['extensions'][ext] = ''
-
-
-def _vcthome():  # Returns the directory where the vct clone is located
-    here = os.path.dirname(os.path.abspath(__file__))
-    ext_dir = os.path.normpath(os.path.join(here, '..'))
-    vct_dir = os.path.normpath(os.path.join(ext_dir, '..'))
-    vcthome_dir = os.path.normpath(os.path.join(vct_dir, '..'))
-
-    return vcthome_dir
 
 
 def _vctextpath(ext, path=None):
