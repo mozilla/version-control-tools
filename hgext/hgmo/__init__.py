@@ -472,8 +472,11 @@ def automationrelevancewebcommand(web, req, tmpl):
         'changelogtag',
         'child',
         'inbranch',
+        'instabilities',
+        'obsolete',
         'parent',
         'phase',
+        'succsandmarkers',
         'tags',
     ])
 
