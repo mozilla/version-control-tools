@@ -64,7 +64,8 @@ Create some obsolete changesets
 Local revset evaluation against hidden changeset renders hidden message
 
   $ hg log -r 'automationrelevant(3208166ea109)'
-  abort: hidden revision '3208166ea109'!
+  abort: hidden revision '3208166ea109'! (no-hg45 !)
+  abort: hidden revision '3208166ea109' was rewritten as: 22296b97e5de! (hg45 !)
   (use --hidden to access hidden revisions)
   [255]
 
