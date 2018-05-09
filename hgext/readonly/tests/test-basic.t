@@ -56,8 +56,10 @@ Pushing a bookmark fails
   no changes found
   remote: repository is read only
   remote: refusing to update bookmarks
-  remote: pushkey-abort: prepushkey.readonly hook failed
-  abort: exporting bookmark bm0 failed!
+  remote: pushkey-abort: prepushkey.readonly hook failed (no-hg45 !)
+  abort: exporting bookmark bm0 failed! (no-hg45 !)
+  remote: prepushkey.readonly hook failed (hg45 !)
+  abort: push failed on remote (hg45 !)
   [255]
 
 Local reason file with content prints message
