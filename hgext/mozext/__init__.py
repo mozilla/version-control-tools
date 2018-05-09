@@ -353,6 +353,7 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
+revsetpredicate = registrar.revsetpredicate()
 templatekeyword = registrar.templatekeyword()
 
 # TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
@@ -892,10 +893,9 @@ class remoterefs(dict):
         f.close()
 
 
+@revsetpredicate('bug(N)')
 def revset_bug(repo, subset, x):
-    """``bug(N)```
-    Changesets referencing a specified Bugzilla bug. e.g. bug(123456).
-    """
+    """Changesets referencing a specified Bugzilla bug. e.g. bug(123456)."""
     err = _('bug() requires an integer argument.')
     bugstring = revset.getstring(x, err)
 
@@ -913,6 +913,7 @@ def revset_bug(repo, subset, x):
     return subset.filter(fltr)
 
 
+@revsetpredicate('dontbuild()')
 def revset_dontbuild(repo, subset, x):
     if x:
         raise ParseError(_('dontbuild() does not take any arguments'))
@@ -920,10 +921,9 @@ def revset_dontbuild(repo, subset, x):
     return subset.filter(lambda x: 'DONTBUILD' in repo[x].description())
 
 
+@revsetpredicate('me()')
 def revset_me(repo, subset, x):
-    """``me()``
-    Changesets that you are involved in.
-    """
+    """Changesets that you are involved in."""
     if x:
         raise ParseError(_('me() does not take any arguments'))
 
@@ -946,6 +946,7 @@ def revset_me(repo, subset, x):
     return subset.filter(fltr)
 
 
+@revsetpredicate('nobug()')
 def revset_nobug(repo, subset, x):
     if x:
         raise ParseError(_('nobug() does not take any arguments'))
@@ -1084,19 +1085,17 @@ def revset_pushhead(repo, subset, x):
         return subset.filter(is_pushhead)
 
 
+@revsetpredicate('reviewer(REVIEWER)')
 def revset_reviewer(repo, subset, x):
-    """``reviewer(REVIEWER)``
-    Changesets reviewed by a specific person.
-    """
+    """Changesets reviewed by a specific person."""
     n = revset.getstring(x, _('reviewer() requires a string argument.'))
 
     return subset.filter(lambda x: n in parse_reviewers(repo[x].description()))
 
 
+@revsetpredicate('reviewed()')
 def revset_reviewed(repo, subset, x):
-    """``reviewed()``
-    Changesets that were reviewed.
-    """
+    """Changesets that were reviewed."""
     if x:
         raise ParseError(_('reviewed() does not take an argument'))
 
@@ -1360,13 +1359,6 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(exchange, 'push', push)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
-
-    revset.symbols['bug'] = revset_bug
-    revset.symbols['dontbuild'] = revset_dontbuild
-    revset.symbols['me'] = revset_me
-    revset.symbols['nobug'] = revset_nobug
-    revset.symbols['reviewer'] = revset_reviewer
-    revset.symbols['reviewed'] = revset_reviewed
 
     if not ui.configbool('mozext', 'disable_local_database'):
         revset.symbols['pushhead'] = revset_pushhead
