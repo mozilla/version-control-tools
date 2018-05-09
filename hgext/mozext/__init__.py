@@ -353,6 +353,8 @@ if util.safehasattr(registrar, 'command'):
 else:
     command = cmdutil.command(cmdtable)
 
+templatekeyword = registrar.templatekeyword()
+
 # TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
 # config items to be registered to avoid a devel warning.
 if util.safehasattr(registrar, 'configitem'):
@@ -1101,23 +1103,27 @@ def revset_reviewed(repo, subset, x):
     return subset.filter(lambda x: list(parse_reviewers(repo[x].description())))
 
 
+@templatekeyword('bug')
 def template_bug(repo, ctx, **args):
     """:bug: String. The bug this changeset is most associated with."""
     bugs = parse_bugs(ctx.description())
     return bugs[0] if bugs else None
 
 
+@templatekeyword('bugs')
 def template_bugs(repo, ctx, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
     return parse_bugs(ctx.description())
 
 
+@templatekeyword('reviewer')
 def template_reviewer(repo, ctx, **args):
     """:reviewer: String. The first reviewer of this changeset."""
     reviewers = list(parse_reviewers(ctx.description()))
     return reviewers[0] if reviewers else None
 
 
+@templatekeyword('reviewers')
 def template_reviewers(repo, ctx, **args):
     """:reviewers: List of strings. The reviewers associated with tis
     changeset."""
@@ -1368,11 +1374,6 @@ def extsetup(ui):
         revset.symbols['firstpushdate'] = revset_firstpushdate
         revset.symbols['firstpushtree'] = revset_firstpushtree
         revset.symbols['pushdate'] = revset_pushdate
-
-    templatekw.keywords['bug'] = template_bug
-    templatekw.keywords['bugs'] = template_bugs
-    templatekw.keywords['reviewer'] = template_reviewer
-    templatekw.keywords['reviewers'] = template_reviewers
 
     if not ui.configbool('mozext', 'disable_local_database'):
         templatekw.keywords['firstrelease'] = template_firstrelease
