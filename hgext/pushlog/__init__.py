@@ -24,7 +24,6 @@ from mercurial import (
     revset,
     templatekw,
     util,
-    wireproto,
 )
 from mercurial.hgweb import (
     webutil,
@@ -37,6 +36,11 @@ from mozhg.util import import_module
 
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
+
+# TRACKING hg46
+wireproto = import_module('mercurial.wireprotov1server')
+if not wireproto:
+    wireproto = import_module('mercurial.wireproto')
 
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
