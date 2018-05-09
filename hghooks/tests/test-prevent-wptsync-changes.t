@@ -127,6 +127,10 @@ Test pushes to try
   $ hg init try
   $ configurehooks try
   $ touch try/.hg/IS_FIREFOX_REPO
+  $ cat >> try/.hg/hgrc << EOF
+  > [phases]
+  > publish = false
+  > EOF
   $ hg -q clone try client
   $ cd client
   $ mkdir -p testing/web-platform/tests
