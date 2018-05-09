@@ -94,7 +94,6 @@ from mercurial import (
     revset,
     templatefilters,
     util,
-    wireproto,
 )
 from mercurial.hgweb import (
     webcommands,
@@ -104,9 +103,6 @@ from mercurial.hgweb.common import (
     ErrorResponse,
     HTTP_OK,
     HTTP_NOT_FOUND,
-)
-from mercurial.hgweb.protocol import (
-    webproto,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -118,6 +114,18 @@ from mozhg.util import import_module
 
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
+
+# TRACKING hg46
+# wireproto -> wireprotov1server
+wireproto = import_module('mercurial.wireprotov1server')
+if not wireproto:
+    wireproto = import_module('mercurial.wireproto')
+
+# hgweb.protocol -> wireprotoserver and symbol rename.
+try:
+    from mercurial.wireprotoserver import httpv1protocolhandler as webproto
+except ImportError:
+    from mercurial.hgweb.protocol import webproto
 
 minimumhgversion = '4.1'
 testedwith = '4.1 4.2 4.3 4.4'
