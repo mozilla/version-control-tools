@@ -96,13 +96,14 @@ def hook(ui, repo, node, source=None, **kwargs):
         haveservo = any(f.startswith('servo/') for f in ctx.files())
 
         if haveservo:
-            servonodes.append(short(ctx.node()))
+            servonodes.append(ctx.node())
 
     res = 0
 
     if servonodes:
         ui.write('(%d changesets contain changes to protected servo/ '
-                 'directory: %s)\n' % (len(servonodes), ', '.join(servonodes)))
+                 'directory: %s)\n' % (len(servonodes),
+                                       ', '.join(map(short, servonodes))))
 
         if is_servo_allowed(os.environ['USER']):
             ui.write('(you have permission to change servo/)\n')
@@ -114,7 +115,7 @@ def hook(ui, repo, node, source=None, **kwargs):
                 if not valid_fixup_description(ctx):
                     res = 1
                     write_error(ui, [
-                        'invalid servo fixup commit: %s' % node,
+                        'invalid servo fixup commit: %s' % short(node),
                         '',
                         'commit description is malformed',
                     ])
@@ -122,14 +123,14 @@ def hook(ui, repo, node, source=None, **kwargs):
                 if not valid_fixup_files(ctx):
                     res = 1
                     write_error(ui, [
-                        'invalid servo fixup commit: %s' % node,
+                        'invalid servo fixup commit: %s' % short(node),
                         '',
                         'commit modifies non-servo files',
                     ])
 
                 if res == 0:
                     ui.write('(allowing valid fixup commit to servo: %s)\n'
-                             % node)
+                             % short(node))
 
         else:
             res = 1
