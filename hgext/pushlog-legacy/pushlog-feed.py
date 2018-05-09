@@ -281,10 +281,10 @@ def pushlogSetup(repo, req):
         query.querystart_value = startdate
     elif 'fromchange' in req.form:
         query.querystart = QueryType.CHANGESET
-        query.querystart_value = req.form.get('fromchange', ['null'])[0]
+        query.querystart_value = req.form['fromchange'][0]
     elif 'startID' in req.form:
         query.querystart = QueryType.PUSHID
-        query.querystart_value = req.form.get('startID', ['0'])[0]
+        query.querystart_value = req.form['startID'][0]
     else:
         # default is last 10 pushes
         query.querystart = QueryType.COUNT
@@ -296,17 +296,17 @@ def pushlogSetup(repo, req):
         query.queryend_value = enddate
     elif 'tochange' in req.form:
         query.queryend = QueryType.CHANGESET
-        query.queryend_value = req.form.get('tochange', ['default'])[0]
+        query.queryend_value = req.form['tochange'][0]
     elif 'endID' in req.form:
         query.queryend = QueryType.PUSHID
-        query.queryend_value = req.form.get('endID', [None])[0]
+        query.queryend_value = req.form['endID'][0]
 
     if 'user' in req.form:
-        query.userquery = req.form.get('user', [])
+        query.userquery = req.form['user']
 
     #TODO: use rev here, switch page to ?page=foo ?
     if 'changeset' in req.form:
-        query.changesetquery = req.form.get('changeset', [])
+        query.changesetquery = req.form['changeset']
 
     try:
         query.formatversion = int(req.form.get('version', ['1'])[0])
