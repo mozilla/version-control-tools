@@ -39,6 +39,22 @@ def addwebcommand(f, name):
 
 ATOM_MIMETYPE = 'application/atom+xml'
 
+
+# TRACKING hg46
+def qsparam(req, key, default):
+    try:
+        return req.qsparams.get(key, default)
+    except AttributeError:
+        return req.form.get(key, [default])[0]
+
+
+def hasqsparam(req, key):
+    try:
+        return key in req.qsparams
+    except AttributeError:
+        return key in req.form
+
+
 # just an enum
 class QueryType:
     DATE, CHANGESET, PUSHID, COUNT = range(4)
@@ -247,10 +263,7 @@ def pushlogSetup(repo, req):
         except sqlite3.OperationalError:
             pass
 
-    if 'node' in req.form:
-        page = int(req.form['node'][0])
-    else:
-        page = 1
+    page = int(qsparam(req, 'node', '1'))
 
     # figure out the urlbase
     proto = req.env.get('wsgi.url_scheme')
@@ -263,9 +276,7 @@ def pushlogSetup(repo, req):
     port = req.env["SERVER_PORT"]
     port = port != default_port and (":" + port) or ""
 
-    tipsonly = False
-    if 'tipsonly' in req.form and req.form['tipsonly'][0] == '1':
-        tipsonly = True
+    tipsonly = qsparam(req, 'tipsonly', None) == '1'
 
     query = PushlogQuery(urlbase='%s://%s%s' % (proto, req.env['SERVER_NAME'], port),
                          repo=repo,
@@ -275,41 +286,47 @@ def pushlogSetup(repo, req):
     query.page = page
 
     # find start component
-    if 'startdate' in req.form:
-        startdate = doParseDate(req.form['startdate'][0])
+    if hasqsparam(req, 'startdate'):
+        startdate = doParseDate(qsparam(req, 'startdate', None))
         query.querystart = QueryType.DATE
         query.querystart_value = startdate
-    elif 'fromchange' in req.form:
+    elif hasqsparam(req, 'fromchange'):
         query.querystart = QueryType.CHANGESET
-        query.querystart_value = req.form['fromchange'][0]
-    elif 'startID' in req.form:
+        query.querystart_value = qsparam(req, 'fromchange', None)
+    elif hasqsparam(req, 'startID'):
         query.querystart = QueryType.PUSHID
-        query.querystart_value = req.form['startID'][0]
+        query.querystart_value = qsparam(req, 'startID', None)
     else:
         # default is last 10 pushes
         query.querystart = QueryType.COUNT
         query.querystart_value = PUSHES_PER_PAGE
 
-    if 'enddate' in req.form:
-        enddate = doParseDate(req.form['enddate'][0])
+    if hasqsparam(req, 'enddate'):
+        enddate = doParseDate(qsparam(req, 'enddate', None))
         query.queryend = QueryType.DATE
         query.queryend_value = enddate
-    elif 'tochange' in req.form:
+    elif hasqsparam(req, 'tochange'):
         query.queryend = QueryType.CHANGESET
-        query.queryend_value = req.form['tochange'][0]
-    elif 'endID' in req.form:
+        query.queryend_value = qsparam(req, 'tochange', None)
+    elif hasqsparam(req, 'endID'):
         query.queryend = QueryType.PUSHID
-        query.queryend_value = req.form['endID'][0]
-
-    if 'user' in req.form:
-        query.userquery = req.form['user']
-
-    #TODO: use rev here, switch page to ?page=foo ?
-    if 'changeset' in req.form:
-        query.changesetquery = req.form['changeset']
+        query.queryend_value = qsparam(req, 'endID', None)
 
     try:
-        query.formatversion = int(req.form.get('version', ['1'])[0])
+        query.userquery = req.qsparams.getall('user')
+    except AttributeError:
+        query.userquery = req.form.get('user', [])
+
+    #TODO: use rev here, switch page to ?page=foo ?
+    # TRACKING hg46
+    if hasqsparam(req, 'changeset'):
+        try:
+            query.changesetquery = req.qsparams.getall('changeset')
+        except AttributeError:
+            query.changesetquery = req.form['changeset']
+
+    try:
+        query.formatversion = int(qsparam(req, 'version', '1'))
     except ValueError:
         raise ErrorResponse(500, 'version parameter must be an integer')
     if query.formatversion < 1 or query.formatversion > 2:
@@ -329,7 +346,12 @@ def pushlogFeed(*args):
         assert len(args) == 3
         web, req = args[0:2]
 
-    req.form['style'] = ['atom']
+    # TRACKING hg46
+    try:
+        req.qsparams['style'] = 'atom'
+    except AttributeError:
+        req.form['style'] = ['atom']
+
     tmpl = web.templater(req)
     query = pushlogSetup(web.repo, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
@@ -485,8 +507,8 @@ def pushlogHTML(*args):
                 rev=0,
                 entries=lambda **x: changelist(limit=0,**x),
                 latestentry=lambda **x: changelist(limit=1,**x),
-                startdate='startdate' in req.form and req.form['startdate'][0] or '1 week ago',
-                enddate='enddate' in req.form and req.form['enddate'][0] or 'now',
+                startdate=qsparam(req, 'startdate', '1 week ago'),
+                enddate=qsparam(req, 'enddate', 'now'),
                 querydescription=query.description(),
                 archives=web.archivelist("tip"))
 
@@ -555,7 +577,7 @@ def pushes(*args):
         web, req, tmpl = args
 
     query = pushlogSetup(web.repo, req)
-    data = pushes_worker(query, web.repo, 'full' in req.form)
+    data = pushes_worker(query, web.repo, hasqsparam(req, 'full'))
 
     if query.formatversion == 1:
         return tmpl('pushes1', **data)
