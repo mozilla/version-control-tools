@@ -18,6 +18,7 @@ from mercurial import (
     demandimport,
     error,
     templatefilters,
+    util,
 )
 
 sys.path.append(os.path.dirname(__file__))
@@ -386,8 +387,14 @@ def pushlogFeed(*args):
             'files': [{'name': fn} for fn in ctx.files()],
         })
 
-    req.respond(HTTP_OK, ATOM_MIMETYPE)
-    return tmpl('pushlog', **data)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        web.res.headers['Content-Type'] = ATOM_MIMETYPE
+        return web.sendtemplate('pushlog', **data)
+    else:
+        req.respond(HTTP_OK, ATOM_MIMETYPE)
+        return tmpl('pushlog', **data)
+
 
 def pushlogHTML(*args):
     """WebCommand for producing the HTML view of the pushlog."""
@@ -502,15 +509,23 @@ def pushlogHTML(*args):
 
     parity = paritygen(web.stripecount)
 
-    return tmpl('pushlog',
-                changenav=changenav(),
-                rev=0,
-                entries=lambda **x: changelist(limit=0,**x),
-                latestentry=lambda **x: changelist(limit=1,**x),
-                startdate=qsparam(req, 'startdate', '1 week ago'),
-                enddate=qsparam(req, 'enddate', 'now'),
-                querydescription=query.description(),
-                archives=web.archivelist("tip"))
+    data = dict(
+        changenav=changenav(),
+        rev=0,
+        entries=lambda **x: changelist(limit=0, **x),
+        latestentry=lambda **x: changelist(limit=1, **x),
+        startdate=qsparam(req, 'startdate', '1 week ago'),
+        enddate=qsparam(req, 'enddate', 'now'),
+        querydescription=query.description(),
+        archives=web.archivelist("tip")
+    )
+
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        return web.sendtemplate('pushlog', **data)
+    else:
+        return tmpl('pushlog', **data)
+
 
 def pushes_worker(query, repo, full):
     """Given a PushlogQuery, return a data structure mapping push IDs
@@ -580,11 +595,17 @@ def pushes(*args):
     data = pushes_worker(query, web.repo, hasqsparam(req, 'full'))
 
     if query.formatversion == 1:
-        return tmpl('pushes1', **data)
+        template = 'pushes1'
     elif query.formatversion == 2:
-        return tmpl('pushes2', **data)
+        template = 'pushes2'
+    else:
+        raise ErrorResponse(500, 'unexpected formatversion')
 
-    raise ErrorResponse(500, 'unexpected formatversion')
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        return web.sendtemplate(template, **data)
+    else:
+        return tmpl(template, **data)
 
 
 addwebcommand(pushlogFeed, 'pushlog')
