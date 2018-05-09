@@ -6,7 +6,6 @@ import sqlite3
 import sys
 import time
 
-import mercurial.hgweb.protocol as hgwebprotocol
 import mercurial.hgweb.webcommands as hgwebcommands
 import mercurial.hgweb.webutil as webutil
 from mercurial.hgweb.common import (
@@ -33,10 +32,6 @@ minimumhgversion = '4.2'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
-
-def addcommand(f, name):
-    setattr(hgwebprotocol, name, f)
-    hgwebprotocol.__all__.append(name)
 
 def addwebcommand(f, name):
     setattr(hgwebcommands, name, f)
