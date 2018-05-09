@@ -18,7 +18,6 @@ from mercurial.node import hex, nullid
 from mercurial import (
     demandimport,
     error,
-    obsolete,
     templatefilters,
 )
 
