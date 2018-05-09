@@ -28,8 +28,9 @@ Pushing a bookmark is not allowed
   searching for changes
   no changes found
   bookmarks are disabled on this repository; refusing to accept modification to "book1"
-  pushkey-abort: prepushkey.prevent_bookmarks hook failed
-  abort: exporting bookmark book1 failed!
+  pushkey-abort: prepushkey.prevent_bookmarks hook failed (no-hg45 !)
+  abort: exporting bookmark book1 failed! (no-hg45 !)
+  abort: prepushkey.prevent_bookmarks hook failed (hg45 !)
   [255]
 
 Pulling a bookmark on the server is allowed
