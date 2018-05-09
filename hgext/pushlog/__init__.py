@@ -132,9 +132,17 @@ def pushlogwireproto(repo, proto, firstpush):
         return '\n'.join(['0', str(e)])
 
 
+# TRACKING hg46
+# 4.5.3 added wireproto.permissions.
+# 4.6 removed it and factored permissions into @wireprotocommand. We bypass
+# @wireprotocommand for now and set the permission on the command entry.
 if util.safehasattr(wireproto, 'permissions'):
     wireproto.permissions['pushlog'] = 'pull'
-
+else:
+    try:
+        wireproto.commands['pushlog'].permission = 'pull'
+    except AttributeError:
+        pass
 
 def exchangepullpushlog(orig, pullop):
     """This is called during pull to fetch pushlog data.
