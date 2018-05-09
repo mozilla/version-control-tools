@@ -318,8 +318,16 @@ def pushlogSetup(repo, req):
     query.DoQuery()
     return query
 
-def pushlogFeed(web, req, tmpl):
+def pushlogFeed(*args):
     """WebCommand for producing the ATOM feed of the pushlog."""
+
+    # TRACKING hg46
+    if len(args) == 1:
+        web = args[0]
+        req = web.req
+    else:
+        assert len(args) == 3
+        web, req = args[0:2]
 
     req.form['style'] = ['atom']
     tmpl = web.templater(req)
@@ -359,8 +367,17 @@ def pushlogFeed(web, req, tmpl):
     req.respond(HTTP_OK, ATOM_MIMETYPE)
     return tmpl('pushlog', **data)
 
-def pushlogHTML(web, req, tmpl):
+def pushlogHTML(*args):
     """WebCommand for producing the HTML view of the pushlog."""
+    # TRACKING hg46
+    if len(args) == 1:
+        web = args[0]
+        req = web.req
+        tmpl = web.tmpl
+    else:
+        assert len(args) == 3
+        web, req, tmpl = args
+
     query = pushlogSetup(web.repo, req)
 
     # these three functions are in webutil in newer hg, but not in hg 1.0
@@ -526,8 +543,17 @@ def pushes_worker(query, repo, full):
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
-def pushes(web, req, tmpl):
+def pushes(*args):
     """WebCommand to return a data structure containing pushes."""
+    # TRACKING hg46
+    if len(args) == 1:
+        web = args[0]
+        req = web.req
+        tmpl = web.tmpl
+    else:
+        assert len(args) == 3
+        web, req, tmpl = args
+
     query = pushlogSetup(web.repo, req)
     data = pushes_worker(query, web.repo, 'full' in req.form)
 
