@@ -1,5 +1,8 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
+futures==3.0.5 \
+    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
+
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 
