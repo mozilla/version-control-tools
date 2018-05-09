@@ -355,6 +355,7 @@ else:
 
 revsetpredicate = registrar.revsetpredicate()
 templatekeyword = registrar.templatekeyword()
+templatefunc = registrar.templatefunc()
 
 # TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
 # config items to be registered to avoid a devel warning.
@@ -1330,8 +1331,9 @@ def template_reltrees(repo, ctx, **args):
 # [gps] This function may not be necessary. However, I was unable to figure out
 # how to do the equivalent with regular template syntax. Yes, I tried the
 # list operator.
+@templatefunc('dates(VALUES, [fmt, [sep]])')
 def template_dates(context, mapping, args):
-    """:dates(VALUES, [fmt, [sep]]): Format a list of dates."""
+    """Format a list of dates"""
     if not (1 <= len(args) <= 3):
         raise ParseError(_("dates expects one, two, or three arguments"))
 
@@ -1382,8 +1384,6 @@ def extsetup(ui):
         templatekw.keywords['pushheaddates'] = template_pushheaddates
         templatekw.keywords['trees'] = template_trees
         templatekw.keywords['reltrees'] = template_reltrees
-
-    templater.funcs['dates'] = template_dates
 
 
 def reposetup(ui, repo):
