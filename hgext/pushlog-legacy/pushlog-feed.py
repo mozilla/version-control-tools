@@ -350,6 +350,8 @@ def pushlogFeed(*args):
     # TRACKING hg46
     try:
         req.qsparams['style'] = 'atom'
+        # Need to reset the templater instance to use the new style.
+        web.tmpl = web.templater(req)
     except AttributeError:
         req.form['style'] = ['atom']
 
