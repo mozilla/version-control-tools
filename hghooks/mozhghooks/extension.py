@@ -18,7 +18,7 @@ from mozhg.util import (
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
 
-testedwith = '4.2 4.3 4.4 4.5'
+testedwith = '4.2 4.3 4.4 4.5 4.6'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
