@@ -2,7 +2,7 @@
   $ export TASKCLUSTER_INSTANCE_TYPE=c5.4xlarge
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
-  (using Mercurial 4.2.3)
+  (using Mercurial *.*) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
