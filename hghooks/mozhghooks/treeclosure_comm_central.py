@@ -48,10 +48,10 @@ def hook(ui, repo, node, source=None, **kwargs):
             'seamonkey': False}
 
     # all changesets from node to 'tip' inclusive are part of this push
-    rev = repo.changectx(node).rev()
-    tip = repo.changectx('tip').rev()
+    rev = repo[node].rev()
+    tip = repo['tip'].rev()
     for i in range(rev, tip+1):
-        ctx = repo.changectx(i)
+        ctx = repo[i]
         for changedFile in ctx.files():
             if isOwned(changedFile, seamonkeyOwns):
                 apps['seamonkey'] = True

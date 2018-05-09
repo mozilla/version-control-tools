@@ -39,14 +39,14 @@ def isPushAllowed(repo, name):
         if data['result']['status'] == 'closed':
             closure_text = "%s is CLOSED! Reason: %s" % (name, data['result']['reason'])
             # Block the push unless they know the magic words
-            if repo.changectx('tip').description().find(magicwords) == -1:
+            if repo['tip'].description().find(magicwords) == -1:
                 printError("%s\nTo push despite the closed tree, include \"%s\" in your push comment" % (closure_text, magicwords))
                 return False
 
             print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
         elif data['result']['status'] == 'approval required':
             # Block the push unless they have approval or are backing out
-            dlower = repo.changectx('tip').description().lower()
+            dlower = repo['tip'].description().lower()
             if not (re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert')):
                 printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
                 return False
@@ -57,7 +57,7 @@ def isPushAllowed(repo, name):
                    "%s\n"
                    "Unable to check if the tree is open - treating as if CLOSED.\n"
                    "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
-        if repo.changectx('tip').description().find(magicwords) == -1:
+        if repo['tip'].description().find(magicwords) == -1:
             return False
     return True
 

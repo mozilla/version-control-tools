@@ -45,9 +45,7 @@ class SyncIPCCheck(PreTxnChangegroupCheck):
 
     def pre(self, node):
         # Accept the entire push for code uplifts
-        changesets = list(self.repo.changelog.revs(self.repo[node].rev()))
-        self.is_uplift = 'a=release' in self.repo.changectx(
-            changesets[-1]).description().lower()
+        self.is_uplift = 'a=release' in self.repo['tip'].description().lower()
 
     def check(self, ctx):
         if self.is_uplift:

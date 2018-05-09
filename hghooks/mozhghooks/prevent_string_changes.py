@@ -30,8 +30,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
     error = ""
     changed_strings = False
-    changesets = list(repo.changelog.revs(repo[node].rev()))
-    if 'a=release' in repo.changectx(changesets[-1]).description().lower():
+    if 'a=release' in repo['tip'].description().lower():
         # Accept the entire push for code uplifts
         return 0
     # Loop through each changeset being added to the repository
@@ -41,8 +40,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
             # Interested only in files potentially used for l10n
             if (re.search('locales/en-US/', file) and file.endswith(('.dtd', '.ini', '.properties'))):
                 changed_strings = True
-                if not re.search('l10n=',
-                                 repo.changectx('tip').description().lower()):
+                if not re.search('l10n=', repo['tip'].description().lower()):
                     error += "* File used for localization (%s) altered in this changeset *\n" % file
     # Check if an error occurred
     if error != "":

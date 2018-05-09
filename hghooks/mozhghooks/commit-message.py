@@ -128,12 +128,12 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         return 0
 
     # All changesets from node to "tip" inclusive are part of this push.
-    rev = repo.changectx(node).rev()
-    tip = repo.changectx("tip").rev()
+    rev = repo[node].rev()
+    tip = repo['tip'].rev()
     rejecting = False
 
     for i in reversed(xrange(rev, tip + 1)):
-        c = repo.changectx(i)
+        c = repo[i]
 
         if "IGNORE BAD COMMIT MESSAGES" in c.description():
             # Ignore commit messages for all earlier revs in this push.

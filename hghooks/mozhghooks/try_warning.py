@@ -31,7 +31,7 @@ def hook(ui, repo, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
-    tip = repo.changectx('tip')
+    tip = repo['tip']
     comment = tip.description()
     config_found = 'try_task_config.json' in tip.manifest()
     syntax_found = 'try:' in comment

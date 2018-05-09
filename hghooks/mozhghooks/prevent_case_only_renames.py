@@ -24,12 +24,13 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         return 0
 
     # All changesets from node to "tip" inclusive are part of this push.
-    rev = repo.changectx(node).rev()
-    tip = repo.changectx("tip").rev()
+    rev = repo[node].rev()
+    tip = repo['tip'].rev()
     rejecting = False
 
     for i in range(rev, tip + 1):
-        ctx = repo.changectx(i)
+        ctx = repo[i]
+
         for f in ctx:
             fctx = ctx.filectx(f)
             r = fctx.renamed()
