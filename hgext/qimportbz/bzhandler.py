@@ -7,7 +7,7 @@ import os
 import re
 from itertools import cycle
 
-from mercurial.util import Abort
+from mercurial.error import Abort
 import bz
 
 # Default behavior is to return all patches smushed together. hg import will

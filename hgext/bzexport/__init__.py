@@ -176,7 +176,7 @@ def get_default_version(ui, api_server, product):
     c = bzauth.load_configuration(ui, api_server, BINARY_CACHE_FILENAME)
     versions = c['product'].get(product, {}).get('version')
     if not versions:
-        raise util.Abort(_("Product %s has no versions") % product)
+        raise error.Abort(_("Product %s has no versions") % product)
     # Ugh! /configuration returns the versions in sorted order, which makes it
     # impossible to determine the default. If there's something like
     # "unspecified" in the list, prefer that for now, until bzapi gets fixed.
@@ -222,7 +222,7 @@ def prompt_menu(ui, name, values,
     if allow_none and choice == len(prompts) - 2:
         return None
     if choice == len(prompts) - 1:
-        raise util.Abort("User requested abort while choosing %s" % name)
+        raise error.Abort("User requested abort while choosing %s" % name)
     return values[choice]
 
 
@@ -267,7 +267,7 @@ def find_users(ui, api_server, user_cache_filename, auth, search_strings):
             try:
                 users = bz.find_users(auth, search_string)
             except Exception as e:
-                raise util.Abort(e.message)
+                raise error.Abort(e.message)
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
                              if user["real_name"] else user["email"], users["users"])
@@ -432,13 +432,13 @@ def edit_form(ui, repo, fields, template_name):
     # Use the previously-created pattern to pull out the new keyword values
     m = pattern.match(new)
     if not m:
-        raise util.Abort("Edited form %s has invalid format" % saved)
+        raise error.Abort("Edited form %s has invalid format" % saved)
 
     new_fields = fields.copy()
     marker_found = False
     for field, value in zip(template_fields, m.groups()):
         if value == '<required>':
-            raise util.Abort("Required field %s not filled in" % (field,))
+            raise error.Abort("Required field %s not filled in" % (field,))
         elif value == '<none>' or value == '':
             if isinstance(fields[field], list):
                 new_fields[field] = []
@@ -541,7 +541,7 @@ def infer_arguments(ui, repo, args, opts):
                 # numbers.
                 bug = args[0]
                 if ' ' in bug:
-                    raise util.Abort(_("Invalid arguments. Can only pass revision and/or bug number"))
+                    raise error.Abort(_("Invalid arguments. Can only pass revision and/or bug number"))
                 ui.debug("interpreting '%s' as a bug alias. Fingers crossed.")
             else:
                 # Assume a revset.
@@ -550,7 +550,7 @@ def infer_arguments(ui, repo, args, opts):
         # With zero args we'll guess at both, and if we fail we'll
         # fail later.
     elif len(args) > 2:
-        raise util.Abort(_("Too many arguments!"))
+        raise error.Abort(_("Too many arguments!"))
     else:
         # Just right.
         rev, bug = args
@@ -563,7 +563,7 @@ def infer_arguments(ui, repo, args, opts):
     if rev == '.' and not opts['force']:
         m, a, r, d = repo.status()[:4]
         if (m or a or r or d):
-            raise util.Abort(_("Local changes found; refresh first!"))
+            raise error.Abort(_("Local changes found; refresh first!"))
 
     if rev in [".", "tip", "qtip", "default"]:
         # Look for a nicer name in the MQ.
@@ -818,7 +818,7 @@ def obsolete_old_patches(ui, auth, bugid, bugzilla, filename, ignore_id, pre_hoo
         bug_attachments = bz.get_attachments(auth, bugid)
         attachments = bug_attachments['bugs'].get(bugid, [])
     except Exception as e:
-        raise util.Abort(e.message)
+        raise error.Abort(e.message)
 
     patches = [p for p in attachments
                if (p["is_patch"]
@@ -837,7 +837,7 @@ def obsolete_old_patches(ui, auth, bugid, bugzilla, filename, ignore_id, pre_hoo
         try:
             bz.obsolete_attachment(auth, p)
         except Exception as e:
-            raise util.Abort(e.message)
+            raise error.Abort(e.message)
 
     return True
 
@@ -859,7 +859,7 @@ def find_reviewers(ui, api_server, user_cache_filename, auth, search_strings):
             try:
                 users = bz.find_users(auth, search_string)
             except Exception as e:
-                raise util.Abort(e.message)
+                raise error.Abort(e.message)
             name = None
             real_names = map(lambda user: "%s <%s>" % (user["real_name"], user["email"])
                              if user["real_name"] else user["email"], users["users"])
@@ -884,7 +884,7 @@ def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, comp
     """
     configuration = bzauth.load_configuration(ui, api_server, config_cache_filename)
     if not configuration or not configuration["flag_type"]:
-        raise util.Abort(_("Could not find configuration object"))
+        raise error.Abort(_("Could not find configuration object"))
 
     # Get the set of flag ids used for this product::component
     prodflags = configuration['product'][product]['component'][component]['flag_type']
@@ -893,7 +893,7 @@ def flag_type_id(ui, api_server, config_cache_filename, flag_name, product, comp
     flag_ids = [id for id in prodflags if flagdefs[str(id)]['name'] == flag_name]
 
     if len(flag_ids) != 1:
-        raise util.Abort(_("Could not find unique %s flag id") % flag_name)
+        raise error.Abort(_("Could not find unique %s flag id") % flag_name)
 
     return flag_ids[0]
 
@@ -1121,7 +1121,7 @@ def bzexport(ui, repo, *args, **opts):
         reviewers = select_users(valid_users, reviewers)
 
     if reviewers is None:
-        raise util.Abort(_("Invalid reviewers"))
+        raise error.Abort(_("Invalid reviewers"))
 
     feedback = []
     if opts["feedback"]:
@@ -1170,7 +1170,7 @@ def bzexport(ui, repo, *args, **opts):
             search_strings.extend(values.get(key, []))
         users = validate_users(ui, api_server, auth, search_strings, multi_user_prompt, 'reviewer')
         if users is None:
-            raise util.Abort("Invalid users")
+            raise error.Abort("Invalid users")
 
         if 'REVIEWERS' in values:  # Always true
             reviewers = select_users(users, values['REVIEWERS'])
@@ -1191,7 +1191,7 @@ def bzexport(ui, repo, *args, **opts):
         if bug is not None:
             ui.write("Bug %s given but creation of new bug requested.\n" % bug)
             if ui.prompt("Continue and create a new bug anyway? (y/n)") != "y":
-                raise util.Abort("User aborted")
+                raise error.Abort("User aborted")
 
         if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") %
                                              (values['PRODUCT'], values['COMPONENT'])) != 'y':
@@ -1215,10 +1215,10 @@ def bzexport(ui, repo, *args, **opts):
             bug = result['id']
             ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
         except Exception, e:
-            raise util.Abort(_("Error creating bug: %s\n" % str(e)))
+            raise error.Abort(_("Error creating bug: %s\n" % str(e)))
     else:
         if bug is None:
-            raise util.Abort(_("No bug number specified and no bug number "
+            raise error.Abort(_("No bug number specified and no bug number "
                                "listed in changeset message!"))
 
     if len(reviewers) > 0:
@@ -1282,7 +1282,7 @@ def bzexport(ui, repo, *args, **opts):
                                    comment=values['ATTACHCOMMENT'],
                                    **extra_args)
     except Exception as e:
-        raise util.Abort('error uploading attachment: %s' % e.message)
+        raise error.Abort('error uploading attachment: %s' % e.message)
 
     attachid = result['attachments'].keys()[0]
     attachment_url = urlparse.urljoin(bugzilla,
@@ -1309,7 +1309,7 @@ def bzexport(ui, repo, *args, **opts):
             try:
                 result = bz.update_bug(auth, result['id'], params)
             except Exception as e:
-                raise util.Abort(e.message)
+                raise error.Abort(e.message)
 
 @command('newbug', [
         ('c', 'comment', '', 'Comment to add with the bug'),
@@ -1351,7 +1351,7 @@ def newbug(ui, repo, *args, **opts):
     if args and not opts['comment']:
         opts['comment'] = args.pop(0)
     if args:
-        raise util.Abort(_("Too many arguments to newbug command (only title and comment may be given)"))
+        raise error.Abort(_("Too many arguments to newbug command (only title and comment may be given)"))
 
     bug_comment = opts['comment'] or '<required>'
 
@@ -1374,7 +1374,7 @@ def newbug(ui, repo, *args, **opts):
 
     cc = validate_users(ui, api_server, auth, values['CC'], multi_user_prompt, 'reviewer')
     if cc is None:
-        raise util.Abort("Invalid users")
+        raise error.Abort("Invalid users")
     cc = select_users(cc, values['CC'])
 
     if opts['interactive'] and ui.prompt(_("Create bug in '%s' :: '%s' (y/n)?") %
@@ -1398,7 +1398,7 @@ def newbug(ui, repo, *args, **opts):
                             blocks=values['BLOCKS'],
                             **create_opts)
     except Exception as e:
-        raise util.Abort('error creating bug: %s' % e.message)
+        raise error.Abort('error creating bug: %s' % e.message)
 
     bug = result['id']
     ui.write("Created bug %s at %sshow_bug.cgi?id=%s\n" % (bug, bugzilla, bug))
