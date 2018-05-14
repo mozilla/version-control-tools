@@ -307,6 +307,12 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg46
+try:
+    sshpeertype = sshpeer.sshv1peer
+except AttributeError:
+    sshpeertype = sshpeer.sshpeer
+
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
@@ -435,7 +441,7 @@ def exchangepullpushlog(orig, pullop):
     # (yet) recommend installing the pushlog extension locally. Furthermore,
     # pulls from hg.mozilla.org should be performed via https://, not ssh://.
     # So just bail on pushlog fetching if pulling via ssh://.
-    if isinstance(pullop.remote, sshpeer.sshpeer):
+    if isinstance(pullop.remote, sshpeertype):
         pullop.repo.ui.warn('cannot fetch pushlog when pulling via ssh://; '
                             'you should be pulling via https://\n')
         return res
