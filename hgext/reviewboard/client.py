@@ -104,7 +104,7 @@ except AttributeError:
     sshpeertype = sshpeer.sshpeer
 
 testedwith = '4.3 4.4 4.5 4.6'
-minimumhgversion = '4.3'
+minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=MozReview&component=Integration%3A%20Mercurial'
 
 cmdtable = {}
