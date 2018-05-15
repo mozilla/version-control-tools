@@ -1077,7 +1077,18 @@ class Docker(object):
             with limited_threadpoolexecutor(10, max_workers) as e:
                 if start_pulse:
                     pulse_host_config = client.create_host_config(
-                        port_bindings={5672: pulse_port})
+                        port_bindings={5672: pulse_port},
+                        # Erlang does an iteration of all possible file
+                        # descriptor numbers when running child processes during
+                        # startup. Docker's file limits may be in the hundreds
+                        # of thousands, causing this iteration to take many
+                        # seconds. So mitigate that with lower file limits.
+                        ulimits=[{
+                            'Name': 'nofile',
+                            'Soft': 128,
+                            'Hard': 128,
+                        }],
+                    )
                     f_pulse_create = e.submit(
                         client.create_container,
                         pulse_image,

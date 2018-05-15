@@ -143,7 +143,18 @@ class HgCluster(object):
                                      networking_config=network_config('ldap'))
 
             pulse_host_config = self._dc.create_host_config(
-                port_bindings={5672: pulse_port})
+                port_bindings={5672: pulse_port},
+                # Erlang does an iteration of all possible file
+                # descriptor numbers when running child processes during
+                # startup. Docker's file limits may be in the hundreds
+                # of thousands, causing this iteration to take many
+                # seconds. So mitigate that with lower file limits.
+                ulimits=[{
+                    'Name': 'nofile',
+                    'Soft': 128,
+                    'Hard': 128,
+                }],
+            )
             f_pulse_create = e.submit(self._dc.create_container, pulse_image,
                                       labels=['pulse'],
                                       host_config=pulse_host_config,
