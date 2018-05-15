@@ -269,15 +269,16 @@ class HgCluster(object):
             for i in web_ids:
                 e.submit(self._d.execute, i, cmd)
 
-        # The host SSH keys are populated during container start. There
-        # is a race between the keys being generated and us fetching them.
-        # Wait on a daemon in the container to become available before
-        # fetching host keys.
+        # The host SSH keys are populated during container start as part of
+        # entrypoint.py. There is a race between the keys being generated and
+        # us fetching them. We wait on a network service (Kafka) started in
+        # entrypoint.py after SSH keys are generated to eliminate this race
+        # condition.
         fs = []
         with futures.ThreadPoolExecutor(web_count) as e:
             for s in web_states:
                 h, p = self._d._get_host_hostname_port(s, '9092/tcp')
-                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
+                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 60))
 
         for f in fs:
             f.result()
