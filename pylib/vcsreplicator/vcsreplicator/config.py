@@ -42,6 +42,11 @@ class Config(object):
         else:
             self._public_url_rewrites = []
 
+        if self.c.has_section('replicationpathrewrites'):
+            self._replication_path_rewrites = self.c.items('replicationpathrewrites')
+        else:
+            self._replication_path_rewrites = []
+
     @property
     def hg_path(self):
         """Path to a hg executable."""
@@ -51,12 +56,20 @@ class Config(object):
         return 'hg'
 
     def parse_wire_repo_path(self, path):
-        """Parse a normalized repository path into a local path."""
+        """Parse a normalized repository path into a local path."""  
         for source, dest in self._path_rewrites:
             if path.startswith(source):
                 return path.replace(source, dest)
 
         return path
+
+    def get_replication_path_rewrite(self, path):
+        """Parse a local path into a wire path"""
+        for source, dest in self._replication_path_rewrites:
+            if path.startswith(source):
+                return dest + path[len(source):]
+
+        return None
 
     def get_pull_url_from_repo_path(self, path):
         """Obtain a URL to be used for pulling from a local repo path."""
