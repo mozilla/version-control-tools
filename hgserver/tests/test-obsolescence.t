@@ -123,6 +123,7 @@ Create some obsolescence markers
   remote: added 1 changesets with 0 changes to 1 files
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/5217e2ac5b1538d1630aa54377056dbfab270508
@@ -141,6 +142,7 @@ Pulling should get the obsmarkers
   adding file changes
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
+  obsoleted 1 changesets
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
@@ -208,6 +210,7 @@ Pushing a changeset then hiding it works
   remote: added 1 changesets with 0 changes to 1 files
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/042a67bdbae8a8b4c4b071303ad92484cf1746b0
@@ -330,6 +333,7 @@ Pushing again should send obsolescence markers
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   remote: 2 new obsolescence markers
+  remote: obsoleted 2 changesets
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/integration/autoland/rev/9e2d548e5f1f94b9172cfeb77b53f5943722b594

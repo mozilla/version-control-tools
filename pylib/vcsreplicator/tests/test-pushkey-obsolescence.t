@@ -127,6 +127,7 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: added 2 changesets with 1 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/obs/rev/5dfb8fc50086c183d1cbd067e48c58307db16dac
@@ -177,6 +178,7 @@ Changegroup message written
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 2 changesets with 1 changes to 2 files (+1 heads)
   vcsreplicator.consumer   > 1 new obsolescence markers
+  vcsreplicator.consumer   > obsoleted 1 changesets
   vcsreplicator.consumer   > (run 'hg heads' to see heads)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -184,7 +186,7 @@ Changegroup message written
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 11
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
-  vcsreplicator.consumer   > 1
+  vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
 
 Obsolescence marker should have been replicated to hgweb
@@ -197,6 +199,7 @@ Creating obsolescence marker directly on server will result in replication
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete 67b45555a21f4d9d470adc4f1ed3af63918f6414
   no username found, using 'root@*' instead (glob)
+  obsoleted 1 changesets
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete
@@ -225,7 +228,8 @@ Creating obsolescence marker directly on server will result in replication
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 14
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
-  vcsreplicator.consumer   > 1
+  vcsreplicator.consumer   > obsoleted 1 changesets
+  vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -293,6 +297,7 @@ Pushing obsolescence marker without bundle2 works
   remote: added 1 changesets with 0 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/33e52188e17750dee7ec7a6b05b5f707ebc2cba9
@@ -335,6 +340,7 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 0 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > 1 new obsolescence markers
+  vcsreplicator.consumer   > obsoleted 1 changesets
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
@@ -342,7 +348,7 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 21
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
-  vcsreplicator.consumer   > 1
+  vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime
   $ consumer --onetime
@@ -371,6 +377,7 @@ Now let's check what happens when replication is lagging
   remote: added 2 changesets with 0 changes to 3 files (+1 heads)
   remote: recorded push in pushlog
   remote: 2 new obsolescence markers
+  remote: obsoleted 2 changesets
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/obs/rev/274cd1d986ab248aae0dfb9a902f7b6c823daec4
@@ -390,6 +397,7 @@ Now let's check what happens when replication is lagging
   remote: added 2 changesets with 0 changes to 3 files (+1 heads)
   remote: recorded push in pushlog
   remote: 2 new obsolescence markers
+  remote: obsoleted 2 changesets
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/obs/rev/4dabe70969cafe3378dd579fb186ce31d168ff0a
@@ -510,6 +518,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 2 changesets with 0 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > 2 new obsolescence markers
+  vcsreplicator.consumer   > obsoleted 2 changesets
   vcsreplicator.consumer   > (run 'hg heads .' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -517,7 +526,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 34
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
-  vcsreplicator.consumer   > 1
+  vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 35
@@ -534,6 +543,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 2 changesets with 0 changes to 2 files (+1 heads)
   vcsreplicator.consumer   > 2 new obsolescence markers
+  vcsreplicator.consumer   > obsoleted 2 changesets
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -541,7 +551,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 38
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
-  vcsreplicator.consumer   > 1
+  vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
 
   $ consumer --dump --partition 2

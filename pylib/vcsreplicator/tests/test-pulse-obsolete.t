@@ -53,6 +53,7 @@ them. So disable the pulse consumer until all repo changes have been made.
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
   remote: 1 new obsolescence markers
+  remote: obsoleted 1 changesets
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
@@ -81,6 +82,7 @@ Create an obsolescence marker on the server
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
   no username found, using 'root@*' instead (glob)
+  obsoleted 1 changesets
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete

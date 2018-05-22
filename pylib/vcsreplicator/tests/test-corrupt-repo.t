@@ -69,7 +69,7 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > transaction abort!
   vcsreplicator.consumer   > rollback completed
-  vcsreplicator.consumer   > abort: index 00manifest.i unknown format 29298!
+  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest.i!
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
@@ -109,7 +109,7 @@ We should get the same failure if we try again
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > transaction abort!
   vcsreplicator.consumer   > rollback completed
-  vcsreplicator.consumer   > abort: index 00manifest.i unknown format 29298!
+  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest.i!
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
