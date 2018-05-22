@@ -29,8 +29,8 @@ jsmin==2.1.1 \
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
 
-Mercurial==4.2.3 \
-    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
+Mercurial==4.3.3 \
+    --hash=sha256:47a63c78698bc735667984bbc5b76619ff29a38d742f20cdf9f44cce59752374
 
 mock==1.0.1 \
     --hash=sha256:b839dd2d9c117c701430c149956918a423a9863b48b09c90e30a6013e7d2f44f \

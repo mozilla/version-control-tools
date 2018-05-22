@@ -67,6 +67,8 @@ kombu==3.0.30 \
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
+# We're stuck on Mercurial 4.2 since we run on Python 2.6 and Mercurial 4.3
+# dropped support for 2.6.
 Mercurial==4.2.3 \
     --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
 

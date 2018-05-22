@@ -15,8 +15,8 @@ github3.py==0.9.6 \
 kombu==3.0.37 \
     --hash=sha256:7ceab743e3e974f3e5736082e8cc514c009e254e646d6167342e0e192aee81a6
 
-Mercurial==4.2.3 \
-    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
+Mercurial==4.3.3 \
+    --hash=sha256:47a63c78698bc735667984bbc5b76619ff29a38d742f20cdf9f44cce59752374
 
 python-hglib==1.7 \
     --hash=sha256:0dc087d15b774cda82d3c8096fb0e514caeb2ddb60eed38e9056b16e279ba3c5

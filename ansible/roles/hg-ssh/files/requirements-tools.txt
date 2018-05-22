@@ -30,8 +30,8 @@ kafka-python==1.4.2 \
 kombu==3.0.35 \
     --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727
 
-Mercurial==4.2.3 \
-    --hash=sha256:04908fc7d89e5810edf3d2762f5aecce5b5c0cb8534f3dbff7d0d848d11ff7ac
+Mercurial==4.3.3 \
+    --hash=sha256:47a63c78698bc735667984bbc5b76619ff29a38d742f20cdf9f44cce59752374
 
 python-dateutil==2.5.3 \
     --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527

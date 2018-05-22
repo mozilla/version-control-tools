@@ -7,8 +7,8 @@
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 
-Mercurial==4.2.3-388d39276ecf \
-    --hash=sha256:e6adcc3a2222a978aaafb991f6feefe7ca4ff1cdacb81b4ccaac397dd681f588
+Mercurial==4.3.3 \
+    --hash=sha256:47a63c78698bc735667984bbc5b76619ff29a38d742f20cdf9f44cce59752374
 
 python-ldap==2.4.20 \
     --hash=sha256:4b8891539a3171d993cf7896b632ff088a4c707ae85ac3c77db1454f7949f3e2
