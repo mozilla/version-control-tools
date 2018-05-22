@@ -18,8 +18,14 @@ Create some repositories
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
 
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ hgmo create-repo try scm_level_1
   (recorded repository creation in replication log)
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ hgmo exec hgssh /set-hgrc-option mozilla-central phases publish false
   $ hgmo exec hgssh /set-hgrc-option mozilla-central experimental evolution all
@@ -55,12 +61,18 @@ Create an obsolete changeset with a large commit message to test SNS message siz
   $ hg commit --amend -m 'rewritten message'
   $ hg -q push
 
+Without this, there is a race condition in the order that the aggregator may
+process acknowledged messages across partitions
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
 An SNS message should be sent with the event details
 
   $ paconsumer --wait-for-n 15
   got a heartbeat-1 message
-  got a heartbeat-1 message
   got a hg-repo-init-2 message
+  got a heartbeat-1 message
   got a hg-repo-init-2 message
   got a hg-hgrc-update-1 message
   got a heartbeat-1 message
@@ -78,11 +90,10 @@ An SNS message should be sent with the event details
 
   $ hgmo exec hgssh tail -n 39 /var/log/snsnotifier.log
   vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
-  vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
-  vcsreplicator.snsnotifier processing message 2: newrepo.1 for https://hg.mozilla.org/mozilla-central
-  vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000002-*.json (glob)
+  vcsreplicator.snsnotifier processing message 1: newrepo.1 for https://hg.mozilla.org/mozilla-central
+  vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000001-*.json (glob)
   vcsreplicator.snsnotifier sending SNS notification to arn:aws:sns:us-east-1:123456789012:hgmo-events
-  vcsreplicator.snsnotifier finished processing message 2
+  vcsreplicator.snsnotifier finished processing message 1
   vcsreplicator.pushnotifications heartbeat-1 message not relevant; ignoring
   vcsreplicator.snsnotifier processing message 3: newrepo.1 for https://hg.mozilla.org/try
   vcsreplicator.snsnotifier uploading to S3: http://localhost:5001/moz-hg-events-us-west-2/events/*/0000000003-*.json (glob)

@@ -141,35 +141,31 @@ def copy_messages(client, consumer_topic, consumer_group, counts,
     The ``counts`` argument is a dict of partition to count of messages to
     copy.
     """
-
-    consumer = Consumer(client, consumer_group, consumer_topic, counts.keys())
     producer = Producer(client, producer_topic, batch_send=False,
                         req_acks=-1, ack_timeout=30000)
 
-    with consumer, producer:
-        return _copy_messages(consumer, producer, counts, alive)
+    with producer:
+        # This is less efficient than creating a consumer over all partitions.
+        # And it favors messages in earlier partitions. But it is deterministic.
+        for partition in sorted(counts):
+            consumer = Consumer(client, consumer_group, consumer_topic,
+                                [partition])
+            with consumer:
+                _copy_messages(consumer, producer, counts[partition],
+                               alive)
 
 
-def _copy_messages(consumer, producer, counts, alive):
+def _copy_messages(consumer, producer, count, alive):
     # Our strategy is to retrieve messages from the partitions that we need
     # to copy from. When the count of unacked messages in a partition reaches
     # 0, we stop consuming from the partition.
-    while counts and alive[0]:
+    while count and alive[0]:
         r = consumer.get_message(timeout=5.0)
         if not r:
             logger.warn('unacked messages but retrieving message failed; weird')
             continue
 
         partition, message, payload = r
-
-        # The Kafka consumer may fetch multiple messages and leave them in
-        # a buffer/queue. Below, we tell the consumer to stop fetching
-        # messages from certain partitions. However, it may have already fetched
-        # a message from a partition we are done with and will serve it up from
-        # its buffer/queue. If we get one of these messages, ignore it.
-        if partition not in counts:
-            logger.warn('got message from exhausted partition %d; ignoring' % partition)
-            continue
 
         logger.warn('copying %s from partition %d' % (payload['name'], partition))
 
@@ -185,13 +181,7 @@ def _copy_messages(consumer, producer, counts, alive):
 
         consumer.commit(partitions=[partition])
 
-        # Now decrement the unacked message count for this partition and stop
-        # consuming this partiion if no more unacked messages.
-        counts[partition] -= 1
-        if counts[partition] == 0:
-            del counts[partition]
-            del consumer.offsets[partition]
-            del consumer.fetch_offsets[partition]
+        count -= 1
 
 
 def cli():
