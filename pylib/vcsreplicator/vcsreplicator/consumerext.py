@@ -10,8 +10,8 @@ from mercurial import (
     extensions,
 )
 
-testedwith = '4.1 4.2 4.3 4.4'
-minimumhgversion = '4.1'
+testedwith = '4.2 4.3 4.4'
+minimumhgversion = '4.2'
 
 
 def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):

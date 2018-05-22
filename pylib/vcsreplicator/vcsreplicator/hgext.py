@@ -52,7 +52,7 @@ if util.safehasattr(policy, 'importmod'):
 else:
     from mercurial import base85
 
-testedwith = '4.1 4.2'
+testedwith = '4.2'
 
 cmdtable = {}
 
