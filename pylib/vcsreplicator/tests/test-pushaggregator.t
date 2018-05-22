@@ -100,7 +100,11 @@ Starting the replication consumer should result in the message being written
 
   $ hgmo exec hgweb0 /usr/bin/supervisorctl start vcsreplicator:2
   vcsreplicator:2: started
-  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ paconsumer --start-from 6 --wait-for-n 2
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
+
   $ paconsumer --dump --start-from 6
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
