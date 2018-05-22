@@ -31,6 +31,7 @@
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central

@@ -59,6 +59,7 @@ Phases should be updated on normal push
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -158,6 +159,7 @@ Mirror gets bookmark updates when pulling the changegroup.
   vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
   vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
+  vcsreplicator.consumer   > new changesets 2777163b5938 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -226,6 +228,7 @@ the bookmark.
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
   vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
+  vcsreplicator.consumer   > new changesets 031adcaa8ee7 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -252,6 +255,7 @@ But processing the next changegroup message should advance the bookmark by 1
   vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
   vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
+  vcsreplicator.consumer   > new changesets e20ecd72ffa9 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -347,6 +351,7 @@ Now test bookmark divergence
   vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark divergent
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
+  vcsreplicator.consumer   > new changesets e84fdf206e79 (hg44 !)
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
