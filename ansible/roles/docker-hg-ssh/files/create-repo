@@ -14,22 +14,12 @@ do
         --non-publishing)
         NONPUBLISHING=1
         ;;
-        --no-generaldelta)
-        NO_GENERALDELTA=1
-        ;;
         *)
         ;;
     esac
 done
 
-INITFLAGS=
-if [ -n "${NO_GENERALDELTA}" ]; then
-  INITFLAGS="--config format.usegeneraldelta=false"
-else
-  INITFLAGS="--config format.usegeneraldelta=true"
-fi
-
-/var/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO} ${INITFLAGS}
+/var/hg/venv_tools/bin/hg init /repo/hg/mozilla/${REPO}
 chown -R hg:${GROUP} /repo/hg/mozilla/${REPO}
 find /repo/hg/mozilla/${REPO} | xargs chmod g+w
 find /repo/hg/mozilla/${REPO} -type d | xargs chmod g+s

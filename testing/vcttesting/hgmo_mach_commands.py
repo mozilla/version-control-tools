@@ -138,11 +138,8 @@ class HgmoCommands(object):
                      help='Name of repository to create')
     @CommandArgument('group', default='scm_level_1',
                      help='LDAP group that owns repo')
-    @CommandArgument('--no-generaldelta', action='store_true',
-                     help='Create repository without generaldelta storage')
-    def create_repo(self, name, group, no_generaldelta=False):
-        out = self.c.create_repo(name, group=group,
-                                 no_generaldelta=no_generaldelta)
+    def create_repo(self, name, group):
+        out = self.c.create_repo(name, group=group)
         if out:
             sys.stdout.write(out)
 

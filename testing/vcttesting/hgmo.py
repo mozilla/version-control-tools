@@ -506,7 +506,7 @@ class HgCluster(object):
 
         return f_private_key.result(), f_public_key.result(), host_ed25519_key, host_rsa_key
 
-    def create_repo(self, name, group='scm_level_1', no_generaldelta=False):
+    def create_repo(self, name, group='scm_level_1'):
         """Create a repository on the cluster.
 
         ``path`` is the path fragment the repository would be accessed under
@@ -515,9 +515,6 @@ class HgCluster(object):
         The repository will be owned by the specified ``group``.
         """
         cmd = ['/create-repo', name, group]
-
-        if no_generaldelta:
-            cmd.append('--no-generaldelta')
 
         return self._d.execute(self.master_id, cmd, stdout=True, stderr=True)
 
