@@ -8,11 +8,11 @@ import os
 
 from mercurial.i18n import _
 from mercurial import (
+    configitems,
     error,
     extensions,
     registrar,
     revset,
-    util,
 )
 from mercurial.hgweb import (
     webcommands,
@@ -25,24 +25,21 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import mozautomation.releasedb as releasedb
 
 from mozhg.util import (
-    import_module,
     is_firefox_repo,
 )
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
 
-minimumhgversion = '4.1'
-testedwith = '4.1 4.2 4.3 4.4'
+minimumhgversion = '4.3'
+testedwith = '4.3 4.4'
 
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem  = registrar.configitem(configtable)
+configtable = {}
+configitem  = registrar.configitem(configtable)
 
-    configitem('mozilla', 'enablefirefoxreleases',
-               default=configitems.dynamicdefault)
-    configitem('mozilla', 'firefoxreleasesdb',
-               default=configitems.dynamicdefault)
+configitem('mozilla', 'enablefirefoxreleases',
+           default=configitems.dynamicdefault)
+configitem('mozilla', 'firefoxreleasesdb',
+           default=configitems.dynamicdefault)
+
 
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
