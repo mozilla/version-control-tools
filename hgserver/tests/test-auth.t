@@ -8,7 +8,7 @@ Attempting to SSH into pash as an unknown user is denied
   $ ssh-keygen -b 2048 -t rsa -f key1 -N '' > /dev/null
 
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  Permission denied (publickey).\r (esc)
+  *Permission denied (publickey)* (glob)
   [255]
 
 SSH as a valid user without proper key
@@ -53,7 +53,7 @@ SSH as a valid user without proper key
   # numEntries: 1
 
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  Permission denied (publickey).\r (esc)
+  *Permission denied (publickey)* (glob)
   [255]
 
 SSH with a valid key gives us warning about no command. Also prints note about
@@ -331,7 +331,7 @@ available.
 
   $ hgmo exec hgssh /set-ldap-property url ldap://localhost:6000
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  Permission denied (publickey).\r (esc)
+  *Permission denied (publickey)* (glob)
   [255]
 
   $ hgmo exec hgssh /set-ldap-property url real
