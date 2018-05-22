@@ -136,13 +136,27 @@ def wait_for_kafka(hostport, timeout=60):
 def wait_for_kafka_topic(hostport, topic, timeout=60):
     """Wait for a Kafka topic to become available."""
     # Delay import to facilitate module use in limited virtualenvs.
-    from kafka import SimpleClient
+    from kafka import SimpleClient, TopicPartition
 
     start = time.time()
     client = SimpleClient(hostport, client_id=b'dummy', timeout=1)
     while not client.has_metadata_for_topic(topic):
         if time.time() - start > timeout:
             raise Exception('timeout reached waiting for topic')
+
+        time.sleep(0.1)
+        client.load_metadata_for_topics()
+
+    # And wait for all partitions in that topic to have a leader.
+    while True:
+        tps = [TopicPartition(topic, p)
+               for p in client.topic_partitions.get(topic, [])]
+
+        if tps and all(client.topics_to_brokers.get(tp) for tp in tps):
+            break
+
+        if time.time() - start > timeout:
+            raise Exception('timeout reached waiting for topic brokers')
 
         time.sleep(0.1)
         client.load_metadata_for_topics()
