@@ -49,13 +49,13 @@ class myui(ui.ui):
     web.port to get a random port for the server
     web.accesslog to send the access log to /dev/null
     """
-    def config(self, section, name, default=None, untrusted=False):
+    def config(self, section, name, *args, **kwargs):
       if section == "web":
           if name == "port":
               return 0
           if name == "accesslog":
               return "/dev/null"
-      return ui.ui.config(self, section, name, default, untrusted)
+      return ui.ui.config(self, section, name, *args, **kwargs)
 
 # We seem to trigger "connection reset by peer" in a lot of our tests,
 # which doesn't seem harmful but does litter the test output with
