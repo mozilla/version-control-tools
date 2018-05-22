@@ -142,6 +142,14 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     #
     # Obsolescence markers are handled via a separate mechanism. So ignore
     # them.
+
+    # Not all pushkey namespaces are consistent in their internal return
+    # value. Some use int. Others bool. We want to be consistent in the type
+    # written to the replication log. And int is more expressive. So we use
+    # that.
+    if isinstance(ret, bool):
+        ret = 1 if ret else 0
+
     if namespace == 'obsolescence':
         return
 
