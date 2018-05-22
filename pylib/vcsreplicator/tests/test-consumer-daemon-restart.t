@@ -11,14 +11,7 @@ Gracefully shut down a consumer daemon
   $ hgmo exec hgweb0 /usr/bin/supervisorctl stop vcsreplicator:2
   vcsreplicator:2: stopped
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  $ hgmo exec hgweb0 tail -n 8 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0

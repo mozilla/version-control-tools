@@ -38,13 +38,7 @@
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
-  $ hgmo exec hgweb0 cat /var/log/vcsreplicator/consumer.log | grep ^vcsreplicator.consumer
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  $ hgmo exec hgweb0 tail -n 15 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
