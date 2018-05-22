@@ -69,7 +69,7 @@ for partition, pm in sorted(client.topic_partitions[topic].items()):
         vcsrproducer.send_heartbeat(producer, partition=partition)
         success_count += 1
     except KafkaError as e:
-        leader = client.brokers[pm.leader]
+        leader = client.brokers[pm]
 
         if hasattr(e, 'errno') and hasattr(e, 'message'):
             message = e.message
