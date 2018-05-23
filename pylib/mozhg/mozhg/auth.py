@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import urlparse
 
-from mercurial import config, util
+from mercurial import config, error
 from mercurial.i18n import _
 
 from util import import_module
@@ -134,7 +134,7 @@ def getbugzillaauth(ui, require=False, profile=None):
         return BugzillaAuth(username=username, password=password)
 
     if require:
-        raise util.Abort(_('unable to obtain Bugzilla authentication.'))
+        raise error.Abort(_('unable to obtain Bugzilla authentication.'))
 
     return None
 

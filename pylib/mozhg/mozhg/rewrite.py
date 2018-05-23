@@ -10,6 +10,7 @@ from mercurial import (
     bookmarks,
     cmdutil,
     context,
+    error,
     hg,
     lock as lockmod,
     obsolete,
@@ -137,12 +138,12 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
     # Validate function called properly.
     for node in oldnodes:
         if len(node) != 20:
-            raise util.Abort('replacechangesets expects 20 byte nodes')
+            raise error.Abort('replacechangesets expects 20 byte nodes')
 
     uoldrevs = [repo[node].rev() for node in oldnodes]
     oldrevs = sorted(uoldrevs)
     if oldrevs != uoldrevs:
-        raise util.Abort('must pass oldnodes in changelog order')
+        raise error.Abort('must pass oldnodes in changelog order')
 
     # We may perform stripping and stripping inside a nested transaction
     # is a recipe for disaster.
@@ -157,7 +158,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
             intrans = False
 
     if intrans:
-        raise util.Abort('cannot call replacechangesets when a transaction '
+        raise error.Abort('cannot call replacechangesets when a transaction '
                          'is active')
 
     # The revisions impacted by the current operation. This is essentially
@@ -206,10 +207,10 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
                               preservefilectx(oldctx))
 
             if not isinstance(newctx, context.memctx):
-                raise util.Abort('createfn must return a context.memctx')
+                raise error.Abort('createfn must return a context.memctx')
 
             if oldctx == newctx:
-                raise util.Abort('createfn must create a new changeset')
+                raise error.Abort('createfn must create a new changeset')
 
             newnode = newctx.commit()
             # Needed so .manifestnode() works, which memctx doesn't have.
@@ -218,7 +219,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
             # This makes the implementation significantly simpler as we don't
             # need to worry about merges when we do auto rebasing later.
             if oldctx.manifestnode() != newctx.manifestnode():
-                raise util.Abort('we do not allow replacements to modify files')
+                raise error.Abort('we do not allow replacements to modify files')
 
             revmap[oldctx.rev()] = newctx.rev()
             nodemap[oldnode] = newnode
@@ -236,7 +237,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
 
             oldctx = repo[rev]
             if oldctx.p1().rev() not in revmap:
-                raise util.Abort('unknown parent of child commit: %s' %
+                raise error.Abort('unknown parent of child commit: %s' %
                                  oldctx.hex(),
                                  hint='please report this as a bug')
 
@@ -316,7 +317,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
         # changeset. Since we didn't do anything that should change the
         # active bookmark, we shouldn't need to adjust it.
         if activebookmark(repo) != oldactivebookmark:
-            raise util.Abort('active bookmark changed; '
+            raise error.Abort('active bookmark changed; '
                              'this should not occur!',
                              hint='please file a bug')
 
