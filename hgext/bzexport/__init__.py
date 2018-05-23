@@ -1019,7 +1019,12 @@ def bzexport(ui, repo, *args, **opts):
         ctx = repo[revs.last()]
         description_from_patch = encoding.tolocal(ctx.description())
         if hasattr(cmdutil, "export"):
-            cmdutil.export(repo, [ctx.hex()], fp=contents, opts=diffopts)
+            # TRACKING hg46
+            # fp kwarg removed in hg46, use exportfile instead
+            if util.safehasattr(cmdutil, 'exportfile'):
+                cmdutil.exportfile(repo, [ctx], contents, opts=diffopts)
+            else:
+                cmdutil.export(repo, [ctx.hex()], fp=contents, opts=diffopts)
         else:
             # Support older hg versions
             patch.export(repo, [ctx.hex()], fp=contents, opts=diffopts)
