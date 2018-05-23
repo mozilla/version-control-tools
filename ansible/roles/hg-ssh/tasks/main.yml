@@ -20,6 +20,8 @@
     # package can be sensitive. So we lock the package version so it isn't
     # upgraded as part of upgrading other system packages.
     - python-2.7.*
+    - python-devel-2.7.*
+    - python-libs-2.7.*
 
 - name: install global ssh config
   copy: src=ssh_config
