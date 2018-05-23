@@ -163,13 +163,20 @@ def obsmod():
 def _basechange(repo, subset):
     repo = repo.unfiltered()
 
+    # TRACKING hg46
+    # 4.6 replaced obsstore.precursors -> obsstore.predecessors
+    try:
+        obs_precursors = repo.obsstore.predecessors
+    except AttributeError:
+        obs_precursors = repo.obsstore.precursors
+
     result = set()
     for n in subset:
         base = repo[n].node()
         while True:
             mod = obsmod()
             precursors = [mod.marker(repo, m)
-                          for m in repo.obsstore.precursors.get(base, ())]
+                          for m in obs_precursors.get(base, ())]
             if len(precursors) == 0:
                 break
 
@@ -181,7 +188,12 @@ def _basechange(repo, subset):
             if base != min(pre.succnodes(), key=lambda n: repo[n].date()):
                 break
 
-            base = pre.precnode()
+            # TRACKING hg46
+            # hg 4.6 replaced marker.precnode -> marker.prednode
+            try:
+                base = pre.prednode()
+            except AttributeError:
+                base = pre.precnode()
 
         result.add(base)
 
