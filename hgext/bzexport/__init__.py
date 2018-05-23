@@ -68,6 +68,8 @@ from mercurial import (
 )
 from hgext import mq
 
+from mozhg.util import import_module
+
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
@@ -94,6 +96,33 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg46
+configitems = import_module('mercurial.configitems')
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('bzexport', 'api_server', default=configitems.dynamicdefault)
+    configitem('bzexport', 'bugzilla', default=configitems.dynamicdefault)
+    configitem('bzexport', 'git', default=configitems.dynamicdefault)
+    configitem('bzexport', 'password', default=configitems.dynamicdefault)
+    configitem('bzexport', 'product', default=configitems.dynamicdefault)
+    configitem('bzexport', 'prodversion', default=configitems.dynamicdefault)
+    configitem('bzexport', 'rename-patch', default=configitems.dynamicdefault)
+    configitem('bzexport', 'showfunc', default=configitems.dynamicdefault)
+    configitem('bzexport', 'unified', default=configitems.dynamicdefault)
+    configitem('bzexport', 'update-patch', default=configitems.dynamicdefault)
+    configitem('bzexport', 'username', default=configitems.dynamicdefault)
+
+    configitem('bugzilla', 'apikey', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'cookie', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'firefoxprofile', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'password', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'url', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'userid', default=configitems.dynamicdefault)
+    configitem('bugzilla', 'username', default=configitems.dynamicdefault)
+
 
 review_re = re.compile(r'[ra][=?]+(\w[^ ]+)')
 
