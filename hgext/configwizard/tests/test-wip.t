@@ -80,7 +80,8 @@ wip enabled when requested
   +[alias]
   +wip = log --graph --rev=wip --template=wip
   +[revsetalias]
-  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
+  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
+  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
   +[templates]
   +wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
   +[color]
@@ -101,7 +102,8 @@ wip enabled when requested
   [alias]
   wip = log --graph --rev=wip --template=wip
   [revsetalias]
-  wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
+  wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
+  wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
   [templates]
   wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
   [color]
@@ -115,6 +117,19 @@ wip enabled when requested
   wip.user = magenta
   [experimental]
   graphshorten = true
+
+Ensure `hg wip` actually works. We do this before the version-mock tests
+to ensure the alias works on the hg version being tested
+
+  $ hg init repo
+  $ cd repo
+  $ touch foo
+  $ echo "test123" >> foo
+  $ hg add foo
+  $ hg -q commit -m "test commit"
+  $ HGRCPATH=$TESTTMP/.hgrc hg debugrevspec wip
+  0
+  $ cd ..
 
 wip alias has pager configuration on <4.1
 
@@ -303,8 +318,10 @@ wip alias ignores old esrs if using firefoxtree
    [alias]
    wip = log --graph --rev=wip --template=wip
    [revsetalias]
-  -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
-  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() and not (fxheads() - date(-90))
+  -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
+  -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
+  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() and not (fxheads() - date(-90)) (no-hg46 !)
+  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() and not (fxheads() - date(-90)) (hg46 !)
    [templates]
    wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
    [color]
@@ -315,5 +332,41 @@ wip alias ignores old esrs if using firefoxtree
   +firefoxtree = */hgext/firefoxtree (glob)
    [pager]
    pager = LESS=FRSXQ less
+  
+  Write changes to hgrc file (Yn)?  y
+
+
+Check that when on 4.6 with the old wip enabled, the alias is updated with a message
+
+  $ cat > fakeversion3.py << EOF
+  > from mercurial import util
+  > util.version = lambda: '4.6'
+  > EOF
+
+  $ hg --config extensions.fakeversion=fakeversion3.py --config revsetalias.wip="(parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()" --config configwizard.steps=wip,configchange configwizard
+  This wizard will guide you through configuring Mercurial for an optimal
+  experience contributing to Mozilla projects.
+  
+  The wizard makes no changes without your permission.
+  
+  To begin, press the enter/return key.
+   <RETURN>
+  It appears you are on a new version of Mercurial (4.6+) but you are using the old `hg wip` alias.
+  In new versions of Mercurial, the revset expression `unstable` has been renamed to `orphan`.
+  
+  We will update the alias for you so it uses the new keyword.
+  Your config file needs updating.
+  Would you like to see a diff of the changes first (Yn)?  y
+  --- hgrc.old
+  +++ hgrc.new
+  @@ -1,7 +1,7 @@
+   [alias]
+   wip = log --graph --rev=wip --template=wip
+   [revsetalias]
+  -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() and not (fxheads() - date(-90))
+  +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() and not (fxheads() - date(-90))
+   [templates]
+   wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
+   [color]
   
   Write changes to hgrc file (Yn)?  y

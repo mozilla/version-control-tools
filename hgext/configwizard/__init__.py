@@ -208,6 +208,13 @@ is in.)
 Would you like to install the `hg wip` alias (Yn)? $$ &Yes $$ &No
 '''.lstrip()
 
+WIP_UPDATED_EXPRESSION = '''
+It appears you are on a new version of Mercurial (4.6+) but you are using the old `hg wip` alias.
+In new versions of Mercurial, the revset expression `unstable` has been renamed to `orphan`.
+
+We will update the alias for you so it uses the new keyword.
+'''.lstrip()
+
 FIREFOXTREE_INFO = '''
 The firefoxtree extension makes interacting with the multiple Firefox
 repositories easier:
@@ -911,9 +918,16 @@ def _checkfsmonitor(ui, cw, hgversion):
 
 
 def _checkwip(ui, cw):
-    havewip = ui.hasconfig('alias', 'wip')
+    havewip_alias = ui.hasconfig('alias', 'wip')
+    havewip_revset = ui.hasconfig('revsetalias', 'wip')
 
-    if not havewip and uipromptchoice(ui, WIP_INFO):
+    hg_version = util.versiontuple(n=2)
+
+    # If the user has the `wip` revset alias, they are on hg46+ and have the old alias
+    # (ie with `orphan` expression instead of `unstable`), we upgrade with a notice
+    if havewip_revset and hg_version >= (4, 6) and 'unstable' in ui.config('revsetalias', 'wip'):
+        ui.write(WIP_UPDATED_EXPRESSION)
+    elif not havewip_alias and uipromptchoice(ui, WIP_INFO):
         return
 
     # The wip configuration changes over time. Ensure it is up to date.
@@ -923,14 +937,18 @@ def _checkwip(ui, cw):
 
     cw.c['alias']['wip'] = 'log --graph --rev=wip --template=wip'
 
+    if hg_version < (4, 6):
+        unstable = 'unstable'
+    else:
+        unstable = 'orphan'
 
     wiprevset = ('('
                 'parents(not public()) '
                 'or not public() '
                 'or . '
                 'or (head() and branch(default))'
-            ') and (not obsolete() or unstable()^) '
-            'and not closed()')
+            ') and (not obsolete() or %s()^) '
+            'and not closed()') % unstable
 
     if ui.hasconfig('extensions', 'firefoxtree') or 'firefoxtree' in cw.c.get('extensions', {}):
         wiprevset += ' and not (fxheads() - date(-90))'
