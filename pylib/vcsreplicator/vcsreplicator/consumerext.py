@@ -10,8 +10,8 @@ from mercurial import (
     extensions,
 )
 
-testedwith = '4.2 4.3 4.4'
-minimumhgversion = '4.2'
+testedwith = '4.3 4.3 4.4'
+minimumhgversion = '4.3'
 
 
 def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):
@@ -32,7 +32,7 @@ def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):
     # effectively simulates all incoming bookmarks as being new/canonical.
     local_bookmarks = repo._bookmarks
     for book in list(local_bookmarks):
-        del local_bookmarks[book]
+        local_bookmarks._del(book)
 
     return orig(ui, repo, remotemarks, *args, **kwargs)
 

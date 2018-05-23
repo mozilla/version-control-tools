@@ -156,8 +156,6 @@ Mirror gets bookmark updates when pulling the changegroup.
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
-  vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
   vcsreplicator.consumer   > new changesets 2777163b5938 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
@@ -226,8 +224,6 @@ the bookmark.
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
-  vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > new changesets 031adcaa8ee7 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -252,8 +248,6 @@ But processing the next changegroup message should advance the bookmark by 1
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
-  vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
   vcsreplicator.consumer   > new changesets e20ecd72ffa9 (hg44 !)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
@@ -345,10 +339,6 @@ Now test bookmark divergence
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads)
-  vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
-  vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
-  vcsreplicator.consumer   > devel-warn: 'del bookmarks[name]' is deprecated, use 'bookmarks.applychanges'
-  vcsreplicator.consumer   > (compatibility will be dropped after Mercurial-4.3, update your code.) at: */pylib/vcsreplicator/vcsreplicator/consumerext.py:* (bookmarks_updatefromremote) (glob)
   vcsreplicator.consumer   > adding remote bookmark divergent
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
   vcsreplicator.consumer   > new changesets e84fdf206e79 (hg44 !)
