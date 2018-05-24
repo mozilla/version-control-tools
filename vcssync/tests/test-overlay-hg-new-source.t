@@ -37,6 +37,7 @@ New changeset in source will be incrementally applied
   hg> adding manifests
   hg> adding file changes
   hg> added 1 changesets with 1 changes to 1 files
+  hg> new changesets becea3ef593b
   hg> d92cc0ff6f1a already processed as eaf64eb11964; skipping 2/3 revisions
   hg> becea3ef593b -> 21cdbe8f0971: add new-source
   1 new changesets; new tip is 21cdbe8f0971d8ec7d64fa34a59ea69e2936ce2e

@@ -47,6 +47,7 @@ Overlay with both new dest and source will pull dest and apply new sources
   hg> adding manifests
   hg> adding file changes
   hg> added 2 changesets with 2 changes to 1 files
+  hg> new changesets afccf7d8a497:05e6f02d8e8c
   hg> (run 'hg update' to get a working copy)
   commencing overlay of http://localhost:$HGPORT/overlay-source
   executing: hg overlay http://localhost:$HGPORT/overlay-source --into subdir -d 05e6f02d8e8c47eea023572bb08ad29f878936df
@@ -56,6 +57,7 @@ Overlay with both new dest and source will pull dest and apply new sources
   hg> adding manifests
   hg> adding file changes
   hg> added 2 changesets with 2 changes to 1 files
+  hg> new changesets 03f307e60484:fabffa48ea9f
   hg> d92cc0ff6f1a already processed as eaf64eb11964; skipping 2/4 revisions
   hg> 03f307e60484 -> 1f5ce5f190a2: new source 1
   hg> fabffa48ea9f -> fc9f4bdac504: new source 2

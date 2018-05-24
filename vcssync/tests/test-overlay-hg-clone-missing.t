@@ -13,6 +13,7 @@ Local clone will be created if necessary
   adding manifests
   adding file changes
   added 1 changesets with 2 changes to 2 files
+  new changesets 88dd2a5005e6
   executing: hg strip --no-backup -r 'not public()'
   hg> abort: empty revision set
   (ignoring strip failure)
@@ -27,6 +28,7 @@ Local clone will be created if necessary
   hg> adding manifests
   hg> adding file changes
   hg> added 2 changesets with 3 changes to 3 files
+  hg> new changesets 76f0fc85e215:d92cc0ff6f1a
   hg> 76f0fc85e215 -> 67c9543981c6: initial - add source-file0 and source-file1
   hg> d92cc0ff6f1a -> eaf64eb11964: add dir0/file0
   2 new changesets; new tip is eaf64eb119642ef85b4d952a49d0f5c815d5bcd1

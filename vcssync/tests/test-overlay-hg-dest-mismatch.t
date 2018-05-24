@@ -44,6 +44,7 @@ destination directory
   hg> adding manifests
   hg> adding file changes
   hg> added 1 changesets with 1 changes to 1 files
+  hg> new changesets 868ababf5511
   hg> (run 'hg update' to get a working copy)
   commencing overlay of http://localhost:$HGPORT/overlay-source
   executing: hg overlay http://localhost:$HGPORT/overlay-source --into destdir -d 868ababf5511149027ca40e5de059e3a88c32a3c
@@ -53,6 +54,7 @@ destination directory
   hg> adding manifests
   hg> adding file changes
   hg> added 1 changesets with 1 changes to 1 files
+  hg> new changesets 74beb83990f0
   hg> d92cc0ff6f1a already processed as 1467125e7dd1; skipping 2/3 revisions
   hg> abort: files mismatch between source and destination: unwanted-file
   hg> (destination must match previously imported changeset (d92cc0ff6f1a) exactly)
@@ -82,6 +84,7 @@ We can correct the issue by reconciling the state in dest
   hg> adding manifests
   hg> adding file changes
   hg> added 1 changesets with 0 changes to 0 files
+  hg> new changesets 0a081fabba0d
   hg> (run 'hg update' to get a working copy)
   commencing overlay of http://localhost:$HGPORT/overlay-source
   executing: hg overlay http://localhost:$HGPORT/overlay-source --into destdir -d 0a081fabba0d02fd0ebead1c5ce1256da71866ea

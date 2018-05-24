@@ -19,6 +19,7 @@ Test unicode in commit descriptions
   adding manifests
   adding file changes
   added 1 changesets with 2 changes to 2 files
+  new changesets 88dd2a5005e6
   executing: hg strip --no-backup -r 'not public()'
   hg> abort: empty revision set
   (ignoring strip failure)
@@ -33,6 +34,7 @@ Test unicode in commit descriptions
   hg> adding manifests
   hg> adding file changes
   hg> added 3 changesets with 4 changes to 4 files
+  hg> new changesets 76f0fc85e215:2943afe809e4
   hg> 76f0fc85e215 -> 67c9543981c6: initial - add source-file0 and source-file1
   hg> d92cc0ff6f1a -> eaf64eb11964: add dir0/file0
   hg> 2943afe809e4 -> 45ba9d247354: add file2 with unicode \xe3\x83\x86\xe3\x82\xb9\xe3\x83\x88 (esc)

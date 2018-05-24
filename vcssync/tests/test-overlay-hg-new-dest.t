@@ -27,6 +27,7 @@ New changeset in dest will be pulled and overlay will reperformed on it
   hg> adding manifests
   hg> adding file changes
   hg> added 1 changesets with 1 changes to 1 files
+  hg> new changesets 7d4c615194ec
   hg> (run 'hg update' to get a working copy)
   commencing overlay of http://localhost:$HGPORT/overlay-source
   executing: hg overlay http://localhost:$HGPORT/overlay-source --into subdir -d 7d4c615194ec642cb4f0ff9be89a536db8075e02
