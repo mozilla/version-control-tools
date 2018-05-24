@@ -56,7 +56,8 @@ Pushing via ssh:// works
 Blackbox logging recorded appropriate entries
 
   $ hgmo exec hgssh cat /repo/hg/mozilla/mozilla-central/.hg/blackbox.log
-  * user1@example.com @0000000000000000000000000000000000000000 (*)> serve --stdio (glob)
+  * root @0000000000000000000000000000000000000000 (*)> init /repo/hg/mozilla/mozilla-central exited 0 after * seconds (glob)
+  * user1@example.com @0000000000000000000000000000000000000000 (*)> -R /repo/hg/mozilla/mozilla-central serve --stdio (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnopen: hgext_vcsreplicator.pretxnopenhook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-prechangegroup: hgext_readonly.prechangegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.prevent_subrepos took * seconds (glob)
