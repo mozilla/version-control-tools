@@ -120,6 +120,7 @@ Cloning will fetch bundle
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets 77538e1ce4be (hg44 !)
 
 #endif
 

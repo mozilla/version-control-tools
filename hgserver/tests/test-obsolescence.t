@@ -143,6 +143,7 @@ Pulling should get the obsmarkers
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
   obsoleted 1 changesets
+  new changesets 5217e2ac5b15 (hg44 !)
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)

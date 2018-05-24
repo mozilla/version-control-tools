@@ -296,6 +296,7 @@ We are able to clone from the newly-created repo
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
+  new changesets 77538e1ce4be (hg44 !)
   updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
