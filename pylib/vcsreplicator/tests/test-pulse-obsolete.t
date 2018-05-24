@@ -133,7 +133,8 @@ Commit message with multiple lines works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
-  remote: 2 new obsolescence markers
+  remote: 1 new obsolescence markers (hg44 !)
+  remote: 2 new obsolescence markers (no-hg44 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/821cb8db71235562a3ee752f0b67502e93835a9f
@@ -353,15 +354,15 @@ Commit message with multiple lines works
       - precursor:
           desc: null
           known: false
-          node: 0a1055f8c9cb8d183d9e5b843e182038f51cbe6e
-          push: null
-          visible: null
-        successors: []
-        time: \d+\.\d+ (re)
-        user: Test User <someone@example.com>
-      - precursor:
-          desc: null
-          known: false
+          node: 0a1055f8c9cb8d183d9e5b843e182038f51cbe6e (no-hg44 !)
+          push: null (no-hg44 !)
+          visible: null (no-hg44 !)
+        successors: [] (no-hg44 !)
+        time: \d+\.\d+ (re) (no-hg44 !)
+        user: Test User <someone@example.com> (no-hg44 !)
+      - precursor: (no-hg44 !)
+          desc: null (no-hg44 !)
+          known: false (no-hg44 !)
           node: 2d43215925d94eb9e5792ae70344b3c8be755e5f
           push: null
           visible: null
