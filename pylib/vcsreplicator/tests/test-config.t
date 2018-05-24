@@ -15,7 +15,7 @@ No config with extension installed should cause immediate abort
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.hosts config option not set') (?)
+      raise *.Abort('replicationproducer.hosts config option not set') (glob) (?)
   Abort: replicationproducer.hosts config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.hosts config option not set
 #else
@@ -37,7 +37,7 @@ Missing clientid
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.clientid config option not set') (?)
+      raise *.Abort('replicationproducer.clientid config option not set') (glob) (?)
   Abort: replicationproducer.clientid config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.clientid config option not set
 #else
@@ -58,7 +58,7 @@ Missing topic
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.topic config option not set') (?)
+      raise *.Abort('replicationproducer.topic config option not set') (glob) (?)
   Abort: replicationproducer.topic config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.topic config option not set
 #else
@@ -79,7 +79,7 @@ No partition map
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.partitionmap.* config options not set') (?)
+      raise *.Abort('replicationproducer.partitionmap.* (glob) (?)
   Abort: replicationproducer.partitionmap.* config options not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.partitionmap.* config options not set
 #else
@@ -100,7 +100,7 @@ No reqacks
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1') (?)
+      raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
   Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
@@ -121,7 +121,7 @@ Bad reqacks value
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.reqacks must be set to -1, 0, or 1') (?)
+      raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
   Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
@@ -142,7 +142,7 @@ No acktimeout
     File "* (glob) (?)
       uisetup(ui) (?)
     File "* (glob) (?)
-      raise util.Abort('replicationproducer.acktimeout config option not set') (?)
+      raise *.Abort('replicationproducer.acktimeout config option* (glob) (?)
   Abort: replicationproducer.acktimeout config option not set (?)
   *** failed to set up extension vcsreplicator: replicationproducer.acktimeout config option not set
 #else
