@@ -61,7 +61,7 @@ them. So disable the pulse consumer until all repo changes have been made.
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hg debugobsolete
-  4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ paconsumer --wait-for-n 13
   got a heartbeat-1 message
@@ -86,7 +86,7 @@ Create an obsolescence marker on the server
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete
-  4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
   7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {'user': 'root@*'} (glob)
 
 Send a precursor marker referencing a node unknown to the server

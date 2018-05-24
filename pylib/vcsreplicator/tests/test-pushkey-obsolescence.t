@@ -118,7 +118,7 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   rebasing 2:11bec8a6b2a3 "add file1"
 
   $ hg debugobsolete
-  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ hg push -f
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
@@ -140,7 +140,7 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
 Obsolescence marker should exist on master
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete
-  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
 Changegroup message written
 
@@ -196,7 +196,7 @@ Obsolescence marker should have been replicated to hgweb
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/obs debugobsolete
-  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
 Creating obsolescence marker directly on server will result in replication
 
@@ -206,7 +206,7 @@ Creating obsolescence marker directly on server will result in replication
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete
-  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
   67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'root@*'} (glob)
 
   $ consumer --dump --partition 2
@@ -237,7 +237,7 @@ Creating obsolescence marker directly on server will result in replication
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/obs debugobsolete
-  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
   67b45555a21f4d9d470adc4f1ed3af63918f6414 0 (*) {'user': 'root@*'} (glob)
 
 Pushing obsolescence marker without bundle2 works

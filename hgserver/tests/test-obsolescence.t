@@ -112,7 +112,7 @@ Create some obsolescence markers
   $ hg rebase -s 1 -d 2
   rebasing 1:ba1c6c2be69c "bar"
   $ hg debugobsolete
-  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ hg push ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
@@ -146,7 +146,7 @@ Pulling should get the obsmarkers
   new changesets 5217e2ac5b15 (hg44 !)
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
-  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ cd ..
 
@@ -155,7 +155,7 @@ Obsolescence markers should have gotten pulled on hgweb mirror
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugobsolete
-  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (* +0000) {'user': 'Test User <someone@example.com>'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
 The pushlog should have new push
 
@@ -219,13 +219,13 @@ Pushing a changeset then hiding it works
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hg debugobsolete
-  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
-  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
+  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugobsolete
-  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
-  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
+  6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
   $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
   0:77538e1ce4be draft 1 user@example.com
@@ -342,15 +342,15 @@ Pushing again should send obsolescence markers
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
-  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
-  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
+  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
 And they should get replicated to mirrors
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/integration/autoland debugobsolete
-  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
-  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {'user': 'Test User <someone@example.com>'} (glob)
+  5fb779ae39de4af3229a53c35d46117e98fb5f83 d57129f00b2f329fc2cf3371a0c28796bcfbde1c 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
+  d57129f00b2f329fc2cf3371a0c28796bcfbde1c 9e2d548e5f1f94b9172cfeb77b53f5943722b594 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
 hgweb should still advertise marker exchange
 
