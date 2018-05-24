@@ -20,8 +20,8 @@ import vcsreplicator.producer as vcsrproducer
 from mercurial.i18n import _
 from mercurial.node import hex
 from mercurial import (
-    cmdutil,
     commands,
+    configitems,
     demandimport,
     error,
     extensions,
@@ -29,7 +29,6 @@ from mercurial import (
     obsolete,
     policy,
     registrar,
-    util,
     wireproto,
 )
 with demandimport.deactivated():
@@ -39,52 +38,33 @@ with demandimport.deactivated():
     # to force it to import now.
     import kafka.codec as kafkacodec
 
-# TRACKING hg43
-try:
-    from mercurial import configitems
-    getattr(configitems, r'configitem', None)
-except ImportError:
-    configitems = None
+base85 = policy.importmod('base85')
 
-# TRACKING hg43 4.3 imports variable modules with policy.importmod().
-if util.safehasattr(policy, 'importmod'):
-    base85 = policy.importmod('base85')
-else:
-    from mercurial import base85
-
-testedwith = '4.2 4.3'
+testedwith = '4.3'
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('replicationproducer', 'hosts',
-               default=[])
-    configitem('replicationproducer', 'clientid',
-               default=None)
-    configitem('replicationproducer', 'connecttimeout',
-               default=configitems.dynamicdefault)
-    configitem('replicationproducer', 'topic',
-               default=None)
-    configitem('replicationproducer', 'reqacks',
-               default=configitems.dynamicdefault)
-    configitem('replicationproducer', 'acktimeout',
-               default=0)
-    configitem('replicationproducer', 'producermap.*',
-               default=configitems.dynamicdefault)
-    configitem('replication', 'unfiltereduser',
-               default=None)
+configitem('replicationproducer', 'hosts',
+           default=[])
+configitem('replicationproducer', 'clientid',
+           default=None)
+configitem('replicationproducer', 'connecttimeout',
+           default=configitems.dynamicdefault)
+configitem('replicationproducer', 'topic',
+           default=None)
+configitem('replicationproducer', 'reqacks',
+           default=configitems.dynamicdefault)
+configitem('replicationproducer', 'acktimeout',
+           default=0)
+configitem('replicationproducer', 'producermap.*',
+           default=configitems.dynamicdefault)
+configitem('replication', 'unfiltereduser',
+           default=None)
 
 
 def precommithook(ui, repo, **kwargs):
