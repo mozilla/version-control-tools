@@ -7,17 +7,17 @@
   $ mkdir dst
   $ echo old >dst/one
 
-  $ ls -R dst
-  one
+  $ find dst -type f | sort
+  dst/one
 
 new file, modified file
 
   $ test-apply-changes src dst one,two
   updating dst/one
   creating dst/two
-  $ ls -R dst
-  one
-  two
+  $ find dst -type f | sort
+  dst/one
+  dst/two
   $ cat dst/one
   new
 
@@ -25,13 +25,10 @@ subdir
 
   $ test-apply-changes src dst sub/three
   creating dst/sub/three
-  $ ls -R dst
-  one
-  sub
-  two
-  
-  dst/sub:
-  three
+  $ find dst -type f | sort
+  dst/one
+  dst/sub/three
+  dst/two
   $ cat dst/sub/three
   new
 
@@ -41,13 +38,10 @@ renamed file
   $ test-apply-changes src dst one,four
   deleting dst/one
   creating dst/four
-  $ ls -R dst
-  four
-  sub
-  two
-  
-  dst/sub:
-  three
+  $ find dst -type f | sort
+  dst/four
+  dst/sub/three
+  dst/two
 
 renamed subdir
 
@@ -56,25 +50,19 @@ renamed subdir
   deleting dst/sub/three
   deleting dst/sub/
   creating dst/def/three
-  $ ls -R dst
-  def
-  four
-  two
-  
-  dst/def:
-  three
+  $ find dst -type f | sort
+  dst/def/three
+  dst/four
+  dst/two
 
 deleted file
 
   $ rm src/two
   $ test-apply-changes src dst two
   deleting dst/two
-  $ ls -R dst
-  def
-  four
-  
-  dst/def:
-  three
+  $ find dst -type f | sort
+  dst/def/three
+  dst/four
 
 deleted subdir
 
@@ -82,6 +70,6 @@ deleted subdir
   $ test-apply-changes src dst def/three
   deleting dst/def/three
   deleting dst/def/
-  $ ls -R dst
-  four
+  $ find dst -type f | sort
+  dst/four
 
