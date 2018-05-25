@@ -85,6 +85,7 @@ from mercurial import (
     bookmarks,
     cmdutil,
     commands,
+    configitems,
     encoding,
     error,
     exchange,
@@ -112,9 +113,6 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 import mozautomation.commitparser as commitparser
 from mozhg.util import import_module
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
-
 # TRACKING hg46
 # wireproto -> wireprotov1server
 wireproto = import_module('mercurial.wireprotov1server')
@@ -132,41 +130,33 @@ testedwith = '4.3 4.4'
 
 cmdtable = {}
 
-# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('mozilla', 'treeherder_repo',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'automationrelevantdraftancestors',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'backoutsearchlimit',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'convertsource',
-               default=None)
-    configitem('hgmo', 'headdivergencemaxnodes',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'mozbuildinfoenabled',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'mozbuildinfowrapper',
-               default=None)
-    configitem('hgmo', 'mozippath',
-               default=None)
-    configitem('hgmo', 'awsippath',
-               default=None)
-    configitem('hgmo', 'pullclonebundlesmanifest',
-               default=configitems.dynamicdefault)
-    configitem('hgmo', 'replacebookmarks',
-               default=configitems.dynamicdefault)
+configitem('mozilla', 'treeherder_repo',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'automationrelevantdraftancestors',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'backoutsearchlimit',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'convertsource',
+           default=None)
+configitem('hgmo', 'headdivergencemaxnodes',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'mozbuildinfoenabled',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'mozbuildinfowrapper',
+           default=None)
+configitem('hgmo', 'mozippath',
+           default=None)
+configitem('hgmo', 'awsippath',
+           default=None)
+configitem('hgmo', 'pullclonebundlesmanifest',
+           default=configitems.dynamicdefault)
+configitem('hgmo', 'replacebookmarks',
+           default=configitems.dynamicdefault)
 
 
 @templatefilters.templatefilter('mozlink')
