@@ -7,34 +7,23 @@ import os
 import pwd
 
 from mercurial import (
+    configitems,
     error,
     obsolete,
     registrar,
-    util,
 )
-
-OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
-
-from mozhg.util import import_module
-
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
 
 testedwith = '4.4'
 minimumhgversion = '4.4'
 
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitems'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('obshacks', 'obsolescenceexchangeusers',
-               default=configitems.dynamicdefault)
-    configitem('obshacks', 'userfromenv',
-               default=configitems.dynamicdefault)
+configitem('obshacks', 'obsolescenceexchangeusers',
+           default=configitems.dynamicdefault)
+configitem('obshacks', 'userfromenv',
+           default=configitems.dynamicdefault)
 
 
 def enableevolutionexchange(repo):
