@@ -14,7 +14,7 @@ import time
 
 from mercurial.node import bin, hex
 from mercurial import (
-    cmdutil,
+    configitems,
     encoding,
     error,
     exchange,
@@ -34,9 +34,6 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozhg.util import import_module
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
-
 # TRACKING hg46
 wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
@@ -50,30 +47,21 @@ testedwith = '4.3 4.4 4.5'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
+command = registrar.command(cmdtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    configitem('pushlog', 'autolanduser',
-               default=configitems.dynamicdefault)
-    configitem('pushlog', 'remoteuserprefix',
-               default=None)
-    configitem('pushlog', 'timeoutro',
-               default=configitems.dynamicdefault)
-    configitem('pushlog', 'timeoutrw',
-               default=configitems.dynamicdefault)
-    configitem('pushlog', 'userprefix',
-               default=None)
+configitem('pushlog', 'autolanduser',
+           default=configitems.dynamicdefault)
+configitem('pushlog', 'remoteuserprefix',
+           default=None)
+configitem('pushlog', 'timeoutro',
+           default=configitems.dynamicdefault)
+configitem('pushlog', 'timeoutrw',
+           default=configitems.dynamicdefault)
+configitem('pushlog', 'userprefix',
+           default=None)
 
 
 revsetpredicate = registrar.revsetpredicate()
