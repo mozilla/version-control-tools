@@ -290,7 +290,7 @@ from mercurial.node import (
     short,
 )
 from mercurial import (
-    cmdutil,
+    configitems,
     demandimport,
     encoding,
     error,
@@ -303,7 +303,6 @@ from mercurial import (
     sshpeer,
     templatefilters,
     templatekw,
-    templater,
     util,
 )
 
@@ -315,11 +314,6 @@ except AttributeError:
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
-
-from mozhg.util import import_module
-
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
 
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
@@ -352,35 +346,27 @@ buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Servic
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
 revsetpredicate = registrar.revsetpredicate()
 templatekeyword = registrar.templatekeyword()
 templatefunc = registrar.templatefunc()
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('mozext', 'headless',
-               default=configitems.dynamicdefault)
-    configitem('mozext', 'ircnick',
-               default=None)
-    configitem('mozext', 'critic_merges',
-               default=None)
-    configitem('mozext', 'disable_local_database',
-               default=False)
-    configitem('mozext', 'noautocritic',
-               default=False)
-    configitem('mozext', 'reject_pushes_with_repo_names',
-               default=False)
+configitem('mozext', 'headless',
+           default=configitems.dynamicdefault)
+configitem('mozext', 'ircnick',
+           default=None)
+configitem('mozext', 'critic_merges',
+           default=None)
+configitem('mozext', 'disable_local_database',
+           default=False)
+configitem('mozext', 'noautocritic',
+           default=False)
+configitem('mozext', 'reject_pushes_with_repo_names',
+           default=False)
 
 colortable = {
     'buildstatus.success': 'green',
@@ -1555,16 +1541,8 @@ def reposetup(ui, repo):
                     for bm in todelete:
                         ui.warn('Removing bookmark %s\n' % bm)
 
-                    # TRACKING hg43 __delitem__ + recordchange() are deprecated
-                    # in favor of applychanges(), which was introduced in 4.3.
-
-                    if util.safehasattr(self._bookmarks, 'applychanges'):
-                        changes = [(bm, None) for bm in todelete]
-                        self._bookmarks.applychanges(self, tr, changes)
-                    else:
-                        for bm in todelete:
-                            del self._bookmarks[bm]
-                        self._bookmarks.recordchange(tr)
+                    changes = [(bm, None) for bm in todelete]
+                    self._bookmarks.applychanges(self, tr, changes)
 
                 todelete = [ref for ref in self.remoterefs.keys()
                             if ref.endswith('RELBRANCH')]
