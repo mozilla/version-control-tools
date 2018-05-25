@@ -28,14 +28,12 @@ testedwith = '4.3 4.4 4.5 4.6'
 minimumhgversion = '4.3'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
 
-    configitem('readonly', 'globalreasonfile',
-               default=None)
+configtable = {}
+configitem = registrar.configitem(configtable)
+
+configitem('readonly', 'globalreasonfile',
+           default=None)
 
 
 def prechangegrouphook(ui, repo, **kwargs):
