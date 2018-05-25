@@ -95,6 +95,7 @@ from mercurial.node import short
 from mercurial import (
     commands,
     cmdutil,
+    configitems,
     error,
     extensions,
     mdiff,
@@ -113,32 +114,25 @@ OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.commitparser import BUG_RE
-from mozhg.util import import_module
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+# TRACKING hg44 generic argument added in 4.4.
+try:
+    configitem('reviewers', '.*',
+               generic=True)
+except TypeError:
+    pass
 
-    # TRACKING hg44 generic argument added in 4.4.
-    try:
-        configitem('reviewers', '.*',
-                   generic=True)
-    except TypeError:
-        pass
-
-    configitem('bugzilla', 'jsonrpc-url',
-               default=None)
-    configitem('bugzilla', 'url',
-               default=None)
-    configitem('mqext', 'qcommit',
-               default=configitems.dynamicdefault)
-    configitem('mqext', 'allowexchangewithapplied',
-               default=False)
+configitem('bugzilla', 'jsonrpc-url',
+           default=None)
+configitem('bugzilla', 'url',
+           default=None)
+configitem('mqext', 'qcommit',
+           default=configitems.dynamicdefault)
+configitem('mqext', 'allowexchangewithapplied',
+           default=False)
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=General'
 
