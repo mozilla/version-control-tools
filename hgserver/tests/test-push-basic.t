@@ -86,7 +86,6 @@ Blackbox logging recorded appropriate entries
 It got replicated to mirrors
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-rev/77538e1ce4be
   200
   
@@ -106,6 +105,7 @@ It got replicated to mirrors
   "pushuser": "user1@example.com"
   }
 
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ http --no-headers ${HGWEB_1_URL}mozilla-central/json-rev/77538e1ce4be
   200
   
