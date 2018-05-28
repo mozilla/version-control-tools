@@ -1,8 +1,18 @@
 #require hgmodocker vcsreplicator
+#testcases legacy bundle2
 
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
   $ standarduser
+
+#if legacy
+Disable binary bookmarks bundle2 part and use the legacy exchange
+to test old client behavior.
+  $ cat >> $HGRCPATH << EOF
+  > [devel]
+  > legacy.exchange = bookmarks
+  > EOF
+#endif
 
 Create the repository and push a change
 

@@ -129,6 +129,8 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     # that.
     if isinstance(ret, bool):
         ret = 0 if ret else 1
+    elif ret is None:
+        ret = 0
 
     if namespace == 'obsolescence':
         return
