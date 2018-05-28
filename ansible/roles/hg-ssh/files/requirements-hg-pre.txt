@@ -1,4 +1,4 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
-Mercurial==4.4.2 \
-    --hash=sha256:dc2f72caccd6b760226753d48c2f4e8889fe176a6b23ef50775caac55ce28b85
+Mercurial==4.5.3 \
+    --hash=sha256:9c4cb257ef1e59e9aba693cc285a6136f7bb4e8300f598ff50ff8b6fc77808fc
