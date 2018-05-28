@@ -13,7 +13,7 @@ from mercurial import (
     registrar,
 )
 
-testedwith = '4.4'
+testedwith = '4.4 4.5 4.6'
 minimumhgversion = '4.4'
 
 
