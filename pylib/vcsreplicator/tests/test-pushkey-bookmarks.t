@@ -87,7 +87,7 @@ Creating a bookmark will write a pushkey message
     new: 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     old: ''
     path: '{moz}/mozilla-central'
-    ret: 1
+    ret: 0
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
   no bookmarks set
@@ -280,7 +280,7 @@ Now test bookmark divergence
     new: e20ecd72ffa991598a1b26333788345377318231
     old: ''
     path: '{moz}/mozilla-central'
-    ret: 1
+    ret: 0
 
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 16

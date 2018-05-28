@@ -102,7 +102,7 @@ Locally bumping changeset to public will trigger a pushkey
     new: '0'
     old: '1'
     path: '{moz}/mozilla-central'
-    ret: 1
+    ret: 0
 
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
   0 draft

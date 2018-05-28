@@ -128,7 +128,7 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
     # written to the replication log. And int is more expressive. So we use
     # that.
     if isinstance(ret, bool):
-        ret = 1 if ret else 0
+        ret = 0 if ret else 1
 
     if namespace == 'obsolescence':
         return
