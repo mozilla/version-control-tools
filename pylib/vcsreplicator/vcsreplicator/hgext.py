@@ -403,7 +403,7 @@ def wireprotodispatch(orig, repo, proto, command):
     origclass = urepo.__class__
 
     class unfilteroncerepo(origclass):
-        def filtered(self, name):
+        def filtered(self, name, *args, **kwargs):
             if name != 'served':
                 raise error.Abort('wtf: %s' % name)
 
