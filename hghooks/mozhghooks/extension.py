@@ -6,41 +6,30 @@
 from __future__ import absolute_import
 
 from mercurial import (
+    configitems,
     registrar,
     util,
 )
 from mozhg.util import (
     identify_repo,
-    import_module,
     timers,
 )
-
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
 
 testedwith = '4.4 4.5 4.6'
 minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    # TRACKING hg44 generic argument not added until 4.4.
-    try:
-        configitem('allowedroots', '.*',
-                   generic=True)
-        configitem('mozilla', 'check.*',
-                   generic=True)
-    except TypeError as e:
-        pass
-
-    configitem('mozilla', 'repo_root',
-               default=configitems.dynamicdefault)
-    configitem('mozilla', 'treeherder_repo',
-               default=None)
+configitem('allowedroots', '.*',
+           generic=True)
+configitem('mozilla', 'check.*',
+           generic=True)
+configitem('mozilla', 'repo_root',
+           default=configitems.dynamicdefault)
+configitem('mozilla', 'treeherder_repo',
+           default=None)
 
 
 def get_check_classes(hook):
