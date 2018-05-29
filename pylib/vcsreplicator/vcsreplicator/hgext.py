@@ -247,7 +247,7 @@ def sendpushkeymessage(ui, repo, namespace, key, old, new, ret):
             namespace, duration))
 
 
-def sendreposyncmessage(ui, repo):
+def sendreposyncmessage(ui, repo, bootstrap=False):
     """Send a message to perform a full repository sync."""
     if repo.vfs.exists('hgrc'):
         hgrc = repo.vfs.read('hgrc')
@@ -261,7 +261,8 @@ def sendreposyncmessage(ui, repo):
         producer = ui.replicationproducer
         vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
                                          hgrc, heads, repo.requirements,
-                                         partition=repo.replicationpartition)
+                                         partition=repo.replicationpartition,
+                                         bootstrap=bootstrap)
         repo.producerlog('SYNC_SENT')
 
 
@@ -347,15 +348,15 @@ def sendheartbeat(ui):
             len(partitions))
 
 
-@command('replicatesync', [], 'replicate this repository to mirrors')
-def replicatecommand(ui, repo):
+@command('replicatesync', [('b', 'bootstrap', False, 'Use bootstrap mode')], 'replicate this repository to mirrors')
+def replicatecommand(ui, repo, **opts):
     """Tell mirrors to synchronize their copy of this repo.
 
     This is intended as a support command to be used to force replication.
     If the replication system is working as intended, it should not need to be
     used.
     """
-    sendreposyncmessage(ui, repo)
+    sendreposyncmessage(ui, repo, bootstrap=opts.get('bootstrap'))
     ui.status(_('wrote synchronization message into replication log\n'))
 
 

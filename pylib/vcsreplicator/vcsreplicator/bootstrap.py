@@ -83,13 +83,14 @@ def hgssh():
             replicatesync_args = [
                 args.hg,
                 '-R', repo,
-                'replicatesync'
+                'replicatesync',
+                '--bootstrap',
             ]
             replicatesync_futures.update({
                 e.submit(subprocess.check_output, replicatesync_args): repo
             })
 
-            logger.info('calling `replicatesync` on %s' % repo)
+            logger.info('calling `replicatesync --bootstrap` on %s' % repo)
 
         # Execute the futures and raise an Exception on fail
         for future in futures.as_completed(replicatesync_futures):
@@ -97,10 +98,10 @@ def hgssh():
 
             exc = future.exception()
             if exc:
-                logger.error('error occurred calling `replicatesync` on %s: %s' % (repo, exc))
+                logger.error('error occurred calling `replicatesync --bootstrap` on %s: %s' % (repo, exc))
                 raise Exception('error triggering replication of Mercurial repo %s: %s' %
                                 (repo, exc))
-            logger.info('called `replicatesync` on %s successfully' % repo)
+            logger.info('called `replicatesync --bootstrap` on %s successfully' % repo)
 
     # Gather the final offsets
     offsets_end = consumer.end_offsets(topicpartitions)
@@ -260,9 +261,10 @@ def hgweb():
 
                 if payload['path'] in repositories_to_clone:
                     # If we have not yet replicated the repository for this message,
-                    # move on to the next message. The assumed upcoming hg-repo-sync-1
+                    # of the repo sync message is not tagged with the bootstrap flag,
+                    # move on to the next message. The assumed upcoming hg-repo-sync-2
                     # message will clone the data represented in this message anyways.
-                    if payload['name'] != 'hg-repo-sync-1':
+                    if payload['name'] != 'hg-repo-sync-2' or not payload['bootstrap']:
                         continue
 
                     # Schedule the repo sync

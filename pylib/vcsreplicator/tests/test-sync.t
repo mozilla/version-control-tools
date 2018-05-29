@@ -19,6 +19,7 @@
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
+    bootstrap: false
     heads:
     - '0000000000000000000000000000000000000000'
     hgrc: '[hooks]
@@ -27,7 +28,7 @@
   
   
       '
-    name: hg-repo-sync-1
+    name: hg-repo-sync-2
     path: '{moz}/mozilla-central'
     requirements:
     - dotencode
@@ -44,7 +45,7 @@
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-repo-sync-1 from partition 2 offset 1
+  vcsreplicator.consumer processing hg-repo-sync-2 from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 0000000000000000000000000000000000000000 ssh://hgssh/mozilla-central
@@ -59,6 +60,16 @@
   [hooks]
   foo = bar
   
+Running `replicatesync --bootstrap` will produce an hg-repo-sync-2 message that no-ops.
+We should not see any pulls, even after waiting for no lag
+
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync --bootstrap
+  wrote synchronization message into replication log
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+  $ hgmo exec hgweb0 tail -n 2 /var/log/vcsreplicator/consumer.log
+  vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer processing hg-repo-sync-2 from partition 2 offset 2
 
 Cleanup
 

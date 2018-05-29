@@ -167,6 +167,17 @@ def process_message(config, payload):
                                payload['requirements'],
                                payload['hgrc'],
                                payload['heads'])
+    elif name == 'hg-repo-sync-2':
+        # If the bootstrap field is set, this message should not
+        # be consumed by the caller of this function (ie the
+        # vcsreplicator consumer processes)
+        if payload['bootstrap']:
+            return
+
+        return process_hg_sync(config, payload['path'],
+                               payload['requirements'],
+                               payload['hgrc'],
+                               payload['heads'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
