@@ -24,6 +24,7 @@ setup(
             'vcsreplicator-pulse-notifier=vcsreplicator.pulsenotifier:cli',
             'vcsreplicator-sns-notifier=vcsreplicator.snsnotifier:cli',
             'vcsreplicator-bootstrap-hgssh=vcsreplicator.bootstrap:hgssh',
+            'vcsreplicator-bootstrap-hgweb=vcsreplicator.bootstrap:hgweb',
         ],
     },
     install_requires=['kafka-python', 'Mercurial'],

@@ -2,25 +2,41 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import collections
 import json
 import logging
 import multiprocessing
 import subprocess
+import sys
+import time
 
 import concurrent.futures as futures
+
+import hglib
 
 from hgmolib import find_hg_repos
 from kafka import (
     KafkaConsumer,
+    OffsetAndMetadata,
     TopicPartition,
 )
 
 from .config import Config
+from .consumer import (
+    value_deserializer,
+    process_hg_sync,
+    process_message,
+)
 
 
 REPOS_DIR = '/repo/hg/mozilla'
 
 logger = logging.getLogger('vcsreplicator.bootstrap')
+
+# Quiet down the vcsreplicator.consumer logger when these scripts are running
+consumer_logger = logging.getLogger('vcsreplicator.consumer')
+null_handler = logging.FileHandler('/dev/null')
+consumer_logger.addHandler(null_handler)
 
 
 def hgssh():
@@ -40,6 +56,8 @@ def hgssh():
 
     # Create consumer to gather partition offsets
     consumer_config = {
+        # set this so offsets are committed to Zookeeper
+        'api_version': (0, 8, 1),
         'bootstrap_servers': config.c.get('replicationproducer', 'hosts'),
         'enable_auto_commit': False,  # We don't actually commit but this is just for good measure
     }
@@ -106,3 +124,207 @@ def hgssh():
 
     print(json.dumps(output))
     logger.info('hgssh bootstrap process complete')
+
+
+def hgweb():
+    '''hgweb component of the vcsreplicator bootstrap procedure. Takes a
+    vcsreplicator config path on the CLI and takes a JSON data structure
+    on stdin'''
+    import argparse
+
+    # Configure logging
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(name)s %(message)s')
+    formatter.converter = time.gmtime
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    # Parse CLI args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', help='Path of config file to load')
+    parser.add_argument('hg', help='Path to hg executable for use in bootstrap process')
+    parser.add_argument('input', help='JSON data input (output from the hgssh bootstrap procedure) file path')
+    parser.add_argument('workers', help='Number of concurrent workers to use for performing clones', type=int,
+                        default=multiprocessing.cpu_count())
+    args = parser.parse_args()
+
+    with open(args.input, 'r') as f:
+        hgssh_data = json.loads(f.read())
+
+    # Convert the JSON keys to integers
+    hgssh_data['offsets'] = {
+        int(k): v
+        for k, v in hgssh_data['offsets'].items()
+    }
+
+    config = Config(filename=args.config)
+
+    consumer_config = {
+        # set this so offsets are committed to Zookeeper
+        'api_version': (0, 8, 1),
+        'bootstrap_servers': config.c.get('consumer', 'hosts'),
+        'client_id': config.c.get('consumer', 'client_id'),
+        'enable_auto_commit': False,
+        'group_id': config.c.get('consumer', 'group'),
+        'value_deserializer': value_deserializer,
+    }
+
+    topic = config.c.get('consumer', 'topic')
+
+    topicpartitions = [
+        TopicPartition(topic, partition)
+        for partition in hgssh_data['offsets']
+    ]
+
+    consumer = KafkaConsumer(**consumer_config)
+    consumer.assign(topicpartitions)
+    logger.info('Kafka consumer assigned to replication topic')
+
+    # Seek all partitions to their start offsets and commit
+    for i, (start, end) in hgssh_data['offsets'].items():
+        consumer.seek(TopicPartition(topic, i), start)
+        logger.info('partition %s of topic %s moved to offset %s' % (i, topic, start))
+    consumer.commit()
+
+    # We will remove repos from this set as we replicate them
+    # Once this is an empty set we are done
+    repositories_to_clone = set(hgssh_data['repositories'])
+
+    extra_messages = collections.defaultdict(collections.deque)  # maps repo names to extra processing messages
+    clone_futures_repo_mapping = {}  # maps cloning futures to repo names
+    extra_messages_futures_repo_mapping = {}  # maps extra messages futures to repo names
+
+    # Overwrite default hglib path so process_message and it's derivatives
+    # use the correct virtualenv
+    hglib.HGPATH = args.hg
+
+    # Maps partitions to the list of messages within the bootstrap range
+    aggregate_messages_by_topicpartition = {
+        tp.partition: []
+        for tp in topicpartitions
+    }
+
+    # Maps a partition to a boolean indicating if there are more messages to process
+    # for this partition. When all the values in this mapping are True, the message
+    # collection step is complete
+    completed_aggregates = {
+        partition: False
+        for partition, (start, end) in hgssh_data['offsets'].items()
+        # We don't need to wait for completion if a partition's
+        # start/end offset are the same
+        if start != end
+    }
+
+    # Get all the messages we need to process from kafka
+    for message in consumer:
+        end_offset_for_partition = hgssh_data['offsets'][message.partition][1] - 1
+
+        # Check if the message we are processing is within the range of accepted messages
+        # If we are in the range, add this message to the list of messages on this partition
+        # If not, mark this partition as complete
+        # If the offsets are equal, do both steps
+        if message.offset <= end_offset_for_partition:
+            aggregate_messages_by_topicpartition[message.partition].append(message)
+
+        if message.offset >= end_offset_for_partition:
+            completed_aggregates[message.partition] = True
+            logger.info('finished retrieving messages on partition %s' % message.partition)
+
+            # Commit and exit the Kafka consume loop if we have gathered all required messages
+            if all(completed for completed in completed_aggregates.values()):
+                consumer.commit(offsets={
+                    TopicPartition(topic, message.partition): OffsetAndMetadata(message.offset + 1, ''),
+                })
+                break
+
+            # Don't commit this offset if it is outside the bootstrap range
+            continue
+
+        consumer.commit(offsets={
+            TopicPartition(topic, message.partition): OffsetAndMetadata(message.offset + 1, ''),
+        })
+
+    logger.info('finished retrieving messages from Kafka')
+
+    # Process the previously collected messages
+    with futures.ThreadPoolExecutor(args.workers) as e:
+        for messages in aggregate_messages_by_topicpartition.values():
+            for message in messages:
+                payload = message.value
+
+                # Ignore heartbeat messages
+                if payload['name'] == 'heartbeat-1':
+                    continue
+
+                if payload['path'] in repositories_to_clone:
+                    # If we have not yet replicated the repository for this message,
+                    # move on to the next message. The assumed upcoming hg-repo-sync-1
+                    # message will clone the data represented in this message anyways.
+                    if payload['name'] != 'hg-repo-sync-1':
+                        continue
+
+                    # Schedule the repo sync
+                    clone_future = e.submit(process_hg_sync, config, payload['path'],
+                                            payload['requirements'], payload['hgrc'],
+                                            payload['heads'], create=True)
+
+                    # Here we register the future against its repo name
+                    clone_futures_repo_mapping[clone_future] = payload['path']
+
+                    # Remove the repo from the set of repos
+                    # which have not been scheduled to sync
+                    repositories_to_clone.remove(payload['path'])
+
+                    logger.info('scheduled clone for %s' % payload['path'])
+                else:
+                    # If the repo is not in the list of repositories to clone,
+                    # then we have already scheduled the repo sync and we will
+                    # need to process this message once the sync completes.
+                    extra_messages[payload['path']].append((config, payload))
+                    logger.info('extra messages found for %s: %s total' %
+                                (payload['path'], len(extra_messages[payload['path']]))
+                    )
+
+        if repositories_to_clone:
+            raise Exception('did not receive expected sync messages for %s' % repositories_to_clone)
+
+        # Process clones
+        remaining_clones = len(clone_futures_repo_mapping)
+        for completed_future in futures.as_completed(clone_futures_repo_mapping):
+            repo = clone_futures_repo_mapping[completed_future]
+
+            exc = completed_future.exception()
+            if exc:
+                raise Exception('error triggering replication of Mercurial repo %s: %s' %
+                                (repo, exc))
+
+            remaining_clones -= 1
+
+            logger.info('%s successfully cloned' % repo)
+            logger.info('%s repositories remaining' % remaining_clones)
+
+            # Schedule extra message processing if necessary
+            if repo in extra_messages:
+                logger.info('scheduling extra processing for %s' % repo)
+                configs, payloads = zip(*extra_messages[repo])
+                future = e.submit(map, process_message, configs, payloads)
+                extra_messages_futures_repo_mapping[future] = repo
+
+        # Process extra messages
+        total_message_batches = len(extra_messages_futures_repo_mapping)
+        for completed_future in futures.as_completed(extra_messages_futures_repo_mapping):
+            repo = extra_messages_futures_repo_mapping[completed_future]
+
+            exc = completed_future.exception()
+            if exc:
+                raise Exception('error triggering replication of Mercurial repo %s: %s' %
+                                (repo, exc))
+
+            total_message_batches -= 1
+
+            logger.info('extra processing for %s completed successfully' % repo)
+            logger.info('%s batches remaining' % total_message_batches)
+
+    logger.info('%s bootstrap process complete' % config.c.get('consumer', 'group'))

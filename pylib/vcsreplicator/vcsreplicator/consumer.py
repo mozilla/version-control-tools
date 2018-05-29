@@ -260,7 +260,6 @@ def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
 
         init_repo(local_path)
 
-
     # TODO set or warn about different requirements.
 
     update_hgrc(local_path, hgrc)
