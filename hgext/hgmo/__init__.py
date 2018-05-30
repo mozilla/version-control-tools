@@ -126,7 +126,7 @@ except ImportError:
     from mercurial.hgweb.protocol import webproto
 
 minimumhgversion = '4.3'
-testedwith = '4.3 4.4'
+testedwith = '4.3 4.4 4.5'
 
 cmdtable = {}
 
