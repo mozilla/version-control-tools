@@ -15,9 +15,9 @@
   when: ansible_distribution_major_version == '6'
 
 - name: download Mercurial package (CentOS 7)
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.4.2-1.x86_64.rpm
-           dest=/var/tmp/mercurial-4.4.2-1.x86_64.rpm
-           sha256sum=8c75f05f83530af2e1f5930d2954dad65914a1ef09f41e22e001f64c26e8c230
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/mercurial-4.5.3-1.x86_64.rpm
+           dest=/var/tmp/mercurial-4.5.3-1.x86_64.rpm
+           sha256sum=204fb73bcbd14baf2f33b7ed7848f9b7554597baca5703817ad6514f1fd79f3e
   when: ansible_distribution_major_version == '7'
 
 - name: Install patch package
@@ -29,5 +29,5 @@
   when: ansible_distribution_major_version == '6'
 
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.4.2-1.x86_64.rpm
+  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.5.3-1.x86_64.rpm
   when: ansible_distribution_major_version == '7'
