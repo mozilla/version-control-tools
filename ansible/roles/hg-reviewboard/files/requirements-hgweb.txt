@@ -5,8 +5,8 @@
 --find-links https://downloads.reviewboard.org/releases/RBTools/0.7/
 --find-links /var/tmp/pip
 
-Mercurial==4.5.3 \
-    --hash=sha256:9c4cb257ef1e59e9aba693cc285a6136f7bb4e8300f598ff50ff8b6fc77808fc
+Mercurial==4.5.3+9-1ed250f701ee \
+    --hash=sha256:da278225482e2d74a1a2fd3e7ed49e620b6c653b6bab0d0137b2952248290839
 
 mod-wsgi==4.5.14 \
     --hash=sha256:8e6d0ccdea6872b71da2ba0fe5d46ca38a6219becc521dcdc4516992c9fe3247
