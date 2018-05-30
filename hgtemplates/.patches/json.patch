@@ -1,0 +1,66 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1527627637 25200
+#      Tue May 29 14:00:37 2018 -0700
+# Node ID cc2f229e36a0bcaccf157fc8ef530bbb23c1af33
+# Parent  64673c8301326b7df55051781725e971ab94675a
+hgtemplates: json style modifications
+
+diff --git a/hgtemplates/json/map b/hgtemplates/json/map
+--- a/hgtemplates/json/map
++++ b/hgtemplates/json/map
+@@ -1,4 +1,36 @@
+ mimetype = 'application/json'
++
++error = '{error|json}'
++info = '\{
++  {join(csets%infocset, ",\n")}
++  }'
++infocset = '"{node|short}": \{
++  "branch": {branch|json},
++  "children": {children|json},
++  "date": {date(date, "%Y-%m-%d %H:%M %1%2")|json},
++  "description": {description|json},
++  "files": {files|json},
++  "node": {node|json},
++  "parents": {parents|json},
++  "rev": {rev|json},
++  "tags": {tags|json},
++  "user": {user|json}
++  }'
++pushes1 = '{pushes|json}'
++pushes2 = '\{
++  "lastpushid": {lastpushid|json},
++  "pushes": {pushes|json}
++  }'
++headdivergence = '\{
++  "commitsbehind": {commitsbehind|json},
++  "filemerges": {filemerges|json},
++  "filemergesignored": {filemergesignored|json}
++  }'
++isancestor = '\{
++  "headnode": {headnode|json},
++  "testnode": {testnode|json},
++  "isancestor": {isancestor|json}
++  }'
+ filerevision = '\{
+   "node": {node|json},
+   "path": {file|json},
+@@ -44,12 +76,16 @@ changeset = '\{
+   "node": {node|json},
+   "date": {date|json},
+   "desc": {desc|utf8|json},
++  "backedoutby": {if(backedoutbynode, backedoutbynode|json, ""|json)},
+   "branch": {if(branch, branch%changesetbranch, "default"|json)},
+   "bookmarks": [{join(changesetbookmark, ", ")}],
+   "tags": [{join(changesettag, ", ")}],
+   "user": {author|utf8|json},
+   "parents": [{join(parent%changesetparent, ", ")}],
+-  "phase": {phase|json}
++  "phase": {phase|json},
++  "pushid": {pushid|json},
++  "pushdate": {pushdate|json},
++  "pushuser": {pushuser|json}
+   }'
+ changesetbranch = '{name|utf8|json}'
+ changesetbookmark = '{bookmark|utf8|json}'

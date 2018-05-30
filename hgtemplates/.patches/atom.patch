@@ -1,0 +1,21 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1527627571 25200
+#      Tue May 29 13:59:31 2018 -0700
+# Node ID 38b966c5860e64c7b94fbfe013f7840e85174e59
+# Parent  73247f273a81da00a5f6a46bc6abbd62f60d3205
+hgtemplates: add pushlog to atom style
+
+diff --git a/hgtemplates/atom/map b/hgtemplates/atom/map
+--- a/hgtemplates/atom/map
++++ b/hgtemplates/atom/map
+@@ -5,6 +5,9 @@ header = header.tmpl
+ changelog = changelog.tmpl
+ changelogentry = changelogentry.tmpl
+ filelog = filelog.tmpl
++pushlog = pushlog.tmpl
++pushlogentry = pushlogentry.tmpl
++pushlogfile = '<li class="file">{name}</li>'
+ tags = tags.tmpl
+ tagentry = tagentry.tmpl
+ bookmarks = bookmarks.tmpl

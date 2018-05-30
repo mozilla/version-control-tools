@@ -1,0 +1,28 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1527627598 25200
+#      Tue May 29 13:59:58 2018 -0700
+# Node ID 82b0f3ebaf5c37e97a2dbb211625735cffc59d1e
+# Parent  38b966c5860e64c7b94fbfe013f7840e85174e59
+hgtemplates: add logo to gitweb style
+
+diff --git a/hgtemplates/static/style-gitweb.css b/hgtemplates/static/style-gitweb.css
+--- a/hgtemplates/static/style-gitweb.css
++++ b/hgtemplates/static/style-gitweb.css
+@@ -78,6 +78,16 @@ div#hint {
+   border-radius: 5px;
+ }
+ 
++.logo {
++    position: relative;
++    float: right;
++    display: block;
++    direction: ltr;
++    overflow: hidden;
++    width: 78px;
++    height: 25px;
++}
++
+ #searchform:hover div#hint { display: block; }
+ 
+ tr.thisrev a { color:#999999; text-decoration: none; }
