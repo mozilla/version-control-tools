@@ -30,7 +30,10 @@ changeset |
 </div>
 
 <div>
-<a class="title" href="{url|urlescape}raw-rev/{node|short}">{desc|strip|escape|firstline|nonempty} <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span></a>
+ <a class="title" href="{url|urlescape}raw-rev/{node|short}">
+  {desc|strip|escape|firstline|nonempty}
+  {alltags}
+ </a>
 </div>
 <div class="title_text">
 <table cellspacing="0">
@@ -41,6 +44,7 @@ changeset |
  <td>changeset {rev}</td>
  <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
 </tr>
+{if(obsolete, '<tr><td>obsolete</td><td>{succsandmarkers%obsfateentry}</td></tr>')}
 {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
 {child%changesetchild}
 </table></div>

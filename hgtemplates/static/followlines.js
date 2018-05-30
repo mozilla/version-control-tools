@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // URL to complement with "linerange" query parameter
     var targetUri = sourcelines.dataset.logurl;
-    if (typeof targetUri === 'undefined') {
+    if (typeof targetUri === 'undefined') {
         return;
     }
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // element
     var selectableElements = Array.prototype.filter.call(
         sourcelines.children,
-        function(x) { return x.tagName === selectableTag });
+        function(x) { return x.tagName === selectableTag; });
 
     var btnTitleStart = 'start following lines history from here';
     var btnTitleEnd = 'terminate line block selection here';
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // extend DOM with CSS class for selection highlight and action buttons
-    var followlinesButtons = []
+    var followlinesButtons = [];
     for (var i = 0; i < selectableElements.length; i++) {
         selectableElements[i].classList.add('followlines-select');
         var btn = createButton();
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (parent === null) {
             return null;
         }
-        if (element.tagName == selectableTag && parent.isSameNode(sourcelines)) {
+        if (element.tagName === selectableTag && parent.isSameNode(sourcelines)) {
             return element;
         }
         return selectableParent(parent);
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // compute line range (startId, endId)
             var endId = parseInt(endElement.id.slice(1));
-            if (endId == startId) {
+            if (endId === startId) {
                 // clicked twice the same line, cancel and reset initial state
                 // (CSS, event listener for selection start)
                 removeSelectedCSSClass();

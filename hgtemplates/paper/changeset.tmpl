@@ -33,7 +33,7 @@
 <h2 class="breadcrumb"><a href="/">Mercurial</a> {pathdef%breadcrumb}</h2>
 <h3>
  changeset {rev}:<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>
- {changesetbranch%changelogbranchname}{changesettag}{changesetbookmark}
+ {alltags}
 </h3>
 
 {searchform}
@@ -49,6 +49,10 @@
  <th class="date">date</th>
  <td class="date age">{date|rfc822date}</td>
 </tr>
+{if(obsolete, '<tr>
+ <th>obsolete</th>
+ <td>{succsandmarkers%obsfateentry}</td>
+</tr>')}
 <tr>
  <th class="author">parents</th>
  <td class="author">{ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}</td>

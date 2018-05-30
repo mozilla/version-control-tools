@@ -137,6 +137,33 @@ a { text-decoration:none; }
   margin: 1em 0;
 }
 
+.phase {
+  color: #999;
+  font-size: 70%;
+  border-bottom: 1px dotted #999;
+  font-weight: normal;
+  margin-left: .5em;
+  vertical-align: baseline;
+}
+
+.obsolete {
+  color: #999;
+  font-size: 70%;
+  border-bottom: 1px dashed #999;
+  font-weight: normal;
+  margin-left: .5em;
+  vertical-align: baseline;
+}
+
+.instability {
+  color: #000;
+  font-size: 70%;
+  border-bottom: 1px solid #000;
+  font-weight: normal;
+  margin-left: .5em;
+  vertical-align: baseline;
+}
+
 .tag {
   color: #999;
   font-size: 70%;
@@ -165,10 +192,6 @@ ul#graphnodes .branchhead {
   vertical-align: baseline;
 }
 
-h3 .branchname {
-  font-size: 80%;
-}
-
 /* Common */
 pre { margin: 0; }
 
@@ -190,6 +213,7 @@ h3 {
 }
 
 .bigtable td {
+  padding: 1px 4px;
   vertical-align: top;
 }
 
@@ -295,10 +319,9 @@ pre.sourcelines > span.followlines-selected {
 }
 
 div#followlines {
-  background-color: #B7B7B7;
-  border: 1px solid #CCC;
-  border-radius: 5px;
-  padding: 4px;
+  background-color: #FFF;
+  border: 1px solid #999;
+  padding: 5px;
   position: fixed;
 }
 
@@ -409,7 +432,6 @@ span.followlines-select .btn-followlines {
   text-align: right;
   font-weight: normal;
   color: #999;
-  margin-right: .5em;
   vertical-align: top;
 }
 
@@ -438,29 +460,23 @@ canvas {
 }
 
 ul#graphnodes {
-	position: absolute;
-	z-index: 10;
-	top: -1.0em;
-	list-style: none inside none;
-	padding: 0;
-}
-
-ul#nodebgs {
 	list-style: none inside none;
 	padding: 0;
 	margin: 0;
-	top: -0.7em;
 }
 
-ul#graphnodes li, ul#nodebgs li {
+ul#graphnodes li {
 	height: 39px;
+	overflow: visible;
+}
+
+ul#graphnodes li .fg {
+	position: absolute;
+	z-index: 10;
 }
 
 ul#graphnodes li .info {
-	display: block;
 	font-size: 70%;
-	position: relative;
-	top: -3px;
 }
 
 /* Comparison */

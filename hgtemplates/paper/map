@@ -9,6 +9,7 @@ changelog = shortlog.tmpl
 shortlog = shortlog.tmpl
 shortlogentry = shortlogentry.tmpl
 graph = graph.tmpl
+graphentry = graphentry.tmpl
 help = help.tmpl
 helptopics = helptopics.tmpl
 
@@ -198,11 +199,21 @@ branchentry = '
       </a>
     </td>
   </tr>'
+phasetag = '{ifeq(phase, 'public', '', '<span class="phase">{phase|escape}</span> ')}'
+obsoletetag = '{if(obsolete, '<span class="obsolete">obsolete</span> ')}'
+instabilitytag = '<span class="instability">{instability|escape}</span> '
 changelogtag = '<span class="tag">{name|escape}</span> '
 changesettag = '<span class="tag">{tag|escape}</span> '
 changesetbookmark = '<span class="tag">{bookmark|escape}</span> '
 changelogbranchhead = '<span class="branchhead">{name|escape}</span> '
 changelogbranchname = '<span class="branchname">{name|escape}</span> '
+alltags = '{phasetag}{obsoletetag}{instabilities%instabilitytag}{inbranch%changelogbranchname}{branches%changelogbranchhead}{tags%changelogtag}{bookmarks%changelogtag}'
+
+successorlink = '<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a> '
+obsfatesuccessors = '{if(successors, ' as ')}{successors%successorlink}'
+obsfateverb = '{obsfateverb(successors, markers)}'
+obsfateoperations = '{if(obsfateoperations(markers), ' using {join(obsfateoperations(markers), ', ')}')}'
+obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}'
 
 filediffparent = '
   <tr>

@@ -25,32 +25,29 @@ var colors = [
 function Graph() {
 
 	this.canvas = document.getElementById('graph');
-	if (window.G_vmlCanvasManager) this.canvas = window.G_vmlCanvasManager.initElement(this.canvas);
 	this.ctx = this.canvas.getContext('2d');
 	this.ctx.strokeStyle = 'rgb(0, 0, 0)';
 	this.ctx.fillStyle = 'rgb(0, 0, 0)';
-	this.cur = [0, 0];
-	this.line_width = 3;
 	this.bg = [0, 4];
 	this.cell = [2, 0];
 	this.columns = 0;
-	this.revlink = '';
 
-	this.reset = function() {
+}
+
+Graph.prototype = {
+	reset: function() {
 		this.bg = [0, 4];
 		this.cell = [2, 0];
 		this.columns = 0;
-		document.getElementById('nodebgs').innerHTML = '';
-		document.getElementById('graphnodes').innerHTML = '';
-	}
+	},
 
-	this.scale = function(height) {
+	scale: function(height) {
 		this.bg_height = height;
 		this.box_size = Math.floor(this.bg_height / 1.2);
 		this.cell_height = this.box_size;
-	}
+	},
 
-	this.setColor = function(color, bg, fg) {
+	setColor: function(color, bg, fg) {
 
 		// Set the colour.
 		//
@@ -62,9 +59,9 @@ function Graph() {
 		// provides the multiplier that should be applied to
 		// the foreground colours.
 		var s;
-		if(typeof color == "string") {
+		if(typeof color === "string") {
 			s = "#" + color;
-		} else { //typeof color == "number"
+		} else { //typeof color === "number"
 			color %= colors.length;
 			var red = (colors[color][0] * fg) || bg;
 			var green = (colors[color][1] * fg) || bg;
@@ -78,9 +75,9 @@ function Graph() {
 		this.ctx.fillStyle = s;
 		return s;
 
-	}
+	},
 
-	this.edge = function(x0, y0, x1, y1, color, width) {
+	edge: function(x0, y0, x1, y1, color, width) {
 
 		this.setColor(color, 0.0, 0.65);
 		if(width >= 0)
@@ -90,28 +87,106 @@ function Graph() {
 		this.ctx.lineTo(x1, y1);
 		this.ctx.stroke();
 
-	}
+	},
 
-	this.render = function(data) {
+	graphNodeCurrent: function(x, y, radius) {
+		this.ctx.lineWidth = 2;
+		this.ctx.beginPath();
+		this.ctx.arc(x, y, radius * 1.75, 0, Math.PI * 2, true);
+		this.ctx.stroke();
+	},
 
-		var backgrounds = '';
-		var nodedata = '';
+	graphNodeClosing: function(x, y, radius) {
+		this.ctx.fillRect(x - radius, y - 1.5, radius * 2, 3);
+	},
 
-		for (var i in data) {
+	graphNodeUnstable: function(x, y, radius) {
+		var x30 = radius * Math.cos(Math.PI / 6);
+		var y30 = radius * Math.sin(Math.PI / 6);
+		this.ctx.lineWidth = 2;
+		this.ctx.beginPath();
+		this.ctx.moveTo(x, y - radius);
+		this.ctx.lineTo(x, y + radius);
+		this.ctx.moveTo(x - x30, y - y30);
+		this.ctx.lineTo(x + x30, y + y30);
+		this.ctx.moveTo(x - x30, y + y30);
+		this.ctx.lineTo(x + x30, y - y30);
+		this.ctx.stroke();
+	},
+
+	graphNodeObsolete: function(x, y, radius) {
+		var p45 = radius * Math.cos(Math.PI / 4);
+		this.ctx.lineWidth = 3;
+		this.ctx.beginPath();
+		this.ctx.moveTo(x - p45, y - p45);
+		this.ctx.lineTo(x + p45, y + p45);
+		this.ctx.moveTo(x - p45, y + p45);
+		this.ctx.lineTo(x + p45, y - p45);
+		this.ctx.stroke();
+	},
+
+	graphNodeNormal: function(x, y, radius) {
+		this.ctx.beginPath();
+		this.ctx.arc(x, y, radius, 0, Math.PI * 2, true);
+		this.ctx.fill();
+	},
+
+	vertex: function(x, y, radius, color, parity, cur) {
+		this.ctx.save();
+		this.setColor(color, 0.25, 0.75);
+		if (cur.graphnode[0] === '@') {
+			this.graphNodeCurrent(x, y, radius);
+		}
+		switch (cur.graphnode.substr(-1)) {
+			case '_':
+				this.graphNodeClosing(x, y, radius);
+				break;
+			case '*':
+				this.graphNodeUnstable(x, y, radius);
+				break;
+			case 'x':
+				this.graphNodeObsolete(x, y, radius);
+				break;
+			default:
+				this.graphNodeNormal(x, y, radius);
+		}
+		this.ctx.restore();
+
+		var left = (this.bg_height - this.box_size) + (this.columns + 1) * this.box_size;
+		var item = document.querySelector('[data-node="' + cur.node + '"]');
+		if (item) {
+			item.style.paddingLeft = left + 'px';
+		}
+	},
+
+	render: function(data) {
+
+		var i, j, cur, line, start, end, color, x, y, x0, y0, x1, y1, column, radius;
+
+		var cols = 0;
+		for (i = 0; i < data.length; i++) {
+			cur = data[i];
+			for (j = 0; j < cur.edges.length; j++) {
+				line = cur.edges[j];
+				cols = Math.max(cols, line[0], line[1]);
+			}
+		}
+		this.canvas.width = (cols + 1) * this.bg_height;
+		this.canvas.height = (data.length + 1) * this.bg_height - 27;
+
+		for (i = 0; i < data.length; i++) {
 
 			var parity = i % 2;
 			this.cell[1] += this.bg_height;
 			this.bg[1] += this.bg_height;
 
-			var cur = data[i];
-			var node = cur[1];
-			var edges = cur[2];
+			cur = data[i];
 			var fold = false;
 
 			var prevWidth = this.ctx.lineWidth;
-			for (var j in edges) {
+			for (j = 0; j < cur.edges.length; j++) {
 
-				line = edges[j];
+				line = cur.edges[j];
 				start = line[0];
 				end = line[1];
 				color = line[2];
@@ -126,8 +201,8 @@ function Graph() {
 					this.columns += 1;
 				}
 
-				if (start == this.columns && start > end) {
-					var fold = true;
+				if (start === this.columns && start > end) {
+					fold = true;
 				}
 
 				x0 = this.cell[0] + this.box_size * start + this.box_size / 2;
@@ -142,26 +217,21 @@ function Graph() {
 
 			// Draw the revision node in the right column
 
-			column = node[0]
-			color = node[1]
+			column = cur.vertex[0];
+			color = cur.vertex[1];
 
 			radius = this.box_size / 8;
 			x = this.cell[0] + this.box_size * column + this.box_size / 2;
 			y = this.bg[1] - this.bg_height / 2;
-			var add = this.vertex(x, y, color, parity, cur);
-			backgrounds += add[0];
-			nodedata += add[1];
+			this.vertex(x, y, radius, color, parity, cur);
 
 			if (fold) this.columns -= 1;
 
 		}
 
-		document.getElementById('nodebgs').innerHTML += backgrounds;
-		document.getElementById('graphnodes').innerHTML += nodedata;
-
 	}
 
-}
+};
 
 
 function process_dates(parentSelector){
@@ -228,10 +298,11 @@ function process_dates(parentSelector){
 			return shortdate(once);
 		}
 
-		for (unit in scales){
+		for (var unit in scales){
+			if (!scales.hasOwnProperty(unit)) { continue; }
 			var s = scales[unit];
 			var n = Math.floor(delta / s);
-			if ((n >= 2) || (s == 1)){
+			if ((n >= 2) || (s === 1)){
 				if (future){
 					return format(n, unit) + ' from now';
 				} else {
@@ -259,7 +330,7 @@ function process_dates(parentSelector){
 
 function toggleDiffstat() {
     var curdetails = document.getElementById('diffstatdetails').style.display;
-    var curexpand = curdetails == 'none' ? 'inline' : 'none';
+    var curexpand = curdetails === 'none' ? 'inline' : 'none';
     document.getElementById('diffstatdetails').style.display = curexpand;
     document.getElementById('diffstatexpand').style.display = curdetails;
 }
@@ -273,7 +344,8 @@ function toggleLinewrap() {
 
     function setLinewrap(enable) {
         var nodes = document.getElementsByClassName('sourcelines');
-        for (var i = 0; i < nodes.length; i++) {
+        var i;
+        for (i = 0; i < nodes.length; i++) {
             if (enable) {
                 nodes[i].classList.add('wrap');
             } else {
@@ -282,7 +354,7 @@ function toggleLinewrap() {
         }
 
         var links = document.getElementsByClassName('linewraplink');
-        for (var i = 0; i < links.length; i++) {
+        for (i = 0; i < links.length; i++) {
             links[i].innerHTML = enable ? 'on' : 'off';
         }
     }
@@ -297,12 +369,12 @@ function format(str, replacements) {
 }
 
 function makeRequest(url, method, onstart, onsuccess, onerror, oncomplete) {
-    xfr = new XMLHttpRequest();
-    xfr.onreadystatechange = function() {
-        if (xfr.readyState === 4) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
             try {
-                if (xfr.status === 200) {
-                    onsuccess(xfr.responseText);
+                if (xhr.status === 200) {
+                    onsuccess(xhr.responseText);
                 } else {
                     throw 'server error';
                 }
@@ -314,11 +386,11 @@ function makeRequest(url, method, onstart, onsuccess, onerror, oncomplete) {
         }
     };
 
-    xfr.open(method, url);
-    xfr.overrideMimeType("text/xhtml; charset=" + document.characterSet.toLowerCase());
-    xfr.send();
+    xhr.open(method, url);
+    xhr.overrideMimeType("text/xhtml; charset=" + document.characterSet.toLowerCase());
+    xhr.send();
     onstart();
-    return xfr;
+    return xhr;
 }
 
 function removeByClassName(className) {
@@ -338,14 +410,26 @@ function appendFormatHTML(element, formatStr, replacements) {
     element.insertAdjacentHTML('beforeend', format(formatStr, replacements));
 }
 
+function adoptChildren(from, to) {
+    var nodes = from.children;
+    var curClass = 'c' + Date.now();
+    while (nodes.length) {
+        var node = nodes[0];
+        node = document.adoptNode(node);
+        node.classList.add(curClass);
+        to.appendChild(node);
+    }
+    process_dates('.' + curClass);
+}
+
 function ajaxScrollInit(urlFormat,
                         nextPageVar,
                         nextPageVarGet,
                         containerSelector,
                         messageFormat,
                         mode) {
-    updateInitiated = false;
-    container = document.querySelector(containerSelector);
+    var updateInitiated = false;
+    var container = document.querySelector(containerSelector);
 
     function scrollHandler() {
         if (updateInitiated) {
@@ -354,8 +438,7 @@ function ajaxScrollInit(urlFormat,
 
         var scrollHeight = document.documentElement.scrollHeight;
         var clientHeight = document.documentElement.clientHeight;
-        var scrollTop = document.body.scrollTop
-            || document.documentElement.scrollTop;
+        var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
 
         if (scrollHeight - (scrollTop + clientHeight) < 50) {
             updateInitiated = true;
@@ -382,36 +465,20 @@ function ajaxScrollInit(urlFormat,
                     appendFormatHTML(container, messageFormat, message);
                 },
                 function onsuccess(htmlText) {
-                    if (mode == 'graph') {
-                        var sizes = htmlText.match(/^\s*<canvas id="graph" width="(\d+)" height="(\d+)"><\/canvas>$/m);
-                        var addWidth = sizes[1];
-                        var addHeight = sizes[2];
-                        addWidth = parseInt(addWidth);
-                        addHeight = parseInt(addHeight);
-                        graph.canvas.width = addWidth;
-                        graph.canvas.height = addHeight;
+                    var doc = docFromHTML(htmlText);
 
+                    if (mode === 'graph') {
+                        var graph = window.graph;
                         var dataStr = htmlText.match(/^\s*var data = (.*);$/m)[1];
                         var data = JSON.parse(dataStr);
-                        if (data.length < nextPageVar) {
-                            nextPageVar = undefined;
-                        }
                         graph.reset();
+                        adoptChildren(doc.querySelector('#graphnodes'), container.querySelector('#graphnodes'));
                         graph.render(data);
                     } else {
-                        var doc = docFromHTML(htmlText);
-                        var nodes = doc.querySelector(containerSelector).children;
-                        var curClass = 'c' + Date.now();
-                        while (nodes.length) {
-                            var node = nodes[0];
-                            node = document.adoptNode(node);
-                            node.classList.add(curClass);
-                            container.appendChild(node);
-                        }
-                        process_dates('.' + curClass);
+                        adoptChildren(doc.querySelector(containerSelector), container);
                     }
 
-                    nextPageVar = nextPageVarGet(htmlText, nextPageVar);
+                    nextPageVar = nextPageVarGet(htmlText);
                 },
                 function onerror(errorText) {
                     var message = {
@@ -450,7 +517,7 @@ function renderDiffOptsForm() {
         "ignoreblanklines",
     ];
 
-    var urlParams = new URLSearchParams(window.location.search);
+    var urlParams = new window.URLSearchParams(window.location.search);
 
     function updateAndRefresh(e) {
         var checkbox = e.target;
@@ -459,7 +526,7 @@ function renderDiffOptsForm() {
         window.location.search = urlParams.toString();
     }
 
-    var allChecked = form.getAttribute("data-ignorews") == "1";
+    var allChecked = form.getAttribute("data-ignorews") === "1";
 
     for (var i = 0; i < KEYS.length; i++) {
         var key = KEYS[i];
@@ -469,11 +536,11 @@ function renderDiffOptsForm() {
             continue;
         }
 
-        currentValue = form.getAttribute("data-" + key);
-        checkbox.checked = currentValue != "0";
+        var currentValue = form.getAttribute("data-" + key);
+        checkbox.checked = currentValue !== "0";
 
         // ignorews implies ignorewsamount and ignorewseol.
-        if (allChecked && (key == "ignorewsamount" || key == "ignorewseol")) {
+        if (allChecked && (key === "ignorewsamount" || key === "ignorewseol")) {
             checkbox.checked = true;
             checkbox.disabled = true;
         }
