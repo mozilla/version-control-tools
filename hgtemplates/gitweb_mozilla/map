@@ -263,10 +263,20 @@ filecompchild = '
   </tr>'
 shortlog = shortlog.tmpl
 graph = graph.tmpl
+graphentry = graphentry.tmpl
+phasetag = '{ifeq(phase, 'public', '', '<span class="phasetag" title="{phase|escape}">{phase|escape}</span> ')}'
+obsoletetag = '{if(obsolete, '<span class="obsoletetag" title="obsolete">obsolete</span> ')}'
+instabilitytag = '<span class="instabilitytag" title="{instability|escape}">{instability|escape}</span> '
 tagtag = '<span class="tagtag" title="{name|escape}">{name|escape}</span> '
 branchtag = '<span class="branchtag" title="{name|escape}">{name|escape}</span> '
 inbranchtag = '<span class="inbranchtag" title="{name|escape}">{name|escape}</span> '
 bookmarktag = '<span class="bookmarktag" title="{name|escape}">{name|escape}</span> '
+alltags = '<span class="logtags">{phasetag}{obsoletetag}{instabilities%instabilitytag}{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span>'
+successorlink = '<a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a> '
+obsfatesuccessors = '{if(successors, ' as ')}{successors%successorlink}'
+obsfateverb = '{obsfateverb(successors, markers)}'
+obsfateoperations = '{if(obsfateoperations(markers), ' using {join(obsfateoperations(markers), ', ')}')}'
+obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}'
 shortlogentry = '
   <tr class="parity{parity}">
     <td class="link">
@@ -276,7 +286,7 @@ shortlogentry = '
     <td>{node|short}<br/><i class="age">{date|isodate}</i></td>
     <td>
       <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
-      <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span>
+      {alltags}
     </td>
   </tr>'
 pushinfo = '<cite>{user}<br/><span class="date">{date|date}</span></cite>'
@@ -296,7 +306,7 @@ filelogentry = '
     <td><i>{author|person}</i></td>
     <td>
       <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
-      <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}{bookmarks%bookmarktag}</span>
+      {alltags}
     </td>
   </tr>
   {if(patch, '<tr><td colspan="4">{diff}</td></tr>')}'
