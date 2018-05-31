@@ -193,6 +193,22 @@ once the vcsreplicator daemons restart.
   remote:   https://hg.mozilla.org/mozilla-central/rev/ba17b5c8e955a5e7f57c478cdd75bc999c5460a1
   remote: recorded changegroup in replication log in \d\.\d+s (re)
 
+Print offsets on hgweb1 host
+
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
+  topic     group           partition    offset    available    lag (s)
+  --------  ------------  -----------  --------  -----------  ---------
+  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            1         0            0          0 (glob)
+  pushdata  *            2        16           16          0 (glob)
+  pushdata  *            3         0            0          0 (glob)
+  pushdata  *            4         0            0          0 (glob)
+  pushdata  *            5         0            0          0 (glob)
+  pushdata  *            6         0            0          0 (glob)
+  pushdata  *            7         0            0          0 (glob)
+
+
 Perform bootstrap procedure on hgweb. vcsreplicator is still off on this host so any replication
 will be an indication of a successful bootstrap
 
@@ -308,6 +324,21 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
+
+Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons activated.
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
+  topic     group           partition    offset    available    lag (s)
+  --------  ------------  -----------  --------  -----------  ---------
+  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            1         0            0          0 (glob)
+  pushdata  *            2        16           16          0 (glob)
+  pushdata  *            3         0            0          0 (glob)
+  pushdata  *            4         0            0          0 (glob)
+  pushdata  *            5         0            0          0 (glob)
+  pushdata  *            6         0            0          0 (glob)
+  pushdata  *            7         0            0          0 (glob)
 
 Clean
 
