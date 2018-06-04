@@ -27,7 +27,7 @@ DOM_PEERS = [
     dict(name='Ehsan Akhgari', nick=['ehsan'], email=['ehsan@mozilla.com', 'ehsan.akhgari@gmail.com']),
     dict(name='Henri Sivonen', nick=['hsivonen'], email=['hsivonen@hsivonen.fi']),
     dict(name='Kyle Machulis', nick=['qdot', 'kmachulis'], email=['qdot@mozilla.com', 'kmachulis@mozilla.com', 'kyle@nonpolynomial.com']),
-    dict(name='Nika Layzell', nick=['mystor'], email=['nika@thelayzells.com']),
+    dict(name='Nika Layzell', nick=['mystor', 'nika'], email=['nika@thelayzells.com']),
     dict(name='Olli Pettay', nick=['smaug'], email=['olli.pettay@helsinki.fi', 'bugs@pettay.fi']),
     dict(name='Peter Van der Beken', nick=['peterv'], email=['peterv@propagandism.org']),
 ]
