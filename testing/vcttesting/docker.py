@@ -165,8 +165,6 @@ class Docker(object):
             'last-bmoweb-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
             'last-hgrb-id': None,
-            'last-autolanddb-id': None,
-            'last-autoland-id': None,
             'last-hgmaster-id': None,
             'last-hgweb-id': None,
             'last-ldap-id': None,
@@ -191,8 +189,6 @@ class Docker(object):
             'last-rbweb-id',
             'last-bmoweb-bootstrap-id',
             'last-rbweb-bootstrap-id',
-            'last-autolanddb-id',
-            'last-autoland-id',
             'last-hgmaster-id',
             'last-hgrb-id',
             'last-hgweb-id',
@@ -853,8 +849,6 @@ class Docker(object):
                 ansibles['hgweb'] = ('docker-hgweb', 'centos7')
 
             f_images = e.submit(self.ensure_images_built, [
-                'autolanddb',
-                'autoland',
                 'ldap',
                 'pulse',
                 'treestatus',
@@ -871,8 +865,6 @@ class Docker(object):
 
         images.update(f_images.result())
 
-        self.state['last-autolanddb-id'] = images['autolanddb']
-        self.state['last-autoland-id'] = images['autoland']
         self.state['last-hgrb-id'] = images['hgrb']
         self.state['last-ldap-id'] = images['ldap']
         self.state['last-pulse-id'] = images['pulse']
@@ -884,8 +876,6 @@ class Docker(object):
         self.save_state()
 
         r = {
-            'autolanddb': images['autolanddb'],
-            'autoland': images['autoland'],
             'hgrb': images['hgrb'],
             'ldap': images['ldap'],
             'pulse': images['pulse'],
@@ -996,7 +986,6 @@ class Docker(object):
             hgrb_image=None, ldap_image=None, ldap_port=None, pulse_port=None,
             rbweb_port=None, web_image=None, pulse_image=None,
             rbweb_image=None, ssh_port=None, hg_port=None,
-            autolanddb_image=None, autoland_image=None, autoland_port=None,
             hgweb_image=None, hgweb_port=None,
             treestatus_image=None, treestatus_port=None,
             max_workers=None, verbose=False):
@@ -1015,13 +1004,8 @@ class Docker(object):
         if pulse_port:
             start_pulse = True
 
-        start_autoland = False
-        if autoland_port:
-            start_autoland = True
-            start_hgrb = True
-
         start_rbweb = False
-        if rbweb_port or start_autoland or start_hgrb:
+        if rbweb_port or start_hgrb:
             start_rbweb = True
             start_ldap = True
 
@@ -1030,7 +1014,7 @@ class Docker(object):
             start_hgweb = True
 
         start_treestatus = False
-        if treestatus_port or start_autoland:
+        if treestatus_port:
             start_treestatus = True
 
         known_images = self.all_docker_images()
@@ -1042,23 +1026,16 @@ class Docker(object):
             ldap_image = None
         if pulse_image and pulse_image not in known_images:
             pulse_image = None
-        if autoland_image and autoland_image not in known_images:
-            autoland_image = None
-        if autolanddb_image and autolanddb_image not in known_images:
-            autolanddb_image = None
         if hgweb_image and hgweb_image not in known_images:
             hgweb_image = None
         if treestatus_image and treestatus_image not in known_images:
             treestatus_image = None
 
         if (not web_image or not hgrb_image or not ldap_image
-                or not pulse_image or not autolanddb_image
-                or not autoland_image or not rbweb_image or not hgweb_image
+                or not pulse_image or not rbweb_image or not hgweb_image
                 or not treestatus_image):
             images = self.build_mozreview(
                 max_workers=max_workers, verbose=verbose)
-            autolanddb_image = images['autolanddb']
-            autoland_image = images['autoland']
             hgrb_image = images['hgrb']
             ldap_image = images['ldap']
             web_image = images['bmoweb']
@@ -1155,22 +1132,6 @@ class Docker(object):
                         networking_config=self.network_config(network_name, 'hgweb'),
                         labels=['hgweb'])
 
-                if start_autoland:
-                    f_autolanddb_create = e.submit(
-                        client.create_container,
-                        autolanddb_image,
-                        labels=['autolanddb'],
-                        networking_config=self.network_config(network_name, 'autolanddb'))
-
-                    autoland_host_config = client.create_host_config(
-                        port_bindings={80: autoland_port})
-                    f_autoland_create = e.submit(
-                        client.create_container,
-                        autoland_image,
-                        host_config=autoland_host_config,
-                        networking_config=self.network_config(network_name, 'autoland'),
-                        labels=['autolandweb'])
-
                 if start_treestatus:
                     treestatus_host_config = client.create_host_config(
                         port_bindings={80: treestatus_port})
@@ -1180,13 +1141,6 @@ class Docker(object):
                         host_config=treestatus_host_config,
                         networking_config=self.network_config(network_name, 'treestatus'),
                         labels=['treestatus'])
-
-                if start_autoland:
-                    autolanddb_id = f_autolanddb_create.result()['Id']
-                    containers.append(autolanddb_id)
-                    f_start_autolanddb = e.submit(
-                        client.start,
-                        autolanddb_id)
 
                 # RabbitMQ takes a while to start up. Start it before other
                 # containers. (We probably could have a callback-driven mechanism
@@ -1207,13 +1161,6 @@ class Docker(object):
 
                 web_id = f_web_create.result()['Id']
                 containers.append(web_id)
-
-                if start_autoland:
-                    f_start_autolanddb.result()
-                    autolanddb_state = client.inspect_container(autolanddb_id)
-                    autoland_id = f_autoland_create.result()['Id']
-                    containers.append(autoland_id)
-                    autoland_state = client.inspect_container(autoland_id)
 
                 if start_hgrb:
                     hgrb_id = f_hgrb_create.result()['Id']
@@ -1261,17 +1208,7 @@ class Docker(object):
                     client.start(treestatus_id)
                     treestatus_state = client.inspect_container(treestatus_id)
 
-                if start_autoland:
-                    assert start_hgrb
-                    assert start_treestatus
-                    f_start_autoland = e.submit(
-                        client.start,
-                        autoland_id)
-                    f_start_autoland.result()
-                    autoland_state = client.inspect_container(autoland_id)
-
                 if start_rbweb:
-                    assert start_autoland
                     client.start(rbweb_id)
                     rbweb_state = client.inspect_container(rbweb_id)
 
@@ -1347,14 +1284,6 @@ class Docker(object):
                 'bugzilla_url': bmo_url,
                 'web_id': web_id,
             }
-
-            if start_autoland:
-                result['autolanddb_id'] = autolanddb_id
-                result['autoland_id'] = autoland_id
-                autoland_hostname, autoland_hostport = \
-                    self._get_host_hostname_port(autoland_state, '80/tcp')
-                result['autoland_url'] = 'http://%s:%d/' % (autoland_hostname,
-                                                            autoland_hostport)
 
             if start_pulse:
                 result['pulse_id'] = pulse_id
@@ -1437,8 +1366,6 @@ class Docker(object):
         ansible_images = {}
         if mozreview:
             docker_images |= {
-                'autolanddb',
-                'autoland',
                 'bmoweb',
                 'ldap',
                 'pulse',
@@ -1510,8 +1437,6 @@ class Docker(object):
                       for c in self.api_client.containers())
 
         ignore_images = set([
-            self.state['last-autoland-id'],
-            self.state['last-autolanddb-id'],
             self.state['last-bmoweb-id'],
             self.state['last-hgrb-id'],
             self.state['last-pulse-id'],
@@ -1529,10 +1454,6 @@ class Docker(object):
             'bmoweb-bootstrapped',
             'pulse',
             'rbweb',
-            'autolanddb',
-            'autolanddb-bootstrapped',
-            'autoland',
-            'autoland-bootstrapped',
             'hgmaster',
             'hgrb',
             'hgweb',

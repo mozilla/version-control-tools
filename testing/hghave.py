@@ -71,8 +71,6 @@ def has_hgmodocker():
 @check('mozreviewdocker', 'Require mozreview Docker pieces')
 def has_mozreviewdocker():
     images = (
-        'autolanddb',
-        'autoland',
         'bmoweb',
         'hgrb',
         'hgweb',

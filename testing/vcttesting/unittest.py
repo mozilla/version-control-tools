@@ -34,8 +34,6 @@ def start_mozreview(mr):
          web_image=os.environ['DOCKER_BMOWEB_IMAGE'],
          ldap_image=os.environ['DOCKER_LDAP_IMAGE'],
          pulse_image=os.environ['DOCKER_PULSE_IMAGE'],
-         autolanddb_image=os.environ['DOCKER_AUTOLANDDB_IMAGE'],
-         autoland_image=os.environ['DOCKER_AUTOLAND_IMAGE'],
          hgrb_image=os.environ['DOCKER_HGRB_IMAGE'],
          rbweb_image=os.environ['DOCKER_RBWEB_IMAGE'],
          hgweb_image=os.environ['DOCKER_HGWEB_IMAGE'],
@@ -321,10 +319,6 @@ class MozReviewWebDriverTest(MozReviewTest):
             publish_button = self.browser.find_element_by_css_selector(
                 "div.modalbox-buttons > input[type=button][value='Publish Review']")
             publish_button.click()
-
-    def dump_autoland_log(self):
-        subprocess.call('docker exec %s cat /home/autoland/autoland.log' %
-                        self.mr.autoland_id, shell=True)
 
     def dump_reviewboard_log(self):
         """Dump the reviewboard log to stdout to help debug failing tests"""

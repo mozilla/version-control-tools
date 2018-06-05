@@ -46,7 +46,6 @@ alias adminbugzilla='BUGZILLA_USERNAME=admin@example.com BUGZILLA_PASSWORD=passw
 alias bugzilla='$TESTDIR/bugzilla'
 alias pulse='$TESTDIR/pulse'
 alias mozreview='$TESTDIR/mozreview'
-alias ottoland='$TESTDIR/ottoland'
 alias treestatus='$TESTDIR/treestatus'
 alias rbmanage='$TESTDIR/reviewboard'
 alias http='$TESTDIR/testing/http-request.py'
@@ -58,7 +57,6 @@ commonenv() {
     --reviewboard-port $HGPORT1 \
     --bugzilla-port $HGPORT2 \
     --pulse-port $HGPORT3 \
-    --autoland-port $HGPORT4 \
     --ldap-port $HGPORT5 \
     --ssh-port $HGPORT6 \
     --hgweb-port $HGPORT7 \

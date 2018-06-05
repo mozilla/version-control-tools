@@ -36,8 +36,6 @@ class MozReviewCommands(object):
         ldap_image = os.environ.get('DOCKER_LDAP_IMAGE')
         pulse_image = os.environ.get('DOCKER_PULSE_IMAGE')
         rbweb_image = os.environ.get('DOCKER_RBWEB_IMAGE')
-        autolanddb_image = os.environ.get('DOCKER_AUTOLANDDB_IMAGE')
-        autoland_image = os.environ.get('DOCKER_AUTOLAND_IMAGE')
         hgweb_image = os.environ.get('DOCKER_HGWEB_IMAGE')
         treestatus_image = os.environ.get('DOCKER_TREESTATUS_IMAGE')
 
@@ -45,8 +43,6 @@ class MozReviewCommands(object):
         return MozReview(where, web_image=web_image,
                          hgrb_image=hgrb_image, ldap_image=ldap_image,
                          pulse_image=pulse_image, rbweb_image=rbweb_image,
-                         autolanddb_image=autolanddb_image,
-                         autoland_image=autoland_image,
                          hgweb_image=hgweb_image,
                          treestatus_image=treestatus_image)
 
@@ -62,8 +58,6 @@ class MozReviewCommands(object):
         help='Port Mercurial HTTP server should listen on.')
     @CommandArgument('--pulse-port', type=int,
         help='Port Pulse should listen on.')
-    @CommandArgument('--autoland-port', type=int,
-        help='Port Autoland should listen on.')
     @CommandArgument('--ldap-port', type=int,
                      help='Port LDAP server should listen on.')
     @CommandArgument('--ssh-port', type=int,
@@ -75,7 +69,7 @@ class MozReviewCommands(object):
     @CommandArgument('--forks', type=int,
                      help='Number of parallel build processes to use. (default=unlimited)')
     def start(self, where, bugzilla_port=None, reviewboard_port=None,
-            mercurial_port=None, pulse_port=None, autoland_port=None,
+            mercurial_port=None, pulse_port=None,
             ldap_port=None, ssh_port=None, hgweb_port=None,
             treestatus_port=None, forks=None):
         mr = self._get_mozreview(where)
@@ -83,7 +77,6 @@ class MozReviewCommands(object):
                  reviewboard_port=reviewboard_port,
                  mercurial_port=mercurial_port,
                  pulse_port=pulse_port,
-                 autoland_port=autoland_port,
                  ldap_port=ldap_port,
                  ssh_port=ssh_port,
                  hgweb_port=hgweb_port,
@@ -96,7 +89,6 @@ class MozReviewCommands(object):
         print('Mercurial RB URL: %s' % mr.mercurial_url)
         print('hg.mo URL: %s' % mr.hgweb_url)
         print('Pulse endpoint: %s:%s' % (mr.pulse_host, mr.pulse_port))
-        print('Autoland URL: %s' % mr.autoland_url)
         print('Treestatus URL: %s' % mr.treestatus_url)
         print('Admin username: %s' % mr.admin_username)
         print('Admin password: %s' % mr.admin_password)
@@ -119,7 +111,7 @@ class MozReviewCommands(object):
         print('Obtain a shell in a container by running:')
         print('  ./mozreview shell <container>')
         print('')
-        print('(valid container names include: rbweb, bmoweb, hgrb, autoland)')
+        print('(valid container names include: rbweb, bmoweb, hgrb)')
 
     @Command('shellinit', category='mozreview',
              description='Print statements to export variables to shells.')
@@ -133,7 +125,6 @@ class MozReviewCommands(object):
         print('export REVIEWBOARD_URL=%s' % mr.reviewboard_url)
         print('export MERCURIAL_URL=%s' % mr.mercurial_url)
         print('export HGWEB_URL=%s' % mr.hgweb_url)
-        print('export AUTOLAND_URL=%s' % mr.autoland_url)
         print('export TREESTATUS_URL=%s' % mr.treestatus_url)
         print('export ADMIN_USERNAME=%s' % mr.admin_username)
         print('export ADMIN_PASSWORD=%s' % mr.admin_password)
@@ -156,12 +147,9 @@ class MozReviewCommands(object):
                      help='Directory of MozReview instance')
     @CommandArgument('--refresh-reviewboard', action='store_true',
                      help='Refresh changes from reviewboard-fork')
-    @CommandArgument('--autoland-only', action='store_true',
-                     help='Only refresh Autoland')
-    def refresh(self, where, refresh_reviewboard, autoland_only):
+    def refresh(self, where, refresh_reviewboard):
         mr = self._get_mozreview(where)
-        mr.refresh(verbose=True, refresh_reviewboard=refresh_reviewboard,
-                   autoland_only=autoland_only)
+        mr.refresh(verbose=True, refresh_reviewboard=refresh_reviewboard)
 
     @Command('autorefresh', category='mozreview',
              description='Automatically refresh containers when files change')
@@ -308,7 +296,7 @@ class MozReviewCommands(object):
              description='Execute a command in a Docker container')
     @CommandArgument('name', help='Name of container to shell into',
                      choices={'bmoweb', 'bmodb', 'pulse', 'rbweb', 'hgrb',
-                              'autoland', 'hgweb', 'treestatus'})
+                              'hgweb', 'treestatus'})
     @CommandArgument('command', help='Command to execute',
                      nargs=argparse.REMAINDER)
     def execute(self, name, command):
@@ -329,7 +317,7 @@ class MozReviewCommands(object):
              description='Start a shell inside a running container')
     @CommandArgument('name', help='Name of container to shell into',
                      choices={'bmoweb', 'bmodb', 'pulse', 'rbweb', 'hgrb',
-                              'autoland', 'treestatus'})
+                              'treestatus'})
     def shell(self, name):
         return self.execute(name, ['/bin/bash'])
 

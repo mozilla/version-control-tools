@@ -11,7 +11,7 @@ import urlparse
 sys.path.insert(0, '/reviewboard/conf')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'reviewboard.settings'
 
-site_url, autoland_url, bugzilla_url = sys.argv[1:]
+site_url, bugzilla_url = sys.argv[1:]
 site_url = urlparse.urlsplit(site_url)
 
 # Define hostname.
@@ -20,12 +20,6 @@ site = DjangoSite.objects.get(pk=1)
 site.domain = site_url.netloc
 site.name = site_url.hostname
 site.save()
-
-# Define Autoland public URL.
-from djblets.extensions.models import RegisteredExtension
-mre = RegisteredExtension.objects.get(class_name='mozreview.extension.MozReviewExtension')
-mre.settings['autoland_url'] = autoland_url.rstrip('/')
-mre.save()
 
 # Define Bugzilla URL.
 from djblets.siteconfig.models import SiteConfiguration

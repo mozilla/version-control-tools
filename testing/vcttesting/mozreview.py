@@ -65,7 +65,6 @@ class MozReview(object):
 
     def __init__(self, path, web_image=None, hgrb_image=None,
                  ldap_image=None, pulse_image=None, rbweb_image=None,
-                 autolanddb_image=None, autoland_image=None,
                  hgweb_image=None, treestatus_image=None):
         if not path:
             raise Exception('You must specify a path to create an instance')
@@ -79,8 +78,6 @@ class MozReview(object):
         self.ldap_image = ldap_image
         self.pulse_image = pulse_image
         self.rbweb_image = rbweb_image
-        self.autolanddb_image = autolanddb_image
-        self.autoland_image = autoland_image
         self.hgweb_image = hgweb_image
         self.treestatus_image = treestatus_image
 
@@ -157,7 +154,6 @@ class MozReview(object):
               ldap_image=None, ldap_port=None, pulse_image=None,
               rbweb_image=None, ssh_port=None,
               hgweb_image=None, hgweb_port=None,
-              autolanddb_image=None, autoland_image=None, autoland_port=None,
               treestatus_image=None, treestatus_port=None, max_workers=None):
         """Start a MozReview instance."""
         if self.started:
@@ -175,8 +171,6 @@ class MozReview(object):
             ssh_port = get_available_port()
         if not pulse_port:
             pulse_port = get_available_port()
-        if not autoland_port:
-            autoland_port = get_available_port()
         if not hgweb_port:
             hgweb_port = get_available_port()
         if not treestatus_port:
@@ -187,8 +181,6 @@ class MozReview(object):
         ldap_image = ldap_image or self.ldap_image
         pulse_image = pulse_image or self.pulse_image
         rbweb_image = rbweb_image or self.rbweb_image
-        autolanddb_image = autolanddb_image or self.autolanddb_image
-        autoland_image = autoland_image or self.autoland_image
         hgweb_image = hgweb_image or self.hgweb_image
         treestatus_image = treestatus_image or self.treestatus_image
 
@@ -210,9 +202,6 @@ class MozReview(object):
                 rbweb_port=reviewboard_port,
                 ssh_port=ssh_port,
                 hg_port=mercurial_port,
-                autolanddb_image=autolanddb_image,
-                autoland_image=autoland_image,
-                autoland_port=autoland_port,
                 hgweb_image=hgweb_image,
                 hgweb_port=hgweb_port,
                 treestatus_image=treestatus_image,
@@ -228,8 +217,6 @@ class MozReview(object):
         self.reviewboard_url = mr_info['reviewboard_url']
         self.rbweb_id = mr_info['rbweb_id']
 
-        self.autoland_id = mr_info['autoland_id']
-        self.autoland_url = mr_info['autoland_url']
         self.pulse_id = mr_info['pulse_id']
         self.pulse_host = mr_info['pulse_host']
         self.pulse_port = mr_info['pulse_port']
@@ -288,8 +275,7 @@ class MozReview(object):
             # Define site domain and hostname in rbweb. This is necessary so it
             # constructs self-referential URLs properly.
             e.submit(self._docker.execute, self.rbweb_id,
-                     ['/set-site-url', self.reviewboard_url,
-                      self.autoland_url, self.bugzilla_url])
+                     ['/set-site-url', self.reviewboard_url, self.bugzilla_url])
 
             # Tell Bugzilla about Review Board URL.
             e.submit(self._docker.execute, mr_info['web_id'],
@@ -332,8 +318,6 @@ class MozReview(object):
             'pulse_id': self.pulse_id,
             'pulse_host': self.pulse_host,
             'pulse_port': self.pulse_port,
-            'autoland_url': self.autoland_url,
-            'autoland_id': self.autoland_id,
             'hgrb_id': self.hgrb_id,
             'hgweb_url': self.hgweb_url,
             'hgweb_id': self.hgweb_id,
@@ -358,8 +342,7 @@ class MozReview(object):
                                  'mozreview-%s' % os.path.basename(self._path)],
                                 stdout=devnull, stderr=subprocess.STDOUT)
 
-    def refresh(self, verbose=False, refresh_reviewboard=False,
-                autoland_only=False):
+    def refresh(self, verbose=False, refresh_reviewboard=False):
         """Refresh a running cluster with latest version of code.
 
         This only updates code from the v-c-t repo. Not all containers
@@ -386,12 +369,10 @@ class MozReview(object):
                                     'all' if refresh_reviewboard else ''])
 
             with futures.ThreadPoolExecutor(4) as e:
-                if not autoland_only:
-                    e.submit(refresh, 'rbweb', self.rbweb_id)
-                    e.submit(refresh, 'hgrb', self.hgrb_id)
-                    e.submit(execute, 'bmoweb', self.bmoweb_id,
-                             ['/usr/bin/supervisorctl', 'restart', 'httpd'])
-                e.submit(refresh, 'autoland', self.autoland_id)
+                e.submit(refresh, 'rbweb', self.rbweb_id)
+                e.submit(refresh, 'hgrb', self.hgrb_id)
+                e.submit(execute, 'bmoweb', self.bmoweb_id,
+                         ['/usr/bin/supervisorctl', 'restart', 'httpd'])
 
     def start_autorefresh(self):
         """Enable auto refreshing of the cluster when changes are made.
@@ -447,10 +428,6 @@ class MozReview(object):
 
         self._docker.execute(self.hgrb_id,
                             ['/create-repo', name, str(rbid)])
-
-        if self.autoland_id:
-            time.sleep(1)
-            self._docker.execute(self.autoland_id, ['/clone-repo', name])
 
         return http_url, ssh_url, rbid
 

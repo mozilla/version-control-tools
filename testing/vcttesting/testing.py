@@ -33,9 +33,6 @@ PYTHON_COVERAGE_DIRS = (
 # be executed by the Mercurial test harness and ``.py`` tests will be executed
 # by the Python test harness.
 UNIT_TEST_DIRS = {
-    'autoland/tests': {
-        'venvs': {'global'},
-    },
     'git/tests': {
         'venvs': {'global'},
     },
@@ -316,8 +313,6 @@ def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
     if 'mozreview' in requirements:
         env['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
         env['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
-        env['DOCKER_AUTOLANDDB_IMAGE'] = mr_images['autolanddb']
-        env['DOCKER_AUTOLAND_IMAGE'] = mr_images['autoland']
         env['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
         env['DOCKER_TREESTATUS_IMAGE'] = mr_images['treestatus']
         env['DOCKER_LDAP_IMAGE'] = mr_images['ldap']
