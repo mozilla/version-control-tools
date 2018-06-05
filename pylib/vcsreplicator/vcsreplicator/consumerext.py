@@ -10,7 +10,7 @@ from mercurial import (
     extensions,
 )
 
-testedwith = '4.3 4.4'
+testedwith = '4.3 4.4 4.5'
 minimumhgversion = '4.3'
 
 

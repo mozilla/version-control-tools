@@ -20,6 +20,7 @@ import vcsreplicator.producer as vcsrproducer
 from mercurial.i18n import _
 from mercurial.node import hex
 from mercurial import (
+    bundle2,
     commands,
     configitems,
     demandimport,
@@ -27,6 +28,7 @@ from mercurial import (
     extensions,
     hg,
     obsolete,
+    phases,
     policy,
     registrar,
     wireproto,
@@ -40,7 +42,7 @@ with demandimport.deactivated():
 
 base85 = policy.importmod('base85')
 
-testedwith = '4.3'
+testedwith = '4.3 4.4 4.5'
 
 cmdtable = {}
 
@@ -65,6 +67,9 @@ configitem('replicationproducer', 'producermap.*',
            default=configitems.dynamicdefault)
 configitem('replication', 'unfiltereduser',
            default=None)
+
+
+_ORIG_PHASE_HEADS_HANDLER = bundle2.parthandlermapping.get('phase-heads')
 
 
 def precommithook(ui, repo, **kwargs):
@@ -137,6 +142,55 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
 
     repo._replicationinfo['pushkey'].append(
         (namespace, key, old, new, ret))
+
+
+# This is a handler for the bundle2 phase-heads part. The prepushkey/pushkey
+# hooks don't run for phases when phases are updated via bundle2. This is
+# arguably an upstream bug. So we install a custom part handler to record the
+# equivalent data in the replication log as a pushkey message.
+def phase_heads_handler(op, inpart):
+    # If the push has changegroup data, we'll generate a changegroup replication
+    # message and the corresponding `hg pull` will update phases automatically.
+    # So we don't need to do anything special for replication.
+    if op.repo._replicationinfo['changegroup']:
+        return _ORIG_PHASE_HEADS_HANDLER(op, inpart)
+
+    # Else this looks like a push without a changegroup. (A phase only push.)
+    # We monkeypatch the function for handling phase updates to record what
+    # changes were made. Then we convert the changes into pushkey messages.
+
+    # We make assumptions later that we only update from the draft phase. Double
+    # check that the source repo doesn't have any secret, etc phase roots.
+    seen_phases = set(i for i, v
+                      in enumerate(op.repo.unfiltered()._phasecache.phaseroots)
+                      if v)
+    supported_phases = {phases.public, phases.draft}
+
+    if seen_phases - supported_phases:
+        raise error.Abort(_('only draft and public phases are supported'))
+
+    moves = {}
+
+    def wrapped_advanceboundary(orig, repo, tr, targetphase, nodes):
+        if targetphase in moves:
+            raise error.ProgrammingError('already handled phase %r' %
+                                         targetphase)
+
+        if targetphase not in supported_phases:
+            raise error.Abort(_('only draft and public phases are supported'))
+
+        moves[targetphase] = nodes
+
+        return orig(repo, tr, targetphase, nodes)
+
+    with extensions.wrappedfunction(phases, 'advanceboundary',
+                                    wrapped_advanceboundary):
+        _ORIG_PHASE_HEADS_HANDLER(op, inpart)
+
+    for phase, nodes in sorted(moves.items()):
+        for node in nodes:
+            op.repo._replicationinfo['pushkey'].append(
+                ('phases', hex(node), '%d' % phases.draft, '%d' % phase, 0))
 
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
@@ -424,6 +478,10 @@ def wireprotodispatch(orig, repo, proto, command):
 def extsetup(ui):
     extensions.wrapfunction(wireproto, 'dispatch', wireprotodispatch)
     extensions.wrapcommand(commands.table, 'init', initcommand)
+
+    if _ORIG_PHASE_HEADS_HANDLER:
+        bundle2.parthandlermapping['phase-heads'] = phase_heads_handler
+        phase_heads_handler.params = _ORIG_PHASE_HEADS_HANDLER.params
 
     # Configure null handler for kafka.* loggers to prevent "No handlers could
     # be found" messages from creeping into output.

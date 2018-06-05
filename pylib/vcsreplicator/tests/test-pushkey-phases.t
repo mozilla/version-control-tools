@@ -1,4 +1,5 @@
 #require hgmodocker vcsreplicator
+#testcases pushkey bundle2
 
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
@@ -8,6 +9,11 @@ Create the repository and push a change
   $ hgmo exec hgssh /create-repo mozilla-central scm_level_1 --non-publishing
   (recorded repository creation in replication log)
   marking repo as non-publishing
+
+#if pushkey
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central devel legacy.exchange phases
+#endif
+
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
   $ standarduser
