@@ -398,3 +398,5 @@ firefox_release_entry_here = '<div class="firefoxreleasecsetentry">
       {if(previousnode, '/
       <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
     </div></div>'
+
+repoinfo = repoinfo.tmpl

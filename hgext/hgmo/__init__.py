@@ -111,7 +111,10 @@ ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 import mozautomation.commitparser as commitparser
-from mozhg.util import import_module
+from mozhg.util import (
+    import_module,
+    repo_owner,
+)
 
 # TRACKING hg46
 # wireproto -> wireprotov1server
@@ -573,6 +576,13 @@ def isancestorwebcommand(web, req, tmpl):
                 isancestor=isancestor)
 
 
+def repoinfowebcommand(web, req, tmpl):
+    group_owner = repo_owner(web.repo)
+
+    return tmpl('repoinfo',
+                groupowner=group_owner)
+
+
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -906,3 +916,6 @@ def extsetup(ui):
 
     setattr(webcommands, 'isancestor', isancestorwebcommand)
     webcommands.__all__.append('isancestor')
+
+    setattr(webcommands, 'repoinfo', repoinfowebcommand)
+    webcommands.__all__.append('repoinfo')

@@ -290,3 +290,6 @@ firefoxreleasebuild = '\{
   "app_version": {app_version|json},
   "files_url": {artifacts_url|json}
   }'
+repoinfo = '\{
+  "group_owner": {groupowner|json}
+  }'
