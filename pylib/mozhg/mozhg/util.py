@@ -5,6 +5,8 @@ from __future__ import absolute_import
 import importlib
 
 import contextlib
+import grp
+import os
 import time
 
 from mercurial import (
@@ -118,6 +120,21 @@ def identify_repo(repo):
         and not d['user_repo'])
 
     return d
+
+
+def repo_owner(repo):
+    """Identify the group owner of a repository."""
+
+    group = repo.vfs.tryread('moz-owner')
+
+    if not group:
+        gid = os.stat(repo.root).st_gid
+        try:
+            group = grp.getgrgid(gid).gr_name
+        except KeyError:
+            group = '<unknown>'
+
+    return group
 
 
 class timers(object):
