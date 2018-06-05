@@ -183,12 +183,14 @@
 # incoming changes. But the hook is part of v-c-t. How can we run a hook that
 # may not be present? Our solution is to disable the hook when interacting
 # with the v-c-t repo.
+#
+# The replicateowner extension doesn't work with https:// remotes, so it is disabled.
 - name: clone version-control-tools repo (server only)
-  command: /var/hg/venv_hgweb/bin/hg --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
   when: vct_dir.stat.exists == False
 
 - name: pull version-control-tools (server only)
-  command: /var/hg/venv_hgweb/bin/hg --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
   when: vct_dir.stat.exists == False
 
 - name: update version-control-tools revision (server only)
