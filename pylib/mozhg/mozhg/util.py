@@ -125,7 +125,7 @@ def identify_repo(repo):
 def repo_owner(repo):
     """Identify the group owner of a repository."""
 
-    group = repo.vfs.tryread('moz-owner')
+    group = repo.vfs.tryread('moz-owner').strip()
 
     if not group:
         gid = os.stat(repo.root).st_gid
