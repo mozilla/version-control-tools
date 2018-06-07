@@ -236,6 +236,15 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             d['convertsourcepath'] = sourcerepo
             d['convertsourcenode'] = convertrevision
 
+    # Did the push to this repo included extra data about the automated landing
+    # system used?
+    # We omit the key if it has no value so that the 'json' filter function in
+    # the map file will return null for the key's value.  Otherwise the filter
+    # will return a JSON empty string, even for False-y values like None.
+    landingsystem = ctx.extra().get('moz-landing-system')
+    if landingsystem:
+        d['landingsystem'] = landingsystem
+
     if onlycheap:
         return
 

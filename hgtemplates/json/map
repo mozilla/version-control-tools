@@ -102,7 +102,8 @@ changeset = '\{
   "phase": {phase|json},
   "pushid": {pushid|json},
   "pushdate": {pushdate|json},
-  "pushuser": {pushuser|json}
+  "pushuser": {pushuser|json},
+  "landingsystem": {if(landingsystem, landingsystem|json, "null")}
   }'
 changesetbranch = '{name|utf8|json}'
 changesetbookmark = '{bookmark|utf8|json}'

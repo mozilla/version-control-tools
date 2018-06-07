@@ -5,6 +5,24 @@
   $ hg -q clone http://localhost:$HGPORT client
   $ cd client
 
+Install a custom commit command to simulate extra changeset data getting added by an extension.
+
+  $ cat > $TESTTMP/commitextradata.py <<EOF
+  > def reposetup(ui, repo):
+  >     class extrarepo(repo.__class__):
+  >         def commit(self, *args, **kwargs):
+  >             extra = kwargs.setdefault('extra', {})
+  >             extra['moz-landing-system'] = 'wobble'
+  >             return super(extrarepo, self).commit(*args, **kwargs)
+  > 
+  >     repo.__class__ = extrarepo
+  > EOF
+
+  $ cat >> $HGRCPATH <<EOF
+  > [extensions]
+  > commitextradata = $TESTTMP/commitextradata.py
+  > EOF
+
   $ echo initial > foo
   $ hg -q commit -A -m 'Bug 271; r=calixte'
   $ hg -q push
@@ -22,7 +40,7 @@
 
   $ hg -q push
 
-Last changeset
+Check the last changeset
 
   $ http http://localhost:$HGPORT/json-rev/tip --header content-type --body-file body
   200
@@ -38,10 +56,10 @@ Last changeset
           0
       ],
       "desc": "NO BUG",
-      "landingsystem": null,
-      "node": "c761ad6d27c96f72f7e4637789e967c3f9730255",
+      "landingsystem": "wobble",
+      "node": "40e31a84e3dcf059c2e33d5a266edc6bad3b81ed",
       "parents": [
-          "ef0e7ae3b607356f580e6d7671abea63db849cc2"
+          "afa8227ab48e5f3c749fb59f2e886cb487594cf2"
       ],
       "phase": "public",
       "pushdate": [
