@@ -1,0 +1,11 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*.t]
+# Whitespace in Mercurial test files needs to be carefully managed. Letting
+# editors strip it automatically leads to unexpected test failures.
+trim_trailing_whitespace = false
+indent_style = space
+indent_size = 2
