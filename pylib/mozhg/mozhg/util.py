@@ -5,7 +5,6 @@ from __future__ import absolute_import
 import importlib
 
 import contextlib
-import grp
 import os
 import time
 
@@ -124,6 +123,8 @@ def identify_repo(repo):
 
 def repo_owner(repo):
     """Identify the group owner of a repository."""
+    # Module not available on Windows. So delay import.
+    import grp
 
     group = repo.vfs.tryread('moz-owner').strip()
 
