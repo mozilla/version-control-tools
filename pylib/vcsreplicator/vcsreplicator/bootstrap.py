@@ -26,6 +26,7 @@ from .consumer import (
     value_deserializer,
     process_hg_sync,
     process_message,
+    MAX_BUFFER_SIZE,
 )
 
 
@@ -169,6 +170,7 @@ def hgweb():
         'client_id': config.c.get('consumer', 'client_id'),
         'enable_auto_commit': False,
         'group_id': config.c.get('consumer', 'group'),
+        'max_partition_fetch_bytes': MAX_BUFFER_SIZE,
         'value_deserializer': value_deserializer,
     }
 
