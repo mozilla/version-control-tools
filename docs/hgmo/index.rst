@@ -8,6 +8,7 @@ hg.mozilla.org
    :maxdepth: 2
 
    architecture
+   custom-apis
    pushlog
    managing-repos
    notifications
