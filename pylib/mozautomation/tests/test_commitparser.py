@@ -637,3 +637,13 @@ class TestAddHyperlinks(unittest.TestCase):
             b'X-Channel-Revision: a1234567890123456789')),
             b'X-Channel-Repo: mozilla-&amp;\n'
             b'X-Channel-Revision: a1234567890123456789')
+
+    def test_link_phabricator(self):
+        """Tests hyperlinking of Phabricator URLs on hg.mozilla.org.
+        Only support hyperlinking for URLs added to commit messages via
+        the Lando API."""
+        # Phabricator URL matching Lando insertion should be hyperlinked
+        self.assertEqual(add_hyperlinks(
+            b'Differential Revision: https://phabricator.services.mozilla.com/D1234'),
+            b'Differential Revision: <a href="https://phabricator.services.mozilla.com/D1234">https://phabricator.services.mozilla.com/D1234</a>'
+        )

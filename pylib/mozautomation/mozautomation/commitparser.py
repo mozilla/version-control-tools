@@ -92,6 +92,8 @@ DIGIT_RE = re.compile('#?\d+')
 # Currently just MozReview-Commit-ID
 METADATA_RE = re.compile('^MozReview-Commit-ID: ')
 
+DIFFERENTIAL_REVISION_RE = re.compile(r'(?P<phaburl>https://phabricator.services.mozilla.com/D\d+)')
+
 
 def parse_bugs(s):
     bugs_with_duplicates = [int(m[1]) for m in BUG_RE.findall(s)]
@@ -309,6 +311,13 @@ def xchannel_link(m):
     return s
 
 
+def differential_revision_repl(match):
+    """Replacement function to linkify Phabricator Differential
+    Revision URLs in commit messages."""
+    phaburl = match.group('phaburl')
+    return '<a href="{link}">{link}</a>'.format(link=phaburl)
+
+
 def add_hyperlinks(s,
                    bugzilla_url='https://bugzilla.mozilla.org/show_bug.cgi?id='):
     """Add hyperlinks to a commit message.
@@ -364,5 +373,8 @@ def add_hyperlinks(s,
 
     # l10n cross channel linking
     s = RE_XCHANNEL_REVISION.sub(xchannel_link, s)
+
+    # Linkify Phabricator differentials
+    s = DIFFERENTIAL_REVISION_RE.sub(differential_revision_repl, s)
 
     return s
