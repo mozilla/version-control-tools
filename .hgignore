@@ -11,6 +11,7 @@ venv/
 \.pyo$
 \.swp$
 \.t.err$
+\.idea/*
 ~$
 \.vagrant/*
 \.vagrantuser$
