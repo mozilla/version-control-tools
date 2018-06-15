@@ -145,21 +145,18 @@ class PushlogQuery(object):
                 params['end_id'] = self.queryend_value
 
             if self.userquery:
-                i = 0
                 subquery = []
-                for u in self.userquery:
+                for i, u in enumerate(self.userquery):
                     subquery.append("user = :user%d" % i)
                     params['user%d' % i] = u
-                    i += 1
+
                 where.append('(' + ' OR '.join(subquery) + ')')
 
             if self.changesetquery:
-                i = 0
                 subquery = []
-                for c in self.changesetquery:
+                for i, c in enumerate(self.changesetquery):
                     subquery.append("id = (select c.pushid from changesets c where c.node = :node%s)" % i)
                     params['node%d' % i] = hex(repo.lookup(c))
-                    i += 1
                 where.append('(' + ' OR '.join(subquery) + ')')
 
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
