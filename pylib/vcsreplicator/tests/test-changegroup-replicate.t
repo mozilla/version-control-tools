@@ -70,7 +70,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
-  $ hgmo exec hgweb0 tail -n 20 /var/log/vcsreplicator/consumer.log
+  $ hgmo exec hgweb0 tail -n 21 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
@@ -87,6 +87,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -169,6 +170,7 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -277,6 +279,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]

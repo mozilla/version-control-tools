@@ -39,7 +39,7 @@
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
-  $ hgmo exec hgweb0 tail -n 15 /var/log/vcsreplicator/consumer.log
+  $ hgmo exec hgweb0 tail -n 16 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
@@ -53,6 +53,7 @@
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > no changes found
   vcsreplicator.consumer   > added 0 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
 
