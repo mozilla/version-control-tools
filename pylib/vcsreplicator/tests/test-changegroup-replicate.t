@@ -59,7 +59,7 @@ Pushing the initial commit will result in replication messages
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
@@ -71,7 +71,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 tail -n 21 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob) (?)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
@@ -79,7 +79,7 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > adding changesets
@@ -135,7 +135,7 @@ Pushing multiple commits results in sane behavior
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r4f52aeca631dfa94331d93cfeaf069526926385a -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -154,7 +154,7 @@ Pushing multiple commits results in sane behavior
   0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
 
   $ hgmo exec hgweb0 tail -n 36 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob) (?)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
@@ -162,7 +162,7 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > adding changesets
@@ -179,7 +179,7 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r4f52aeca631dfa94331d93cfeaf069526926385a -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -240,7 +240,7 @@ Pushing multiple heads results in appropriate behavior
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 4c9443886fe84db9a4a5f29a5777517d2890d308 -r 4b11352745a6b3eb429ca8cd486dfdc221a4bc62 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r4c9443886fe84db9a4a5f29a5777517d2890d308 -r4b11352745a6b3eb429ca8cd486dfdc221a4bc62 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -263,7 +263,7 @@ Pushing multiple heads results in appropriate behavior
   0:77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
 
   $ hgmo exec hgweb0 tail -n 52 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
+  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob) (?)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
@@ -271,7 +271,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > adding changesets
@@ -288,7 +288,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (4f52aeca631dfa94331d93cfeaf069526926385a) and 3 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4f52aeca631dfa94331d93cfeaf069526926385a ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r4f52aeca631dfa94331d93cfeaf069526926385a -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -304,7 +304,7 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 9
   vcsreplicator.consumer pulling 2 heads (4c9443886fe84db9a4a5f29a5777517d2890d308, 4b11352745a6b3eb429ca8cd486dfdc221a4bc62) and 4 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r 4c9443886fe84db9a4a5f29a5777517d2890d308 -r 4b11352745a6b3eb429ca8cd486dfdc221a4bc62 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r4c9443886fe84db9a4a5f29a5777517d2890d308 -r4b11352745a6b3eb429ca8cd486dfdc221a4bc62 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

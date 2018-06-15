@@ -312,7 +312,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 14
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 15
   vcsreplicator.consumer pulling 1 heads (ba17b5c8e955a5e7f57c478cdd75bc999c5460a1) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r ba17b5c8e955a5e7f57c478cdd75bc999c5460a1 ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -rba17b5c8e955a5e7f57c478cdd75bc999c5460a1 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

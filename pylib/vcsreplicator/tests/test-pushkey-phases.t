@@ -66,7 +66,7 @@ There should be no pushkey on a push with a draft changeset
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
@@ -166,7 +166,7 @@ accurate)
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (fde0c41176556d1ec1bcf85e66706e5e76012508) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r fde0c41176556d1ec1bcf85e66706e5e76012508 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -rfde0c41176556d1ec1bcf85e66706e5e76012508 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -227,7 +227,7 @@ Pulling first changegroup will find its phase
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 13
   vcsreplicator.consumer pulling 1 heads (58017affcc6559ab3237457a5fb1e0e3bde306b1) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 58017affcc6559ab3237457a5fb1e0e3bde306b1 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r58017affcc6559ab3237457a5fb1e0e3bde306b1 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -254,7 +254,7 @@ Similar behavior for second changegroup
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 16
   vcsreplicator.consumer pulling 1 heads (601c8c0d17b02057475d528f022cf5d85da89825) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 601c8c0d17b02057475d528f022cf5d85da89825 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r601c8c0d17b02057475d528f022cf5d85da89825 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

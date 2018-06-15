@@ -61,7 +61,7 @@
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 4
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
@@ -99,7 +99,7 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (11bec8a6b2a30ac170575ecfd7a06af5a75e2d77) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r11bec8a6b2a30ac170575ecfd7a06af5a75e2d77 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -172,7 +172,7 @@ Changegroup message written
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (67b45555a21f4d9d470adc4f1ed3af63918f6414) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 67b45555a21f4d9d470adc4f1ed3af63918f6414 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r67b45555a21f4d9d470adc4f1ed3af63918f6414 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -277,7 +277,7 @@ Pushing obsolescence marker without bundle2 works
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 17
   vcsreplicator.consumer pulling 1 heads (de9a6dc9203d34261c1e2bea219bdd6053d74dda) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r de9a6dc9203d34261c1e2bea219bdd6053d74dda ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -rde9a6dc9203d34261c1e2bea219bdd6053d74dda -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -336,7 +336,7 @@ Pushing obsolescence marker without bundle2 works
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 20
   vcsreplicator.consumer pulling 1 heads (33e52188e17750dee7ec7a6b05b5f707ebc2cba9) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 33e52188e17750dee7ec7a6b05b5f707ebc2cba9 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r33e52188e17750dee7ec7a6b05b5f707ebc2cba9 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -463,7 +463,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 24
   vcsreplicator.consumer pulling 1 heads (3694f932529eff9a4b78fafab6097f27f3c37daa) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 3694f932529eff9a4b78fafab6097f27f3c37daa ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r3694f932529eff9a4b78fafab6097f27f3c37daa -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -481,7 +481,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 27
   vcsreplicator.consumer pulling 1 heads (63d556ea5b9faf08c8c41864c1fcaf3d57f986c8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 63d556ea5b9faf08c8c41864c1fcaf3d57f986c8 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r63d556ea5b9faf08c8c41864c1fcaf3d57f986c8 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -499,7 +499,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 30
   vcsreplicator.consumer pulling 1 heads (87d2d20529e71d92b847f1bad94c8ebb00203230) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 87d2d20529e71d92b847f1bad94c8ebb00203230 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r87d2d20529e71d92b847f1bad94c8ebb00203230 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -518,7 +518,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 33
   vcsreplicator.consumer pulling 1 heads (27eddb78301f686b0894dadaa2deb6dfbb080123) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 27eddb78301f686b0894dadaa2deb6dfbb080123 ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r27eddb78301f686b0894dadaa2deb6dfbb080123 -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -544,7 +544,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 37
   vcsreplicator.consumer pulling 1 heads (84b66e579087f83fdd8ea21456fe68a1c9b60cbe) and 2 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/obs into $TESTTMP/repos/obs
-  vcsreplicator.consumer   $ hg pull -r 84b66e579087f83fdd8ea21456fe68a1c9b60cbe ssh://$DOCKER_HOSTNAME:$HGPORT/obs
+  vcsreplicator.consumer   $ hg pull -r84b66e579087f83fdd8ea21456fe68a1c9b60cbe -- ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

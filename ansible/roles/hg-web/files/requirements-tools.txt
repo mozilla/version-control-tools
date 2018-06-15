@@ -34,8 +34,8 @@ pyaml==17.10.0 \
 PyYAML==3.12 \
     --hash=sha256:592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab
 
-python-hglib==1.9 \
-    --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
+python-hglib==2.6.1 \
+    --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 
 requests==2.18.1 \
     --hash=sha256:6afd3371c1f4c1970497cdcace5c5ecbbe58267bf05ca1abd93d99d170803ab7

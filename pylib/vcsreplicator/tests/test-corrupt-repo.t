@@ -25,7 +25,7 @@
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
@@ -63,7 +63,7 @@ Pulling into corrupt repo should result in abort
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 0c6b2090d458675af812e445c8ab9b809e321f57 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets
@@ -103,7 +103,7 @@ We should get the same failure if we try again
   $ consumer --onetime
   vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
-  vcsreplicator.consumer   $ hg pull -r 0c6b2090d458675af812e445c8ab9b809e321f57 ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
+  vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

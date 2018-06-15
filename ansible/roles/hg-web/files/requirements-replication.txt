@@ -10,8 +10,8 @@ kafka-python==1.4.2 \
 Mercurial==4.5.3+9-1ed250f701ee \
     --hash=sha256:da278225482e2d74a1a2fd3e7ed49e620b6c653b6bab0d0137b2952248290839
 
-python-hglib==1.9 \
-    --hash=sha256:f4302892b2b8287cf326586c7280b9eadfc3d0c7cd3feba957429a8d9b1a60ce
+python-hglib==2.6.1 \
+    --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 
 PyYAML==3.12 \
     --hash=sha256:592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab

@@ -18,8 +18,8 @@ kombu==3.0.37 \
 Mercurial==4.5.3 \
     --hash=sha256:9c4cb257ef1e59e9aba693cc285a6136f7bb4e8300f598ff50ff8b6fc77808fc
 
-python-hglib==1.7 \
-    --hash=sha256:0dc087d15b774cda82d3c8096fb0e514caeb2ddb60eed38e9056b16e279ba3c5
+python-hglib==2.6.1 \
+    --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 
 requests==2.13.0 \
     --hash=sha256:1a720e8862a41aa22e339373b526f508ef0c8988baf48b84d3fc891a8e237efb
