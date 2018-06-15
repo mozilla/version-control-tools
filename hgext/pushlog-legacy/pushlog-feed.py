@@ -163,8 +163,6 @@ class PushlogQuery(object):
                 where.append('(' + ' OR '.join(subquery) + ')')
 
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
-            #print "query: %s" % query
-            #print "params: %s" % params
             try:
                 res = self.conn.execute(query, params)
                 lastid = None
