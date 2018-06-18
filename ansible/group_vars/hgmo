@@ -11,8 +11,9 @@ zk_servers: {
   #"hgweb1.dmz.scl3.mozilla.com": 5,
   # hgssh3 was replaced by hgssh4 on 2016-06-30.
   #"hgssh3.dmz.scl3.mozilla.com": 6,
-  "hgweb11.dmz.scl3.mozilla.com": 7,
-  "hgweb12.dmz.scl3.mozilla.com": 8,
+  # hgweb11 and 12 were decommissioned ~2018-06-19.
+  #"hgweb11.dmz.scl3.mozilla.com": 7,
+  #"hgweb12.dmz.scl3.mozilla.com": 8,
   "hgweb13.dmz.scl3.mozilla.com": 9,
   "hgweb14.dmz.scl3.mozilla.com": 10,
   "hgssh4.dmz.scl3.mozilla.com": 11,
