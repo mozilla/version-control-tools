@@ -320,4 +320,4 @@ No "mozreview.remote" and no remote tells to run configure
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

@@ -1008,4 +1008,4 @@ Pushing to a discarded review series will create a new series
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

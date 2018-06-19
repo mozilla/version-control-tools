@@ -337,4 +337,4 @@ The raw diff demonstrates the original bytes are preserved
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

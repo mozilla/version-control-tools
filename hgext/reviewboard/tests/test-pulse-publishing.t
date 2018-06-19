@@ -126,4 +126,4 @@ Creating a reply will send a Pulse message
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

@@ -317,4 +317,4 @@ Discarding the parent review request draft should discard draft on children
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

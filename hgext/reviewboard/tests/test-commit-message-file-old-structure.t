@@ -252,4 +252,4 @@ FileDiff.
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

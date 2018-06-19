@@ -113,4 +113,4 @@ Specifying blockers and dependencies works
 Cleanup
 
   $ $TESTDIR/d0cker stop-bmo bzexport-test-newbug
-  stopped 1 containers
+  stopped 2 containers

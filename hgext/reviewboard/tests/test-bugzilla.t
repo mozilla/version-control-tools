@@ -300,4 +300,4 @@ Ensure r? in the commit description sets a review flag when pushing
     summary: bug2
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

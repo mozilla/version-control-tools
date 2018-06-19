@@ -29,4 +29,4 @@ HSTS header absent if both conditions are true
   200
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

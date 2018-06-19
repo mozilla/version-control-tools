@@ -619,4 +619,4 @@ Reviewer deduction can be disabled with a config option.
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

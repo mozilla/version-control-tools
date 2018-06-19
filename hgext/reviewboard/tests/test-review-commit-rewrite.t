@@ -147,4 +147,4 @@ Check rewriting when submitter == reviewer
     - 'MozReview-Commit-ID: 5ijR9k'
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

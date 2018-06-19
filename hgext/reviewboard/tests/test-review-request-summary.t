@@ -427,4 +427,4 @@ Verify non-submitters will not see the draft diffstats
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

@@ -1380,4 +1380,4 @@ when a revised patch is pushed.
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

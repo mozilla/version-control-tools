@@ -898,4 +898,4 @@ recycling behavior when commit IDs are present.
       - ''
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

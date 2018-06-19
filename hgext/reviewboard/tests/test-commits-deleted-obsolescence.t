@@ -1129,4 +1129,4 @@ Review request 5 (whose commit was deleted) should be discarded
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers

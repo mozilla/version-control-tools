@@ -100,4 +100,4 @@ Configuring with an existing old configuration using a git remote will issue a w
 Cleanup
 
   $ mozreview stop
-  stopped 9 containers
+  stopped 7 containers
