@@ -1,6 +1,7 @@
   $ . $TESTDIR/hgext/firefoxreleases/tests/helpers.sh
   $ enable_extension
   $ start_server
+  listening at http://localhost:$HGPORT/ (bound to $LOCALIP:$HGPORT) (?)
 
 Page showing table of Firefox releases is available
 

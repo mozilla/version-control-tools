@@ -30,7 +30,7 @@ from mozhg.util import (
 
 
 minimumhgversion = '4.3'
-testedwith = '4.3 4.4 4.5'
+testedwith = '4.3 4.4 4.5 4.6'
 
 configtable = {}
 configitem  = registrar.configitem(configtable)
@@ -109,15 +109,37 @@ def release_configurations(db, repo):
         fltr=lambda build: build.revision in repo)
 
 
-def firefox_releases_web_command(web, req, tmpl):
+def firefox_releases_web_command(*args):
     """Show information about Firefox releases."""
+
+    # TRACKING hg46
+    if len(args) == 1:
+        web = args[0]
+        req = web.req
+    else:
+        web, req, tmpl = args
+
     repo = web.repo
 
     db = db_for_repo(repo)
     if not db:
-        return tmpl('error', error='Firefox release info not available')
+        error_message = 'Firefox release info not available'
+        # TRACKING hg46
+        # the templater is no longer callable in hg46.
+        # # instead use the generate method
+        if hasattr(web, 'sendtemplate'):
+            return web.sendtemplate('error', error=error_message)
+        else:
+            return tmpl('error', error=error_message)
 
-    platform = req.form['platform'][0] if 'platform' in req.form else None
+
+    # TRACKING hg46
+    # hgweb requests no longer accept form data. The same data
+    # will be passed in as a query string parameter
+    if not hasattr(req, 'form'):
+        platform = req.qsparams['platform'] if 'platform' in req.qsparams else None
+    else:
+        platform = req.form['platform'][0] if 'platform' in req.form else None
 
     builds = []
 
@@ -135,7 +157,12 @@ def firefox_releases_web_command(web, req, tmpl):
         entry['anchor'] = build_anchor(build)
         releases.append(entry)
 
-    return tmpl('firefoxreleases', releases=releases)
+    # TRACKING hg46
+    if hasattr(web, 'sendtemplate'):
+        return web.sendtemplate('firefoxreleases', releases=releases)
+    else:
+        return tmpl('firefoxreleases', releases=releases)
+
 
 
 def release_config(build):
