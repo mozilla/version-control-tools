@@ -122,7 +122,7 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.2 4.3 4.4 4.5'
+testedwith = '4.2 4.3 4.4 4.5 4.6'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
