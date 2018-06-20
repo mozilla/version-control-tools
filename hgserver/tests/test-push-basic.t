@@ -102,7 +102,8 @@ It got replicated to mirrors
   "phase": "public",
   "pushid": 1,
   "pushdate": [*, 0], (glob)
-  "pushuser": "user1@example.com"
+  "pushuser": "user1@example.com",
+  "landingsystem": null
   }
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -122,7 +123,8 @@ It got replicated to mirrors
   "phase": "public",
   "pushid": 1,
   "pushdate": [*, 0], (glob)
-  "pushuser": "user1@example.com"
+  "pushuser": "user1@example.com",
+  "landingsystem": null
   }
 
 Pushlog should be replicated
