@@ -435,6 +435,13 @@ Attachment Comment (appears as a regular comment on the bug):
 field_re = re.compile(r'@([^@]+)@')
 
 
+def edit(ui, text):
+    # TRACKING HG43
+    try:
+        return ui.edit(text, ui.username(), action='bzexport').decode('utf-8')
+    except TypeError:
+        return ui.edit(text, ui.username()).decode('utf-8')
+
 def edit_form(ui, repo, fields, template_name):
     template_fields = []
 
@@ -465,7 +472,7 @@ def edit_form(ui, repo, fields, template_name):
     pattern = re.compile(pattern, re.S)
 
     # Allow user to edit the form
-    new = ui.edit(orig.encode('utf-8'), ui.username(), action='bzexport').decode('utf-8')
+    new = edit(ui, orig.encode('utf-8'))
 
     saved = savefile(repo, "last_bzexport.txt", new)
     ui.write("saved edited form in %s\n" % saved)
