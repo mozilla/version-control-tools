@@ -5,10 +5,11 @@ reviewboard-hg2.dmz.scl3.mozilla.com ansible_sudo=yes
 reviewboard[1:2].webapp.scl3.mozilla.com ansible_ssh_user=root
 
 [hgweb-prod]
-hgweb[11:16].dmz.scl3.mozilla.com ansible_sudo=yes
+hgweb[13:16].dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-prod]
-hgssh[4:6].dmz.scl3.mozilla.com ansible_sudo=yes
+hgssh4.dmz.scl3.mozilla.com ansible_sudo=yes
+hgssh6.dmz.scl3.mozilla.com ansible_sudo=yes
 
 [hgssh-prod-master]
 hgssh4.dmz.scl3.mozilla.com
