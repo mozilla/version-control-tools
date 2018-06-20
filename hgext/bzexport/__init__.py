@@ -68,10 +68,10 @@ from mercurial import (
 )
 from hgext import mq
 
-from mozhg.util import import_module
-
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import import_module
 
 import bzauth
 import bz
