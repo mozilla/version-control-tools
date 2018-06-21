@@ -115,7 +115,7 @@ def identify_repo(repo):
     # be liberal in what we apply this label to.
     d['firefox_releasing'] = (
         d['firefox']
-        and d['publishing']
+        and repo.ui.configbool('mozilla', 'firefox_releasing')
         and not d['user_repo'])
 
     return d
