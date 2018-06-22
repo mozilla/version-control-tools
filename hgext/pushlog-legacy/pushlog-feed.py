@@ -28,7 +28,7 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.3 4.4 4.5'
+testedwith = '4.3 4.4 4.5 4.6'
 minimumhgversion = '4.3'
 
 cal = pdt.Calendar()
@@ -262,19 +262,35 @@ def pushlogSetup(repo, req):
     page = int(qsparam(req, 'node', '1'))
 
     # figure out the urlbase
-    proto = req.env.get('wsgi.url_scheme')
+    # TRACKING hg46
+    if util.safehasattr(req, 'urlscheme'):
+        proto = req.urlscheme
+    else:
+        proto = req.env.get('wsgi.url_scheme')
+
     if proto == 'https':
         proto = 'https'
         default_port = "443"
     else:
         proto = 'http'
         default_port = "80"
-    port = req.env["SERVER_PORT"]
+
+    # TRACKING hg46
+    if util.safehasattr(req, 'rawenv'):
+        port = req.rawenv["SERVER_PORT"]
+    else:
+        port = req.env["SERVER_PORT"]
     port = port != default_port and (":" + port) or ""
 
     tipsonly = qsparam(req, 'tipsonly', None) == '1'
 
-    query = PushlogQuery(urlbase='%s://%s%s' % (proto, req.env['SERVER_NAME'], port),
+    # TRACKING hg46
+    if util.safehasattr(req, 'rawenv'):
+        urlbase = req.advertisedbaseurl
+    else:
+        urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
+
+    query = PushlogQuery(urlbase=urlbase,
                          repo=repo,
                          dbconn=conn,
                          tipsonly=tipsonly,
@@ -308,6 +324,7 @@ def pushlogSetup(repo, req):
         query.queryend = QueryType.PUSHID
         query.queryend_value = qsparam(req, 'endID', None)
 
+    # TRACKING hg46
     try:
         query.userquery = req.qsparams.getall('user')
     except AttributeError:
@@ -359,9 +376,15 @@ def pushlogFeed(*args):
     else:
         dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
 
+    # TRACKING hg46
+    if util.safehasattr(req, 'apppath'):
+        url = req.apppath or '/'
+    else:
+        url = req.url
+
     data = {
         'urlbase': query.urlbase,
-        'url': req.url,
+        'url': url,
         'repo': query.reponame,
         'date': dt,
         'entries': [],
@@ -380,7 +403,7 @@ def pushlogFeed(*args):
             'date': isotime(date),
             'user': xmlescape(user),
             'urlbase': query.urlbase,
-            'url': req.url,
+            'url': url,
             'files': [{'name': fn} for fn in ctx.files()],
         })
 
@@ -567,7 +590,12 @@ def pushes_worker(query, repo, full):
 
             # Only expose obsolescence metadata if the repo has some.
             if haveobs:
-                precursors = repo.obsstore.precursors.get(ctx.node(), ())
+                # TRACKING hg46
+                if util.safehasattr(repo.obsstore, 'predecessors'):
+                    precursors = repo.obsstore.predecessors.get(ctx.node(), ())
+                else:
+                    precursors = repo.obsstore.precursors.get(ctx.node(), ())
+
                 precursors = [hex(m[0]) for m in precursors]
                 if precursors:
                     node['precursors'] = precursors

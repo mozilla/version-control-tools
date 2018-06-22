@@ -422,7 +422,8 @@ Hidden changesets dropped in feed
    <id>http://*:$HGPORT/pushlog</id> (glob)
    <link rel="self" href="http://*:$HGPORT/pushlog"/> (glob)
    <link rel="alternate" href="http://*:$HGPORT/pushloghtml"/> (glob)
-   <title>server Pushlog</title>
+   <title>server Pushlog</title> (no-hg46 !)
+   <title>$TESTTMP/server Pushlog</title> (hg46 !)
    <updated>*Z</updated> (glob)
    <entry>
     <title>Changeset d129109168f0ed985e51b0f86df256acdcfcfe45</title>

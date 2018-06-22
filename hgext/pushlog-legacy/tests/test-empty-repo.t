@@ -17,7 +17,8 @@ Accessing /pushlog on a repo without a pushlog db should succeed
    <id>http://*:$HGPORT/pushlog</id> (glob)
    <link rel="self" href="http://*:$HGPORT/pushlog"/> (glob)
    <link rel="alternate" href="http://*:$HGPORT/pushloghtml"/> (glob)
-   <title>server Pushlog</title>
+   <title>server Pushlog</title> (no-hg46 !)
+   <title>$TESTTMP/server Pushlog</title> (hg46 !)
    <updated>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z</updated> (re)
   
   </feed>
