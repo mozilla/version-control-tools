@@ -169,3 +169,7 @@ Can filter by platform
   "files_url": "https://example.com/build0/"
   }]
   }
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

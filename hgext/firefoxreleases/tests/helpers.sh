@@ -40,7 +40,7 @@ EOF
 
   touch .hg/IS_FIREFOX_REPO
 
-  hg serve -d -p $HGPORT --pid-file hg.pid --hgmo
+  hg serve -d -p $HGPORT --pid-file hg.pid --hgmo -E error.log
   cat hg.pid >> $DAEMON_PIDS
   cd ..
 }
