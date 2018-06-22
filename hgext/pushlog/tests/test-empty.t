@@ -47,3 +47,7 @@ No pushlog file should have been created for read-only operations
   00changelog.i
   requires
   store
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

@@ -60,3 +60,7 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: pretxnchangegroup.pushlog hook failed
   abort: push failed on remote
   [255]
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

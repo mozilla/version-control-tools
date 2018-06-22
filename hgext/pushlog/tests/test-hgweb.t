@@ -30,7 +30,7 @@
   recorded push in pushlog
 
   $ cd ../server
-  $ hg serve -d -p $HGPORT --pid-file hg.pid
+  $ hg serve -d -p $HGPORT --pid-file hg.pid -E error.log
   $ cat hg.pid >> $DAEMON_PIDS
 
 Push info should show up in changeset view
@@ -305,3 +305,7 @@ pushrev() works in search
       "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
       "query": "pushrev(1)"
   }
+
+Confirm no errors in log
+
+  $ cat error.log

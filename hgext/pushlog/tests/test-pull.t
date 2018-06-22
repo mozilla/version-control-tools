@@ -170,3 +170,7 @@ Pulling an old changeset only pulls relevant changesets
   ID: 6; user: hguser; Date: \d+; Rev: 6; Node: 2e70e96c7d550e541406a47d87df354309fe9a72 (re)
 
   $ cd ..
+
+Confirm no errors in log
+
+  $ cat ./server/error.log
