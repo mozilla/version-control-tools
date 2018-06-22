@@ -103,3 +103,7 @@ Full output should do the same
           "user": "*" (glob)
       }
   }
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

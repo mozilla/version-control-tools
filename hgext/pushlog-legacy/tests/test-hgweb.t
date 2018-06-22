@@ -123,3 +123,7 @@ Format version 2 has pushes in a child object and a last push id
           }
       }
   }
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

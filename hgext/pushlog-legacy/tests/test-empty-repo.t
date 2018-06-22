@@ -3,7 +3,7 @@
   $ cd server
   $ serverconfig .hg/hgrc
 
-  $ hg serve -d -p $HGPORT --pid-file hg.pid
+  $ hg serve -d -p $HGPORT --pid-file hg.pid -E error.log
   $ cat hg.pid >> $DAEMON_PIDS
 
 Accessing /pushlog on a repo without a pushlog db should succeed
@@ -58,3 +58,7 @@ Create an empty database and test variations with that
   content-type: application/json
   
   {}
+
+Confirm no errors in log
+
+  $ cat error.log

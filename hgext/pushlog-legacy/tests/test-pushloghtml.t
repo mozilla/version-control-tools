@@ -3,7 +3,7 @@
   $ cd server
   $ serverconfig .hg/hgrc
   $ export USER=hguser
-  $ hg serve -d -p $HGPORT --pid-file hg.pid
+  $ hg serve -d -p $HGPORT --pid-file hg.pid -E error.log
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -59,3 +59,7 @@ Main HTML page lists all pushes
   <tr class="pushlogentry parity1  id3"><td></td><td><a href="/rev/17880384fe19">17880384fe19</a></td><td><strong>test &mdash; second commit on branch_foo</strong> <span class="logtags"><span class="inbranchtag" title="branch_foo">branch_foo</span> <span class="tagtag" title="foo2">foo2</span> </span></td></tr>
   <tr class="pushlogentry parity0  id2"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/a8ffcd74ae3e">a8ffcd74ae3e</a></td><td><strong>test &mdash; first commit on branch_foo</strong> <span class="logtags"><span class="inbranchtag" title="branch_foo">branch_foo</span> </span></td></tr> (glob)
   <tr class="pushlogentry parity1  id1"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/04caf62ca417">04caf62ca417</a></td><td><strong>test &mdash; initial commit</strong> <span class="logtags"></span></td></tr> (glob)
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

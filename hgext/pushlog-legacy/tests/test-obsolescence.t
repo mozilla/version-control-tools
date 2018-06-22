@@ -733,3 +733,7 @@ Specifying a hidden changeset works
           "user": "user@example.com"
       }
   }
+
+Confirm no errors in log
+
+  $ cat ../server/error.log
