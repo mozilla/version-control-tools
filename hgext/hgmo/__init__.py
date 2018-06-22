@@ -83,7 +83,6 @@ from mercurial.i18n import _
 from mercurial.node import bin, short
 from mercurial import (
     bookmarks,
-    cmdutil,
     commands,
     configitems,
     encoding,
@@ -93,6 +92,7 @@ from mercurial import (
     hg,
     registrar,
     revset,
+    scmutil,
     templatefilters,
     util,
 )
@@ -104,6 +104,7 @@ from mercurial.hgweb.common import (
     ErrorResponse,
     HTTP_OK,
     HTTP_NOT_FOUND,
+    statusmessage,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -122,6 +123,13 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
+# TRACKING hg46
+dateutil = import_module('mercurial.dateutil')
+if dateutil:
+    makedate = dateutil.makedate
+else:
+    makedate = util.makedate
+
 # hgweb.protocol -> wireprotoserver and symbol rename.
 try:
     from mercurial.wireprotoserver import httpv1protocolhandler as webproto
@@ -129,7 +137,7 @@ except ImportError:
     from mercurial.hgweb.protocol import webproto
 
 minimumhgversion = '4.3'
-testedwith = '4.3 4.4 4.5'
+testedwith = '4.3 4.4 4.5 4.6'
 
 cmdtable = {}
 
@@ -287,41 +295,78 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             break
 
 
-def changesetentry(orig, web, req, tmpl, ctx):
+def changesetentry(orig, web, *args):
     """Wraps webutil.changesetentry to provide extra metadata."""
-    d = orig(web, req, tmpl, ctx)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        ctx = args[-1]
+        d = orig(web, ctx)
+    else:
+        req, tmpl, ctx = args
+        d = orig(web, req, tmpl, ctx)
+
     addmetadata(web.repo, ctx, d)
     return d
 
 
-def changelistentry(orig, web, ctx, tmpl):
-    d = orig(web, ctx, tmpl)
+def changelistentry(orig, web, ctx, *args):
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        d = orig(web, ctx)
+    else:
+        tmpl = args[0]
+        d = orig(web, ctx, tmpl)
+
     addmetadata(web.repo, ctx, d, onlycheap=True)
     return d
 
 
-def mozbuildinfowebcommand(web, req, tmpl):
+def mozbuildinfowebcommand(web, *args):
     """Web command handler for the "mozbuildinfo" command."""
     repo = web.repo
 
-    # TODO we should be using the templater instead of emitting JSON directly.
-    # But this requires not having the JSON formatter from the
-    # pushlog-legacy.py extension.
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
 
-    if not repo.ui.configbool('hgmo', 'mozbuildinfoenabled', False):
-        req.respond(HTTP_OK, 'application/json')
-        return json.dumps({'error': 'moz.build evaluation is not enabled for this repo'})
+        # TODO we should be using the templater instead of emitting JSON directly.
+        # But this requires not having the JSON formatter from the
+        # pushlog-legacy.py extension.
+        if not web.configbool('hgmo', 'mozbuildinfoenabled', False):
+            return web.sendtemplate('error',
+                                    error={'error': 'moz.build evaluation is not enabled for this repo'})
 
-    if not repo.ui.config('hgmo', 'mozbuildinfowrapper'):
-        req.respond(HTTP_OK, 'application/json')
-        return json.dumps({'error': 'moz.build wrapper command not defined; refusing to execute'})
+        if not web.config('hgmo', 'mozbuildinfowrapper'):
+            return web.sendtemplate('error',
+                                    error={'error': 'moz.build wrapper command not defined; refusing to execute'})
 
-    rev = 'tip'
-    if 'node' in req.form:
-        rev = req.form['node'][0]
+        rev = 'tip'
+        if 'node' in req.qsparams:
+            rev = req.qsparams['node']
 
-    ctx = repo[rev]
-    paths = req.form.get('p', ctx.files())
+        ctx = scmutil.revsingle(repo, bytes(rev))
+        paths = req.qsparams.getall('p') or ctx.files()
+    else:
+        req, tmpl = args
+
+        # TODO we should be using the templater instead of emitting JSON directly.
+        # But this requires not having the JSON formatter from the
+        # pushlog-legacy.py extension.
+
+        if not repo.ui.configbool('hgmo', 'mozbuildinfoenabled', False):
+            req.respond(HTTP_OK, 'application/json')
+            return json.dumps({'error': 'moz.build evaluation is not enabled for this repo'})
+
+        if not repo.ui.config('hgmo', 'mozbuildinfowrapper'):
+            req.respond(HTTP_OK, 'application/json')
+            return json.dumps({'error': 'moz.build wrapper command not defined; refusing to execute'})
+
+        rev = 'tip'
+        if 'node' in req.form:
+            rev = req.form['node'][0]
+
+        ctx = repo[rev]
+        paths = req.form.get('p', ctx.files())
 
     pipedata = json.dumps({
         'repo': repo.root,
@@ -329,13 +374,13 @@ def mozbuildinfowebcommand(web, req, tmpl):
         'paths': paths,
     })
 
-    args = repo.ui.config('hgmo', 'mozbuildinfowrapper')
+    configargs = repo.ui.config('hgmo', 'mozbuildinfowrapper')
     # Should be verified by extsetup. Double check since any process invocation
     # has security implications.
-    assert '"' not in args
-    assert "'" not in args
-    args = args.split()
-    args = [a.replace('%repo%', repo.root) for a in args]
+    assert '"' not in configargs
+    assert "'" not in configargs
+    configargs = configargs.split()
+    configargs = [a.replace('%repo%', repo.root) for a in configargs]
 
     # We do not use a shell because it is only a vector for pain and possibly
     # security issues.
@@ -343,7 +388,7 @@ def mozbuildinfowebcommand(web, req, tmpl):
     # We switch cwd of the process so state from the current directory isn't
     # picked up.
     try:
-        p = subprocess.Popen(args,
+        p = subprocess.Popen(configargs,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
@@ -352,41 +397,73 @@ def mozbuildinfowebcommand(web, req, tmpl):
                              close_fds=True)
     except OSError as e:
         repo.ui.log('error invoking moz.build info process: %s\n' % e.errno)
-        return json.dumps({'error': 'unable to invoke moz.build info process'})
+
+        # TRACKING hg46
+        if util.safehasattr(web, 'sendtemplate'):
+            return web.sendtemplate('error', error={'error': 'unable to invoke moz.build info process'})
+        else:
+            return json.dumps({'error': 'unable to invoke moz.build info process'})
 
     stdout, stderr = p.communicate(pipedata)
 
-    req.respond(HTTP_OK, 'application/json')
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        if p.returncode:
+            repo.ui.log('failure obtaining moz.build info: stdout: %s; '
+                        'stderr: %s\n' % (stdout, stderr))
+            return web.sendtemplate('error', error={'error': 'unable to obtain moz.build info \n\n%s\n\n%s' % (stdout, stderr)})
+        elif stderr.strip():
+            repo.ui.log('moz.build evaluation output: %s\n' % stderr.strip())
 
-    if p.returncode:
-        repo.ui.log('failure obtaining moz.build info: stdout: %s; '
-                    'stderr: %s\n' % (stdout, stderr))
-        return json.dumps({'error': 'unable to obtain moz.build info'},
-                          indent=2)
-    elif stderr.strip():
-        repo.ui.log('moz.build evaluation output: %s\n' % stderr.strip())
+        try:
+            web.res.setbodygen(stream_json(json.loads(stdout)))
+            return web.res.sendresponse()
+        except Exception:
+            return web.sendtemplate('error', error={'error': 'invalid JSON returned; report this error'})
 
-    # Round trip to ensure we have valid JSON.
-    try:
-        d = json.loads(stdout)
-        return stream_json(d)
-    except Exception:
-        return json.dumps({'error': 'invalid JSON returned; report this error'},
-                          indent=2)
+    else:
+        req.respond(HTTP_OK, 'application/json')
+
+        if p.returncode:
+            repo.ui.log('failure obtaining moz.build info: stdout: %s; '
+                        'stderr: %s\n' % (stdout, stderr))
+            return json.dumps({'error': 'unable to obtain moz.build info'})
+        elif stderr.strip():
+            repo.ui.log('moz.build evaluation output: %s\n' % stderr.strip())
+
+        # Round trip to ensure we have valid JSON.
+        try:
+            d = json.loads(stdout)
+            return stream_json(d)
+        except Exception:
+            return json.dumps({'error': 'invalid JSON returned; report this error'})
 
 
-def infowebcommand(web, req, tmpl):
+def infowebcommand(web, *args):
     """Get information about the specified changeset(s).
 
     This is a legacy API from before the days of Mercurial's built-in JSON
     API. It is used by unidentified parts of automation. Over time these
     consumers should transition to the modern/native JSON API.
     """
-    if 'node' not in req.form:
-        return tmpl('error', error={'error': "missing parameter 'node'"})
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
+
+        if 'node' not in req.qsparams:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+
+        nodes = req.qsparams.getall('node')
+    else:
+        req, tmpl = args
+
+        if 'node' not in req.form:
+            return tmpl('error', error={'error': "missing parameter 'node'"})
+
+        nodes = req.form['node']
 
     csets = []
-    for node in req.form['node']:
+    for node in nodes:
         ctx = web.repo[node]
         csets.append({
             'rev': ctx.rev(),
@@ -401,10 +478,14 @@ def infowebcommand(web, req, tmpl):
             'files': ctx.files(),
         })
 
-    return tmpl('info', csets=csets)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        return web.sendtemplate('info', csets=csets)
+    else:
+        return tmpl('info', csets=csets)
 
 
-def headdivergencewebcommand(web, req, tmpl):
+def headdivergencewebcommand(web, *args):
     """Get information about divergence between this repo and a changeset.
 
     This API was invented to be used by MozReview to obtain information about
@@ -415,13 +496,27 @@ def headdivergencewebcommand(web, req, tmpl):
     Changes in other repositories must be rebased onto or merged into
     this repository.
     """
-    if 'node' not in req.form:
-        return tmpl('error', error={'error': "missing parameter 'node'"})
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
+
+        if 'node' not in req.qsparams:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+    else:
+        req, tmpl = args
+
+        if 'node' not in req.form:
+            return tmpl('error', error={'error': "missing parameter 'node'"})
 
     repo = web.repo
 
-    paths = set(req.form.get('p', []))
-    basectx = repo[req.form['node'][0]]
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        paths = set(req.qsparams.getall('p'))
+        basectx = repo[req.qsparams['node']]
+    else:
+        paths = set(req.form.get('p', []))
+        basectx = repo[req.form['node'][0]]
 
     # Find how much this repo has changed since the requested changeset.
     # Our heuristic is to find the descendant head with the highest revision
@@ -466,13 +561,30 @@ def headdivergencewebcommand(web, req, tmpl):
         for p in files & paths:
             filemerges.setdefault(p, []).append(ctx.hex())
 
-    return tmpl('headdivergence', commitsbehind=commitsbehind,
-                filemerges=filemerges, filemergesignored=filemergesignored)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        return web.sendtemplate('headdivergence', commitsbehind=commitsbehind,
+                    filemerges=filemerges, filemergesignored=filemergesignored)
+    else:
+        return tmpl('headdivergence', commitsbehind=commitsbehind,
+                    filemerges=filemerges, filemergesignored=filemergesignored)
 
 
-def automationrelevancewebcommand(web, req, tmpl):
-    if 'node' not in req.form:
-        return tmpl('error', error={'error': "missing parameter 'node'"})
+def automationrelevancewebcommand(web, *args):
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
+        tmpl = web.templater(req)
+    else:
+        req, tmpl = args
+
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        if 'node' not in req.qsparams:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+    else:
+        if 'node' not in req.form:
+            return tmpl('error', error={'error': "missing parameter 'node'"})
 
     repo = web.repo
     deletefields = set([
@@ -481,6 +593,7 @@ def automationrelevancewebcommand(web, req, tmpl):
         'branches',
         'changelogtag',
         'child',
+        'ctx',
         'inbranch',
         'instabilities',
         'obsolete',
@@ -488,6 +601,7 @@ def automationrelevancewebcommand(web, req, tmpl):
         'phase',
         'succsandmarkers',
         'tags',
+        'whyunstable',
     ])
 
     csets = []
@@ -496,7 +610,12 @@ def automationrelevancewebcommand(web, req, tmpl):
     # requested node is visible, so consumers can make intelligent decisions
     # about what to do if the changeset isn't visible.
     urepo = repo.unfiltered()
-    revs = list(urepo.revs('automationrelevant(%r)', req.form['node'][0]))
+
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        revs = list(urepo.revs('automationrelevant(%r)', req.qsparams['node']))
+    else:
+        revs = list(urepo.revs('automationrelevant(%r)', req.form['node'][0]))
 
     # The pushlog extensions wraps webutil.commonentry and the way it is called
     # means pushlog opens a SQLite connection on every call. This is inefficient.
@@ -525,7 +644,13 @@ def automationrelevancewebcommand(web, req, tmpl):
                 if k == 'files':
                     entry['files'] = sorted(ctx.files())
                 elif k == 'allparents':
-                    entry['parents'] = [p['node'] for p in v()]
+                    # TRACKING hg46
+                    if util.safehasattr(web, 'sendtemplate'):
+                        iterator = v().itermaps(ctx)
+                    else:
+                        iterator = v()
+
+                    entry['parents'] = [p['node'] for p in iterator]
                     del entry['allparents']
                 # These aren't interesting to us, so prune them. The
                 # original impetus for this was because "changelogtag"
@@ -548,18 +673,36 @@ def automationrelevancewebcommand(web, req, tmpl):
         'visible': visible,
     }
 
-    req.respond(HTTP_OK, 'application/json')
-    return stream_json(data)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        web.res.status = statusmessage(HTTP_OK)
+        web.res.setbodygen(stream_json(data))
+        return web.res.sendresponse()
+    else:
+        req.respond(HTTP_OK, 'application/json')
+        return stream_json(data)
 
 
-def isancestorwebcommand(web, req, tmpl):
+def isancestorwebcommand(web, *args):
     """Determine whether a changeset is an ancestor of another."""
-    for k in ('head', 'node'):
-        if k not in req.form:
-            raise ErrorResponse(HTTP_NOT_FOUND, "missing parameter '%s'" % k)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
+        for k in ('head', 'node'):
+            if k not in req.qsparams:
+                raise ErrorResponse(HTTP_NOT_FOUND, "missing parameter '%s'" % k)
 
-    head = req.form['head'][0]
-    node = req.form['node'][0]
+        head = req.qsparams['head']
+        node = req.qsparams['node']
+    else:
+        req, tmpl = args
+
+        for k in ('head', 'node'):
+            if k not in req.form:
+                raise ErrorResponse(HTTP_NOT_FOUND, "missing parameter '%s'" % k)
+
+        head = req.form['head'][0]
+        node = req.form['node'][0]
 
     try:
         headctx = web.repo[head]
@@ -579,17 +722,31 @@ def isancestorwebcommand(web, req, tmpl):
             isancestor = True
             break
 
-    return tmpl('isancestor',
-                headnode=headctx.hex(),
-                testnode=testctx.hex(),
-                isancestor=isancestor)
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        return web.sendtemplate('isancestor',
+                                headnode=headctx.hex(),
+                                testnode=testctx.hex(),
+                                isancestor=isancestor)
+    else:
+        return tmpl('isancestor',
+                    headnode=headctx.hex(),
+                    testnode=testctx.hex(),
+                    isancestor=isancestor)
 
 
-def repoinfowebcommand(web, req, tmpl):
-    group_owner = repo_owner(web.repo)
+def repoinfowebcommand(web, *args):
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        group_owner = repo_owner(web.repo)
+        return web.sendtemplate('repoinfo',
+                                groupowner=group_owner)
+    else:
+        tmpl = args[-1]
+        group_owner = repo_owner(web.repo)
 
-    return tmpl('repoinfo',
-                groupowner=group_owner)
+        return tmpl('repoinfo',
+                    groupowner=group_owner)
 
 
 def revset_reviewer(repo, subset, x):
@@ -716,10 +873,19 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
         data = json.loads(ui.fin.read())
 
         repo = hg.repository(ui, path=data['repo'])
-        ctx = repo[data['node']]
+        # TRACKING hg46
+        if util.safehasattr(scmutil, 'revsingle'):
+            ctx = scmutil.revsingle(repo, bytes(data['node']))
+        else:
+            ctx = repo[data['node']]
+
         paths = data['paths']
     else:
-        ctx = repo[opts['rev']]
+        # TRACKING hg46
+        if util.safehasattr(scmutil, 'revsingle'):
+            ctx = scmutil.revsingle(repo, bytes(opts['rev']))
+        else:
+            ctx = repo[opts['rev']]
 
     try:
         d = mozbuildinfo.filesinfo(repo, ctx, paths=paths)
@@ -855,8 +1021,15 @@ def processbundlesmanifest(orig, repo, proto):
     return manifest
 
 
-def filelog(orig, web, req, tmpl):
+def filelog(orig, web, *args):
     """Wraps webcommands.filelog to provide pushlog metadata to template."""
+    # TRACKING hg46
+    if util.safehasattr(web, 'sendtemplate'):
+        req = web.req
+        tmpl = web.templater(req)
+    else:
+        req, tmpl = args
+
     # Template wrapper to add pushlog data to entries when the template is
     # evaluated.
     class tmplwrapper(tmpl.__class__):
@@ -865,7 +1038,7 @@ def filelog(orig, web, req, tmpl):
                 push = web.repo.pushlog.pushfromnode(bin(entry['node']))
                 if push:
                     entry['pushid'] = push.pushid
-                    entry['pushdate'] = util.makedate(push.when)
+                    entry['pushdate'] = makedate(push.when)
                 else:
                     entry['pushid'] = None
                     entry['pushdate'] = None
@@ -877,8 +1050,14 @@ def filelog(orig, web, req, tmpl):
         if hasattr(web.repo, 'pushlog'):
             tmpl.__class__ = tmplwrapper
 
-        for r in orig(web, req, tmpl):
-            yield r
+        # TRACKING hg46
+        if util.safehasattr(web, 'sendtemplate'):
+            web.tmpl = tmpl
+            for r in orig(web):
+                yield r
+        else:
+            for r in orig(web, req, tmpl):
+                yield r
     finally:
         tmpl.__class__ = orig_class
 
