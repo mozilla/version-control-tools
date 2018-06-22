@@ -43,7 +43,7 @@ Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
 minimumhgversion = '4.3'
-testedwith = '4.3 4.4 4.5'
+testedwith = '4.3 4.4 4.5 4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
