@@ -174,11 +174,17 @@ def build_anchor(build):
                          build.build_id)
 
 
-def changesetentry(orig, web, req, tmpl, ctx):
+def changesetentry(orig, web, *args):
     """Add metadata for an individual changeset in hgweb."""
-    repo = web.repo
+    # TRACKING hg46
+    if len(args) == 1:
+        ctx = args[-1]
+        d = orig(web, ctx)
+    else:
+        req, tmpl, ctx = args
+        d = orig(web, req, tmpl, ctx)
 
-    d = orig(web, req, tmpl, ctx)
+    repo = web.repo
 
     db = db_for_repo(repo)
     if not db:
