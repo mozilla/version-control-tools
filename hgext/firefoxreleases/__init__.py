@@ -13,6 +13,7 @@ from mercurial import (
     extensions,
     registrar,
     revset,
+    util,
 )
 from mercurial.hgweb import (
     webcommands,
@@ -109,15 +110,14 @@ def release_configurations(db, repo):
         fltr=lambda build: build.revision in repo)
 
 
-def firefox_releases_web_command(*args):
+def firefox_releases_web_command(web, *args):
     """Show information about Firefox releases."""
 
     # TRACKING hg46
-    if len(args) == 1:
-        web = args[0]
+    if util.safehasattr(web, 'sendtemplate'):
         req = web.req
     else:
-        web, req, tmpl = args
+        req, tmpl = args
 
     repo = web.repo
 
@@ -127,7 +127,7 @@ def firefox_releases_web_command(*args):
         # TRACKING hg46
         # the templater is no longer callable in hg46.
         # # instead use the generate method
-        if hasattr(web, 'sendtemplate'):
+        if util.safehasattr(web, 'sendtemplate'):
             return web.sendtemplate('error', error=error_message)
         else:
             return tmpl('error', error=error_message)
@@ -158,7 +158,7 @@ def firefox_releases_web_command(*args):
         releases.append(entry)
 
     # TRACKING hg46
-    if hasattr(web, 'sendtemplate'):
+    if util.safehasattr(web, 'sendtemplate'):
         return web.sendtemplate('firefoxreleases', releases=releases)
     else:
         return tmpl('firefoxreleases', releases=releases)
