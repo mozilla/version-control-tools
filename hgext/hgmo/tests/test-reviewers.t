@@ -36,3 +36,7 @@ Reviewer revset works
   $ grep '<a href="/rev/' body
   <a href="/rev/e32726f11326">diff</a><br/>
   <a href="/rev/b2695d7dbd02">diff</a><br/>
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

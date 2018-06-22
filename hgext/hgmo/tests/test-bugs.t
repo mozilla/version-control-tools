@@ -36,3 +36,7 @@ No bug output if no bugs found
   $ http http://localhost:$HGPORT/rev/9295dbc456b5 --body-file body > /dev/null
   $ grep '<td>bugs' body
   [1]
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

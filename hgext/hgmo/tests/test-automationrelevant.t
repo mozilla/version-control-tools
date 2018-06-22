@@ -221,4 +221,7 @@ web command for exposing automation relevance works
     "visible": true
   }
 
+
+Confirm no errors in log
+
   $ cat error.log

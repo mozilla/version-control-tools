@@ -137,3 +137,7 @@ Verify headdivergencemaxnodes limit works
       "filemerges": {},
       "filemergesignored": true
   }
+
+Confirm no errors in log
+
+  $ cat error.log

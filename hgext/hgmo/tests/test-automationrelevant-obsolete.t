@@ -161,3 +161,7 @@ Unless --hidden is used
   }
 
   $ cd ..
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

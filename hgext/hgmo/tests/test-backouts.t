@@ -51,3 +51,7 @@ Reference a backed out node that doesn't exist (bug 1257152)
 
   $ grep 'backs out' body
   [1]
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

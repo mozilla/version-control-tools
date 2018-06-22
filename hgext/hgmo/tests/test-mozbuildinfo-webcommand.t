@@ -37,6 +37,10 @@ Web command isn't available unless enabled
   
   {"error": "moz.build evaluation is not enabled for this repo"}
 
+Confirm no errors in log
+
+  $ cat ./server/error.log
+
 Restart server with evaluation enabled
 
   $ cd server
@@ -45,7 +49,8 @@ Restart server with evaluation enabled
   > mozbuildinfoenabled = True
   > EOF
 
-  $ hg serve -d -p $HGPORT1 --pid-file hg.pid -E error.log --hgmo
+  $ hg serve -d -p $HGPORT1 --pid-file hg.pid -E error2.log --hgmo
+  listening at http://localhost:$HGPORT1/ (bound to $LOCALIP:$HGPORT1) (?)
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -57,6 +62,10 @@ Web command errors unless a wrapper is defined
   
   {"error": "moz.build wrapper command not defined; refusing to execute"}
 
+Confirm no errors in log
+
+  $ cat ./server/error2.log
+
 Restart the server with dummy wrapper
 
   $ cd server
@@ -65,7 +74,7 @@ Restart the server with dummy wrapper
   > mozbuildinfowrapper = `which hg` --config extensions.hgmo=$TESTDIR/hgext/hgmo mozbuildinfo --pipemode
   > EOF
 
-  $ hg serve -d -p $HGPORT2 --pid-file hg.pid -E error.log --hgmo
+  $ hg serve -d -p $HGPORT2 --pid-file hg.pid -E error3.log --hgmo
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -150,6 +159,10 @@ Errors displayed properly
     "error": "no moz.build info available"
   }
 
+Confirm no errors in log
+
+  $ cat ./server/error3.log
+
 Restart the server with a bad wrapper command
 
   $ cd server
@@ -157,7 +170,7 @@ Restart the server with a bad wrapper command
   > [hgmo]
   > mozbuildinfowrapper = /does/not/exist
   > EOF
-  $ hg serve -d -p $HGPORT3 --pid-file hg.pid -E error2.log --hgmo
+  $ hg serve -d -p $HGPORT3 --pid-file hg.pid -E error4.log --hgmo
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -167,6 +180,10 @@ Restart the server with a bad wrapper command
   
   {"error": "unable to invoke moz.build info process"}
 
+Confirm no errors in log
+
+  $ cat ./server/error4.log
+
 Restart the server with a wrapper that doesn't emit JSON
 
   $ cd server
@@ -174,7 +191,7 @@ Restart the server with a wrapper that doesn't emit JSON
   > [hgmo]
   > mozbuildinfowrapper = $TESTDIR/hgext/hgmo/tests/wrapper-not-json
   > EOF
-  $ hg serve -d -p $HGPORT4 --pid-file hg.pid --hgmo
+  $ hg serve -d -p $HGPORT4 --pid-file hg.pid --hgmo -E error5.log
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -182,6 +199,9 @@ Restart the server with a wrapper that doesn't emit JSON
   200
   content-type: application/json
   
-  {
-    "error": "invalid JSON returned; report this error"
-  }
+  {"error": "invalid JSON returned; report this error"}
+
+
+Confirm no errors in log
+
+  $ cat ./server/error5.log

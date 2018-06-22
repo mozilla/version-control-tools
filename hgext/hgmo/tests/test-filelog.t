@@ -26,3 +26,7 @@ Single file with 3 commits
   3
   $ grep -c '<br/>created <i>1970-01-01 00:00 +0000</i>' body
   3
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

@@ -132,3 +132,7 @@ A missing manifest results in the local file being deleted
   undo.branch
   undo.desc
   undo.dirstate
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

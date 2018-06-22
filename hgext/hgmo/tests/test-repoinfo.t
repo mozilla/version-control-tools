@@ -15,3 +15,7 @@
 
   $ grep Push body
     <tr><td>Push Group</td><td>*</td></tr> (glob)
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

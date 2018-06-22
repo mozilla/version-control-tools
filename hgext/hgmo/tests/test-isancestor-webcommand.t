@@ -96,3 +96,7 @@ Unknown test revision raises reasonable error
   content-type: application/json
   
   "unknown node revision foobar"
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

@@ -73,3 +73,7 @@ Check the last changeset
       ],
       "user": "test"
   }
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

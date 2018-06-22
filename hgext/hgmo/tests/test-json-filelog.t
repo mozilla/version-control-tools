@@ -94,3 +94,7 @@ Single file with 3 commits
           }
       ]
   }
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

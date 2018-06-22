@@ -35,3 +35,7 @@ Commit not changing milestone should show milestone
   $ http http://localhost:$HGPORT/rev/5e06103db78f --body-file body > /dev/null
   $ grep '<td>milestone' body
   <tr><td>milestone</td><td>14.0</td></tr>
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

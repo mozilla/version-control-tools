@@ -26,3 +26,7 @@
   $ http http://localhost:$HGPORT/rev/3f1e8da7de66 --body-file body > /dev/null
   $ grep converted body
   <tr><td>converted from</td><td><a href="/mozilla-central/rev/c0f2344539c41be3e493656d83a59306f9395e2f">c0f2344539c41be3e493656d83a59306f9395e2f</a></td></tr>
+
+Confirm no errors in log
+
+  $ cat ../server/error.log

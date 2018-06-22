@@ -55,3 +55,7 @@ Last changeset
       ],
       "user": "test"
   }
+
+Confirm no errors in log
+
+  $ cat ../server/error.log
