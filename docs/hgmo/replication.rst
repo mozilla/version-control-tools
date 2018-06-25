@@ -9,62 +9,6 @@ a read/write master server available via SSH and a set of read-only
 mirrors available over HTTP. As changes are pushed to the master server,
 they are replicated to the read-only mirrors.
 
-Legacy Replication System
-=========================
-
-The legacy replication system is very crude yet surprisingly effective:
-
-1. ``mozhghooks.replicate`` hook fires during *changegroup* and
-   *pushkey* hooks as part of push operations.
-2. ``/usr/local/bin/repo-push.sh`` is invoked. This script iterates
-   through all mirrors and effectively runs ``ssh -l hg <mirror>
-   <repo>``.
-3. On each mirror, the SSH session effectively runs
-   ``/usr/local/bin/mirror-pull <repo>``. The ``mirror-pull`` script
-   then typically performs a ``hg pull ssh://<master>/<repo>``.
-
-Each mirror performs its replication in parallel. So, the number of
-mirrors can be scaled without increasing mirror time proportionally.
-
-Replication is performed synchronously with the push. So, the client's
-``hg push`` command doesn't finish until replication finishes. This adds
-latency to pushes.
-
-There are several downsides with this replication method:
-
-* Replication is synchronous with push, adding latency. This is felt
-  most notably on the Try repository, which takes 9-15s to replicate.
-  Other repositories typically take 1-8s.
-* If a mirror is slow, it is a long pole and slows down replication for
-  the push, adding yet more latency to the push.
-* If a mirror is down, the system is not intelligent enough to
-  automatically remove the mirror from the mirrors list. The master will
-  retry several times before failing. This adds latency to pushes.
-* If a mirror is removed from the replication system, it doesn't re-sync
-  when it comes back online. Instead, it must be manually re-synced by
-  running a script. If a server reboots for no reason, it can become out
-  of sync and someone may or may not re-sync it promptly.
-* Each mirror syncs and subsequently exposes data at different times.
-  There is a window during replication where mirror A will advertise
-  data that mirror B does not yet have. This can lead to clients seeing
-  inconsistent repository state due to hitting different servers behind
-  the load balancer.
-
-In addition:
-
-* There is no mechanism for replicating repository creation or deletion
-  events.
-* This is no mechanism for replicating hgrc changes.
-* This replication system is optimized for a low-latency,
-  high-availability intra-datacenter environment and won't work well
-  with a future, globally distributed hg.mozilla.org service (which will
-  be far more prone to network events such as loss of connectivity).
-
-Despite all these downsides, the legacy replication system is
-surprisingly effective. Mirrors getting out of sync is rare.
-Historically the largest problem has been the increased push latency due
-to synchronous replication.
-
 VCSReplicator Introduction
 ==========================
 
@@ -291,25 +235,6 @@ each push (requires bundle2 on the client) or write events to Kafka as a
 single unit (if that's even supported). We should also support rolling
 back the previous transaction in Mercurial if the post transaction
 close message(s) fails to write.
-
-Comparison to Legacy Replication System
-=======================================
-
-* Writing to replication log is synchronous with pushing but actual
-  replication is asynchronous. This means that pushes from the perspective
-  of clients are much faster.
-* Mirrors that are down will not slow down pushes since push operations
-  don't directly communicate with mirrors.
-* Mirrors that go down will recover and catch up on replication backlog
-  when they return to service (as opposed to requiring manual intervention
-  to correct).
-* Repository creation events will be automatically replicated.
-* hgrc changes will be replicated.
-* It will be much easier to write tools that key off the replication log
-  for performing additional actions (IRC notifications, e-mail notifications,
-  Git mirroring, bug updates, etc).
-* (Eventually) The window where inconsistent state is exposed on mirrors
-  will be shrunk drastically.
 
 Installation and Configuring
 ============================

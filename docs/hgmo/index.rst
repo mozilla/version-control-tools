@@ -17,5 +17,6 @@ hg.mozilla.org
    mozbuildinfo
    firefoxreleases
    replication
+   replication-history
    ops
    upgrading
