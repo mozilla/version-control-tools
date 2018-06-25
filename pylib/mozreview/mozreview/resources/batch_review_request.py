@@ -53,6 +53,7 @@ from reviewboard.webapi.resources import (
 
 from mozreview.errors import (
     REVIEW_REQUEST_UPDATE_NOT_ALLOWED,
+    USE_PHABRICATOR,
 )
 from mozreview.extra_data import (
     AUTHOR_KEY,
@@ -97,6 +98,17 @@ You must reopen the review request before it can be updated.
 Review requests should only be reopened if your changes have not landed or have
 been backed out - file new bugs for follow-up work.
 '''.strip()
+
+USE_PHABRICATOR_MESSAGE = '''
+
+****************************************************
+MozReview is no longer accepting new review requests
+****************************************************
+
+Please use Phabricator for new review requests.
+See https://moz-conduit.readthedocs.io/ for the
+Phabricator installation and user guide.
+'''.rstrip()
 
 
 class DiffProcessingException(Exception):
@@ -398,6 +410,18 @@ class BatchReviewRequestResource(WebAPIResource):
             logger.info('using squashed review request %d' % squashed_rr.id)
 
         except ReviewRequest.DoesNotExist:
+            prevent_new_requests = False
+            try:
+                with open('/mozreview-settings.json', 'r') as f:
+                    settings = json.load(f)
+                prevent_new_requests = settings['prevent_new']
+            except (IOError, KeyError, ValueError):
+                pass
+            if prevent_new_requests:
+                raise SubmissionException(
+                    USE_PHABRICATOR.with_message(USE_PHABRICATOR_MESSAGE)
+                )
+
             squashed_rr = ReviewRequest.objects.create(
                     user=user, repository=repo, commit_id=identifier,
                     local_site=local_site)

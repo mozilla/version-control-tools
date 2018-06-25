@@ -99,3 +99,8 @@ REVIEW_REQUEST_UPDATE_NOT_ALLOWED = WebAPIError(
     1009,
     "Updating review request not allowed at this time.",
     http_status=405)  # 405 Method not Allowed
+
+USE_PHABRICATOR = WebAPIError(
+    1010,
+    "New review requests are no longer supported.",
+    http_status=405)
