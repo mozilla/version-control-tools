@@ -14,11 +14,21 @@ firefoxrelease() revset should issue warning if feature not enabled
   $ hg log -r 'firefoxrelease()'
   (warning: firefoxrelease() revset not available)
 
-And if the database is missing
+And if the database is missing (using deprecated var name)
 
   $ cat >> .hg/hgrc << EOF
   > [mozilla]
   > enablefirefoxreleases = true
+  > EOF
+
+  $ hg log -r 'firefoxrelease()'
+  (warning: firefoxrelease() revset not available)
+
+And if the database is missing (using non-deprecated)
+
+  $ cat >> .hg/hgrc << EOF
+  > [mozilla]
+  > firefox_releasing = true
   > EOF
 
   $ hg log -r 'firefoxrelease()'

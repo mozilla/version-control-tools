@@ -36,7 +36,9 @@ testedwith = '4.3 4.4 4.5 4.6'
 configtable = {}
 configitem  = registrar.configitem(configtable)
 
-configitem('mozilla', 'enablefirefoxreleases',
+configitem('mozilla', 'enablefirefoxreleases',  # deprecated, use firefox_releasing
+           default=configitems.dynamicdefault)
+configitem('mozilla', 'firefox_releasing',
            default=configitems.dynamicdefault)
 configitem('mozilla', 'firefoxreleasesdb',
            default=configitems.dynamicdefault)
@@ -58,7 +60,8 @@ def db_for_repo(repo):
     if not repo.local():
         return None
 
-    if not repo.ui.configbool('mozilla', 'enablefirefoxreleases', False):
+    if (not repo.ui.configbool('mozilla', 'enablefirefoxreleases', False)  # deprecated
+            and not repo.ui.configbool('mozilla', 'firefox_releasing', False)):
         return None
 
     if not is_firefox_repo(repo):

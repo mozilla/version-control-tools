@@ -35,7 +35,7 @@ start_server() {
 hgmo = $TESTDIR/hgext/hgmo
 
 [mozilla]
-enablefirefoxreleases = true
+firefox_releasing = true
 EOF
 
   touch .hg/IS_FIREFOX_REPO
