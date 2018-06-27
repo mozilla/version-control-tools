@@ -255,6 +255,7 @@ def logsyslog(ui, message):
 
     syslog.openlog(ident, 0, facility)
     syslog.syslog(syslog.LOG_NOTICE, message)
+    syslog.closelog()
 
 
 class hgwebwrapped(hgweb_mod.hgweb):
@@ -320,8 +321,6 @@ class hgwebwrapped(hgweb_mod.hgweb):
                      '%.3f' % deltatime,
                      '%.3f' % deltacpu)
 
-            syslog.closelog()
-
 
 class sshserverwrapped(sshserver.sshserver):
     """Wrap sshserver class to record events."""
@@ -361,7 +360,6 @@ class sshserverwrapped(sshserver.sshserver):
                      '%.3f' % deltatime,
                      '%.3f' % deltacpu)
 
-            syslog.closelog()
             self._serverlog = None
 
     def serve_one(self):
