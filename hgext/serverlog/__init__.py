@@ -213,7 +213,7 @@ def protocolcall(repo, req, cmd):
     # TODO figure out why our custom attribute is getting lost in
     # production.
     if hasattr(req, '_serverlog'):
-        logsyslog(req._serverlog, 'BEGIN_PROTOCOL', cmd)
+        logevent(req._serverlog, 'BEGIN_PROTOCOL', cmd)
 
     return origcall(repo, req, cmd)
 
@@ -237,7 +237,14 @@ def repopath(repo):
     return path
 
 
-def logsyslog(context, action, *args):
+def logevent(context, action, *args):
+    """Log a server event.
+
+    ``context`` is a dict containing state of the session/request.
+
+    ``action`` is the event name and ``args`` are arguments specific to the
+    ``action``.
+    """
     syslog.openlog(context['ident'], 0, context['facility'])
 
     fmt = '%s %s %s'
@@ -276,7 +283,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         uri = req.env.get('REQUEST_URI', 'UNKNOWN')
 
         sl = serverlog
-        logsyslog(sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
+        logevent(sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
         startcpu = startusage.ru_utime + startusage.ru_stime
@@ -291,7 +298,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
                 yield what
 
                 if sl['writecount'] - lastlogamount > datasizeinterval:
-                    logsyslog(sl, 'WRITE_PROGRESS', '%d' % sl['writecount'])
+                    logevent(sl, 'WRITE_PROGRESS', '%d' % sl['writecount'])
                     lastlogamount = sl['writecount']
         finally:
             # It is easy to introduce cycles in localrepository instances.
@@ -307,9 +314,10 @@ class hgwebwrapped(hgweb_mod.hgweb):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logsyslog(sl, 'END_REQUEST', '%d' % sl['writecount'],
-                      '%.3f' % deltatime,
-                      '%.3f' % deltacpu)
+            logevent(sl, 'END_REQUEST',
+                     '%d' % sl['writecount'],
+                     '%.3f' % deltatime,
+                     '%.3f' % deltacpu)
 
             syslog.closelog()
 
@@ -329,9 +337,9 @@ class sshserverwrapped(sshserver.sshserver):
         # methods.
         self.repo._serverlog = serverlog
 
-        logsyslog(serverlog, 'BEGIN_SSH_SESSION',
-                  serverlog['path'],
-                  os.environ['USER'])
+        logevent(serverlog, 'BEGIN_SSH_SESSION',
+                 serverlog['path'],
+                 os.environ['USER'])
 
         self._serverlog = serverlog
 
@@ -349,9 +357,9 @@ class sshserverwrapped(sshserver.sshserver):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logsyslog(serverlog, 'END_SSH_SESSION',
-                '%.3f' % deltatime,
-                '%.3f' % deltacpu)
+            logevent(serverlog, 'END_SSH_SESSION',
+                     '%.3f' % deltatime,
+                     '%.3f' % deltacpu)
 
             syslog.closelog()
             self._serverlog = None
@@ -362,7 +370,7 @@ class sshserverwrapped(sshserver.sshserver):
         origdispatch = wireproto.dispatch
 
         def dispatch(repo, proto, cmd):
-            logsyslog(self._serverlog, 'BEGIN_SSH_COMMAND', cmd)
+            logevent(self._serverlog, 'BEGIN_SSH_COMMAND', cmd)
             return origdispatch(repo, proto, cmd)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
@@ -380,9 +388,9 @@ class sshserverwrapped(sshserver.sshserver):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logsyslog(self._serverlog, 'END_SSH_COMMAND',
-                '%.3f' % deltatime,
-                '%.3f' % deltacpu)
+            logevent(self._serverlog, 'END_SSH_COMMAND',
+                     '%.3f' % deltatime,
+                     '%.3f' % deltacpu)
 
             wireproto.dispatch = origdispatch
             self._serverlog['requestid'] = ''
