@@ -9,6 +9,29 @@
     - docker
     - docker-kafkabroker
 
+# Docker isn't running systemd. Remove the rsyslog config file telling
+# rsyslog to bind to /run/systemd/journal/syslog so it binds to /dev/log
+# by default and logging tools work.
+- name: remove systemd syslog config
+  file: path=/etc/rsyslog.d/listen.conf
+        state=absent
+
+# Hack up rsyslog config so it works without systemd
+- name: remove systemd from rsyslog
+  replace: dest=/etc/rsyslog.conf
+           regexp='^\$ModLoad imjournal.*'
+           replace=''
+
+- name: enable local syslog logging
+  replace: dest=/etc/rsyslog.conf
+           regexp='^\$OmitLocalLogging on'
+           replace='$OmitLocalLogging off'
+
+- name: disable syslog journal file
+  replace: dest=/etc/rsyslog.conf
+           regexp='^\$IMJournalStateFile'
+           replace='#$IMJournalStateFile'
+
 - name: install Docker support files
   copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
   with_items:
