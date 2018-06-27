@@ -245,15 +245,19 @@ def logevent(ui, context, action, *args):
     ``action`` is the event name and ``args`` are arguments specific to the
     ``action``.
     """
-    syslog.openlog(context['ident'], 0, context['facility'])
-
     fmt = '%s %s %s'
     formatters = (context['requestid'], action, ' '.join(args))
     if context.get('sessionid'):
         fmt = '%s:' + fmt
         formatters = tuple([context['sessionid']] + list(formatters))
 
-    syslog.syslog(syslog.LOG_NOTICE, fmt % formatters)
+    logsyslog(ui, context, fmt % formatters)
+
+
+def logsyslog(ui, context, message):
+    """Log a formatted message to syslog."""
+    syslog.openlog(context['ident'], 0, context['facility'])
+    syslog.syslog(syslog.LOG_NOTICE, message)
 
 
 class hgwebwrapped(hgweb_mod.hgweb):
