@@ -227,8 +227,8 @@ def protocolcall(repo, req, cmd):
 
     # TODO figure out why our custom attribute is getting lost in
     # production.
-    if hasattr(req, '_serverlog'):
-        logevent(repo.ui, req._serverlog, 'BEGIN_PROTOCOL', cmd)
+    if hasattr(repo, '_serverlog'):
+        logevent(repo.ui, repo._serverlog, 'BEGIN_PROTOCOL', cmd)
 
     return origcall(repo, req, cmd)
 
@@ -296,7 +296,6 @@ class hgwebwrapped(hgweb_mod.hgweb):
         # Stuff a reference to the state and the bound logging method so we can
         # record and log inside request handling.
         self._serverlog = serverlog
-        req._serverlog = serverlog
         repo._serverlog = serverlog
 
         # TODO REQUEST_URI may not be defined in all WSGI environments,
