@@ -19,13 +19,6 @@ In your hgrc, add the following:
 Configuration Options
 =====================
 
-syslog.ident
-   String to prefix all syslog entries with. Defaults to "hgweb".
-
-syslog.facility
-   String syslog facility to write to. Corresponds to a LOG_* attribute
-   in the syslog module. Defaults to LOG_LOCAL2.
-
 serverlog.reporoot
    Root path for all repositories. When logging the repository path, this
    prefix will be stripped.
@@ -39,6 +32,16 @@ serverlog.ssh
 serverlog.datalogsizeinterval
    Interval (in bytes) between log events when data is being streamed to
    clients. Default value is 10,000,000.
+
+serverlog.syslog
+   Enable syslog logging.
+
+serverlog.syslog.ident
+   String to prefix all syslog entries with. Defaults to "hgweb".
+
+serverlog.syslog.facility
+   String syslog facility to write to. Corresponds to a LOG_* attribute
+   in the syslog module. Defaults to LOG_LOCAL2.
 
 Logged Messages
 ===============
@@ -192,10 +195,6 @@ minimumhgversion = '4.5'
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('syslog', 'ident',
-           default='hgweb')
-configitem('syslog', 'facility',
-           default='LOG_LOCAL2')
 configitem('serverlog', 'reporoot',
            default='')
 configitem('serverlog', 'hgweb',
@@ -204,6 +203,12 @@ configitem('serverlog', 'ssh',
            default=True)
 configitem('serverlog', 'datalogsizeinterval',
            default=10000000)
+configitem('serverlog', 'syslog',
+           default=True)
+configitem('serverlog', 'syslog.ident',
+           default='hgweb')
+configitem('serverlog', 'syslog.facility',
+           'LOG_LOCAL2')
 
 origcall = protocol.call
 
@@ -245,13 +250,14 @@ def logevent(ui, context, action, *args):
         fmt = '%s:' + fmt
         formatters = tuple([context['sessionid']] + list(formatters))
 
-    logsyslog(ui, fmt % formatters)
+    if ui.configbool('serverlog', 'syslog'):
+        logsyslog(ui, fmt % formatters)
 
 
 def logsyslog(ui, message):
     """Log a formatted message to syslog."""
-    ident = ui.config('syslog', 'ident')
-    facility = getattr(syslog, ui.config('syslog', 'facility'))
+    ident = ui.config('serverlog', 'syslog.ident')
+    facility = getattr(syslog, ui.config('serverlog', 'syslog.facility'))
 
     syslog.openlog(ident, 0, facility)
     syslog.syslog(syslog.LOG_NOTICE, message)
