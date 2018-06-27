@@ -176,6 +176,7 @@ import time
 import uuid
 
 from mercurial import (
+    registrar,
     sshserver,
     wireproto,
 )
@@ -187,6 +188,22 @@ from mercurial.hgweb import (
 
 testedwith = '4.5'
 minimumhgversion = '4.5'
+
+configtable = {}
+configitem = registrar.configitem(configtable)
+
+configitem('syslog', 'ident',
+           default='hgweb')
+configitem('syslog', 'facility',
+           default='LOG_LOCAL2')
+configitem('serverlog', 'reporoot',
+           default='')
+configitem('serverlog', 'hgweb',
+           default=True)
+configitem('serverlog', 'ssh',
+           default=True)
+configitem('serverlog', 'datalogsizeinterval',
+           default=10000000)
 
 origcall = protocol.call
 
@@ -202,13 +219,13 @@ def protocolcall(repo, req, cmd):
 
 
 def setsyslogkeys(context, ui):
-    context['ident'] = ui.config('syslog', 'ident', 'hgweb')
-    facility = ui.config('syslog', 'facility', 'LOG_LOCAL2')
+    context['ident'] = ui.config('syslog', 'ident')
+    facility = ui.config('syslog', 'facility')
     context['facility'] = getattr(syslog, facility)
 
 
 def repopath(repo):
-    root = repo.ui.config('serverlog', 'reporoot', '')
+    root = repo.ui.config('serverlog', 'reporoot')
     if root and not root.endswith('/'):
         root += '/'
 
@@ -265,8 +282,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         startcpu = startusage.ru_utime + startusage.ru_stime
         starttime = time.time()
 
-        datasizeinterval = repo.ui.configint('serverlog',
-            'datalogsizeinterval', 10000000)
+        datasizeinterval = repo.ui.configint('serverlog', 'datalogsizeinterval')
         lastlogamount = 0
 
         try:
@@ -375,7 +391,7 @@ class sshserverwrapped(sshserver.sshserver):
 def extsetup(ui):
     protocol.call = protocolcall
 
-    if ui.configbool('serverlog', 'hgweb', True):
+    if ui.configbool('serverlog', 'hgweb'):
         orighgweb = hgweb_mod.hgweb
         hgweb_mod.hgweb = hgwebwrapped
         hgwebdir_mod.hgweb = hgwebwrapped
@@ -399,5 +415,5 @@ def extsetup(ui):
             s.__class__ = hgwebwrapped
             break
 
-    if ui.configbool('serverlog', 'ssh', True):
+    if ui.configbool('serverlog', 'ssh'):
         sshserver.sshserver = sshserverwrapped
