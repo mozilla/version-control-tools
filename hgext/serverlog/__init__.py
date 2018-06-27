@@ -33,6 +33,12 @@ serverlog.datalogsizeinterval
    Interval (in bytes) between log events when data is being streamed to
    clients. Default value is 10,000,000.
 
+serverlog.blackbox
+   Enable blackbox logging using Mercurial's ui.log() facility.
+
+serverlog.blackbox.service
+   Service name to use when logging to ui.log(). Defaults to ``hgweb``.
+
 serverlog.syslog
    Enable syslog logging.
 
@@ -195,6 +201,10 @@ minimumhgversion = '4.5'
 configtable = {}
 configitem = registrar.configitem(configtable)
 
+configitem('serverlog', 'blackbox',
+           default=True)
+configitem('serverlog', 'blackbox.service',
+           default='hgweb')
 configitem('serverlog', 'reporoot',
            default='')
 configitem('serverlog', 'hgweb',
@@ -249,6 +259,10 @@ def logevent(ui, context, action, *args):
     if context.get('sessionid'):
         fmt = '%s:' + fmt
         formatters = tuple([context['sessionid']] + list(formatters))
+
+    if ui.configbool('serverlog', 'blackbox'):
+        ui.log(ui.config('serverlog', 'blackbox.service'),
+               fmt + '\n', *formatters)
 
     if ui.configbool('serverlog', 'syslog'):
         logsyslog(ui, fmt % formatters)
