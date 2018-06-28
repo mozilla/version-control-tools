@@ -258,7 +258,7 @@ inconsistent state can confuse repository consumers.
 The leader server runs a daemon that monitors the partition consumer offsets
 for all active consumers. When all active consumers have acknowledged a
 message, the daemon re-published that fully-consumed message in a separate
-Kafka topic - ``pushdataaggregator`` on hg.mozilla.org.
+Kafka topic - ``replicatedpushdata`` on hg.mozilla.org.
 
 .. seqdiag::
 
@@ -272,7 +272,7 @@ Kafka topic - ``pushdataaggregator`` on hg.mozilla.org.
        aggregator -> pushdataaggregator [label = "msg0"];
    }
 
-The stream of messages in the ``pushdataaggregator`` Kafka topic represents all
+The stream of messages in the ``replicatedpushdata`` Kafka topic represents all
 fully-replicated repository changes acknowledged by all consumers. There is a
 single partition in this topic, which means all events for all repositories
 are available in a single, ordered stream.
