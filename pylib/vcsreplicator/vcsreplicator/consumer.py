@@ -178,6 +178,9 @@ def process_message(config, payload):
                                payload['requirements'],
                                payload['hgrc'],
                                payload['heads'])
+    elif name == 'hg-heads-1':
+        # Set of heads isn't used
+        return
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 

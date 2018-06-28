@@ -128,3 +128,12 @@ def record_hg_repo_sync(producer, path, hgrc, heads, requirements, partition, bo
         'heads': heads,
         'bootstrap': bootstrap,
     }, partition=partition)
+
+
+def record_hg_repo_heads(producer, path, heads, partition):
+    """Produce a message that advertises heads in a repository."""
+    return producer.send_message({
+        'name': 'hg-heads-1',
+        'path': path,
+        'heads': heads,
+    }, partition=partition)

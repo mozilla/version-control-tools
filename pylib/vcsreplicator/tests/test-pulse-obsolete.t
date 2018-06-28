@@ -63,20 +63,23 @@ them. So disable the pulse consumer until all repo changes have been made.
   $ hg debugobsolete
   4da703b7f59b720f524f709aa07eed3182ba1acd 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
-  $ paconsumer --wait-for-n 13
+  $ paconsumer --wait-for-n 16
   got a heartbeat-1 message
   got a hg-repo-init-2 message
   got a hg-hgrc-update-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
+  got a hg-heads-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
+  got a hg-heads-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
   got a hg-pushkey-1 message
+  got a hg-heads-1 message
 
 Create an obsolescence marker on the server
 
@@ -141,31 +144,36 @@ Commit message with multiple lines works
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
   remote: recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
-  $ paconsumer --wait-for-n 24
+  $ paconsumer --wait-for-n 29
   got a heartbeat-1 message
   got a hg-repo-init-2 message
   got a hg-hgrc-update-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
+  got a hg-heads-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
-  got a heartbeat-1 message
-  got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a heartbeat-1 message
-  got a heartbeat-1 message
-  got a hg-pushkey-1 message
+  got a hg-heads-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
   got a hg-pushkey-1 message
+  got a hg-heads-1 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-pushkey-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
   got a hg-pushkey-1 message
+  got a hg-heads-1 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
+  got a hg-pushkey-1 message
+  got a hg-heads-1 message
 
   $ hgmo exec hgssh supervisorctl start pulsenotifier
   pulsenotifier: started

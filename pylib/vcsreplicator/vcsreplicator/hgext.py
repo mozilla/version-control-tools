@@ -6,6 +6,7 @@
 from __future__ import absolute_import
 
 import contextlib
+import functools
 import hashlib
 import json
 import logging
@@ -99,6 +100,9 @@ def pretxnopenhook(ui, repo, **kwargs):
         'pushkey': [],
         'changegroup': False,
         'obsolescence': {},
+        # Stuff a copy of served heads so we can determine after close
+        # whether they changed and we need to write a message.
+        'pre_served_heads': repo.filtered('served').heads(),
     }
 
 
@@ -165,6 +169,17 @@ def pretxnclosehook(ui, repo, **kwargs):
             ui.warn('replication log not available; cannot close transaction\n')
             return True
 
+    # If our set of served heads changed in the course of this transaction,
+    # schedule the writing of a message to reflect this. The message can be
+    # used by downstream consumers to influence which heads are exposed to
+    # clients.
+    heads = repo.filtered('served').heads()
+
+    if heads != repo._replicationinfo['pre_served_heads']:
+        tr = repo.currenttransaction()
+        tr.addpostclose('vcsreplicator-record-heads-change',
+                        lambda tr: repo._afterlock(
+                            functools.partial(sendheadsmessage, ui, repo)))
 
 def txnclosehook(ui, repo, **kwargs):
     # Obtain obsolescence markers added as part of the transaction. These
@@ -264,6 +279,20 @@ def sendreposyncmessage(ui, repo, bootstrap=False):
                                          partition=repo.replicationpartition,
                                          bootstrap=bootstrap)
         repo.producerlog('SYNC_SENT')
+
+
+def sendheadsmessage(ui, repo):
+    heads = [hex(n) for n in repo.filtered('served').heads()]
+
+    with ui.kafkainteraction():
+        repo.producerlog('HEADS_SENDING')
+        producer = ui.replicationproducer
+        vcsrproducer.record_hg_repo_heads(producer,
+                                          repo.replicationwireprotopath,
+                                          heads,
+                                          partition=repo.replicationpartition)
+
+        repo.producerlog('HEADS_SENT')
 
 
 # Wraps ``hg init`` to send a replication event.

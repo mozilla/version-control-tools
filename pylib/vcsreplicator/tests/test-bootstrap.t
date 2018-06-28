@@ -86,8 +86,8 @@ We send the output to a file for use in the hgweb bootstrap procedure
               0
           ],
           "2": [
-              8,
-              10
+              10,
+              12
           ],
           "3": [
               0,
@@ -124,7 +124,7 @@ Confirm offsets returned by the bootstrap procedure match offsets from a dump
   --------  ------------  -----------  --------  -----------  ---------
   pushdata  *            0         2            2          0 (glob)
   pushdata  *            1         0            0          0 (glob)
-  pushdata  *            2        10           10          0 (glob)
+  pushdata  *            2        12           12          0 (glob)
   pushdata  *            3         0            0          0 (glob)
   pushdata  *            4         0            0          0 (glob)
   pushdata  *            5         0            0          0 (glob)
@@ -157,7 +157,7 @@ publish some extra commits and add them to the range of bootstrap messages.
   --------  ------------  -----------  --------  -----------  ---------
   pushdata  *            0         2            2          0 (glob)
   pushdata  *            1         0            0          0 (glob)
-  pushdata  *            2        13           13          0 (glob)
+  pushdata  *            2        16           16          0 (glob)
   pushdata  *            3         0            0          0 (glob)
   pushdata  *            4         0            0          0 (glob)
   pushdata  *            5         0            0          0 (glob)
@@ -169,7 +169,7 @@ Edit the JSON object to include the new messages
   >>> tmpdir = os.environ['TESTTMP']
   >>> with open(tmpdir + '/hgssh.json', 'r') as f:
   ...     d = json.loads(f.read())
-  >>> d['offsets']['2'] = (8, 13)  # change (8, 10) -> (8, 13)
+  >>> d['offsets']['2'] = (10, 16)  # change (10, 12) -> (10, 16)
   >>> with open(tmpdir + '/hgssh_edited.json', 'w') as f:
   ...     f.write(json.dumps(d))
 
@@ -201,7 +201,7 @@ Print offsets on hgweb1 host
   --------  ------------  -----------  --------  -----------  ---------
   pushdata  *            0         2            2          0 (glob)
   pushdata  *            1         0            0          0 (glob)
-  pushdata  *            2        16           16          0 (glob)
+  pushdata  *            2        20           20          0 (glob)
   pushdata  *            3         0            0          0 (glob)
   pushdata  *            4         0            0          0 (glob)
   pushdata  *            5         0            0          0 (glob)
@@ -217,7 +217,7 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap Kafka consumer assigned to replication topic
   vcsreplicator.bootstrap partition 0 of topic pushdata moved to offset 2
   vcsreplicator.bootstrap partition 1 of topic pushdata moved to offset 0
-  vcsreplicator.bootstrap partition 2 of topic pushdata moved to offset 8
+  vcsreplicator.bootstrap partition 2 of topic pushdata moved to offset 10
   vcsreplicator.bootstrap partition 3 of topic pushdata moved to offset 0
   vcsreplicator.bootstrap partition 4 of topic pushdata moved to offset 0
   vcsreplicator.bootstrap partition 5 of topic pushdata moved to offset 0
@@ -228,6 +228,7 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
   vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 1 total
+  vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total
   vcsreplicator.bootstrap {moz}/* successfully cloned (glob)
   vcsreplicator.bootstrap 1 repositories remaining
   vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central (?)
@@ -280,7 +281,7 @@ Confirm anticipated offsets on hgweb0
   --------  ------------  -----------  --------  -----------  ---------
   pushdata  *            0         2            2    * (glob)
   pushdata  *            1         0            0    * (glob)
-  pushdata  *            2        13           16    * (glob)
+  pushdata  *            2        16           20    * (glob)
   pushdata  *            3         0            0    * (glob)
   pushdata  *            4         0            0    * (glob)
   pushdata  *            5         0            0    * (glob)
@@ -306,11 +307,11 @@ messages to play back and their output makes the test non-deterministic
   
 Verify consumer log output. The indicated initial offsets should start at 13, not 0.
 
-  $ hgmo exec hgweb0 tail -n 17 /var/log/vcsreplicator/consumer.log
+  $ hgmo exec hgweb0 tail -n 18 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[2] (glob)
-  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 13
-  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 14
-  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 15
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 16
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 17
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 18
   vcsreplicator.consumer pulling 1 heads (ba17b5c8e955a5e7f57c478cdd75bc999c5460a1) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -rba17b5c8e955a5e7f57c478cdd75bc999c5460a1 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
@@ -324,6 +325,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer processing hg-heads-1 from partition 2 offset 19
 
 Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons activated.
 
@@ -333,7 +335,7 @@ Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons a
   --------  ------------  -----------  --------  -----------  ---------
   pushdata  *            0         2            2          0 (glob)
   pushdata  *            1         0            0          0 (glob)
-  pushdata  *            2        16           16          0 (glob)
+  pushdata  *            2        20           20          0 (glob)
   pushdata  *            3         0            0          0 (glob)
   pushdata  *            4         0            0          0 (glob)
   pushdata  *            5         0            0          0 (glob)

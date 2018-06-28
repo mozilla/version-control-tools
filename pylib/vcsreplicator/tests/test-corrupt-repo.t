@@ -35,6 +35,8 @@
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
+  $ consumer --onetime
+  vcsreplicator.consumer processing hg-heads-1 from partition 2 offset 4
 
 Corrupt the local repo
 
@@ -45,9 +47,9 @@ Corrupt the local repo
   $ hg -q push
 
   $ consumer --onetime
-  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 4
-  $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
+  $ consumer --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 6
 
 Pulling into corrupt repo should result in abort
 
@@ -59,9 +61,14 @@ Pulling into corrupt repo should result in abort
     nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
+  - _created: \d+\.\d+ (re)
+    heads:
+    - 0c6b2090d458675af812e445c8ab9b809e321f57
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -97,11 +104,16 @@ And the message should still be not consumed
     nodecount: 1
     path: '{moz}/mozilla-central'
     source: serve
+  - _created: \d+\.\d+ (re)
+    heads:
+    - 0c6b2090d458675af812e445c8ab9b809e321f57
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
 
 We should get the same failure if we try again
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 6
+  vcsreplicator.consumer processing hg-changegroup-2 from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -133,6 +145,7 @@ We can skip over the message
   skipped message in partition 2 for group ttest
 
   $ consumer --onetime
+  vcsreplicator.consumer processing hg-heads-1 from partition 2 offset 8
 
 Cleanup
 
