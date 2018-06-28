@@ -45,53 +45,243 @@ supports replicating:
 * hgrc config files
 * repository creation
 
-How it Works
+Architecture
 ============
 
-A Kafka topic for holding Mercurial replication data is created. A
-Mercurial extension is installed on the leader server (the server where
-writes go). When data is written to a Mercurial repository, that data or
-metadata is written into Kafka.
+A cluster of servers form a Kafka cluster to expose a single logical network
+service. On hg.mozilla.org, that cluster looks like the following:
 
-On each mirror, a daemon is watching the Kafka topic. When a new message
-is written, it reacts to it. This typically involves applying data or
-performing some action in reaction to an upstream event.
+.. nwdiag::
 
-Each mirror operates independently of the leader. There is no direct
-signaling from leader to mirror when new data arrives. Instead, each
-consumer/daemon independently reacts to the availability of new data in
-Kafka. This reaction occurs practically instantaneously, as clients are
-continuously polling and Kafka will send data to *subscribed* clients
-as soon as it arrives.
+   nwdiag {
+       network {
+           address = "Kafka";
+           node01 [address = "hgssh01"];
+           node02 [address = "hgweb01"];
+           node03 [address = "hgweb02"];
+           node04 [address = "hgweb03"];
+           node05 [address = "hgweb04"];
+       }
+   }
 
-A Kafka cluster requires a quorum of servers in order to acknowledge and
-thus accept writes. Pushes to Mercurial will fail if quorum is not
-available and the replication event can not be robustly stored.
+A Kafka topic (i.e. a message queue) is created for messages describing
+repository change events.
 
-Each mirror maintains its own offset into the replication log. If a
-mirror goes offline for an extended period of time, it will resume
-applying the replication log where it left off when it reconnects to
-Kafka.
+A Mercurial extension is installed on the leader server (the server where
+writes go). When a Mercurial repository is changed, a new message is published
+to Kafka.
 
-The Kafka topic is partitioned. Data for a particular repository is
-consistently routed to a specific partition based on the routing
-scheme defined on the server. There exist a pool of consumer processes
-on the mirror. Each process consumes exactly 1 partition. This enables
-concurrent consumption on clients (as opposed to having 1 process that
-consumes 1 message at a time) without having to invent a message
-acknowledgement and ordering system in addition to what Kafka supports.
+For example, when a repository is created:
 
-Replicated Data Topic
----------------------
+.. blockdiag::
 
-Replication data may be written into multiple partitions. Furthermore,
-mirrors may acknowledge replicated messages at different times. There
-are a class of consumers that want to react to a single stream of
-replication events once they are acknowledged by all active mirrors.
+   blockdiag {
+       span_width = 240;
+       init [label = "hg init"];
+       init -> Kafka [label = "repo-create"];
+   }
 
-There exists a unified replicated data topic exposing a single partition
-for this stream of messages. A daemon process effectively copies messages
-that have been acknowledged by all active mirrors into this topic.
+And when a new push occurs:
+
+.. blockdiag::
+
+   blockdiag {
+       span_width = 240;
+       push [label = "hg push"];
+       push -> Kafka [label = "new-changesets"];
+   }
+
+The published messages contain the repository name and details about the
+change that occurred.
+
+Publishing to Kafka and Mercurial's transaction are coupled: if we cannot
+write messages to Kafka, the repository change operation is prevented or
+*rolled back*.
+
+At a lower level on hg.mozilla.org, the ``pushdata`` Kafka topic contains
+8 partitions and repository change messages are written into 1 of 8 of those
+partitions.
+
+.. blockdiag::
+
+   blockdiag {
+       producer -> pushdata0;
+       producer -> pushdata1;
+       producer -> pushdata2;
+       producer -> pushdata3;
+       producer -> pushdata4;
+       producer -> pushdata5;
+       producer -> pushdata6;
+       producer -> pushdata7;
+   }
+
+Each repository deterministically writes to the same partition via a name-based
+routing mechanism plus hashing. For example, the *foo* repository may always
+write to partition ``1`` but the *bar* repository may always write to
+partition ``6``.
+
+Messages published to Kafka topics/partitions are ordered: if message ``A`` is
+published before message ``B``, consumers will always see ``A`` before ``B``.
+This means the messages for a given repository are always consumed in
+chronological order.
+
+On each mirror, a ``vcsreplicator-consumer`` daemon process is bound to each
+partition in the ``pushdata`` topic. These processes essentially monitor each
+partition for new messages.
+
+.. blockdiag::
+
+   blockdiag {
+       producer -> pushdata0 <- vcsreplicator0;
+       producer -> pushdata1 <- vcsreplicator1;
+       producer -> pushdata2 <- vcsreplicator2;
+       producer -> pushdata3 <- vcsreplicator3;
+       producer -> pushdata4 <- vcsreplicator4;
+       producer -> pushdata5 <- vcsreplicator5;
+       producer -> pushdata6 <- vcsreplicator6;
+       producer -> pushdata7 <- vcsreplicator7;
+   }
+
+When a new message is written to the partition, the consumer daemon reacts to
+that message. The consumer daemon then takes an appropriate action for each
+message, often by invoking an ``hg`` process to complete an action. e.g.
+when a repository is created:
+
+.. seqdiag::
+
+   seqdiag {
+       producer -> pushdata2 [label = "new-repo"];
+       pushdata2 <- vcsreplicator2 [label = "new-repo"];
+       vcsreplicator2 -> init;
+       init [label = "hg init"];
+       pushdata2 <-- vcsreplicator2 [label = "ack"];
+   }
+
+Sometimes the replicated data is too large to fit in a Kafka message. In
+that case, the consumer will connect to the leader server to obtain data.
+
+.. seqdiag::
+
+   seqdiag {
+       pushdata2 <- vcsreplicator2 [label = "msg"];
+       vcsreplicator2 -> hg;
+       hg -> hgssh [label = "hg pull"];
+       hg <-- hgssh [label = "apply data"];
+       pushdata2 <-- vcsreplicator2 [label = "ack"];
+   }
+
+Consumers react to new messages within milliseconds of them being published.
+And the same activity is occurring on each consumer simultaneously and
+independently.
+
+.. blockdiag::
+
+   blockdiag {
+       producer -> pushdata2 [label = "msg"];
+       pushdata2 <- consumer01 [label = "msg"];
+       pushdata2 <- consumer02 [label = "msg"];
+       pushdata2 <- consumer03 [label = "msg"];
+       pushdata2 <- consumer04 [label = "msg"];
+
+       group hgweb01 {
+           label = "hgweb01";
+           consumer01 -> hg01;
+           consumer01 [label = "vcsreplicator2"];
+           hg01 [label = "hg"];
+       }
+
+       group hgweb02 {
+           label = "hgweb02";
+           consumer02 -> hg02;
+           consumer02 [label = "vcsreplicator2"];
+           hg02 [label = "hg"];
+       }
+
+       group hgweb03 {
+           label = "hgweb03";
+           consumer03 -> hg03;
+           consumer03 [label = "vcsreplicator2"];
+           hg03 [label = "hg"];
+       }
+
+       group hgweb04 {
+           label = "hgweb04";
+           consumer04 -> hg04;
+           consumer04 [label = "vcsreplicator2"];
+           hg04 [label = "hg"];
+       }
+   }
+
+Consumers typically fully process a message within a few seconds. Events
+corresponding to *big* changes (such as cloning a repository, large pushes,
+etc) can take longer - sometimes minutes.
+
+We rely on repository change messages to have deterministic side-effects. i.e.
+independent consumers starting in the same state that apply the same stream
+of messages should end up in an identical state. In theory, a consumer could
+start from the very beginning of a Kafka topic, apply every message, and arrive
+at an identical state as the leader.
+
+Consumers only process a single message per topic-partition simultaneously.
+This is to ensure complete ordering of messages for a given repository and
+to ensure that messages are successfully processed at most once.
+
+After a consumer successfully performs actions in reaction to a published
+message, it acknowledges that Kafka message. Once a consumer has acknowledged
+a message, that message will never be delivered to that consumer again.
+
+Kafka tracks acknowledged messages by recording the *offset* of the last
+acknowledged message within a given topic-partition.
+
+Each mirror maintains its own offsets into the various topic-partitions. If
+a mirror goes offline, Kafka will durably store messages. When the consumer
+process comes back online, it will resume consuming messages at the last
+acknowledged offset, picking up where it left off when it disconnected
+from Kafka.
+
+Aggregated Push Data
+--------------------
+
+Repository change messages may be written into multiple partitions to
+facilitate parallel consumption. Unfortunately, this loses total ordering
+of messages since there is no ordering across Kafka partitions.
+
+In addition, consumers - being on separate servers - don't react to and
+acknowledge messages at exactly the same time. i.e. there is always a window
+of time between message publish and it being fully consumed where different
+consumers have different repository states due to being in different phases
+of processing a message. As an example, a *fast* server may take 1s to process
+a push to a repository but a *slow* server may take 2s. There is a window of
+1s where one server has new state and another has old state. Exposing
+inconsistent state can confuse repository consumers.
+
+The leader server runs a daemon that monitors the partition consumer offsets
+for all active consumers. When all active consumers have acknowledged a
+message, the daemon re-published that fully-consumed message in a separate
+Kafka topic - ``pushdataaggregator`` on hg.mozilla.org.
+
+.. seqdiag::
+
+   seqdiag {
+       pushdata0 <- consumer01 [label = "msg0"];
+       pushdata0 <- consumer02 [label = "msg0"];
+
+       pushdata0 <-- consumer02 [label = "ack"];
+       pushdata0 <-- consumer01 [label = "ack"];
+
+       aggregator -> pushdataaggregator [label = "msg0"];
+   }
+
+The stream of messages in the ``pushdataaggregator`` Kafka topic represents all
+fully-replicated repository changes acknowledged by all consumers. There is a
+single partition in this topic, which means all events for all repositories
+are available in a single, ordered stream.
+
+This stream of fully-replicated messages can be consumed by consumers wish
+to react to events. e.g. on hg.mozilla.org, we have a daemon that publishes
+messages to Pulse (a RabbitMQ broker) and Amazon SNS so 3rd party consumers
+can get a notification when a repository even occurs and then implement
+their own derived actions (such as triggering CI against new commits).
 
 Known Deficiencies
 ------------------
