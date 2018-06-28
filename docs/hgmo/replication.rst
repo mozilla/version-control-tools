@@ -269,7 +269,7 @@ Kafka topic - ``replicatedpushdata`` on hg.mozilla.org.
        pushdata0 <-- consumer02 [label = "ack"];
        pushdata0 <-- consumer01 [label = "ack"];
 
-       aggregator -> pushdataaggregator [label = "msg0"];
+       aggregator -> replicatedpushdata [label = "msg0"];
    }
 
 The stream of messages in the ``replicatedpushdata`` Kafka topic represents all
