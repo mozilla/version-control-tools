@@ -14,6 +14,8 @@ Extension works with default config
   new changesets 96ee1d7354c4:94086d65796f (?)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 94086d65796fd7fc8f957a2c5548db17a13f1f1f
 
@@ -28,17 +30,24 @@ Connecting to non-running server fails
   ensuring http://localhost:$HGPORT1/repo0@94086d65796f is available at no-server
   socket error: [Errno 111] Connection refused
   abort: reached maximum number of network attempts; giving up
-  
+   (hg46 !)
   [255]
 
 Server abort part way through response results in retries
 
   $ cp -a server/bad-server server/bad-server-bytelimit
 
+#if hg46
+  $ cat >> server/bad-server-bytelimit/.hg/hgrc << EOF
+  > [badserver]
+  > bytelimit = 500
+  > EOF
+#else
   $ cat >> server/bad-server-bytelimit/.hg/hgrc << EOF
   > [badserver]
   > bytelimit = 11
   > EOF
+#endif
 
   $ hg robustcheckout http://localhost:$HGPORT/bad-server-bytelimit byte-limit --revision 94086d65796f --sharebase $TESTTMP/bad-server-share
   (using Mercurial *) (glob)
@@ -59,7 +68,7 @@ Server abort part way through response results in retries
   requesting all changes
   stream ended unexpectedly (got 0 bytes, expected 4)
   abort: reached maximum number of network attempts; giving up
-  
+   (hg46 !)
   [255]
 
 Adjusting the network limit works
@@ -77,7 +86,7 @@ Adjusting the network limit works
   requesting all changes
   stream ended unexpectedly (got 0 bytes, expected 4)
   abort: reached maximum number of network attempts; giving up
-  
+   (hg46 !)
   [255]
 
 Recovering server will result in good clone
@@ -102,6 +111,8 @@ Recovering server will result in good clone
   new changesets 96ee1d7354c4:94086d65796f (?)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 94086d65796fd7fc8f957a2c5548db17a13f1f1f
 

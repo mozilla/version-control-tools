@@ -7,7 +7,13 @@ from mercurial.hgweb import (
 
 def extsetup(ui):
     class droppinghgweb(hgweb_mod.hgweb):
-        def _runwsgi(self, req, repo):
+        def _runwsgi(self, *args):
+            # TRACKING hg46
+            if len(args) == 3:
+                req, res, repo = args
+            else:
+                req, repo = args
+
             bytelimit = repo.ui.configint('badserver', 'bytelimit')
 
             untilgoodcount = repo.vfs.tryread('badserveruntilgood')
@@ -21,7 +27,7 @@ def extsetup(ui):
                 repo.vfs.write('badserveruntilgood', str(untilgoodcount - 1))
 
             bytecount = 0
-            for r in super(droppinghgweb, self)._runwsgi(req, repo):
+            for r in super(droppinghgweb, self)._runwsgi(*args):
                 # We serviced the requested number of requests. Do everything
                 # like normal.
                 if untilgoodcount == 0:

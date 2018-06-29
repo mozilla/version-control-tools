@@ -13,6 +13,8 @@
   new changesets b8b78f0253d8:aada1b3e573f (hg44 !)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   PERFHERDER_DATA: {"framework": {"name": "vcs"}, "suites": \[{"extraOptions": \["c5.4xlarge"\], "lowerIsBetter": true, "name": "clone", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "lowerIsBetter": true, "name": "update", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5.4xlarge"\], "lowerIsBetter": true, "name": "overall", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}]} (re)

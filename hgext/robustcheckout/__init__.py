@@ -49,7 +49,7 @@ except ImportError:
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5'
+testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6'
 minimumhgversion = '3.7'
 
 cmdtable = {}
@@ -92,6 +92,7 @@ def supported_hg():
         (4, 3),
         (4, 4),
         (4, 5),
+        (4, 6),
     )
 
 
@@ -585,7 +586,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     # doesn't exist.
     havewantedrev = False
     if revision and revision in repo:
-        ctx = repo[revision]
+        ctx = scmutil.revsingle(repo, revision)
 
         if not ctx.hex().startswith(revision):
             raise error.Abort('--revision argument is ambiguous',

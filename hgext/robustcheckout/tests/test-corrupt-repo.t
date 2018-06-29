@@ -12,6 +12,8 @@
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   $ hg -R dest --config extensions.strip= strip -r aada1b3e573f --no-backup
@@ -45,6 +47,8 @@ Corrupt the manifest
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
 
@@ -77,6 +81,8 @@ Now check corruption is handled during clone
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
 

@@ -51,6 +51,8 @@ Enabling a sparse profile on a repo not using sparse is an error
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 no-sparse --revision 6af47298a235
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at no-sparse
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 6af47298a235491213679cd4f91881d22c735c72
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 no-sparse --revision 6af47298a235 --sparseprofile irrelevant
@@ -68,6 +70,8 @@ Specifying a sparse profile that doesn't exist results in error
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   abort: sparse profile doesnotexist does not exist at revision 6af47298a235491213679cd4f91881d22c735c72
   [255]
 
@@ -79,6 +83,8 @@ Specifying a sparse profile uses it
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   searching for changes
   no changes found
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (setting sparse config to profile profiles/python)
   0 files added, 0 files dropped, 0 files conflicting
   (sparse refresh complete)
@@ -97,6 +103,8 @@ No-op update does something reasonable
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-simple
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (sparse profile profiles/python already set; no need to update sparse config)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 6af47298a235491213679cd4f91881d22c735c72
@@ -116,6 +124,8 @@ Specifying a new sparse profile will replace existing profile
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-simple
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (replacing existing sparse config with profile profiles/dir0)
   2 files added, 2 files dropped, 0 files conflicting
   (sparse refresh complete)
@@ -133,6 +143,8 @@ Specifying a new sparse profile and updating the revision works
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@4916c5373fd6 is available at sparse-simple
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (replacing existing sparse config with profile profiles/dir1)
   2 files added, 3 files dropped, 0 files conflicting
   (sparse refresh complete)
@@ -149,6 +161,8 @@ Purging a file outside the sparse profile works
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 sparse-purge --revision 6af47298a235 --sparseprofile profiles/dir0
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-purge
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (setting sparse config to profile profiles/dir0)
   (sparse refresh complete)
   warning: sparse profile 'profiles/dir0' not found in rev 000000000000 - ignoring it
@@ -163,6 +177,8 @@ Purging with update to same revision
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-purge
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (purging working directory)
   (sparse profile profiles/dir0 already set; no need to update sparse config)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -183,6 +199,8 @@ Purging with update to different revision
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@4916c5373fd6 is available at sparse-purge
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (purging working directory)
   (sparse profile profiles/dir0 already set; no need to update sparse config)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -203,6 +221,8 @@ Purge with update to different revision and profile
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@6af47298a235 is available at sparse-purge
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
+  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
+  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (purging working directory)
   (replacing existing sparse config with profile profiles/dir1)
   3 files added, 3 files dropped, 0 files conflicting
