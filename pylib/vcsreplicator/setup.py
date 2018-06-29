@@ -28,5 +28,5 @@ setup(
             'vcsreplicator-bootstrap-hgweb=vcsreplicator.bootstrap:hgweb',
         ],
     },
-    install_requires=['kafka-python', 'Mercurial'],
+    install_requires=['cbor2', 'kafka-python', 'Mercurial'],
 )

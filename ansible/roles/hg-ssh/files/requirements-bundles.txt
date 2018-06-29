@@ -16,6 +16,9 @@ boto3==1.5.3 \
 boto==2.48.0 \
     --hash=sha256:13be844158d1bd80a94c972c806ec8381b9ea72035aa06123c5db6bc6a6f3ead
 
+cbor2==4.1.0 \
+    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
+
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
 

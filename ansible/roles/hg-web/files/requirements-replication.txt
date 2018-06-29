@@ -1,6 +1,9 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
+cbor2==4.1.0 \
+    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
+
 futures==3.0.5 \
     --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
 

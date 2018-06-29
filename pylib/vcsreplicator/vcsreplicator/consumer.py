@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import binascii
 import errno
 import io
 import json
@@ -15,6 +16,7 @@ import signal
 import sys
 import time
 
+import cbor2
 import hglib
 from kafka.consumer import SimpleConsumer
 
@@ -201,7 +203,13 @@ def handle_message_heads(config, payload):
 
     This handles message processing for the heads consumer process.
     """
-    # TODO implement message handling.
+    name = payload['name']
+    if name == 'hg-heads-1':
+        return process_hg_heads(config, payload['path'], payload['heads'],
+                                payload['last_push_id'])
+
+    # All other messages are no-ops. We allow all unknown message types
+    # through.
 
 
 def init_repo(path):
@@ -346,6 +354,55 @@ def process_hg_delete(config, wire_path):
     except OSError as e:
         logger.warn('could not delete repo at %s: %s' % (local_path, e))
     logger.warn('repository at %s deleted' % local_path)
+
+
+def process_hg_heads(config, path, heads, last_push_id):
+    local_path = config.parse_wire_repo_path(path)
+
+    logger.warn('updating replicated heads for %s' % local_path)
+
+    # We atomically write out a machine-readable file containing heads at
+    # <repo>/.hg/replicated-heads. It is important that readers *always* have
+    # a consistent snapshot of this file. Hence the use of a temporary file
+    # and atomic rename.
+    dest = os.path.join(local_path, '.hg', 'replicated-data')
+    dest_tmp = '%s.tmp' % dest
+
+    if any(len(h) != 40 for h in heads):
+        raise ValueError('expected 40 byte hex heads in message')
+
+    with open(dest_tmp, 'wb') as fh:
+        data = {
+            # May be None or an integer.
+            b'last_push_id': last_push_id,
+            # Heads are in hex. We store in binary for reading efficiency.
+            b'heads': list(map(binascii.unhexlify, heads)),
+        }
+
+        cbor2.dump(data, fh, canonical=True)
+
+    # If we're replacing a file, we need to ensure the mtime is advanced,
+    # otherwise things caching the file may not see multiple updates in rapid
+    # succession and may hold onto an earlier update. We can't just "touch"
+    # the file because filesystem mtime resolution may not be that fine
+    # grained. So we ensure the mtime is always incremented by at least 2s.
+    try:
+        st = os.stat(dest)
+        old_mtime = st.st_mtime
+    except OSError as e:
+        if e.errno != errno.ENOENT:
+            raise
+
+        old_mtime = 0
+
+    new_mtime = os.stat(dest_tmp).st_mtime
+    if new_mtime <= old_mtime + 2:
+        os.utime(dest, (old_mtime + 2, old_mtime + 2))
+        logger.warn('advanced mtime of %s from %d to %d' % (dest, old_mtime,
+                                                            old_mtime + 2))
+
+    os.rename(dest_tmp, dest)
+    logger.warn('%s wrote with %d heads successfully' % (dest, len(heads)))
 
 
 def get_hg_client(path):

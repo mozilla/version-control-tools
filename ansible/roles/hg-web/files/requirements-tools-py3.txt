@@ -1,3 +1,6 @@
+cbor2==4.1.0 \
+    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
+
 certifi==2018.1.18 \
     --hash=sha256:14131608ad2fd56836d33a71ee60fa1c82bc9d2c8d98b7bdbc631fe1b3cd1296
 

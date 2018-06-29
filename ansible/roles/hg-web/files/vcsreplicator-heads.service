@@ -19,5 +19,10 @@ TimeoutStopSec=60
 SyslogIdentifier=vcsreplicator
 SyslogFacility=local2
 
+# Increase priority so other processes don't interfere with the performance
+# properties of this daemon. This helps keep message processing "on time"
+# and should help minimize timing differences across machines.
+Nice=-10
+
 [Install]
 WantedBy=multi-user.target
