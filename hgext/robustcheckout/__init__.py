@@ -86,6 +86,15 @@ def getsparse():
     return sparse
 
 
+def supported_hg():
+    '''Returns True if the Mercurial version is supported for robustcheckout'''
+    return util.versiontuple(n=2) in (
+        (4, 3),
+        (4, 4),
+        (4, 5),
+    )
+
+
 if os.name == 'nt':
     import ctypes
 
@@ -228,7 +237,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
     # However, given that sparse has performance implications, we want to fail
     # fast if we can't satisfy the desired checkout request.
     if sparseprofile:
-        if util.versiontuple(n=2) not in ((4, 3), (4, 4), (4, 5)):
+        if not supported_hg():
             raise error.Abort('sparse profile support only available for '
                               'Mercurial versions greater than 4.3 (using %s)' % util.version())
 
@@ -635,7 +644,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         try:
             old_sparse_fn = getattr(repo.dirstate, '_sparsematchfn', None)
             if old_sparse_fn is not None:
-                assert util.versiontuple(n=2) in ((4, 3), (4, 4), (4, 5))
+                assert supported_hg(), 'Mercurial version not supported (must be 4.3+)'
                 repo.dirstate._sparsematchfn = lambda: matchmod.always(repo.root, '')
 
             with timeit('purge'):
