@@ -69,3 +69,7 @@ Now simulate an abandoned transaction on an initial checkout
   new changesets aada1b3e573f (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

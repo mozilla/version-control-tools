@@ -15,3 +15,7 @@ file0 should still be present
 
   $ ls dest
   file0
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

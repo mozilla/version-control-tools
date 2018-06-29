@@ -56,3 +56,7 @@ And again for safe measure
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

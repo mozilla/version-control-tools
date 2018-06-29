@@ -73,3 +73,7 @@ Ignored files are also purged when requested
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   $ ls dest
   foo
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

@@ -104,3 +104,7 @@ Recovering server will result in good clone
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 94086d65796fd7fc8f957a2c5548db17a13f1f1f
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

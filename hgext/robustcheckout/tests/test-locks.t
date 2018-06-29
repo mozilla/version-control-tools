@@ -166,3 +166,7 @@ Simulate a held lock on the store without a working directory
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

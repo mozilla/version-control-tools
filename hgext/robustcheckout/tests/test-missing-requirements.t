@@ -115,3 +115,7 @@ Test behavior when fncache is missing
   generaldelta
   revlogv1
   store
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

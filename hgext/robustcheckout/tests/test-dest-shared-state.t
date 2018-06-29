@@ -72,3 +72,7 @@ we require pooled storage
 
   $ ls nopoolshare
   foo
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

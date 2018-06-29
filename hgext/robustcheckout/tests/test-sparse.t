@@ -216,3 +216,7 @@ Purge with update to different revision and profile
   C dir1/foo.py
 
 #endif
+
+Confirm no errors in log
+
+  $ cat ./server/error.log

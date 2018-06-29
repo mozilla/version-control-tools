@@ -54,7 +54,7 @@ cat >> hgweb.conf << EOF
 refreshinterval = -1
 EOF
 
-hg serve -d -p $HGPORT --pid-file hg.pid --web-conf hgweb.conf
+hg serve -d -p $HGPORT --pid-file hg.pid --web-conf hgweb.conf -E error.log
 cat hg.pid >> $DAEMON_PIDS
 
 cd $TESTTMP

@@ -77,3 +77,7 @@ Added and copied files will be lost during update
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
   $ hg -R dest status
+
+Confirm no errors in log
+
+  $ cat ./server/error.log
