@@ -115,6 +115,11 @@
            venv=/var/hg/venv_hg_pre
            requirements=../roles/hg-ssh/files/requirements-hg-pre.txt
 
+- name: create virtualenv for bundle generation
+  include: ../../../tasks/virtualenv.yml
+           venv=/var/hg/venv_bundles
+           requirements=../roles/hg-ssh/files/requirements-bundles.txt
+
 # Hooks are referenced in various hgrc files via "python:mozhghooks.*".
 # This means they are imported as Python modules from the "mozhghooks"
 # package. We create a .pth file telling the virtualenv that
@@ -131,14 +136,19 @@
   with_items:
     - { venv: venv_pash, path: hghooks, pth: mozhghooks }
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
+    - { venv: venv_bundles, path: hghooks, pth: mozhghooks }
     - { venv: venv_pash, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
+    - { venv: venv_bundles, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_pash, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
+    - { venv: venv_bundles, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_pash, path: pylib/mozautomation, pth: mozautomation }
     - { venv: venv_tools, path: pylib/mozautomation, pth: mozautomation }
+    - { venv: venv_bundles, path: pylib/mozautomation, pth: mozautomation }
     - { venv: venv_pash, path: hgserver/hgmolib, pth: hgmolib }
     - { venv: venv_tools, path: hgserver/hgmolib, pth: hgmolib }
+    - { venv: venv_bundles, path: hgserver/hgmolib, pth: hgmolib }
 
 - name: determine if v-c-t clone is present
   stat: path=/var/hg/version-control-tools/.hg
@@ -164,8 +174,11 @@
   command: /usr/bin/rsync -rlpt --chmod=Dg+s,ugo+r --delete-after /vct/ /var/hg/version-control-tools/
   when: vct_dir.stat.exists == True
 
-- name: install vcsreplicator into virtualenv
+- name: install vcsreplicator into tools virtualenv
   command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+
+- name: install vcsreplicator into bundles virtualenv
+  command: /var/hg/venv_bundles/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf

@@ -21,7 +21,7 @@ import concurrent.futures as futures
 
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
-HG = '/var/hg/venv_tools/bin/hg'
+HG = '/var/hg/venv_bundles/bin/hg'
 PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 
 # The types of bundles to generate.

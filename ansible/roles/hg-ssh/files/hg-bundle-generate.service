@@ -4,7 +4,7 @@ After=network.target
 OnFailure=mail-unit-output@%n.service
 
 [Service]
-ExecStart=/var/hg/venv_tools/bin/python -u /var/hg/version-control-tools/scripts/generate-hg-s3-bundles -f /repo/hg/bundles/repos
+ExecStart=/var/hg/venv_bundles/bin/python -u /var/hg/version-control-tools/scripts/generate-hg-s3-bundles -f /repo/hg/bundles/repos
 Type=oneshot
 User=hg
 Group=hg
