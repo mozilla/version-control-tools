@@ -152,8 +152,10 @@ def hgweb():
                         default=multiprocessing.cpu_count())
     args = parser.parse_args()
 
+    logger.info('reading hgssh JSON document')
     with open(args.input, 'r') as f:
         hgssh_data = json.loads(f.read())
+        logger.info('JSON document read')
 
     # Convert the JSON keys to integers
     hgssh_data['offsets'] = {
@@ -230,6 +232,7 @@ def hgweb():
         # If the offsets are equal, do both steps
         if message.offset <= end_offset_for_partition:
             aggregate_messages_by_topicpartition[message.partition].append(message)
+            logger.info('message on partition %s, offset %s has been collected' % (message.partition, message.offset))
 
         if message.offset >= end_offset_for_partition:
             completed_aggregates[message.partition] = True
@@ -253,7 +256,8 @@ def hgweb():
 
     # Process the previously collected messages
     with futures.ThreadPoolExecutor(args.workers) as e:
-        for messages in aggregate_messages_by_topicpartition.values():
+        for partition, messages in aggregate_messages_by_topicpartition.items():
+            logger.info('processing messages for partition %s' % partition)
             for message in messages:
                 payload = message.value
 
