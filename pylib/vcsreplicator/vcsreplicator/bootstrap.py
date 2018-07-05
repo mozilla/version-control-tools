@@ -40,6 +40,15 @@ null_handler = logging.FileHandler('/dev/null')
 consumer_logger.addHandler(null_handler)
 
 
+def clone_repo(config, path, requirements, hgrc, heads, create=False):
+    """Wraps process_hg_sync to provide logging"""
+    logger.info('syncing repo: %s' % path)
+    try:
+        return process_hg_sync(config, path, requirements, hgrc, heads, create=False)
+    finally:
+        logger.info('exiting sync for: %s' % path)
+
+
 def hgssh():
     '''hgssh component of the vcsreplicator bootstrap procedure.'''
     import argparse
@@ -254,6 +263,9 @@ def hgweb():
 
     logger.info('finished retrieving messages from Kafka')
 
+    # TODO send details of failures somewhere to audit
+    exitcode = 0
+
     # Process the previously collected messages
     with futures.ThreadPoolExecutor(args.workers) as e:
         for partition, messages in aggregate_messages_by_topicpartition.items():
@@ -274,7 +286,7 @@ def hgweb():
                         continue
 
                     # Schedule the repo sync
-                    clone_future = e.submit(process_hg_sync, config, payload['path'],
+                    clone_future = e.submit(clone_repo, config, payload['path'],
                                             payload['requirements'], payload['hgrc'],
                                             payload['heads'], create=True)
 
@@ -296,7 +308,8 @@ def hgweb():
                     )
 
         if repositories_to_clone:
-            raise Exception('did not receive expected sync messages for %s' % repositories_to_clone)
+            logger.error('did not receive expected sync messages for %s' % repositories_to_clone)
+            exitcode = 1
 
         # Process clones
         remaining_clones = len(clone_futures_repo_mapping)
@@ -305,8 +318,9 @@ def hgweb():
 
             exc = completed_future.exception()
             if exc:
-                raise Exception('error triggering replication of Mercurial repo %s: %s' %
-                                (repo, exc))
+                logger.error('error triggering replication of Mercurial repo %s: %s' %
+                            (repo, exc))
+                exitcode = 1
 
             remaining_clones -= 1
 
@@ -327,8 +341,9 @@ def hgweb():
 
             exc = completed_future.exception()
             if exc:
-                raise Exception('error triggering replication of Mercurial repo %s: %s' %
+                logger.error('error triggering replication of Mercurial repo %s: %s' %
                                 (repo, exc))
+                exitcode = 1
 
             total_message_batches -= 1
 
@@ -336,3 +351,5 @@ def hgweb():
             logger.info('%s batches remaining' % total_message_batches)
 
     logger.info('%s bootstrap process complete' % config.c.get('consumer', 'group'))
+
+    return exitcode
