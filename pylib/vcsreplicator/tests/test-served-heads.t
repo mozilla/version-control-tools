@@ -184,12 +184,11 @@ But it isn't available on hgweb because the updates heads aren't written out
   "revision not found: 36638cc83b4d9084a2a38f41f345da73390ad05b"
 
 And the pushlog doesn't expose it
-TODO not yet implemented
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-pushes?version=2 --body-file body > /dev/null
   $ python -m json.tool < body
   {
-      "lastpushid": 3,
+      "lastpushid": 2,
       "pushes": {
           "1": {
               "changesets": [
@@ -209,14 +208,6 @@ TODO not yet implemented
                   "4b11352745a6b3eb429ca8cd486dfdc221a4bc62"
               ],
               "date": \d+, (re)
-              "user": "user@example.com"
-          },
-          "3": {
-              "changesets": [],
-              "date": \d+, (re)
-              "obsoletechangesets": [
-                  "36638cc83b4d9084a2a38f41f345da73390ad05b"
-              ],
               "user": "user@example.com"
           }
       }

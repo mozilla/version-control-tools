@@ -437,16 +437,36 @@ class pushlog(object):
                 c.execute('INSERT INTO changesets (pushid, rev, node) '
                     'VALUES (?, ?, ?)', (pushid, rev, node))
 
-    def lastpushid(self):
+    def lastpushid(self, conn=None):
         """Obtain the integer pushid of the last known push."""
-        with self.conn(readonly=True) as c:
-            if not c:
-                return 0
-
+        def query(c):
             res = c.execute('SELECT id from pushlog ORDER BY id DESC').fetchone()
             if not res:
                 return 0
             return res[0]
+
+        if conn:
+            return query(conn)
+        else:
+            with self.conn(readonly=True) as c:
+                if not c:
+                    return 0
+
+                return query(c)
+
+    def last_push_id_replicated(self, conn=None):
+        """Obtain the integer push id of the last replicated push."""
+        actual = self.lastpushid(conn=conn)
+
+        # If replicated data isn't available or the last push id isn't recorded,
+        # there's nothing special to do.
+        if util.safehasattr(self.repo, 'replicated_data'):
+            data = self.repo.replicated_data
+
+            if data[b'last_push_id'] is not None:
+                return min(data[b'last_push_id'], actual)
+
+        return actual
 
     def pushes(self, start_id=None, start_id_exclusive=False,
                end_id=None, end_id_exclusive=False,
@@ -456,7 +476,8 @@ class pushlog(object):
                end_time=None, end_time_exclusive=False,
                start_node=None, start_node_exclusive=False,
                end_node=None, end_node_exclusive=False,
-               nodes=None):
+               nodes=None,
+               only_replicated=False):
         """Return information about pushes to this repository.
 
         This is a generator of Push namedtuples describing each push. Each
@@ -493,6 +514,9 @@ class pushlog(object):
 
         ``limit`` can be used to limit the number of returned pushes to that
         count.
+
+        ``only_replicated`` can be specified to only include info about pushes
+        that have been fully replicated.
 
         When multiple filters are defined, they are logically ANDed together.
         """
@@ -565,6 +589,17 @@ class pushlog(object):
 
             if node_q:
                 inner_q += 'AND (%s) ' % ' OR '.join(node_q)
+
+            # Implement max push ID filtering separately from end_id. This makes
+            # things simpler, as we don't need to take inclusive/exclusive into
+            # play.
+            if only_replicated:
+                max_push_id = self.last_push_id_replicated(conn=c)
+            else:
+                max_push_id = self.lastpushid(conn=c)
+
+            inner_q += 'AND id <= ?'
+            args.append(max_push_id)
 
             if reverse:
                 inner_q += 'ORDER BY id DESC '

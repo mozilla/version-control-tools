@@ -101,6 +101,7 @@ class PushlogQuery(object):
                 offset=(self.page - 1) * self.querystart_value,
                 limit=self.querystart_value,
                 reverse=True,
+                only_replicated=True,
             )
 
             for push in pushes:
@@ -153,6 +154,7 @@ class PushlogQuery(object):
                 end_node=end_node,
                 end_node_exclusive=False,
                 nodes=self.changesetquery,
+                only_replicated=True,
             )
 
             for push in pushes:
@@ -164,7 +166,7 @@ class PushlogQuery(object):
                 for node in nodes:
                     self.entries.append((push.pushid, push.user, push.when, node))
 
-        self.lastpushid = self.repo.pushlog.lastpushid()
+        self.lastpushid = self.repo.pushlog.last_push_id_replicated()
 
     def description(self):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
