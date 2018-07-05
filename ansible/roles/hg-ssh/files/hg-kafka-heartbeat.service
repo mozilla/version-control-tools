@@ -1,0 +1,9 @@
+[Unit]
+Description=Send a heartbeat message through the replication system
+OnFailure=mail-unit-output@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/var/hg/venv_tools/bin/hg sendheartbeat
+User=hg
+Group=hg

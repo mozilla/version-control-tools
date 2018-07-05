@@ -1,0 +1,34 @@
+# Periodically sending heartbeat messages through the replication system
+# accomplishes a few things:
+#
+# 1) Verifies that Kafka is available and that messages can be
+#    published to it.
+# 2) Provides a forcing function for downstream consumers to process
+#    events.
+#
+# In the case of #2, publishing a message causes the Kafka consumer
+# to immediately have a message consumption lag. Since we have monitoring
+# in place that consumers don't fall too far behind producers, by
+# continuously producing messages, we force consumers to continuously
+# be processing them. If any consumers are in a bad state, hung, etc,
+# the fact that we are always producing messages will find broken consumers
+# sooner.
+
+[Unit]
+Description=Trigger heartbeat sending service periodically.
+PartOf=hg-master.target
+
+# Wait for NFS mount to exist before starting, otherwise AssertPathExists
+# below fails.
+After=remote-fs.target
+
+# We only want to have a single master at a time. Look for a file with the
+# current hostname in it indicating that we are the master.
+AssertPathExists=/repo/hg/master.%H
+
+[Timer]
+OnUnitInactiveSec=30
+OnBootSec=60
+
+[Install]
+WantedBy=hg-master.target

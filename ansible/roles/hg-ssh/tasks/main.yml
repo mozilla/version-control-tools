@@ -308,6 +308,8 @@
   with_items:
     - hg-bundle-generate.service
     - hg-bundle-generate.timer
+    - hg-kafka-heartbeat.service
+    - hg-kafka-heartbeat.timer
     - pulsenotifier.service
     - pushdataaggregator.service
     - snsnotifier.service
@@ -321,6 +323,7 @@
   when: vct_dir.stat.exists == False
   with_items:
     - hg-bundle-generate.timer
+    - hg-kafka-heartbeat.timer
     - pulsenotifier.service
     - pushdataaggregator.service
     - snsnotifier.service
