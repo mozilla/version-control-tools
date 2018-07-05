@@ -177,27 +177,11 @@ The new changeset is available in local storage on the mirror
   
 
 But it isn't available on hgweb because the updates heads aren't written out
-TODO not yet implemented
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-rev/36638cc83b4d9084a2a38f41f345da73390ad05b
-  200
+  404
   
-  {
-  "node": "36638cc83b4d9084a2a38f41f345da73390ad05b",
-  "date": [0.0, 0],
-  "desc": "h2_c3",
-  "backedoutby": "",
-  "branch": "default",
-  "bookmarks": [],
-  "tags": ["tip"],
-  "user": "Test User \u003csomeone@example.com\u003e",
-  "parents": ["4b11352745a6b3eb429ca8cd486dfdc221a4bc62"],
-  "phase": "public",
-  "pushid": 3,
-  "pushdate": [*, 0], (glob)
-  "pushuser": "user@example.com",
-  "landingsystem": null
-  }
+  "revision not found: 36638cc83b4d9084a2a38f41f345da73390ad05b"
 
 And the pushlog doesn't expose it
 TODO not yet implemented
@@ -228,10 +212,11 @@ TODO not yet implemented
               "user": "user@example.com"
           },
           "3": {
-              "changesets": [
+              "changesets": [],
+              "date": \d+, (re)
+              "obsoletechangesets": [
                   "36638cc83b4d9084a2a38f41f345da73390ad05b"
               ],
-              "date": \d+, (re)
               "user": "user@example.com"
           }
       }

@@ -233,9 +233,9 @@
 - name: install mozautomation into tools virtualenv
   command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/mozautomation
 
-# Various hgrc files reference hooks via "python:mozhghooks.*". Install
-# a link in the replication virtualenv to the path to these hooks inside
-# the version-control-tools checkout.
+# Various extensions and hooks reference Python packages provided by
+# version-control-tools. Register links so all packages are available in
+# virtualenvs.
 - name: add packages to virtualens
   copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
         content=/var/hg/version-control-tools/{{ item.path }}
