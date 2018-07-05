@@ -439,7 +439,10 @@ class pushlog(object):
 
     def lastpushid(self):
         """Obtain the integer pushid of the last known push."""
-        with self.conn() as c:
+        with self.conn(readonly=True) as c:
+            if not c:
+                return 0
+
             res = c.execute('SELECT id from pushlog ORDER BY id DESC').fetchone()
             if not res:
                 return 0
