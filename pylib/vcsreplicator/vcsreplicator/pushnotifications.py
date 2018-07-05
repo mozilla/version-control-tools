@@ -108,7 +108,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
 def _get_pushlog_info(hgclient, public_url, revs):
     template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
-    args = hglib.util.cmdbuilder(b'log', b'--hidden', r=revs, template=template)
+    args = hglib.util.cmdbuilder(b'log', hidden=True, r=revs, template=template)
     out = hgclient.rawcommand(args)
 
     pushes = {}
@@ -187,7 +187,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
 
         def rev_info(node):
             template = b'{node}\\0{desc}\\0{pushid}'
-            args = hglib.util.cmdbuilder(b'log', b'--hidden', r=node,
+            args = hglib.util.cmdbuilder(b'log', hidden=True, r=node,
                                          template=template)
             # Mercurial will abort with "unknown revision" if you give it
             # 40 character hash that isn't known.
