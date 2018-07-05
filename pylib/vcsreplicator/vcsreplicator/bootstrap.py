@@ -40,11 +40,11 @@ null_handler = logging.FileHandler('/dev/null')
 consumer_logger.addHandler(null_handler)
 
 
-def clone_repo(config, path, requirements, hgrc, heads, create=False):
+def clone_repo(config, path, requirements, hgrc, heads):
     """Wraps process_hg_sync to provide logging"""
     logger.info('syncing repo: %s' % path)
     try:
-        return process_hg_sync(config, path, requirements, hgrc, heads, create=False)
+        return process_hg_sync(config, path, requirements, hgrc, heads, create=True)
     finally:
         logger.info('exiting sync for: %s' % path)
 
@@ -288,7 +288,7 @@ def hgweb():
                     # Schedule the repo sync
                     clone_future = e.submit(clone_repo, config, payload['path'],
                                             payload['requirements'], payload['hgrc'],
-                                            payload['heads'], create=True)
+                                            payload['heads'])
 
                     # Here we register the future against its repo name
                     clone_futures_repo_mapping[clone_future] = payload['path']
