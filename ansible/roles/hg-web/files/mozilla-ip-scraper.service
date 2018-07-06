@@ -9,3 +9,5 @@ Type=oneshot
 User=hg
 Group=hg
 Nice=10
+# Needed for HTTPS_PROXY in some environments.
+EnvironmentFile=/etc/environment
