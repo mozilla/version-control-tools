@@ -112,7 +112,7 @@ def pushlogwireproto(repo, proto, firstpush):
     try:
         firstpush = int(firstpush)
 
-        for pushid, who, when, nodes in repo.pushlog.pushes(startid=firstpush):
+        for pushid, who, when, nodes in repo.pushlog.pushes(start_id=firstpush):
             lines.append('%d %s %d %s' % (pushid, who, when, ' '.join(nodes)))
 
         return '\n'.join(lines)
@@ -448,7 +448,7 @@ class pushlog(object):
                 return 0
             return res[0]
 
-    def pushes(self, startid=1, reverse=False, limit=None, offset=None):
+    def pushes(self, start_id=1, reverse=False, limit=None, offset=None):
         """Return information about pushes to this repository.
 
         This is a generator of Push namedtuples describing each push. Each
@@ -458,7 +458,7 @@ class pushlog(object):
 
         Nodes are returned in their 40 byte hex form.
 
-        ``startid`` is the numeric pushid to start returning values from. Value
+        ``start_id`` is the numeric pushid to start returning values from. Value
         is inclusive.
 
         ``reverse`` can be used to return pushes from most recent to oldest
@@ -481,7 +481,7 @@ class pushlog(object):
             # not pushes.
             inner_q = ('SELECT id, user, date FROM pushlog '
                        'WHERE id >= ? ')
-            args = [startid]
+            args = [start_id]
 
             if reverse:
                 inner_q += 'ORDER BY id DESC '
