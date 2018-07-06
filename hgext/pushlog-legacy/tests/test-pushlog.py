@@ -24,17 +24,24 @@ mydir = os.path.normpath(os.path.join(here, '..'))
 root = os.path.normpath(os.path.join(here, '..', '..', '..'))
 devnull = file("/dev/null", "w")
 
+HGRC_TEMPLATE = '''
+[extensions]
+pushlog={root}/hgext/pushlog
+pushlog-feed={root}/hgext/pushlog-legacy/pushlog-feed.py
+hgmo={root}/hgext/hgmo
+[web]
+templates={templates}
+style=gitweb_mozilla
+'''
+
 #==============================
 # utility functions and classes
 def write_hgrc(repodir):
     with open(join(repodir, ".hg", "hgrc"), "w") as f:
-        f.write("""[extensions]
-pushlog-feed=%s/pushlog-feed.py
-hgmo=%s/hgext/hgmo
-[web]
-templates=%s
-style=gitweb_mozilla
-""" % (mydir, root, os.environ['HG_TEMPLATES']))
+        f.write(HGRC_TEMPLATE.format(
+            root=root,
+            templates=os.environ['HG_TEMPLATES'],
+        ))
 
 def loadjsonfile(f):
     """Given a file path relative to the srcdir, load the file as a JSON object."""
