@@ -175,13 +175,7 @@ class PushlogQuery(object):
                 # likely just an empty db, so return an empty result
                 pass
 
-        try:
-            query = 'select id from pushlog order by id desc limit 1'
-            row = conn.execute(query).fetchone()
-            if row:
-                self.lastpushid = row[0]
-        except sqlite3.OperationalError:
-            pass
+        self.lastpushid = self.repo.pushlog.lastpushid()
 
     def description(self):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
