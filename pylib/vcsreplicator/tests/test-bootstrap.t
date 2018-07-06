@@ -233,8 +233,9 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 1 total
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total
   vcsreplicator.bootstrap exiting sync for: {moz}/mozilla-central
-  vcsreplicator.bootstrap syncing repo: {moz}/testrepo
+  vcsreplicator.bootstrap syncing repo: {moz}/testrepo (?)
   vcsreplicator.bootstrap {moz}/mozilla-central successfully cloned
+  vcsreplicator.bootstrap syncing repo: {moz}/testrepo (?)
   vcsreplicator.bootstrap 1 repositories remaining
   vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central
   vcsreplicator.bootstrap exiting sync for: {moz}/testrepo
