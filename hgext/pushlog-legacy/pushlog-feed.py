@@ -103,7 +103,7 @@ class PushlogQuery(object):
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
             try:
-                res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?",
+                res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY id DESC LIMIT ? OFFSET ?",
                                    (self.querystart_value,
                                    (self.page - 1) * self.querystart_value))
                 for (id, user, date) in res:
