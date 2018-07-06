@@ -189,18 +189,13 @@ def hgweb():
 
     topicpartitions = [
         TopicPartition(topic, partition)
-        for partition in hgssh_data['offsets']
+        for partition, (start_offset, end_offset) in hgssh_data['offsets'].items()
+        # there is no need to do an assignment if the length of the
+        # bootstrap message range is 0
+        if start_offset != end_offset
     ]
 
     consumer = KafkaConsumer(**consumer_config)
-    consumer.assign(topicpartitions)
-    logger.info('Kafka consumer assigned to replication topic')
-
-    # Seek all partitions to their start offsets and commit
-    for i, (start, end) in hgssh_data['offsets'].items():
-        consumer.seek(TopicPartition(topic, i), start)
-        logger.info('partition %s of topic %s moved to offset %s' % (i, topic, start))
-    consumer.commit()
 
     # We will remove repos from this set as we replicate them
     # Once this is an empty set we are done
@@ -220,46 +215,41 @@ def hgweb():
         for tp in topicpartitions
     }
 
-    # Maps a partition to a boolean indicating if there are more messages to process
-    # for this partition. When all the values in this mapping are True, the message
-    # collection step is complete
-    completed_aggregates = {
-        partition: False
-        for partition, (start, end) in hgssh_data['offsets'].items()
-        # We don't need to wait for completion if a partition's
-        # start/end offset are the same
-        if start != end
-    }
+    # Gather all the Kafka messages within the bootstrap range for each partition
+    for topicpartition in topicpartitions:
+        start_offset, end_offset = hgssh_data['offsets'][topicpartition.partition]
 
-    # Get all the messages we need to process from kafka
-    for message in consumer:
-        end_offset_for_partition = hgssh_data['offsets'][message.partition][1] - 1
+        end_offset -= 1
 
-        # Check if the message we are processing is within the range of accepted messages
-        # If we are in the range, add this message to the list of messages on this partition
-        # If not, mark this partition as complete
-        # If the offsets are equal, do both steps
-        if message.offset <= end_offset_for_partition:
-            aggregate_messages_by_topicpartition[message.partition].append(message)
-            logger.info('message on partition %s, offset %s has been collected' % (message.partition, message.offset))
+        # Assign the consumer to the next partition and move to the start offset
+        logger.info('assigning the consumer to partition %s' % topicpartition.partition)
+        consumer.assign([topicpartition])
 
-        if message.offset >= end_offset_for_partition:
-            completed_aggregates[message.partition] = True
-            logger.info('finished retrieving messages on partition %s' % message.partition)
-
-            # Commit and exit the Kafka consume loop if we have gathered all required messages
-            if all(completed for completed in completed_aggregates.values()):
-                consumer.commit(offsets={
-                    TopicPartition(topic, message.partition): OffsetAndMetadata(message.offset + 1, ''),
-                })
-                break
-
-            # Don't commit this offset if it is outside the bootstrap range
-            continue
-
+        logger.info('seeking the consumer to offset %s' % start_offset)
+        consumer.seek(topicpartition, start_offset)
         consumer.commit(offsets={
-            TopicPartition(topic, message.partition): OffsetAndMetadata(message.offset + 1, ''),
+            topicpartition: OffsetAndMetadata(start_offset, '')
         })
+
+        logger.info('partition %s of topic %s moved to offset %s' %
+                    (topicpartition.partition, topicpartition.topic, start_offset))
+
+        # Get all the messages we need to process from kafka
+        for message in consumer:
+            # Check if the message we are processing is within the range of accepted messages
+            # If we are in the range, add this message to the list of messages on this partition
+            # If we are at the end of the range, break from the loop and move on to the next partition
+            if message.offset <= end_offset:
+                aggregate_messages_by_topicpartition[message.partition].append(message)
+                logger.info('message on partition %s, offset %s has been collected' % (message.partition, message.offset))
+
+            consumer.commit(offsets={
+                TopicPartition(topic, message.partition): OffsetAndMetadata(message.offset + 1, ''),
+            })
+
+            if message.offset >= end_offset:
+                logger.info('finished retrieving messages on partition %s' % message.partition)
+                break
 
     logger.info('finished retrieving messages from Kafka')
 

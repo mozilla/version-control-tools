@@ -22,8 +22,7 @@ Create several repos on the remaining replication nodes
 
   $ hgmo create-repo testrepo scm_level_1
   (recorded repository creation in replication log)
-  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --start-from 0 --wait-for-n 1 /etc/mercurial/vcsreplicator.ini
-  got a hg-repo-init-2 message
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
   $ standarduser
@@ -214,17 +213,18 @@ will be an indication of a successful bootstrap
 
   $ docker cp $TESTTMP/hgssh_edited.json $HGWEB_0_CID:/etc/mercurial/hgssh.json
   $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /var/hg/venv_replication/bin/hg /etc/mercurial/hgssh.json 1
-  vcsreplicator.bootstrap Kafka consumer assigned to replication topic
-  vcsreplicator.bootstrap partition 0 of topic pushdata moved to offset 2
-  vcsreplicator.bootstrap partition 1 of topic pushdata moved to offset 0
+  vcsreplicator.bootstrap reading hgssh JSON document
+  vcsreplicator.bootstrap JSON document read
   vcsreplicator.bootstrap partition 2 of topic pushdata moved to offset 10
-  vcsreplicator.bootstrap partition 3 of topic pushdata moved to offset 0
-  vcsreplicator.bootstrap partition 4 of topic pushdata moved to offset 0
-  vcsreplicator.bootstrap partition 5 of topic pushdata moved to offset 0
-  vcsreplicator.bootstrap partition 6 of topic pushdata moved to offset 0
-  vcsreplicator.bootstrap partition 7 of topic pushdata moved to offset 0
+  vcsreplicator.bootstrap message on partition 2, offset 10 has been collected
+  vcsreplicator.bootstrap message on partition 2, offset 11 has been collected
+  vcsreplicator.bootstrap message on partition 2, offset 12 has been collected
+  vcsreplicator.bootstrap message on partition 2, offset 13 has been collected
+  vcsreplicator.bootstrap message on partition 2, offset 14 has been collected
+  vcsreplicator.bootstrap message on partition 2, offset 15 has been collected
   vcsreplicator.bootstrap finished retrieving messages on partition 2
   vcsreplicator.bootstrap finished retrieving messages from Kafka
+  vcsreplicator.bootstrap processing messages for partition 2
   vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
   vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 1 total
@@ -238,7 +238,6 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap extra processing for {moz}/mozilla-central completed successfully
   vcsreplicator.bootstrap 0 batches remaining
   * bootstrap process complete (glob)
-
 
 
 Confirm commits replicated to hgweb host
@@ -279,7 +278,7 @@ Confirm anticipated offsets on hgweb0
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         2            2    * (glob)
+  pushdata  *            0         0            2   * (glob)
   pushdata  *            1         0            0    * (glob)
   pushdata  *            2        16           20    * (glob)
   pushdata  *            3         0            0    * (glob)
@@ -289,10 +288,24 @@ Confirm anticipated offsets on hgweb0
   pushdata  *            7         0            0    * (glob)
 
 Start up vcsreplicator and check that new commits are safely replayed.
-We only start partition 2, as the other partitions do not have relevant
-messages to play back and their output makes the test non-deterministic
+Start partition 2 last to ensure the relevant test output appears at the
+bottom of the log file.
 
 
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:0
+  vcsreplicator:0: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:1
+  vcsreplicator:1: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:3
+  vcsreplicator:3: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:4
+  vcsreplicator:4: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:5
+  vcsreplicator:5: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:6
+  vcsreplicator:6: started
+  $ hgmo exec hgweb0 supervisorctl start vcsreplicator:7
+  vcsreplicator:7: started
   $ hgmo exec hgweb0 supervisorctl start vcsreplicator:2
   vcsreplicator:2: started
 
