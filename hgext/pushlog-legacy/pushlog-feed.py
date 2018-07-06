@@ -61,9 +61,8 @@ class QueryType:
     DATE, CHANGESET, PUSHID, COUNT = range(4)
 
 class PushlogQuery(object):
-    def __init__(self, repo, dbconn, urlbase='', tipsonly=False, reponame=''):
+    def __init__(self, repo, urlbase='', tipsonly=False, reponame=''):
         self.repo = repo
-        self.conn = dbconn
         self.urlbase = urlbase
         self.tipsonly = tipsonly
         self.reponame = reponame
@@ -89,7 +88,7 @@ class PushlogQuery(object):
         # ID of the last known push in the database.
         self.lastpushid = None
 
-    def DoQuery(self):
+    def DoQuery(self, conn):
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         # Use an unfiltered repo because query parameters may reference hidden
@@ -97,25 +96,25 @@ class PushlogQuery(object):
         # treat them appropriately at the filter layer.
         repo = self.repo.unfiltered()
         self.entries = []
-        if not self.conn:
+        if not conn:
             # we didn't get a connection to the database, return empty
             return
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             # Get entries from self.page, using self.querystart_value as
             # the number of pushes per page.
             try:
-                res = self.conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?",
-                                        (self.querystart_value,
-                                         (self.page - 1) * self.querystart_value))
+                res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY date DESC LIMIT ? OFFSET ?",
+                                   (self.querystart_value,
+                                   (self.page - 1) * self.querystart_value))
                 for (id, user, date) in res:
                     limit = ""
                     if self.tipsonly:
                         limit = " LIMIT 1"
-                    res2 = self.conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
+                    res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
                     for node, in res2:
                         self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
                 # get count of pushes
-                self.totalentries = self.conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
+                self.totalentries = conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
             except sqlite3.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
@@ -161,7 +160,7 @@ class PushlogQuery(object):
 
             query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
             try:
-                res = self.conn.execute(query, params)
+                res = conn.execute(query, params)
                 lastid = None
                 for (id, user, date, node) in res:
                     # Empty push.
@@ -178,7 +177,7 @@ class PushlogQuery(object):
 
         try:
             query = 'select id from pushlog order by id desc limit 1'
-            row = self.conn.execute(query).fetchone()
+            row = conn.execute(query).fetchone()
             if row:
                 self.lastpushid = row[0]
         except sqlite3.OperationalError:
@@ -292,7 +291,6 @@ def pushlogSetup(repo, req):
 
     query = PushlogQuery(urlbase=urlbase,
                          repo=repo,
-                         dbconn=conn,
                          tipsonly=tipsonly,
                          reponame=reponame)
     query.page = page
@@ -345,7 +343,7 @@ def pushlogSetup(repo, req):
     if query.formatversion < 1 or query.formatversion > 2:
         raise ErrorResponse(500, 'version parameter must be 1 or 2')
 
-    query.DoQuery()
+    query.DoQuery(conn)
     return query
 
 def pushlogFeed(*args):
