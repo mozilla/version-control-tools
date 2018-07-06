@@ -113,11 +113,12 @@ class PushlogQuery(object):
                     res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
                     for node, in res2:
                         self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
-                # get count of pushes
-                self.totalentries = conn.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
             except sqlite3.OperationalError:
                 # likely just an empty db, so return an empty result
                 pass
+
+            self.totalentries = self.repo.pushlog.push_count()
+
         else:
             # for all other queries we'll build the query piece by piece
             basequery = "SELECT id, user, date, node from pushlog LEFT JOIN changesets ON id = pushid WHERE "

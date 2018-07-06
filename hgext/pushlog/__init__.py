@@ -490,6 +490,14 @@ class pushlog(object):
             if current:
                 yield current
 
+    def push_count(self):
+        """Obtain the number of pushes in the database."""
+        with self.conn(readonly=True) as c:
+            if not c:
+                return 0
+
+            return c.execute('SELECT COUNT(*) FROM pushlog').fetchone()[0]
+
     def pushfromnode(self, node):
         """Obtain info about a push that added the specified changeset.
 
