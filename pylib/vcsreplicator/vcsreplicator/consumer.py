@@ -4,11 +4,13 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import errno
 import io
 import json
 import logging
 import os
 import pipes
+import shutil
 import signal
 import sys
 import time
@@ -181,6 +183,8 @@ def process_message(config, payload):
     elif name == 'hg-heads-1':
         # Set of heads isn't used
         return
+    elif name == 'hg-repo-delete-1':
+        return process_hg_delete(config, payload['path'])
 
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
@@ -292,6 +296,41 @@ def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
 
         logger.warn('pulled %d changesets into %s' % (newtip - oldtip,
                                                       local_path))
+
+
+def process_hg_delete(config, wire_path):
+    """Process message indicating repository at path should be deleted"""
+    local_path = config.parse_wire_repo_path(wire_path)
+
+    if not os.path.exists(local_path):
+        logger.warn('delete message received for path that does not exist: %s' % local_path)
+        return
+
+    # Use configured `todelete_path` if available
+    if config.c.has_section('consumer') and config.c.has_option('consumer', 'todelete_path'):
+        todelete_path = config.c.get('consumer', 'todelete_path')
+    else:
+        todelete_path = '/repo/hg/todelete'
+
+    try:
+        logger.info('deleting repo at %s' % local_path)
+
+        destination = wire_path.replace('{moz}', todelete_path)
+        logger.info('moving %s to %s' % (local_path, destination))
+
+        try:
+            os.makedirs(os.path.dirname(destination))
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        os.rename(local_path, destination)
+
+        logger.info('deleting repo at %s' % destination)
+        shutil.rmtree(destination)
+    except OSError as e:
+        logger.warn('could not delete repo at %s: %s' % (local_path, e))
+    logger.warn('repository at %s deleted' % local_path)
 
 
 def get_hg_client(path):

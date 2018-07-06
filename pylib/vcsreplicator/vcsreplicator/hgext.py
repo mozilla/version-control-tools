@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import syslog
 import time
 import traceback
@@ -295,6 +296,16 @@ def sendheadsmessage(ui, repo):
         repo.producerlog('HEADS_SENT')
 
 
+def sendrepodeletemessage(ui, repo):
+    """Send a message to delete a repository."""
+    with ui.kafkainteraction():
+        repo.producerlog('DELETE_SENDING')
+        producer = ui.replicationproducer
+        vcsrproducer.record_hg_repo_delete(producer, repo.replicationwireprotopath,
+                                           partition=repo.replicationpartition)
+        repo.producerlog('DELETE_SENT')
+
+
 # Wraps ``hg init`` to send a replication event.
 def initcommand(orig, ui, dest, **opts):
     with ui.kafkainteraction():
@@ -387,6 +398,29 @@ def replicatecommand(ui, repo, **opts):
     """
     sendreposyncmessage(ui, repo, bootstrap=opts.get('bootstrap'))
     ui.status(_('wrote synchronization message into replication log\n'))
+
+
+@command('replicatedelete', [], 'delete this repository and all mirrors')
+def replicatedelete(ui, repo):
+    """Remove repo and synchronize deletion across mirrors.
+
+    This is intended as a mechanism to perform a repo deletion with a single
+    command, from the master hgssh host.
+    """
+    repo_dir = repo.root
+
+    try:
+        sendrepodeletemessage(ui, repo)
+        ui.status(_('wrote delete message into replication log\n'))
+
+        todelete_repo_name = repo.root + '.todelete'
+
+        os.rename(repo.root, todelete_repo_name)
+        shutil.rmtree(todelete_repo_name)
+        ui.status(_('repo deleted from local host\n'))
+
+    except IOError as e:
+        raise error.Abort(_('could not delete repo %s: %s\n' % (repo_dir, e)))
 
 
 @command('debugbase85obsmarkers', [], 'MARKERS', norepo=True)

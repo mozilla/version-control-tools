@@ -137,3 +137,11 @@ def record_hg_repo_heads(producer, path, heads, partition):
         'path': path,
         'heads': heads,
     }, partition=partition)
+
+
+def record_hg_repo_delete(producer, path, partition):
+    """Produce a message that will delete a repository."""
+    return producer.send_message({
+        'name': 'hg-repo-delete-1',
+        'path': path,
+    }, partition=partition)

@@ -581,6 +581,13 @@
         group=root
         mode=0755
 
+- name: directory for repos deleted through vcsreplicator
+  file: path=/repo/hg/todelete
+        owner=hg
+        group=hg
+        mode=0750
+        state=directory
+
 - name: systemd service file for vcsreplicator
   copy: src=vcsreplicator@.service
         dest=/etc/systemd/system/vcsreplicator@.service
