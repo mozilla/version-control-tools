@@ -2,7 +2,6 @@ from datetime import datetime
 from math import ceil
 import os
 import re
-import sqlite3
 import sys
 import time
 
@@ -88,7 +87,7 @@ class PushlogQuery(object):
         # ID of the last known push in the database.
         self.lastpushid = None
 
-    def DoQuery(self, conn):
+    def DoQuery(self):
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         # Use an unfiltered repo because query parameters may reference hidden
@@ -96,9 +95,7 @@ class PushlogQuery(object):
         # treat them appropriately at the filter layer.
         repo = self.repo.unfiltered()
         self.entries = []
-        if not conn:
-            # we didn't get a connection to the database, return empty
-            return
+
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             pushes = self.repo.pushlog.pushes(
                 offset=(self.page - 1) * self.querystart_value,
@@ -119,61 +116,53 @@ class PushlogQuery(object):
             self.totalentries = self.repo.pushlog.push_count()
 
         else:
-            # for all other queries we'll build the query piece by piece
-            basequery = "SELECT id, user, date, node from pushlog LEFT JOIN changesets ON id = pushid WHERE "
-            where = []
-            params = {}
+            start_when = None
+            start_push_id = None
+            end_when = None
+            end_push_id = None
+            start_node = None
+            end_node = None
+
             if self.querystart == QueryType.DATE:
-                where.append("date > :start_date")
-                params['start_date'] = self.querystart_value
-            elif self.querystart == QueryType.CHANGESET:
-                where.append("id > (select c.pushid from changesets c where c.node = :start_node)")
-                params['start_node'] = hex(repo.lookup(self.querystart_value))
+                start_when = self.querystart_value
             elif self.querystart == QueryType.PUSHID:
-                where.append("id > :start_id")
-                params['start_id'] = self.querystart_value
+                start_push_id = int(self.querystart_value)
+            elif self.querystart == QueryType.CHANGESET:
+                start_node = self.querystart_value
 
             if self.queryend == QueryType.DATE:
-                where.append("date < :end_date ")
-                params['end_date'] = self.queryend_value
-            elif self.queryend == QueryType.CHANGESET:
-                where.append("id <= (select c.pushid from changesets c where c.node = :end_node)")
-                params['end_node'] = hex(repo.lookup(self.queryend_value))
+                end_when = self.queryend_value
             elif self.queryend == QueryType.PUSHID:
-                where.append("id <= :end_id ")
-                params['end_id'] = self.queryend_value
+                end_push_id = int(self.queryend_value)
+            elif self.queryend == QueryType.CHANGESET:
+                end_node = self.queryend_value
 
-            if self.userquery:
-                subquery = []
-                for i, u in enumerate(self.userquery):
-                    subquery.append("user = :user%d" % i)
-                    params['user%d' % i] = u
+            pushes = self.repo.pushlog.pushes(
+                reverse=True,
+                start_id=start_push_id,
+                start_id_exclusive=True,
+                end_id=end_push_id,
+                end_id_exclusive=False,
+                start_time=start_when,
+                start_time_exclusive=True,
+                end_time=end_when,
+                end_time_exclusive=True,
+                users=self.userquery,
+                start_node=start_node,
+                start_node_exclusive=True,
+                end_node=end_node,
+                end_node_exclusive=False,
+                nodes=self.changesetquery,
+            )
 
-                where.append('(' + ' OR '.join(subquery) + ')')
+            for push in pushes:
+                if self.tipsonly:
+                    nodes = [push.nodes[0]]
+                else:
+                    nodes = push.nodes
 
-            if self.changesetquery:
-                subquery = []
-                for i, c in enumerate(self.changesetquery):
-                    subquery.append("id = (select c.pushid from changesets c where c.node = :node%s)" % i)
-                    params['node%d' % i] = hex(repo.lookup(c))
-                where.append('(' + ' OR '.join(subquery) + ')')
-
-            query = basequery + ' AND '.join(where) + ' ORDER BY id DESC, rev DESC'
-            try:
-                res = conn.execute(query, params)
-                lastid = None
-                for (id, user, date, node) in res:
-                    # Empty push.
-                    if not node:
-                        continue
-
-                    if self.tipsonly and id == lastid:
-                        continue
-                    self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
-                    lastid = id
-            except sqlite3.OperationalError:
-                # likely just an empty db, so return an empty result
-                pass
+                for node in nodes:
+                    self.entries.append((push.pushid, push.user, push.when, node))
 
         self.lastpushid = self.repo.pushlog.lastpushid()
 
@@ -323,8 +312,7 @@ def pushlogSetup(repo, req):
     if query.formatversion < 1 or query.formatversion > 2:
         raise ErrorResponse(500, 'version parameter must be 1 or 2')
 
-    with repo.pushlog.conn(readonly=True) as conn:
-        query.DoQuery(conn)
+    query.DoQuery()
 
     return query
 

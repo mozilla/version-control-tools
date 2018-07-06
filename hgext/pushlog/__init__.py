@@ -448,7 +448,15 @@ class pushlog(object):
                 return 0
             return res[0]
 
-    def pushes(self, start_id=1, reverse=False, limit=None, offset=None):
+    def pushes(self, start_id=None, start_id_exclusive=False,
+               end_id=None, end_id_exclusive=False,
+               reverse=False, limit=None, offset=None,
+               users=None,
+               start_time=None, start_time_exclusive=False,
+               end_time=None, end_time_exclusive=False,
+               start_node=None, start_node_exclusive=False,
+               end_node=None, end_node_exclusive=False,
+               nodes=None):
         """Return information about pushes to this repository.
 
         This is a generator of Push namedtuples describing each push. Each
@@ -458,8 +466,24 @@ class pushlog(object):
 
         Nodes are returned in their 40 byte hex form.
 
-        ``start_id`` is the numeric pushid to start returning values from. Value
-        is inclusive.
+        ``start_id`` and ``end_id`` define the lower and upper bounds for
+        numeric push IDs. ``start_id_exclusive`` and ``end_end_exclusive`` can
+        be used to make the boundary condition exclusive instead of inclusive.
+
+        ``start_time`` and ``end_time`` define a lower and upper limit for the
+        push time, as specified in seconds since UNIX epoch.
+        ``start_time_exclusive`` and ``end_time_exclusive`` can be used to make
+        the boundary condition exclusive instead of inclusive.
+
+        ``start_node`` and ``end_node`` define a lower and upper limit for
+        pushes as defined by a push containing a revision.
+        ``start_node_exclusive`` and ``end_node_exclusive`` can be used to make
+        the boundary condition exclusive instead of inclusive.
+
+        ``nodes`` is an iterable of revision identifiers. If specified, only
+        pushes containing nodes from this set will be returned.
+
+        ``users`` is an iterable of push users to limit results to.
 
         ``reverse`` can be used to return pushes from most recent to oldest
         instead of the default of oldest to newest.
@@ -469,10 +493,36 @@ class pushlog(object):
 
         ``limit`` can be used to limit the number of returned pushes to that
         count.
+
+        When multiple filters are defined, they are logically ANDed together.
         """
+        if start_id is not None and start_node is not None:
+            raise ValueError('cannot specify both start_id and start_node')
+
+        if end_id is not None and end_node is not None:
+            raise ValueError('cannot specify both end_id and end_node')
+
         with self.conn(readonly=True) as c:
             if not c:
                 return
+
+            start_id = start_id if start_id is not None else 0
+
+            # We further refine start_id and end_id by nodes, if specified.
+            # We /could/ do this in a single SQL statement. But that would
+            # make the level of nesting a bit complicated. So we just issue
+            # an extra SQL statement to resolve the push id from a node.
+            if start_node is not None:
+                start_node = self.repo.lookup(start_node)
+                start_id = self.pushfromnode(start_node).pushid
+                start_id_exclusive = start_node_exclusive
+
+            if end_node is not None:
+                end_node = self.repo.lookup(end_node)
+                end_id = self.pushfromnode(end_node).pushid
+                end_id_exclusive = end_node_exclusive
+
+            op = '>' if start_id_exclusive else '>='
 
             # In order to support LIMIT and OFFSET at the push level,
             # we need to use an inner SELECT to apply the filtering there.
@@ -480,8 +530,41 @@ class pushlog(object):
             # Since we're doing a LEFT JOIN, LIMIT and OFFSET would count nodes,
             # not pushes.
             inner_q = ('SELECT id, user, date FROM pushlog '
-                       'WHERE id >= ? ')
+                       'WHERE id %s ? ' % op)
             args = [start_id]
+
+            if end_id is not None:
+                op = '<' if end_id_exclusive else '<='
+                inner_q += 'AND id %s ? ' % op
+                args.append(end_id)
+
+            if start_time is not None:
+                op = '>' if start_time_exclusive else '>='
+                inner_q += 'AND date %s ? ' % op
+                args.append(start_time)
+
+            if end_time is not None:
+                op = '<' if end_time_exclusive else '<='
+                inner_q += 'AND date %s ? ' % op
+                args.append(end_time)
+
+            user_q = []
+            for user in users or []:
+                user_q.append('user=?')
+                args.append(user)
+
+            if user_q:
+                inner_q += 'AND (%s) ' % ' OR '.join(user_q)
+
+            # We include the push for each listed node. We do this via multiple
+            # subqueries to select the pushid for each node.
+            node_q = []
+            for node in nodes or []:
+                node_q.append('id=(SELECT pushid FROM changesets WHERE node=?)')
+                args.append(hex(self.repo.lookup(node)))
+
+            if node_q:
+                inner_q += 'AND (%s) ' % ' OR '.join(node_q)
 
             if reverse:
                 inner_q += 'ORDER BY id DESC '
