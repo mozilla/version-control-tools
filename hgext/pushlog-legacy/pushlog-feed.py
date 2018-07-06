@@ -61,11 +61,11 @@ class QueryType:
     DATE, CHANGESET, PUSHID, COUNT = range(4)
 
 class PushlogQuery(object):
-    def __init__(self, repo, urlbase='', tipsonly=False, reponame=''):
+    def __init__(self, repo, urlbase='', tipsonly=False):
         self.repo = repo
         self.urlbase = urlbase
         self.tipsonly = tipsonly
-        self.reponame = reponame
+        self.reponame = os.path.basename(repo.root)
 
         self.page = 1
         self.dates = []
@@ -245,10 +245,6 @@ def pushlogSetup(repo, req):
     build a PushlogQuery object and populate it with data from the request.
     The returned query object will have its query already run, and
     its entries member can be read."""
-    repopath = os.path.dirname(repo.path)
-    reponame = os.path.basename(repopath)
-    if reponame == '.hg':
-        reponame = os.path.basename(os.path.dirname(repopath))
     pushdb = os.path.join(repo.path, "pushlog2.db")
     # If the database doesn't already exist, don't try to open it.
     conn = None
@@ -291,8 +287,7 @@ def pushlogSetup(repo, req):
 
     query = PushlogQuery(urlbase=urlbase,
                          repo=repo,
-                         tipsonly=tipsonly,
-                         reponame=reponame)
+                         tipsonly=tipsonly)
     query.page = page
 
     # find start component
