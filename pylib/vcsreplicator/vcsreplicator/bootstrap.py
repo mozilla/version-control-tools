@@ -56,7 +56,7 @@ def hgssh():
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='Path to config file')
     parser.add_argument('hg', help='Path to hg executable for use in bootstrap process')
-    parser.add_argument('workers', help='Number of concurrent workers to use for publishing messages', type=int,
+    parser.add_argument('--workers', help='Number of concurrent workers to use for publishing messages', type=int,
                         default=multiprocessing.cpu_count())
     args = parser.parse_args()
 
@@ -157,7 +157,7 @@ def hgweb():
     parser.add_argument('config', help='Path of config file to load')
     parser.add_argument('hg', help='Path to hg executable for use in bootstrap process')
     parser.add_argument('input', help='JSON data input (output from the hgssh bootstrap procedure) file path')
-    parser.add_argument('workers', help='Number of concurrent workers to use for performing clones', type=int,
+    parser.add_argument('--workers', help='Number of concurrent workers to use for performing clones', type=int,
                         default=multiprocessing.cpu_count())
     args = parser.parse_args()
 
