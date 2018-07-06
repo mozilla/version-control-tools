@@ -245,15 +245,6 @@ def pushlogSetup(repo, req):
     build a PushlogQuery object and populate it with data from the request.
     The returned query object will have its query already run, and
     its entries member can be read."""
-    pushdb = os.path.join(repo.path, "pushlog2.db")
-    # If the database doesn't already exist, don't try to open it.
-    conn = None
-    if os.path.isfile(pushdb):
-        try:
-            conn = sqlite3.connect(pushdb)
-        except sqlite3.OperationalError:
-            pass
-
     page = int(qsparam(req, 'node', '1'))
 
     # figure out the urlbase
@@ -338,7 +329,9 @@ def pushlogSetup(repo, req):
     if query.formatversion < 1 or query.formatversion > 2:
         raise ErrorResponse(500, 'version parameter must be 1 or 2')
 
-    query.DoQuery(conn)
+    with repo.pushlog.conn(readonly=True) as conn:
+        query.DoQuery(conn)
+
     return query
 
 def pushlogFeed(*args):
