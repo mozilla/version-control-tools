@@ -334,9 +334,18 @@ def process_hg_delete(config, wire_path):
 
 
 def get_hg_client(path):
-    # This engages some client-specific functionality to mirror changes instead
-    # of using default Mercurial semantics.
-    configs = ['extensions.vcsreplicatorconsumer=%s' % CONSUMER_EXT]
+    configs = [
+        # This engages some client-specific functionality to mirror changes
+        # instead of using default Mercurial semantics.
+        'extensions.vcsreplicatorconsumer=%s' % CONSUMER_EXT,
+        # Disable aggressive merge deltas, which some repos may have in their
+        # .hg/hgrc. Aggressive merge deltas will force the consumer to
+        # recompute deltas on merges against both parents. This will
+        # significantly slow down replication. The deltas on the canonical
+        # server should have already had this logic applied. And it is
+        # redundant to do it on the consumers.
+        'format.aggressivemergedeltas=false',
+    ]
 
     return hglib.open(path, encoding='UTF-8', configs=configs)
 
