@@ -72,7 +72,7 @@ Modify hgrc files
 Run hgssh bootstrap procedure and confirm the format of the returned data
 We send the output to a file for use in the hgweb bootstrap procedure
 
-  $ hgmo exec hgssh sudo -u hg -g hg /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg 5 > $TESTTMP/hgssh.json
+  $ hgmo exec hgssh sudo -u hg -g hg /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 1 > $TESTTMP/hgssh.json
   $ cat $TESTTMP/hgssh.json | python -m json.tool
   {
       "offsets": {
@@ -212,9 +212,11 @@ Perform bootstrap procedure on hgweb. vcsreplicator is still off on this host so
 will be an indication of a successful bootstrap
 
   $ docker cp $TESTTMP/hgssh_edited.json $HGWEB_0_CID:/etc/mercurial/hgssh.json
-  $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /var/hg/venv_replication/bin/hg /etc/mercurial/hgssh.json 1
+  $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /var/hg/venv_replication/bin/hg /etc/mercurial/hgssh.json --workers 1
   vcsreplicator.bootstrap reading hgssh JSON document
   vcsreplicator.bootstrap JSON document read
+  vcsreplicator.bootstrap assigning the consumer to partition 2
+  vcsreplicator.bootstrap seeking the consumer to offset 10
   vcsreplicator.bootstrap partition 2 of topic pushdata moved to offset 10
   vcsreplicator.bootstrap message on partition 2, offset 10 has been collected
   vcsreplicator.bootstrap message on partition 2, offset 11 has been collected
@@ -225,16 +227,19 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap finished retrieving messages on partition 2
   vcsreplicator.bootstrap finished retrieving messages from Kafka
   vcsreplicator.bootstrap processing messages for partition 2
-  vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
-  vcsreplicator.bootstrap scheduled clone for {moz}/* (glob)
+  vcsreplicator.bootstrap scheduled clone for {moz}/mozilla-central
+  vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central
+  vcsreplicator.bootstrap scheduled clone for {moz}/testrepo
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 1 total
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total
-  vcsreplicator.bootstrap {moz}/* successfully cloned (glob)
+  vcsreplicator.bootstrap exiting sync for: {moz}/mozilla-central
+  vcsreplicator.bootstrap syncing repo: {moz}/testrepo
+  vcsreplicator.bootstrap {moz}/mozilla-central successfully cloned
   vcsreplicator.bootstrap 1 repositories remaining
-  vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central (?)
-  vcsreplicator.bootstrap {moz}/* successfully cloned (glob)
+  vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central
+  vcsreplicator.bootstrap exiting sync for: {moz}/testrepo
+  vcsreplicator.bootstrap {moz}/testrepo successfully cloned
   vcsreplicator.bootstrap 0 repositories remaining
-  vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central (?)
   vcsreplicator.bootstrap extra processing for {moz}/mozilla-central completed successfully
   vcsreplicator.bootstrap 0 batches remaining
   * bootstrap process complete (glob)

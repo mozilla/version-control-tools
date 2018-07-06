@@ -78,7 +78,7 @@ def hgssh():
     # Gather the initial offsets
     topicpartitions = [
         TopicPartition(topic, partition_number)
-        for partition_number in partitions
+        for partition_number in sorted(partitions)
     ]
     offsets_start = consumer.end_offsets(topicpartitions)
     logger.info('gathered initial Kafka offsets')
@@ -189,7 +189,8 @@ def hgweb():
 
     topicpartitions = [
         TopicPartition(topic, partition)
-        for partition, (start_offset, end_offset) in hgssh_data['offsets'].items()
+        for partition, (start_offset, end_offset)
+        in sorted(hgssh_data['offsets'].items())
         # there is no need to do an assignment if the length of the
         # bootstrap message range is 0
         if start_offset != end_offset
@@ -258,7 +259,7 @@ def hgweb():
 
     # Process the previously collected messages
     with futures.ThreadPoolExecutor(args.workers) as e:
-        for partition, messages in aggregate_messages_by_topicpartition.items():
+        for partition, messages in sorted(aggregate_messages_by_topicpartition.items()):
             logger.info('processing messages for partition %s' % partition)
             for message in messages:
                 payload = message.value
