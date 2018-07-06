@@ -448,7 +448,7 @@ class pushlog(object):
                 return 0
             return res[0]
 
-    def pushes(self, startid=1):
+    def pushes(self, startid=1, reverse=False, limit=None, offset=None):
         """Return information about pushes to this repository.
 
         This is a generator of Push namedtuples describing each push. Each
@@ -460,19 +460,51 @@ class pushlog(object):
 
         ``startid`` is the numeric pushid to start returning values from. Value
         is inclusive.
+
+        ``reverse`` can be used to return pushes from most recent to oldest
+        instead of the default of oldest to newest.
+
+        ``offset`` can be used to skip the first N pushes that would be
+        returned.
+
+        ``limit`` can be used to limit the number of returned pushes to that
+        count.
         """
         with self.conn(readonly=True) as c:
             if not c:
                 return
 
+            # In order to support LIMIT and OFFSET at the push level,
+            # we need to use an inner SELECT to apply the filtering there.
+            # That's because LIMIT and OFFSET apply to the SELECT as a whole.
+            # Since we're doing a LEFT JOIN, LIMIT and OFFSET would count nodes,
+            # not pushes.
             inner_q = ('SELECT id, user, date FROM pushlog '
                        'WHERE id >= ? ')
+            args = [startid]
+
+            if reverse:
+                inner_q += 'ORDER BY id DESC '
+            else:
+                inner_q += 'ORDER BY id ASC '
+
+            if limit is not None:
+                inner_q += 'LIMIT ? '
+                args.append(limit)
+
+            if offset is not None:
+                inner_q += 'OFFSET ? '
+                args.append(offset)
 
             q = ('SELECT id, user, date, rev, node FROM (%s) '
-                 'LEFT JOIN changesets on id=pushid '
-                 'ORDER BY id ASC, rev ASC ' % inner_q)
+                 'LEFT JOIN changesets on id=pushid ' % inner_q)
 
-            res = c.execute(q, (startid,))
+            if reverse:
+                q += 'ORDER BY id DESC, rev DESC '
+            else:
+                q += 'ORDER BY id ASC, rev ASC '
+
+            res = c.execute(q, args)
 
             lastid = None
             current = None

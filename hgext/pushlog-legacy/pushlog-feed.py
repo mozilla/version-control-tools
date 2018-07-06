@@ -100,22 +100,21 @@ class PushlogQuery(object):
             # we didn't get a connection to the database, return empty
             return
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
-            # Get entries from self.page, using self.querystart_value as
-            # the number of pushes per page.
-            try:
-                res = conn.execute("SELECT id, user, date FROM pushlog ORDER BY id DESC LIMIT ? OFFSET ?",
-                                   (self.querystart_value,
-                                   (self.page - 1) * self.querystart_value))
-                for (id, user, date) in res:
-                    limit = ""
-                    if self.tipsonly:
-                        limit = " LIMIT 1"
-                    res2 = conn.execute("SELECT node FROM changesets WHERE pushid = ? ORDER BY rev DESC" + limit, (id,))
-                    for node, in res2:
-                        self.entries.append((id, user.encode('utf-8'), date, node.encode('utf-8')))
-            except sqlite3.OperationalError:
-                # likely just an empty db, so return an empty result
-                pass
+            pushes = self.repo.pushlog.pushes(
+                offset=(self.page - 1) * self.querystart_value,
+                limit=self.querystart_value,
+                reverse=True,
+            )
+
+            for push in pushes:
+                if self.tipsonly and push.nodes:
+                    nodes = [push.nodes[0]]
+                else:
+                    nodes = push.nodes
+
+                for node in nodes:
+                    self.entries.append(
+                        (push.pushid, push.user, push.when, node))
 
             self.totalentries = self.repo.pushlog.push_count()
 
