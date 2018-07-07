@@ -90,10 +90,13 @@ class Consumer(SimpleConsumer):
         return partition, message, payload
 
 
-def consume(config, consumer, timeout=0.1, onetime=False):
+def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
     """Read messages from a consumer and process them as they arrive.
 
     This loop runs forever until asked to exit via a SIGINT or SIGTERM.
+
+    ``message_handler`` is a callable that will receive the ``(config,
+    payload)`` of the message to process.
     """
     count = [0]
 
@@ -119,7 +122,7 @@ def consume(config, consumer, timeout=0.1, onetime=False):
                 partition, message, payload = r
                 logger.warn('processing %s from partition %s offset %s' % (
                             payload['name'], partition, message.offset))
-                process_message(config, payload)
+                message_handler(config, payload)
                 # Only commit offset from partition message came from.
                 consumer.commit(partitions=[partition])
 
@@ -133,8 +136,12 @@ def consume(config, consumer, timeout=0.1, onetime=False):
         signal.signal(signal.SIGTERM, oldterm)
 
 
-def process_message(config, payload):
-    """Process a decoded event message."""
+def handle_message_main(config, payload):
+    """Process a decoded event message.
+
+    This represents message processing for the main consumer process. It
+    is responsible for applying most messages.
+    """
 
     name = payload['name']
     if name == 'heartbeat-1':
@@ -181,7 +188,7 @@ def process_message(config, payload):
                                payload['hgrc'],
                                payload['heads'])
     elif name == 'hg-heads-1':
-        # Set of heads isn't used
+        # This message is handled by the heads consumer.
         return
     elif name == 'hg-repo-delete-1':
         return process_hg_delete(config, payload['path'])
@@ -512,11 +519,11 @@ def print_offsets():
     sys.exit(0)
 
 
-def consumer_cli():
+def run_cli(message_handler):
     """Command line interface to consumer.
 
-    This does a couple of things. We can probably split it up into separate
-    functions.
+    ``message_handler`` is the message processing callable to be used when
+    messages are acted upon.
     """
     import argparse
     import yaml
@@ -629,10 +636,16 @@ def consumer_cli():
         logger.warn('starting consumer for topic=%s group=%s partitions=%s' % (
             topic, group, partitions or 'all'))
     try:
-        consume(config, consumer, onetime=args.onetime,
+        consume(config, consumer, message_handler,
+                onetime=args.onetime,
                 timeout=poll_timeout)
         if not args.onetime:
             logger.warn('process exiting gracefully')
     except BaseException:
         logger.error('exiting main consume loop with error')
         raise
+
+
+def consumer_cli():
+    """Entrypoint for vcsreplicator-consumer executable."""
+    run_cli(handle_message_main)

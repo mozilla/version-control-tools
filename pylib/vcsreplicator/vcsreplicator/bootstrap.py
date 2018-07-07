@@ -25,7 +25,7 @@ from .config import Config
 from .consumer import (
     value_deserializer,
     process_hg_sync,
-    process_message,
+    handle_message_main,
     MAX_BUFFER_SIZE,
 )
 
@@ -206,7 +206,7 @@ def hgweb():
     clone_futures_repo_mapping = {}  # maps cloning futures to repo names
     extra_messages_futures_repo_mapping = {}  # maps extra messages futures to repo names
 
-    # Overwrite default hglib path so process_message and it's derivatives
+    # Overwrite default hglib path so handle_message_main and it's derivatives
     # use the correct virtualenv
     hglib.HGPATH = args.hg
 
@@ -326,7 +326,7 @@ def hgweb():
             if repo in extra_messages:
                 logger.info('scheduling extra processing for %s' % repo)
                 configs, payloads = zip(*extra_messages[repo])
-                future = e.submit(map, process_message, configs, payloads)
+                future = e.submit(map, handle_message_main, configs, payloads)
                 extra_messages_futures_repo_mapping[future] = repo
 
         # Process extra messages
