@@ -1,0 +1,23 @@
+[Unit]
+Description=Update Mercurial replicated heads
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+ExecStart=/var/hg/venv_replication/bin/vcsreplicator-headsconsumer /etc/mercurial/vcsreplicator-pending.ini
+WorkingDirectory=/
+PrivateTmp=true
+User=hg
+Group=hg
+
+# We want new repos to be group writable by default. Default umask of
+# 022 prevents this.
+UMask=002
+
+Restart=always
+TimeoutStopSec=60
+
+SyslogIdentifier=vcsreplicator
+SyslogFacility=local2
+
+[Install]
+WantedBy=multi-user.target

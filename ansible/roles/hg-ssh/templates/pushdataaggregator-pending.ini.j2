@@ -4,7 +4,7 @@ hosts = {% for host in zk_servers %}{{ host }}:9092{% if not loop.last%}, {% end
 connect_timeout = 10
 client_id = pushdataaggregator
 
-monitor_topic = replicatedpushdatapending
+monitor_topic = pushdata
 monitor_groups_file = /etc/mercurial/pushdataaggregator_groups
 ack_group = pushdataaggregator
-aggregate_topic = replicatedpushdata
+aggregate_topic = replicatedpushdatapending

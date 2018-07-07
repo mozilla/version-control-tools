@@ -35,23 +35,29 @@ with open('/usr/local/bin/mirror-pull', 'wb') as fh:
 
         fh.write(line)
 
-vcsreplicator = open('/etc/mercurial/vcsreplicator.ini', 'rb').readlines()
-with open('/etc/mercurial/vcsreplicator.ini', 'wb') as fh:
-    for line in vcsreplicator:
-        for k, v in REPLACEMENTS.items():
-            line = line.replace(k, v)
+REWRITE_CONSUMER_CONFIGS = (
+    '/etc/mercurial/vcsreplicator.ini',
+    '/etc/mercurial/vcsreplicator-pending.ini',
+)
 
-        # The client config file defines the client ID and group, which are
-        # used for offset management. Since the file contents come from
-        # the same container, we need to update the per-container values
-        # at container start time to something unique. We choose the
-        # hostname of the container, which should be unique.
-        if line.startswith('client_id ='):
-            line = 'client_id = %s\n' % hostname
-        elif line.startswith('group = '):
-            line = 'group = %s\n' % hostname
+for f in REWRITE_CONSUMER_CONFIGS:
+    vcsreplicator = open(f, 'rb').readlines()
+    with open(f, 'wb') as fh:
+        for line in vcsreplicator:
+            for k, v in REPLACEMENTS.items():
+                line = line.replace(k, v)
 
-        fh.write(line)
+            # The client config file defines the client ID and group, which are
+            # used for offset management. Since the file contents come from
+            # the same container, we need to update the per-container values
+            # at container start time to something unique. We choose the
+            # hostname of the container, which should be unique.
+            if line.startswith('client_id ='):
+                line = 'client_id = %s\n' % hostname
+            elif line.startswith('group = '):
+                line = 'group = %s\n' % hostname
+
+            fh.write(line)
 
 # Replace SSH config for master server with the current environment's.
 ssh_config = open('/home/hg/.ssh/config', 'rb').readlines()

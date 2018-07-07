@@ -109,6 +109,7 @@
         - { topic: pushdata, partitions: 8 }
         - { topic: pushlog, partitions: 1 }
         # copy of messages from "pushdata" once they are acknowledged by mirrors
+        - { topic: replicatedpushdatapending, partitions: 1 }
         - { topic: replicatedpushdata, partitions: 1 }
 
     - name: record deployment of this changeset

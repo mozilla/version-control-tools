@@ -196,6 +196,14 @@ def handle_message_main(config, payload):
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
 
+def handle_message_heads(config, payload):
+    """Process a decoded event message.
+
+    This handles message processing for the heads consumer process.
+    """
+    # TODO implement message handling.
+
+
 def init_repo(path):
     '''Initializes a new hg repo at the specified path'''
     # We can't use hglib.init() because it doesn't pass config options
@@ -649,3 +657,8 @@ def run_cli(message_handler):
 def consumer_cli():
     """Entrypoint for vcsreplicator-consumer executable."""
     run_cli(handle_message_main)
+
+
+def heads_consumer_cli():
+    """Entrypoint for vcsreplicator-headsconsumer executable."""
+    run_cli(handle_message_heads)

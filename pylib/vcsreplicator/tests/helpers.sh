@@ -33,6 +33,16 @@ topic = replicatedpushdata
 group = pushdataaggregatorlocal
 EOF
 
+  cat >> pushdataaggregator-pendingconsumer.ini << EOF
+[consumer]
+hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
+connect_timeout = 5
+poll_timeout = 0.2
+client_id = pushdataaggregatorlocal
+topic = replicatedpushdatapending
+group = pushdataaggregatorlocal
+EOF
+
 cat >> pulse-consumer.ini << EOF
 [consumer]
 hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
@@ -56,6 +66,7 @@ EOF
 }
 
 alias consumer='vcsreplicator-consumer $TESTTMP/vcsreplicator.ini'
+alias papendingconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-pendingconsumer.ini'
 alias paconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-consumer.ini'
 alias pulseconsumer='vcsreplicator-consumer $TESTTMP/pulse-consumer.ini'
 alias snsconsumer='vcsreplicator-consumer $TESTTMP/sns-consumer.ini'

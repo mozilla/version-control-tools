@@ -341,10 +341,11 @@ class HgCluster(object):
         # Create Kafka topics.
         TOPICS = [
             ('pushdata', '8'),
+            ('replicatedpushdatapending', '1'),
             ('replicatedpushdata', '1'),
         ]
         fs = []
-        with futures.ThreadPoolExecutor(2) as e:
+        with futures.ThreadPoolExecutor(3) as e:
             for topic, partitions in TOPICS:
                 cmd = [
                     '/opt/kafka/bin/kafka-topics.sh',

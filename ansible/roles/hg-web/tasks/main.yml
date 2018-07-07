@@ -567,12 +567,15 @@
   when: vct_dir.stat.exists == False
 
 
-- name: copy vcsreplicator config
-  template: src=vcsreplicator.ini.j2
-            dest=/etc/mercurial/vcsreplicator.ini
+- name: install vcsreplicator config
+  template: src="{{ item }}.j2"
+            dest=/etc/mercurial/{{ item }}
             owner=root
             group=root
             mode=0644
+  with_items:
+    - vcsreplicator.ini
+    - vcsreplicator-pending.ini
 
 - name: directory for vcsreplicator logs
   file: path=/var/log/vcsreplicator
@@ -613,6 +616,24 @@
 
 - name: restart vcsreplicator daemons (server only)
   command: /usr/bin/systemctl restart vcsreplicator@*.service
+  when: vct_dir.stat.exists == False
+
+- name: systemd service file for vcsreplicator-heads
+  copy: src=vcsreplicator-heads.service
+        dest=/etc/systemd/system/vcsreplicator-heads.service
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: vcsreplicator-heads service is enabled (server only)
+  service: name=vcsreplicator-heads.service
+           enabled=yes
+  when: vct_dir.stat.exists == False
+
+- name: restart vcsreplicator-heads daemon (server only)
+  command: /usr/bin/systemctl restart vcsreplicator-heads.service
   when: vct_dir.stat.exists == False
 
 - name: create Nagios config directory

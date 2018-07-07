@@ -1,0 +1,16 @@
+[consumer]
+{% if zk_servers is defined %}
+hosts = {% for host in zk_servers %}{{ host }}:9092{% if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+
+connect_timeout = 10
+poll_timeout = 2.0
+client_id = {{ ansible_hostname }}
+topic = replicatedpushdatapending
+
+# Every machine acting on replication events needs to receive its own
+# copy of the message. So the group name must be unique.
+group = {{ ansible_hostname }}
+
+[path_rewrites]
+{moz} = /repo/hg/mozilla

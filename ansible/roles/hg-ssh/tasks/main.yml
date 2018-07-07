@@ -208,6 +208,7 @@
     - hgrc
     - notifications.ini
     - pushdataaggregator.ini
+    - pushdataaggregator-pending.ini
 
 - name: install repo-push script
   copy: src={{ vct }}/scripts/repo-push.sh
@@ -294,6 +295,7 @@
     - check_kafka_hg_heartbeat.cfg
     - check_pulsenotifier_lag.cfg
     - check_pushdataaggregator_lag.cfg
+    - check_pushdataaggregator_pending_lag.cfg
     - check_snsnotifier_lag.cfg
   notify: restart nrpe.service
 
@@ -312,6 +314,7 @@
     - hg-kafka-heartbeat.timer
     - pulsenotifier.service
     - pushdataaggregator.service
+    - pushdataaggregator-pending.service
     - snsnotifier.service
     - unifyrepo.service
     - hg-master-monitor.service
@@ -326,6 +329,7 @@
     - hg-kafka-heartbeat.timer
     - pulsenotifier.service
     - pushdataaggregator.service
+    - pushdataaggregator-pending.service
     - snsnotifier.service
     - unifyrepo.service
     - hg-master-monitor.timer

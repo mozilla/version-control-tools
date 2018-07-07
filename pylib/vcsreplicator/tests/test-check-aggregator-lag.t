@@ -3,7 +3,7 @@
   $ . $TESTDIR/pylib/vcsreplicator/tests/helpers.sh
   $ vcsrenv
 
-  $ alias check='hgmo exec hgssh /var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag /etc/mercurial/pushdataaggregator.ini'
+  $ alias check='hgmo exec hgssh /var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag /etc/mercurial/pushdataaggregator-pending.ini'
 
 Check should be OK by default
 
@@ -31,8 +31,8 @@ Check should be OK by default
 
 Stop the aggregator so there is message lag
 
-  $ hgmo exec hgssh /usr/bin/supervisorctl stop pushdataaggregator
-  pushdataaggregator: stopped
+  $ hgmo exec hgssh /usr/bin/supervisorctl stop pushdataaggregator-pending
+  pushdataaggregator-pending: stopped
 
 No issues reported when thresholds aren't met
 
@@ -95,8 +95,8 @@ Critical reported when message count hits threshold
 
 Resuming aggregator clears check
 
-  $ hgmo exec hgssh /usr/bin/supervisorctl start pushdataaggregator
-  pushdataaggregator: started
+  $ hgmo exec hgssh /usr/bin/supervisorctl start pushdataaggregator-pending
+  pushdataaggregator-pending: started
 
   $ check --warning-count 0
   OK - aggregator has copied all fully replicated messages

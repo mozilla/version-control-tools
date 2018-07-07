@@ -1,0 +1,26 @@
+[Unit]
+Description=Aggregate replicated pending messages to a new topic
+After=network.target remote-fs.target nss-lookup.target
+PartOf=hg-master.target
+
+# We only want to have a single master at a time. Look for a file with the
+# current hostname in it indicating that we are the master.
+AssertPathExists=/repo/hg/master.%H
+
+[Service]
+WorkingDirectory=/
+User=hg-notifier
+Group=hg-notifier
+PrivateTmp=true
+
+# --max-polls causes process to self-exit after N * 1s. This is to mitigate
+# a memory leak tracked by 1302564.
+ExecStart=/var/hg/venv_tools/bin/vcsreplicator-aggregator --max-polls 1800 /etc/mercurial/pushdataaggregator-pending.ini
+Restart=always
+TimeoutStopSec=60
+
+SyslogIdentifier=pushdataaggregator-pending
+SyslogFacility=local2
+
+[Install]
+WantedBy=hg-master.target

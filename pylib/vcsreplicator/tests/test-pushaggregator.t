@@ -9,6 +9,23 @@ Create a repository
   (recorded repository creation in replication log)
   $ standarduser
 
+The aggregate pending topic should contain a heartbeat and repo creation message
+
+  $ papendingconsumer --wait-for-n 2
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  $ papendingconsumer --dump
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 2
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/mozilla-central'
+
 The aggregate topic should contain a heartbeat and repo creation message
 
   $ paconsumer --wait-for-n 2
@@ -22,7 +39,7 @@ The aggregate topic should contain a heartbeat and repo creation message
     name: heartbeat-1
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
-    _original_partition: 2
+    _original_partition: 0
     generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/mozilla-central'
@@ -45,15 +62,15 @@ The aggregate topic should contain a heartbeat and repo creation message
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
-The aggregate topic should contain a changegroup message
+The aggregate pending topic should contain a changegroup message
 
-  $ paconsumer --start-from 2 --wait-for-n 4
+  $ papendingconsumer --start-from 2 --wait-for-n 4
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a hg-changegroup-2 message
   got a hg-heads-1 message
 
-  $ paconsumer --dump --start-from 2
+  $ papendingconsumer --dump --start-from 2
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
@@ -74,6 +91,41 @@ The aggregate topic should contain a changegroup message
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
+    heads:
+    - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    last_push_id: 1
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
+
+The aggregate topic should contain a changegroup message
+
+  $ paconsumer --start-from 2 --wait-for-n 4
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
+  got a hg-heads-1 message
+
+  $ paconsumer --dump --start-from 2
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    heads:
+    - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    name: hg-changegroup-2
+    nodecount: 1
+    path: '{moz}/mozilla-central'
+    source: serve
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
     last_push_id: 1
@@ -102,6 +154,9 @@ Stopping the replication on an active mirror should result in no message copy
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
+  $ papendingconsumer --dump --start-from 7
+  []
+
   $ paconsumer --dump --start-from 7
   []
 
@@ -110,12 +165,12 @@ Starting the replication consumer should result in the message being written
   $ hgmo exec hgweb0 /usr/bin/supervisorctl start vcsreplicator:2
   vcsreplicator:2: started
 
-  $ paconsumer --start-from 7 --wait-for-n 3
+  $ papendingconsumer --start-from 7 --wait-for-n 3
   got a heartbeat-1 message
   got a hg-changegroup-2 message
   got a hg-heads-1 message
 
-  $ paconsumer --dump --start-from 7
+  $ papendingconsumer --dump --start-from 7
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
@@ -132,6 +187,34 @@ Starting the replication consumer should result in the message being written
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 2
+    heads:
+    - 8f2fa335d20b56ae20f663553e7e94e4ccdda8ed
+    last_push_id: 2
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
+
+  $ paconsumer --start-from 7 --wait-for-n 3
+  got a heartbeat-1 message
+  got a hg-changegroup-2 message
+  got a hg-heads-1 message
+
+  $ paconsumer --dump --start-from 7
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    heads:
+    - 8f2fa335d20b56ae20f663553e7e94e4ccdda8ed
+    name: hg-changegroup-2
+    nodecount: 1
+    path: '{moz}/mozilla-central'
+    source: serve
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
     heads:
     - 8f2fa335d20b56ae20f663553e7e94e4ccdda8ed
     last_push_id: 2
@@ -169,7 +252,7 @@ Aggregation of messages from multiple partitions works
   vcsreplicator:\d: started (re)
   vcsreplicator:\d: started (re)
 
-  $ paconsumer --start-from 10 --wait-for-n 6
+  $ papendingconsumer --start-from 10 --wait-for-n 6
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
@@ -177,7 +260,7 @@ Aggregation of messages from multiple partitions works
   got a hg-repo-init-2 message
   got a hg-repo-init-2 message
 
-  $ paconsumer --dump --start-from 10
+  $ papendingconsumer --dump --start-from 10
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 0
@@ -205,6 +288,46 @@ Aggregation of messages from multiple partitions works
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
     _original_partition: 7
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/users/foo'
+
+  $ paconsumer --start-from 10 --wait-for-n 6
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-repo-init-2 message
+  got a hg-repo-init-2 message
+  got a hg-repo-init-2 message
+
+  $ paconsumer --dump --start-from 10
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    name: heartbeat-1
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/mc2'
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/try'
+  - _created: \d+\.\d+ (re)
+    _original_created: \d+\.\d+ (re)
+    _original_partition: 0
     generaldelta: true
     name: hg-repo-init-2
     path: '{moz}/users/foo'
