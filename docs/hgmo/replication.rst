@@ -258,7 +258,7 @@ inconsistent state can confuse repository consumers.
 The leader server runs a daemon that monitors the partition consumer offsets
 for all active consumers. When all active consumers have acknowledged a
 message, the daemon re-published that fully-consumed message in a separate
-Kafka topic - ``replicatedpushdata`` on hg.mozilla.org.
+Kafka topic - ``replicatedpushdatapending`` on hg.mozilla.org.
 
 .. seqdiag::
 
@@ -269,19 +269,75 @@ Kafka topic - ``replicatedpushdata`` on hg.mozilla.org.
        pushdata0 <-- consumer02 [label = "ack"];
        pushdata0 <-- consumer01 [label = "ack"];
 
-       aggregator -> replicatedpushdata [label = "msg0"];
+       aggregator -> replicatedpushdatapending [label = "msg0"];
    }
 
+There is a single partition in the ``replicatedpushdatapending`` topic, which
+means all messages for all repositories are available in a single, ordered
+stream. And those messages aren't exposed until all active consumers have
+processed them.
+
+Each mirror runs a daemon that subscribes to this single topic-partition.
+This daemon will take appropriate actions for each received message before
+acknowledging it.
+
+The leader server also monitors consumer offsets in the
+``replicatedpushdatapending`` topic-partition. When a message is fully consumed,
+it is re-published to the ``replicatedpushdata`` Kafka topic.
+
 The stream of messages in the ``replicatedpushdata`` Kafka topic represents all
-fully-replicated repository changes acknowledged by all consumers. There is a
-single partition in this topic, which means all events for all repositories
-are available in a single, ordered stream.
+fully-replicated repository changes acknowledged by all consumers.
 
 This stream of fully-replicated messages can be consumed by consumers wish
 to react to events. e.g. on hg.mozilla.org, we have a daemon that publishes
 messages to Pulse (a RabbitMQ broker) and Amazon SNS so 3rd party consumers
 can get a notification when a repository even occurs and then implement
 their own derived actions (such as triggering CI against new commits).
+
+Minimizing the Inconsistency Window for Exposed Data
+----------------------------------------------------
+
+As mentioned above, there is a race condition between the
+``vcsreplicator-consumer`` processes on different servers fully processing
+and acknowledging a message written to the ``pushdata`` topic. This can
+lead to different servers exposing different repository state at any given
+time.
+
+We minimize this window by employing a multi-stage *commit* to expose
+new repository data.
+
+The stream of repository change messages being written by the leader
+includes a message containing the set of revisions that are DAG heads that
+should be exposed by servers. When this message is initially published
+to the ``pushdata`` topic, the ``vcsreplicator-consumer`` process performs
+a no-op when it sees this message. But the message is copied into the
+``replicatedpushdatapending`` topic when its offset is acknowledged.
+
+The *hgweb* servers run a ``vcsreplicator-headsconsumer`` process that
+is similar to the ``vcsreplicator-consumer`` process, except it only
+performs meaningful action for these messages containing repository
+DAG heads.
+
+When ``vcsreplicator-headsconsumer`` sees a *heads* message, it atomically
+writes out a file containing the set of repository heads. Then it
+acknowledges the message.
+
+A Mercurial extension loaded into the *hgweb* processes teaches Mercurial
+to use the file containing repository heads to determine what data to
+publicly expose on the server. Even if the repository contains new
+repository data, unless the new data is listed in the *heads* file, it
+won't be visible to repository consumers.
+
+The ``vcsreplicator-headsconsumer`` process is running on each mirror
+and the actions it is performing are occurring independently: there is
+no central/shared data store recording which heads to expose. This means
+there is still a race condition where each server writes out *heads* files
+at a different pace. However, because the ``vcsreplicator-headsconsumer``
+process is only writing out (usually) small files and because the process
+runs at elevated priority, the timings on different servers is usually
+very tight and the inconsistency window is thus very short - often just a
+few milliseconds. This window is so short as to not pose a significant
+problem.
 
 Known Deficiencies
 ------------------
