@@ -76,6 +76,7 @@ The aggregate topic should contain a changegroup message
     _original_partition: 2
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    last_push_id: 1
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -133,6 +134,7 @@ Starting the replication consumer should result in the message being written
     _original_partition: 2
     heads:
     - 8f2fa335d20b56ae20f663553e7e94e4ccdda8ed
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 

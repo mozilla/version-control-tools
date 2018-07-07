@@ -58,6 +58,7 @@ Phases should be updated on normal push
   - _created: \d+\.\d+ (re)
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    last_push_id: 1
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -159,6 +160,7 @@ We send a changegroup and a pushkey but don't process them immediately
   - _created: \d+\.\d+ (re)
     heads:
     - 2777163b593873bfa63c7129e02a21becc299ff0
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -217,6 +219,7 @@ We should have 2 changegroup messages
   - _created: \d+\.\d+ (re)
     heads:
     - 031adcaa8ee7e23dd05ce5900645e771a3637682
+    last_push_id: 3
     name: hg-heads-1
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
@@ -233,6 +236,7 @@ We should have 2 changegroup messages
   - _created: \d+\.\d+ (re)
     heads:
     - e20ecd72ffa991598a1b26333788345377318231
+    last_push_id: 4
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -366,6 +370,7 @@ Now test bookmark divergence
     heads:
     - e84fdf206e79496713b3a56eae2e16c490475cc8
     - e20ecd72ffa991598a1b26333788345377318231
+    last_push_id: 5
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 

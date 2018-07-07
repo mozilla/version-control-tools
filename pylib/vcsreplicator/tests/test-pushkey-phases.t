@@ -61,6 +61,7 @@ There should be no pushkey on a push with a draft changeset
   - _created: \d+\.\d+ (re)
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    last_push_id: 1
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -164,6 +165,7 @@ processing on the mirror.
   - _created: \d+\.\d+ (re)
     heads:
     - fde0c41176556d1ec1bcf85e66706e5e76012508
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -223,6 +225,7 @@ Now simulate a consumer that is multiple pushes behind
   - _created: \d+\.\d+ (re)
     heads:
     - 58017affcc6559ab3237457a5fb1e0e3bde306b1
+    last_push_id: 3
     name: hg-heads-1
     path: '{moz}/mozilla-central'
   - _created: \d+\.\d+ (re)
@@ -239,6 +242,7 @@ Now simulate a consumer that is multiple pushes behind
   - _created: \d+\.\d+ (re)
     heads:
     - 601c8c0d17b02057475d528f022cf5d85da89825
+    last_push_id: 4
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 

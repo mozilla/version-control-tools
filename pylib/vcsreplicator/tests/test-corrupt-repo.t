@@ -64,6 +64,7 @@ Pulling into corrupt repo should result in abort
   - _created: \d+\.\d+ (re)
     heads:
     - 0c6b2090d458675af812e445c8ab9b809e321f57
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -107,6 +108,7 @@ And the message should still be not consumed
   - _created: \d+\.\d+ (re)
     heads:
     - 0c6b2090d458675af812e445c8ab9b809e321f57
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 

@@ -31,6 +31,7 @@ from mercurial import (
     obsolete,
     policy,
     registrar,
+    util,
     wireproto,
 )
 with demandimport.deactivated():
@@ -285,12 +286,19 @@ def sendreposyncmessage(ui, repo, bootstrap=False):
 def sendheadsmessage(ui, repo):
     heads = [hex(n) for n in repo.filtered('served').heads()]
 
+    # Pull numeric push ID from the pushlog extensions, if available.
+    if util.safehasattr(repo, 'pushlog'):
+        last_push_id = repo.pushlog.lastpushid()
+    else:
+        last_push_id = None
+
     with ui.kafkainteraction():
         repo.producerlog('HEADS_SENDING')
         producer = ui.replicationproducer
         vcsrproducer.record_hg_repo_heads(producer,
                                           repo.replicationwireprotopath,
                                           heads,
+                                          last_push_id,
                                           partition=repo.replicationpartition)
 
         repo.producerlog('HEADS_SENT')

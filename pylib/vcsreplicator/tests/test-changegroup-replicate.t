@@ -49,6 +49,7 @@ Pushing the initial commit will result in replication messages
   - _created: \d+\.\d+ (re)
     heads:
     - 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+    last_push_id: 1
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -138,6 +139,7 @@ Pushing multiple commits results in sane behavior
   - _created: \d+\.\d+ (re)
     heads:
     - 4f52aeca631dfa94331d93cfeaf069526926385a
+    last_push_id: 2
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 
@@ -252,6 +254,7 @@ Pushing multiple heads results in appropriate behavior
     heads:
     - 4b11352745a6b3eb429ca8cd486dfdc221a4bc62
     - 4c9443886fe84db9a4a5f29a5777517d2890d308
+    last_push_id: 3
     name: hg-heads-1
     path: '{moz}/mozilla-central'
 

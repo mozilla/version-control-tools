@@ -171,6 +171,7 @@ Changegroup message written
   - _created: * (glob)
     heads:
     - 67b45555a21f4d9d470adc4f1ed3af63918f6414
+    last_push_id: 3
     name: hg-heads-1
     path: '{moz}/obs'
 
@@ -283,6 +284,7 @@ Pushing obsolescence marker without bundle2 works
   - _created: * (glob)
     heads:
     - de9a6dc9203d34261c1e2bea219bdd6053d74dda
+    last_push_id: 4
     name: hg-heads-1
     path: '{moz}/obs'
 
@@ -350,6 +352,7 @@ Pushing obsolescence marker without bundle2 works
     heads:
     - 33e52188e17750dee7ec7a6b05b5f707ebc2cba9
     - 5dfb8fc50086c183d1cbd067e48c58307db16dac
+    last_push_id: 5
     name: hg-heads-1
     path: '{moz}/obs'
 
