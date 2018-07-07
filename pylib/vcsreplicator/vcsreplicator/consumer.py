@@ -512,7 +512,7 @@ def print_offsets():
     sys.exit(0)
 
 
-def cli():
+def consumer_cli():
     """Command line interface to consumer.
 
     This does a couple of things. We can probably split it up into separate

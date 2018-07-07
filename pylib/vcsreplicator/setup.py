@@ -19,7 +19,7 @@ setup(
             'check_vcsreplicator_lag=vcsreplicator.nagios:check_consumer_lag',
             'check_vcsreplicator_aggregator_lag=vcsreplicator.nagios:check_aggregator_lag',
             'vcsreplicator-aggregator=vcsreplicator.aggregator:cli',
-            'vcsreplicator-consumer=vcsreplicator.consumer:cli',
+            'vcsreplicator-consumer=vcsreplicator.consumer:consumer_cli',
             'vcsreplicator-print-offsets=vcsreplicator.consumer:print_offsets',
             'vcsreplicator-pulse-notifier=vcsreplicator.pulsenotifier:cli',
             'vcsreplicator-sns-notifier=vcsreplicator.snsnotifier:cli',

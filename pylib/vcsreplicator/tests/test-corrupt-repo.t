@@ -84,7 +84,7 @@ Pulling into corrupt repo should result in abort
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
       load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')()
-    File "*/vcsreplicator/consumer.py", line *, in cli (glob)
+    File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       timeout=poll_timeout)
     File "*/vcsreplicator/consumer.py", line *, in consume (glob)
       process_message(config, payload)
@@ -130,7 +130,7 @@ We should get the same failure if we try again
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
       load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')()
-    File "*/vcsreplicator/consumer.py", line *, in cli (glob)
+    File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       timeout=poll_timeout)
     File "*/vcsreplicator/consumer.py", line *, in consume (glob)
       process_message(config, payload)
