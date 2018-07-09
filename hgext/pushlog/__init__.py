@@ -465,10 +465,14 @@ class pushlog(object):
             if not c:
                 return
 
-            res = c.execute('SELECT id, user, date, rev, node from pushlog '
-                    'LEFT JOIN changesets ON id=pushid '
-                    'WHERE id >= ? '
-                    'ORDER BY id, rev ASC', (startid,))
+            inner_q = ('SELECT id, user, date FROM pushlog '
+                       'WHERE id >= ? ')
+
+            q = ('SELECT id, user, date, rev, node FROM (%s) '
+                 'LEFT JOIN changesets on id=pushid '
+                 'ORDER BY id ASC, rev ASC ' % inner_q)
+
+            res = c.execute(q, (startid,))
 
             lastid = None
             current = None
