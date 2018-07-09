@@ -471,6 +471,18 @@ the load on the hg.mozilla.org servers.
 
 This service only runs on the master server.
 
+pushdataaggregator-pending.service
+--------------------------
+
+This systemd service monitors the state of the replication mirrors and
+copies fully acknowledged/applied messages into a new Kafka topic
+(``replicatedpushdatapending``).
+
+The ``replicatedpushdatapending`` topic is watched by the
+``vcsreplicator-headsconsumer`` process on the hgweb machines.
+
+This service only runs on the master server.
+
 pushdataaggregator.service
 --------------------------
 
@@ -790,22 +802,113 @@ doesn't come back::
    with details of the incident so the root cause can be tracked down
    and the underlying bug fixed.
 
-check_pushdataaggregator_lag
-----------------------------
+check_vcsreplicator_pending_lag
+-------------------------------
 
-``check_pushdataaggregator_lag`` monitors the lag of the aggregated replication
-log (the ``pushdataaggregator.service`` systemd service).
+``check_vcsreplicator_pending_lag`` monitors the replication log to
+see whether the ``vcsreplicator-headsconsumer`` process has processed
+all available messages.
+
+This check is similar to ``vcsvcsreplicator_lag`` except it is monitoring
+the processing of the ``replicatedpushdatapending`` topic as performed by
+the ``vcsreplicator-headsconsumer`` process.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+When a host is fully in sync with the replication log, the check will
+output the following::
+
+   OK - 1/1 consumers completely in sync
+
+   OK - partition 0 is completely in sync (X/Y)
+
+When a host has some partitions that are slightly out of sync with the
+replication log, we get a slightly different output::
+
+   OK - 1/1 consumers out of sync but within tolerances
+
+   OK - partition 0 is 1 messages behind (0/1)
+   OK - partition 0 is 1.232 seconds behind
+
+Even though consumers are slightly behind replaying the replication log,
+the drift is within tolerances, so the check is reporting OK. However,
+the state of each partition's lag is printed for forensic purposes.
+
+Warning and Critical Output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The monitor alerts when the lag of the replication log is too great. Lag
+is measured in message count and time since the first unconsumed messaged
+was created. Time is the more important lag indicator.
+
+When a partition/consumer is too far behind, the monitor will issue a
+**WARNING** or **CRITICAL** alert depending on how far behind consumers
+are. The output will look like::
+
+   WARNING - 1/1 partitions out of sync
+
+   WARNING - partition 0 is 15 messages behind (10/25)
+   OK - partition 0 is 5.421 seconds behind
+
+The check will also emit a warning when there appears to be clock drift
+between the producer and the consumer.::
+
+   WARNING - 0/1 partitions out of sync
+   OK - partition 0 is completely in sync (25/25)
+   WARNING - clock drift of -1.234s between producer and consumer
+
+Remediation to Consumer Lag
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Because of the limited functionality performed by the
+``vcsreplicator-headsconsumer`` process, this alert should never fire.
+
+If this alert fires, the likely cause is the ``vcsreplicator-headsconsumer``
+process / ``vcsreplicator-heads.service`` daemon has crashed. Since this
+process operates mostly identically across machines, it is expected that
+a failure will occur on all servers, not just 1.
+
+First check the status of the daemon process::
+
+   $ systemctl status vcsreplicator-heads.service
+
+If the service isn't in the ``active (running)`` state, the consumer daemon has
+crashed for some reason. Try to start it::
+
+   $ systemctl start vcsreplicator-heads.service
+
+You might want to take a look at the logs in the journal to make sure the
+process is happy::
+
+   $ journalctl -f --unit vcsreplicator-heads.service
+
+If there are errors starting the consumer process (including if the
+consumer process keeps restarting due to crashing applying the next
+available message), then we've encountered a scenario that will
+require a bit more human involvement.
+
+.. important::
+
+   If the service is not working properly after restart, escalate to
+   VCS on call.
+
+check_pushdataaggregator_pending_lag
+------------------------------------
+
+``check_pushdataaggregator_pending_lag`` monitors the lag of the aggregated
+replication log (the ``pushdataaggregator-pending.service`` systemd service).
 
 The check verifies that the aggregator service has copied all fully
-replicated messages to the unified, aggregate Kafka topic.
+replicated messages to the ``replicatedpushdatapending`` Kafka topic.
 
 The check will alert if the number of outstanding ready-to-copy messages
 exceeds configured thresholds.
 
 .. important::
 
-   If messages aren't being copied into the aggregated message log, derived
-   services such as Pulse notification won't be writing data.
+   If messages aren't being copied into the aggregated message log, recently
+   pushed changesets won't be exposed on https://hg.mozilla.org/.
 
 Expected Output
 ^^^^^^^^^^^^^^^
@@ -840,6 +943,66 @@ behind and a per-partition breakdown of where that lag is. e.g.::
    OK - partition 5 is completely in sync (1/1)
    OK - partition 6 is completely in sync (1/1)
    OK - partition 7 is completely in sync (1/1)
+
+   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
+   for details about this check.
+
+Remediation to Check Failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the check is failing, first verify the Kafka cluster is operating as
+expected. If it isn't, other alerts on the hg machines should be firing.
+**Failures in this check can likely be ignored if the Kafka cluster is in
+a known bad state.**
+
+If there are no other alerts, there is a chance the daemon process has
+become wedged. Try bouncing the daemon::
+
+   $ systemctl restart pushdataaggregator-pending.service
+
+Then wait a few minutes to see if the lag decreased. You can also look at
+the journal to see what the daemon is doing::
+
+   $ journalctl -f --unit pushdataaggregator-pending.service
+
+If things are failing, escalate to VCS on call.
+
+check_pushdataaggregator_lag
+----------------------------
+
+``check_pushdataaggregator_lag`` monitors the lag of the aggregated replication
+log (the ``pushdataaggregator.service`` systemd service).
+
+The check verifies that the aggregator service has copied all fully
+replicated messages to the unified, aggregate Kafka topic.
+
+The check will alert if the number of outstanding ready-to-copy messages
+exceeds configured thresholds.
+
+.. important::
+
+   If messages aren't being copied into the aggregated message log, derived
+   services such as Pulse notification won't be writing data.
+
+Expected Output
+^^^^^^^^^^^^^^^
+
+Normal output will say that all messages have been copied and all partitions
+are in sync or within thresholds::
+
+   OK - aggregator has copied all fully replicated messages
+
+   OK - partition 0 is completely in sync (1/1)
+
+Failure Output
+^^^^^^^^^^^^^^
+
+The check will print a summary line indicating total number of messages
+behind and a per-partition breakdown of where that lag is. e.g.::
+
+   CRITICAL - 1 messages from 1 partitions behind
+
+   CRITICAL - partition 0 is 1 messages behind (1/2)
 
    See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
    for details about this check.
