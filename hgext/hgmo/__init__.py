@@ -918,7 +918,7 @@ def mozrepohash(ui, repo):
     pushlog = getattr(repo, r'pushlog', None)
     if pushlog:
         for push in pushlog.pushes():
-            push_blob = b'%d%d%s' % (push.pudhid, push.when, push.user)
+            push_blob = b'%d%d%s' % (push.pushid, push.when, push.user)
 
             for node in push.nodes:
                 pushes[bin(node)] = push_blob
