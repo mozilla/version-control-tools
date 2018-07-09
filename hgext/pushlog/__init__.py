@@ -463,7 +463,7 @@ class pushlog(object):
         if util.safehasattr(self.repo, 'replicated_data'):
             data = self.repo.replicated_data
 
-            if data[b'last_push_id'] is not None:
+            if data and data[b'last_push_id'] is not None:
                 return min(data[b'last_push_id'], actual)
 
         return actual
