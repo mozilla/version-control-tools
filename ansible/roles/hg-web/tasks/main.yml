@@ -644,12 +644,15 @@
         mode=0755
 
 - name: install check_vcsreplicator_lag NRPE config
-  copy: src=check_vcsreplicator_lag.cfg
-        dest=/etc/nagios/nrpe.d/check_vcsreplicator_lag.cfg
+  copy: src={{ item }}
+        dest=/etc/nagios/nrpe.d/{{ item }}
         owner=root
         group=root
         mode=0644
   notify: restart nrpe
+  with_items:
+    - check_vcsreplicator_lag.cfg
+    - check_vcsreplicator_pending_lag.cfg
 
 # Needs to come near end for fresh server provisioning scenario to work
 # right.
