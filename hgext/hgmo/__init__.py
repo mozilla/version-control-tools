@@ -910,35 +910,46 @@ def mozrepohash(ui, repo):
     The hash can be used to test for repository equivalence. Useful for
     determining if a repo on 2 different servers is identical.
     """
-    h = hashlib.sha256()
+    # Hash of revisions in default repoview.
+    h_default = hashlib.sha256()
+    # Hash of revisions in unfiltered repoview.
+    h_unfiltered = hashlib.sha256()
+    # Hash of pushlog data.
+    h_pushlog = hashlib.sha256()
+    # Hash of obsstore data.
+    h_obsstore = hashlib.sha256()
 
-    repo = repo.unfiltered()
-
-    pushes = {} # node to blob describing push.
     pushlog = getattr(repo, r'pushlog', None)
     if pushlog:
         for push in pushlog.pushes():
-            push_blob = b'%d%d%s' % (push.pushid, push.when, push.user)
+            h_pushlog.update(b'%d%d%s' % (push.pushid, push.when, push.user))
 
             for node in push.nodes:
-                pushes[bin(node)] = push_blob
+                h_pushlog.update(node)
 
     # Add each changelog entry to the hash, complete with its push ID.
     for rev in repo:
         ctx = repo[rev]
 
-        h.update(b'%d%s%s' % (
-            rev, ctx.node(), pushes.get(ctx.node(), b'empty')))
+        h_default.update(b'%d%s%d' % (
+            rev, ctx.node(), ctx.phase()))
+
+    urepo = repo.unfiltered()
+    for rev in urepo:
+        ctx = urepo[rev]
+        phase = ctx.phase()
+        node = ctx.node()
+
+        h_unfiltered.update(b'%d%s%d' % (rev, node, phase))
 
     # Add extra files from storage.
-    h.update(b'bookmarks:')
-    h.update(repo.vfs.tryread(b'bookmarks'))
-    h.update(b'phaseroots:')
-    h.update(repo.svfs.tryread(b'phaseroots'))
-    h.update(b'obsstore')
-    h.update(repo.svfs.tryread(b'obsstore'))
+    h_obsstore.update(b'obsstore')
+    h_obsstore.update(repo.svfs.tryread(b'obsstore'))
 
-    ui.write(h.hexdigest() + b'\n')
+    ui.write('normal: %s\n' % h_default.hexdigest())
+    ui.write('unfiltered: %s\n' % h_unfiltered.hexdigest())
+    ui.write('pushlog: %s\n' % h_pushlog.hexdigest())
+    ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
 
 
 def pull(orig, repo, remote, *args, **kwargs):

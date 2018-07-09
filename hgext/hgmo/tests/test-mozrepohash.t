@@ -9,23 +9,35 @@
 Empty repo is hashable
 
   $ hg mozrepohash
-  8d51358dfceb09704d3151dd72c0c94fd058ff4243cc015a1f973fe0a6dc8252
+  normal: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  unfiltered: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  pushlog: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  obsstore: 5d84b09c2a8ff32940e865afbdbdae4c677485c7e9ce36f84dcc98a23ae67ba9
 
 Repo with single changeset has a hash
 
   $ echo 0 > foo
   $ hg -q commit -A -m initial
   $ hg mozrepohash
-  5619a72e8d3aa07ad84732ab8cd8595ae674b1b4f8798be96db0184ad7260b4a
+  normal: bf9f494d166953d7e8d2ddc24d05c3cc6613af78a052cda5bef7a9e70926e493
+  unfiltered: bf9f494d166953d7e8d2ddc24d05c3cc6613af78a052cda5bef7a9e70926e493
+  pushlog: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  obsstore: 5d84b09c2a8ff32940e865afbdbdae4c677485c7e9ce36f84dcc98a23ae67ba9
 
 Changing the phase changes the hash
 
   $ hg phase --public -r .
   $ hg mozrepohash
-  e78b47275a3be33a4e327041c7734368e216f15498b52fd6df06cfabbe0c6197
+  normal: d78aadc55ac73d879f79532ec829d15d83cff06578d7d41250d090062329354e
+  unfiltered: d78aadc55ac73d879f79532ec829d15d83cff06578d7d41250d090062329354e
+  pushlog: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  obsstore: 5d84b09c2a8ff32940e865afbdbdae4c677485c7e9ce36f84dcc98a23ae67ba9
 
 Adding a bookmark changes the hash
 
   $ hg book mymark
   $ hg mozrepohash
-  cd51f5673cb73bfa6f2768865ad7666e45179796ddc142a5739ea81b3862eb4d
+  normal: d78aadc55ac73d879f79532ec829d15d83cff06578d7d41250d090062329354e
+  unfiltered: d78aadc55ac73d879f79532ec829d15d83cff06578d7d41250d090062329354e
+  pushlog: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  obsstore: 5d84b09c2a8ff32940e865afbdbdae4c677485c7e9ce36f84dcc98a23ae67ba9
