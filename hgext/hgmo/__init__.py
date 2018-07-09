@@ -74,6 +74,7 @@ moz.build info. In fact, the wrapper command itself can be defined as this
 string. Of course, no security will be provided.
 """
 
+import hashlib
 import json
 import os
 import subprocess
@@ -900,6 +901,44 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     ui.write(json.dumps(d, indent=2, sort_keys=True))
     ui.write('\n')
     return
+
+
+@command('mozrepohash', [])
+def mozrepohash(ui, repo):
+    """obtain a hash of the repo contents.
+
+    The hash can be used to test for repository equivalence. Useful for
+    determining if a repo on 2 different servers is identical.
+    """
+    h = hashlib.sha256()
+
+    repo = repo.unfiltered()
+
+    pushes = {} # node to blob describing push.
+    pushlog = getattr(repo, r'pushlog', None)
+    if pushlog:
+        for push in pushlog.pushes():
+            push_blob = b'%d%d%s' % (push.pudhid, push.when, push.user)
+
+            for node in push.nodes:
+                pushes[bin(node)] = push_blob
+
+    # Add each changelog entry to the hash, complete with its push ID.
+    for rev in repo:
+        ctx = repo[rev]
+
+        h.update(b'%d%s%s' % (
+            rev, ctx.node(), pushes.get(ctx.node(), b'empty')))
+
+    # Add extra files from storage.
+    h.update(b'bookmarks:')
+    h.update(repo.vfs.tryread(b'bookmarks'))
+    h.update(b'phaseroots:')
+    h.update(repo.svfs.tryread(b'phaseroots'))
+    h.update(b'obsstore')
+    h.update(repo.svfs.tryread(b'obsstore'))
+
+    ui.write(h.hexdigest() + b'\n')
 
 
 def pull(orig, repo, remote, *args, **kwargs):
