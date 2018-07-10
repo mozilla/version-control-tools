@@ -367,6 +367,38 @@ Kafka topic before the message has been acknowledged by all replicas. This
 could result in clients seeing inconsistent repository state depending on
 which hgweb server they access.
 
+Verifying Replication Consistency
+=================================
+
+The replication service tries to ensure that repositories on multiple
+servers are as identical as possible. But testing for this using standard
+filesystem comparison tools is difficult because some bits on disk may vary
+even though Mercurial data is consistent.
+
+The ``hg mozrepohash`` command can be used to display hashes of important
+Mercurial data. If the output from this command is identical across machines,
+then the underlying repository stores should be identical.
+
+To mass collect hashes of all repositories, you can run something like
+the following::
+
+   $ /var/hg/version-control-tools/scripts/find-hg-repos.py /repo/hg/mozilla/ | \
+     sudo -u hg -g hg parallel --progress --res /var/tmp/repohash \
+     /var/hg/venv_tools/bin/hg --config extensions.hgmo=/var/hg/version-control-tools/hgext/hgmo -R /repo/hg/mozilla/{} mozrepohash
+
+This command will use GNU parallel to run ``hg mozrepohash`` on all repositories
+found by the ``find-hg-repos.py`` script and write the results into
+``/var/tmp/repohash``.
+
+You can then ``rsync`` those results to a central machine and compare
+output::
+
+   $ for h in hgweb{1,2,4,5}.dmz.mdc1.mozilla.com; do \
+       rsync -avz --delete-after --exclude stderr $h:/var/tmp/repohash/ $h/ \
+     done
+
+   $ diff -r hgweb1.dmz.mdc1.mozilla.com hgweb2.dmz.mdc1.mozilla.com
+
 .. _hgmo_ops_monitoring:
 
 SSH Server Services
