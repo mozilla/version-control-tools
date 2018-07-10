@@ -125,7 +125,7 @@ if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
 # TRACKING hg46
-dateutil = import_module('mercurial.dateutil')
+dateutil = import_module('mercurial.utils.dateutil')
 if dateutil:
     makedate = dateutil.makedate
 else:
