@@ -916,6 +916,10 @@ def mozrepohash(ui, repo):
     h_unfiltered = hashlib.sha256()
     # Hash of revisions with phases.
     h_phases = hashlib.sha256()
+    # Hash of heads in default repoview.
+    h_heads = hashlib.sha256()
+    # Hash of heads in unfiltered repoview.
+    h_heads_unfiltered = hashlib.sha256()
     # Hash of pushlog data.
     h_pushlog = hashlib.sha256()
     # Hash of obsstore data.
@@ -944,14 +948,24 @@ def mozrepohash(ui, repo):
         h_unfiltered.update(b'%d%s' % (rev, node))
         h_phases.update(b'%d%s%d' % (rev, node, phase))
 
+    for head in sorted(repo.heads()):
+        h_heads.update(head)
+
+    for head in sorted(urepo.heads()):
+        h_heads_unfiltered.update(head)
+
     # Add extra files from storage.
     h_obsstore.update(b'obsstore')
     h_obsstore.update(repo.svfs.tryread(b'obsstore'))
 
     ui.write('revisions: %d visible; %d total\n' % (len(repo), len(urepo)))
+    ui.write('heads: %d visible; %d total\n' % (len(repo.heads()),
+                                                len(urepo.heads())))
     ui.write('normal: %s\n' % h_default.hexdigest())
     ui.write('unfiltered: %s\n' % h_unfiltered.hexdigest())
     ui.write('phases: %s\n' % h_phases.hexdigest())
+    ui.write('heads: %s\n' % h_heads.hexdigest())
+    ui.write('unfiltered heads: %s\n' % h_heads_unfiltered.hexdigest())
     ui.write('pushlog: %s\n' % h_pushlog.hexdigest())
 
     if repo.svfs.exists(b'obsstore'):
