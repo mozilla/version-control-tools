@@ -948,6 +948,7 @@ def mozrepohash(ui, repo):
     h_obsstore.update(b'obsstore')
     h_obsstore.update(repo.svfs.tryread(b'obsstore'))
 
+    ui.write('revisions: %d visible; %d total\n' % (len(repo), len(urepo)))
     ui.write('normal: %s\n' % h_default.hexdigest())
     ui.write('unfiltered: %s\n' % h_unfiltered.hexdigest())
     ui.write('phases: %s\n' % h_phases.hexdigest())
