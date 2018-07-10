@@ -952,7 +952,9 @@ def mozrepohash(ui, repo):
     ui.write('unfiltered: %s\n' % h_unfiltered.hexdigest())
     ui.write('phases: %s\n' % h_phases.hexdigest())
     ui.write('pushlog: %s\n' % h_pushlog.hexdigest())
-    ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
+
+    if repo.svfs.exists(b'obsstore'):
+        ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
 
 
 def pull(orig, repo, remote, *args, **kwargs):
