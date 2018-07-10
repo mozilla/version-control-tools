@@ -922,6 +922,8 @@ def mozrepohash(ui, repo):
     h_heads_unfiltered = hashlib.sha256()
     # Hash of pushlog data.
     h_pushlog = hashlib.sha256()
+    # Hash of obsolete records.
+    h_obsrecords = hashlib.sha256()
     # Hash of obsstore data.
     h_obsstore = hashlib.sha256()
 
@@ -954,6 +956,24 @@ def mozrepohash(ui, repo):
     for head in sorted(urepo.heads()):
         h_heads_unfiltered.update(head)
 
+    for pre, sucs, flags, metadata, date, parents in sorted(repo.obsstore):
+        h_obsrecords.update(pre)
+
+        for suc in sucs:
+            h_obsrecords.update(suc)
+
+        h_obsrecords.update(b'%d' % flags)
+
+        for k, v in metadata:
+            h_obsrecords.update(k)
+            h_obsrecords.update(v)
+
+        h_obsrecords.update(b'%d' % date[0])
+        h_obsrecords.update(b'%d' % date[1])
+
+        for p in parents or []:
+            h_obsrecords.update(p)
+
     # Add extra files from storage.
     h_obsstore.update(b'obsstore')
     h_obsstore.update(repo.svfs.tryread(b'obsstore'))
@@ -969,6 +989,8 @@ def mozrepohash(ui, repo):
     ui.write('pushlog: %s\n' % h_pushlog.hexdigest())
 
     if repo.svfs.exists(b'obsstore'):
+        ui.write('obsolete records count: %d\n' % len(repo.obsstore))
+        ui.write('obsolete records: %s\n' % h_obsrecords.hexdigest())
         ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
 
 
