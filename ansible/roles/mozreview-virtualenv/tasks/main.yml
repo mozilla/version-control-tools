@@ -68,7 +68,7 @@
   command: /usr/bin/virtualenv {{ venv }} creates={{ venv }}/bin/python
 
 - name: upgrade python packaging packages
-  command: "{{ venv }}/bin/python /var/tmp/get-pip-8.0.3.py --upgrade --no-index --find-links /var/tmp/virtualenv-14.0.6/virtualenv_support pip==8.0.3 setuptools==20.1.1 wheel==0.29.0"
+  command: "{{ venv }}/bin/python /var/tmp/get-pip-8.0.3.py --upgrade --no-index --no-setuptools --find-links /var/tmp/virtualenv-14.0.6/virtualenv_support pip==8.0.3 setuptools==20.1.1 wheel==0.29.0"
 
 - name: copy requirements.txt
   copy: src=requirements.txt
