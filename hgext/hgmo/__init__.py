@@ -903,8 +903,10 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     return
 
 
-@command('mozrepohash', [])
-def mozrepohash(ui, repo):
+@command('mozrepohash', [
+    ('', 'no-raw', False, 'skip hashing raw files'),
+])
+def mozrepohash(ui, repo, no_raw=False):
     """obtain a hash of the repo contents.
 
     The hash can be used to test for repository equivalence. Useful for
@@ -991,7 +993,9 @@ def mozrepohash(ui, repo):
     if repo.svfs.exists(b'obsstore'):
         ui.write('obsolete records count: %d\n' % len(repo.obsstore))
         ui.write('obsolete records: %s\n' % h_obsrecords.hexdigest())
-        ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
+
+        if not no_raw:
+            ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
 
 
 def pull(orig, repo, remote, *args, **kwargs):
