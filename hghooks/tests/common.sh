@@ -19,6 +19,8 @@ configurehooks () {
   cat >> $1/.hg/hgrc << EOF
 [extensions]
 blackbox =
+# Included so mozilla.firefox_releasing config option is registered.
+firefoxreleases = $TESTDIR/hgext/firefoxreleases
 mozhooks = $TESTDIR/hghooks/mozhghooks/extension.py
 
 [blackbox]
