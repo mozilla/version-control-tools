@@ -1,0 +1,71 @@
+# THIS PLAYBOOK IS DANGEROUS:
+#
+# * It nukes a repository on hgweb, making it temporarily unavailable
+# * It resets permissions on hgssh to temporarily make the repo lockable
+#   by the sync user so we can use `hg clone --stream`
+# * It temporarily resets phases to work around
+#   https://bz.mercurial-scm.org/show_bug.cgi?id=5648
+#
+# Example Usage:
+#
+# $ ansible-playbook -i ansible/hosts \
+#     -e repo=users/foo_mozilla.com/repo \
+#     -e user_owner=hg -e group_owner=scm_level_1 \
+#     ansible/hgmo-stream-clone-repo.yml
+---
+- hosts: hgssh-prod-master
+  gather_facts: no
+  tasks:
+    - name: adjust permissions to allow `hg clone --stream`
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/{{ repo | mandatory}} vcs-sync@mozilla.com {{ group_owner | mandatory }} wwr
+
+- hosts: hgweb-prod
+  gather_facts: no
+  serial: 10
+  tasks:
+    - name: remove repository on hgweb
+      file: path=/repo/hg/mozilla/{{ repo | mandatory }}
+            state=absent
+
+    - name: clone repository to hgweb
+      become_user: hg
+      # This may time out since it requires a server-side lock, which could take
+      # a while to acquire when N clients are requesting it. So retry automatically.
+      retries: 3
+      # We disable clone bundles, otherwise we may clone from a pre-generated
+      # bundle, which is not what we want.
+      # We also enable evolution so obsolescence markers are exchanged, if present.
+      command: /var/hg/venv_replication/bin/hg --config ui.clonebundles=false --config experimental.evolution=all clone -U --stream ssh://hg.mozilla.org/{{ repo | mandatory }} /repo/hg/mozilla/{{ repo | mandatory }}
+
+   # TODO remove when https://bz.mercurial-scm.org/show_bug.cgi?id=5648 is resolved.
+    - name: reset phases
+      become_user: hg
+      command: /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/{{ repo | mandatory }} --hidden phase --draft --force -r 0:tip
+
+- hosts: hgssh-prod-master
+  gather_facts: no
+  tasks:
+    - name: synchronize hgrc
+      command: /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/{{ repo | mandatory }} replicatehgrc
+
+    - name: restore permissions
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/{{ repo | mandatory }} {{ user_owner | mandatory }} {{ group_owner | mandatory }} wwr
+
+- hosts: hgweb-prod
+  gather_facts: no
+  serial: 10
+  tasks:
+    - name: run `hg pull`
+      become_user: hg
+      command: /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/{{ repo | mandatory }} pull ssh://hg.mozilla.org/{{ repo | mandatory }}
+
+    # These will populate caches which can be expensive to compute on first load.
+    # This helps prevent hgweb from triggering a bunch of CPU load if the repo
+    # is accessed frequently.
+    - name: seed branches cache
+      become_user: hg
+      command: /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/{{ repo | mandatory }} branches
+
+    - name: seed tags cache
+      become_user: hg
+      command: /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/{{ repo | mandatory }} tags
