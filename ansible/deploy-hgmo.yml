@@ -100,11 +100,11 @@
     - name: discover kafka topics
       command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
       register: kafka_topics
-      when: ansible_hostname == 'hgssh4'
+      when: ansible_hostname == 'hgssh1'
 
     - name: create kafka topics
       command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item.topic }} --partitions {{ item.partitions }} --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
-      when: "ansible_hostname == 'hgssh4' and '{{ item.topic }}' not in kafka_topics.stdout_lines"
+      when: "ansible_hostname == 'hgssh1' and '{{ item.topic }}' not in kafka_topics.stdout_lines"
       with_items:
         - { topic: pushdata, partitions: 8 }
         - { topic: pushlog, partitions: 1 }
