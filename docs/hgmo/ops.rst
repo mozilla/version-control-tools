@@ -1242,8 +1242,9 @@ all of which we'll use:
 All command invocations require a ``--zookeeper`` argument defining
 the Zookeeper servers to connect to. The value for this argument should
 be the ``zookeeper.connect`` variable from ``/etc/kafka/server.properties``.
-e.g. ``hgssh4.dmz.scl3.mozilla.com:2181/hgmoreplication,hgweb11.dmz.scl3.mozilla.com:2181/hgmoreplication``.
-**If this value doesn't match exactly, things may not go as planned.**
+e.g. ``localhost:2181/hgmoreplication``.
+**If this value doesn't match exactly, the ``--generate`` step may emit empty
+output and other operations may fail.**
 
 The first step is to generate a JSON document that will be used to perform
 data reassignment. To do this, we need a list of broker IDs to move data
@@ -1252,7 +1253,7 @@ to and a JSON file listing the topics to move.
 The list of broker IDs is the set of Zookeeper IDs as defined in
 ``ansible/group_vars/hgmo`` (this is the file you changed earlier to
 add the new server). Simply select the servers you wish for data to
-exist on. e.g. ``7,8,9,10,11``.
+exist on. e.g. ``14,15,16,17,20``.
 
 The JSON file denotes which Kafka topics should be moved. Typically
 every known Kafka topic is moved. Use the following as a template::
@@ -1260,12 +1261,16 @@ every known Kafka topic is moved. Use the following as a template::
    {
      "topics": [
        {"topic": "pushdata"},
-       {"topic": "pushlog"},
        {"topic": "replicatedpushdata"},
-       {"topic": "__consumer_offsets"}
+       {"topic": "replicatedpushdatapending"},
      ],
      "version": 1
    }
+
+.. hint::
+
+   You can find the set of active Kafka topics by doing an
+   ``ls /var/lib/kafka/logs`` and looking at directory names.
 
 Once you have all these pieces of data, you can run
 ``kafka-reassign-partitions.sh`` to generate a proposed reassignment plan::
@@ -1318,9 +1323,11 @@ Once data has been removed from a Kafka node, it can safely be turned off.
 
 The first step is to remove the server from the Zookeeper/Kafka list
 in Ansible. See https://hg.mozilla.org/hgcustom/version-control-tools/rev/adc5024917c7
-for an example commit. Deploy this via ``./deploy hgmo``.
+for an example commit.
 
-Next, stop Kafka and Zookeeper from the server::
+Deploy this change via ``./deploy hgmo``.
+
+Next, stop Kafka and Zookeeper on the server::
 
    $ systemctl stop kafka.service
    $ systemctl stop zookeeper.service
