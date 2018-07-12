@@ -460,11 +460,10 @@ class pushlog(object):
 
         # If replicated data isn't available or the last push id isn't recorded,
         # there's nothing special to do.
-        if util.safehasattr(self.repo, 'replicated_data'):
-            data = self.repo.replicated_data
+        data = getattr(self.repo, r'replicated_data', None)
 
-            if data and data[b'last_push_id'] is not None:
-                return min(data[b'last_push_id'], actual)
+        if data and data[b'last_push_id'] is not None:
+            return min(data[b'last_push_id'], actual)
 
         return actual
 
