@@ -14,11 +14,13 @@ zk_servers: {
   # hgweb11 and 12 were decommissioned ~2018-06-19.
   #"hgweb11.dmz.scl3.mozilla.com": 7,
   #"hgweb12.dmz.scl3.mozilla.com": 8,
-  "hgweb13.dmz.scl3.mozilla.com": 9,
-  "hgweb14.dmz.scl3.mozilla.com": 10,
-  "hgssh4.dmz.scl3.mozilla.com": 11,
-  "hgweb15.dmz.scl3.mozilla.com": 12,
-  "hgweb16.dmz.scl3.mozilla.com": 13,
+  # Kafka replicas were moved from scl3 to mdc1 on 2018-07-12 and
+  # servers were subsequently decommissioned.
+  #"hgweb13.dmz.scl3.mozilla.com": 9,
+  #"hgweb14.dmz.scl3.mozilla.com": 10,
+  #"hgssh4.dmz.scl3.mozilla.com": 11,
+  #"hgweb15.dmz.scl3.mozilla.com": 12,
+  #"hgweb16.dmz.scl3.mozilla.com": 13,
   "hgweb1.dmz.mdc1.mozilla.com": 14,
   "hgweb2.dmz.mdc1.mozilla.com": 15,
   #"hgweb3.dmz.mdc1.mozilla.com": 16,
