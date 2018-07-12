@@ -92,7 +92,9 @@ def extsetup(ui):
     # This tells the branchmap code that the branchmap cache for our custom
     # repoview is derived from the served repoview. It makes branchmap
     # cache generation a bit faster by allowing a partial calculation.
-    branchmap.subsettable['replicatedserved'] = 'served'
+    # TODO this is buggy and causes exceptions. See
+    # https://bugzilla.mozilla.org/show_bug.cgi?id=1470606#c35.
+    #branchmap.subsettable['replicatedserved'] = 'served'
 
 
 def reposetup(ui, repo):
