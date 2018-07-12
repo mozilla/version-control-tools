@@ -25,6 +25,7 @@ zk_servers: {
   #"hgweb4.dmz.mdc1.mozilla.com": 17,
   "hgweb5.dmz.mdc1.mozilla.com": 18,
   "hgweb6.dmz.mdc1.mozilla.com": 19,
+  "hgssh1.dmz.mdc1.mozilla.com": 20,
 }
 # The string used by zookeeper.connect is used both to connect to
 # Zookeeper *and* as a primary key of sorts to store data. If
