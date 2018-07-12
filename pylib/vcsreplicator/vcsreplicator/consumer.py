@@ -359,7 +359,7 @@ def process_hg_delete(config, wire_path):
 def process_hg_heads(config, path, heads, last_push_id):
     local_path = config.parse_wire_repo_path(path)
 
-    logger.warn('updating replicated heads for %s' % local_path)
+    logger.warn('updating replicated data for %s' % local_path)
 
     # We atomically write out a machine-readable file containing heads at
     # <repo>/.hg/replicated-heads. It is important that readers *always* have
@@ -402,7 +402,8 @@ def process_hg_heads(config, path, heads, last_push_id):
                                                             old_mtime + 2))
 
     os.rename(dest_tmp, dest)
-    logger.warn('%s wrote with %d heads successfully' % (dest, len(heads)))
+    logger.warn('%s wrote with %d heads successfully; last push id: %d' % (
+        dest, len(heads), last_push_id))
 
 
 def get_hg_client(path):

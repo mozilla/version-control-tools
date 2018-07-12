@@ -50,8 +50,8 @@ wait for the consumer to have no lag.
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 3
   vcsreplicator.consumer processing hg-changegroup-2 from partition 0 offset 4
   vcsreplicator.consumer processing hg-heads-1 from partition 0 offset 5
-  vcsreplicator.consumer updating replicated heads for /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 1 heads successfully
+  vcsreplicator.consumer updating replicated data for /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 1 heads successfully; last push id: 1
 
 A file should have been written out in the repo containing the binary heads
 
@@ -131,8 +131,8 @@ Wait for it to be processed by the heads consumer daemon
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 7
   vcsreplicator.consumer processing hg-changegroup-2 from partition 0 offset 8
   vcsreplicator.consumer processing hg-heads-1 from partition 0 offset 9
-  vcsreplicator.consumer updating replicated heads for /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 2 heads successfully
+  vcsreplicator.consumer updating replicated data for /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 2 heads successfully; last push id: 2
 
   $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/replicated-data
   \xa2Eheads\x82TK\x115'E\xa6\xb3\xebB\x9c\xa8\xcdHm\xfd\xc2!\xa4\xbcbTL\x94C\x88o\xe8M\xb9\xa4\xa5\xf2\x9aWwQ}(\x90\xd3\x08Llast_push_id\x02 (no-eol) (esc)
