@@ -166,7 +166,7 @@ To mark an individual repository as read-only, create a
 to the user as the reason the repository is read-only.
 
 To mark all repositories on hg.mozilla.org as read-only, create the
-``/etc/mercurial/readonlyreason`` file. If the file has content, it will
+``/repo/hg/readonlyreason`` file. If the file has content, it will
 be printed to the user.
 
 Retiring Repositories
@@ -1368,7 +1368,7 @@ To stop all Kafka consumers and writers::
    $ systemctl stop hg-master.target
 
 You will also want to make all repositories read-only by creating the
-``/etc/mercurial/readonlyreason`` file (and having the content say that
+``/repo/hg/readonlyreason`` file (and having the content say that
 pushes are disabled for maintenance reasons).
 
 To stop all Kafka and Zookeeper processes::
@@ -1421,4 +1421,4 @@ clear.
 
 Finally, make repositories pushable again::
 
-   $ rm /etc/mercurial/readonlyreason
+   $ rm /repo/hg/readonlyreason

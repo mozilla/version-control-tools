@@ -47,7 +47,7 @@ Marking individual repo as read-only works
 
 Global read only file works
 
-  $ hgmo exec hgssh touch /etc/mercurial/readonlyreason
+  $ hgmo exec hgssh touch /repo/hg/readonlyreason
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
