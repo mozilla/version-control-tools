@@ -61,8 +61,9 @@ def computeunreplicated(repo, visibilityexceptions=None):
         # unfiltered repo is really weird. But it could conceivably happen
         # in weird conditions. Let's log it and treat it as non-fatal.
         except error.LookupError:
-            repo.ui.log(_('node in replicated data file does not exist: %s\n') %
-                         hex(node))
+            repo.ui.log('vcsreplicator',
+                        _('node in replicated data file does not exist: %s\n') %
+                        hex(node))
 
     # Find the set of revisions between the changelog's heads and the replicated
     # heads, also excluding already filtered revisions. We use
