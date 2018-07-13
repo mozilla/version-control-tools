@@ -112,7 +112,7 @@ def reposetup(ui, repo):
             Returns None if the file does not exist or is empty.
             """
             try:
-                raw_data = repo.vfs.read(b'replicated-data')
+                raw_data = self.vfs.read(b'replicated-data')
             except IOError as e:
                 if e.errno != errno.ENOENT:
                     raise
