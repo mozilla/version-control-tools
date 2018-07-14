@@ -17,6 +17,9 @@ ExecStart=/var/hg/venv_tools/bin/vcsreplicator-sns-notifier /etc/mercurial/notif
 Restart=always
 TimeoutStopSec=60
 
+# Needed for HTTPS_PROXY in some environments.
+EnvironmentFile=/etc/environment
+
 SyslogIdentifier=snsnotifier
 SyslogFacility=local2
 
