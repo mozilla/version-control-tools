@@ -27,7 +27,7 @@
       when: vct_node_phase.stdout != 'public'
 
     - name: capture changes since last time
-      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh4.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
+      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
     - name: check if mozbuild chroot is available
@@ -41,7 +41,7 @@
            channel="#vcs"
            nick=hg-deploy-bot
            color=red
-           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh4.dmz.scl3.mozilla.com'].previous_vct_node.content | b64decode }}"
+           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}"
       run_once: true
 
 - hosts: hgweb-prod
@@ -118,7 +118,7 @@
             owner=root
             group=root
             mode=0644
-      when: ansible_hostname == 'hgssh4'
+      when: ansible_hostname == 'hgssh1'
 
 - hosts: localhost
   gather_facts: no
