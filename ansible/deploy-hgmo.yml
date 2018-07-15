@@ -55,8 +55,8 @@
         # We have to use hostvars to reference variables on other hosts.
         # slurp captures content in base64 encoded form. Decode it
         # before it is passed in.
-        mirror_private_key: "{{ hostvars['hgssh4.dmz.scl3.mozilla.com'].mirror_private_key.content | b64decode }}",
-        mirror_host_key: "{{ hostvars['hgssh4.dmz.scl3.mozilla.com'].mirror_host_key.content | b64decode }}",
+        mirror_private_key: "{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].mirror_private_key.content | b64decode }}",
+        mirror_host_key: "{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].mirror_host_key.content | b64decode }}",
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
