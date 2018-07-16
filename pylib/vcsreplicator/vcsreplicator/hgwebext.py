@@ -23,7 +23,7 @@ from mercurial import (
     repoview,
 )
 
-testedwith = '4.5'
+testedwith = '4.5 4.6'
 minimumhgversion = '4.5'
 
 

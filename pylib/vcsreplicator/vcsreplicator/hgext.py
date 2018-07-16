@@ -32,8 +32,18 @@ from mercurial import (
     policy,
     registrar,
     util,
-    wireproto,
 )
+
+from mozhg.util import (
+    import_module,
+)
+
+# TRACKING hg46
+# wireproto -> wireprotov1server
+wireproto = import_module('mercurial.wireprotov1server')
+if not wireproto:
+    wireproto = import_module('mercurial.wireproto')
+
 with demandimport.deactivated():
     from kafka import SimpleClient
     import kafka.common as kafkacommon
@@ -43,7 +53,7 @@ with demandimport.deactivated():
 
 base85 = policy.importmod('base85')
 
-testedwith = '4.3 4.4 4.5'
+testedwith = '4.3 4.4 4.5 4.6'
 
 cmdtable = {}
 
