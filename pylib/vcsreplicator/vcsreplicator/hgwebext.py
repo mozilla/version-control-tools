@@ -18,6 +18,7 @@ from mercurial import (
     branchmap,
     dagutil,
     error,
+    hg,
     localrepo,
     repoview,
 )
@@ -97,14 +98,27 @@ def extsetup(ui):
     # https://bugzilla.mozilla.org/show_bug.cgi?id=1470606#c35.
     #branchmap.subsettable['replicatedserved'] = 'served'
 
+    # hgweb caches repository instances. And it determines whether instances
+    # need to be reconstructed by stat()ing files listed in ``hg.foi`` at
+    # request time. We add ``.hg/replicated-data`` to this list to ensure
+    # that changes to the file are reflected on the next request and that
+    # old cached state of this file/attribute aren't used.
+    REFRESH_ENTRY = ('path', 'replicated-data')
+
+    if REFRESH_ENTRY not in hg.foi:
+        hg.foi.append(REFRESH_ENTRY)
+
 
 def reposetup(ui, repo):
     if not repo.local():
         return
 
     class replicatedrepo(repo.__class__):
-        # The property value will be cached for as long as stat() returns the
-        # same mtime.
+        # The property value will be cached until the repo's file caches are
+        # invalidated. (The file is *not* stat()ed on every attribute access.)
+        # This typically only occurs if the repository mutates itself. If
+        # another process mutates the file, it will not be reflected on this
+        # repository instance.
         @localrepo.repofilecache('replicated-data')
         def replicated_data(self):
             """Obtain the data structure holding fully replicated data.
