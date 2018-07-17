@@ -316,10 +316,11 @@ def hgweb():
 
                 # Add error to audit output
                 outputdata[repo].append(message)
+            else:
+                logger.info('%s successfully cloned' % repo)
 
             remaining_clones -= 1
 
-            logger.info('%s successfully cloned' % repo)
             logger.info('%s repositories remaining' % remaining_clones)
 
             # Schedule extra message processing if necessary
