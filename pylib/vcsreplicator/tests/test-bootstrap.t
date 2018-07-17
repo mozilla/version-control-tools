@@ -25,6 +25,9 @@ Create several repos on the remaining replication nodes
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
+  $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
+  $ hgmo create-repo deleterepo scm_level_1
+  (recorded repository creation in replication log)
   $ standarduser
 
 Fill the repos with some commits to replicate
@@ -77,8 +80,8 @@ We send the output to a file for use in the hgweb bootstrap procedure
   {
       "offsets": {
           "0": [
-              2,
-              2
+              4,
+              5
           ],
           "1": [
               0,
@@ -110,6 +113,7 @@ We send the output to a file for use in the hgweb bootstrap procedure
           ]
       },
       "repositories": [
+          "{moz}/deleterepo",
           "{moz}/mozilla-central",
           "{moz}/testrepo"
       ]
@@ -121,7 +125,7 @@ Confirm offsets returned by the bootstrap procedure match offsets from a dump
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            0         5            5          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        12           12          0 (glob)
   pushdata  *            3         0            0          0 (glob)
@@ -154,7 +158,7 @@ publish some extra commits and add them to the range of bootstrap messages.
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            0         5            5          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        16           16          0 (glob)
   pushdata  *            3         0            0          0 (glob)
@@ -198,7 +202,7 @@ Print offsets on hgweb1 host
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            0         5            5          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        20           20          0 (glob)
   pushdata  *            3         0            0          0 (glob)
@@ -207,6 +211,9 @@ Print offsets on hgweb1 host
   pushdata  *            6         0            0          0 (glob)
   pushdata  *            7         0            0          0 (glob)
 
+Delete the "deleterepo" to generate an error in the hgweb output
+
+  $ hgmo exec hgssh sudo rm -rf /repo/hg/mozilla/deleterepo
 
 Perform bootstrap procedure on hgweb. vcsreplicator is still off on this host so any replication
 will be an indication of a successful bootstrap
@@ -215,6 +222,11 @@ will be an indication of a successful bootstrap
   $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /var/hg/venv_replication/bin/hg /etc/mercurial/hgssh.json --workers 1
   vcsreplicator.bootstrap reading hgssh JSON document
   vcsreplicator.bootstrap JSON document read
+  vcsreplicator.bootstrap assigning the consumer to partition 0
+  vcsreplicator.bootstrap seeking the consumer to offset 4
+  vcsreplicator.bootstrap partition 0 of topic pushdata moved to offset 4
+  vcsreplicator.bootstrap message on partition 0, offset 4 has been collected
+  vcsreplicator.bootstrap finished retrieving messages on partition 0
   vcsreplicator.bootstrap assigning the consumer to partition 2
   vcsreplicator.bootstrap seeking the consumer to offset 10
   vcsreplicator.bootstrap partition 2 of topic pushdata moved to offset 10
@@ -226,16 +238,24 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap message on partition 2, offset 15 has been collected
   vcsreplicator.bootstrap finished retrieving messages on partition 2
   vcsreplicator.bootstrap finished retrieving messages from Kafka
-  vcsreplicator.bootstrap processing messages for partition 2
+  vcsreplicator.bootstrap processing messages for partition 0
+  vcsreplicator.bootstrap scheduled clone for {moz}/deleterepo
+  vcsreplicator.bootstrap processing messages for partition 2 (?)
+  vcsreplicator.bootstrap syncing repo: {moz}/deleterepo
+  vcsreplicator.bootstrap processing messages for partition 2 (?)
   vcsreplicator.bootstrap scheduled clone for {moz}/mozilla-central
-  vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central
+  vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central (?)
   vcsreplicator.bootstrap scheduled clone for {moz}/testrepo
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 1 total
   vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total
+  vcsreplicator.bootstrap exiting sync for: {moz}/deleterepo
+  vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central (?)
+  vcsreplicator.bootstrap error triggering replication of Mercurial repo {moz}/deleterepo: (255, "pulling from ssh://hgssh/deleterepo\nremote: Warning: Permanently added the RSA host key for IP address * to the list of known hosts.\nremote: requested repo deleterepo does not exist", 'abort: no suitable response from remote hg!') (glob)
+  vcsreplicator.bootstrap 2 repositories remaining
   vcsreplicator.bootstrap exiting sync for: {moz}/mozilla-central
-  vcsreplicator.bootstrap syncing repo: {moz}/testrepo (?)
-  vcsreplicator.bootstrap {moz}/mozilla-central successfully cloned
-  vcsreplicator.bootstrap syncing repo: {moz}/testrepo (?)
+  vcsreplicator.bootstrap {moz}/mozilla-central successfully cloned (?)
+  vcsreplicator.bootstrap syncing repo: {moz}/testrepo
+  vcsreplicator.bootstrap {moz}/mozilla-central successfully cloned (?)
   vcsreplicator.bootstrap 1 repositories remaining
   vcsreplicator.bootstrap scheduling extra processing for {moz}/mozilla-central
   vcsreplicator.bootstrap exiting sync for: {moz}/testrepo
@@ -244,6 +264,7 @@ will be an indication of a successful bootstrap
   vcsreplicator.bootstrap extra processing for {moz}/mozilla-central completed successfully
   vcsreplicator.bootstrap 0 batches remaining
   * bootstrap process complete (glob)
+  [1]
 
 
 Confirm commits replicated to hgweb host
@@ -284,7 +305,7 @@ Confirm anticipated offsets on hgweb0
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         0            2   * (glob)
+  pushdata  *            0         5            5    * (glob)
   pushdata  *            1         0            0    * (glob)
   pushdata  *            2        16           20    * (glob)
   pushdata  *            3         0            0    * (glob)
@@ -352,7 +373,7 @@ Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons a
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
   topic     group           partition    offset    available    lag (s)
   --------  ------------  -----------  --------  -----------  ---------
-  pushdata  *            0         2            2          0 (glob)
+  pushdata  *            0         5            5          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        20           20          0 (glob)
   pushdata  *            3         0            0          0 (glob)
@@ -360,6 +381,15 @@ Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons a
   pushdata  *            5         0            0          0 (glob)
   pushdata  *            6         0            0          0 (glob)
   pushdata  *            7         0            0          0 (glob)
+
+Ensure the audit output is in the correct format
+
+  $ hgmo exec hgweb0 cat /repo/hg/hgweb_bootstrap_out.json | python -m json.tool
+  {
+      "{moz}/deleterepo": [
+          "error triggering replication of Mercurial repo {moz}/deleterepo: (255, \\"pulling from ssh://hgssh/deleterepo\\\\nremote: Warning: Permanently added the RSA host key for IP address '*.*.*.*' to the list of known hosts.\\\\nremote: requested repo deleterepo does not exist\\", 'abort: no suitable response from remote hg!')" (glob)
+      ]
+  }
 
 Clean
 

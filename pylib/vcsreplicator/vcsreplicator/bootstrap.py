@@ -352,5 +352,6 @@ def hgweb():
 
     # If anything broke, dump the errors and set exit code 1
     if outputdata:
-        print(json.dumps(outputdata))
+        with open('/repo/hg/hgweb_bootstrap_out.json', 'w') as f:
+            f.write(json.dumps(outputdata))
         return 1
