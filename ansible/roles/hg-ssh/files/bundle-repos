@@ -11,10 +11,10 @@ releases/mozilla-esr45
 releases/mozilla-esr38
 releases/mozilla-esr31
 mozilla-unified zstd_max
-build/tools zstd_max
-build/mozharness zstd_max
-build/talos zstd_max
-hgcustom/version-control-tools zstd_max
+build/tools
+build/mozharness
+build/talos
+hgcustom/version-control-tools
 comm-central zstd_max
 projects/ash
 projects/cedar
