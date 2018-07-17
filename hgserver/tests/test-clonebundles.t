@@ -88,6 +88,7 @@ An index.html and bundles.json document should be produced
   $ hgmo exec hgssh ls /repo/hg/bundles
   bundles.json
   index.html
+  lastrun
   mozilla-central
   repos
 
@@ -106,6 +107,11 @@ A subsequent bundle generation should produce a backup clonebundles.manifest.old
   $ hgmo exec hgssh ls /repo/hg/mozilla/mozilla-central/.hg/ | grep clonebundles
   clonebundles.manifest
   clonebundles.manifest.old
+
+The lastrun file should have been written with the last completion time.
+
+  $ hgmo exec hgssh cat /repo/hg/bundles/lastrun
+  \d+-\d+-\d+T\d+:\d+:\d+.\d+Z (re)
 
 Cloning will fetch bundle
 

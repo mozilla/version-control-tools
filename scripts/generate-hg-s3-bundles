@@ -504,3 +504,8 @@ if __name__ == '__main__':
     if upload:
         upload_index(html_index)
         upload_json_manifest(json_manifest)
+
+    # Touch a file after successful execution. We monitor this file's age
+    # and alert when the bundle generation process is busted.
+    with open(os.path.join(BUNDLE_ROOT, 'lastrun'), 'w') as fh:
+        fh.write('%sZ\n' % datetime.datetime.utcnow().isoformat())
