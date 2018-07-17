@@ -93,8 +93,8 @@ Pulling into corrupt repo should result in abort
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
       payload['heads'])
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
-      raise Exception('unexpected exit code during pull: %d' % res)
-  Exception: unexpected exit code during pull: 255
+      raise hglib.error.CommandError(args, res, out, err)
+  hglib.error.CommandError: (255, 'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', 'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest.i!')
   [1]
 
 And the message should still be not consumed
@@ -141,8 +141,8 @@ We should get the same failure if we try again
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
       payload['heads'])
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
-      raise Exception('unexpected exit code during pull: %d' % res)
-  Exception: unexpected exit code during pull: 255
+      raise hglib.error.CommandError(args, res, out, err)
+  hglib.error.CommandError: (255, 'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', 'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest.i!')
   [1]
 
 We can skip over the message

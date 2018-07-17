@@ -222,7 +222,7 @@ def init_repo(path):
     proc = hglib.util.popen(args)
     out, err = proc.communicate()
     if proc.returncode:
-        raise Exception('error creating Mercurial repo %s: %s' % (path, out))
+        raise hglib.error.CommandError(args, proc.returncode, out, err)
 
     logger.warn('created Mercurial repository: %s' % path)
 
@@ -261,7 +261,7 @@ def process_hg_changegroup(config, path, source, node_count, heads):
         args = hglib.util.cmdbuilder('pull', url or 'default', r=heads)
         res, out, err = run_command(c, args)
         if res:
-            raise Exception('unexpected exit code during pull: %d' % res)
+            raise hglib.error.CommandError(args, res, out, err)
 
         newtip = int(c.log('tip')[0].rev)
 
@@ -282,12 +282,11 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
         logger.warn('executing pushkey on %s for %s[%s]' %
                     (path, namespace, key))
 
-        res, out, err = run_command(c, ['debugpushkey', path, namespace,
-                                        key, old, new])
+        args = ['debugpushkey', path, namespace, key, old, new]
+        res, out, err = run_command(c, args)
 
         if res and res != ret:
-            raise Exception('unexpected exit code from pushkey on %s for '
-                            '%s[%s]: %s' % (path, namespace, key, res))
+            raise hglib.error.CommandError(args, res, out, err)
 
 
 def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
@@ -313,7 +312,7 @@ def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
         args = hglib.util.cmdbuilder('pull', url or 'default', r=heads)
         res, out, err = run_command(c, args)
         if res not in (0, 1):
-            raise Exception('unexpected exit code from pull: %d' % res)
+            raise hglib.error.CommandError(args, res, out, err)
 
         newtip = int(c.log('tip')[0].rev)
 

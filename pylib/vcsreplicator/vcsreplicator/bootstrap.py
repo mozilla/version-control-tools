@@ -311,7 +311,7 @@ def hgweb():
 
             exc = completed_future.exception()
             if exc:
-                message = 'error triggering replication of Mercurial repo %s: %s' % (repo, repr(exc))
+                message = 'error triggering replication of Mercurial repo %s: %s' % (repo, str(exc))
                 logger.error(message)
 
                 # Add error to audit output
@@ -336,7 +336,7 @@ def hgweb():
 
             exc = completed_future.exception()
             if exc:
-                message = 'error processing extra messages for %s: %s' % (repo, repr(exc))
+                message = 'error processing extra messages for %s: %s' % (repo, str(exc))
                 logger.error(message)
 
                 # Add error to audit output
