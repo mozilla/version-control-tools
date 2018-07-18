@@ -568,6 +568,31 @@ Monitoring and Alerts
 
 hg.mozilla.org is monitored by Nagios.
 
+check_hg_bundle_generate_age
+----------------------------
+
+This check monitors the last generation time of *clone bundles*. The check
+is a simple wrapper around the ``check_file_age`` check. It monitors the age
+of the ``/repo/hg/bundles/lastrun`` file. This file should be touched every
+~24h when the ``hg-bundle-generate.service`` unit completes.
+
+Remediation
+^^^^^^^^^^^
+
+If this alert fires, it means the ``hg-bundle-generate.service`` unit hasn't
+completed in the past 1+ days. This failure is non-urgent. But the failure
+needs to be investigated within 5 days.
+
+A bug against the hg.mozilla.org service operator should be filed. The alert
+can be acknowledged once a bug is on file.
+
+If the alert turns critical and an hg.mozilla.org service operator has not
+acknowledged the alert's existence, attempts should be made to page a service
+operator. The paging can be deferred until waking hours for the person
+being paged, as the alert does not represent an immediate issue. The important
+thing is that the appropriate people are made aware of the alert so they
+can fix it.
+
 check_zookeeper
 ---------------
 

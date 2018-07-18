@@ -292,6 +292,7 @@
         group=root
         mode=0644
   with_items:
+    - check_hg_bundle_generate_age.cfg
     - check_kafka_hg_heartbeat.cfg
     - check_pulsenotifier_lag.cfg
     - check_pushdataaggregator_lag.cfg
