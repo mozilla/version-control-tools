@@ -54,6 +54,40 @@ def QuoteForPOSIX(string):
     return "\\'".join("'" + p + "'" for p in string.split("'"))
 
 
+def source_environment(path):
+    """Source a file with environment variables.
+
+    Parsed environment variables are added to ``os.environ`` as a side-effect.
+    """
+    if not os.path.isfile(path):
+        return
+
+    # Open in text mode because environment variables are not bytes in Python
+    # 3.
+    with open(path, 'r') as fh:
+        for line in fh:
+            line = line.strip()
+
+            if not line or line.startswith('#'):
+                continue
+
+            # Valid formats:
+            # key=value
+            # key="value"
+            if '=' not in line:
+                continue
+
+            key, value = line.split('=', 1)
+
+            key = key.strip()
+            value = value.strip()
+
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+
+            os.environ[key] = value
+
+
 def process_non_root_login(user):
     # Delay import so these don't interfere with root login code path.
     from datetime import datetime
@@ -95,5 +129,15 @@ def process_non_root_login(user):
 
 
 if __name__ == '__main__':
+    # /etc/environment contains important environment variables needed for
+    # the execution of some functionality (like hooks making HTTP requests
+    # and needing to pick up http_proxy and kin). This file is normally sourced
+    # by login shells. But we are the login process and a shell is never
+    # invoked. There are ways to get sshd to source a file with environment
+    # variables by using PAM. But this feels  complicated and requires mucking
+    # about with system auth settings. It is relatively easy to source the file
+    # from Python. So we do that.
+    source_environment('/etc/environment')
+
     user = os.environ.get('USER')
     process_non_root_login(user)
