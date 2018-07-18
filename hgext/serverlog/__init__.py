@@ -183,17 +183,37 @@ import resource
 import syslog
 import time
 import uuid
+import weakref
 
 from mercurial import (
+    error,
+    extensions,
     registrar,
-    sshserver,
+    util,
     wireproto,
 )
 from mercurial.hgweb import (
-    protocol,
     hgweb_mod,
     hgwebdir_mod,
 )
+
+OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import import_module
+
+# TRACKING hg46 mercurial.hgweb.protocol effectively renamed to
+# mercurial.wireprotoserver
+protocol = import_module('mercurial.hgweb.protocol')
+wireprotoserver = import_module('mercurial.wireprotoserver')
+
+# TRACKING hg46 mercurial.sshserver renamed to mercurial.wireprotoserver
+sshserver = import_module('mercurial.sshserver')
+
+# TRACKING hg46 mercurial.wireprotov1server contains unified code for
+# dispatching a wire protocol command
+wireprotov1server = import_module('mercurial.wireprotov1server')
+
 
 testedwith = '4.5'
 minimumhgversion = '4.5'
@@ -220,7 +240,10 @@ configitem('serverlog', 'syslog.ident',
 configitem('serverlog', 'syslog.facility',
            'LOG_LOCAL2')
 
-origcall = protocol.call
+# TRACKING hg46 module removed in 4.6
+if protocol:
+    origcall = protocol.call
+
 
 def protocolcall(repo, req, cmd):
     """Wraps mercurial.hgweb.protocol to record requests."""
@@ -231,6 +254,103 @@ def protocolcall(repo, req, cmd):
         logevent(repo.ui, repo._serverlog, 'BEGIN_PROTOCOL', cmd)
 
     return origcall(repo, req, cmd)
+
+
+class fileobjectproxy(object):
+    """A proxy around a file object that stores a serverlog reference."""
+    __slots__ = (
+        '_fp',
+        '_serverlog',
+    )
+
+    def __init__(self, fp, serverlog):
+        object.__setattr__(self, '_fp', fp)
+        object.__setattr__(self, '_serverlog', serverlog)
+
+    def __getattribute__(self, name):
+        if name in ('_fp', '_serverlog'):
+            return object.__getattribute__(self, name)
+
+        return getattr(object.__getattribute__(self, '_fp'), name)
+
+    def __delattr__(self, name):
+        return delattr(object.__getattribute__(self, '_fp'), name)
+
+    def __setattr__(self, name, value):
+        return setattr(object.__getattribute__(self, '_fp'), name, value)
+
+
+def wrappeddispatch(orig, repo, proto, command):
+    """Wraps wireprotov1server.dispatch() to record command requests."""
+    # TRACKING hg46
+    # For historical reasons, SSH and HTTP use different log events. With
+    # the unification of the dispatch code in 4.6, we could likely unify these.
+    # Keep in mind this function is only called on 4.6+: 4.5 has a different
+    # code path completely.
+
+    if isinstance(proto, wireprotoserver.httpv1protocolhandler):
+        logevent(repo.ui, repo._serverlog, 'BEGIN_PROTOCOL', command)
+    elif isinstance(proto, wireprotoserver.sshv1protocolhandler):
+        logevent(repo.ui, repo._serverlog, 'BEGIN_SSH_COMMAND', command)
+
+        startusage = resource.getrusage(resource.RUSAGE_SELF)
+
+        repo._serverlog.update({
+            'requestid': str(uuid.uuid1()),
+            'startcpu': startusage.ru_utime + startusage.ru_stime,
+            'starttime': time.time(),
+            'ui': weakref.ref(repo.ui),
+        })
+    else:
+        raise error.ProgrammingError('unhandled protocol handler: %r' % proto)
+
+    return orig(repo, proto, command)
+
+
+def wrappedsshv1respondbytes(orig, fout, rsp):
+    try:
+        return orig(fout, rsp)
+    finally:
+        record_completed_ssh_command(fout)
+
+
+def wrappedsshv1respondstream(orig, fout, rsp):
+    try:
+        return orig(fout, rsp)
+    finally:
+        record_completed_ssh_command(fout)
+
+
+def wrappedsshv1respondooberror(orig, fout, ferr, message):
+    try:
+        return orig(fout, ferr, message)
+    finally:
+        record_completed_ssh_command(fout)
+
+
+def record_completed_ssh_command(fout):
+    serverlog = fout._serverlog
+    ui = serverlog['ui']()
+
+    # This should not occur. But weakrefs are weakrefs. Be paranoid.
+    if not ui:
+        return
+
+    endtime = time.time()
+    endusage = resource.getrusage(resource.RUSAGE_SELF)
+    endcpu = endusage.ru_utime + endusage.ru_stime
+
+    deltatime = endtime - serverlog['starttime']
+    deltacpu = endcpu - serverlog['startcpu']
+
+    logevent(ui, serverlog, 'END_SSH_COMMAND',
+             '%.3f' % deltatime,
+             '%.3f' % deltacpu)
+
+    del serverlog['ui']
+    del serverlog['starttime']
+    del serverlog['startcpu']
+    serverlog['requestid'] = ''
 
 
 def repopath(repo):
@@ -279,19 +399,28 @@ def logsyslog(ui, message):
 
 
 class hgwebwrapped(hgweb_mod.hgweb):
-    def _runwsgi(self, req, repo):
+    def _runwsgi(self, *args):
+        # TRACKING hg46 (req, repo) -> (req, res, repo)
+        if len(args) == 3:
+            req, res, repo = args
+        else:
+            req, repo = args
+
         serverlog = {
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
 
+        # TRACKING hg46 req.env renamed to req.rawenv.
+        env = req.rawenv if util.safehasattr(req, 'rawenv') else req.env
+
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
         # set to the relative path of the repo (I think).
-        serverlog['path'] = req.env.get('REPO_NAME') or repopath(repo)
+        serverlog['path'] = env.get('REPO_NAME') or repopath(repo)
 
-        serverlog['ip'] = req.env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
-            req.env.get('REMOTE_ADDR') or 'UNKNOWN'
+        serverlog['ip'] = env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
+            env.get('REMOTE_ADDR') or 'UNKNOWN'
 
         # Stuff a reference to the state and the bound logging method so we can
         # record and log inside request handling.
@@ -300,7 +429,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
 
         # TODO REQUEST_URI may not be defined in all WSGI environments,
         # including wsgiref. We /could/ copy code from hgweb_mod here.
-        uri = req.env.get('REQUEST_URI', 'UNKNOWN')
+        uri = env.get('REQUEST_URI', 'UNKNOWN')
 
         sl = serverlog
         logevent(repo.ui, sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
@@ -313,7 +442,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         lastlogamount = 0
 
         try:
-            for what in super(hgwebwrapped, self)._runwsgi(req, repo):
+            for what in super(hgwebwrapped, self)._runwsgi(*args):
                 sl['writecount'] += len(what)
                 yield what
 
@@ -341,21 +470,35 @@ class hgwebwrapped(hgweb_mod.hgweb):
                      '%.3f' % deltacpu)
 
 
-class sshserverwrapped(sshserver.sshserver):
+# TRACKING hg46 sshserver.sshserver moved to wireprotoserver.sshserver
+sshservermod = wireprotoserver if wireprotoserver else sshserver
+
+
+class sshserverwrapped(sshservermod.sshserver):
     """Wrap sshserver class to record events."""
 
     def serve_forever(self):
+        # TRACKING hg46 self.repo renamed to self._repo.
+        if util.safehasattr(self, '_repo'):
+            repo = self._repo
+        else:
+            repo = self.repo
+
         serverlog = {
             'sessionid': str(uuid.uuid1()),
             'requestid': '',
-            'path': repopath(self.repo),
+            'path': repopath(repo),
         }
 
         # Stuff a reference to the state so we can do logging within repo
         # methods.
-        self.repo._serverlog = serverlog
+        repo._serverlog = serverlog
 
-        logevent(self.repo.ui, serverlog, 'BEGIN_SSH_SESSION',
+        # TRACKING hg46 we rely on hacked version of fout file handle in 4.6+.
+        if util.safehasattr(self, '_fout'):
+            self._fout = fileobjectproxy(self._fout, serverlog)
+
+        logevent(repo.ui, serverlog, 'BEGIN_SSH_SESSION',
                  serverlog['path'],
                  os.environ['USER'])
 
@@ -375,12 +518,13 @@ class sshserverwrapped(sshserver.sshserver):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logevent(self.repo.ui, serverlog, 'END_SSH_SESSION',
+            logevent(repo.ui, serverlog, 'END_SSH_SESSION',
                      '%.3f' % deltatime,
                      '%.3f' % deltacpu)
 
             self._serverlog = None
 
+    # TRACKING hg46 this method doesn't exist on 4.6+.
     def serve_one(self):
         self._serverlog['requestid'] = str(uuid.uuid1())
 
@@ -414,7 +558,20 @@ class sshserverwrapped(sshserver.sshserver):
 
 
 def extsetup(ui):
-    protocol.call = protocolcall
+    if protocol:
+        protocol.call = protocolcall
+
+    if wireprotov1server:
+        extensions.wrapfunction(wireprotov1server, 'dispatch',
+                                wrappeddispatch)
+
+    if wireprotoserver:
+        extensions.wrapfunction(wireprotoserver, '_sshv1respondbytes',
+                                wrappedsshv1respondbytes)
+        extensions.wrapfunction(wireprotoserver, '_sshv1respondstream',
+                                wrappedsshv1respondstream)
+        extensions.wrapfunction(wireprotoserver, '_sshv1respondooberror',
+                                wrappedsshv1respondooberror)
 
     if ui.configbool('serverlog', 'hgweb'):
         orighgweb = hgweb_mod.hgweb
@@ -441,4 +598,4 @@ def extsetup(ui):
             break
 
     if ui.configbool('serverlog', 'ssh'):
-        sshserver.sshserver = sshserverwrapped
+        sshservermod.sshserver = sshserverwrapped
