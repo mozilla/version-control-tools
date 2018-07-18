@@ -120,62 +120,6 @@ class HGWebTest:
 
 #==============================
 # tests
-
-class TestPushlog(HGWebTest, unittest.TestCase):
-    def setUp(self):
-        HGWebTest.setUp(self)
-        os.environ['TZ'] = "America/New_York"
-
-    def setUpRepo(self):
-        # unpack the test repo
-        repoarchive = os.path.join(mydir, "testdata/test-repo.tar.bz2")
-        check_call(["tar", "xjf", repoarchive], cwd=self.repodir)
-
-    def assertEqualFeeds(self, a, b):
-        self.assertEqual(a.feed.updated, b.feed.updated, "not the same updated time, %s != %s" % (a.feed.updated, b.feed.updated))
-        self.assertEqual(len(a.entries), len(b.entries), "not the same number of entries, %d != %d" % (len(a.entries), len(b.entries)))
-        for ae, be in zip(a.entries, b.entries):
-            self.assertEqual(ae.updated, be.updated, "not the same updated time, %s != %s" % (ae.updated, be.updated))
-            self.assertEqual(ae.title, be.title, "not the same title, %s != %s" % (ae.title, be.title))
-            self.assertEqual(ae.id, be.id, "not the same id, %s != %s" % (ae.id, be.id))
-            self.assertEqual(ae.author_detail.name, be.author_detail.name, "not the same author, %s != %s" % (ae.author_detail.name, be.author_detail.name))
-
-    def teststartidtoenddatequery(self):
-        """Query with a startID and an enddate."""
-        testjson = self.loadjsonurl("/json-pushes?startID=5&enddate=2008-11-20%2010:53:25")
-        expectedjson = loadjsonfile("testdata/test-repo-startid-enddate-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def teststartdatetoendidquery(self):
-        """Query with a startdate and an endID."""
-        testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&endID=15")
-        expectedjson = loadjsonfile("testdata/test-repo-startdate-endid-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def testfromchangetoenddatequery(self):
-        """Query with fromchange and an enddate."""
-        testjson = self.loadjsonurl("/json-pushes?fromchange=cc07cc0e87f8&enddate=2008-11-20%2010:52:56")
-        expectedjson = loadjsonfile("testdata/test-repo-fromchange-enddate-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def teststartdatetochangequery(self):
-        """Query with a startdate and tochange."""
-        testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&tochange=af5fb85d9324")
-        expectedjson = loadjsonfile("testdata/test-repo-startdate-tochange-query.json")
-        self.assertEqual(testjson, expectedjson, "json-pushes did not yield expected json data!")
-
-    def testdateparsing(self):
-        """Test that we can parse partial dates, missing seconds, minutes, hours."""
-        testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53:00")
-        expectedjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53")
-        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds")
-        testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2011:00:00")
-        expectedjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2011")
-        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds and minutes")
-        testjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-21%2000:00:00")
-        expectedjson = self.loadjsonurl("/json-pushes?startdate=2008-11-20%2010:52:25&enddate=2008-11-21")
-        self.assertEqual(testjson, expectedjson, "Failed to parse date with missing seconds, minutes, hours")
-
 class TestPushlogUserQueries(HGWebTest, unittest.TestCase):
     def setUp(self):
         HGWebTest.setUp(self)
