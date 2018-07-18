@@ -140,60 +140,6 @@ class TestPushlog(HGWebTest, unittest.TestCase):
             self.assertEqual(ae.id, be.id, "not the same id, %s != %s" % (ae.id, be.id))
             self.assertEqual(ae.author_detail.name, be.author_detail.name, "not the same author, %s != %s" % (ae.author_detail.name, be.author_detail.name))
 
-    def testlatestpushlogatom(self):
-        """Get only the latest 10 pushes via pushlog."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-latest-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testpage2pushlogatom(self):
-        """Get the second page of 10 pushes via pushlog/2."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog/2"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-page-2-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testpushlogatom(self):
-        """Get all ATOM data via pushlog."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?startdate=2008-11-20%2010:50:00&enddate=2008-11-20%2010:54:00"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testpartialdatequeryatom(self):
-        """Get some ATOM data via pushlog date query."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53:25"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testchangesetqueryatom(self):
-        """Get some ATOM data via pushlog changeset query."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?fromchange=4ccee53e18ac&tochange=a79451771352"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-changeset-query-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testtipsonlyatom(self):
-        """Get only the tips as ATOM data from pushlog?tipsonly=1."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?tipsonly=1"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-tipsonly-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testpartialdatequerytipsonlyatom(self):
-        """Get some tipsonly ATOM data via pushlog date query."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?startdate=2008-11-20%2010:52:25&enddate=2008-11-20%2010:53:25&tipsonly=1"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-tipsonly-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testchangesetquerytipsonlyatom(self):
-        """Get some tipsonly ATOM data via pushlog changeset query."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?fromchange=4ccee53e18ac&tochange=a79451771352&tipsonly=1"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-changeset-query-tipsonly-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
-    def testdatequerytrailingspaceatom(self):
-        """Dates with leading/trailing spaces should work properly."""
-        testfeed = feedparser.parse(self.urlopen("/pushlog?startdate=%202008-11-20%2010:52:25%20&enddate=%202008-11-20%2010:53:25%20&foo=bar"))
-        expectedfeed = feedparser.parse(os.path.join(mydir, "testdata/test-repo-date-query-data.xml"))
-        self.assertEqualFeeds(testfeed, expectedfeed)
-
     def teststartidtoenddatequery(self):
         """Query with a startID and an enddate."""
         testjson = self.loadjsonurl("/json-pushes?startID=5&enddate=2008-11-20%2010:53:25")
