@@ -1,9 +1,12 @@
+# coding=utf-8
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import datetime
 import logging
+import re
 
 from django.contrib.auth.models import User
 from django.db import models, transaction
@@ -57,6 +60,20 @@ def get_or_create_bugzilla_users(user_data):
         email = user['email']
         real_name = user['real_name']
         can_login = user['can_login']
+
+        # remove emoji from real_name; something between rb, djano, and mysql breaks
+        emoji_re = re.compile(
+            "["
+            u"\U0001F600-\U0001F64F"  # emoticons
+            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+            u"\U0001F680-\U0001F6FF"  # transport & map symbols
+            u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+            u"\U00002702-\U000027B0"
+            u"\U000024C2-\U0001F251"
+            "]+",
+            flags=re.UNICODE,
+        )
+        real_name = emoji_re.sub("", real_name)
 
         ircnick_match = BMO_IRC_NICK_RE.search(real_name)
 
