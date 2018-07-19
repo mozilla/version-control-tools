@@ -24,6 +24,7 @@ from mercurial import (
     filelog,
     hg,
     registrar,
+    revlog,
     scmutil,
     store,
     util,
@@ -37,7 +38,7 @@ from mozhg.util import import_module
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
 
-testedwith = '4.1 4.2 4.3 4.4 4.5'
+testedwith = '4.1 4.2 4.3 4.4 4.5 4.6'
 
 cmdtable = {}
 
@@ -56,6 +57,12 @@ if util.safehasattr(registrar, 'configitem'):
 
     configitem('overlay', 'sourceurl',
                default=configitems.dynamicdefault)
+
+# TRACKING hg46
+if util.safehasattr(revlog, 'parsemeta'):
+    parsemeta = revlog.parsemeta
+else:
+    parsemeta = filelog.parsemeta
 
 REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
@@ -186,8 +193,8 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
 
         sourcetext = sourcefl.revision(sourcenode)
         desttext = destfl.revision(destnode)
-        sourcemeta = filelog.parsemeta(sourcetext)[0]
-        destmeta = filelog.parsemeta(desttext)[0]
+        sourcemeta = parsemeta(sourcetext)[0]
+        destmeta = parsemeta(desttext)[0]
 
         # Copy path needs to be normalized before comparison.
         if destmeta is not None and destmeta.get('copy', '').startswith(prefix):
