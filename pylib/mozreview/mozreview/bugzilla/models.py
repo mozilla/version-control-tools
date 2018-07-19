@@ -70,6 +70,8 @@ def get_or_create_bugzilla_users(user_data):
             u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
             u"\U00002702-\U000027B0"
             u"\U000024C2-\U0001F251"
+            u"\U000E0001"
+            u"\U000E0020-\U000E007F"
             "]+",
             flags=re.UNICODE,
         )
