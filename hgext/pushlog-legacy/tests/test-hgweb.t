@@ -4,16 +4,16 @@
 
 Sanity check the html output
 
-  $ http http://localhost:$HGPORT/pushloghtml --header content-type --body-file body
+  $ http http://localhost:$HGPORT/hg-test/pushloghtml --header content-type --body-file body
   200
   content-type: text/html; charset=ascii
 
   $ grep 7127e784b4ba body
-  <tr class="pushlogentry parity0  id31"><td></td><td><a href="/rev/7127e784b4ba">7127e784b4ba</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
+  <tr class="pushlogentry parity0  id31"><td></td><td><a href="/hg-test/rev/7127e784b4ba">7127e784b4ba</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
 
 Get all JSON data
 
-  $ http "http://localhost:$HGPORT/json-pushes?startID=0" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startID=0" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -272,7 +272,7 @@ Get all JSON data
 
 Get all JSON data with details
 
-  $ http "http://localhost:$HGPORT/json-pushes?startID=0&full=1" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startID=0&full=1" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1264,7 +1264,7 @@ Get all JSON data with details
 
 Query with fromchange and an endID
 
-  $ http "http://localhost:$HGPORT/json-pushes?fromchange=1980d3e0c05f&endID=15" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?fromchange=1980d3e0c05f&endID=15" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1298,7 +1298,7 @@ Query with fromchange and an endID
 
 Query with a startID and tochange
 
-  $ http "http://localhost:$HGPORT/json-pushes?startID=9&tochange=6a9848d7dc42" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startID=9&tochange=6a9848d7dc42" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1318,7 +1318,7 @@ Query with a startID and tochange
 
 Query for two changesets at once
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=6fa979d08156&changeset=069b8cf8dcac" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?changeset=6fa979d08156&changeset=069b8cf8dcac" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1345,7 +1345,7 @@ Query for two changesets at once
 
 Query a changeset that doesn't exist
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=foobar" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?changeset=foobar" --header content-type --body-file body
   404
   content-type: application/json
 
@@ -1354,7 +1354,7 @@ Query a changeset that doesn't exist
 
 Test paging
 
-  $ http "http://localhost:$HGPORT/json-pushes/1?version=2" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes/1?version=2" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1445,7 +1445,7 @@ Test paging
       }
   }
 
-  $ http "http://localhost:$HGPORT/json-pushes/2?version=2" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes/2?version=2" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1538,7 +1538,7 @@ Test paging
 
 Format version 1 works
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=069b8cf8dcac&version=1" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?changeset=069b8cf8dcac&version=1" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1556,7 +1556,7 @@ Format version 1 works
 
 Format version 3 fails
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=f3afcf0b3c24&version=3" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?changeset=f3afcf0b3c24&version=3" --header content-type --body-file body
   500
   content-type: application/json
 
@@ -1565,7 +1565,7 @@ Format version 3 fails
 
 Format version 2 has pushes in a child object and a last push id
 
-  $ http "http://localhost:$HGPORT/json-pushes?changeset=069b8cf8dcac&version=2" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?changeset=069b8cf8dcac&version=2" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1587,7 +1587,7 @@ Format version 2 has pushes in a child object and a last push id
 
 Query with a startID and an enddate
 
-  $ http "http://localhost:$HGPORT/json-pushes?startID=1&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startID=1&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1621,7 +1621,7 @@ Query with a startID and an enddate
 
 Query with a startdate and an endID
 
-  $ http "http://localhost:$HGPORT/json-pushes?startdate=$STARTTIME&endID=3" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startdate=$STARTTIME&endID=3" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1655,7 +1655,7 @@ Query with a startdate and an endID
 Query with fromchange and an enddate
 
 
-  $ http "http://localhost:$HGPORT/json-pushes?fromchange=8c687ea0e27c&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?fromchange=8c687ea0e27c&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1690,7 +1690,7 @@ Query with fromchange and an enddate
 Query with a startdate and tochange
 
 
-  $ http "http://localhost:$HGPORT/json-pushes?startdate=$STARTTIME&tochange=ea44848ca8aa" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startdate=$STARTTIME&tochange=ea44848ca8aa" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1718,7 +1718,7 @@ Test that we can parse partial dates, missing seconds
   >>> import os
   >>> os.environ['MIDTIME'] = os.environ['MIDTIME'][:-3]
 
-  $ http "http://localhost:$HGPORT/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1762,7 +1762,7 @@ Test that we can parse partial dates, missing seconds and minutes
   >>> import os
   >>> os.environ['MIDTIME'] = os.environ['MIDTIME'][:-3]
 
-  $ http "http://localhost:$HGPORT/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -1807,7 +1807,7 @@ Test that we can parse partial dates, missing seconds, minutes and hours
   >>> import os
   >>> os.environ['MIDTIME'] = os.environ['MIDTIME'][:-3]
 
-  $ http "http://localhost:$HGPORT/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 

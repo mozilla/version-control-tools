@@ -349,6 +349,8 @@ def pushlogFeed(*args):
     # TRACKING hg46
     if util.safehasattr(req, 'apppath'):
         url = req.apppath or '/'
+        if not url.endswith('/'):
+            url += '/'
     else:
         url = req.url
 

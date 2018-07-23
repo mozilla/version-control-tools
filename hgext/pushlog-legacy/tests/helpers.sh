@@ -28,16 +28,25 @@ httpjson() {
   python -m json.tool < body
 }
 
+wsgiconfig() {
+  cat >> $1 << EOF
+[paths]
+/ = /$TESTTMP/*
+
+EOF
+}
+
 maketestrepousers() {
   hg init hg-test
   cd hg-test
   serverconfig .hg/hgrc
-  hg serve -d -p $HGPORT --pid-file hg.pid -E error.log
+  wsgiconfig config.wsgi
+  hg serve -d -p $HGPORT --pid-file hg.pid -E error.log --web-conf config.wsgi
   cat hg.pid >> $DAEMON_PIDS
 
   cd ..
 
-  hg clone http://localhost:$HGPORT client > /dev/null
+  hg clone http://localhost:$HGPORT/hg-test client > /dev/null
   cd client
 
   touch testfile

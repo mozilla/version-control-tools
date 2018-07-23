@@ -2,23 +2,23 @@
   $ hg init server
   $ cd server
   $ serverconfig .hg/hgrc
+  $ wsgiconfig config.wsgi
 
-  $ hg serve -d -p $HGPORT --pid-file hg.pid -E error.log
+  $ hg serve -d -p $HGPORT --pid-file hg.pid -E error.log --web-conf config.wsgi
   $ cat hg.pid >> $DAEMON_PIDS
 
 Accessing /pushlog on a repo without a pushlog db should succeed
 
-  $ http http://localhost:$HGPORT/pushlog --header content-type
+  $ http http://localhost:$HGPORT/server/pushlog --header content-type
   200
   content-type: application/atom+xml
   
   <?xml version="1.0" encoding="ascii"?>
   <feed xmlns="http://www.w3.org/2005/Atom">
-   <id>http://*:$HGPORT/pushlog</id> (glob)
-   <link rel="self" href="http://*:$HGPORT/pushlog"/> (glob)
-   <link rel="alternate" href="http://*:$HGPORT/pushloghtml"/> (glob)
-   <title>server Pushlog</title> (no-hg46 !)
-   <title>$TESTTMP/server Pushlog</title> (hg46 !)
+   <id>http://*:$HGPORT/server/pushlog</id> (glob)
+   <link rel="self" href="http://*:$HGPORT/server/pushlog"/> (glob)
+   <link rel="alternate" href="http://*:$HGPORT/server/pushloghtml"/> (glob)
+   <title>server Pushlog</title>
    <updated>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z</updated> (re)
   
   </feed>
@@ -36,7 +36,7 @@ Accessing a read-only repository should also succeed
 
   $ chmod 555 .hg
 
-  $ http http://localhost:$HGPORT/pushlog --no-body --header content-type
+  $ http http://localhost:$HGPORT/server/pushlog --no-body --header content-type
   200
   content-type: application/atom+xml
 
@@ -54,7 +54,7 @@ Create an empty database and test variations with that
   requires
   store
 
-  $ http http://localhost:$HGPORT/json-pushes --header content-type
+  $ http http://localhost:$HGPORT/server/json-pushes --header content-type
   200
   content-type: application/json
   

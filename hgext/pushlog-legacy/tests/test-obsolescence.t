@@ -20,7 +20,8 @@
   > style = gitweb_mozilla
   > EOF
 
-  $ hg serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log
+  $ wsgiconfig config.wsgi
+  $ hg serve -d -p $HGPORT --pid-file hg.pid -A access.log -E error.log --web-conf config.wsgi
   $ cat hg.pid >> $DAEMON_PIDS
   $ cd ..
 
@@ -68,7 +69,7 @@
 
 Hidden changesets exposed as list under obsoletechangesets in version 1
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?version=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?version=1"
   200
   {
       "1": {
@@ -107,7 +108,7 @@ Hidden changesets exposed as list under obsoletechangesets in version 1
 
 obsolete changeset metadata exposed under full with version 1
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?version=1&full=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?version=1&full=1"
   200
   {
       "1": {
@@ -238,7 +239,7 @@ obsolete changeset metadata exposed under full with version 1
 
 Hidden changesets exposed as list with version 2
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?version=2"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?version=2"
   200
   {
       "lastpushid": 4,
@@ -280,7 +281,7 @@ Hidden changesets exposed as list with version 2
 
 Hidden changeset metadata exposed under version 2 with full
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?version=2&full=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?version=2&full=1"
   200
   {
       "lastpushid": 4,
@@ -414,21 +415,20 @@ Hidden changeset metadata exposed under version 2 with full
 
 Hidden changesets dropped in feed
 
-  $ http --no-headers "http://localhost:$HGPORT/atom-pushlog"
+  $ http --no-headers "http://localhost:$HGPORT/server/atom-pushlog"
   200
   
   <?xml version="1.0" encoding="ascii"?>
   <feed xmlns="http://www.w3.org/2005/Atom">
-   <id>http://*:$HGPORT/pushlog</id> (glob)
-   <link rel="self" href="http://*:$HGPORT/pushlog"/> (glob)
-   <link rel="alternate" href="http://*:$HGPORT/pushloghtml"/> (glob)
-   <title>server Pushlog</title> (no-hg46 !)
-   <title>$TESTTMP/server Pushlog</title> (hg46 !)
+   <id>http://*:$HGPORT/server/pushlog</id> (glob)
+   <link rel="self" href="http://*:$HGPORT/server/pushlog"/> (glob)
+   <link rel="alternate" href="http://*:$HGPORT/server/pushloghtml"/> (glob)
+   <title>server Pushlog</title>
    <updated>*Z</updated> (glob)
    <entry>
     <title>Changeset d129109168f0ed985e51b0f86df256acdcfcfe45</title>
     <id>http://www.selenic.com/mercurial/#changeset-d129109168f0ed985e51b0f86df256acdcfcfe45</id>
-    <link href="http://*:$HGPORT/rev/d129109168f0ed985e51b0f86df256acdcfcfe45"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/d129109168f0ed985e51b0f86df256acdcfcfe45"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -442,7 +442,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset 418a63f508062fb2eb9130065c5ddc7908dd5949</title>
     <id>http://www.selenic.com/mercurial/#changeset-418a63f508062fb2eb9130065c5ddc7908dd5949</id>
-    <link href="http://*:$HGPORT/rev/418a63f508062fb2eb9130065c5ddc7908dd5949"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/418a63f508062fb2eb9130065c5ddc7908dd5949"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -456,7 +456,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset 62eebb2f0f00195f9d965f718090c678c4fa414d</title>
     <id>http://www.selenic.com/mercurial/#changeset-62eebb2f0f00195f9d965f718090c678c4fa414d</id>
-    <link href="http://*:$HGPORT/rev/62eebb2f0f00195f9d965f718090c678c4fa414d"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/62eebb2f0f00195f9d965f718090c678c4fa414d"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -470,7 +470,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset b3641753ee63b166fad7c5f10060b0cbbc8a86b0</title>
     <id>http://www.selenic.com/mercurial/#changeset-b3641753ee63b166fad7c5f10060b0cbbc8a86b0</id>
-    <link href="http://*:$HGPORT/rev/b3641753ee63b166fad7c5f10060b0cbbc8a86b0"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/b3641753ee63b166fad7c5f10060b0cbbc8a86b0"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -484,7 +484,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset d313a202a85e114000f669c2fcb49ad42376ac04</title>
     <id>http://www.selenic.com/mercurial/#changeset-d313a202a85e114000f669c2fcb49ad42376ac04</id>
-    <link href="http://*:$HGPORT/rev/d313a202a85e114000f669c2fcb49ad42376ac04"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/d313a202a85e114000f669c2fcb49ad42376ac04"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -498,7 +498,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset ae13d9da6966307c98b60987fb4fedc2e2f29736</title>
     <id>http://www.selenic.com/mercurial/#changeset-ae13d9da6966307c98b60987fb4fedc2e2f29736</id>
-    <link href="http://*:$HGPORT/rev/ae13d9da6966307c98b60987fb4fedc2e2f29736"/> (glob)
+    <link href="http://*:$HGPORT/server/rev/ae13d9da6966307c98b60987fb4fedc2e2f29736"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -512,7 +512,7 @@ Hidden changesets dropped in feed
    <entry>
     <title>Changeset 96ee1d7354c4ad7372047672c36a1f561e3a6a4c</title>
     <id>http://www.selenic.com/mercurial/#changeset-96ee1d7354c4ad7372047672c36a1f561e3a6a4c</id>
-    <link href="*:$HGPORT/rev/96ee1d7354c4ad7372047672c36a1f561e3a6a4c"/> (glob)
+    <link href="*:$HGPORT/server/rev/96ee1d7354c4ad7372047672c36a1f561e3a6a4c"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
      <name>user@example.com</name>
@@ -529,7 +529,7 @@ Hidden changesets dropped in feed
 
 Specifying a fromchange with a hidden changeset works
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?fromchange=d313a202a85e"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?fromchange=d313a202a85e"
   200
   {
       "3": {
@@ -550,7 +550,7 @@ Specifying a fromchange with a hidden changeset works
       }
   }
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?fromchange=d313a202a85e&full=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?fromchange=d313a202a85e&full=1"
   200
   {
       "3": {
@@ -629,7 +629,7 @@ Specifying a fromchange with a hidden changeset works
 
 Specifying a tochange with a hidden changeset works
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?startID=1&tochange=ae13d9da6966"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?startID=1&tochange=ae13d9da6966"
   200
   {
       "2": {
@@ -643,7 +643,7 @@ Specifying a tochange with a hidden changeset works
       }
   }
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?startID=1&tochange=ae13d9da6966&full=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?startID=1&tochange=ae13d9da6966&full=1"
   200
   {
       "2": {
@@ -683,7 +683,7 @@ Specifying a tochange with a hidden changeset works
 
 Specifying a hidden changeset works
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?changeset=ae13d9da6966"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?changeset=ae13d9da6966"
   200
   {
       "2": {
@@ -697,7 +697,7 @@ Specifying a hidden changeset works
       }
   }
 
-  $ httpjson "http://localhost:$HGPORT/json-pushes?changeset=ae13d9da6966&full=1"
+  $ httpjson "http://localhost:$HGPORT/server/json-pushes?changeset=ae13d9da6966&full=1"
   200
   {
       "2": {

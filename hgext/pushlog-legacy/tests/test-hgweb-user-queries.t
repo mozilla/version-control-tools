@@ -2,7 +2,7 @@
   $ maketestrepousers > /dev/null
 
 Query for an individual user's pushes
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -98,7 +98,7 @@ Query for an individual user's pushes
   }
 
 
-  $ http "http://localhost:$HGPORT/json-pushes?user=someone" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=someone" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -188,7 +188,7 @@ Query for an individual user's pushes
 
 
 Query for two users' pushes
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&user=someone" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&user=someone" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -365,7 +365,7 @@ Query for two users' pushes
 
 
 Querying for all users' pushes + a startID should be equivalent to just querying for that startID
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&user=someone&user=johndoe&startID=20" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&user=someone&user=johndoe&startID=20" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -462,7 +462,7 @@ Querying for all users' pushes + a startID should be equivalent to just querying
   }
 
 
-  $ http "http://localhost:$HGPORT/json-pushes?startID=20" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?startID=20" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -560,7 +560,7 @@ Querying for all users' pushes + a startID should be equivalent to just querying
 
 
 Query for a user and a startdate
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&startdate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&startdate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -642,7 +642,7 @@ Query for a user and a startdate
 
 
 Query for a user with a startdate and an enddate  
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&startdate=$STARTTIME&enddate=$MIDTIME" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -670,7 +670,7 @@ Query for multiple changesets and a user
 Should be the same as just querying for the one changeset,
 as only one changeset was pushed by this user
 
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&changeset=3580f0821c4d" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&changeset=3580f0821c4d" --header content-type --body-file body
   200
   content-type: application/json
 
@@ -687,7 +687,7 @@ as only one changeset was pushed by this user
   }
 
 
-  $ http "http://localhost:$HGPORT/json-pushes?user=luser&changeset=3580f0821c4d&changeset=26bb8677e78d" --header content-type --body-file body
+  $ http "http://localhost:$HGPORT/hg-test/json-pushes?user=luser&changeset=3580f0821c4d&changeset=26bb8677e78d" --header content-type --body-file body
   200
   content-type: application/json
 
