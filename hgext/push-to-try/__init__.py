@@ -35,7 +35,7 @@ if util.safehasattr(registrar, 'configitem'):
     configitem('push-to-try', 'nodate',
                default=False)
 
-testedwith = '4.1 4.2 4.3 4.4'
+testedwith = '4.1 4.2 4.3 4.4 4.5 4.6'
 minimumhgversion = '4.1'
 
 @command('push-to-try', [
