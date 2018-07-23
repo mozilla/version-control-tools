@@ -82,7 +82,7 @@ following config option::
   allowexchangewithapplied = true
 '''
 
-testedwith = '4.3 4.4'
+testedwith = '4.3 4.4 4.5 4.6'
 minimumhgversion = '4.3'
 
 import os
@@ -114,6 +114,9 @@ OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozautomation.commitparser import BUG_RE
+from mozhg.util import import_module
+
+logcmdutil = import_module('mercurial.logcmdutil')
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -144,6 +147,12 @@ if util.safehasattr(registrar, 'command'):
     command = registrar.command(cmdtable)
 else:
     command = cmdutil.command(cmdtable)
+
+# TRACKING hg46
+if util.safehasattr(logcmdutil, 'diffordiffstat'):
+    diffordiffstat = logcmdutil.diffordiffstat
+else:
+    diffordiffstat = cmdutil.diffordiffstat
 
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
@@ -670,7 +679,7 @@ def qrefresh_wrapper(orig, self, repo, *pats, **opts):
             m = cmdutil.matchmod.match(repo.root, repo.getcwd(), [],
                                        opts.get('include'), opts.get('exclude'),
                                        'relpath', auditor=repo.auditor)
-            cmdutil.diffordiffstat(self, repo, mdiff.diffopts(),
+            diffordiffstat(self, repo, mdiff.diffopts(),
                                    repo.dirstate.parents()[0], None, m,
                                    stat=True)
             diffstat = self.popbuffer()
