@@ -33,21 +33,21 @@ Create a new bug and attach a patch
 Use qimport to get it into the mq patch queue
 
   $ hg qpop -a
-  popping first-patch
+  popping bug-1-first-patch
   patch queue now empty
-  $ hg qrm first-patch
+  $ hg qrm bug-1-first-patch
 
   $ hg qimport bz://1
   Fetching... done
   Parsing... done
   adding 1 to series file
-  renamed 1 -> first-patch
+  renamed 1 -> bug-1-first-patch
 
   $ hg qpush
-  applying first-patch
-  now at: first-patch
+  applying bug-1-first-patch
+  now at: bug-1-first-patch
   $ hg qpop -a
-  popping first-patch
+  popping bug-1-first-patch
   patch queue now empty
 
 Stop messing around with mq and do it again normally
