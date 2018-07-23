@@ -33,7 +33,16 @@ The default values are::
   patch_format = %(filename)s
   msg_format = Bug %(bugnum)s - "%(title)s" [%(flags)s]
 """
-from mercurial import hg, commands, cmdutil, extensions, url, httppeer
+from mercurial import (
+    cmdutil,
+    commands,
+    extensions,
+    httppeer,
+    hg,
+    registrar,
+    url,
+    util,
+)
 from hgext import mq
 
 import re
@@ -46,8 +55,22 @@ import pb
 import scp
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qimportbz'
-testedwith = '3.9 4.0 4.1 4.2'
-minimumhgversion = '3.9'
+testedwith = '4.2 4.3 4.4 4.5 4.6'
+minimumhgversion = '4.2'
+
+
+# TRACKING hg44 - must register config items
+if util.safehasattr(registrar, 'configitem'):
+    configtable = {}
+    configitem = registrar.configitem(configtable)
+
+    configitem('qimportbz', 'bugzilla', default='bugzilla.mozilla.org')
+    configitem('qimportbz', 'auto_choose_all', default=False)
+    configitem('qimportbz', 'scp', default=os.environ.get('SCP', "scp"))
+    configitem('qimportbz', 'pastebin', default=os.environ.get('PASTEBIN', "pastebin.mozilla.org"))
+    configitem('qimportbz', 'msg_format', default='Bug %(bugnum)s - "%(title)s" [%(flags)s]')
+    configitem('qimportbz', 'joinstr', default=' ')
+    configitem('qimportbz', 'patch_format', default='%(filename)s')
 
 
 def extsetup(ui):

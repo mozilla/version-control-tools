@@ -8,7 +8,10 @@ try:
 except ImportError:
     import StringIO
 
-from mercurial import patch
+from mercurial import (
+    patch,
+    util,
+)
 
 # int(bug num) -> Bug
 cache = {}
@@ -94,9 +97,50 @@ class Patch(Attachment):
         self.flags = list(sorted(Flag(bug, n) for n in node.findall('flag')))
         rawtext = base64.b64decode(node.find('data').text)
 
-        data = patch.extract(bug.settings.ui, StringIO.StringIO(rawtext))
-        # Mercurial 3.6 returns a dict. Previous versions a tuple.
-        if isinstance(data, dict):
+        # TRACKING hg46 - `patch.extract` is now a context manager
+        if util.versiontuple(n=2) >= (4, 6):
+            with patch.extract(bug.settings.ui, StringIO.StringIO(rawtext)) as data:
+                filename = data.get('filename')
+                message = data.get('message')
+                user = data.get('user')
+                date = data.get('date')
+                branch = data.get('branch')
+                nodeid = data.get('node')
+                p1 = data.get('p1')
+                p2 = data.get('p2')
+
+                # for some reason, patch.extract writes a temporary file with the diff hunks
+                if filename:
+                    try:
+                        # BugZilla is not explicit about patch encoding. We need to check it's utf-8.
+                        # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
+                        with open(filename) as fp:
+                            self.data = fp.read().decode('utf-8')
+                        # Attempt to detect the start of the diff. Borrowed from:
+                        # http://selenic.com/hg/file/79e5de2bfa8c/mercurial/patch.py#l163
+                        diffre = re.compile(r'^(?:Index:[ \t]|diff[ \t]|RCS file: |'
+                                            r'retrieving revision [0-9]+(\.[0-9]+)*$|'
+                                            r'---[ \t].*?^\+\+\+[ \t]|'
+                                            r'\*\*\*[ \t].*?^---[ \t])', re.MULTILINE | re.DOTALL)
+                        m = diffre.search(self.data)
+                        if m:
+                            # Remove the patch header, since we'll be re-adding a cleaned up version later.
+                            self.data = self.data[m.start(0):]
+                    except UnicodeDecodeError:
+                        # Ftr, this could be due to the (included) message part: see later message block.
+                        bug.settings.ui.warn(
+                            "Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
+                        # Print the exception without its traceback.
+                        sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
+                        # Can't do better than discard data:
+                        # trying |.decode('utf-8', 'replace')| as a fallback would be too risky
+                        #   if user imports the result then forgets to fix it.
+                        self.data = ''
+                else:
+                    self.data = ''
+        else:
+            data = patch.extract(bug.settings.ui, StringIO.StringIO(rawtext))
+
             filename = data.get('filename')
             message = data.get('message')
             user = data.get('user')
@@ -105,40 +149,37 @@ class Patch(Attachment):
             nodeid = data.get('node')
             p1 = data.get('p1')
             p2 = data.get('p2')
-        else:
-            assert isinstance(data, tuple)
-            filename, message, user, date, branch, nodeid, p1, p2 = data
 
-        # for some reason, patch.extract writes a temporary file with the diff hunks
-        if filename:
-            fp = file(filename)
-            try:
-                # BugZilla is not explicit about patch encoding. We need to check it's utf-8.
-                # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
-                self.data = fp.read().decode('utf-8')
-                # Attempt to detect the start of the diff. Borrowed from:
-                # http://selenic.com/hg/file/79e5de2bfa8c/mercurial/patch.py#l163
-                diffre = re.compile(r'^(?:Index:[ \t]|diff[ \t]|RCS file: |'
-                                    r'retrieving revision [0-9]+(\.[0-9]+)*$|'
-                                    r'---[ \t].*?^\+\+\+[ \t]|'
-                                    r'\*\*\*[ \t].*?^---[ \t])', re.MULTILINE | re.DOTALL)
-                m = diffre.search(self.data)
-                if m:
-                    # Remove the patch header, since we'll be re-adding a cleaned up version later.
-                    self.data = self.data[m.start(0):]
-            except UnicodeDecodeError:
-                # Ftr, this could be due to the (included) message part: see later message block.
-                bug.settings.ui.warn("Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
-                # Print the exception without its traceback.
-                sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
-                # Can't do better than discard data:
-                # trying |.decode('utf-8', 'replace')| as a fallback would be too risky
-                #   if user imports the result then forgets to fix it.
+            # for some reason, patch.extract writes a temporary file with the diff hunks
+            if filename:
+                fp = file(filename)
+                try:
+                    # BugZilla is not explicit about patch encoding. We need to check it's utf-8.
+                    # utf-8: convert from 8-bit encoding to internal (16/32-bit) Unicode.
+                    self.data = fp.read().decode('utf-8')
+                    # Attempt to detect the start of the diff. Borrowed from:
+                    # http://selenic.com/hg/file/79e5de2bfa8c/mercurial/patch.py#l163
+                    diffre = re.compile(r'^(?:Index:[ \t]|diff[ \t]|RCS file: |'
+                                        r'retrieving revision [0-9]+(\.[0-9]+)*$|'
+                                        r'---[ \t].*?^\+\+\+[ \t]|'
+                                        r'\*\*\*[ \t].*?^---[ \t])', re.MULTILINE | re.DOTALL)
+                    m = diffre.search(self.data)
+                    if m:
+                        # Remove the patch header, since we'll be re-adding a cleaned up version later.
+                        self.data = self.data[m.start(0):]
+                except UnicodeDecodeError:
+                    # Ftr, this could be due to the (included) message part: see later message block.
+                    bug.settings.ui.warn("Patch id=%s desc=\"%s\" diff data were discarded:\n" % (self.id, self.desc))
+                    # Print the exception without its traceback.
+                    sys.excepthook(sys.exc_info()[0], sys.exc_info()[1], None)
+                    # Can't do better than discard data:
+                    # trying |.decode('utf-8', 'replace')| as a fallback would be too risky
+                    #   if user imports the result then forgets to fix it.
+                    self.data = ''
+                fp.close()
+                os.remove(filename)
+            else:
                 self.data = ''
-            fp.close()
-            os.remove(filename)
-        else:
-            self.data = ''
 
         # Remove seconds (which are always ':00') and timezone from the patch date:
         # keep 'yyyy-mm-dd hh:mn' only.
