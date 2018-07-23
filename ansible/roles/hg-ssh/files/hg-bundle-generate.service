@@ -11,4 +11,5 @@ Group=hg
 Nice=10
 
 # Needed for HTTPS_PROXY in some environments.
-EnvironmentFile=/etc/environment
+# Disabled because of TCP slowness.
+#EnvironmentFile=/etc/environment
