@@ -34,7 +34,7 @@ if not getattr(cmdutil, 'bailifchanged', None):
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
 
-testedwith = '3.9 4.0 4.1 4.2'
+testedwith = '3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
 
 cmdtable = {}
