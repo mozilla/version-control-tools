@@ -1,0 +1,17 @@
+amqp==1.4.9
+anyjson==0.3.3
+botocore==1.8.17
+boto3==1.5.3
+boto==2.48.0
+cbor2==4.1.0
+docutils==0.12
+futures==3.0.3
+jmespath==0.9.0
+kafka-python==1.4.2
+kombu==3.0.35
+Mercurial==4.6.2
+python-dateutil==2.5.3
+python-hglib==2.6.1
+s3transfer==0.1.12
+six==1.10.0
+tabulate==0.7.5
