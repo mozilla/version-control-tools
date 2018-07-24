@@ -4,12 +4,6 @@
 #
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-ssh/files/requirements-bundles.txt ansible/roles/hg-ssh/files/requirements-bundles.in
 #
-amqp==1.4.9 \
-    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908 \
-    # via kombu
-anyjson==0.3.3 \
-    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
-    # via kombu
 boto3==1.5.3 \
     --hash=sha256:5f0e6f5c4e70bd226946073caef9b7e6fb715ed9af6887a77f3de3d8530514d7
 boto==2.48.0 \
@@ -31,9 +25,6 @@ jmespath==0.9.0 \
     # via boto3, botocore
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
-kombu==3.0.35 \
-    --hash=sha256:22ab336a17962717a5d9470547e5508d4bcf1b6ec10cd9486868daf4e5edb727 \
-    --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727
 mercurial==4.6.2 \
     --hash=sha256:1cd04ea0200b3cfad7dfd8f149aca6ac8ac2209c423c27258cf4a1ded8e366af \
     --hash=sha256:57a582baf1e36c4e0a05b0a20c25c8ca1c8704dbeddf9cec7447088834f9de08 \

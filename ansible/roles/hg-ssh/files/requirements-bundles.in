@@ -2,6 +2,5 @@ boto3==1.5.3
 boto==2.48.0
 cbor2==4.1.0
 kafka-python==1.4.2
-kombu==3.0.35
 Mercurial==4.6.2
 python-hglib==2.6.1
