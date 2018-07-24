@@ -234,9 +234,7 @@ We don't review merge commits
    create mode 100644 bar
 
   $ git mozreview push
-  fatal: 'cinnabar' appears to be a git command, but we were not
-  able to execute it. Maybe git-cinnabar is broken?
-  abort: error performing cinnabar push; please report this bug
+  abort: error performing cinnabar push; Pushing merges is not supported yet
   [1]
 
 Cleanup
