@@ -5,36 +5,47 @@
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-ssh/files/requirements-bundles.txt ansible/roles/hg-ssh/files/requirements-bundles.in
 #
 amqp==1.4.9 \
-    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
+    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908 \
+    # via kombu
 anyjson==0.3.3 \
-    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
+    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
+    # via kombu
 boto3==1.5.3 \
     --hash=sha256:5f0e6f5c4e70bd226946073caef9b7e6fb715ed9af6887a77f3de3d8530514d7
 boto==2.48.0 \
-    --hash=sha256:13be844158d1bd80a94c972c806ec8381b9ea72035aa06123c5db6bc6a6f3ead
+    --hash=sha256:13be844158d1bd80a94c972c806ec8381b9ea72035aa06123c5db6bc6a6f3ead \
+    --hash=sha256:deb8925b734b109679e3de65856018996338758f4b916ff4fe7bb62b6d7000d1
 botocore==1.8.17 \
-    --hash=sha256:fb68fc9f90c28ea8a3e855e154989b15ac810b1a261c6f0b893a064a9d6a81f2
+    --hash=sha256:fb68fc9f90c28ea8a3e855e154989b15ac810b1a261c6f0b893a064a9d6a81f2 \
+    # via boto3, s3transfer
 cbor2==4.1.0 \
     --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
 docutils==0.12 \
-    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa
+    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa \
+    # via botocore
 futures==3.0.3 \
-    --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
+    --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4 \
+    # via s3transfer
 jmespath==0.9.0 \
-    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815
+    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815 \
+    # via boto3, botocore
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 kombu==3.0.35 \
+    --hash=sha256:22ab336a17962717a5d9470547e5508d4bcf1b6ec10cd9486868daf4e5edb727 \
     --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727
 mercurial==4.6.2 \
     --hash=sha256:1cd04ea0200b3cfad7dfd8f149aca6ac8ac2209c423c27258cf4a1ded8e366af \
     --hash=sha256:57a582baf1e36c4e0a05b0a20c25c8ca1c8704dbeddf9cec7447088834f9de08 \
     --hash=sha256:958e9029acaf542f6c4e341e63e17eb8c8c99d4a6d0766ec8403cfe25bf0c4ce
 python-dateutil==2.5.3 \
-    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
+    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527 \
+    # via botocore
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 s3transfer==0.1.12 \
-    --hash=sha256:23c156ca4d64b022476c92c44bf938bef71af9ce0dcd8fd6585e7bce52f66e47
+    --hash=sha256:23c156ca4d64b022476c92c44bf938bef71af9ce0dcd8fd6585e7bce52f66e47 \
+    # via boto3
 six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
+    # via python-dateutil
