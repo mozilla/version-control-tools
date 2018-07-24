@@ -23,8 +23,7 @@ try_task_config.json is allowed on Firefox user repos
 
   $ mkdir -p users/someuser
   $ hg init users/someuser/firefox
-  $ configurehooks users/someuser/firefox
-  $ touch users/someuser/firefox/.hg/IS_FIREFOX_REPO
+  $ configurereleasinghooks users/someuser/firefox
 
   $ hg -R client-normal push $TESTTMP/users/someuser/firefox
   pushing to $TESTTMP/users/someuser/firefox
@@ -35,8 +34,7 @@ try_task_config.json is allowed on Firefox user repos
   added 2 changesets with 2 changes to 2 files
 
   $ hg init server
-  $ configurehooks server
-  $ touch server/.hg/IS_FIREFOX_REPO
+  $ configurereleasinghooks server
 
   $ hg -q clone server client
   $ cd client
@@ -103,15 +101,5 @@ Multiple changesets handled properly
   rollback completed
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
-
-Making repo non-publishing will allow the push
-
-  $ hg --config phases.publish=false push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 3 files
 
   $ cd ..

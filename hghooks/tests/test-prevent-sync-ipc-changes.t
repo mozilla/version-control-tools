@@ -1,8 +1,7 @@
   $ . $TESTDIR/hghooks/tests/common.sh
 
   $ hg init server
-  $ configurehooks server
-  $ touch server/.hg/IS_FIREFOX_REPO
+  $ configurereleasinghooks server
   $ cd server
 
   $ echo "foo" > dummy

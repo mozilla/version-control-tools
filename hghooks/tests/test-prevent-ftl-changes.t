@@ -3,8 +3,7 @@
 Commit adding an FTL file without appropriate reviewer errors
 
   $ hg init normal
-  $ configurehooks normal
-  $ touch normal/.hg/IS_FIREFOX_REPO
+  $ configurereleasinghooks normal
   $ hg -q clone normal client-normal
   $ cd client-normal
   $ touch test.ftl

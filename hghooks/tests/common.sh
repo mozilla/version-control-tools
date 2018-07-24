@@ -30,3 +30,21 @@ track = *
 repo_root = $TESTTMP
 EOF
 }
+
+configurereleasinghooks() {
+  cat >> $1/.hg/hgrc << EOF
+[extensions]
+blackbox =
+# Included so mozilla.firefox_releasing config option is registered.
+firefoxreleases = $TESTDIR/hgext/firefoxreleases
+mozhooks = $TESTDIR/hghooks/mozhghooks/extension.py
+
+[blackbox]
+track = *
+
+[mozilla]
+repo_root = $TESTTMP
+firefox_releasing = True
+EOF
+  touch $1/.hg/IS_FIREFOX_REPO
+}
