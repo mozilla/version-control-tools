@@ -308,6 +308,20 @@ def wrappeddispatch(orig, repo, proto, command):
 
 
 def wrappedsshv1respondbytes(orig, fout, rsp):
+    # This function is called as part of the main dispatch loop *and* as part
+    # of sshv1protocolhandler.getpayload() (which is called by commands that
+    # want to read "body" data from the client). We don't want to record a
+    # completed command for the latter. There's no good way of only
+    # monkeypatching the former. So we sniff the stack for presence of
+    # getpayload() and don't do anything special in that case.
+    for f in inspect.stack():
+        frame = f[0]
+
+        # If there are multiple functions named getpayload() this could give
+        # false positives. Until it is a problem, meh.
+        if frame.f_code.co_name == r'getpayload':
+            return orig(fout, rsp)
+
     try:
         return orig(fout, rsp)
     finally:
