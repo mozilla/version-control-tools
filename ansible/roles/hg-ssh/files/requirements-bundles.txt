@@ -12,8 +12,6 @@ boto==2.48.0 \
 botocore==1.8.17 \
     --hash=sha256:fb68fc9f90c28ea8a3e855e154989b15ac810b1a261c6f0b893a064a9d6a81f2 \
     # via boto3, s3transfer
-cbor2==4.1.0 \
-    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa \
     # via botocore
