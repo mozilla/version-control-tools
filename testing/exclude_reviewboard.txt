@@ -1,6 +1,5 @@
 # List of reviewboard tests for use as an exclude list
 # To use: `./run-tests --blacklist=testing/exclude_reviewboard.txt`
-test-auth.t
 test-bugzilla-review-flag-cleared.t
 test-bugzilla-review-interaction.t
 test-bugzilla-security.t
@@ -31,6 +30,7 @@ test-push-multiple-bugs.t
 test-push.t
 test-repo-discovery.t
 test-review-commit-rewrite.t
+test-reviewboard-auth.t
 test-reviewer-flags.t
 test-reviewer-unicode.t
 test-review-request-approval.t
