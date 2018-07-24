@@ -60,14 +60,34 @@ And raises during upload since we don't have credentials in the test env
     File "/var/hg/venv_bundles/lib/python2.7/site-packages/concurrent/futures/thread.py", line \d+, in run (re)
       result = self.fn(*self.args, **self.kwargs)
     File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in upload_to_s3 (re)
-      c = S3Connection(host=host)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto/s3/connection.py", line \d+, in __init__ (re)
-      validate_certs=validate_certs, profile_name=profile_name)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto/connection.py", line \d+, in __init__ (re)
-      host, config, self.provider, self._required_auth_capability())
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto/auth.py", line \d+, in get_auth_handler (re)
-      'Check your credentials' % (len(names), str(names)))
-  boto.exception.NoAuthHandlerFound: No handler was ready to authenticate. 1 handlers were checked. ['HmacAuthV1Handler'] Check your credentials
+      key.load()
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/factory.py", line 505, in do_action
+      response = action(self, *args, **kwargs)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/action.py", line 83, in __call__
+      response = getattr(parent.meta.client, operation_name)(**params)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line 314, in _api_call
+      return self._make_api_call(operation_name, kwargs)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line 599, in _make_api_call
+      operation_model, request_dict)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 148, in make_request
+      return self._send_request(request_dict, operation_model)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 173, in _send_request
+      request = self.create_request(request_dict, operation_model)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 157, in create_request
+      operation_name=operation_model.name)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line 227, in emit
+      return self._emit(event_name, kwargs)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line 210, in _emit
+      response = handler(**kwargs)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line 90, in handler
+      return self.sign(operation_name, request)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line 156, in sign
+      auth.add_auth(request)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line 420, in add_auth
+      super(S3SigV4Auth, self).add_auth(request)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line 352, in add_auth
+      raise NoCredentialsError
+  botocore.exceptions.NoCredentialsError: Unable to locate credentials
   [1]
 
 The manifest should be empty because there were no successful uploads
