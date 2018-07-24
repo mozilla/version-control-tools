@@ -38,5 +38,3 @@ s3transfer==0.1.12 \
     --hash=sha256:23c156ca4d64b022476c92c44bf938bef71af9ce0dcd8fd6585e7bce52f66e47
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
-tabulate==0.7.5 \
-    --hash=sha256:9071aacbd97a9a915096c1aaf0dc684ac2672904cd876db5904085d6dac9810e

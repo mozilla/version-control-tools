@@ -14,4 +14,3 @@ python-dateutil==2.5.3
 python-hglib==2.6.1
 s3transfer==0.1.12
 six==1.10.0
-tabulate==0.7.5
