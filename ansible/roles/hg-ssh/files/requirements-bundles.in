@@ -1,5 +1,5 @@
-boto3==1.5.3
-boto==2.48.0
+boto3
+boto
 kafka-python==1.4.2
 Mercurial==4.6.2
 python-hglib==2.6.1
