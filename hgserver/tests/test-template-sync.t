@@ -833,3 +833,8 @@ And compare what the patches produced versus what's in v-c-t
   +repoinfo = '\{
   +  "group_owner": {groupowner|json}
   +  }'
+
+Produce a patch file with differences so we can more easily turn them into
+patches.
+
+  $ hg export > $TESTDIR/hgtemplates/.patches/DIFFERENCES
