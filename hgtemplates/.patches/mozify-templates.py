@@ -34,6 +34,16 @@ COPY_FILES = {
     'static/moz-logo-bw-rgb.svg',
 }
 
+REPLACEMENTS = [
+    # Replace logo HTML.
+    (b'<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>',
+     b'<div class="logo">\n'
+     b'    <a href="{logourl}">\n'
+     b'        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />\n'
+     b'    </a>\n'
+     b'</div>'),
+]
+
 
 def main(source_templates, vct_templates_path, new_templates_path):
     # source_templates is the canonical templates to start from.
@@ -120,6 +130,30 @@ def main(source_templates, vct_templates_path, new_templates_path):
                        check=True)
         sys.stderr.flush()
         sys.stdout.flush()
+
+    # Change the logo URL.
+    for f in sorted(gitweb_mozilla.iterdir()):
+        if f.suffix != '.tmpl':
+            continue
+
+        with f.open('rb') as fh:
+            s = fh.read()
+
+        for search, replace in REPLACEMENTS:
+            if search not in s:
+                continue
+
+            print('replacing %s... in %s' % (search[0:24], f))
+
+            s = s.replace(search, replace)
+
+        with f.open('wb') as fh:
+            fh.write(s)
+
+    print('committing automated transformations')
+    subprocess.run(['hg', 'commit', '-m', 'common rewrites'],
+                   cwd=new_templates_path,
+                   check=True)
 
 
 if __name__ == '__main__':
