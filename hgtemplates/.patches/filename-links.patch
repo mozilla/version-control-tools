@@ -1,0 +1,72 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532552415 25200
+#      Wed Jul 25 14:00:15 2018 -0700
+# Node ID a582ad15f720778f4cb94a925f4c625c29912642
+# Parent  0592a907e23b9556e6d906adc6bd320bbcf711e2
+hgtemplates: add file names in various links
+
+diff --git a/hgtemplates/gitweb_mozilla/fileannotate.tmpl b/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+--- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl
++++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+@@ -13,7 +13,7 @@
+         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+     </a>
+ </div>
+-<a href="/">Mercurial</a> {pathdef%breadcrumb} / annotate
++<a href="/">Mercurial</a> {pathdef%breadcrumb} / annotate / {file|escape}
+ </div>
+ 
+ <div class="page_nav">
+diff --git a/hgtemplates/gitweb_mozilla/filediff.tmpl b/hgtemplates/gitweb_mozilla/filediff.tmpl
+--- a/hgtemplates/gitweb_mozilla/filediff.tmpl
++++ b/hgtemplates/gitweb_mozilla/filediff.tmpl
+@@ -13,7 +13,7 @@
+         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+     </a>
+ </div>
+-<a href="/">Mercurial</a> {pathdef%breadcrumb} / diff
++<a href="/">Mercurial</a> {pathdef%breadcrumb} / diff / {file|escape}
+ </div>
+ 
+ <div class="page_nav">
+diff --git a/hgtemplates/gitweb_mozilla/filelog.tmpl b/hgtemplates/gitweb_mozilla/filelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/filelog.tmpl
++++ b/hgtemplates/gitweb_mozilla/filelog.tmpl
+@@ -1,5 +1,5 @@
+ {header}
+-<title>{repo|escape}: File revisions</title>
++<title>{repo|escape}: File revisions: {file|escape}</title>
+ <link rel="alternate" type="application/atom+xml"
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+@@ -13,7 +13,7 @@
+         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+     </a>
+ </div>
+-<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revisions
++<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revisions / {file|escape}
+ </div>
+ 
+ <div class="page_nav">
+diff --git a/hgtemplates/gitweb_mozilla/filerevision.tmpl b/hgtemplates/gitweb_mozilla/filerevision.tmpl
+--- a/hgtemplates/gitweb_mozilla/filerevision.tmpl
++++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl
+@@ -13,7 +13,7 @@
+         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+     </a>
+ </div>
+-<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revision
++<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revision / {file|escape}@{node|short}
+ </div>
+ 
+ <div class="page_nav">
+@@ -66,7 +66,7 @@ file |
+ </table>
+ </div>
+ 
+-<div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
++<div class="page_path description">{desc|strip|escape|mozlink|nonempty}</div>
+ 
+ <div class="page_body">
+ <pre class="sourcelines stripes"
