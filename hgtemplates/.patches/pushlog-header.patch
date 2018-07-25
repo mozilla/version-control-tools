@@ -1,0 +1,34 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532547922 25200
+#      Wed Jul 25 12:45:22 2018 -0700
+# Node ID 18ffa79e05b7728cabc41e49a4346c439806cac3
+# Parent  065f5f1cf640d1e260eea4f83690a89ee61a3ccf
+hgtemplates: add pushlog links to navigation headers
+
+These rewrites aren't performed by the automatic translation
+because the patterns are slightly different. Capture them
+manually.
+
+diff --git a/hgtemplates/gitweb_mozilla/changelog.tmpl b/hgtemplates/gitweb_mozilla/changelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/changelog.tmpl
++++ b/hgtemplates/gitweb_mozilla/changelog.tmpl
+@@ -17,6 +17,7 @@
+ <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
+ <a href="{url|urlescape}shortlog/{symrev}{sessionvars%urlparameter}">shortlog</a> |
+ changelog |
++<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
+ <a href="{url|urlescape}graph/{symrev}{sessionvars%urlparameter}">graph</a> |
+ <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
+ <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
+diff --git a/hgtemplates/gitweb_mozilla/map b/hgtemplates/gitweb_mozilla/map
+--- a/hgtemplates/gitweb_mozilla/map
++++ b/hgtemplates/gitweb_mozilla/map
+@@ -23,6 +23,7 @@ helpentry = '
+ naventry = '<a href="{url|urlescape}log/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
+ navshortentry = '<a href="{url|urlescape}shortlog/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
+ navgraphentry = '<a href="{url|urlescape}graph/{node|short}{sessionvars%urlparameter}">{label|escape}</a> '
++navpushentry = '<a href="{url|urlescape}pushloghtml/{page}{sessionvars%urlparameter}">{label|escape}</a> '
+ filenaventry = '<a href="{url|urlescape}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{label|escape}</a> '
+ filedifflink = '<a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">{file|escape}</a> '
+ filenodelink = '
