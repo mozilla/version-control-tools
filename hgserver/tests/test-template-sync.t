@@ -217,6 +217,8 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch index.patch
   applying patch from stdin
+  applying patch firefoxreleases2.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
@@ -234,7 +236,7 @@ And compare what the patches produced versus what's in v-c-t
 
   $ hg diff -c .
   diff -r * -r * hgtemplates/gitweb_mozilla/changelogentry.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,16 +1,15 @@
   -<div>
@@ -262,7 +264,7 @@ And compare what the patches produced versus what's in v-c-t
    
    </div>
   diff -r * -r * hgtemplates/gitweb_mozilla/changeset.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -319,7 +321,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="title_text">
    <table cellspacing="0">
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -339,7 +341,7 @@ And compare what the patches produced versus what's in v-c-t
        renderDiffOptsForm();
    </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -351,7 +353,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filelog.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,5 +1,5 @@
    {header}
@@ -370,7 +372,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filerevision.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -391,7 +393,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="page_body">
    <pre class="sourcelines stripes"
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,10 +5,10 @@
    
@@ -409,7 +411,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
   diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
-  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
   @@ -97,7 +97,7 @@
      <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
@@ -495,53 +497,26 @@ And compare what the patches produced versus what's in v-c-t
        <td class="indexlinks">{archives%indexarchiveentry}</td>
        <td>{if(isdirectory, '',
                '<div class="rss_logo">
-  @@ -360,3 +359,44 @@
-       <span>At end of lines:</span>
+  @@ -361,6 +360,11 @@
        <input id="ignorewseol-checkbox" type="checkbox" />
      </form>'
-  +
+   
   +pushlog = pushlog.tmpl
   +bughyperlink = '<a href="{url}">{no|escape}</a>'
   +reviewerlink = '<a href="{url|urlescape}log?rev={revset|urlescape}&revcount=50">{name|escape}</a>'
   +backedoutnodelink = '<a style="font-family: monospace" href="{url|urlescape}rev/{node|short}">{node|short}</a>'
   +
-  +firefoxreleases = firefoxreleases.tmpl
-  +firefoxreleasetableentry = '<tr id="{anchor|escape}" class="parity{parity}">
-  +  <td class="firefoxreleasefixed"><a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a></td>
-  +  <td class="firefoxreleasefixed">{build_id|escape}</td>
-  +  <td>{channel|escape}</td>
-  +  <td>{platform|escape}</td>
-  +  <td>{app_version|escape}</td>
-  +  <td><a href="{artifacts_url}">files</a></td>
-  +  </tr>'
-  +
-  +# Render a first and last release build entry on the changeset page.
-  +firefox_release_entry = '<div class="firefoxreleasecsetentry">
-  +    <div>{channel|escape} {platform|escape}</div>
-  +    <div class="firefoxreleasecsetdetails">
-  +      {ifeq(revision, node, '{revision|short}', '<a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a>')}
-  +      /
-  +      {app_version|escape}
-  +      /
-  +      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
-  +      /
-  +      <a href="{artifacts_url}">files</a>
-  +    </div></div>'
-  +
-  +# Render a release build for this changeset.
-  +firefox_release_entry_here = '<div class="firefoxreleasecsetentry">
-  +    <div>{channel|escape} {platform|escape}</div>
-  +    <div class="firefoxreleasecsetdetails">
-  +      {app_version|escape}
-  +      /
-  +      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
-  +      {if(previousnode, '/
-  +      <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
-  +    </div></div>'
+   firefoxreleases = firefoxreleases.tmpl
+   firefoxreleasetableentry = '<tr id="{anchor|escape}" class="parity{parity}">
+     <td class="firefoxreleasefixed"><a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a></td>
+  @@ -394,3 +398,5 @@
+         {if(previousnode, '/
+         <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
+       </div></div>'
   +
   +repoinfo = repoinfo.tmpl
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:49:31 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:57:50 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -8,12 +8,12 @@
    <body>

@@ -1,0 +1,49 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548670 25200
+#      Wed Jul 25 12:57:50 2018 -0700
+# Node ID 63162c72e5cce871fb03f601209b9d9b7f59f25f
+# Parent  5a8c109d6634831cfc53e9443693303ccf294011
+hgtemplates: add firefox releases template entries
+
+diff --git a/hgtemplates/gitweb_mozilla/map b/hgtemplates/gitweb_mozilla/map
+--- a/hgtemplates/gitweb_mozilla/map
++++ b/hgtemplates/gitweb_mozilla/map
+@@ -360,3 +360,37 @@ diffoptsform = '
+     <span>At end of lines:</span>
+     <input id="ignorewseol-checkbox" type="checkbox" />
+   </form>'
++
++firefoxreleases = firefoxreleases.tmpl
++firefoxreleasetableentry = '<tr id="{anchor|escape}" class="parity{parity}">
++  <td class="firefoxreleasefixed"><a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a></td>
++  <td class="firefoxreleasefixed">{build_id|escape}</td>
++  <td>{channel|escape}</td>
++  <td>{platform|escape}</td>
++  <td>{app_version|escape}</td>
++  <td><a href="{artifacts_url}">files</a></td>
++  </tr>'
++
++# Render a first and last release build entry on the changeset page.
++firefox_release_entry = '<div class="firefoxreleasecsetentry">
++    <div>{channel|escape} {platform|escape}</div>
++    <div class="firefoxreleasecsetdetails">
++      {ifeq(revision, node, '{revision|short}', '<a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a>')}
++      /
++      {app_version|escape}
++      /
++      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
++      /
++      <a href="{artifacts_url}">files</a>
++    </div></div>'
++
++# Render a release build for this changeset.
++firefox_release_entry_here = '<div class="firefoxreleasecsetentry">
++    <div>{channel|escape} {platform|escape}</div>
++    <div class="firefoxreleasecsetdetails">
++      {app_version|escape}
++      /
++      <a href="{url|urlescape}firefoxreleases{sessionvars%urlparameter}#{anchor}">{build_id|escape}</a>
++      {if(previousnode, '/
++      <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
++    </div></div>'
