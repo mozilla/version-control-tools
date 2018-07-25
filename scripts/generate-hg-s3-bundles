@@ -167,7 +167,10 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
                 print('copying %s:%s to reset expiration time' % (bucket_name,
                                                                   remote_path))
                 key.copy_from(
-                    CopySource={'Bucket': bucket_name, 'Key': remote_path})
+                    CopySource={'Bucket': bucket_name, 'Key': remote_path},
+                    # This magic is needed to prevent S3 from complaining that
+                    # metadata wasn't updated as part of the copy.
+                    MetadataDirective='REPLACE')
                 print('copying %s:%s completed' % (bucket_name, remote_path))
             else:
                 print('uploading %s:%s from %s' % (bucket_name, remote_path,
