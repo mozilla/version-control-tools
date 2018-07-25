@@ -241,17 +241,6 @@ And compare what the patches produced versus what's in v-c-t
   $ hg commit -A -m 'v-c-t version'
 
   $ hg diff -c .
-  diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 14:00:43 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -69,7 +69,6 @@
-   <div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
-   
-   {diffoptsform}
-  -
-   <script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
-       renderDiffOptsForm();
-   </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 14:00:43 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
