@@ -7,6 +7,7 @@
 
 import pathlib
 import shutil
+import subprocess
 import sys
 
 
@@ -98,6 +99,27 @@ def main(source_templates, vct_templates_path, new_templates_path):
         dest = new_templates_path / f
         with dest.open('wb') as fh:
             fh.write(backups[f])
+
+    # We need to track all files in the destination so `hg import` below works.
+    # TODO we should perhaps be a bit more careful about committing in the case
+    # where new_templates_path == vct_templates_path.
+    subprocess.run(['hg', 'addremove', '.'],
+                   cwd=new_templates_path,
+                   check=True)
+    subprocess.run(['hg', 'commit', '-m', 'fresh templates'])
+
+    # Apply all our patches.
+    patch_dir = vct_templates_path / '.patches'
+
+    for p in sorted(patch_dir.iterdir()):
+        if p.suffix != '.patch':
+            continue
+
+        subprocess.run(['hg', 'import', str(p.resolve())],
+                       cwd=new_templates_path.parent,
+                       check=True)
+        sys.stderr.flush()
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':
