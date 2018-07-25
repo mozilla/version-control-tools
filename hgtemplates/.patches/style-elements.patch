@@ -1,0 +1,33 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548259 25200
+#      Wed Jul 25 12:50:59 2018 -0700
+# Node ID eb00cfd6ca6f9c7d30aa12beb6291050e8d06fe7
+# Parent  3aefbbb8a69243a03942582c1415d2c6a25ae4ff
+hgtemplates: add custom style elements to page header
+
+diff --git a/hgtemplates/gitweb_mozilla/header.tmpl b/hgtemplates/gitweb_mozilla/header.tmpl
+--- a/hgtemplates/gitweb_mozilla/header.tmpl
++++ b/hgtemplates/gitweb_mozilla/header.tmpl
+@@ -5,4 +5,21 @@
+ <link rel="icon" href="{staticurl|urlescape}hgicon.png" type="image/png" />
+ <meta name="robots" content="index, nofollow"/>
+ <link rel="stylesheet" href="{staticurl|urlescape}style-gitweb.css" type="text/css" />
++
++<style type="text/css">
++div.feed \{
++  float: right;
++}
++a img \{
++  border-width: 0px;
++}
++div.log_link \{
++  width: 80px;
++  background-color: white;
++}
++
++div.log_body \{
++  padding-left: 96px;
++}
++</style>
+ <script type="text/javascript" src="{staticurl|urlescape}mercurial.js"></script>
