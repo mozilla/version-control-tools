@@ -205,6 +205,8 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch missing-graph-link.patch
   applying patch from stdin
+  applying patch link-atom.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
@@ -222,7 +224,7 @@ And compare what the patches produced versus what's in v-c-t
 
   $ hg diff -c .
   diff -r * -r * hgtemplates/gitweb_mozilla/changelogentry.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,16 +1,15 @@
   -<div>
@@ -250,7 +252,7 @@ And compare what the patches produced versus what's in v-c-t
    
    </div>
   diff -r * -r * hgtemplates/gitweb_mozilla/changeset.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -307,7 +309,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="title_text">
    <table cellspacing="0">
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -327,7 +329,7 @@ And compare what the patches produced versus what's in v-c-t
        renderDiffOptsForm();
    </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -339,7 +341,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filelog.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,5 +1,5 @@
    {header}
@@ -357,17 +359,8 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -31,7 +31,7 @@
-   <a href="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> |
-   <a href="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
-   <a href="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}">comparison</a> |
-  -<a href="{url|urlescape}rss-log/tip/{file|urlescape}">rss</a> |
-  +<a href="{url|urlescape}atom-log/{symrev}/{file|urlescape}"><img src="{staticurl}livemarks16.png" alt="Feed" title="Feed of repository changes"/></a>
-   <a href="{url|urlescape}help{sessionvars%urlparameter}">help</a>
-   <br/>
-   {nav%filenav}
   diff -r * -r * hgtemplates/gitweb_mozilla/filerevision.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -388,7 +381,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="page_body">
    <pre class="sourcelines stripes"
   diff -r * -r * hgtemplates/gitweb_mozilla/footer.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/footer.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/footer.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/footer.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,5 +1,6 @@
    <div class="page_footer">
@@ -398,7 +391,7 @@ And compare what the patches produced versus what's in v-c-t
    <a href="{url|urlescape}rss-log">RSS</a>
    <a href="{url|urlescape}atom-log">Atom</a>
   diff -r * -r * hgtemplates/gitweb_mozilla/header.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/header.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/header.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,4 +5,21 @@
    <link rel="icon" href="{staticurl|urlescape}hgicon.png" type="image/png" />
@@ -423,7 +416,7 @@ And compare what the patches produced versus what's in v-c-t
   +</style>
    <script type="text/javascript" src="{staticurl|urlescape}mercurial.js"></script>
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,10 +5,10 @@
    
@@ -587,7 +580,7 @@ And compare what the patches produced versus what's in v-c-t
    {motd}
    </div>
   diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
-  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
   @@ -97,7 +97,7 @@
      <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
@@ -719,7 +712,7 @@ And compare what the patches produced versus what's in v-c-t
   +
   +repoinfo = repoinfo.tmpl
   diff -r * -r * hgtemplates/gitweb_mozilla/notfound.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/notfound.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/notfound.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -9,7 +9,7 @@
        <a href="{logourl}">
@@ -731,7 +724,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_body">
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:47:25 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:50:10 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -8,12 +8,12 @@
    <body>

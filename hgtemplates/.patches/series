@@ -4,3 +4,4 @@ json.patch
 logo.patch
 pushlog-header.patch
 missing-graph-link.patch
+link-atom.patch

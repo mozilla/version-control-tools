@@ -1,0 +1,20 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548210 25200
+#      Wed Jul 25 12:50:10 2018 -0700
+# Node ID 08aff3b516bd7a5809fe9ca0762e1836b5449d52
+# Parent  be2dae870e083c6aa9723dff4758dc6d739dd818
+hgtemplates: link to ATOM feed instead of RSS feed
+
+diff --git a/hgtemplates/gitweb_mozilla/filelog.tmpl b/hgtemplates/gitweb_mozilla/filelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/filelog.tmpl
++++ b/hgtemplates/gitweb_mozilla/filelog.tmpl
+@@ -26,7 +26,7 @@ revisions |
+ <a href="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> |
+ <a href="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
+ <a href="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}">comparison</a> |
+-<a href="{url|urlescape}rss-log/tip/{file|urlescape}">rss</a> |
++<a href="{url|urlescape}atom-log/{symrev}/{file|urlescape}"><img src="{staticurl}livemarks16.png" alt="Feed" title="Feed of repository changes"/></a>
+ <a href="{url|urlescape}help{sessionvars%urlparameter}">help</a>
+ <br/>
+ {nav%filenav}
