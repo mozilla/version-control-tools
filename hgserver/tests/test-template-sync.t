@@ -155,7 +155,6 @@ Run script to apply our templates changes
   adding static/style-gitweb.css
   adding static/style-paper.css
   adding static/style.css
-  applying */hgtemplates/.patches/atom.patch (glob)
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
@@ -194,11 +193,16 @@ Run script to apply our templates changes
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
   committing automated transformations
-  applying */hgtemplates/.patches/firefoxreleases.patch (glob)
+  applying patch atom.patch
+  applying patch from stdin
+  applying patch firefoxreleases.patch
+  applying patch from stdin
   patching file hgtemplates/json/map
   Hunk #1 succeeded at 54 with fuzz 2 (offset 17 lines).
-  applying */hgtemplates/.patches/json.patch (glob)
-  applying */hgtemplates/.patches/logo.patch (glob)
+  applying patch json.patch
+  applying patch from stdin
+  applying patch logo.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.

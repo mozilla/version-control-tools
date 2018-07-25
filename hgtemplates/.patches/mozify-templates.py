@@ -161,18 +161,31 @@ def main(source_templates, vct_templates_path, new_templates_path):
                    cwd=new_templates_path,
                    check=True)
 
-    # Apply all our patches.
+    # Apply all our patches. The order of patches is defined by a series
+    # file. Kinda like how MQ works.
     patch_dir = vct_templates_path / '.patches'
+    series = patch_dir / 'series'
 
-    for p in sorted(patch_dir.iterdir()):
-        if p.suffix != '.patch':
-            continue
+    with series.open('r') as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
 
-        subprocess.run(['hg', 'import', str(p.resolve())],
-                       cwd=new_templates_path.parent,
-                       check=True)
-        sys.stderr.flush()
-        sys.stdout.flush()
+            patch_path = patch_dir / line
+
+            with patch_path.open('rb') as fh:
+                patch = fh.read()
+
+            print('applying patch %s' % patch_path.name)
+            sys.stdout.flush()
+
+            subprocess.run(['hg', 'import', '-'],
+                           input=patch,
+                           cwd=new_templates_path.parent,
+                           check=True)
+            sys.stderr.flush()
+            sys.stdout.flush()
 
 
 if __name__ == '__main__':
