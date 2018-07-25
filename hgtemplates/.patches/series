@@ -3,3 +3,4 @@ firefoxreleases.patch
 json.patch
 logo.patch
 pushlog-header.patch
+missing-graph-link.patch

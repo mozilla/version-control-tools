@@ -1,0 +1,21 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548045 25200
+#      Wed Jul 25 12:47:25 2018 -0700
+# Node ID 39e98c260ac28638fc9bf1a73a827e02f380d516
+# Parent  871e3c14fca68d4a1c88fe6acf35d33efdf14c65
+hgtemplates: add graph link to error template
+
+This looks like an upstream deficiency...
+
+diff --git a/hgtemplates/gitweb_mozilla/error.tmpl b/hgtemplates/gitweb_mozilla/error.tmpl
+--- a/hgtemplates/gitweb_mozilla/error.tmpl
++++ b/hgtemplates/gitweb_mozilla/error.tmpl
+@@ -17,6 +17,7 @@
+ <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
+ <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
+ <a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
++<a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
+ <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
+ <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
+ <a href="{url|urlescape}branches{sessionvars%urlparameter}">branches</a> |
