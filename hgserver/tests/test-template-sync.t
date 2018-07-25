@@ -155,42 +155,41 @@ Run script to apply our templates changes
   adding static/style-gitweb.css
   adding static/style-paper.css
   adding static/style.css
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changelog.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changeset.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changelog.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changeset.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changeset.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/error.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/error.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/error.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/fileannotate.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/fileannotate.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filecomparison.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filecomparison.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filecomparison.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filediff.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filediff.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filediff.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filelog.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filelog.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filelog.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filerevision.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filerevision.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filerevision.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/graph.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/graph.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/graph.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/help.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/help.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/help.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/helptopics.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/helptopics.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/helptopics.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/index.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/manifest.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/manifest.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/manifest.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/notfound.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/search.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/notfound.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/search.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/search.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/shortlog.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/shortlog.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/shortlog.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/summary.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/summary.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/summary.tmpl
-  replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
+  replacing b'\n<a href="{logourl}" tit'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
   replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
   committing automated transformations
   applying patch atom.patch
@@ -244,14 +243,12 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 14:00:43 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -5,10 +5,10 @@
+  @@ -4,7 +4,11 @@
+   <body>
    
    <div class="page_header">
-       <div class="logo">
-  -    <a href="{logourl}">
-  -        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
-  -    </a>
-  -</div>
+  -    <a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
+  +    <div class="logo">
   +        <a href="{logourl}">
   +            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
   +        </a>

@@ -36,8 +36,8 @@ COPY_FILES = {
 
 REPLACEMENTS = [
     # Replace logo HTML.
-    (b'<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>',
-     b'<div class="logo">\n'
+    (b'\n<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>',
+     b'\n<div class="logo">\n'
      b'    <a href="{logourl}">\n'
      b'        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />\n'
      b'    </a>\n'
