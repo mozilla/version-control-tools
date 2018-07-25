@@ -134,11 +134,13 @@ HTML_ENTRY = '''
 
 def upload_to_s3(region_name, bucket_name, local_path, remote_path):
     """Upload a file to S3."""
+    session = boto3.Session(region_name=region_name)
+
     attempt = 0
     while attempt < 3:
         attempt += 1
         try:
-            c = boto3.resource('s3', region_name=region_name)
+            c = session.resource('s3')
 
             b = c.Bucket(bucket_name)
             key = b.Object(remote_path)
