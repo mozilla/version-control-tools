@@ -215,6 +215,8 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch notfound.patch
   applying patch from stdin
+  applying patch index.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
@@ -232,7 +234,7 @@ And compare what the patches produced versus what's in v-c-t
 
   $ hg diff -c .
   diff -r * -r * hgtemplates/gitweb_mozilla/changelogentry.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,16 +1,15 @@
   -<div>
@@ -260,7 +262,7 @@ And compare what the patches produced versus what's in v-c-t
    
    </div>
   diff -r * -r * hgtemplates/gitweb_mozilla/changeset.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -317,7 +319,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="title_text">
    <table cellspacing="0">
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -337,7 +339,7 @@ And compare what the patches produced versus what's in v-c-t
        renderDiffOptsForm();
    </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -349,7 +351,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filelog.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,5 +1,5 @@
    {header}
@@ -368,7 +370,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filerevision.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -389,7 +391,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="page_body">
    <pre class="sourcelines stripes"
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,10 +5,10 @@
    
@@ -406,154 +408,8 @@ And compare what the patches produced versus what's in v-c-t
        <a href="/">Mercurial</a> {pathdef%breadcrumb}
    </div>
    
-  @@ -16,13 +16,144 @@
-       <tr>
-           <td><a href="?sort={sort_name}">Name</a></td>
-           <td><a href="?sort={sort_description}">Description</a></td>
-  -        <td><a href="?sort={sort_contact}">Contact</a></td>
-           <td><a href="?sort={sort_lastchange}">Last modified</a></td>
-           <td>&nbsp;</td>
-           <td>&nbsp;</td>
-       </tr>
-       {entries%indexentry}
-   </table>
-  +&nbsp;
-  +&nbsp;
-  +&nbsp;
-  +<div class="title">
-  +     Repository Layout
-  +</div>
-  +<table cellspacing="0">
-  +    <tr>
-  +        <td><a href="/">/</a></td>
-  +        <td>Mozilla top level repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/automation">automation</a></td>
-  +        <td>QA automation projects</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/build">build</a></td>
-  +        <td>Build team projects</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/experimental">experimental</a></td>
-  +        <td>Playground for version control wizards</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/hgcustom">hgcustom</a></td>
-  +        <td>Mercurial customizations</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/incubator">incubator</a></td>
-  +        <td>Incubator projects</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/l10n">l10n</a></td>
-  +        <td>L10n infrastructure projects</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/l10n-central">l10n-central</a></td>
-  +        <td>L10n repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/gaia-l10n">gaia-l10n</a></td>
-  +        <td>Gaia L10n repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/labs">labs</a></td>
-  +        <td>Mozilla <a href="http://labs.mozilla.com/">labs</a> projects</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/projects">projects</a></td>
-  +        <td>Miscellaneous project repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/qa">qa</a></td>
-  +        <td>QA projects and functional test repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/integration">integration</a></td>
-  +        <td>Source code integration work</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases">releases</a></td>
-  +        <td>Release branches (use releases/l10n-branchname for l10n repos)</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v1_2">releases/gaia-l10n/v1_2</a></td>
-  +        <td>Gaia l10n v1_2 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v1_3">releases/gaia-l10n/v1_3</a></td>
-  +        <td>Gaia l10n v1_3 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v1_4">releases/gaia-l10n/v1_4</a></td>
-  +        <td>Gaia l10n v1_4 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v2_0">releases/gaia-l10n/v2_0</a></td>
-  +        <td>Gaia l10n v2_0 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v2_1">releases/gaia-l10n/v2_1</a></td>
-  +        <td>Gaia l10n v2_1 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v2_2">releases/gaia-l10n/v2_2</a></td>
-  +        <td>Gaia l10n v2_2 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/gaia-l10n/v2_5">releases/gaia-l10n/v2_5</a></td>
-  +        <td>Gaia l10n v2_5 repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/l10n/mozilla-aurora">releases/l10n/mozilla-aurora</a></td>
-  +        <td>Aurora l10n repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/l10n/mozilla-beta">releases/l10n/mozilla-beta</a></td>
-  +        <td>Beta l10n repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/releases/l10n/mozilla-release">releases/l10n/mozilla-release</a></td>
-  +        <td>Release l10n repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/rewriting-and-analysis">rewriting-and-analysis</a></td>
-  +        <td>Rewriting &amp; Analysis</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/SeaMonkey">SeaMonkey</a></td>
-  +        <td>The SeaMonkey Project</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/services">services</a></td>
-  +        <td>Code related to Mozilla services projects (Firefox sync, etc..)</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/users">users</a></td>
-  +        <td>User code repositories</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/weave-l10n">weave-l10n</a></td>
-  +        <td>l10n repos for weave code</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/webtools">webtools</a></td>
-  +        <td>Webtool projects like mxr, etc</td>
-  +    </tr>
-  +    <tr>
-  +        <td><a href="/www">www</a></td>
-  +        <td>Code related to various mozilla websites</td>
-  +    </tr>
-  +</table>
-   <div class="page_footer">
-   {motd}
-   </div>
   diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
-  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
   @@ -97,7 +97,7 @@
      <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
@@ -685,7 +541,7 @@ And compare what the patches produced versus what's in v-c-t
   +
   +repoinfo = repoinfo.tmpl
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:52:19 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:49:31 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -8,12 +8,12 @@
    <body>

@@ -1,0 +1,159 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548171 25200
+#      Wed Jul 25 12:49:31 2018 -0700
+# Node ID be2dae870e083c6aa9723dff4758dc6d739dd818
+# Parent  6cc127c38c45762ad47401558ad73fba8995f607
+hgtemplates: index page changes
+
+We've changed the index page in various ways.
+
+diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/index.tmpl
+--- a/hgtemplates/gitweb_mozilla/index.tmpl
++++ b/hgtemplates/gitweb_mozilla/index.tmpl
+@@ -12,13 +12,144 @@
+     <tr>
+         <td><a href="?sort={sort_name}">Name</a></td>
+         <td><a href="?sort={sort_description}">Description</a></td>
+-        <td><a href="?sort={sort_contact}">Contact</a></td>
+         <td><a href="?sort={sort_lastchange}">Last modified</a></td>
+         <td>&nbsp;</td>
+         <td>&nbsp;</td>
+     </tr>
+     {entries%indexentry}
+ </table>
++&nbsp;
++&nbsp;
++&nbsp;
++<div class="title">
++     Repository Layout
++</div>
++<table cellspacing="0">
++    <tr>
++        <td><a href="/">/</a></td>
++        <td>Mozilla top level repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/automation">automation</a></td>
++        <td>QA automation projects</td>
++    </tr>
++    <tr>
++        <td><a href="/build">build</a></td>
++        <td>Build team projects</td>
++    </tr>
++    <tr>
++        <td><a href="/experimental">experimental</a></td>
++        <td>Playground for version control wizards</td>
++    </tr>
++    <tr>
++        <td><a href="/hgcustom">hgcustom</a></td>
++        <td>Mercurial customizations</td>
++    </tr>
++    <tr>
++        <td><a href="/incubator">incubator</a></td>
++        <td>Incubator projects</td>
++    </tr>
++    <tr>
++        <td><a href="/l10n">l10n</a></td>
++        <td>L10n infrastructure projects</td>
++    </tr>
++    <tr>
++        <td><a href="/l10n-central">l10n-central</a></td>
++        <td>L10n repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/gaia-l10n">gaia-l10n</a></td>
++        <td>Gaia L10n repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/labs">labs</a></td>
++        <td>Mozilla <a href="http://labs.mozilla.com/">labs</a> projects</td>
++    </tr>
++    <tr>
++        <td><a href="/projects">projects</a></td>
++        <td>Miscellaneous project repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/qa">qa</a></td>
++        <td>QA projects and functional test repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/integration">integration</a></td>
++        <td>Source code integration work</td>
++    </tr>
++    <tr>
++        <td><a href="/releases">releases</a></td>
++        <td>Release branches (use releases/l10n-branchname for l10n repos)</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v1_2">releases/gaia-l10n/v1_2</a></td>
++        <td>Gaia l10n v1_2 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v1_3">releases/gaia-l10n/v1_3</a></td>
++        <td>Gaia l10n v1_3 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v1_4">releases/gaia-l10n/v1_4</a></td>
++        <td>Gaia l10n v1_4 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v2_0">releases/gaia-l10n/v2_0</a></td>
++        <td>Gaia l10n v2_0 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v2_1">releases/gaia-l10n/v2_1</a></td>
++        <td>Gaia l10n v2_1 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v2_2">releases/gaia-l10n/v2_2</a></td>
++        <td>Gaia l10n v2_2 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/gaia-l10n/v2_5">releases/gaia-l10n/v2_5</a></td>
++        <td>Gaia l10n v2_5 repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/l10n/mozilla-aurora">releases/l10n/mozilla-aurora</a></td>
++        <td>Aurora l10n repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/l10n/mozilla-beta">releases/l10n/mozilla-beta</a></td>
++        <td>Beta l10n repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/releases/l10n/mozilla-release">releases/l10n/mozilla-release</a></td>
++        <td>Release l10n repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/rewriting-and-analysis">rewriting-and-analysis</a></td>
++        <td>Rewriting &amp; Analysis</td>
++    </tr>
++    <tr>
++        <td><a href="/SeaMonkey">SeaMonkey</a></td>
++        <td>The SeaMonkey Project</td>
++    </tr>
++    <tr>
++        <td><a href="/services">services</a></td>
++        <td>Code related to Mozilla services projects (Firefox sync, etc..)</td>
++    </tr>
++    <tr>
++        <td><a href="/users">users</a></td>
++        <td>User code repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/weave-l10n">weave-l10n</a></td>
++        <td>l10n repos for weave code</td>
++    </tr>
++    <tr>
++        <td><a href="/webtools">webtools</a></td>
++        <td>Webtool projects like mxr, etc</td>
++    </tr>
++    <tr>
++        <td><a href="/www">www</a></td>
++        <td>Code related to various mozilla websites</td>
++    </tr>
++</table>
+ <div class="page_footer">
+ {motd}
+ </div>
