@@ -1,0 +1,22 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548415 25200
+#      Wed Jul 25 12:53:35 2018 -0700
+# Node ID 5a8c109d6634831cfc53e9443693303ccf294011
+# Parent  eb00cfd6ca6f9c7d30aa12beb6291050e8d06fe7
+hgtemplates: remove description and owner from summary page
+
+diff --git a/hgtemplates/gitweb_mozilla/summary.tmpl b/hgtemplates/gitweb_mozilla/summary.tmpl
+--- a/hgtemplates/gitweb_mozilla/summary.tmpl
++++ b/hgtemplates/gitweb_mozilla/summary.tmpl
+@@ -29,8 +29,8 @@ summary |
+ 
+ <div class="title">&nbsp;</div>
+ <table cellspacing="0">
+-<tr><td>description</td><td>{desc}</td></tr>
+-<tr><td>owner</td><td>{owner|obfuscate}</td></tr>
++<!--<tr><td>description</td><td>{desc}</td></tr>
++<tr><td>owner</td><td>{owner|obfuscate}</td></tr>-->
+ <tr><td>last change</td><td class="date age">{lastchange|rfc822date}</td></tr>
+ </table>
+ 
