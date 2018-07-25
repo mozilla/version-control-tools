@@ -42,7 +42,23 @@ REPLACEMENTS = [
      b'        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />\n'
      b'    </a>\n'
      b'</div>'),
+
+    # Insert pushlog link in page header.
+    (b'<a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |\n',
+     b'<a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |\n'
+     b'<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |\n'),
+
+    (b'<a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |\n',
+     b'<a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |\n'
+     b'<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |\n'),
 ]
+
+# Files in gitweb_mozilla where REPLACEMENTS should not apply.
+GITWEB_IGNORE_REPLACEMENTS = {
+    'firefoxreleases.tmpl',
+    'pushlog.tmpl',
+    'repoinfo.tmpl',
+}
 
 
 def main(source_templates, vct_templates_path, new_templates_path):
@@ -134,6 +150,9 @@ def main(source_templates, vct_templates_path, new_templates_path):
     # Change the logo URL.
     for f in sorted(gitweb_mozilla.iterdir()):
         if f.suffix != '.tmpl':
+            continue
+
+        if f.name in GITWEB_IGNORE_REPLACEMENTS:
             continue
 
         with f.open('rb') as fh:

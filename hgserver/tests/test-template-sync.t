@@ -162,25 +162,42 @@ Run script to apply our templates changes
   applying */hgtemplates/.patches/json.patch (glob)
   applying */hgtemplates/.patches/logo.patch (glob)
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/bookmarks.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/branches.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changelog.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changeset.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/changeset.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/error.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/error.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/fileannotate.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filecomparison.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filecomparison.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filediff.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filediff.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filelog.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filelog.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filerevision.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/filerevision.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/graph.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/graph.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/help.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/help.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/helptopics.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/helptopics.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/index.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/manifest.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/manifest.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/notfound.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/search.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/search.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/shortlog.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/shortlog.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/summary.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/summary.tmpl
   replacing b'<a href="{logourl}" titl'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
+  replacing b'<a href="{url|urlescape}'... in $TESTTMP/templates/hgtemplates/gitweb_mozilla/tags.tmpl
   committing automated transformations
 
 And replace the working directory with what is in this repository, modulo the
@@ -198,28 +215,6 @@ And compare what the patches produced versus what's in v-c-t
   $ hg commit -A -m 'v-c-t version'
 
   $ hg diff -c .
-  diff -r * -r * hgtemplates/gitweb_mozilla/bookmarks.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   bookmarks |
-  diff -r * -r * hgtemplates/gitweb_mozilla/branches.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/changelog.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -271,15 +266,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog/{symrev}{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph/{symrev}{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -33,14 +34,13 @@
+  @@ -34,14 +34,13 @@
    {searchform}
    </div>
    
@@ -298,7 +285,7 @@ And compare what the patches produced versus what's in v-c-t
    <tr><td>author</td><td>{author|obfuscate}</td></tr>
    <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
    {branch%changesetbranch}
-  @@ -51,9 +51,24 @@
+  @@ -52,9 +51,24 @@
    {if(obsolete, '<tr><td>obsolete</td><td>{succsandmarkers%obsfateentry}</td></tr>')}
    {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
    {child%changesetchild}
@@ -327,11 +314,10 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/error.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,8 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
+  @@ -22,6 +22,7 @@
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
+   <a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
   +<a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
    <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
    <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
@@ -348,15 +334,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -68,7 +69,6 @@
+  @@ -69,7 +69,6 @@
    <div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
    
    {diffoptsform}
@@ -364,17 +342,6 @@ And compare what the patches produced versus what's in v-c-t
    <script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
        renderDiffOptsForm();
    </script>
-  diff -r * -r * hgtemplates/gitweb_mozilla/filecomparison.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -387,14 +354,6 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/filelog.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -414,15 +373,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -30,7 +31,7 @@
+  @@ -31,7 +31,7 @@
    <a href="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> |
    <a href="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
    <a href="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}">comparison</a> |
@@ -443,15 +394,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -65,7 +66,7 @@
+  @@ -66,7 +66,7 @@
    </table>
    </div>
    
@@ -470,17 +413,6 @@ And compare what the patches produced versus what's in v-c-t
    <div class="rss_logo">
    <a href="{url|urlescape}rss-log">RSS</a>
    <a href="{url|urlescape}atom-log">Atom</a>
-  diff -r * -r * hgtemplates/gitweb_mozilla/graph.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog/{symrev}{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   graph |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/header.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -506,28 +438,6 @@ And compare what the patches produced versus what's in v-c-t
   +}
   +</style>
    <script type="text/javascript" src="{staticurl|urlescape}mercurial.js"></script>
-  diff -r * -r * hgtemplates/gitweb_mozilla/help.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  diff -r * -r * hgtemplates/gitweb_mozilla/helptopics.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -692,17 +602,6 @@ And compare what the patches produced versus what's in v-c-t
    <div class="page_footer">
    {motd}
    </div>
-  diff -r * -r * hgtemplates/gitweb_mozilla/manifest.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
   --- a/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
@@ -855,28 +754,6 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_body">
-  diff -r * -r * hgtemplates/gitweb_mozilla/search.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  diff -r * -r * hgtemplates/gitweb_mozilla/shortlog.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   shortlog |
-   <a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph/{symrev}{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
@@ -899,15 +776,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
    <div class="page_nav">
-  @@ -21,6 +21,7 @@
-   summary |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -33,8 +34,8 @@
+  @@ -34,8 +34,8 @@
    
    <div class="title">&nbsp;</div>
    <table cellspacing="0">
@@ -918,17 +787,6 @@ And compare what the patches produced versus what's in v-c-t
    <tr><td>last change</td><td class="date age">{lastchange|rfc822date}</td></tr>
    </table>
    
-  diff -r * -r * hgtemplates/gitweb_mozilla/tags.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  +++ b/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -21,6 +21,7 @@
-   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
-   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
-   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
-  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
-   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
-   tags |
-   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/json/map (glob)
   --- a/hgtemplates/json/map	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/json/map	Thu Jan 01 00:00:00 1970 +0000
