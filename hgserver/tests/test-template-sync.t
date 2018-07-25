@@ -364,6 +364,17 @@ And compare what the patches produced versus what's in v-c-t
    <script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
        renderDiffOptsForm();
    </script>
+  diff -r * -r * hgtemplates/gitweb_mozilla/filecomparison.tmpl (glob)
+  --- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
+  +++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
+  @@ -21,6 +21,7 @@
+   <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
+   <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
+   <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
+  +<a href="{url|urlescape}pushloghtml{sessionvars%urlparameter}">pushlog</a> |
+   <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
+   <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
+   <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
