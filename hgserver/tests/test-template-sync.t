@@ -219,6 +219,8 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch firefoxreleases2.patch
   applying patch from stdin
+  applying patch changeset-metadata.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
@@ -235,93 +237,8 @@ And compare what the patches produced versus what's in v-c-t
   $ hg commit -A -m 'v-c-t version'
 
   $ hg diff -c .
-  diff -r * -r * hgtemplates/gitweb_mozilla/changelogentry.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Wed Jul 25 12:57:50 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,16 +1,15 @@
-  -<div>
-  - <a class="title" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
-  -  <span class="age">{date|rfc822date}</span>
-  -  {desc|strip|firstline|escape|nonempty}
-  -  {alltags}
-  - </a>
-  +<div class="title">
-  +{node|short}: {desc|strip|firstline|escape}
-  +{alltags}
-   </div>
-   <div class="title_text">
-   <div class="log_link">
-  -<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a><br/>
-  +<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">diff</a><br/>
-  +<a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a>
-   </div>
-  -<i>{author|obfuscate} [{date|rfc822date}] rev {rev}</i><br/>
-  +<cite>{author|obfuscate}</cite> - {date|rfc822date} - rev {rev}<br/>
-  +{if(pushid, 'Push <a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a> by {pushuser|escape} at {pushdate|isodate}<br />')}
-   </div>
-  -<div class="log_body description">{desc|strip|escape|websub|nonempty}
-  +<div class="log_body description">{desc|strip|escape|mozlink}
-   
-   </div>
-  diff -r * -r * hgtemplates/gitweb_mozilla/changeset.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Wed Jul 25 12:57:50 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -13,7 +13,7 @@
-           <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
-       </a>
-   </div>
-  -<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset
-  +<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset / {node|short} {if(backedoutbynode, '&#x2620;')}
-   </div>
-   
-   <div class="page_nav">
-  @@ -34,14 +34,13 @@
-   {searchform}
-   </div>
-   
-  -<div>
-  - <a class="title" href="{url|urlescape}raw-rev/{node|short}">
-  -  {desc|strip|escape|firstline|nonempty}
-  -  {alltags}
-  - </a>
-  +<div class="title">
-  +{desc|strip|escape|mozlink|firstline|nonempty}
-  +{alltags}
-   </div>
-   <div class="title_text">
-   <table cellspacing="0">
-  +{if(backedoutbynode, '<tr><td colspan="2" style="background:#ff3333;"><strong>&#x2620;&#x2620; backed out by <a style="font-family: monospace" href="{url|urlescape}rev/{backedoutbynode|short}">{backedoutbynode|short}</a> &#x2620; &#x2620;</strong></td></tr>')}
-   <tr><td>author</td><td>{author|obfuscate}</td></tr>
-   <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
-   {branch%changesetbranch}
-  @@ -52,9 +51,24 @@
-   {if(obsolete, '<tr><td>obsolete</td><td>{succsandmarkers%obsfateentry}</td></tr>')}
-   {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
-   {child%changesetchild}
-  +<tr><td>push id</td><td>{if(pushid, '<a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a>', 'unknown')}</td></tr>
-  +<tr><td>push user</td><td>{if(pushuser, pushuser|escape, 'unknown')}</td></tr>
-  +<tr><td>push date</td><td>{if(pushdate, pushdate|isodate, 'unknown')}</td></tr>
-  +{if(convertsourcepath, '<tr><td>converted from</td><td><a href="{convertsourcepath}/rev/{convertsourcenode}">{convertsourcenode}</a></td></tr>')}
-  +{if(treeherderrepourl, if(pushhead, '<tr><td>treeherder</td><td>{treeherderrepo|escape}@{pushhead|short} [<a href="{treeherderrepourl}&revision={pushhead}">default view</a>] [<a href="{treeherderrepourl}&revision={pushhead}&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>'))}
-  +{if(perfherderurl, '<tr><td>perfherder</td><td>[<a href="{perfherderurl}&framework=1" target="_blank">talos</a>] [<a href="{perfherderurl}&framework=2" target="_blank">build metrics</a>] [<a href="{perfherderurl}&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>')}
-  +{if(reviewers, '<tr><td>reviewers</td><td>{join(reviewers%reviewerlink, ", ")}</td></tr>')}
-  +{if(bugs, '<tr><td>bugs</td><td>{join(bugs%bughyperlink, ", ")}</td></tr>')}
-  +{if(milestone, '<tr><td>milestone</td><td>{milestone|escape}</td></tr>')}
-  +{if(backsoutnodes, '<tr><td>backs out</td><td>{join(backsoutnodes%backedoutnodelink, "<br />")}</td></tr>')}
-  +{if(have_first_and_last_firefox_releases, '
-  +  <tr><td>first release with</td><td><div>{firefox_releases_first % firefox_release_entry}</div></td></tr>
-  +  <tr><td>last release without</td><td><div>{firefox_releases_last % firefox_release_entry}</div></td></tr>
-  +  ')}
-  +{if(firefox_releases_here, '<tr><td>releases</td><td><div>{firefox_releases_here % firefox_release_entry_here}</div></td></tr>')}
-   </table></div>
-   
-  -<div class="page_body description">{desc|strip|escape|websub|nonempty}</div>
-  +<div class="page_body description">{desc|strip|escape|mozlink}</div>
-   <div class="list_head"></div>
-   <div class="title_text">
-   <table cellspacing="0">
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -341,7 +258,7 @@ And compare what the patches produced versus what's in v-c-t
        renderDiffOptsForm();
    </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -353,7 +270,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filelog.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -1,5 +1,5 @@
    {header}
@@ -372,7 +289,7 @@ And compare what the patches produced versus what's in v-c-t
    
    <div class="page_nav">
   diff -r * -r * hgtemplates/gitweb_mozilla/filerevision.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -13,7 +13,7 @@
            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
@@ -393,7 +310,7 @@ And compare what the patches produced versus what's in v-c-t
    <div class="page_body">
    <pre class="sourcelines stripes"
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,10 +5,10 @@
    
@@ -411,7 +328,7 @@ And compare what the patches produced versus what's in v-c-t
    </div>
    
   diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
-  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
   @@ -97,7 +97,7 @@
      <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
@@ -516,7 +433,7 @@ And compare what the patches produced versus what's in v-c-t
   +
   +repoinfo = repoinfo.tmpl
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 12:57:50 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 13:59:39 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -8,12 +8,12 @@
    <body>
