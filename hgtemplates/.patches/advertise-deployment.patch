@@ -1,0 +1,18 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548231 25200
+#      Wed Jul 25 12:50:31 2018 -0700
+# Node ID 3aefbbb8a69243a03942582c1415d2c6a25ae4ff
+# Parent  08aff3b516bd7a5809fe9ca0762e1836b5449d52
+hgtemplates: advertise deployment info in footer
+
+diff --git a/hgtemplates/gitweb_mozilla/footer.tmpl b/hgtemplates/gitweb_mozilla/footer.tmpl
+--- a/hgtemplates/gitweb_mozilla/footer.tmpl
++++ b/hgtemplates/gitweb_mozilla/footer.tmpl
+@@ -1,5 +1,6 @@
+ <div class="page_footer">
+ <div class="page_footer_text">{repo|escape}</div>
++<div class="page_footer_text" style="padding-left: 10px">Deployed from <a href="https://hg.mozilla.org/hgcustom/version-control-tools/rev/VCTNODE">VCTNODE</a> at DEPLOYDATE.</div>
+ <div class="rss_logo">
+ <a href="{url|urlescape}rss-log">RSS</a>
+ <a href="{url|urlescape}atom-log">Atom</a>

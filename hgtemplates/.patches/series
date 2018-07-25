@@ -6,3 +6,4 @@ pushlog-header.patch
 missing-graph-link.patch
 link-atom.patch
 style-elements.patch
+advertise-deployment.patch
