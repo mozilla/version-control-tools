@@ -1,0 +1,20 @@
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548339 25200
+#      Wed Jul 25 12:52:19 2018 -0700
+# Node ID 8cdc0d9c58e9a23f95cb48637a81c9d18e16bde4
+# Parent  808e83fd09cf033c855b4ac19adc3a3754c71d6a
+hgtemplates: remove repo name from not found
+
+diff --git a/hgtemplates/gitweb_mozilla/notfound.tmpl b/hgtemplates/gitweb_mozilla/notfound.tmpl
+--- a/hgtemplates/gitweb_mozilla/notfound.tmpl
++++ b/hgtemplates/gitweb_mozilla/notfound.tmpl
+@@ -9,7 +9,7 @@
+     <a href="{logourl}">
+         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+     </a>
+-</div> Not found: {repo|escape}
++</div>
+ </div>
+ 
+ <div class="page_body">
