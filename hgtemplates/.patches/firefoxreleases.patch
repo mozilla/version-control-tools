@@ -2,44 +2,14 @@
 # User Gregory Szorc <gps@mozilla.com>
 # Date 1527627624 25200
 #      Tue May 29 14:00:24 2018 -0700
-# Node ID 64673c8301326b7df55051781725e971ab94675a
-# Parent  82b0f3ebaf5c37e97a2dbb211625735cffc59d1e
+# Node ID c779cbf60109390ebb9a387050101308a11c8912
+# Parent  038e346c227f73ede822b38661a8292d96dd00b0
 hgtemplates: add firefox releases
 
-diff --git a/hgtemplates/json/map b/hgtemplates/json/map
---- a/hgtemplates/json/map
-+++ b/hgtemplates/json/map
-@@ -35,7 +35,9 @@ changelistentry = '\{
-   "user": {author|utf8|json},
-   "phase": {phase|json},
-   "parents": [{if(allparents, join(allparents%changesetparent, ", "),
--                  join(parent%changesetparent, ", "))}]
-+                  join(parent%changesetparent, ", "))}],
-+  "pushid": {pushid|json},
-+  "pushdate": {pushdate|json}
-   }'
- changelistentryname = '{name|utf8|json}'
- changeset = '\{
-@@ -224,3 +226,15 @@ indexentry = '\{
-   "lastchange": {lastchange|json},
-   "labels": {labels|json}
-   }'
-+
-+firefoxreleases = '\{
-+  "builds": [{join(releases%firefoxreleasebuild, ", ")}]
-+  }'
-+firefoxreleasebuild = '\{
-+  "node": {revision|json},
-+  "buildid": {build_id|json},
-+  "channel": {channel|json},
-+  "platform": {platform|json},
-+  "app_version": {app_version|json},
-+  "files_url": {artifacts_url|json}
-+  }'
 diff --git a/hgtemplates/static/style-gitweb.css b/hgtemplates/static/style-gitweb.css
 --- a/hgtemplates/static/style-gitweb.css
 +++ b/hgtemplates/static/style-gitweb.css
-@@ -398,3 +398,17 @@ ul#graphnodes li .info {
+@@ -403,3 +403,17 @@ ul#graphnodes li .info {
  #doc {
      margin: 0 8px;
  }

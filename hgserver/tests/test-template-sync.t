@@ -197,8 +197,6 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch firefoxreleases.patch
   applying patch from stdin
-  patching file hgtemplates/json/map
-  Hunk #1 succeeded at 54 with fuzz 2 (offset 17 lines).
   applying patch json.patch
   applying patch from stdin
   applying patch logo.patch
@@ -774,48 +772,6 @@ And compare what the patches produced versus what's in v-c-t
    <tr><td>last change</td><td class="date age">{lastchange|rfc822date}</td></tr>
    </table>
    
-  diff -r * -r * hgtemplates/json/map (glob)
-  --- a/hgtemplates/json/map	Wed Jul 25 12:45:22 2018 -0700
-  +++ b/hgtemplates/json/map	Thu Jan 01 00:00:00 1970 +0000
-  @@ -68,7 +68,9 @@
-     "user": {author|utf8|json},
-     "phase": {phase|json},
-     "parents": [{if(allparents, join(allparents%changesetparent, ", "),
-  -                  join(parent%changesetparent, ", "))}]
-  +                  join(parent%changesetparent, ", "))}],
-  +  "pushid": {pushid|json},
-  +  "pushdate": {pushdate|json}
-     }'
-   graphentry = '\{
-     "node": {node|json},
-  @@ -84,9 +86,7 @@
-     "color": {color|json},
-     "edges": {edges|json},
-     "parents": [{if(allparents, join(allparents%changesetparent, ", "),
-  -                  join(parent%changesetparent, ", "))}],
-  -  "pushid": {pushid|json},
-  -  "pushdate": {pushdate|json}
-  +                  join(parent%changesetparent, ", "))}]
-     }'
-   changelistentryname = '{name|utf8|json}'
-   changeset = '\{
-  @@ -102,7 +102,8 @@
-     "phase": {phase|json},
-     "pushid": {pushid|json},
-     "pushdate": {pushdate|json},
-  -  "pushuser": {pushuser|json}
-  +  "pushuser": {pushuser|json},
-  +  "landingsystem": {if(landingsystem, landingsystem|json, "null")}
-     }'
-   changesetbranch = '{name|utf8|json}'
-   changesetbookmark = '{bookmark|utf8|json}'
-  @@ -290,3 +291,6 @@
-     "app_version": {app_version|json},
-     "files_url": {artifacts_url|json}
-     }'
-  +repoinfo = '\{
-  +  "group_owner": {groupowner|json}
-  +  }'
 
 Produce a patch file with differences so we can more easily turn them into
 patches.
