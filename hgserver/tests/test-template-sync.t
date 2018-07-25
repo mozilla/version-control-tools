@@ -223,6 +223,8 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch filename-links.patch
   applying patch from stdin
+  applying patch misc.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
@@ -240,7 +242,7 @@ And compare what the patches produced versus what's in v-c-t
 
   $ hg diff -c .
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 14:00:15 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Wed Jul 25 14:00:43 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -69,7 +69,6 @@
    <div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
@@ -251,7 +253,7 @@ And compare what the patches produced versus what's in v-c-t
        renderDiffOptsForm();
    </script>
   diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 14:00:15 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 14:00:43 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -5,10 +5,10 @@
    
@@ -268,113 +270,8 @@ And compare what the patches produced versus what's in v-c-t
        <a href="/">Mercurial</a> {pathdef%breadcrumb}
    </div>
    
-  diff -r * -r * hgtemplates/gitweb_mozilla/map (glob)
-  --- a/hgtemplates/gitweb_mozilla/map	Wed Jul 25 14:00:15 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
-  @@ -97,7 +97,7 @@
-     <a href="#{lineid}"></a><span id="{lineid}">{strip(line|escape, '\r\n')}</span>'
-   annotateline = '
-     <tr id="{lineid}" style="font-family:monospace" class="parity{parity}{ifeq(node, originalnode, ' thisrev')}">
-  -    <td class="annotate linenr parity{blockparity}" style="text-align: right;">
-  +    <td class="annotate parity{blockparity}" style="text-align: right;">
-         {if(blockhead,
-             '<a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}">
-                {rev}
-  @@ -106,7 +106,7 @@
-           <div>
-             <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#l{targetline}">
-               {node|short}</a>
-  -          {desc|escape|firstline}
-  +          {desc|escape|mozlink|firstline}
-           </div>
-           <div><em>{author|obfuscate}</em></div>
-           <div>parents: {parents%annotateparent}</div>
-  @@ -279,34 +279,34 @@
-   obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}'
-   shortlogentry = '
-     <tr class="parity{parity}">
-  -    <td class="age"><i class="age">{date|rfc822date}</i></td>
-  -    <td><i>{author|person}</i></td>
-  +    <td class="link">
-  +      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">diff</a><br/>
-  +      <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a>
-  +    </td>
-  +    <td>{node|short}<br/><i class="age">{date|isodate}</i></td>
-       <td>
-  -      <a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
-  -        <b>{desc|strip|firstline|escape|nonempty}</b>
-  -        {alltags}
-  -      </a>
-  -    </td>
-  -    <td class="link" nowrap>
-  -      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">changeset</a> |
-  -      <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">files</a>
-  +      <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
-  +      {alltags}
-       </td>
-     </tr>'
-  +pushinfo = '<cite>{user}<br/><span class="date">{date|date}</span></cite>'
-  +mergehidden = '<br/>\xe2\x86\x90 {count} merge changesets <a class="expand hideid{id}" href="#">[Collapse]</a>' (esc)
-  +pushlogentry = '<tr class="pushlogentry parity{parity} {hidden} id{id}"><td>{push%pushinfo}</td><td><a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td><td><strong>{author|person} &mdash; {desc|strip|escape|mozlink|firstline|addbreaks}</strong> <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>{mergerollup%mergehidden}</td></tr>\n'
-   filelogentry = '
-     <tr class="parity{if(patch, '1', '{parity}')}">
-  -    <td class="age"><i class="age">{date|rfc822date}</i></td>
-  +    <td class="link">
-  +      <a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">diff</a><br/>
-  +      <a href="{url|urlescape}file/{node|short}{sessionvars%urlparameter}">browse</a><br/>
-  +      <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a>
-  +    </td>
-  +    <td>
-  +      {node|short}<br/>created <i>{date|isodate}</i>{rename%filelogrename}
-  +      {if(pushdate, '<br/>pushed <i>{pushdate|isodate}</i>', '<br/>pushed <i>unknown</i>')}
-  +    </td>
-       <td><i>{author|person}</i></td>
-       <td>
-  -      <a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">
-  -        <b>{desc|strip|firstline|escape|nonempty}</b>
-  -        {alltags}
-  -      </a>
-  -    </td>
-  -    <td class="link">
-  -      <a href="{url|urlescape}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">file</a> |
-  -      <a href="{url|urlescape}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
-  -      <a href="{url|urlescape}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a>
-  -      {rename%filelogrename}
-  +      <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
-  +      {alltags}
-       </td>
-     </tr>
-     {if(patch, '<tr><td colspan="4">{diff}</td></tr>')}'
-  @@ -319,8 +319,7 @@
-         </a>
-       </td>
-       <td>{description}</td>
-  -    <td>{contact|obfuscate}</td>
-  -    <td class="age">{lastchange|rfc822date}</td>
-  +    <td class="age">at {lastchange|rfc3339date}</td>
-       <td class="indexlinks">{archives%indexarchiveentry}</td>
-       <td>{if(isdirectory, '',
-               '<div class="rss_logo">
-  @@ -361,6 +360,11 @@
-       <input id="ignorewseol-checkbox" type="checkbox" />
-     </form>'
-   
-  +pushlog = pushlog.tmpl
-  +bughyperlink = '<a href="{url}">{no|escape}</a>'
-  +reviewerlink = '<a href="{url|urlescape}log?rev={revset|urlescape}&revcount=50">{name|escape}</a>'
-  +backedoutnodelink = '<a style="font-family: monospace" href="{url|urlescape}rev/{node|short}">{node|short}</a>'
-  +
-   firefoxreleases = firefoxreleases.tmpl
-   firefoxreleasetableentry = '<tr id="{anchor|escape}" class="parity{parity}">
-     <td class="firefoxreleasefixed"><a href="{url|urlescape}rev/{revision}{sessionvars%urlparameter}">{revision|short}</a></td>
-  @@ -394,3 +398,5 @@
-         {if(previousnode, '/
-         <a href="{url|urlescape}pushloghtml?fromchange={previousnode|short}&tochange={node|short}">pushlog to previous</a>')}
-       </div></div>'
-  +
-  +repoinfo = repoinfo.tmpl
   diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 14:00:15 2018 -0700
+  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 14:00:43 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
   @@ -8,12 +8,12 @@
    <body>
