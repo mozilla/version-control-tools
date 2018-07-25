@@ -134,19 +134,6 @@ def main(source_templates, vct_templates_path, new_templates_path):
                    check=True)
     subprocess.run(['hg', 'commit', '-m', 'fresh templates'])
 
-    # Apply all our patches.
-    patch_dir = vct_templates_path / '.patches'
-
-    for p in sorted(patch_dir.iterdir()):
-        if p.suffix != '.patch':
-            continue
-
-        subprocess.run(['hg', 'import', str(p.resolve())],
-                       cwd=new_templates_path.parent,
-                       check=True)
-        sys.stderr.flush()
-        sys.stdout.flush()
-
     # Change the logo URL.
     for f in sorted(gitweb_mozilla.iterdir()):
         if f.suffix != '.tmpl':
@@ -173,6 +160,19 @@ def main(source_templates, vct_templates_path, new_templates_path):
     subprocess.run(['hg', 'commit', '-m', 'common rewrites'],
                    cwd=new_templates_path,
                    check=True)
+
+    # Apply all our patches.
+    patch_dir = vct_templates_path / '.patches'
+
+    for p in sorted(patch_dir.iterdir()):
+        if p.suffix != '.patch':
+            continue
+
+        subprocess.run(['hg', 'import', str(p.resolve())],
+                       cwd=new_templates_path.parent,
+                       check=True)
+        sys.stderr.flush()
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':
