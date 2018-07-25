@@ -376,18 +376,22 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/fileannotate.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,8 +8,8 @@
+  @@ -8,8 +8,12 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
   -<a href="/">Mercurial</a> {pathdef%breadcrumb} / annotate
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
   +<a href="/">Mercurial</a> {pathdef%breadcrumb} / annotate / {file|escape}
    </div>
    
    <div class="page_nav">
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -395,7 +399,7 @@ And compare what the patches produced versus what's in v-c-t
    <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
    <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
    <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -64,7 +65,6 @@
+  @@ -64,7 +69,6 @@
    <div class="page_path description">{desc|strip|escape|websub|nonempty}</div>
    
    {diffoptsform}
@@ -406,30 +410,38 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/filecomparison.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / comparison
    </div>
    
   diff -r * -r * hgtemplates/gitweb_mozilla/filediff.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,8 +8,8 @@
+  @@ -8,8 +8,12 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
   -<a href="/">Mercurial</a> {pathdef%breadcrumb} / diff
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
   +<a href="/">Mercurial</a> {pathdef%breadcrumb} / diff / {file|escape}
    </div>
    
    <div class="page_nav">
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -447,18 +459,22 @@ And compare what the patches produced versus what's in v-c-t
    <link rel="alternate" type="application/atom+xml"
       href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
    <link rel="alternate" type="application/rss+xml"
-  @@ -8,8 +8,8 @@
+  @@ -8,8 +8,12 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
   -<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revisions
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
   +<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revisions / {file|escape}
    </div>
    
    <div class="page_nav">
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -466,7 +482,7 @@ And compare what the patches produced versus what's in v-c-t
    <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
    <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
    <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -26,7 +27,7 @@
+  @@ -26,7 +31,7 @@
    <a href="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}">annotate</a> |
    <a href="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}">diff</a> |
    <a href="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}">comparison</a> |
@@ -478,18 +494,22 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/filerevision.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,8 +8,8 @@
+  @@ -8,8 +8,12 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
   -<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revision
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
   +<a href="/">Mercurial</a> {pathdef%breadcrumb} / file revision / {file|escape}@{node|short}
    </div>
    
    <div class="page_nav">
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -497,7 +517,7 @@ And compare what the patches produced versus what's in v-c-t
    <a href="{url|urlescape}graph{sessionvars%urlparameter}">graph</a> |
    <a href="{url|urlescape}tags{sessionvars%urlparameter}">tags</a> |
    <a href="{url|urlescape}bookmarks{sessionvars%urlparameter}">bookmarks</a> |
-  @@ -61,7 +62,7 @@
+  @@ -61,7 +66,7 @@
    </table>
    </div>
    
@@ -519,16 +539,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/graph.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/graph.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / graph
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog/{symrev}{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
@@ -564,16 +588,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/help.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/help.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / help
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -584,16 +612,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/helptopics.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/helptopics.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / help
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -766,16 +798,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/manifest.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/manifest.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / files
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -926,28 +962,36 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/notfound.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/notfound.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -5,7 +5,7 @@
+  @@ -5,7 +5,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a> Not found: {repo|escape}
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div> Not found: {repo|escape}
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    </div>
    
    <div class="page_body">
   diff -r * -r * hgtemplates/gitweb_mozilla/search.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/search.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / search
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
@@ -958,16 +1002,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/shortlog.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/shortlog.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / shortlog
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    shortlog |
    <a href="{url|urlescape}log/{symrev}{sessionvars%urlparameter}">changelog</a> |
@@ -1015,16 +1063,20 @@ And compare what the patches produced versus what's in v-c-t
   diff -r * -r * hgtemplates/gitweb_mozilla/tags.tmpl (glob)
   --- a/hgtemplates/gitweb_mozilla/tags.tmpl	Tue May 29 13:59:58 2018 -0700
   +++ b/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,7 +8,7 @@
+  @@ -8,7 +8,11 @@
    <body>
    
    <div class="page_header">
   -<a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +<div class="logo">        <a href="{logourl}">            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />        </a>    </div>
+  +<div class="logo">
+  +    <a href="{logourl}">
+  +        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+  +    </a>
+  +</div>
    <a href="/">Mercurial</a> {pathdef%breadcrumb} / tags
    </div>
    
-  @@ -17,6 +17,7 @@
+  @@ -17,6 +21,7 @@
    <a href="{url|urlescape}summary{sessionvars%urlparameter}">summary</a> |
    <a href="{url|urlescape}shortlog{sessionvars%urlparameter}">shortlog</a> |
    <a href="{url|urlescape}log{sessionvars%urlparameter}">changelog</a> |
