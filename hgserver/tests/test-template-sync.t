@@ -237,49 +237,14 @@ But not the patches themselves
 
 And compare what the patches produced versus what's in v-c-t
 
+  $ hg addremove
+  $ hg diff
+
   $ hg commit -A -m 'v-c-t version'
+  nothing changed
+  [1]
 
-  $ hg diff -c .
-  diff -r * -r * hgtemplates/gitweb_mozilla/index.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/index.tmpl	Wed Jul 25 14:00:43 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -4,7 +4,11 @@
-   <body>
-   
-   <div class="page_header">
-  -    <a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
-  +    <div class="logo">
-  +        <a href="{logourl}">
-  +            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
-  +        </a>
-  +    </div>
-       <a href="/">Mercurial</a> {pathdef%breadcrumb}
-   </div>
-   
-  diff -r * -r * hgtemplates/gitweb_mozilla/summary.tmpl (glob)
-  --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Wed Jul 25 14:00:43 2018 -0700
-  +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
-  @@ -8,12 +8,12 @@
-   <body>
-   
-   <div class="page_header">
-  -<div class="logo">
-  -    <a href="{logourl}">
-  -        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
-  -    </a>
-  -</div>
-  -<a href="/">Mercurial</a> {pathdef%breadcrumb} / summary
-  +    <div class="logo">
-  +        <a href="{logourl}">
-  +            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
-  +        </a>
-  +    </div>
-  +    <a href="/">Mercurial</a> {pathdef%breadcrumb} / summary
-   </div>
-   
-   <div class="page_nav">
+Indent this to produce a patch file containing the differences between
+what's checked in and what the patch process yields.
 
-Produce a patch file with differences so we can more easily turn them into
-patches.
-
-  $ hg export > $TESTDIR/hgtemplates/.patches/DIFFERENCES
+$ hg export > $TESTDIR/hgtemplates/.patches/DIFFERENCES

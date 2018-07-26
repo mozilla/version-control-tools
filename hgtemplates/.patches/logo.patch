@@ -2,14 +2,52 @@
 # User Gregory Szorc <gps@mozilla.com>
 # Date 1527627598 25200
 #      Tue May 29 13:59:58 2018 -0700
-# Node ID 82b0f3ebaf5c37e97a2dbb211625735cffc59d1e
-# Parent  38b966c5860e64c7b94fbfe013f7840e85174e59
+# Node ID 8a978029fc0c0fc0abded1ec268688f458294dcb
+# Parent  d76bf09529a7d2edf66a6cbd3cd9d2ffe4e5d503
 hgtemplates: add logo to gitweb style
 
+diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/index.tmpl
+--- a/hgtemplates/gitweb_mozilla/index.tmpl
++++ b/hgtemplates/gitweb_mozilla/index.tmpl
+@@ -4,7 +4,11 @@
+ <body>
+ 
+ <div class="page_header">
+-    <a href="{logourl}" title="Mercurial" style="float: right;">Mercurial</a>
++    <div class="logo">
++        <a href="{logourl}">
++            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
++        </a>
++    </div>
+     <a href="/">Mercurial</a> {pathdef%breadcrumb}
+ </div>
+ 
+diff --git a/hgtemplates/gitweb_mozilla/summary.tmpl b/hgtemplates/gitweb_mozilla/summary.tmpl
+--- a/hgtemplates/gitweb_mozilla/summary.tmpl
++++ b/hgtemplates/gitweb_mozilla/summary.tmpl
+@@ -8,12 +8,12 @@
+ <body>
+ 
+ <div class="page_header">
+-<div class="logo">
+-    <a href="{logourl}">
+-        <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
+-    </a>
+-</div>
+-<a href="/">Mercurial</a> {pathdef%breadcrumb} / summary
++    <div class="logo">
++        <a href="{logourl}">
++            <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
++        </a>
++    </div>
++    <a href="/">Mercurial</a> {pathdef%breadcrumb} / summary
+ </div>
+ 
+ <div class="page_nav">
 diff --git a/hgtemplates/static/style-gitweb.css b/hgtemplates/static/style-gitweb.css
 --- a/hgtemplates/static/style-gitweb.css
 +++ b/hgtemplates/static/style-gitweb.css
-@@ -78,6 +78,16 @@ div#hint {
+@@ -76,6 +76,16 @@ div#hint {
    border-radius: 5px;
  }
  
