@@ -16,7 +16,6 @@ from mercurial.node import (
 )
 from mercurial import (
     branchmap,
-    dagutil,
     error,
     hg,
     localrepo,
@@ -50,7 +49,8 @@ def computeunreplicated(repo, visibilityexceptions=None):
     if data is None:
         return unserved
 
-    cl = repo.unfiltered().changelog
+    urepo = repo.unfiltered()
+    cl = urepo.changelog
     clrev = cl.rev
     replicated_head_revs = set()
 
@@ -67,25 +67,29 @@ def computeunreplicated(repo, visibilityexceptions=None):
                         hex(node))
 
     # Find the set of revisions between the changelog's heads and the replicated
-    # heads, also excluding already filtered revisions. We use
-    # ``revlogdag.ancestorset`` for this. This function essentially iterates
-    # over starting revisions and walks ancestors until we find a revision in
-    # a stop set or encounter an already seen revision. Parent revisions are
-    # indexed, so ancestry walking is fast (as opposed to child walking,
-    # which isn't indexed and is slow).
+    # heads.
     #
-    # In the common case, a push has not recently occurred: all DAG heads will
-    # already be present in the stop set and this will simply do a set lookup
-    # for each DAG head. That should be fast.
+    # In the common case, the set of replicated heads is the same as the
+    # set of actual heads. Since this case is fast to check for, we do that
+    # explicitly and short-circuit a DAG walk.
     #
-    # In the uncommon case, we perform a DAG walk for each unreplicated head.
-    # This will take time in proportion to the unreplicated DAG size, which
-    # is often small.
-    dag = dagutil.revlogdag(cl)
-    unreplicated_revs = dag.ancestorset(cl.headrevs(),
-                                        stops=replicated_head_revs | unserved)
+    # If the set of heads are different, we use a revset to compute the
+    # DAG difference between the 2 sets of heads and their ancestors.
+    # Note that we cannot perform a simple DAG traversal while stopping
+    # at replicated head revisions. The reason is that there is no guarantee
+    # that the DAG ancestors occur in the replicated heads set. This can
+    # occur when a new head is added to the repo, for example.
 
-    return frozenset(unserved | unreplicated_revs)
+    cl_heads = cl.headrevs()
+
+    if set(cl_heads) == replicated_head_revs:
+        unreplicated_revs = set()
+
+    else:
+        unreplicated_revs = urepo.revs('::%ld - ::%ld', cl_heads,
+                                       replicated_head_revs)
+
+    return frozenset(unserved | set(unreplicated_revs))
 
 
 def extsetup(ui):
