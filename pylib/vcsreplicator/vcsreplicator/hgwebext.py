@@ -95,26 +95,27 @@ def updatecache(repo):
         if 'try' not in repo.root:
             return
 
-        repo.ui.log('vcsreplicator', *args)
+        repo.ui.log('vcsreplicator', '%r: %s' % (repo.filtername, args[0]),
+                    *args[1:])
 
-    log('updating branch cache for filter %r\n', repo.filtername)
+    log('updating branch cache\n')
 
     cl = repo.changelog
     filtername = repo.filtername
     partial = repo._branchcaches.get(filtername)
 
     if partial is None:
-        log('no partial cache for %r\n', repo.filtername)
+        log('no partial cache\n')
     elif not partial.validfor(repo):
-        log('partial cache not valid for %r\n', repo.filtername)
+        log('partial cache not valid\n')
 
     revs = []
     if partial is None or not partial.validfor(repo):
         partial = branchmap.read(repo)
         if partial is None:
-            log('no existing branchmap for %r\n', repo.filtername)
+            log('no existing branchmap\n')
         else:
-            log('have partial branchmap for %r\n', repo.filtername)
+            log('have partial branchmap\n')
 
         if partial is None:
             subsetname = branchmap.subsettable.get(filtername)
