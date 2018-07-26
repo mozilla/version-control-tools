@@ -127,7 +127,7 @@ def updatecache(repo):
                 extrarevs = subset.changelog.filteredrevs - cl.filteredrevs
                 revs.extend(r for  r in extrarevs if r <= partial.tiprev)
 
-    log('extending revs from %d\n', partial.tiprev)
+    log('extending revs from %d\n', partial.tiprev + 1)
 
     revs.extend(cl.revs(start=partial.tiprev + 1))
 
