@@ -91,13 +91,26 @@ def computeunreplicated(repo, visibilityexceptions=None):
 # This is a copy of branchmap.updatecache from Mercurial 4.5.3. This is
 # here so we can debug exceptions.
 def updatecache(repo):
+    repo.ui.log('vcsreplicator', 'updating branch cache for filter %r\n',
+                repo.filtername)
+
     cl = repo.changelog
     filtername = repo.filtername
     partial = repo._branchcaches.get(filtername)
 
+    if partial is None:
+        repo.ui.log('vcsreplicator', 'no partial cache\n')
+    elif not partial.validfor(repo):
+        repo.ui.log('vcsreplicator', 'partial cache not valid\n')
+
     revs = []
     if partial is None or not partial.validfor(repo):
         partial = branchmap.read(repo)
+        if partial is None:
+            repo.ui.log('vcsreplicator', 'no existing branchmap\n')
+        else:
+            repo.ui.log('vcsreplicator', 'have partial branchmap\n')
+
         if partial is None:
             subsetname = branchmap.subsettable.get(filtername)
             if subsetname is None:
@@ -107,7 +120,13 @@ def updatecache(repo):
                 partial = subset.branchmap().copy()
                 extrarevs = subset.changelog.filteredrevs - cl.filteredrevs
                 revs.extend(r for  r in extrarevs if r <= partial.tiprev)
+
+    repo.ui.log('vcsreplicator', 'extending revs from %d\n', partial.tiprev)
+
     revs.extend(cl.revs(start=partial.tiprev + 1))
+
+    repo.ui.log('vcsreplicator', 'updating cache for revs: %r\n', revs)
+
     if revs:
         partial.update(repo, revs)
         partial.write(repo)
