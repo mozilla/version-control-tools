@@ -27,6 +27,14 @@ testedwith = '4.5 4.6'
 minimumhgversion = '4.5'
 
 
+def log(repo, *args):
+    if 'try' not in repo.root:
+        return
+
+    repo.ui.log('vcsreplicator', '%r: %s' % (repo.filtername, args[0]),
+                *args[1:])
+
+
 def computeunreplicated(repo, visibilityexceptions=None):
     """Compute the set of filtered revisions for exclusion from hgweb.
 
@@ -91,31 +99,24 @@ def computeunreplicated(repo, visibilityexceptions=None):
 # This is a copy of branchmap.updatecache from Mercurial 4.5.3. This is
 # here so we can debug exceptions.
 def updatecache(repo):
-    def log(*args):
-        if 'try' not in repo.root:
-            return
-
-        repo.ui.log('vcsreplicator', '%r: %s' % (repo.filtername, args[0]),
-                    *args[1:])
-
-    log('updating branch cache\n')
+    log(repo, 'updating branch cache\n')
 
     cl = repo.changelog
     filtername = repo.filtername
     partial = repo._branchcaches.get(filtername)
 
     if partial is None:
-        log('no partial cache\n')
+        log(repo, 'no partial cache\n')
     elif not partial.validfor(repo):
-        log('partial cache not valid\n')
+        log(repo, 'partial cache not valid\n')
 
     revs = []
     if partial is None or not partial.validfor(repo):
         partial = branchmap.read(repo)
         if partial is None:
-            log('no existing branchmap\n')
+            log(repo, 'no existing branchmap\n')
         else:
-            log('have partial branchmap\n')
+            log(repo, 'have partial branchmap\n')
 
         if partial is None:
             subsetname = branchmap.subsettable.get(filtername)
@@ -127,11 +128,11 @@ def updatecache(repo):
                 extrarevs = subset.changelog.filteredrevs - cl.filteredrevs
                 revs.extend(r for  r in extrarevs if r <= partial.tiprev)
 
-    log('extending revs from %d\n', partial.tiprev + 1)
+    log(repo, 'extending revs from %d\n', partial.tiprev + 1)
 
     revs.extend(cl.revs(start=partial.tiprev + 1))
 
-    log('updating cache for %d revs: %d to %d\n', len(revs),
+    log(repo, 'updating cache for %d revs: %d to %d\n', len(revs),
         revs[0] if revs else -1, revs[-1] if revs else -1)
 
     if revs:
