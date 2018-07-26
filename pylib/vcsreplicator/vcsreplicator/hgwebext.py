@@ -27,14 +27,6 @@ testedwith = '4.5 4.6'
 minimumhgversion = '4.5'
 
 
-def log(repo, *args):
-    if 'mozilla/try' not in repo.root:
-        return
-
-    repo.ui.log('vcsreplicator', '%r: %s' % (repo.filtername, args[0]),
-                *args[1:])
-
-
 def computeunreplicated(repo, visibilityexceptions=None):
     """Compute the set of filtered revisions for exclusion from hgweb.
 
@@ -43,14 +35,10 @@ def computeunreplicated(repo, visibilityexceptions=None):
     ``replicated-heads`` file.
     """
 
-    log(repo, 'computing unreplicated\n')
-
     # We first filter out secret and hidden changesets, which is the default
     # behavior of hgweb.
     unserved = repoview.computeunserved(
         repo, visibilityexceptions=visibilityexceptions)
-
-    log(repo, '%d revisions unserved\n', len(unserved))
 
     data = repo.replicated_data
 
@@ -66,8 +54,6 @@ def computeunreplicated(repo, visibilityexceptions=None):
     clrev = cl.rev
     replicated_head_revs = set()
 
-    log(repo, '%d heads in replicated-data file\n', len(data[b'heads']))
-
     for node in data[b'heads']:
         try:
             replicated_head_revs.add(clrev(node))
@@ -79,8 +65,6 @@ def computeunreplicated(repo, visibilityexceptions=None):
             repo.ui.log('vcsreplicator',
                         _('node in replicated data file does not exist: %s\n') %
                         hex(node))
-
-    log(repo, 'resolved %d head revs\n', len(replicated_head_revs))
 
     # Find the set of revisions between the changelog's heads and the replicated
     # heads, also excluding already filtered revisions. We use
@@ -101,56 +85,7 @@ def computeunreplicated(repo, visibilityexceptions=None):
     unreplicated_revs = dag.ancestorset(cl.headrevs(),
                                         stops=replicated_head_revs | unserved)
 
-    log(repo, 'resolved %d filtered revs\n', len(unreplicated_revs))
-
     return frozenset(unserved | unreplicated_revs)
-
-
-# This is a copy of branchmap.updatecache from Mercurial 4.5.3. This is
-# here so we can debug exceptions.
-def updatecache(repo):
-    log(repo, 'updating branch cache\n')
-
-    cl = repo.changelog
-    filtername = repo.filtername
-    partial = repo._branchcaches.get(filtername)
-
-    if partial is None:
-        log(repo, 'no partial cache\n')
-    elif not partial.validfor(repo):
-        log(repo, 'partial cache not valid\n')
-
-    revs = []
-    if partial is None or not partial.validfor(repo):
-        partial = branchmap.read(repo)
-        if partial is None:
-            log(repo, 'no existing branchmap\n')
-        else:
-            log(repo, 'have partial branchmap\n')
-
-        if partial is None:
-            subsetname = branchmap.subsettable.get(filtername)
-            if subsetname is None:
-                partial = branchmap.branchcache()
-            else:
-                subset = repo.filtered(subsetname)
-                partial = subset.branchmap().copy()
-                extrarevs = subset.changelog.filteredrevs - cl.filteredrevs
-                revs.extend(r for  r in extrarevs if r <= partial.tiprev)
-
-    log(repo, 'extending revs from %d\n', partial.tiprev + 1)
-
-    revs.extend(cl.revs(start=partial.tiprev + 1))
-
-    log(repo, 'updating cache for %d revs: %d to %d\n', len(revs),
-        revs[0] if revs else -1, revs[-1] if revs else -1)
-
-    if revs:
-        partial.update(repo, revs)
-        partial.write(repo)
-
-    assert partial.validfor(repo), filtername
-    repo._branchcaches[repo.filtername] = partial
 
 
 def extsetup(ui):
@@ -162,9 +97,6 @@ def extsetup(ui):
     # TODO this is buggy and causes exceptions. See
     # https://bugzilla.mozilla.org/show_bug.cgi?id=1470606#c35.
     #branchmap.subsettable['replicatedserved'] = 'served'
-
-    # Replace branchmap.updatecache with our version.
-    branchmap.updatecache = updatecache
 
     # hgweb caches repository instances. And it determines whether instances
     # need to be reconstructed by stat()ing files listed in ``hg.foi`` at
