@@ -132,7 +132,8 @@ def main(source_templates, vct_templates_path, new_templates_path):
     subprocess.run(['hg', 'addremove', '.'],
                    cwd=new_templates_path,
                    check=True)
-    subprocess.run(['hg', 'commit', '-m', 'fresh templates'])
+    subprocess.run(['hg', 'commit', '-m',
+                    'hgtemplates: synchronize vanilla templates'])
 
     # Change the logo URL.
     for f in sorted(gitweb_mozilla.iterdir()):
@@ -157,7 +158,8 @@ def main(source_templates, vct_templates_path, new_templates_path):
             fh.write(s)
 
     print('committing automated transformations')
-    subprocess.run(['hg', 'commit', '-m', 'common rewrites'],
+    subprocess.run(['hg', 'commit', '-m',
+                    'hgtemplates: perform common rewrites'],
                    cwd=new_templates_path,
                    check=True)
 
