@@ -104,17 +104,17 @@ def updatecache(repo):
     partial = repo._branchcaches.get(filtername)
 
     if partial is None:
-        log('no partial cache\n')
+        log('no partial cache for %r\n', repo.filtername)
     elif not partial.validfor(repo):
-        log('partial cache not valid\n')
+        log('partial cache not valid for %r\n', repo.filtername)
 
     revs = []
     if partial is None or not partial.validfor(repo):
         partial = branchmap.read(repo)
         if partial is None:
-            log('no existing branchmap\n')
+            log('no existing branchmap for %r\n', repo.filtername)
         else:
-            log('have partial branchmap\n')
+            log('have partial branchmap for %r\n', repo.filtername)
 
         if partial is None:
             subsetname = branchmap.subsettable.get(filtername)
