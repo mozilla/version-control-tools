@@ -119,11 +119,7 @@ def reposetup(ui, repo):
         # This typically only occurs if the repository mutates itself. If
         # another process mutates the file, it will not be reflected on this
         # repository instance.
-        #@localrepo.repofilecache('replicated-data')
-
-        # Testing with a regular @property to isolate intermittent failures
-        # in CI.
-        @property
+        @localrepo.repofilecache('replicated-data')
         def replicated_data(self):
             """Obtain the data structure holding fully replicated data.
 
