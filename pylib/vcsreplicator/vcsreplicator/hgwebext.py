@@ -43,10 +43,14 @@ def computeunreplicated(repo, visibilityexceptions=None):
     ``replicated-heads`` file.
     """
 
+    log(repo, 'computing unreplicated\n')
+
     # We first filter out secret and hidden changesets, which is the default
     # behavior of hgweb.
     unserved = repoview.computeunserved(
         repo, visibilityexceptions=visibilityexceptions)
+
+    log(repo, '%d revisions unserved\n', len(unserved))
 
     data = repo.replicated_data
 
@@ -62,6 +66,8 @@ def computeunreplicated(repo, visibilityexceptions=None):
     clrev = cl.rev
     replicated_head_revs = set()
 
+    log(repo, '%d heads in replicated-data file\n', len(data[b'heads']))
+
     for node in data[b'heads']:
         try:
             replicated_head_revs.add(clrev(node))
@@ -73,6 +79,8 @@ def computeunreplicated(repo, visibilityexceptions=None):
             repo.ui.log('vcsreplicator',
                         _('node in replicated data file does not exist: %s\n') %
                         hex(node))
+
+    log(repo, 'resolved %d head revs\n', len(replicated_head_revs))
 
     # Find the set of revisions between the changelog's heads and the replicated
     # heads, also excluding already filtered revisions. We use
@@ -92,6 +100,8 @@ def computeunreplicated(repo, visibilityexceptions=None):
     dag = dagutil.revlogdag(cl)
     unreplicated_revs = dag.ancestorset(cl.headrevs(),
                                         stops=replicated_head_revs | unserved)
+
+    log(repo, 'resolved %d filtered revs\n', len(unreplicated_revs))
 
     return frozenset(unserved | unreplicated_revs)
 
