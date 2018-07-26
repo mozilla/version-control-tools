@@ -88,6 +88,34 @@ def computeunreplicated(repo, visibilityexceptions=None):
     return frozenset(unserved | unreplicated_revs)
 
 
+# This is a copy of branchmap.updatecache from Mercurial 4.5.3. This is
+# here so we can debug exceptions.
+def updatecache(repo):
+    cl = repo.changelog
+    filtername = repo.filtername
+    partial = repo._branchcaches.get(filtername)
+
+    revs = []
+    if partial is None or not partial.validfor(repo):
+        partial = branchmap.read(repo)
+        if partial is None:
+            subsetname = branchmap.subsettable.get(filtername)
+            if subsetname is None:
+                partial = branchmap.branchcache()
+            else:
+                subset = repo.filtered(subsetname)
+                partial = subset.branchmap().copy()
+                extrarevs = subset.changelog.filteredrevs - cl.filteredrevs
+                revs.extend(r for  r in extrarevs if r <= partial.tiprev)
+    revs.extend(cl.revs(start=partial.tiprev + 1))
+    if revs:
+        partial.update(repo, revs)
+        partial.write(repo)
+
+    assert partial.validfor(repo), filtername
+    repo._branchcaches[repo.filtername] = partial
+
+
 def extsetup(ui):
     repoview.filtertable['replicatedserved'] = computeunreplicated
 
@@ -97,6 +125,9 @@ def extsetup(ui):
     # TODO this is buggy and causes exceptions. See
     # https://bugzilla.mozilla.org/show_bug.cgi?id=1470606#c35.
     #branchmap.subsettable['replicatedserved'] = 'served'
+
+    # Replace branchmap.updatecache with our version.
+    branchmap.updatecache = updatecache
 
     # hgweb caches repository instances. And it determines whether instances
     # need to be reconstructed by stat()ing files listed in ``hg.foi`` at
