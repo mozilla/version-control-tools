@@ -28,7 +28,7 @@ minimumhgversion = '4.5'
 
 
 def log(repo, *args):
-    if 'try' not in repo.root:
+    if 'mozilla/try' not in repo.root:
         return
 
     repo.ui.log('vcsreplicator', '%r: %s' % (repo.filtername, args[0]),
