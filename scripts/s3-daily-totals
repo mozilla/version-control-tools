@@ -41,11 +41,11 @@ def get_s3_daily_totals(day):
         data = f.result()
 
         for line in data.splitlines():
-            parts = line.split(' ')
-            if parts[7] != 'REST.GET.OBJECT':
+            parts = line.split(b' ')
+            if parts[7] != b'REST.GET.OBJECT':
                 continue
 
-            if parts[12] == '304':
+            if parts[12] == b'304':
                 continue
 
             total += int(parts[14])
