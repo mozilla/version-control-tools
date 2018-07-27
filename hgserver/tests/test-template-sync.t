@@ -51,6 +51,31 @@ Run script to apply our templates changes
   adding hgtemplates/gitweb/shortlog.tmpl
   adding hgtemplates/gitweb/summary.tmpl
   adding hgtemplates/gitweb/tags.tmpl
+  adding hgtemplates/gitweb_mozilla/bookmarks.tmpl
+  adding hgtemplates/gitweb_mozilla/branches.tmpl
+  adding hgtemplates/gitweb_mozilla/changelog.tmpl
+  adding hgtemplates/gitweb_mozilla/changelogentry.tmpl
+  adding hgtemplates/gitweb_mozilla/changeset.tmpl
+  adding hgtemplates/gitweb_mozilla/error.tmpl
+  adding hgtemplates/gitweb_mozilla/fileannotate.tmpl
+  adding hgtemplates/gitweb_mozilla/filecomparison.tmpl
+  adding hgtemplates/gitweb_mozilla/filediff.tmpl
+  adding hgtemplates/gitweb_mozilla/filelog.tmpl
+  adding hgtemplates/gitweb_mozilla/filerevision.tmpl
+  adding hgtemplates/gitweb_mozilla/footer.tmpl
+  adding hgtemplates/gitweb_mozilla/graph.tmpl
+  adding hgtemplates/gitweb_mozilla/graphentry.tmpl
+  adding hgtemplates/gitweb_mozilla/header.tmpl
+  adding hgtemplates/gitweb_mozilla/help.tmpl
+  adding hgtemplates/gitweb_mozilla/helptopics.tmpl
+  adding hgtemplates/gitweb_mozilla/index.tmpl
+  adding hgtemplates/gitweb_mozilla/manifest.tmpl
+  adding hgtemplates/gitweb_mozilla/map
+  adding hgtemplates/gitweb_mozilla/notfound.tmpl
+  adding hgtemplates/gitweb_mozilla/search.tmpl
+  adding hgtemplates/gitweb_mozilla/shortlog.tmpl
+  adding hgtemplates/gitweb_mozilla/summary.tmpl
+  adding hgtemplates/gitweb_mozilla/tags.tmpl
   adding hgtemplates/json/changelist.tmpl
   adding hgtemplates/json/graph.tmpl
   adding hgtemplates/json/map
@@ -125,9 +150,6 @@ Run script to apply our templates changes
   adding hgtemplates/static/style-paper.css
   adding hgtemplates/static/style.css
 
-And make a copy of gitweb into gitweb_mozilla
-
-  $ cp -R hgtemplates/gitweb hgtemplates/gitweb_mozilla
 Including files we've added
 
   $ for f in pushlog.tmpl pushlogentry.tmpl; do cp $TESTDIR/hgtemplates/atom/$f hgtemplates/atom/$f; done
@@ -137,34 +159,9 @@ Including files we've added
   $ hg commit -A -m 'copy gitweb to gitweb_mozilla'
   adding hgtemplates/atom/pushlog.tmpl
   adding hgtemplates/atom/pushlogentry.tmpl
-  adding hgtemplates/gitweb_mozilla/bookmarks.tmpl
-  adding hgtemplates/gitweb_mozilla/branches.tmpl
-  adding hgtemplates/gitweb_mozilla/changelog.tmpl
-  adding hgtemplates/gitweb_mozilla/changelogentry.tmpl
-  adding hgtemplates/gitweb_mozilla/changeset.tmpl
-  adding hgtemplates/gitweb_mozilla/error.tmpl
-  adding hgtemplates/gitweb_mozilla/fileannotate.tmpl
-  adding hgtemplates/gitweb_mozilla/filecomparison.tmpl
-  adding hgtemplates/gitweb_mozilla/filediff.tmpl
-  adding hgtemplates/gitweb_mozilla/filelog.tmpl
-  adding hgtemplates/gitweb_mozilla/filerevision.tmpl
   adding hgtemplates/gitweb_mozilla/firefoxreleases.tmpl
-  adding hgtemplates/gitweb_mozilla/footer.tmpl
-  adding hgtemplates/gitweb_mozilla/graph.tmpl
-  adding hgtemplates/gitweb_mozilla/graphentry.tmpl
-  adding hgtemplates/gitweb_mozilla/header.tmpl
-  adding hgtemplates/gitweb_mozilla/help.tmpl
-  adding hgtemplates/gitweb_mozilla/helptopics.tmpl
-  adding hgtemplates/gitweb_mozilla/index.tmpl
-  adding hgtemplates/gitweb_mozilla/manifest.tmpl
-  adding hgtemplates/gitweb_mozilla/map
-  adding hgtemplates/gitweb_mozilla/notfound.tmpl
   adding hgtemplates/gitweb_mozilla/pushlog.tmpl
   adding hgtemplates/gitweb_mozilla/repoinfo.tmpl
-  adding hgtemplates/gitweb_mozilla/search.tmpl
-  adding hgtemplates/gitweb_mozilla/shortlog.tmpl
-  adding hgtemplates/gitweb_mozilla/summary.tmpl
-  adding hgtemplates/gitweb_mozilla/tags.tmpl
   adding hgtemplates/static/jquery-1.2.6.min.js
   adding hgtemplates/static/livemarks16.png
   adding hgtemplates/static/moz-logo-bw-rgb.svg

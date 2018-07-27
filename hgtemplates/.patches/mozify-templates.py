@@ -65,6 +65,14 @@ def main(source_templates, vct_templates_path, new_templates_path):
         f = new_templates_path / f
         f.unlink()
 
+    # Now nuke gitweb_mozilla and make a fresh copy from gitweb.
+    gitweb_mozilla = new_templates_path / 'gitweb_mozilla'
+
+    if gitweb_mozilla.exists():
+        shutil.rmtree(gitweb_mozilla)
+
+    shutil.copytree(new_templates_path / 'gitweb', gitweb_mozilla)
+
 
 if __name__ == '__main__':
     source_templates, vct_templates, new_templates = sys.argv[1:]
