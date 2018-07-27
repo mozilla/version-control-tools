@@ -1,0 +1,27 @@
+version: 1
+tasks:
+  - metadata:
+      name: "version-control-tools Tests"
+      description: "Builds the test environment and runs tests (without Docker)"
+      owner: ${event.push.owner}
+      source: ${event.repository.url}
+    taskId: {$eval: as_slugid(vct_tests)}
+    created: {$fromNow: ''}
+    deadline: {$fromNow: '5 hours'}
+    provisionerId: aws-provisioner-v1
+    workerType: version-control-tools
+    scopes:
+      - queue:route:notify:irc-channel.#vcs
+    routes:
+      - notify.irc-channel.#vcs.on-any
+    extra:
+      notify:
+        ircChannelMessage: "Tests for ${event.push.revision} ran, completion status: ${status.state}"      
+    payload:
+      maxRunTime: '5 hours'
+      env:
+        NO_DOCKER: 1
+      command:
+        - "/bin/bash"
+        - "-lc"
+        - "hg clone ${event.repo.url} v-c-t && cd v-c-t && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
