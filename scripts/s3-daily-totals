@@ -23,7 +23,7 @@ def get_s3_daily_totals(day):
 
     def get_body(b, k):
         try:
-            obj = s3.Object(bn, path)
+            obj = s3.Object(b, k)
             return obj.get()['Body'].read()
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] != 'NoSuchKey':
