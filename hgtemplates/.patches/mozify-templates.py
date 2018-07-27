@@ -22,12 +22,32 @@ REMOVE_FILES = {
     'static/style-monoblue.css',
 }
 
+COPY_FILES = {
+    'atom/pushlog.tmpl',
+    'atom/pushlogentry.tmpl',
+    'gitweb_mozilla/firefoxreleases.tmpl',
+    'gitweb_mozilla/pushlog.tmpl',
+    'gitweb_mozilla/repoinfo.tmpl',
+    'static/jquery-1.2.6.min.js',
+    'static/livemarks16.png',
+    'static/moz-logo-bw-rgb.svg',
+}
+
 
 def main(source_templates, vct_templates_path, new_templates_path):
     # source_templates is the canonical templates to start from.
     # vct_templates is hgtemplates/ from v-c-t.
     # new_templates_path is templates directory to write to. It could be
     # v-c-t's hgtemplates/.
+
+    # vct_templates_path could be the same as new_templates_path and we
+    # need to copy files from vct_templates path that may get removed below.
+    # So make a copy of all files that may be nuked.
+    backups = {}
+    for f in COPY_FILES:
+        p = vct_templates_path / f
+        with p.open('rb') as fh:
+            backups[f] = fh.read()
 
     # Ensure new_templates_path is empty.
     if new_templates_path.exists():
@@ -72,6 +92,12 @@ def main(source_templates, vct_templates_path, new_templates_path):
         shutil.rmtree(gitweb_mozilla)
 
     shutil.copytree(new_templates_path / 'gitweb', gitweb_mozilla)
+
+    # Create all new files.
+    for f in sorted(COPY_FILES):
+        dest = new_templates_path / f
+        with dest.open('wb') as fh:
+            fh.write(backups[f])
 
 
 if __name__ == '__main__':

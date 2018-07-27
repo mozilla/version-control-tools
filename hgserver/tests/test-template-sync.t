@@ -24,6 +24,8 @@ Run script to apply our templates changes
   adding hgtemplates/atom/filelog.tmpl
   adding hgtemplates/atom/header.tmpl
   adding hgtemplates/atom/map
+  adding hgtemplates/atom/pushlog.tmpl
+  adding hgtemplates/atom/pushlogentry.tmpl
   adding hgtemplates/atom/tagentry.tmpl
   adding hgtemplates/atom/tags.tmpl
   adding hgtemplates/gitweb/bookmarks.tmpl
@@ -62,6 +64,7 @@ Run script to apply our templates changes
   adding hgtemplates/gitweb_mozilla/filediff.tmpl
   adding hgtemplates/gitweb_mozilla/filelog.tmpl
   adding hgtemplates/gitweb_mozilla/filerevision.tmpl
+  adding hgtemplates/gitweb_mozilla/firefoxreleases.tmpl
   adding hgtemplates/gitweb_mozilla/footer.tmpl
   adding hgtemplates/gitweb_mozilla/graph.tmpl
   adding hgtemplates/gitweb_mozilla/graphentry.tmpl
@@ -72,6 +75,8 @@ Run script to apply our templates changes
   adding hgtemplates/gitweb_mozilla/manifest.tmpl
   adding hgtemplates/gitweb_mozilla/map
   adding hgtemplates/gitweb_mozilla/notfound.tmpl
+  adding hgtemplates/gitweb_mozilla/pushlog.tmpl
+  adding hgtemplates/gitweb_mozilla/repoinfo.tmpl
   adding hgtemplates/gitweb_mozilla/search.tmpl
   adding hgtemplates/gitweb_mozilla/shortlog.tmpl
   adding hgtemplates/gitweb_mozilla/summary.tmpl
@@ -145,26 +150,13 @@ Run script to apply our templates changes
   adding hgtemplates/static/followlines.js
   adding hgtemplates/static/hgicon.png
   adding hgtemplates/static/hglogo.png
+  adding hgtemplates/static/jquery-1.2.6.min.js
+  adding hgtemplates/static/livemarks16.png
   adding hgtemplates/static/mercurial.js
+  adding hgtemplates/static/moz-logo-bw-rgb.svg
   adding hgtemplates/static/style-gitweb.css
   adding hgtemplates/static/style-paper.css
   adding hgtemplates/static/style.css
-
-Including files we've added
-
-  $ for f in pushlog.tmpl pushlogentry.tmpl; do cp $TESTDIR/hgtemplates/atom/$f hgtemplates/atom/$f; done
-  $ for f in firefoxreleases.tmpl pushlog.tmpl repoinfo.tmpl; do cp $TESTDIR/hgtemplates/gitweb_mozilla/$f hgtemplates/gitweb_mozilla/$f; done
-  $ for f in jquery-1.2.6.min.js livemarks16.png moz-logo-bw-rgb.svg; do cp $TESTDIR/hgtemplates/static/$f hgtemplates/static/$f; done
-
-  $ hg commit -A -m 'copy gitweb to gitweb_mozilla'
-  adding hgtemplates/atom/pushlog.tmpl
-  adding hgtemplates/atom/pushlogentry.tmpl
-  adding hgtemplates/gitweb_mozilla/firefoxreleases.tmpl
-  adding hgtemplates/gitweb_mozilla/pushlog.tmpl
-  adding hgtemplates/gitweb_mozilla/repoinfo.tmpl
-  adding hgtemplates/static/jquery-1.2.6.min.js
-  adding hgtemplates/static/livemarks16.png
-  adding hgtemplates/static/moz-logo-bw-rgb.svg
 
 Now apply every patch we have recorded
 
