@@ -37,7 +37,7 @@ def get_s3_daily_totals(day):
             path = 's3/hg-bundles/%s' % day
             fs.append(e.submit(get_body, bn, path))
 
-    for f in fs:
+    for f in futures.as_completed(fs):
         data = f.result()
 
         for line in data.splitlines():
