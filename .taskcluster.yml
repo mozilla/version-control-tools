@@ -14,9 +14,16 @@ tasks:
       - queue:route:notify:irc-channel.#vcs
     routes:
       - notify.irc-channel.#vcs.on-any
+      - treeherder.version-control-tools.${event.push.revision}.${event.push.pushlog_id}
     extra:
       notify:
         ircChannelMessage: "Tests for ${event.push.revision} ran, completion status: ${status.state}"      
+      treeherder:
+        symbol: T
+        jobSymbol: T
+        groupName: v-c-t Tests
+        productName: version-control-tools
+        jobKind: test
     payload:
       maxRunTime: '5 hours'
       env:
