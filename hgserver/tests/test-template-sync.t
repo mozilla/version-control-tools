@@ -1,19 +1,17 @@
 This test verifies that all our patches to the gitweb template apply cleanly
 and exactly produce the gitweb_mozilla template.
 
-Create a repo so we can apply patches. We populate the repo with a pristine
-copy of the templates from an hg install in the virtualenv
+Create a repo so we can test differences against v-c-t
 
   $ hg init templates
   $ cd templates
-  $ cp -R $TESTDIR/venv/mercurials/4.5.3/lib/python2.7/site-packages/mercurial/templates/ hgtemplates
 
-Nuke templates we don't use
+Run script to apply our templates changes
 
-  $ rm -rf hgtemplates/coal hgtemplates/monoblue hgtemplates/spartan
-  $ rm hgtemplates/static/background.png
-  $ rm hgtemplates/static/style-extra-coal.css
-  $ rm hgtemplates/static/style-monoblue.css
+  $ $TESTDIR/hgtemplates/.patches/mozify-templates.py \
+  >   $TESTDIR/venv/mercurials/4.5.3/lib/python2.7/site-packages/mercurial/templates \
+  >   $TESTDIR/hgtemplates \
+  >   `pwd`/hgtemplates
 
   $ hg commit -A -m initial
   adding hgtemplates/atom/bookmarkentry.tmpl
