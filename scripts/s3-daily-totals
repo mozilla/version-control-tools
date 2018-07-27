@@ -12,6 +12,7 @@ BUCKETS = (
     'moz-devservices-logging-us-west-1',
     'moz-devservices-logging-us-west-2',
     'moz-devservices-logging-us-east-1',
+    'moz-devservices-logging-us-east-2',
     'moz-devservices-logging-eu-central-1',
 )
 
