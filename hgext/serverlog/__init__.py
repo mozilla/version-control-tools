@@ -190,7 +190,6 @@ from mercurial import (
     extensions,
     registrar,
     util,
-    wireproto,
 )
 from mercurial.hgweb import (
     hgweb_mod,
@@ -214,6 +213,8 @@ sshserver = import_module('mercurial.sshserver')
 # dispatching a wire protocol command
 wireprotov1server = import_module('mercurial.wireprotov1server')
 
+# TRACKING hg46 mercurial.wireproto split up and renamed
+wireproto = import_module('mercurial.wireproto')
 
 testedwith = '4.5'
 minimumhgversion = '4.5'

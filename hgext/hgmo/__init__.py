@@ -1055,14 +1055,25 @@ def processbundlesmanifest(orig, repo, proto):
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
     # actual source IP, so prefer it.
-    sourceip = proto.req.env.get('HTTP_X_CLUSTER_CLIENT_IP',
-                                 proto.req.env.get('REMOTE_ADDR'))
+    # TRACKING hg46
+    if util.safehasattr(proto, '_req'):
+        sourceip = proto._req.headers.get('X-CLUSTER-CLIENT-IP',
+                                          proto._req.headers.get('REMOTE-ADDR'))
+    else:
+        sourceip = proto.req.env.get('HTTP_X_CLUSTER_CLIENT_IP',
+                                     proto.req.env.get('REMOTE_ADDR'))
+
     if not sourceip:
         return manifest
     else:
         sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
 
-    origlines = manifest.splitlines()
+    # TRACKING hg46
+    # `manifest` will be a bytesresponse object in 4.6+
+    if util.safehasattr(manifest, 'data'):
+        origlines = manifest.data.splitlines()
+    else:
+        origlines = manifest.splitlines()
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
