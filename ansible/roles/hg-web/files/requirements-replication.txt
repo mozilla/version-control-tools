@@ -10,8 +10,10 @@ futures==3.0.5 \
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 
-Mercurial==4.5.3+9-1ed250f701ee \
-    --hash=sha256:da278225482e2d74a1a2fd3e7ed49e620b6c653b6bab0d0137b2952248290839
+Mercurial==4.6.2 \
+    --hash=sha256:958e9029acaf542f6c4e341e63e17eb8c8c99d4a6d0766ec8403cfe25bf0c4ce \
+    --hash=sha256:57a582baf1e36c4e0a05b0a20c25c8ca1c8704dbeddf9cec7447088834f9de08 \
+    --hash=sha256:1cd04ea0200b3cfad7dfd8f149aca6ac8ac2209c423c27258cf4a1ded8e366af
 
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
