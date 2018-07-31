@@ -52,11 +52,20 @@ class DeployCommands(object):
 
     @Command('hgmo', category='deploy',
              description='Deploy hg.mozilla.org')
+    @CommandArgument('--skip-hgssh', action='store_true',
+                     help='Do not deploy to hgssh instances')
+    @CommandArgument('--skip-hgweb', action='store_true',
+                     help='Do not deploy to hgweb instances')
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
-    def hgmo(self, verbosity=None):
+    def hgmo(self, skip_hgssh=False, skip_hgweb=False, verbosity=None):
         from vcttesting.deploy import deploy_hgmo as deploy
-        return deploy(verbosity=verbosity)
+
+        return deploy(
+            skip_hgssh=skip_hgssh,
+            skip_hgweb=skip_hgweb,
+            verbosity=verbosity,
+        )
 
     @Command('hgmo-strip', category='deploy',
              description='Strip commits from a hg.mozilla.org repo')
