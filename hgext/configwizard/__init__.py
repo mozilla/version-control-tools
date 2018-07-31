@@ -412,6 +412,8 @@ if registrar and util.safehasattr(registrar, 'configitem'):
                default=None)
     configitem('mozilla', 'mozbuild_state_path',
                default=_vcthome())
+    configitem('revsetalias', 'wip',
+               default=None)
 
 wizardsteps = set([
     'hgversion',
