@@ -3,8 +3,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
+import logging
 import os
+import sys
+from datetime import datetime
 
+import hg_helper
+import ldap_helper
 
 NO_HG_ACCESS = '''
 A SSH connection has been established and your account (%s)
@@ -32,26 +38,7 @@ bug (http://tinyurl.com/njcfhma) and request hg access be restored
 for %s.
 '''.lstrip()
 
-
-def QuoteForPOSIX(string):
-    '''quote a string so it can be used as an argument in a  posix shell
-
-    According to: http://www.unix.org/single_unix_specification/
-    2.2.1 Escape Character(Backslash)
-
-    A backslash that is not quoted shall preserve the literal value
-    of the following character, with the exception of a <newline>.
-
-    2.2.2 Single-Quotes
-
-    Enclosing characters in single-quotes( '' ) shall preserve
-    the literal value of each character within the single-quotes.
-    A single-quote cannot occur within single-quotes.
-
-    from: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/498202
-    thank you google!
-    '''
-    return "\\'".join("'" + p + "'" for p in string.split("'"))
+AUTOLAND_USER = 'bind-autoland@mozilla.com'
 
 
 def source_environment(path):
@@ -88,15 +75,20 @@ def source_environment(path):
             os.environ[key] = value
 
 
-def process_non_root_login(user):
-    # Delay import so these don't interfere with root login code path.
-    from datetime import datetime
-    import json
-    import logging
-    import sys
-    import hg_helper
-    import ldap_helper
+def touch_hg_access_date(user):
+    # Run ldap access date toucher, silently fail and log if we're unable to write
+    try:
+        settings = ldap_helper.get_ldap_settings()
+        ldap_helper.update_access_date(user, 'hgAccessDate',
+                                       datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
+                                       settings['url'],
+                                       settings['write_url'])
+    except Exception:
+        logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
+        logging.exception('Failed to update LDAP attributes for %s' % user)
 
+
+def process_login(user):
     user_status = hg_helper.is_valid_user(user)
     if user_status == 2:
         sys.stderr.write(HG_ACCESS_DISABLED % (user, user))
@@ -106,25 +98,23 @@ def process_non_root_login(user):
         sys.stderr.write(NO_HG_ACCESS % user)
         sys.exit(0)
 
-    # Run ldap access date toucher, silently fail and log if we're unable to write
-    try:
-        settings = ldap_helper.get_ldap_settings()
-        ldap_helper.update_access_date(user, 'hgAccessDate',
-                                       datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
-                                       settings['url'],
-                                       settings['write_url'])
-    except Exception:
-         logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
-         logging.exception('Failed to update LDAP attributes for %s' % user)
-
     with open('/etc/mercurial/pash.json', 'rb') as fh:
         pash_settings = json.load(fh)
 
-    hg_helper.serve(cname=pash_settings['hostname'],
-                    enable_repo_config=pash_settings.get('repo_config', False),
-                    enable_repo_group=pash_settings.get('repo_group', False),
-                    enable_user_repos=pash_settings.get('user_repos', False),
-                    enable_mozreview_ldap_associate=pash_settings.get('mr_ldap_associate', False))
+    touch_hg_access_date(user)
+
+    # Touch the initiator of the autoland request, if required.
+    if user == pash_settings.get('autoland_user', AUTOLAND_USER):
+        request_user = os.environ.get('AUTOLAND_REQUEST_USER')
+        if request_user:
+            touch_hg_access_date(request_user)
+
+    hg_helper.serve(
+        cname=pash_settings['hostname'],
+        enable_repo_config=pash_settings.get('repo_config', False),
+        enable_repo_group=pash_settings.get('repo_group', False),
+        enable_user_repos=pash_settings.get('user_repos', False),
+        enable_mozreview_ldap_associate=pash_settings.get('mr_ldap_associate', False))
     sys.exit(0)
 
 
@@ -139,5 +129,4 @@ if __name__ == '__main__':
     # from Python. So we do that.
     source_environment('/etc/environment')
 
-    user = os.environ.get('USER')
-    process_non_root_login(user)
+    process_login(os.environ.get('USER'))

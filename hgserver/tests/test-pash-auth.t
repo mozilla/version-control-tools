@@ -170,6 +170,52 @@ Successful login should set hgAccessDate LDAP attribute
   # numResponses: 2
   # numEntries: 1
 
+Successful autoland login should set requester's hgAccountEnabled as well
+
+bind-autoland account
+  $ ssh-keygen -b 2048 -t rsa -f keyA -N '' > /dev/null
+  $ hgmo create-ldap-user --key-file keyA bind-autoland@mozilla.com bind-autoland 1001 'bind-autoland'
+  $ hgmo add-user-to-group bind-autoland@mozilla.com scm_autoland
+  $ hgmo add-ssh-key bind-autoland@mozilla.com - < keyA.pub
+
+user2
+  $ hgmo create-ldap-user user2@example.com user2 1002 'other user'
+
+ssh as autoland, tagging user2 as the originator of the request
+  $ AUTOLAND_REQUEST_USER=user2@example.com ssh -T -F ssh_config -i keyA -l bind-autoland@mozilla.com -p $HGPORT $SSH_SERVER -o SendEnv=AUTOLAND_REQUEST_USER
+  A SSH connection has been successfully established.
+  
+  Your account (bind-autoland@mozilla.com) has privileges to access Mercurial over
+  SSH.
+  
+  You are a member of the following LDAP groups that govern source control
+  access:
+  
+     scm_autoland
+  
+  This will give you write access to the following repos:
+  
+     Autoland (integration/autoland)
+  
+  You will NOT have write access to the following repos:
+  
+     Firefox Repos (mozilla-central, releases/*), Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/)
+  
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
+  [1]
+
+hgAccessDate on both accounts should be set
+  $ hgmo exec hgssh /usr/bin/ldapsearch -b 'dc=mozilla' -s sub -x mail=bind-autoland@mozilla.com -LLL hgAccessDate
+  dn: mail=bind-autoland@mozilla.com,o=com,dc=mozilla
+  hgAccessDate: 2\d{3}\d{2}\d{2}\d{2}\d{2}\d{2}\.\d+Z (re)
+  
+  $ hgmo exec hgssh /usr/bin/ldapsearch -b 'dc=mozilla' -s sub -x mail=user2@example.com -LLL hgAccessDate
+  dn: mail=user2@example.com,o=com,dc=mozilla
+  hgAccessDate: 2\d{3}\d{2}\d{2}\d{2}\d{2}\d{2}\.\d+Z (re)
+  
+
 No HG access prints helpful error message
 
   $ hgmo create-ldap-user --no-hg-access --key-file key1 nohgaccess@example.com nohgaccess 1001 'No HgAccess'
