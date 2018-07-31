@@ -209,6 +209,9 @@ wireprotoserver = import_module('mercurial.wireprotoserver')
 # TRACKING hg46 mercurial.sshserver renamed to mercurial.wireprotoserver
 sshserver = import_module('mercurial.sshserver')
 
+# TRACKING hg46 mercurial.wireprototypes introduced this version
+wireprototypes = import_module('mercurial.wireprototypes')
+
 # TRACKING hg46 mercurial.wireprotov1server contains unified code for
 # dispatching a wire protocol command
 wireprotov1server = import_module('mercurial.wireprotov1server')
@@ -315,12 +318,22 @@ def wrappedsshv1respondbytes(orig, fout, rsp):
     # completed command for the latter. There's no good way of only
     # monkeypatching the former. So we sniff the stack for presence of
     # getpayload() and don't do anything special in that case.
+    #
+    # In addition, Mercurial 4.6+ calls _sshv1respondbytes() twice in cases
+    # when sending a wireprototypes.pushres. The first call is always an
+    # empty string. So we sniff for that as well.
     for f in inspect.stack():
         frame = f[0]
 
         # If there are multiple functions named getpayload() this could give
         # false positives. Until it is a problem, meh.
         if frame.f_code.co_name == r'getpayload':
+            return orig(fout, rsp)
+
+        if (wireprototypes and frame.f_code.co_name == r'_runsshserver' and
+            isinstance(frame.f_locals[r'rsp'], wireprototypes.pushres) and
+            rsp == b''):
+
             return orig(fout, rsp)
 
     try:
