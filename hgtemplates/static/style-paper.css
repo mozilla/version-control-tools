@@ -308,6 +308,11 @@ td.annotate:hover div.annotate-info { display: inline; }
   float: left;
 }
 
+.sourcelines > span:after {
+  content: '';
+  display: inline-block;
+}
+
 .sourcelines > span:target, tr:target td {
   background-color: #bfdfff;
 }
@@ -350,6 +355,7 @@ div.followlines-link {
 }
 
 .btn-followlines {
+  position: absolute;
   display: none;
   cursor: pointer;
   box-sizing: content-box;
@@ -365,14 +371,6 @@ div.followlines-link {
   font-family: monospace;
   text-align: center;
   line-height: 5px;
-}
-
-tr .btn-followlines {
-  position: absolute;
-}
-
-span .btn-followlines {
-  float: left;
 }
 
 span.followlines-select .btn-followlines {

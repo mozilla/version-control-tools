@@ -328,14 +328,15 @@ function process_dates(parentSelector){
 	}
 }
 
-function toggleDiffstat() {
+function toggleDiffstat(event) {
     var curdetails = document.getElementById('diffstatdetails').style.display;
     var curexpand = curdetails === 'none' ? 'inline' : 'none';
     document.getElementById('diffstatdetails').style.display = curexpand;
     document.getElementById('diffstatexpand').style.display = curdetails;
+    event.preventDefault();
 }
 
-function toggleLinewrap() {
+function toggleLinewrap(event) {
     function getLinewrap() {
         var nodes = document.getElementsByClassName('sourcelines');
         // if there are no such nodes, error is thrown here
@@ -360,6 +361,7 @@ function toggleLinewrap() {
     }
 
     setLinewrap(!getLinewrap());
+    event.preventDefault();
 }
 
 function format(str, replacements) {
@@ -551,6 +553,28 @@ function renderDiffOptsForm() {
     form.style.display = 'block';
 }
 
+function addDiffStatToggle() {
+    var els = document.getElementsByClassName("diffstattoggle");
+
+    for (var i = 0; i < els.length; i++) {
+        els[i].addEventListener("click", toggleDiffstat, false);
+    }
+}
+
+function addLineWrapToggle() {
+    var els = document.getElementsByClassName("linewraptoggle");
+
+    for (var i = 0; i < els.length; i++) {
+        var nodes = els[i].getElementsByClassName("linewraplink");
+
+        for (var j = 0; j < nodes.length; j++) {
+            nodes[j].addEventListener("click", toggleLinewrap, false);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
    process_dates();
+   addDiffStatToggle();
+   addLineWrapToggle();
 }, false);

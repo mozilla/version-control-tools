@@ -33,7 +33,6 @@ fileellipses = '...'
 diffstatlink = diffstat.tmpl
 diffstatnolink = diffstat.tmpl
 changelogentry = shortlogentry.tmpl
-searchentry = shortlogentry.tmpl
 changeset = changeset.tmpl
 manifest = manifest.tmpl
 
@@ -213,7 +212,12 @@ successorlink = '<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparamet
 obsfatesuccessors = '{if(successors, ' as ')}{successors%successorlink}'
 obsfateverb = '{obsfateverb(successors, markers)}'
 obsfateoperations = '{if(obsfateoperations(markers), ' using {join(obsfateoperations(markers), ', ')}')}'
-obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}'
+obsfateusers = '{if(obsfateusers(markers), ' by {join(obsfateusers(markers)%'{user|obfuscate}', ', ')}')}'
+obsfatedate = '{if(obsfatedate(markers), ' {ifeq(min(obsfatedate(markers)), max(obsfatedate(markers)), '<span class="age">{min(obsfatedate(markers))|rfc822date}</span>', 'between <span class="age">{min(obsfatedate(markers))|rfc822date}</span> and <span class="age">{max(obsfatedate(markers))|rfc822date}</span>')}')}'
+obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}{obsfateusers}{obsfatedate}'
+instabilitychangesetlink = '<a href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>'
+divergentnode = '{instabilitychangesetlink} ({phase})'
+whyunstableentry = '{instability}: {if(divergentnodes, divergentnodes%divergentnode)} {reason} {instabilitychangesetlink}'
 
 filediffparent = '
   <tr>

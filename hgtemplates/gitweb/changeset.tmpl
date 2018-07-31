@@ -44,7 +44,8 @@ changeset |
  <td>changeset {rev}</td>
  <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
 </tr>
-{if(obsolete, '<tr><td>obsolete</td><td>{succsandmarkers%obsfateentry}</td></tr>')}
+{if(obsolete, succsandmarkers%obsfateentry)}
+{if(instabilities, whyunstable%whyunstableentry)}
 {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
 {child%changesetchild}
 </table></div>

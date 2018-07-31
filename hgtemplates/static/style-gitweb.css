@@ -29,7 +29,7 @@ a.title:hover { background-color: #d9d8d1; }
 div.title_text { padding:6px 0px; border: solid #d9d8d1; border-width:0px 0px 1px; }
 div.log_body { padding:8px 8px 8px 150px; }
 .age { white-space:nowrap; }
-span.age { position:relative; float:left; width:142px; font-style:italic; }
+a.title span.age { position:relative; float:left; width:142px; font-style:italic; }
 div.log_link {
 	padding:0px 8px;
 	font-size:10px; font-family:sans-serif; font-style:normal;
@@ -242,6 +242,7 @@ div.followlines-link {
 }
 
 .btn-followlines {
+  position: absolute;
   display: none;
   cursor: pointer;
   box-sizing: content-box;
@@ -257,14 +258,6 @@ div.followlines-link {
   font-family: monospace;
   text-align: center;
   line-height: 5px;
-}
-
-tr .btn-followlines {
-  position: absolute;
-}
-
-span .btn-followlines {
-  float: left;
 }
 
 span.followlines-select .btn-followlines {

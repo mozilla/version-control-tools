@@ -51,7 +51,11 @@
 </tr>
 {if(obsolete, '<tr>
  <th>obsolete</th>
- <td>{succsandmarkers%obsfateentry}</td>
+ <td>{join(succsandmarkers%obsfateentry, '<br>\n')}</td>
+</tr>')}
+{if(instabilities, '<tr>
+ <th>unstable</th>
+ <td>{join(whyunstable%whyunstableentry, '<br>\n')}</td>
 </tr>')}
 <tr>
  <th class="author">parents</th>
@@ -69,9 +73,9 @@
   <th class="diffstat">diffstat</th>
   <td class="diffstat">
     {diffsummary}
-    <a id="diffstatexpand" href="javascript:toggleDiffstat()">[<tt>+</tt>]</a>
+    <a id="diffstatexpand" class="diffstattoggle" href="#">[<tt>+</tt>]</a>
     <div id="diffstatdetails" style="display:none;">
-      <a href="javascript:toggleDiffstat()">[<tt>-</tt>]</a>
+      <a class="diffstattoggle" href="#">[<tt>-</tt>]</a>
       <table class="diffstat-table stripes2">{diffstat}</table>
     </div>
   </td>
@@ -79,7 +83,7 @@
 </table>
 
 <div class="overflow">
-<div class="sourcefirst linewraptoggle">line wrap: <a class="linewraplink" href="javascript:toggleLinewrap()">on</a></div>
+<div class="sourcefirst linewraptoggle">line wrap: <a class="linewraplink" href="#">on</a></div>
 <div class="sourcefirst"> line diff</div>
 <div class="stripes2 diffblocks">
 {diff}

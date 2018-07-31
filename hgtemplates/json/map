@@ -50,9 +50,8 @@ lineentry = '\{
 search = '\{
   "node": {node|json},
   "query": {query|json},
-  "entries": [{join(entries%searchentry, ", ")}]
+  "entries": [{join(entries%changelistentry, ", ")}]
   }'
-searchentry = '{changelistentry}'
 # changelog and shortlog are the same web API but with different
 # number of entries.
 changelog = changelist.tmpl
@@ -182,7 +181,7 @@ filediff = '\{
   "author": {author|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
   "children": [{join(child%changesetparent, ", ")}],
-  "diff": [{join(diff%diffblock, ", ")}]
+  "diff": [{join(diff, ", ")}]
   }'
 diffblock = '\{
   "blockno": {blockno|json},

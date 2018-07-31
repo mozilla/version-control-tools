@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if ( childSupportElms.length > 0 ) {
             btnSupportElm = childSupportElms[0];
         }
-        var refNode = btnSupportElm.children[0]; // node to insert <button> before
+        var refNode = btnSupportElm.childNodes[0]; // node to insert <button> before
         btnSupportElm.insertBefore(btn, refNode);
     }
 

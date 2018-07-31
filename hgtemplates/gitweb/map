@@ -57,7 +57,6 @@ filenav = '{before%filenaventry}{after%filenaventry}'
 
 fileellipses = '...'
 changelogentry = changelogentry.tmpl
-searchentry = changelogentry.tmpl
 changeset = changeset.tmpl
 manifest = manifest.tmpl
 direntry = '
@@ -275,7 +274,20 @@ successorlink = '<a class="list" href="{url|urlescape}rev/{node|short}{sessionva
 obsfatesuccessors = '{if(successors, ' as ')}{successors%successorlink}'
 obsfateverb = '{obsfateverb(successors, markers)}'
 obsfateoperations = '{if(obsfateoperations(markers), ' using {join(obsfateoperations(markers), ', ')}')}'
-obsfateentry = '{obsfateverb}{obsfateoperations}{obsfatesuccessors}'
+obsfateusers = '{if(obsfateusers(markers), ' by {join(obsfateusers(markers)%'{user|obfuscate}', ', ')}')}'
+obsfatedate = '{if(obsfatedate(markers), ' {ifeq(min(obsfatedate(markers)), max(obsfatedate(markers)), '<span class="age">{min(obsfatedate(markers))|rfc822date}</span>', 'between <span class="age">{min(obsfatedate(markers))|rfc822date}</span> and <span class="age">{max(obsfatedate(markers))|rfc822date}</span>')}')}'
+obsfateentry = '
+  <tr>
+    <td>obsolete</td>
+    <td>{obsfateverb}{obsfateoperations}{obsfatesuccessors}{obsfateusers}{obsfatedate}</td>
+  </tr>'
+instabilitychangesetlink = '<a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a>'
+divergentnode = '{instabilitychangesetlink} ({phase})'
+whyunstableentry = '
+  <tr>
+    <td>unstable</td>
+    <td>{instability}: {if(divergentnodes, divergentnodes%divergentnode)} {reason} {instabilitychangesetlink}</td>
+  </tr>'
 shortlogentry = '
   <tr class="parity{parity}">
     <td class="age"><i class="age">{date|rfc822date}</i></td>
