@@ -68,13 +68,9 @@ def mozreview_create_repo(verbosity=0):
                         verbosity=verbosity)
 
 
-def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, verbosity=0):
+def deploy_hgmo(verbosity=0):
     """Deploy to hg.mozilla.org."""
-    extra = {
-        'skip_hgssh': skip_hgssh,
-        'skip_hgweb': skip_hgweb,
-        'vct': ROOT,
-    }
+    extra = {'vct': ROOT}
 
     return run_playbook('deploy-hgmo', extra_vars=extra,
                         verbosity=verbosity)

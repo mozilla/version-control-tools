@@ -43,31 +43,8 @@
            color=red
            msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}"
       run_once: true
-    
-    - name: notify IRC when skipping hgssh
-      irc: server=irc.mozilla.org
-           port=6697
-           use_ssl=true
-           channel="#vcs"
-           nick=hg-deploy-bot
-           color=red
-           msg="Skipping hgssh during this deploy"
-      run_once: true
-      when: skip_hgssh == True
-      
-    - name: notify IRC when skipping hgweb
-      irc: server=irc.mozilla.org
-           port=6697
-           use_ssl=true
-           channel="#vcs"
-           nick=hg-deploy-bot
-           color=red
-           msg="Skipping hgweb during this deploy"
-      run_once: true
-      when: skip_hgweb == True
 
 - hosts: hgweb-prod
-  when: skip_hgweb == False
   pre_tasks:
     - name: capture bloxtool config
       slurp: src=/etc/mercurial/bloxtool.json
@@ -90,7 +67,6 @@
       }
 
 - hosts: hgssh-prod
-  when: skip_hgssh == False
   pre_tasks:
     # Until we integrate secrets with Ansible, the LDAP config is
     # pre-defined on the server.
