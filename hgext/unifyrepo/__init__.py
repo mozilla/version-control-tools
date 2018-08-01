@@ -475,8 +475,7 @@ def unifyrepo(ui, settings):
             # Mass replacing may not be the proper strategy. But it works for
             # our current use case.
             bm.clear()
-            bm.update(books)
-            bm.recordchange(tr)
+            bm.applychanges(destrepo, tr, books.items())
 
     # This is a bit hacky. Pushlog and bookmarks aren't currently replicated
     # via the normal hooks mechanism because we use the low-level APIs to
