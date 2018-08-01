@@ -28,8 +28,6 @@
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 wdirlock --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
 Simulate a held lock on the working directory for a no-op pull but working
@@ -47,8 +45,6 @@ directory update.
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to aada1b3e573f7272bb2ef93b34acbf0f77c69d44
 
@@ -58,8 +54,6 @@ directory update.
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 wdirlock-pull --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock-pull
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
   $ cd server/repo0
@@ -83,8 +77,6 @@ directory update.
   adding file changes
   added 1 changesets with 1 changes to 1 files
   new changesets a7c4155bc8eb (?)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to a7c4155bc8eb86ecec78c91f744f597e7c9a3ff3
 
@@ -95,8 +87,6 @@ to be acquired.
   $ hg -q robustcheckout http://localhost:$HGPORT/repo1 storelock --revision 7d5b54cb09e1
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
   $ hg -R storelock acquirestorelock
   $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
@@ -116,8 +106,6 @@ to be acquired.
   new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 65cd4e3b46a3f22a08ec4162871e67f57c322f6a
 
@@ -130,8 +118,6 @@ Simulate a held lock on the store for a pull plus working directory update.
   $ hg -q robustcheckout http://localhost:$HGPORT/repo1 storelock-pull --revision 7d5b54cb09e1
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-pull
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
   $ hg -R storelock-pull acquirestorelock
   $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
@@ -156,8 +142,6 @@ Simulate a held lock on the store for a pull plus working directory update.
   new changesets 65cd4e3b46a3:fca136d824da (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to fca136d824dac41b19345549edfda68fe63213c4
 
@@ -180,8 +164,6 @@ Simulate a held lock on the store without a working directory
   new changesets 65cd4e3b46a3:fca136d824da (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
 

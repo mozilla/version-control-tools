@@ -3,8 +3,6 @@
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 local --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at local
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
 Blow out content of .hg directory to simulate a rolled back repo or something
@@ -24,8 +22,6 @@ Blow out content of .hg directory to simulate a rolled back repo or something
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -56,8 +52,6 @@ Test a variation where the local repo still exists
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -75,8 +69,6 @@ Test behavior when fncache is missing
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 requires-existing --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
   dotencode
@@ -96,8 +88,6 @@ Test behavior when fncache is missing
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
@@ -117,8 +107,6 @@ Test behavior when fncache is missing
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-missing
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires

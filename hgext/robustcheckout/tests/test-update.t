@@ -12,8 +12,6 @@
   new changesets b8b78f0253d8:aada1b3e573f (?)
   searching for changes
   no changes found
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -30,8 +28,6 @@ Modifications to a tracked file should get lost during update
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -48,8 +44,6 @@ Modifications should also get lost when updating to new revision
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@b8b78f0253d8 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to b8b78f0253d822e33ba652fd3d80a5c0837cfdf3
 
@@ -67,8 +61,6 @@ Added and copied files will be lost during update
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -80,8 +72,6 @@ Added and copied files will be lost during update
   (using Mercurial *) (glob)
   ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
-  devel-warn: changectx.__init__ is getting more limited, see context.changectxdeprecwarn() for details (hg46 !)
-  (compatibility will be dropped after Mercurial-4.6, update your code.) at: */mercurial/localrepo.py:849 (__contains__) (glob) (hg46 !)
   (purging working directory)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce

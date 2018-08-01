@@ -585,16 +585,21 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     # We only pull if we are using symbolic names or the requested revision
     # doesn't exist.
     havewantedrev = False
-    if revision and revision in repo:
-        ctx = scmutil.revsingle(repo, revision)
 
-        if not ctx.hex().startswith(revision):
-            raise error.Abort('--revision argument is ambiguous',
-                              hint='must be the first 12+ characters of a '
-                                   'SHA-1 fragment')
+    if revision:
+        try:
+            ctx = scmutil.revsingle(repo, revision)
+        except error.RepoLookupError:
+            ctx = None
 
-        checkoutrevision = ctx.hex()
-        havewantedrev = True
+        if ctx:
+            if not ctx.hex().startswith(revision):
+                raise error.Abort('--revision argument is ambiguous',
+                                  hint='must be the first 12+ characters of a '
+                                       'SHA-1 fragment')
+
+            checkoutrevision = ctx.hex()
+            havewantedrev = True
 
     if not havewantedrev:
         ui.write('(pulling to obtain %s)\n' % (revision or branch,))
