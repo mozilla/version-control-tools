@@ -45,11 +45,12 @@
 
 from __future__ import absolute_import, print_function
 
+import argparse
+import collections
 import difflib
 import distutils.version as version
 import errno
 import json
-import optparse
 import os
 import random
 import re
@@ -119,6 +120,7 @@ if pygmentspresent:
         }
 
     class TestRunnerLexer(lexer.RegexLexer):
+        testpattern = r'[\w-]+\.(t|py)(#[a-zA-Z0-9_\-\.]+)?'
         tokens = {
             'root': [
                 (r'^Skipped', token.Generic.Skipped, 'skipped'),
@@ -126,11 +128,11 @@ if pygmentspresent:
                 (r'^ERROR: ', token.Generic.Failed, 'failed'),
             ],
             'skipped': [
-                (r'[\w-]+\.(t|py)', token.Generic.SName),
+                (testpattern, token.Generic.SName),
                 (r':.*', token.Generic.Skipped),
             ],
             'failed': [
-                (r'[\w-]+\.(t|py)', token.Generic.FName),
+                (testpattern, token.Generic.FName),
                 (r'(:| ).*', token.Generic.Failed),
             ]
         }
@@ -296,122 +298,134 @@ def parsettestcases(path):
 
 def getparser():
     """Obtain the OptionParser used by the CLI."""
-    parser = optparse.OptionParser("%prog [options] [tests]")
+    parser = argparse.ArgumentParser(usage='%(prog)s [options] [tests]')
 
-    # keep these sorted
-    parser.add_option("--blacklist", action="append",
+    selection = parser.add_argument_group('Test Selection')
+    selection.add_argument('--allow-slow-tests', action='store_true',
+        help='allow extremely slow tests')
+    selection.add_argument("--blacklist", action="append",
         help="skip tests listed in the specified blacklist file")
-    parser.add_option("--whitelist", action="append",
-        help="always run tests listed in the specified whitelist file")
-    parser.add_option("--test-list", action="append",
-                      help="read tests to run from the specified file")
-    parser.add_option("--changed", type="string",
+    selection.add_argument("--changed",
         help="run tests that are changed in parent rev or working directory")
-    parser.add_option("-C", "--annotate", action="store_true",
-        help="output files annotated with coverage")
-    parser.add_option("-c", "--cover", action="store_true",
-        help="print a test coverage report")
-    parser.add_option("--color", choices=["always", "auto", "never"],
-                      default=os.environ.get('HGRUNTESTSCOLOR', 'auto'),
-                      help="colorisation: always|auto|never (default: auto)")
-    parser.add_option("-d", "--debug", action="store_true",
+    selection.add_argument("-k", "--keywords",
+        help="run tests matching keywords")
+    selection.add_argument("-r", "--retest", action="store_true",
+        help = "retest failed tests")
+    selection.add_argument("--test-list", action="append",
+        help="read tests to run from the specified file")
+    selection.add_argument("--whitelist", action="append",
+        help="always run tests listed in the specified whitelist file")
+    selection.add_argument('tests', metavar='TESTS', nargs='*',
+                        help='Tests to run')
+
+    harness = parser.add_argument_group('Test Harness Behavior')
+    harness.add_argument('--bisect-repo',
+                        metavar='bisect_repo',
+                        help=("Path of a repo to bisect. Use together with "
+                              "--known-good-rev"))
+    harness.add_argument("-d", "--debug", action="store_true",
         help="debug mode: write output of test scripts to console"
              " rather than capturing and diffing it (disables timeout)")
-    parser.add_option("-f", "--first", action="store_true",
+    harness.add_argument("-f", "--first", action="store_true",
         help="exit on the first test failure")
-    parser.add_option("-H", "--htmlcov", action="store_true",
-        help="create an HTML report of the coverage of the files")
-    parser.add_option("-i", "--interactive", action="store_true",
+    harness.add_argument("-i", "--interactive", action="store_true",
         help="prompt to accept changed output")
-    parser.add_option("-j", "--jobs", type="int",
+    harness.add_argument("-j", "--jobs", type=int,
         help="number of jobs to run in parallel"
              " (default: $%s or %d)" % defaults['jobs'])
-    parser.add_option("--keep-tmpdir", action="store_true",
+    harness.add_argument("--keep-tmpdir", action="store_true",
         help="keep temporary directory after running tests")
-    parser.add_option("-k", "--keywords",
-        help="run tests matching keywords")
-    parser.add_option("--list-tests", action="store_true",
+    harness.add_argument('--known-good-rev',
+                        metavar="known_good_rev",
+                        help=("Automatically bisect any failures using this "
+                              "revision as a known-good revision."))
+    harness.add_argument("--list-tests", action="store_true",
         help="list tests instead of running them")
-    parser.add_option("-l", "--local", action="store_true",
-        help="shortcut for --with-hg=<testdir>/../hg, "
-             "and --with-chg=<testdir>/../contrib/chg/chg if --chg is set")
-    parser.add_option("--loop", action="store_true",
+    harness.add_argument("--loop", action="store_true",
         help="loop tests repeatedly")
-    parser.add_option("--runs-per-test", type="int", dest="runs_per_test",
-        help="run each test N times (default=1)", default=1)
-    parser.add_option("-n", "--nodiff", action="store_true",
-        help="skip showing test changes")
-    parser.add_option("--outputdir", type="string",
-        help="directory to write error logs to (default=test directory)")
-    parser.add_option("-p", "--port", type="int",
+    harness.add_argument('--random', action="store_true",
+        help='run tests in random order')
+    harness.add_argument('--order-by-runtime', action="store_true",
+        help='run slowest tests first, according to .testtimes')
+    harness.add_argument("-p", "--port", type=int,
         help="port on which servers should listen"
              " (default: $%s or %d)" % defaults['port'])
-    parser.add_option("--compiler", type="string",
-        help="compiler to build with")
-    parser.add_option("--pure", action="store_true",
-        help="use pure Python code instead of C extensions")
-    parser.add_option("-R", "--restart", action="store_true",
+    harness.add_argument('--profile-runner', action='store_true',
+                        help='run statprof on run-tests')
+    harness.add_argument("-R", "--restart", action="store_true",
         help="restart at last error")
-    parser.add_option("-r", "--retest", action="store_true",
-        help="retest failed tests")
-    parser.add_option("-S", "--noskips", action="store_true",
-        help="don't report skip tests verbosely")
-    parser.add_option("--shell", type="string",
+    harness.add_argument("--runs-per-test", type=int, dest="runs_per_test",
+        help="run each test N times (default=1)", default=1)
+    harness.add_argument("--shell",
         help="shell to use (default: $%s or %s)" % defaults['shell'])
-    parser.add_option("-t", "--timeout", type="int",
-        help="kill errant tests after TIMEOUT seconds"
-             " (default: $%s or %d)" % defaults['timeout'])
-    parser.add_option("--slowtimeout", type="int",
+    harness.add_argument('--showchannels', action='store_true',
+                        help='show scheduling channels')
+    harness.add_argument("--slowtimeout", type=int,
         help="kill errant slow tests after SLOWTIMEOUT seconds"
              " (default: $%s or %d)" % defaults['slowtimeout'])
-    parser.add_option("--time", action="store_true",
-        help="time how long each test takes")
-    parser.add_option("--json", action="store_true",
-                      help="store test result data in 'report.json' file")
-    parser.add_option("--tmpdir", type="string",
+    harness.add_argument("-t", "--timeout", type=int,
+        help="kill errant tests after TIMEOUT seconds"
+             " (default: $%s or %d)" % defaults['timeout'])
+    harness.add_argument("--tmpdir",
         help="run tests in the given temporary directory"
              " (implies --keep-tmpdir)")
-    parser.add_option("-v", "--verbose", action="store_true",
+    harness.add_argument("-v", "--verbose", action="store_true",
         help="output verbose messages")
-    parser.add_option("--xunit", type="string",
-                      help="record xunit results at specified path")
-    parser.add_option("--view", type="string",
-        help="external diff viewer")
-    parser.add_option("--with-hg", type="string",
+
+    hgconf = parser.add_argument_group('Mercurial Configuration')
+    hgconf.add_argument("--chg", action="store_true",
+        help="install and use chg wrapper in place of hg")
+    hgconf.add_argument("--compiler",
+        help="compiler to build with")
+    hgconf.add_argument('--extra-config-opt', action="append", default=[],
+        help='set the given config opt in the test hgrc')
+    hgconf.add_argument("-l", "--local", action="store_true",
+        help="shortcut for --with-hg=<testdir>/../hg, "
+             "and --with-chg=<testdir>/../contrib/chg/chg if --chg is set")
+    hgconf.add_argument("--ipv6", action="store_true",
+        help="prefer IPv6 to IPv4 for network related tests")
+    hgconf.add_argument("--pure", action="store_true",
+        help="use pure Python code instead of C extensions")
+    hgconf.add_argument("-3", "--py3k-warnings", action="store_true",
+        help="enable Py3k warnings on Python 2.7+")
+    hgconf.add_argument("--with-chg", metavar="CHG",
+        help="use specified chg wrapper in place of hg")
+    hgconf.add_argument("--with-hg",
         metavar="HG",
         help="test using specified hg script rather than a "
              "temporary installation")
-    parser.add_option("--chg", action="store_true",
-                      help="install and use chg wrapper in place of hg")
-    parser.add_option("--with-chg", metavar="CHG",
-                      help="use specified chg wrapper in place of hg")
-    parser.add_option("--ipv6", action="store_true",
-                      help="prefer IPv6 to IPv4 for network related tests")
-    parser.add_option("-3", "--py3k-warnings", action="store_true",
-        help="enable Py3k warnings on Python 2.7+")
     # This option should be deleted once test-check-py3-compat.t and other
     # Python 3 tests run with Python 3.
-    parser.add_option("--with-python3", metavar="PYTHON3",
-                      help="Python 3 interpreter (if running under Python 2)"
-                           " (TEMPORARY)")
-    parser.add_option('--extra-config-opt', action="append",
-                      help='set the given config opt in the test hgrc')
-    parser.add_option('--random', action="store_true",
-                      help='run tests in random order')
-    parser.add_option('--profile-runner', action='store_true',
-                      help='run statprof on run-tests')
-    parser.add_option('--allow-slow-tests', action='store_true',
-                      help='allow extremely slow tests')
-    parser.add_option('--showchannels', action='store_true',
-                      help='show scheduling channels')
-    parser.add_option('--known-good-rev', type="string",
-                      metavar="known_good_rev",
-                      help=("Automatically bisect any failures using this "
-                            "revision as a known-good revision."))
-    parser.add_option('--bisect-repo', type="string",
-                      metavar='bisect_repo',
-                      help=("Path of a repo to bisect. Use together with "
-                            "--known-good-rev"))
+    hgconf.add_argument("--with-python3", metavar="PYTHON3",
+        help="Python 3 interpreter (if running under Python 2)"
+             " (TEMPORARY)")
+
+    reporting = parser.add_argument_group('Results Reporting')
+    reporting.add_argument("-C", "--annotate", action="store_true",
+        help="output files annotated with coverage")
+    reporting.add_argument("--color", choices=["always", "auto", "never"],
+        default=os.environ.get('HGRUNTESTSCOLOR', 'auto'),
+        help="colorisation: always|auto|never (default: auto)")
+    reporting.add_argument("-c", "--cover", action="store_true",
+        help="print a test coverage report")
+    reporting.add_argument('--exceptions', action='store_true',
+        help='log all exceptions and generate an exception report')
+    reporting.add_argument("-H", "--htmlcov", action="store_true",
+        help="create an HTML report of the coverage of the files")
+    reporting.add_argument("--json", action="store_true",
+        help="store test result data in 'report.json' file")
+    reporting.add_argument("--outputdir",
+        help="directory to write error logs to (default=test directory)")
+    reporting.add_argument("-n", "--nodiff", action="store_true",
+        help="skip showing test changes")
+    reporting.add_argument("-S", "--noskips", action="store_true",
+        help="don't report skip tests verbosely")
+    reporting.add_argument("--time", action="store_true",
+        help="time how long each test takes")
+    reporting.add_argument("--view",
+        help="external diff viewer")
+    reporting.add_argument("--xunit",
+        help="record xunit results at specified path")
 
     for option, (envvar, default) in defaults.items():
         defaults[option] = type(default)(os.environ.get(envvar, default))
@@ -421,7 +435,7 @@ def getparser():
 
 def parseargs(args, parser):
     """Parse arguments with our OptionParser and validate results."""
-    (options, args) = parser.parse_args(args)
+    options = parser.parse_args(args)
 
     # jython is always pure
     if 'java' in sys.platform or '__pypy__' in sys.modules:
@@ -550,7 +564,7 @@ def parseargs(args, parser):
     if options.showchannels:
         options.nodiff = True
 
-    return (options, args)
+    return options
 
 def rename(src, dst):
     """Like os.rename(), trade atomicity and opened files friendliness
@@ -659,6 +673,7 @@ class Test(unittest.TestCase):
 
     def __init__(self, path, outputdir, tmpdir, keeptmpdir=False,
                  debug=False,
+                 first=False,
                  timeout=None,
                  startport=None, extraconfigopts=None,
                  py3kwarnings=False, shell=None, hgcommand=None,
@@ -711,6 +726,7 @@ class Test(unittest.TestCase):
         self._threadtmp = tmpdir
         self._keeptmpdir = keeptmpdir
         self._debug = debug
+        self._first = first
         self._timeout = timeout
         self._slowtimeout = slowtimeout
         self._startport = startport
@@ -890,15 +906,18 @@ class Test(unittest.TestCase):
             # Diff generation may rely on written .err file.
             if (ret != 0 or out != self._refout) and not self._skipped \
                 and not self._debug:
-                f = open(self.errpath, 'wb')
-                for line in out:
-                    f.write(line)
-                f.close()
+                with open(self.errpath, 'wb') as f:
+                    for line in out:
+                        f.write(line)
 
             # The result object handles diff calculation for us.
-            if self._result.addOutputMismatch(self, ret, out, self._refout):
-                # change was accepted, skip failing
-                return
+            with firstlock:
+                if self._result.addOutputMismatch(self, ret, out, self._refout):
+                    # change was accepted, skip failing
+                    return
+                if self._first:
+                    global firsterror
+                    firsterror = True
 
             if ret:
                 msg = 'output changed and ' + describe(ret)
@@ -930,10 +949,9 @@ class Test(unittest.TestCase):
 
         if (self._ret != 0 or self._out != self._refout) and not self._skipped \
             and not self._debug and self._out:
-            f = open(self.errpath, 'wb')
-            for line in self._out:
-                f.write(line)
-            f.close()
+            with open(self.errpath, 'wb') as f:
+                for line in self._out:
+                    f.write(line)
 
         vlog("# Ret was:", self._ret, '(%s)' % self.name)
 
@@ -967,8 +985,6 @@ class Test(unittest.TestCase):
             self._portmap(6),
             self._portmap(7),
             self._portmap(8),
-            (br'(?m)^(saved backup bundle to .*\.hg)( \(glob\))?$',
-             br'\1 (glob)'),
             (br'([^0-9])%s' % re.escape(self._localip()), br'\1$LOCALIP'),
             (br'\bHG_TXNID=TXN:[a-f0-9]{40}\b', br'HG_TXNID=TXN:$ID$'),
             ]
@@ -978,6 +994,20 @@ class Test(unittest.TestCase):
             r.append((re.escape(os.environ['DOCKER_HOSTNAME'].encode('utf-8')),
                       b'$DOCKER_HOSTNAME'))
 
+        replacementfile = os.path.join(self._testdir, b'common-pattern.py')
+
+        if os.path.exists(replacementfile):
+            data = {}
+            with open(replacementfile, mode='rb') as source:
+                # the intermediate 'compile' step help with debugging
+                code = compile(source.read(), replacementfile, 'exec')
+                exec(code, data)
+                for value in data.get('substitutions', ()):
+                    if len(value) != 2:
+                        msg = 'malformatted substitution in %s: %r'
+                        msg %= (replacementfile, value)
+                        raise ValueError(msg)
+                    r.append(value)
         return r
 
     def _escapepath(self, p):
@@ -1031,10 +1061,11 @@ class Test(unittest.TestCase):
             offset = '' if i == 0 else '%s' % i
             env["HGPORT%s" % offset] = '%s' % (self._startport + i)
         env = os.environ.copy()
-        env['PYTHONUSERBASE'] = sysconfig.get_config_var('userbase')
+        env['PYTHONUSERBASE'] = sysconfig.get_config_var('userbase') or ''
         # TODO enable these at Mozilla.
         #env['HGEMITWARNINGS'] = '1'
         env['TESTTMP'] = self._testtmp
+        env['TESTNAME'] = self.name
         env['HOME'] = self._testtmp
         # This number should match portneeded in _getport
         for port in xrange(9):
@@ -1050,6 +1081,17 @@ class Test(unittest.TestCase):
         env["HGENCODINGMODE"] = "strict"
         env['HGIPV6'] = str(int(self._useipv6))
         env["ERR_FILE"] = self.errpath
+
+        extraextensions = []
+        for opt in self._extraconfigopts:
+            section, key = opt.encode('utf-8').split(b'.', 1)
+            if section != 'extensions':
+                continue
+            name = key.split(b'=', 1)[0]
+            extraextensions.append(name)
+
+        if extraextensions:
+            env['HGTESTEXTRAEXTENSIONS'] = b' '.join(extraextensions)
 
         # LOCALIP could be ::1 or 127.0.0.1. Useful for tests that require raw
         # IP addresses.
@@ -1070,7 +1112,7 @@ class Test(unittest.TestCase):
                 del env[k]
 
         # unset env related to hooks
-        for k in env.keys():
+        for k in list(env):
             if k.startswith('HG_'):
                 del env[k]
 
@@ -1081,33 +1123,36 @@ class Test(unittest.TestCase):
 
     def _createhgrc(self, path):
         """Create an hgrc file for this test."""
-        hgrc = open(path, 'wb')
-        hgrc.write(b'[ui]\n')
-        hgrc.write(b'slash = True\n')
-        hgrc.write(b'interactive = False\n')
-        hgrc.write(b'mergemarkers = detailed\n')
-        hgrc.write(b'promptecho = True\n')
-        hgrc.write(b'[defaults]\n')
-        hgrc.write(b'backout = -d "0 0"\n')
-        hgrc.write(b'commit = -d "0 0"\n')
-        hgrc.write(b'shelve = --date "0 0"\n')
-        hgrc.write(b'tag = -d "0 0"\n')
-        hgrc.write(b'[devel]\n')
-        hgrc.write(b'all-warnings = true\n')
-        hgrc.write(b'default-date = 0 0\n')
-        hgrc.write(b'[largefiles]\n')
-        hgrc.write(b'usercache = %s\n' %
-                   (os.path.join(self._testtmp, b'.cache/largefiles')))
-        hgrc.write(b'[web]\n')
-        hgrc.write(b'address = localhost\n')
-        hgrc.write(b'ipv6 = %s\n' % str(self._useipv6).encode('ascii'))
+        with open(path, 'wb') as hgrc:
+            hgrc.write(b'[ui]\n')
+            hgrc.write(b'slash = True\n')
+            hgrc.write(b'interactive = False\n')
+            hgrc.write(b'mergemarkers = detailed\n')
+            hgrc.write(b'promptecho = True\n')
+            hgrc.write(b'[defaults]\n')
+            hgrc.write(b'backout = -d "0 0"\n')
+            hgrc.write(b'commit = -d "0 0"\n')
+            hgrc.write(b'shelve = --date "0 0"\n')
+            hgrc.write(b'tag = -d "0 0"\n')
+            hgrc.write(b'[devel]\n')
+            hgrc.write(b'all-warnings = true\n')
+            hgrc.write(b'default-date = 0 0\n')
+            hgrc.write(b'[largefiles]\n')
+            hgrc.write(b'usercache = %s\n' %
+                       (os.path.join(self._testtmp, b'.cache/largefiles')))
+            hgrc.write(b'[lfs]\n')
+            hgrc.write(b'usercache = %s\n' %
+                       (os.path.join(self._testtmp, b'.cache/lfs')))
+            hgrc.write(b'[web]\n')
+            hgrc.write(b'address = localhost\n')
+            hgrc.write(b'ipv6 = %s\n' % str(self._useipv6).encode('ascii'))
+            hgrc.write(b'server-header = testing stub value\n')
 
-        for opt in self._extraconfigopts:
-            section, key = opt.split('.', 1)
-            assert '=' in key, ('extra config opt %s must '
-                                'have an = for assignment' % opt)
-            hgrc.write(b'[%s]\n%s\n' % (section, key))
-        hgrc.close()
+            for opt in self._extraconfigopts:
+                section, key = opt.encode('utf-8').split(b'.', 1)
+                assert b'=' in key, ('extra config opt %s must '
+                                     'have an = for assignment' % opt)
+                hgrc.write(b'[%s]\n%s\n' % (section, key))
 
     def fail(self, msg):
         # unittest differentiates between errored and failed.
@@ -1213,25 +1258,23 @@ class TTest(Test):
 
     def __init__(self, path, *args, **kwds):
         # accept an extra "case" parameter
-        case = None
-        if 'case' in kwds:
-            case = kwds.pop('case')
+        case = kwds.pop('case', None)
         self._case = case
         self._allcases = parsettestcases(path)
         super(TTest, self).__init__(path, *args, **kwds)
         if case:
-            self.name = '%s (case %s)' % (self.name, _strpath(case))
+            self.name = '%s#%s' % (self.name, _strpath(case))
             self.errpath = b'%s.%s.err' % (self.errpath[:-4], case)
             self._tmpname += b'-%s' % case
+        self._have = {}
 
     @property
     def refpath(self):
         return os.path.join(self._testdir, self.bname)
 
     def _run(self, env):
-        f = open(self.path, 'rb')
-        lines = f.readlines()
-        f.close()
+        with open(self.path, 'rb') as f:
+            lines = f.readlines()
 
         # .t file is both reference output and the test input, keep reference
         # output updated with the the test input. This avoids some race
@@ -1243,10 +1286,9 @@ class TTest(Test):
 
         # Write out the generated script.
         fname = b'%s.sh' % self._testtmp
-        f = open(fname, 'wb')
-        for l in script:
-            f.write(l)
-        f.close()
+        with open(fname, 'wb') as f:
+            for l in script:
+                f.write(l)
 
         cmd = b'%s "%s"' % (self._shell, fname)
         vlog("# Running", cmd)
@@ -1264,10 +1306,14 @@ class TTest(Test):
         return self._processoutput(exitcode, output, salt, after, expected)
 
     def _hghave(self, reqs):
+        allreqs = b' '.join(reqs)
+        if allreqs in self._have:
+            return self._have.get(allreqs)
+
         # TODO do something smarter when all other uses of hghave are gone.
         tdir = self._testdir.replace(b'\\', b'/')
         proc = Popen4(b'%s -c "%s/hghave %s"' %
-                      (self._shell, tdir, b' '.join(reqs)),
+                      (self._shell, tdir, allreqs),
                       self._testtmp, 0, self._getenv())
         stdout, stderr = proc.communicate()
         ret = proc.wait()
@@ -1278,10 +1324,13 @@ class TTest(Test):
             sys.exit(1)
 
         if ret != 0:
+            self._have[allreqs] = (False, stdout)
             return False, stdout
 
         if b'slow' in reqs:
             self._timeout = self._slowtimeout
+
+        self._have[allreqs] = (True, None)
         return True, None
 
     def _iftest(self, args):
@@ -1335,6 +1384,13 @@ class TTest(Test):
             script.append(b'alias hg="%s"\n' % self._hgcommand)
         if os.getenv('MSYSTEM'):
             script.append(b'alias pwd="pwd -W"\n')
+        if self._case:
+            if isinstance(self._case, str):
+                quoted = shellquote(self._case)
+            else:
+                quoted = shellquote(self._case.decode('utf8')).encode('utf8')
+            script.append(b'TESTCASE=%s\n' % quoted)
+            script.append(b'export TESTCASE\n')
 
         n = 0
         for n, l in enumerate(lines):
@@ -1344,10 +1400,11 @@ class TTest(Test):
                 lsplit = l.split()
                 if len(lsplit) < 2 or lsplit[0] != b'#require':
                     after.setdefault(pos, []).append('  !!! invalid #require\n')
-                haveresult, message = self._hghave(lsplit[1:])
-                if not haveresult:
-                    script = [b'echo "%s"\nexit 80\n' % message]
-                    break
+                if not skipping:
+                    haveresult, message = self._hghave(lsplit[1:])
+                    if not haveresult:
+                        script = [b'echo "%s"\nexit 80\n' % message]
+                        break
                 after.setdefault(pos, []).append(l)
             elif l.startswith(b'#if'):
                 lsplit = l.split()
@@ -1438,23 +1495,17 @@ class TTest(Test):
                 if expected.get(pos, None):
                     els = expected[pos]
 
-                i = 0
                 optional = []
-                while i < len(els):
-                    el = els[i]
-
-                    r = self.linematch(el, lout)
+                for i, el in enumerate(els):
+                    r = False
+                    if el:
+                        r, exact = self.linematch(el, lout)
                     if isinstance(r, str):
-                        if r == '+glob':
-                            lout = el[:-1] + ' (glob)\n'
-                            r = '' # Warn only this line.
-                        elif r == '-glob':
+                        if r == '-glob':
                             lout = ''.join(el.rsplit(' (glob)', 1))
                             r = '' # Warn only this line.
                         elif r == "retry":
                             postout.append(b'  ' + el)
-                            els.pop(i)
-                            break
                         else:
                             log('\ninfo, unknown linematch result: %r\n' % r)
                             r = False
@@ -1472,8 +1523,11 @@ class TTest(Test):
 
                                 if not self._iftest(conditions):
                                     optional.append(i)
-
-                    i += 1
+                        if exact:
+                            # Don't allow line to be matches against a later
+                            # line in the output
+                            els.pop(i)
+                            break
 
                 if r:
                     if r == "retry":
@@ -1532,6 +1586,7 @@ class TTest(Test):
     @staticmethod
     def rematch(el, l):
         try:
+            el = b'(?:' + el + b')'
             # use \Z to ensure that the regex matches to the end of the string
             if os.name == 'nt':
                 return re.match(el + br'\r?\n\Z', l)
@@ -1572,40 +1627,41 @@ class TTest(Test):
         return TTest.rematch(res, l)
 
     def linematch(self, el, l):
-        retry = False
         if el == l: # perfect match (fast)
-            return True
-        if el:
-            if el.endswith(b" (?)\n"):
-                retry = "retry"
-                el = el[:-5] + b"\n"
+            return True, True
+        retry = False
+        if el.endswith(b" (?)\n"):
+            retry = "retry"
+            el = el[:-5] + b"\n"
+        else:
+            m = optline.match(el)
+            if m:
+                conditions = [c for c in m.group(2).split(b' ')]
+
+                el = m.group(1) + b"\n"
+                if not self._iftest(conditions):
+                    retry = "retry"    # Not required by listed features
+
+        if el.endswith(b" (esc)\n"):
+            if PYTHON3:
+                el = el[:-7].decode('unicode_escape') + '\n'
+                el = el.encode('utf-8')
             else:
-                m = optline.match(el)
-                if m:
-                    conditions = [c for c in m.group(2).split(b' ')]
-
-                    el = m.group(1) + b"\n"
-                    if not self._iftest(conditions):
-                        retry = "retry"    # Not required by listed features
-
-            if el.endswith(b" (esc)\n"):
-                if PYTHON3:
-                    el = el[:-7].decode('unicode_escape') + '\n'
-                    el = el.encode('utf-8')
-                else:
-                    el = el[:-7].decode('string-escape') + '\n'
-            if el == l or os.name == 'nt' and el[:-1] + b'\r\n' == l:
-                return True
-            if el.endswith(b" (re)\n"):
-                return TTest.rematch(el[:-6], l) or retry
-            if el.endswith(b" (glob)\n"):
-                # ignore '(glob)' added to l by 'replacements'
-                if l.endswith(b" (glob)\n"):
-                    l = l[:-8] + b"\n"
-                return TTest.globmatch(el[:-8], l) or retry
-            if os.altsep and l.replace(b'\\', b'/') == el:
-                return b'+glob'
-        return retry
+                el = el[:-7].decode('string-escape') + '\n'
+        if el == l or os.name == 'nt' and el[:-1] + b'\r\n' == l:
+            return True, True
+        if el.endswith(b" (re)\n"):
+            return (TTest.rematch(el[:-6], l) or retry), False
+        if el.endswith(b" (glob)\n"):
+            # ignore '(glob)' added to l by 'replacements'
+            if l.endswith(b" (glob)\n"):
+                l = l[:-8] + b"\n"
+            return (TTest.globmatch(el[:-8], l) or retry), False
+        if os.altsep:
+            _l = l.replace(b'\\', b'/')
+            if el == _l or os.name == 'nt' and el[:-1] + b'\r\n' == _l:
+                return True, True
+        return retry, True
 
     @staticmethod
     def parsehghaveoutput(lines):
@@ -1635,6 +1691,8 @@ class TTest(Test):
         return TTest.ESCAPESUB(TTest._escapef, s)
 
 iolock = threading.RLock()
+firstlock = threading.RLock()
+firsterror = False
 
 class TestResult(unittest._TextTestResult):
     """Holds results when executing via unittest."""
@@ -1666,6 +1724,14 @@ class TestResult(unittest._TextTestResult):
             self.color = False
         else: # 'always', for testing purposes
             self.color = pygmentspresent
+
+    def onStart(self, test):
+        """ Can be overriden by custom TestResult
+        """
+
+    def onEnd(self):
+        """ Can be overriden by custom TestResult
+        """
 
     def addFailure(self, test, reason):
         self.failures.append((test, reason))
@@ -1720,7 +1786,7 @@ class TestResult(unittest._TextTestResult):
 
     def addOutputMismatch(self, test, ret, got, expected):
         """Record a mismatch in test output for a particular test."""
-        if self.shouldStop:
+        if self.shouldStop or firsterror:
             # don't print, some other test case already failed and
             # printed, we're just stale and probably failed due to our
             # temp dir getting cleaned up.
@@ -1741,20 +1807,20 @@ class TestResult(unittest._TextTestResult):
             else:
                 servefail, lines = getdiff(expected, got,
                                            test.refpath, test.errpath)
+                self.stream.write('\n')
+                for line in lines:
+                    line = highlightdiff(line, self.color)
+                    if PYTHON3:
+                        self.stream.flush()
+                        self.stream.buffer.write(line)
+                        self.stream.buffer.flush()
+                    else:
+                        self.stream.write(line)
+                        self.stream.flush()
+
                 if servefail:
                     raise test.failureException(
                         'server failed to start (HGPORT=%s)' % test._startport)
-                else:
-                    self.stream.write('\n')
-                    for line in lines:
-                        line = highlightdiff(line, self.color)
-                        if PYTHON3:
-                            self.stream.flush()
-                            self.stream.buffer.write(line)
-                            self.stream.buffer.flush()
-                        else:
-                            self.stream.write(line)
-                            self.stream.flush()
 
             # handle interactive prompt without releasing iolock
             if self._options.interactive:
@@ -1807,6 +1873,16 @@ class TestResult(unittest._TextTestResult):
             with iolock:
                 self.stream.writeln('INTERRUPTED: %s (after %d seconds)' % (
                     test.name, self.times[-1][3]))
+
+def getTestResult():
+    """
+    Returns the relevant test result
+    """
+    if "CUSTOM_TEST_RESULT" in os.environ:
+        testresultmodule = __import__(os.environ["CUSTOM_TEST_RESULT"])
+        return testresultmodule.TestResult
+    else:
+        return TestResult
 
 class TestSuite(unittest.TestSuite):
     """Custom unittest TestSuite that knows how to execute Mercurial tests."""
@@ -1880,9 +1956,8 @@ class TestSuite(unittest.TestSuite):
                     continue
 
                 if self._keywords:
-                    f = open(test.path, 'rb')
-                    t = f.read().lower() + test.bname.lower()
-                    f.close()
+                    with open(test.path, 'rb') as f:
+                        t = f.read().lower() + test.bname.lower()
                     ignored = False
                     for k in self._keywords.lower().split():
                         if k not in t:
@@ -2003,10 +2078,11 @@ class TestSuite(unittest.TestSuite):
 def loadtimes(outputdir):
     times = []
     try:
-        with open(os.path.join(outputdir, b'.testtimes-')) as fp:
+        with open(os.path.join(outputdir, b'.testtimes')) as fp:
             for line in fp:
-                ts = line.split()
-                times.append((ts[0], [float(t) for t in ts[1:]]))
+                m = re.match('(.*?) ([0-9. ]+)', line)
+                times.append((m.group(1),
+                              [float(t) for t in m.group(2).split()]))
     except IOError as err:
         if err.errno != errno.ENOENT:
             raise
@@ -2046,74 +2122,97 @@ class TextTestRunner(unittest.TextTestRunner):
 
         self._runner = runner
 
+        self._result = getTestResult()(self._runner.options, self.stream,
+                                       self.descriptions, self.verbosity)
+
     def listtests(self, test):
-        result = TestResult(self._runner.options, self.stream,
-                            self.descriptions, 0)
         test = sorted(test, key=lambda t: t.name)
+
+        self._result.onStart(test)
+
         for t in test:
             print(t.name)
-            result.addSuccess(t)
+            self._result.addSuccess(t)
 
         if self._runner.options.xunit:
             with open(self._runner.options.xunit, "wb") as xuf:
-                self._writexunit(result, xuf)
+                self._writexunit(self._result, xuf)
 
         if self._runner.options.json:
             jsonpath = os.path.join(self._runner._outputdir, b'report.json')
             with open(jsonpath, 'w') as fp:
-                self._writejson(result, fp)
+                self._writejson(self._result, fp)
 
-        return result
+        return self._result
 
     def run(self, test):
-        result = TestResult(self._runner.options, self.stream,
-                            self.descriptions, self.verbosity)
+        self._result.onStart(test)
+        test(self._result)
 
-        test(result)
-
-        failed = len(result.failures)
-        skipped = len(result.skipped)
-        ignored = len(result.ignored)
+        failed = len(self._result.failures)
+        skipped = len(self._result.skipped)
+        ignored = len(self._result.ignored)
 
         with iolock:
             self.stream.writeln('')
 
             if not self._runner.options.noskips:
-                for test, msg in result.skipped:
+                for test, msg in self._result.skipped:
                     formatted = 'Skipped %s: %s\n' % (test.name, msg)
-                    self.stream.write(highlightmsg(formatted, result.color))
-            for test, msg in result.failures:
+                    msg = highlightmsg(formatted, self._result.color)
+                    self.stream.write(msg)
+            for test, msg in self._result.failures:
                 formatted = 'Failed %s: %s\n' % (test.name, msg)
-                self.stream.write(highlightmsg(formatted, result.color))
-            for test, msg in result.errors:
+                self.stream.write(highlightmsg(formatted, self._result.color))
+            for test, msg in self._result.errors:
                 self.stream.writeln('Errored %s: %s' % (test.name, msg))
 
             if self._runner.options.xunit:
                 with open(self._runner.options.xunit, "wb") as xuf:
-                    self._writexunit(result, xuf)
+                    self._writexunit(self._result, xuf)
 
             if self._runner.options.json:
                 jsonpath = os.path.join(self._runner._outputdir, b'report.json')
                 with open(jsonpath, 'w') as fp:
-                    self._writejson(result, fp)
+                    self._writejson(self._result, fp)
 
             self._runner._checkhglib('Tested')
 
-            savetimes(self._runner._outputdir, result)
+            savetimes(self._runner._outputdir, self._result)
 
             if failed and self._runner.options.known_good_rev:
-                self._bisecttests(t for t, m in result.failures)
+                self._bisecttests(t for t, m in self._result.failures)
             self.stream.writeln(
                 '# Ran %d tests, %d skipped, %d failed.'
-                % (result.testsRun, skipped + ignored, failed))
+                % (self._result.testsRun, skipped + ignored, failed))
             if failed:
                 self.stream.writeln('python hash seed: %s' %
                     os.environ['PYTHONHASHSEED'])
             if self._runner.options.time:
-                self.printtimes(result.times)
+                self.printtimes(self._result.times)
+
+            if self._runner.options.exceptions:
+                exceptions = aggregateexceptions(
+                    os.path.join(self._runner._outputdir, b'exceptions'))
+
+                self.stream.writeln('Exceptions Report:')
+                self.stream.writeln('%d total from %d frames' %
+                                    (exceptions['total'],
+                                     len(exceptions['exceptioncounts'])))
+                combined = exceptions['combined']
+                for key in sorted(combined, key=combined.get, reverse=True):
+                    frame, line, exc = key
+                    totalcount, testcount, leastcount, leasttest = combined[key]
+
+                    self.stream.writeln('%d (%d tests)\t%s: %s (%s - %d total)'
+                                        % (totalcount,
+                                           testcount,
+                                           frame, exc,
+                                           leasttest, leastcount))
+
             self.stream.flush()
 
-        return result
+        return self._result
 
     def _bisecttests(self, tests):
         bisectcmd = ['hg', 'bisect']
@@ -2151,10 +2250,11 @@ class TextTestRunner(unittest.TextTestRunner):
                     'Failed to identify failure point for %s' % test)
                 continue
             dat = m.groupdict()
-            verb = 'broken' if dat['goodbad'] == 'bad' else 'fixed'
+            verb = 'broken' if dat['goodbad'] == b'bad' else 'fixed'
             self.stream.writeln(
                 '%s %s by %s (%s)' % (
-                    test, verb, dat['node'], dat['summary']))
+                    test, verb, dat['node'].decode('ascii'),
+                    dat['summary'].decode('utf8', 'ignore')))
 
     def printtimes(self, times):
         # iolock held by run
@@ -2258,6 +2358,60 @@ class TextTestRunner(unittest.TextTestRunner):
                              separators=(',', ': '))
         outf.writelines(("testreport =", jsonout))
 
+def sorttests(testdescs, previoustimes, shuffle=False):
+    """Do an in-place sort of tests."""
+    if shuffle:
+        random.shuffle(testdescs)
+        return
+
+    if previoustimes:
+        def sortkey(f):
+            f = f['path']
+            if f in previoustimes:
+                # Use most recent time as estimate
+                return -previoustimes[f][-1]
+            else:
+                # Default to a rather arbitrary value of 1 second for new tests
+                return -1.0
+    else:
+        # keywords for slow tests
+        slow = {b'svn': 10,
+                b'cvs': 10,
+                b'hghave': 10,
+                b'largefiles-update': 10,
+                b'run-tests': 10,
+                b'corruption': 10,
+                b'race': 10,
+                b'i18n': 10,
+                b'check': 100,
+                b'gendoc': 100,
+                b'contrib-perf': 200,
+                }
+        perf = {}
+
+        def sortkey(f):
+            # run largest tests first, as they tend to take the longest
+            f = f['path']
+            try:
+                return perf[f]
+            except KeyError:
+                try:
+                    val = -os.stat(f).st_size
+                except OSError as e:
+                    if e.errno != errno.ENOENT:
+                        raise
+                    perf[f] = -1e9  # file does not exist, tell early
+                    return -1e9
+                for kw, mul in slow.items():
+                    if kw in f:
+                        val *= mul
+                if f.endswith(b'.py'):
+                    val /= 10.0
+                perf[f] = val / 1000.0
+                return perf[f]
+
+    testdescs.sort(key=sortkey)
+
 class TestRunner(object):
     """Holds context for executing tests.
 
@@ -2302,18 +2456,16 @@ class TestRunner(object):
         oldmask = os.umask(0o22)
         try:
             parser = parser or getparser()
-            options, args = parseargs(args, parser)
-            # positional arguments are paths to test files to run, so
-            # we make sure they're all bytestrings
-            args = [_bytespath(a) for a in args]
+            options = parseargs(args, parser)
+            tests = [_bytespath(a) for a in options.tests]
             if options.test_list is not None:
                 for listfile in options.test_list:
                     with open(listfile, 'rb') as f:
-                        args.extend(t for t in f.read().splitlines() if t)
+                        tests.extend(t for t in f.read().splitlines() if t)
             self.options = options
 
             self._checktools()
-            testdescs = self.findtests(args)
+            testdescs = self.findtests(tests)
             if options.profile_runner:
                 import statprof
                 statprof.start()
@@ -2327,51 +2479,26 @@ class TestRunner(object):
             os.umask(oldmask)
 
     def _run(self, testdescs):
-        if self.options.random:
-            random.shuffle(testdescs)
-        else:
-            # keywords for slow tests
-            slow = {b'svn': 10,
-                    b'cvs': 10,
-                    b'hghave': 10,
-                    b'largefiles-update': 10,
-                    b'run-tests': 10,
-                    b'corruption': 10,
-                    b'race': 10,
-                    b'i18n': 10,
-                    b'check': 100,
-                    b'gendoc': 100,
-                    b'contrib-perf': 200,
-                   }
-            perf = {}
-            def sortkey(f):
-                # run largest tests first, as they tend to take the longest
-                f = f['path']
-                try:
-                    return perf[f]
-                except KeyError:
-                    try:
-                        val = -os.stat(f).st_size
-                    except OSError as e:
-                        if e.errno != errno.ENOENT:
-                            raise
-                        perf[f] = -1e9 # file does not exist, tell early
-                        return -1e9
-                    for kw, mul in slow.items():
-                        if kw in f:
-                            val *= mul
-                    if f.endswith(b'.py'):
-                        val /= 10.0
-                    perf[f] = val / 1000.0
-                    return perf[f]
-            testdescs.sort(key=sortkey)
-
         self._testdir = osenvironb[b'TESTDIR'] = getattr(
             os, 'getcwdb', os.getcwd)()
+        # assume all tests in same folder for now
+        if testdescs:
+            pathname = os.path.dirname(testdescs[0]['path'])
+            if pathname:
+                # TODO enable at Mozilla.
+                pass
+                #osenvironb[b'TESTDIR'] = os.path.join(osenvironb[b'TESTDIR'],
+                #                                      pathname)
         if self.options.outputdir:
             self._outputdir = canonpath(_bytespath(self.options.outputdir))
         else:
             self._outputdir = self._testdir
+            if testdescs and pathname:
+                self._outputdir = os.path.join(self._outputdir, pathname)
+        previoustimes = {}
+        if self.options.order_by_runtime:
+            previoustimes = dict(loadtimes(self._outputdir))
+        sorttests(testdescs, previoustimes, shuffle=self.options.random)
 
         if 'PYTHONHASHSEED' not in os.environ:
             # use a random python hash seed all the time
@@ -2388,11 +2515,6 @@ class TestRunner(object):
                 print("error: temp dir %r already exists" % tmpdir)
                 return 1
 
-                # Automatically removing tmpdir sounds convenient, but could
-                # really annoy anyone in the habit of using "--tmpdir=/tmp"
-                # or "--tmpdir=$HOME".
-                #vlog("# Removing temp dir", tmpdir)
-                #shutil.rmtree(tmpdir)
             os.makedirs(tmpdir)
         else:
             d = None
@@ -2414,12 +2536,27 @@ class TestRunner(object):
             self._tmpbindir = os.path.join(self._hgtmp, b'install', b'bin')
             os.makedirs(self._tmpbindir)
 
-            # This looks redundant with how Python initializes sys.path from
-            # the location of the script being executed.  Needed because the
-            # "hg" specified by --with-hg is not the only Python script
-            # executed in the test suite that needs to import 'mercurial'
-            # ... which means it's not really redundant at all.
-            self._pythondir = self._bindir
+            normbin = os.path.normpath(os.path.abspath(whg))
+            normbin = normbin.replace(os.sep.encode('ascii'), b'/')
+
+            # Other Python scripts in the test harness need to
+            # `import mercurial`. If `hg` is a Python script, we assume
+            # the Mercurial modules are relative to its path and tell the tests
+            # to load Python modules from its directory.
+            with open(whg, 'rb') as fh:
+                initial = fh.read(1024)
+
+            if re.match(b'#!.*python', initial):
+                self._pythondir = self._bindir
+            # If it looks like our in-repo Rust binary, use the source root.
+            # This is a bit hacky. But rhg is still not supported outside the
+            # source directory. So until it is, do the simple thing.
+            elif re.search(b'/rust/target/[^/]+/hg', normbin):
+                self._pythondir = os.path.dirname(self._testdir)
+            # Fall back to the legacy behavior.
+            else:
+                self._pythondir = self._bindir
+
         else:
             self._installdir = os.path.join(self._hgtmp, b"install")
             self._bindir = os.path.join(self._installdir, b"bin")
@@ -2491,6 +2628,23 @@ class TestRunner(object):
 
         self._coveragefile = os.path.join(self._testdir, b'.coverage')
 
+        if self.options.exceptions:
+            exceptionsdir = os.path.join(self._outputdir, b'exceptions')
+            try:
+                os.makedirs(exceptionsdir)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+
+            # Remove all existing exception reports.
+            for f in os.listdir(exceptionsdir):
+                os.unlink(os.path.join(exceptionsdir, f))
+
+            osenvironb[b'HGEXCEPTIONSDIR'] = exceptionsdir
+            logexceptions = os.path.join(self._testdir, b'logexceptions.py')
+            self.options.extra_config_opt.append(
+                'extensions.logexceptions=%s' % logexceptions.decode('utf-8'))
+
         vlog("# Using TESTDIR", self._testdir)
         vlog("# Using RUNTESTDIR", osenvironb[b'RUNTESTDIR'])
         vlog("# Using HGTMP", self._hgtmp)
@@ -2519,16 +2673,41 @@ class TestRunner(object):
             else:
                 args = os.listdir(b'.')
 
+        expanded_args = []
+        for arg in args:
+            if os.path.isdir(arg):
+                if not arg.endswith(b'/'):
+                    arg += b'/'
+                expanded_args.extend([arg + a for a in os.listdir(arg)])
+            else:
+                expanded_args.append(arg)
+        args = expanded_args
+
+        testcasepattern = re.compile(br'([\w-]+\.t|py)(#([a-zA-Z0-9_\-\.]+))')
         tests = []
         for t in args:
+            case = None
+
             if not (os.path.basename(t).startswith(b'test-')
                     and (t.endswith(b'.py') or t.endswith(b'.t'))):
-                continue
+
+                m = testcasepattern.match(t)
+                if m is not None:
+                    t, _, case = m.groups()
+                else:
+                    continue
+
             if t.endswith(b'.t'):
                 # .t file may contain multiple test cases
                 cases = sorted(parsettestcases(t))
                 if cases:
-                    tests += [{'path': t, 'case': c} for c in sorted(cases)]
+                    if case is not None and case in cases:
+                        tests += [{'path': t, 'case': case}]
+                    elif case is not None and case not in cases:
+                        # Ignore invalid cases
+                        pass
+                    else:
+                        tests += [{'path': t, 'case': c} for c in sorted(cases)]
                 else:
                     tests.append({'path': t})
             else:
@@ -2580,7 +2759,9 @@ class TestRunner(object):
                               showchannels=self.options.showchannels,
                               tests=tests, loadtest=_reloadtest)
             verbosity = 1
-            if self.options.verbose:
+            if self.options.list_tests:
+                verbosity = 0
+            elif self.options.verbose:
                 verbosity = 2
             runner = TextTestRunner(self, verbosity=verbosity)
 
@@ -2600,6 +2781,8 @@ class TestRunner(object):
 
             if result.failures:
                 failed = True
+
+            result.onEnd()
 
             if self.options.anycoverage:
                 self._outputcoverage()
@@ -2652,6 +2835,7 @@ class TestRunner(object):
         t = testcls(refpath, self._outputdir, tmpdir,
                     keeptmpdir=self.options.keep_tmpdir,
                     debug=self.options.debug,
+                    first=self.options.first,
                     timeout=self.options.timeout,
                     startport=self._getport(count),
                     extraconfigopts=self.options.extra_config_opt,
@@ -2773,13 +2957,12 @@ class TestRunner(object):
                     if e.errno != errno.ENOENT:
                         raise
         else:
-            f = open(installerrs, 'rb')
-            for line in f:
-                if PYTHON3:
-                    sys.stdout.buffer.write(line)
-                else:
-                    sys.stdout.write(line)
-            f.close()
+            with open(installerrs, 'rb') as f:
+                for line in f:
+                    if PYTHON3:
+                        sys.stdout.buffer.write(line)
+                    else:
+                        sys.stdout.write(line)
             sys.exit(1)
         os.chdir(self._testdir)
 
@@ -2787,28 +2970,24 @@ class TestRunner(object):
 
         if self.options.py3k_warnings and not self.options.anycoverage:
             vlog("# Updating hg command to enable Py3k Warnings switch")
-            f = open(os.path.join(self._bindir, 'hg'), 'rb')
-            lines = [line.rstrip() for line in f]
-            lines[0] += ' -3'
-            f.close()
-            f = open(os.path.join(self._bindir, 'hg'), 'wb')
-            for line in lines:
-                f.write(line + '\n')
-            f.close()
+            with open(os.path.join(self._bindir, 'hg'), 'rb') as f:
+                lines = [line.rstrip() for line in f]
+                lines[0] += ' -3'
+            with open(os.path.join(self._bindir, 'hg'), 'wb') as f:
+                for line in lines:
+                    f.write(line + '\n')
 
         hgbat = os.path.join(self._bindir, b'hg.bat')
         if os.path.isfile(hgbat):
             # hg.bat expects to be put in bin/scripts while run-tests.py
             # installation layout put it in bin/ directly. Fix it
-            f = open(hgbat, 'rb')
-            data = f.read()
-            f.close()
+            with open(hgbat, 'rb') as f:
+                data = f.read()
             if b'"%~dp0..\python" "%~dp0hg" %*' in data:
                 data = data.replace(b'"%~dp0..\python" "%~dp0hg" %*',
                                     b'"%~dp0python" "%~dp0hg" %*')
-                f = open(hgbat, 'wb')
-                f.write(data)
-                f.close()
+                with open(hgbat, 'wb') as f:
+                    f.write(data)
             else:
                 print('WARNING: cannot fix hg.bat reference to python.exe')
 
@@ -2932,6 +3111,59 @@ class TestRunner(object):
             else:
                 print("WARNING: Did not find prerequisite tool: %s " %
                       p.decode("utf-8"))
+
+def aggregateexceptions(path):
+    exceptioncounts = collections.Counter()
+    testsbyfailure = collections.defaultdict(set)
+    failuresbytest = collections.defaultdict(set)
+
+    for f in os.listdir(path):
+        with open(os.path.join(path, f), 'rb') as fh:
+            data = fh.read().split(b'\0')
+            if len(data) != 5:
+                continue
+
+            exc, mainframe, hgframe, hgline, testname = data
+            exc = exc.decode('utf-8')
+            mainframe = mainframe.decode('utf-8')
+            hgframe = hgframe.decode('utf-8')
+            hgline = hgline.decode('utf-8')
+            testname = testname.decode('utf-8')
+
+            key = (hgframe, hgline, exc)
+            exceptioncounts[key] += 1
+            testsbyfailure[key].add(testname)
+            failuresbytest[testname].add(key)
+
+    # Find test having fewest failures for each failure.
+    leastfailing = {}
+    for key, tests in testsbyfailure.items():
+        fewesttest = None
+        fewestcount = 99999999
+        for test in sorted(tests):
+            if len(failuresbytest[test]) < fewestcount:
+                fewesttest = test
+                fewestcount = len(failuresbytest[test])
+
+        leastfailing[key] = (fewestcount, fewesttest)
+
+    # Create a combined counter so we can sort by total occurrences and
+    # impacted tests.
+    combined = {}
+    for key in exceptioncounts:
+        combined[key] = (exceptioncounts[key],
+                         len(testsbyfailure[key]),
+                         leastfailing[key][0],
+                         leastfailing[key][1])
+
+    return {
+        'exceptioncounts': exceptioncounts,
+        'total': sum(exceptioncounts.values()),
+        'combined': combined,
+        'leastfailing': leastfailing,
+        'byfailure': testsbyfailure,
+        'bytest': failuresbytest,
+    }
 
 if __name__ == '__main__':
     runner = TestRunner()
