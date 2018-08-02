@@ -26,7 +26,7 @@ tasks:
     command:
       - "/bin/bash"
       - "-lc"
-      - "hg clone ${repo.url} v-c-t && cd v-c-t && hg up ${repo.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
+      - "hg clone ${repository.url} v-c-t && cd v-c-t && hg up ${repository.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
   extra:
     - treeherder:
         symbol: T
