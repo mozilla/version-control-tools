@@ -21,7 +21,8 @@ from voluptuous.humanize import validate_with_humanized_errors
 
 
 def write_to_file_atomically(file_path: Path, content: str) -> None:
-    # Writes new data to a temp file, then renames the temp file to the existing filename
+    '''Writes new data to a temp file, then renames the temp 
+    file to the existing filename'''
     temp_file_path = file_path.with_suffix('.tmp')
     with temp_file_path.open(mode='w') as temp_file:
         temp_file.write(content)
@@ -30,6 +31,8 @@ def write_to_file_atomically(file_path: Path, content: str) -> None:
 
 @truth
 def is_ip_address_network(value: str) -> bool:
+    '''Validates if a given value (interpreted as a str) represents
+    an IP address network'''
     try:
         # This call will raise a ValueError if value is not a valid ip address range
         ipaddress.ip_network(value, strict=True)
@@ -40,6 +43,8 @@ def is_ip_address_network(value: str) -> bool:
 
 @truth
 def all_required_regions_exist(prefixes: list) -> bool:
+    '''Validates that the set of all required regions is a subset
+    of all the regions in the iterable of IP networks'''
     required_regions = {
         'us-west-2',
         'us-west-1',
@@ -57,6 +62,13 @@ def all_required_regions_exist(prefixes: list) -> bool:
 
 
 def get_mozilla_office_ips():
+    '''Entry point for the Mozilla office IP scraper
+    
+    Calls out to bloxtool to obtain Mozilla network information
+    in JSON format. Validates the JSON against a known schema and
+    atomically re-writes a file with the CIDR representations of
+    Mozilla office IP address spaces.
+    '''
     try:
         mozilla_ip_ranges_file = Path('/var/hg/moz-ip-ranges.txt')
         bloxtool_config_file = Path('/etc/mercurial/bloxtool.ini')
@@ -102,6 +114,12 @@ def get_mozilla_office_ips():
 
 
 def get_aws_ips():
+    '''Entry point for the AWS IP address scraper
+    
+    Downloads the AWS IP ranges JSON document from Amazon and verifies against a
+    known schema. Atomically rewrites a file with the CIDR representations of
+    AWS IP address spaces.
+    '''
     try:
         # Grab the new data from Amazon
         amazon_ip_ranges_file = Path('/var/hg/aws-ip-ranges.json')
@@ -170,6 +188,7 @@ def get_aws_ips():
     except VoluptuousInvalid as vi:
         sys.exit('The JSON data from Amazon does not match the required schema.')
 
+# Register possible commands
 COMMANDS = {
     'aws': get_aws_ips,
     'moz-offices': get_mozilla_office_ips,
