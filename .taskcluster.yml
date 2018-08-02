@@ -29,7 +29,7 @@ tasks:
       - "-lc"
       - "hg clone ${repository.url} v-c-t && cd v-c-t && hg up ${push.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
   extra:
-    - treeherder:
-        symbol: T
-        jobKind: test
-        productName: version-control-tools
+    treeherder:
+      symbol: T
+      jobKind: test
+      productName: version-control-tools
