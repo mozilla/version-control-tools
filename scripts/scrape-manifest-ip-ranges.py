@@ -9,8 +9,10 @@
 
 import ipaddress
 import json
+import logging
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -18,6 +20,13 @@ from datadiff import diff
 from voluptuous import All, Schema, Invalid as VoluptuousInvalid, truth
 from voluptuous.humanize import validate_with_humanized_errors
 
+
+formatter = logging.Formatter('%(name)s %(message)s')
+formatter.converter = time.gmtime
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(formatter)
+logger = logging.getLogger('mozilla-ip-scraper')
+logger.addHandler(handler)
 
 
 def write_to_file_atomically(file_path: Path, content: str) -> None:
@@ -104,13 +113,21 @@ def get_mozilla_office_ips():
 
 
     except subprocess.CalledProcessError as cpe:
-        sys.exit('An error occurred while executing the bloxtool command.')
+        logger.exception('An error occurred while executing the bloxtool command: exit code %s' % cpe.returncode)
+        logger.exception('STDOUT: %s' % cpe.stdout)
+        logger.exception('STDERR: %s' % cpe.stderr)
+        sys.exit(1)
 
     except json.JSONDecodeError as jde:
-        sys.exit('An error occurred parsing the bloxtool output as JSON.')
+        logger.exception('An error occurred parsing the bloxtool output as JSON: %s' % jde.msg)
+        sys.exit(1)
 
     except VoluptuousInvalid as vi:
-        sys.exit('The JSON data from bloxtool does not match the required schema.')
+        logger.exception('The JSON data from bloxtool does not match the required schema.')
+        logger.exception('Error message: %s' % vi.msg)
+        logger.exception('Error path: %s' % vi.path)
+        logger.exception('Exception message: %s' % vi.error_message)
+        sys.exit(1)
 
 
 def get_aws_ips():
@@ -176,17 +193,25 @@ def get_aws_ips():
         write_to_file_atomically(amazon_ip_ranges_file, json.dumps(output_as_dict))
 
         # Print the diff for collection as systemd unit output
-        print('AWS IP ranges document has been updated')
-        print(file_diff)
+        logger.info('AWS IP ranges document has been updated')
+        logger.info(file_diff)
 
-    except subprocess.CalledProcessError:
-        sys.exit('An error occurred when notifying about changes to the file.')
+    except subprocess.CalledProcessError as cpe:
+        logger.exception('An error occurred when notifying about changes to the file: exit code %s' % cpe.returncode)
+        logger.exception('STDOUT: %s' % cpe.stdout)
+        logger.exception('STDERR: %s' % cpe.stderr)
+        sys.exit(1)
 
     except json.JSONDecodeError as jde:
-        sys.exit('An error occurred parsing the data retrieved from Amazon as JSON.')
+        logger.exception('An error occurred parsing the data retrieved from Amazon as JSON: %s' % jde.msg)
+        sys.exit(1)
 
     except VoluptuousInvalid as vi:
-        sys.exit('The JSON data from Amazon does not match the required schema.')
+        logger.exception('The JSON data from Amazon does not match the required schema.')
+        logger.exception('Error message: %s' % vi.msg)
+        logger.exception('Error path: %s' % vi.path)
+        logger.exception('Exception message: %s' % vi.error_message)
+        sys.exit(1)
 
 # Register possible commands
 COMMANDS = {
