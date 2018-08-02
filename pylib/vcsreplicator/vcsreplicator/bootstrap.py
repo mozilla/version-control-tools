@@ -134,7 +134,7 @@ def hgssh():
     }
 
     print(json.dumps(output))
-    logger.info('hgssh bootstrap process complete')
+    logger.info('hgssh bootstrap process complete!')
 
 
 def hgweb():
