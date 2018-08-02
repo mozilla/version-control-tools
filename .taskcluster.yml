@@ -1,6 +1,6 @@
 version: 1
 tasks:
-  metadata:
+- metadata:
     name: "version-control-tools Tests"
     description: "Builds the test environment and runs tests (without Docker)"
     owner: ${push.owner}
