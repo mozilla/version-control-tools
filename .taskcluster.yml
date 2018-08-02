@@ -13,6 +13,7 @@ tasks:
   expires: {$fromNow: '1 year 1 second'} # 1 second so artifacts expire first, despite rounding errors
   provisionerId: "aws-provisioner-v1"
   workerType: "version-control-tools"
+  scopes: []
   routes:
     - "tc-treeherder.v2.${repository.project}.${push.revision}.${push.pushlog_id}"
   dependencies: []
