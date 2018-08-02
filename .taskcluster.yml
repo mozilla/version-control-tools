@@ -1,34 +1,34 @@
 version: 1
 tasks:
-  - metadata:
-      name: "version-control-tools Tests"
-      description: "Builds the test environment and runs tests (without Docker)"
-      owner: ${event.push.owner}
-      source: ${event.repository.url}
-    taskId: {$eval: as_slugid(vct_tests)}
-    created: {$fromNow: ''}
-    deadline: {$fromNow: '5 hours'}
-    provisionerId: aws-provisioner-v1
-    workerType: version-control-tools
-    scopes:
-      - queue:route:notify:irc-channel.#vcs
-    routes:
-      - notify.irc-channel.#vcs.on-any
-      - treeherder.version-control-tools.${event.push.revision}.${event.push.pushlog_id}
-    extra:
-      notify:
-        ircChannelMessage: "Tests for ${event.push.revision} ran, completion status: ${status.state}"      
-      treeherder:
+  metadata:
+    name: "version-control-tools Tests"
+    description: "Builds the test environment and runs tests (without Docker)"
+    owner: ${push.owner}
+    source: ${repository.url}
+  taskId: '${as_slugid("decision")}'
+  taskGroupId: '${as_slugid("decision")}'
+  schedulerId: '${repository.level}'
+  created: {$fromNow: ''}
+  deadline: {$fromNow: '1 day'}
+  expires: {$fromNow: '1 year 1 second'} # 1 second so artifacts expire first, despite rounding errors
+  provisionerId: "aws-provisioner-v1"
+  workerType: "version-control-tools"
+  routes:
+    - "tc-treeherder.v2.${repository.project}.${push.revision}.${push.pushlog_id}"
+  dependencies: []
+  requires: all-completed
+  retries: 5
+  payload:
+    env:
+      NO_DOCKER: 1
+    image: 'ubuntu:18.04'
+    maxRunTime: '5 hours'
+    command:
+      - "/bin/bash"
+      - "-lc"
+      - "hg clone ${repo.url} v-c-t && cd v-c-t && hg up ${repo.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
+  extra:
+    - treeherder:
         symbol: T
-        jobSymbol: T
-        groupName: v-c-t Tests
-        productName: version-control-tools
         jobKind: test
-    payload:
-      maxRunTime: '5 hours'
-      env:
-        NO_DOCKER: 1
-      command:
-        - "/bin/bash"
-        - "-lc"
-        - "hg clone ${event.repo.url} v-c-t && cd v-c-t && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
+        productName: version-control-tools
