@@ -27,7 +27,7 @@ tasks:
     command:
       - "/bin/bash"
       - "-lc"
-      - "apt-get update && apt-get install -y mercurial && hg clone ${repository.url} v-c-t && cd v-c-t && hg up ${push.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
+      - "apt-get update && apt-get install -y --no-install-recommends ca-certificates gcc gettext libcurl4-openssl-dev libffi-dev liblzma-dev libsasl2-dev libldap2-dev libssl-dev npm mercurial python-dev && hg clone ${repository.url} v-c-t && cd v-c-t && hg up ${push.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --all-hg-versions --no-hg-tip"
   extra:
     treeherder:
       symbol: T
