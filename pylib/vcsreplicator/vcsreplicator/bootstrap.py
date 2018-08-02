@@ -155,7 +155,6 @@ def hgweb():
     # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='Path of config file to load')
-    parser.add_argument('hg', help='Path to hg executable for use in bootstrap process')
     parser.add_argument('input', help='JSON data input (output from the hgssh bootstrap procedure) file path')
     parser.add_argument('--workers', help='Number of concurrent workers to use for performing clones', type=int,
                         default=multiprocessing.cpu_count())
@@ -208,7 +207,7 @@ def hgweb():
 
     # Overwrite default hglib path so handle_message_main and it's derivatives
     # use the correct virtualenv
-    hglib.HGPATH = args.hg
+    hglib.HGPATH = config.c.get('programs', 'hg')
 
     # Maps partitions to the list of messages within the bootstrap range
     aggregate_messages_by_topicpartition = {
