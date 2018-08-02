@@ -197,4 +197,4 @@ else
   echo "Not building Docker images because NO_DOCKER is set."
 fi
 
-echo finished creating test environment
+echo finished creating test environment!
