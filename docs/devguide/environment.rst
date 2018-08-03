@@ -40,6 +40,7 @@ installed:
 * libsasl2-dev
 * libldap2-dev
 * libssl-dev
+* zlib1g-dev
 * mercurial (to clone version-control-tools)
 
 Many of these dependencies are needed to compile binary Python
@@ -49,7 +50,7 @@ You can install these dependencies by running::
 
    $ sudo apt-get install build-essential git python-dev npm \
      libcurl4-openssl-dev libffi-dev liblzma-dev \
-     libsasl2-dev libldap2-dev libssl-dev mercurial
+     libsasl2-dev libldap2-dev libssl-dev zlib1g-dev mercurial
 
 You will also need to install Docker for a number of test and dev
 environments to work. See the
