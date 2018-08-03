@@ -23,7 +23,7 @@ tasks:
     env:
       NO_DOCKER: 1
     image: 'ubuntu:18.04'
-    maxRunTime: 18000
+    maxRunTime: 1800
     command:
       - "/bin/bash"
       - "-lc"
