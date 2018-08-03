@@ -21,4 +21,8 @@ RUN apt-get update && \
     zlib1g-dev && \
   apt-get clean -y && rm -rf /var/lib/apt/lists
 
+RUN hg clone https://hg.mozilla.org/hgcustom/version-control-tools /vct-cache && \
+  cd /vct-cache && \
+  NO_DOCKER=1 ./create-test-environment
+
 VOLUME /work
