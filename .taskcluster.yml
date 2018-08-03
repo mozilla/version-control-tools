@@ -22,14 +22,14 @@ tasks:
   payload:
     env:
       NO_DOCKER: 1
-      TEMPDIR: /work/tmp
+      TMPDIR: /work/tmp
       USER: hg
     image: 'mozvct/vcttest:0.2'
     maxRunTime: 3600
     command:
       - "/bin/bash"
       - "-lc"
-      - "hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && mkdir -p venv && cp -a -t venv/ /vct-cache/venv/hg /vct-cache/venv/mercurials /vct-cache/venv/git-cinnabar && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --with-hg=venv/mercurials/4.6.2/bin/hg --no-docker --color=never"
+      - "mkdir /work/tmp && hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && mkdir -p venv && cp -a -t venv/ /vct-cache/venv/hg /vct-cache/venv/mercurials /vct-cache/venv/git-cinnabar && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --with-hg=venv/mercurials/4.6.2/bin/hg --no-docker --color=never"
   extra:
     treeherder:
       symbol: T
