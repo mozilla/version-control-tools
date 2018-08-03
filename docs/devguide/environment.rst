@@ -30,6 +30,8 @@ Ubuntu Requirements
 On a fresh Ubuntu 16.04 install, the following packages need to be
 installed:
 
+* build-essential
+* git
 * python-dev
 * npm
 * libcurl4-openssl-dev
@@ -45,7 +47,7 @@ extensions that are part of the virtualenv.
 
 You can install these dependencies by running::
 
-   $ sudo apt-get install python-dev npm \
+   $ sudo apt-get install build-essential git python-dev npm \
      libcurl4-openssl-dev libffi-dev liblzma-dev \
      libsasl2-dev libldap2-dev libssl-dev mercurial
 
