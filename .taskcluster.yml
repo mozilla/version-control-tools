@@ -22,6 +22,7 @@ tasks:
   payload:
     env:
       NO_DOCKER: 1
+      USER: hg
     image: 'ubuntu:18.04'
     maxRunTime: 1800
     command:
