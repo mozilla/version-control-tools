@@ -7,6 +7,8 @@ if [ -z "${HG_VERSION}" ]; then
   exit 1
 fi
 
+cd /work/vct
+
 cp -a /vct-cache/venv .
 ./create-test-environment
 ./run-tests \
