@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 if [ -z "${HG_VERSION}" ]; then
   echo "HG_VERSION not set"
