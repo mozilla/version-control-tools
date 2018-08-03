@@ -1,3 +1,7 @@
+# We need to unset this otherwise tests running on Taskcluster have
+# extra output.
+unset TASKCLUSTER_INSTANCE_TYPE
+
 cat >> $HGRCPATH << EOF
 [share]
 pool = $TESTTMP/share
