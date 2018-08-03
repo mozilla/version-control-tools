@@ -1,5 +1,17 @@
 FROM ubuntu:18.04
 
+RUN groupadd -g 1000 worker && \
+    useradd -u 1000 -g 1000 -s /bin/bash -m worker
+
+# Set variable normally configured at login, by the shells parent process, these
+# are taken from GNU su manual
+ENV HOME=/home/worker \
+    SHELL=/bin/bash \
+    USER=worker \
+    LOGNAME=worker \
+    HOSTNAME=taskcluster-worker \
+    DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
     build-essential \

@@ -21,17 +21,18 @@ tasks:
   retries: 5
   payload:
     env:
+      HG_VERSION: "4.6.2"
       NO_DOCKER: 1
       TMPDIR: /work/tmp
       USER: hg
-    image: 'mozvct/vcttest:0.2'
+    image: 'mozvct/vcttest:0.3'
     maxRunTime: 3600
     command:
       - "/bin/bash"
       - "-lc"
-      - "mkdir /work/tmp && hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && cp -a /vct-cache/venv . && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --with-hg=venv/mercurials/4.6.2/bin/hg --no-docker --color=never"
+      - "mkdir /work/tmp && hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && chown -R worker:worker /work && su worker -- testing/taskcluster-run-tests"
   extra:
     treeherder:
-      symbol: T
+      symbol: 4.6
       jobKind: test
       productName: version-control-tools

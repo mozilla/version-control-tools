@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "${HG_VERSION}" ]; then
+  echo "HG_VERSION not set"
+  exit 1
+fi
+
+cp -a /vct-cache/venv .
+./create-test-environment
+./run-tests \
+  --blacklist=testing/exclude_reviewboard.txt \
+  --with-hg=venv/mercurials/${HG_VERSION}/bin/hg \
+  --no-docker \
+  --color=never
