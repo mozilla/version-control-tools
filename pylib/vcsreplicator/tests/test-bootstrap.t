@@ -219,7 +219,7 @@ Perform bootstrap procedure on hgweb. vcsreplicator is still off on this host so
 will be an indication of a successful bootstrap
 
   $ docker cp $TESTTMP/hgssh_edited.json $HGWEB_0_CID:/etc/mercurial/hgssh.json
-  $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /var/hg/venv_replication/bin/hg /etc/mercurial/hgssh.json --workers 1
+  $ hgmo exec hgweb0 sudo -u hg -g hg /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /etc/mercurial/hgssh.json --workers 1
   vcsreplicator.bootstrap reading hgssh JSON document
   vcsreplicator.bootstrap JSON document read
   vcsreplicator.bootstrap assigning the consumer to partition 0
