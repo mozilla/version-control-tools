@@ -332,7 +332,7 @@ def mozbuildinfowebcommand(web, *args):
 
         # TODO we should be using the templater instead of emitting JSON directly.
         # But this requires not having the JSON formatter from the
-        # pushlog-legacy.py extension.
+        # pushlog/feed.py extension.
         if not web.configbool('hgmo', 'mozbuildinfoenabled', False):
             return web.sendtemplate('error',
                                     error={'error': 'moz.build evaluation is not enabled for this repo'})
@@ -352,7 +352,7 @@ def mozbuildinfowebcommand(web, *args):
 
         # TODO we should be using the templater instead of emitting JSON directly.
         # But this requires not having the JSON formatter from the
-        # pushlog-legacy.py extension.
+        # pushlog/feed.py extension.
 
         if not repo.ui.configbool('hgmo', 'mozbuildinfoenabled', False):
             req.respond(HTTP_OK, 'application/json')
@@ -847,7 +847,7 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
 
         setconfig('firefoxreleases', ['firefoxreleases'])
         setconfig('pushlog', ['pushlog'])
-        setconfig('pushlog-feed', ['pushlog-legacy', 'pushlog-feed.py'])
+        setconfig('pushlog-feed', ['pushlog', 'feed.py'])
 
         ui.setconfig('web', 'logoimg', 'moz-logo-bw-rgb.svg')
 

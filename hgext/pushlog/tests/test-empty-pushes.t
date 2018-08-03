@@ -1,4 +1,4 @@
-  $ . $TESTDIR/hgext/pushlog-legacy/tests/helpers.sh
+  $ . $TESTDIR/hgext/pushlog/tests/helpers.sh
 
   $ hg init server
   $ cd server

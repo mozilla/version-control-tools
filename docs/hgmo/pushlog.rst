@@ -34,22 +34,22 @@ No additional configuration is necessary.
 
 The web components for pushlog are separate from the core extension and
 require a bit more effort to configure. This code lives in
-``hgext/pushlog-legacy``. It is our intention to eventually aggregate
-this code into ``hgext/pushlog`` so there is a unified pushlog
+``hgext/pushlog/feed.py``. It is our intention to eventually aggregate
+this code into a single pushlog extension so there is a unified pushlog
 experience.
 
 The web component will require the following extension::
 
    [extensions]
-   pushlog-feed = /path/to/version-control-tools/hgext/pushlog-legacy/pushlog-feed.py
+   pushlog-feed = /path/to/version-control-tools/hgext/pushlog/feed.py
 
-``pushlog-feed.py`` exposes some hgweb endpoints that expose pushlog
+``pushlog/feed.py`` exposes some hgweb endpoints that expose pushlog
 data.
 
 Templates
 ---------
 
-It isn't enough to activate the ``pushlog-feed`` extension: you'll also
+It isn't enough to activate the ``pushlog/feed.py`` extension: you'll also
 need to configure some
 `Mercurial theming <https://www.mercurial-scm.org/wiki/Theming>`_
 to render pushlog data.

@@ -55,11 +55,6 @@ want to maintain a unified repository, *mozext* is very valuable.
 
 This extension lives under ``hgext/mozext``.
 
-pushlog-legacy
-==============
-
-This is a collection of code that modifies Mercurial to support
-recording when and who pushes to repositories.
 
 qbackout
 ========

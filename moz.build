@@ -27,10 +27,6 @@ with Files('hgext/mozext/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: mozext')
     FINAL = True
 
-with Files('hgext/pushlog-legacy/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: Pushlog')
-    FINAL = True
-
 with Files('hgext/pushlog/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: Pushlog')
     FINAL = True

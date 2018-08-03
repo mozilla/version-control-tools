@@ -1,4 +1,4 @@
-  $ . $TESTDIR/hgext/pushlog-legacy/tests/helpers.sh
+  $ . $TESTDIR/hgext/pushlog/tests/helpers.sh
 
   $ cat >> $HGRCPATH << EOF
   > [experimental]
@@ -12,7 +12,7 @@
   $ cat >> .hg/hgrc << EOF
   > [extensions]
   > pushlog = $TESTDIR/hgext/pushlog
-  > pushlog-feed = $TESTDIR/hgext/pushlog-legacy/pushlog-feed.py
+  > pushlog-feed = $TESTDIR/hgext/pushlog/feed.py
   > [phases]
   > publish = false
   > [web]

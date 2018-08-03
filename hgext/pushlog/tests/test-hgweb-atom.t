@@ -1,4 +1,4 @@
-  $ . $TESTDIR/hgext/pushlog-legacy/tests/helpers.sh
+  $ . $TESTDIR/hgext/pushlog/tests/helpers.sh
   $ maketestrepousers > /dev/null
 
 Get only the latest 10 pushes via pushlog

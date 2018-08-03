@@ -2,7 +2,7 @@ serverconfig() {
   cat >> $1 << EOF
 [extensions]
 hgmo = $TESTDIR/hgext/hgmo
-pushlog-feed = $TESTDIR/hgext/pushlog-legacy/pushlog-feed.py
+pushlog-feed = $TESTDIR/hgext/pushlog/feed.py
 pushlog = $TESTDIR/hgext/pushlog
 
 [web]
@@ -20,7 +20,7 @@ EOF
 alias http=$TESTDIR/testing/http-request.py
 
 jsoncompare() {
-  python $TESTDIR/hgext/pushlog-legacy/tests/json-compare.py $1 $2
+  python $TESTDIR/hgext/pushlog/tests/json-compare.py $1 $2
 }
 
 httpjson() {

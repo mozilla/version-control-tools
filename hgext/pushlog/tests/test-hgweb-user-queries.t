@@ -1,4 +1,4 @@
-  $ . $TESTDIR/hgext/pushlog-legacy/tests/helpers.sh
+  $ . $TESTDIR/hgext/pushlog/tests/helpers.sh
   $ maketestrepousers > /dev/null
 
 Query for an individual user's pushes
