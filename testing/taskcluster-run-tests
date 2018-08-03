@@ -10,6 +10,7 @@ fi
 cd /work/vct
 
 cp -a /vct-cache/venv .
+chown -R `whoami` .
 ./create-test-environment
 ./run-tests \
   --verbose \
