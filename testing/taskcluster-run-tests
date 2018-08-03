@@ -10,6 +10,7 @@ fi
 cp -a /vct-cache/venv .
 ./create-test-environment
 ./run-tests \
+  --verbose \
   --blacklist=testing/exclude_reviewboard.txt \
   --with-hg=venv/mercurials/${HG_VERSION}/bin/hg \
   --no-docker \
