@@ -30,7 +30,7 @@ tasks:
     command:
       - "/bin/bash"
       - "-lc"
-      - "mkdir /work/tmp && hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && chown -R worker:worker /work && su worker -- testing/taskcluster-run-tests"
+      - "mkdir /work/tmp && hg clone ${repository.url} /work/vct && cd /work/vct && hg up ${push.revision} && testing/taskcluster-run-tests"
   extra:
     treeherder:
       symbol: 4.6

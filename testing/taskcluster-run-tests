@@ -9,7 +9,7 @@ fi
 
 cd /work/vct
 
-#cp -a /vct-cache/venv .
+cp -a /vct-cache/venv .
 ./create-test-environment
 ./run-tests \
   --verbose \
