@@ -23,12 +23,12 @@ tasks:
     env:
       NO_DOCKER: 1
       USER: hg
-    image: 'ubuntu:18.04'
+    image: 'mozvct/vcttest:0.1'
     maxRunTime: 3600
     command:
       - "/bin/bash"
       - "-lc"
-      - "apt-get update && apt-get install -y --no-install-recommends build-essential ca-certificates gcc gettext git libcurl4-openssl-dev libffi-dev liblzma-dev libsasl2-dev libldap2-dev libssl-dev npm mercurial python3 python-dev sqlite3 zlib1g-dev && hg clone ${repository.url} v-c-t && cd v-c-t && hg up ${push.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --with-hg=venv/mercurials/4.6.2/bin/hg --no-docker --color=never"
+      - "hg clone ${repository.url} /work/vct && /work/vct && hg up ${push.revision} && ./create-test-environment && ./run-tests --blacklist=testing/exclude_reviewboard.txt --with-hg=venv/mercurials/4.6.2/bin/hg --no-docker --color=never"
   extra:
     treeherder:
       symbol: T

@@ -1,0 +1,24 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    gcc \
+    gettext \
+    git \
+    libcurl4-openssl-dev \
+    libffi-dev \
+    liblzma-dev \
+    libsasl2-dev \
+    libldap2-dev \
+    libssl-dev \
+    npm \
+    mercurial \
+    python3 \
+    python-dev \
+    sqlite3 \
+    zlib1g-dev && \
+  apt-get clean -y && rm -rf /var/lib/apt/lists
+
+VOLUME /work
