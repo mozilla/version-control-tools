@@ -14,6 +14,8 @@ ENV HOME=/home/worker \
 
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
+    autoconf \
+    automake \
     build-essential \
     ca-certificates \
     gcc \
@@ -25,8 +27,10 @@ RUN apt-get update && \
     libsasl2-dev \
     libldap2-dev \
     libssl-dev \
+    libtool \
     npm \
     mercurial \
+    pkg-config \
     python3 \
     python-dev \
     sqlite3 \
@@ -37,5 +41,14 @@ RUN hg clone https://hg.mozilla.org/hgcustom/version-control-tools /vct-cache &&
   cd /vct-cache && \
   NO_DOCKER=1 ./create-test-environment && \
   chown -R worker:worker /vct-cache
+
+# Install Watchman for fsmonitor tests
+RUN git clone https://github.com/facebook/watchman.git /watchman && \
+  cd /watchman && \
+  git checkout v4.9.0 && \
+  ./autogen.sh && \
+  ./configure && \
+  make && \
+  make install
 
 VOLUME /work
