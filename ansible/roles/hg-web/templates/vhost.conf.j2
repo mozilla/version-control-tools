@@ -28,7 +28,7 @@ LimitRequestFields 1000
     # If this value is too small, logs will appear in the error log:
     #
     #   The timeout specified has expired: ... mod_wsgi ... Failed to proxy response to client
-    Timeout 120
+    Timeout 180
 
     RewriteEngine on
     RewriteRule ^/(.*)index.cgi/?(.*) https://hg.mozilla.org/$1$2
