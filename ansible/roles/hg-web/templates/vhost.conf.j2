@@ -57,6 +57,7 @@ LimitRequestFields 1000
     WSGIScriptAliasMatch ^/(experimental|incubator|testpilot-l10n|weave-l10n|gaia-l10n|build|labs|services|l10n(?!-)|l10n-central|projects|automation|qa|hgcustom|webtools|releases|rewriting-and-analysis|www|SeaMonkey)(.*) /repo_local/mozilla/webroot_wsgi/$1/hgweb.wsgi$2
     WSGIScriptAliasMatch ^/dist(.*) /repo_local/mozilla/webroot_wsgi/dist/hgweb.wsgi$1
     WSGIScriptAliasMatch ^/integration(.*) /repo_local/mozilla/webroot_wsgi/integration/hgweb.wsgi$1
+    WSGIScriptAliasMatch ^/mozreview(.*) /repo_local/mozilla/webroot_wsgi/mozreview/hgweb.wsgi$1
     WSGIScriptAliasMatch ^(/(?!users|robots).*) /repo_local/mozilla/webroot_wsgi/hgweb.wsgi$1
 
     <Location /users>
