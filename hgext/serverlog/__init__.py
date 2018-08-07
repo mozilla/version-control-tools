@@ -219,7 +219,7 @@ wireprotov1server = import_module('mercurial.wireprotov1server')
 # TRACKING hg46 mercurial.wireproto split up and renamed
 wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.5'
+testedwith = '4.5 4.6'
 minimumhgversion = '4.5'
 
 configtable = {}
