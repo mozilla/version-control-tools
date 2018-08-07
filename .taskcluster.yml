@@ -25,7 +25,7 @@ tasks:
       NO_DOCKER: 1
       TMPDIR: /work/tmp
       USER: hg
-    image: 'mozvct/vcttest:0.4'
+    image: 'mozvct/vcttest:0.5'
     maxRunTime: 3600
     command:
       - "/bin/bash"
