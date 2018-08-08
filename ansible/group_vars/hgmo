@@ -25,8 +25,8 @@ zk_servers: {
   "hgweb2.dmz.mdc1.mozilla.com": 15,
   "hgweb3.dmz.mdc1.mozilla.com": 16,
   "hgweb4.dmz.mdc1.mozilla.com": 17,
-  "hgweb5.dmz.mdc1.mozilla.com": 18,
-  "hgweb6.dmz.mdc1.mozilla.com": 19,
+  #"hgweb5.dmz.mdc1.mozilla.com": 18,
+  #"hgweb6.dmz.mdc1.mozilla.com": 19,
   "hgssh1.dmz.mdc1.mozilla.com": 20,
 }
 # The string used by zookeeper.connect is used both to connect to
