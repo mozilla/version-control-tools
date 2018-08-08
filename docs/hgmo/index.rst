@@ -12,6 +12,7 @@ hg.mozilla.org
    pushlog
    managing-repos
    notifications
+   automatedclients
    bundleclone
    contributing
    mozbuildinfo
