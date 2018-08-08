@@ -45,4 +45,4 @@ kafka_min_insync_replicas: 3
 # defined in LDAP means that Ansible's muckery of the zookeeper user
 # doesn't work. So ignore it on these hosts.
 ignore_zookeeper_user:
-  - hgssh2.dmz.scl3.mozilla.com
+  - hgssh2.dmz.mdc1.mozilla.com
