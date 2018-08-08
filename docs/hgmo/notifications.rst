@@ -4,76 +4,8 @@
 Change Notifications
 ====================
 
-Pulse Notifications
-===================
-
-hg.mozilla.org guarantees at least once delivery of
-`Pulse <https://wiki.mozilla.org/Auto-tools/Projects/Pulse>`_ messages when a
-push is performed to the server.
-
-Pulse messages are written to the following exchanges:
-
-* `exchange/hgpushes/v1 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v1,routingKeyPattern:%23))>`_
-* (experimental) `exchange/hgpushes/v2 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v2,routingKeyPattern:%23))>`_
-
-The routing key for each message is the relative path of the repository
-on hg.mozilla.org (e.g. ``mozilla-central`` or ``integration/mozilla-inbound``).
-
-The ``payload`` of the JSON messages published to Pulse depend on the exchange.
-
-The ``exchange/hgpushes/v1`` exchange only supported publishing *push events*
-that described a push. The ``exchange/hgpushes/v2`` exchange supports publishing
-multiple event types.
-
-.. important::
-
-   New message types can be added to the ``exchange/hgpushes/v2`` exchange at
-   any time.
-
-   Consumers should either ignore unknown message types or fail fast when
-   encountering one.
-
-The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
-
-``type``
-   String denoting the message type.
-``data``
-   Dictionary holding details about the event.
-
-The message types and their data are described later in this document.
-
-SNS Notifications
-=================
-
-Change events for hg.mozilla.org are published to
-`Amazon Simple Notification Service (SNS) <https://aws.amazon.com/sns/>`_.
-
-Messages are published to SNS topic
-``arn:aws:sns:us-west-2:699292812394:hgmo-events``.
-
-The message is JSON with the following keys:
-
-``type``
-   String denoting the message type.
-``data_url``
-   URL where JSON describing the event can be obtained.
-``data`` (optional)
-   Dictionary holding details about the event.
-``external`` (optional)
-   Boolean indicating whether data is only available externally.
-   If this key is present, ``data`` will not be present and the only
-   way to obtain data is to query ``data_url``.
-``repo_url`` (optional)
-   URL of repository from which this data originated. This key is only
-   present if ``data`` is not present, as this value is already recorded
-   inside ``data``. The main purpose of this key is to facilitate
-   message filtering without having to query ``data_url`` to determine
-   which repository the message belongs to.
-
-The message types and their data are described later in this document.
-
-At least once delivery is guaranteed. And, new message types may be
-introduced at any time.
+hg.mozilla.org publishes notifications when various events occur, such as
+a push to a repository.
 
 Common Properties of Notifications
 ==================================
@@ -242,3 +174,74 @@ An example message payload for is as follows::
        }
      }
    }
+
+Pulse Notifications
+===================
+
+hg.mozilla.org guarantees at least once delivery of
+`Pulse <https://wiki.mozilla.org/Auto-tools/Projects/Pulse>`_ messages when a
+push is performed to the server.
+
+Pulse messages are written to the following exchanges:
+
+* `exchange/hgpushes/v1 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v1,routingKeyPattern:%23))>`_
+* (experimental) `exchange/hgpushes/v2 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v2,routingKeyPattern:%23))>`_
+
+The routing key for each message is the relative path of the repository
+on hg.mozilla.org (e.g. ``mozilla-central`` or ``integration/mozilla-inbound``).
+
+The ``payload`` of the JSON messages published to Pulse depend on the exchange.
+
+The ``exchange/hgpushes/v1`` exchange only supported publishing *push events*
+that described a push. The ``exchange/hgpushes/v2`` exchange supports publishing
+multiple event types.
+
+.. important::
+
+   New message types can be added to the ``exchange/hgpushes/v2`` exchange at
+   any time.
+
+   Consumers should either ignore unknown message types or fail fast when
+   encountering one.
+
+The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
+
+``type``
+   String denoting the message type.
+``data``
+   Dictionary holding details about the event.
+
+The message types and their data are described later in this document.
+
+SNS Notifications
+=================
+
+Change events for hg.mozilla.org are published to
+`Amazon Simple Notification Service (SNS) <https://aws.amazon.com/sns/>`_.
+
+Messages are published to SNS topic
+``arn:aws:sns:us-west-2:699292812394:hgmo-events``.
+
+The message is JSON with the following keys:
+
+``type``
+   String denoting the message type.
+``data_url``
+   URL where JSON describing the event can be obtained.
+``data`` (optional)
+   Dictionary holding details about the event.
+``external`` (optional)
+   Boolean indicating whether data is only available externally.
+   If this key is present, ``data`` will not be present and the only
+   way to obtain data is to query ``data_url``.
+``repo_url`` (optional)
+   URL of repository from which this data originated. This key is only
+   present if ``data`` is not present, as this value is already recorded
+   inside ``data``. The main purpose of this key is to facilitate
+   message filtering without having to query ``data_url`` to determine
+   which repository the message belongs to.
+
+The message types and their data are described later in this document.
+
+At least once delivery is guaranteed. And, new message types may be
+introduced at any time.
