@@ -15,11 +15,13 @@ import sys
 def modify_mtime(repo, dry_run=False):
     args = ['hg', 'log', '-r', 'tip', '-T', '{pushdate|hgdate}']
 
-    res = subprocess.run(args, stdout=subprocess.PIPE, cwd=repo)
+    res = subprocess.run(args, cwd=repo, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
 
     if res.returncode:
         print('error obtaining last push date for %s' % repo)
-        print('stdout: %s' % res.stdout)
+        print('stdout: %s' % res.stdout.strip())
+        print('stderr: %s' % res.stderr.strip())
         return False
 
     # Should be 2 integers. First is UNIX epoch. Second is timezone offset.
@@ -29,18 +31,12 @@ def modify_mtime(repo, dry_run=False):
     current_mtime = hg_dir.stat().st_mtime
     delta = last_push_time - current_mtime
 
-    # We only muck with the filesystem mtime if it is much different
-    # than what it should be.
-
-    if delta >= -60 and delta <= 60:
-        print('mtime for %s is reasonably accurate; ignoring' % repo)
-        return True
-
     if dry_run:
         print('would adjust mtime of %s by %ds' % (repo, delta))
         return True
 
     print('adjusting mtime of %s by %ds' % (repo, delta))
+    os.utime(repo, (last_push_time, last_push_time))
     os.utime(hg_dir, (last_push_time, last_push_time))
     return True
 
