@@ -29,6 +29,7 @@ def modify_mtime(repo, dry_run=False):
 
     hg_dir = repo / '.hg'
     store_dir = repo / '.hg' / 'store'
+    changelog = store_dir / '00changelog.i'
     current_mtime = hg_dir.stat().st_mtime
     delta = last_push_time - current_mtime
 
@@ -41,6 +42,8 @@ def modify_mtime(repo, dry_run=False):
     os.utime(hg_dir, (last_push_time, last_push_time))
     if store_dir.exists():
         os.utime(store_dir, (last_push_time, last_push_time))
+    if changelog.exists():
+        os.utime(changelog, (last_push_time, last_push_time))
     return True
 
 
