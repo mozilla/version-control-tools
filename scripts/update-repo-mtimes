@@ -1,0 +1,84 @@
+#!/usr/bin/env python3.6
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import argparse
+import concurrent.futures
+import os
+import pathlib
+import multiprocessing
+import subprocess
+import sys
+
+
+def modify_mtime(repo, dry_run=False):
+    args = ['hg', 'log', '-r', 'tip', '-T', '{pushdate}']
+    res = subprocess.run(args, check=True, stdout=subprocess.PIPE,
+                         cwd=repo)
+
+    if res.returncode:
+        print('error obtaining last push date for %s' % repo)
+        return False
+
+    last_push_time = int(res.stdout)
+
+    hg_dir = repo / '.hg'
+    current_mtime = hg_dir.stat().st_mtime
+    delta = last_push_time - current_mtime
+
+    # We only muck with the filesystem mtime if it is much different
+    # than what it should be.
+
+    if delta >= -60 and delta <= 60:
+        print('mtime for %s is reasonably accurate; ignoring' % repo)
+        return True
+
+    if dry_run:
+        print('would adjust mtime of %s by %ds' % (repo, delta))
+        return True
+
+    print('adjusting mtime of %s by %ds' % (repo, delta))
+    os.utime(hg_dir, (last_push_time, last_push_time))
+    return True
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-j', type=int, default=multiprocessing.cpu_count())
+    parser.add_argument('-n', '--dry-run', action='store_true',
+                        help='Do not actually perform actions')
+
+    args = parser.parse_args()
+
+    repos = []
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+
+        repo = pathlib.Path(line)
+
+        dot_hg = repo / '.hg'
+        if not dot_hg.exists():
+            print('%s is not a valid path to a repo; ignoring' % line)
+            continue
+
+        repos.append(repo)
+
+    res = 0
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.j) as e:
+        fs = []
+        for repo in repos:
+            fs.append(e.submit(modify_mtime, repo, dry_run=args.dry_run))
+
+        for f in concurrent.futures.as_completed(fs):
+            try:
+                if not f.result():
+                    res = 1
+            except Exception as e:
+                res = 1
+                print(e)
+
+    sys.exit(res)
