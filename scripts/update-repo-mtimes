@@ -13,15 +13,17 @@ import sys
 
 
 def modify_mtime(repo, dry_run=False):
-    args = ['hg', 'log', '-r', 'tip', '-T', '{pushdate}']
-    res = subprocess.run(args, check=True, stdout=subprocess.PIPE,
-                         cwd=repo)
+    args = ['hg', 'log', '-r', 'tip', '-T', '{pushdate|hgdate}']
+
+    res = subprocess.run(args, stdout=subprocess.PIPE, cwd=repo)
 
     if res.returncode:
         print('error obtaining last push date for %s' % repo)
+        print('stdout: %s' % res.stdout)
         return False
 
-    last_push_time = int(res.stdout)
+    # Should be 2 integers. First is UNIX epoch. Second is timezone offset.
+    last_push_time = int(res.stdout.split(b' ')[0])
 
     hg_dir = repo / '.hg'
     current_mtime = hg_dir.stat().st_mtime
