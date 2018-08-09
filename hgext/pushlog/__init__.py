@@ -885,9 +885,7 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     return 1
 
 
-# TODO use revsetpredicate once upstream bug
-# https://bz.mercurial-scm.org/show_bug.cgi?id=5601 is resolved.
-#@revsetpredicate('pushhead()', safe=True)
+@revsetpredicate('pushhead()', safe=True)
 def revset_pushhead(repo, subset, x):
     """``pushhead()``
 
@@ -908,7 +906,7 @@ def revset_pushhead(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-#@revsetpredicate('pushdate(interval)', safe=True)
+@revsetpredicate('pushdate(interval)', safe=True)
 def revset_pushdate(repo, subset, x):
     """``pushdate(interval)``
 
@@ -929,7 +927,7 @@ def revset_pushdate(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-#@revsetpredicate('pushuser(string)', safe=True)
+@revsetpredicate('pushuser(string)', safe=True)
 def revset_pushuser(repo, subset, x):
     """``pushuser(string)``
 
@@ -955,7 +953,7 @@ def revset_pushuser(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-#@revsetpredicate('pushid(int)', safe=True)
+@revsetpredicate('pushid(int)', safe=True)
 def revset_pushid(repo, subset, x):
     """``pushid(int)``
 
@@ -984,7 +982,7 @@ def revset_pushid(repo, subset, x):
     return subset & pushrevs
 
 
-#@revsetpredicate('pushrev(set)', safe=True)
+@revsetpredicate('pushrev(set)', safe=True)
 def revset_pushrev(repo, subset, x):
     """``pushrev(set)``
 
@@ -1067,18 +1065,6 @@ def verifypushlog(ui, repo):
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
-
-    # TODO remove once we switch to @revsetpredicate
-    revset.symbols['pushhead'] = revset_pushhead
-    revset.safesymbols.add('pushhead')
-    revset.symbols['pushdate'] = revset_pushdate
-    revset.safesymbols.add('pushdate')
-    revset.symbols['pushuser'] = revset_pushuser
-    revset.safesymbols.add('pushuser')
-    revset.symbols['pushid'] = revset_pushid
-    revset.safesymbols.add('pushid')
-    revset.symbols['pushrev'] = revset_pushrev
-    revset.safesymbols.add('pushrev')
 
     keywords = {
         'pushid': template_pushid,
