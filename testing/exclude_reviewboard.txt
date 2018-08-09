@@ -21,7 +21,7 @@ test-httpd-web-security.t
 test-ldap-association.t
 test-multiple-parents.t
 test-multiple-precursors.t
-test-obsolescence.t
+test-obsolescence-reviewboard.t
 test-operation-prevention.t
 test-pulse-publishing.t
 test-push-http.t
