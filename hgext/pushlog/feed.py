@@ -9,7 +9,6 @@ import mercurial.hgweb.webcommands as hgwebcommands
 import mercurial.hgweb.webutil as webutil
 from mercurial.hgweb.common import (
     ErrorResponse,
-    HTTP_OK,
     paritygen,
 )
 from mercurial.node import hex, nullid
@@ -17,7 +16,6 @@ from mercurial import (
     demandimport,
     error,
     templatefilters,
-    util,
 )
 
 sys.path.append(os.path.dirname(__file__))
@@ -27,39 +25,29 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.3 4.4 4.5 4.6'
-minimumhgversion = '4.3'
+testedwith = '4.6'
+minimumhgversion = '4.6'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
 
+
 def addwebcommand(f, name):
+    '''Adds `f` as a webcommand named `name`.'''
     setattr(hgwebcommands, name, f)
     hgwebcommands.__all__.append(name)
+
 
 ATOM_MIMETYPE = 'application/atom+xml'
 
 
-# TRACKING hg46
-def qsparam(req, key, default):
-    try:
-        return req.qsparams.get(key, default)
-    except AttributeError:
-        return req.form.get(key, [default])[0]
-
-
-def hasqsparam(req, key):
-    try:
-        return key in req.qsparams
-    except AttributeError:
-        return key in req.form
-
-
-# just an enum
 class QueryType:
+    '''Enumeration of the different Pushlog query types'''
     DATE, CHANGESET, PUSHID, COUNT = range(4)
 
+
 class PushlogQuery(object):
+    '''Represents the internal state of a query to Pushlog'''
     def __init__(self, repo, urlbase='', tipsonly=False):
         self.repo = repo
         self.urlbase = urlbase
@@ -87,13 +75,12 @@ class PushlogQuery(object):
         # ID of the last known push in the database.
         self.lastpushid = None
 
-    def DoQuery(self):
+    def do_query(self):
         """Figure out what the query parameters are, and query the database
         using those parameters."""
         # Use an unfiltered repo because query parameters may reference hidden
         # changesets. Hidden changesets are still in the pushlog. We'll
         # treat them appropriately at the filter layer.
-        repo = self.repo.unfiltered()
         self.entries = []
 
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
@@ -195,6 +182,7 @@ class PushlogQuery(object):
 
         return 'Changes pushed ' + ', '.join(bits)
 
+
 def localdate(ts):
     """Given a timestamp, return a (timestamp, tzoffset) tuple,
     which is what Mercurial works with. Attempts to get DST
@@ -203,9 +191,10 @@ def localdate(ts):
     offset = time.timezone
     if t[8] == 1:
         offset = time.altzone
-    return (ts, offset)
+    return ts, offset
 
-def doParseDate(datestring):
+
+def do_parse_date(datestring):
     """Given a date string, try to parse it as an ISO 8601 date.
     If that fails, try parsing it with the parsedatetime module,
     which can handle relative dates in natural language."""
@@ -225,41 +214,17 @@ def doParseDate(datestring):
         date, x = cal.parse(datestring)
     return time.mktime(date)
 
-def pushlogSetup(repo, req):
+
+def pushlog_setup(repo, req):
     """Given a repository object and a hgweb request object,
     build a PushlogQuery object and populate it with data from the request.
     The returned query object will have its query already run, and
     its entries member can be read."""
-    page = int(qsparam(req, 'node', '1'))
+    page = int(req.qsparams.get('node', '1'))
 
-    # figure out the urlbase
-    # TRACKING hg46
-    if util.safehasattr(req, 'urlscheme'):
-        proto = req.urlscheme
-    else:
-        proto = req.env.get('wsgi.url_scheme')
+    tipsonly = req.qsparams.get('tipsonly', None) == '1'
 
-    if proto == 'https':
-        proto = 'https'
-        default_port = "443"
-    else:
-        proto = 'http'
-        default_port = "80"
-
-    # TRACKING hg46
-    if util.safehasattr(req, 'rawenv'):
-        port = req.rawenv["SERVER_PORT"]
-    else:
-        port = req.env["SERVER_PORT"]
-    port = port != default_port and (":" + port) or ""
-
-    tipsonly = qsparam(req, 'tipsonly', None) == '1'
-
-    # TRACKING hg46
-    if util.safehasattr(req, 'rawenv'):
-        urlbase = req.advertisedbaseurl
-    else:
-        urlbase = '%s://%s%s' % (proto, req.env['SERVER_NAME'], port)
+    urlbase = req.advertisedbaseurl
 
     query = PushlogQuery(urlbase=urlbase,
                          repo=repo,
@@ -267,78 +232,58 @@ def pushlogSetup(repo, req):
     query.page = page
 
     # find start component
-    if hasqsparam(req, 'startdate'):
-        startdate = doParseDate(qsparam(req, 'startdate', None))
+    if 'startdate' in req.qsparams:
+        startdate = do_parse_date(req.qsparams.get('startdate', None))
         query.querystart = QueryType.DATE
         query.querystart_value = startdate
-    elif hasqsparam(req, 'fromchange'):
+    elif 'fromchange' in req.qsparams:
         query.querystart = QueryType.CHANGESET
-        query.querystart_value = qsparam(req, 'fromchange', None)
-    elif hasqsparam(req, 'startID'):
+        query.querystart_value = req.qsparams.get('fromchange', None)
+    elif 'startID' in req.qsparams:
         query.querystart = QueryType.PUSHID
-        query.querystart_value = qsparam(req, 'startID', None)
+        query.querystart_value = req.qsparams.get('startID', None)
     else:
         # default is last 10 pushes
         query.querystart = QueryType.COUNT
         query.querystart_value = PUSHES_PER_PAGE
 
-    if hasqsparam(req, 'enddate'):
-        enddate = doParseDate(qsparam(req, 'enddate', None))
+    if 'enddate' in req.qsparams:
+        enddate = do_parse_date(req.qsparams.get('enddate', None))
         query.queryend = QueryType.DATE
         query.queryend_value = enddate
-    elif hasqsparam(req, 'tochange'):
+    elif 'tochange' in req.qsparams:
         query.queryend = QueryType.CHANGESET
-        query.queryend_value = qsparam(req, 'tochange', None)
-    elif hasqsparam(req, 'endID'):
+        query.queryend_value = req.qsparams.get('tochange', None)
+    elif 'endID' in req.qsparams:
         query.queryend = QueryType.PUSHID
-        query.queryend_value = qsparam(req, 'endID', None)
+        query.queryend_value = req.qsparams.get('endID', None)
 
-    # TRACKING hg46
-    try:
-        query.userquery = req.qsparams.getall('user')
-    except AttributeError:
-        query.userquery = req.form.get('user', [])
+    query.userquery = req.qsparams.getall('user')
 
     #TODO: use rev here, switch page to ?page=foo ?
-    # TRACKING hg46
-    if hasqsparam(req, 'changeset'):
-        try:
-            query.changesetquery = req.qsparams.getall('changeset')
-        except AttributeError:
-            query.changesetquery = req.form['changeset']
+    query.changesetquery = req.qsparams.getall('changeset')
 
     try:
-        query.formatversion = int(qsparam(req, 'version', '1'))
+        query.formatversion = int(req.qsparams.get('version', '1'))
     except ValueError:
         raise ErrorResponse(500, 'version parameter must be an integer')
     if query.formatversion < 1 or query.formatversion > 2:
         raise ErrorResponse(500, 'version parameter must be 1 or 2')
 
-    query.DoQuery()
+    query.do_query()
 
     return query
 
-def pushlogFeed(*args):
+
+def pushlog_feed(web):
     """WebCommand for producing the ATOM feed of the pushlog."""
+    req = web.req
 
-    # TRACKING hg46
-    if len(args) == 1:
-        web = args[0]
-        req = web.req
-    else:
-        assert len(args) == 3
-        web, req = args[0:2]
+    req.qsparams['style'] = 'atom'
+    # Need to reset the templater instance to use the new style.
+    web.tmpl = web.templater(req)
 
-    # TRACKING hg46
-    try:
-        req.qsparams['style'] = 'atom'
-        # Need to reset the templater instance to use the new style.
-        web.tmpl = web.templater(req)
-    except AttributeError:
-        req.form['style'] = ['atom']
-
-    tmpl = web.templater(req)
-    query = pushlogSetup(web.repo, req)
+    query = pushlog_setup(web.repo, req)
     isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
 
     if query.entries:
@@ -346,13 +291,9 @@ def pushlogFeed(*args):
     else:
         dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
 
-    # TRACKING hg46
-    if util.safehasattr(req, 'apppath'):
-        url = req.apppath or '/'
-        if not url.endswith('/'):
-            url += '/'
-    else:
-        url = req.url
+    url = req.apppath or '/'
+    if not url.endswith('/'):
+        url += '/'
 
     data = {
         'urlbase': query.urlbase,
@@ -379,27 +320,16 @@ def pushlogFeed(*args):
             'files': [{'name': fn} for fn in ctx.files()],
         })
 
-    # TRACKING hg46
-    if util.safehasattr(web, 'sendtemplate'):
-        web.res.headers['Content-Type'] = ATOM_MIMETYPE
-        return web.sendtemplate('pushlog', **data)
-    else:
-        req.respond(HTTP_OK, ATOM_MIMETYPE)
-        return tmpl('pushlog', **data)
+    web.res.headers['Content-Type'] = ATOM_MIMETYPE
+    return web.sendtemplate('pushlog', **data)
 
 
-def pushlogHTML(*args):
+def pushlog_html(web):
     """WebCommand for producing the HTML view of the pushlog."""
-    # TRACKING hg46
-    if len(args) == 1:
-        web = args[0]
-        req = web.req
-        tmpl = web.tmpl
-    else:
-        assert len(args) == 3
-        web, req, tmpl = args
+    req = web.req
+    tmpl = web.tmpl
 
-    query = pushlogSetup(web.repo, req)
+    query = pushlog_setup(web.repo, req)
 
     # these three functions are in webutil in newer hg, but not in hg 1.0
     def nodetagsdict(repo, node):
@@ -506,17 +436,13 @@ def pushlogHTML(*args):
         rev=0,
         entries=lambda **x: changelist(limit=0, **x),
         latestentry=lambda **x: changelist(limit=1, **x),
-        startdate=qsparam(req, 'startdate', '1 week ago'),
-        enddate=qsparam(req, 'enddate', 'now'),
+        startdate=req.qsparams.get('startdate', '1 week ago'),
+        enddate=req.qsparams.get('enddate', 'now'),
         querydescription=query.description(),
         archives=web.archivelist("tip")
     )
 
-    # TRACKING hg46
-    if util.safehasattr(web, 'sendtemplate'):
-        return web.sendtemplate('pushlog', **data)
-    else:
-        return tmpl('pushlog', **data)
+    return web.sendtemplate('pushlog', **data)
 
 
 def pushes_worker(query, repo, full):
@@ -562,11 +488,7 @@ def pushes_worker(query, repo, full):
 
             # Only expose obsolescence metadata if the repo has some.
             if haveobs:
-                # TRACKING hg46
-                if util.safehasattr(repo.obsstore, 'predecessors'):
-                    precursors = repo.obsstore.predecessors.get(ctx.node(), ())
-                else:
-                    precursors = repo.obsstore.precursors.get(ctx.node(), ())
+                precursors = repo.obsstore.predecessors.get(ctx.node(), ())
 
                 precursors = [hex(m[0]) for m in precursors]
                 if precursors:
@@ -577,19 +499,13 @@ def pushes_worker(query, repo, full):
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
-def pushes(*args):
-    """WebCommand to return a data structure containing pushes."""
-    # TRACKING hg46
-    if len(args) == 1:
-        web = args[0]
-        req = web.req
-        tmpl = web.tmpl
-    else:
-        assert len(args) == 3
-        web, req, tmpl = args
 
-    query = pushlogSetup(web.repo, req)
-    data = pushes_worker(query, web.repo, hasqsparam(req, 'full'))
+def pushes(web):
+    """WebCommand to return a data structure containing pushes."""
+    req = web.req
+
+    query = pushlog_setup(web.repo, req)
+    data = pushes_worker(query, web.repo, 'full' in req.qsparams)
 
     if query.formatversion == 1:
         template = 'pushes1'
@@ -598,13 +514,9 @@ def pushes(*args):
     else:
         raise ErrorResponse(500, 'unexpected formatversion')
 
-    # TRACKING hg46
-    if util.safehasattr(web, 'sendtemplate'):
-        return web.sendtemplate(template, **data)
-    else:
-        return tmpl(template, **data)
+    return web.sendtemplate(template, **data)
 
 
-addwebcommand(pushlogFeed, 'pushlog')
-addwebcommand(pushlogHTML, 'pushloghtml')
+addwebcommand(pushlog_feed, 'pushlog')
+addwebcommand(pushlog_html, 'pushloghtml')
 addwebcommand(pushes, 'pushes')
