@@ -321,7 +321,8 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     if opts.get('dir'):
         exactFiles = ['glob:' + opts['dir'] + '/**']
     else:
-        matchfn = scmutil.match(repo['.'], changedFiles, default='relglob')
+        paths = [p + '/**' if os.path.isdir(p) else p for p in changedFiles]
+        matchfn = scmutil.match(repo['.'], paths, default='relglob')
         exactFiles = ['path:' + path for path in repo['.'].walk(matchfn)]
         if len(exactFiles) == 0:
             return
