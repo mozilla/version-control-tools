@@ -356,7 +356,6 @@ def patch_changes(ui, repo, found, patchfile=None, **opts):
 
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
-supersuckerRe = re.compile(r"sr=(\w+)")
 
 @command('reviewers', [
     ('f', 'file', [], 'see reviewers for FILE', 'FILE'),
@@ -388,15 +387,12 @@ def reviewers(ui, repo, patchfile=None, **opts):
         return ui.config('reviewers', reviewer, reviewer)
 
     suckers = Counter()
-    supersuckers = Counter()
     changeCount = 0
     found = [False]
     minSuckers = 5
     for change in patch_changes(ui, repo, found, patchfile, **opts):
         changeCount += 1
         suckers.update(canon(x) for x in suckerRe.findall(change.description()))
-        if not opts.get('brief'):
-            supersuckers.update(canon(x) for x in supersuckerRe.findall(change.description()))
         if len(suckers) >= minSuckers:
             found[0] = True
 
@@ -419,14 +415,6 @@ def reviewers(ui, repo, patchfile=None, **opts):
         for (reviewer, count) in suckers.most_common(10):
             ui.write("  %s: %d\n" % (reviewer, count))
     ui.write("\n")
-
-    ui.write("Potential super-reviewers:\n")
-    if (len(supersuckers) == 0):
-        ui.write("  none found in range (try higher --limit?)\n")
-    else:
-        for (reviewer, count) in supersuckers.most_common(10):
-            ui.write("  %s: %d\n" % (reviewer, count))
-
 
 def fetch_bugs(url, ui, bugs):
     data = json.dumps({
