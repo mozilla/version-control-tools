@@ -84,6 +84,7 @@ from mercurial.i18n import _
 from mercurial.node import bin, short
 from mercurial import (
     bookmarks,
+    cmdutil,
     commands,
     configitems,
     encoding,
@@ -905,8 +906,8 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
 
 @command('mozrepohash', [
     ('', 'no-raw', False, 'skip hashing raw files'),
-])
-def mozrepohash(ui, repo, no_raw=False):
+] + cmdutil.formatteropts)
+def mozrepohash(ui, repo, no_raw=False, **opts):
     """obtain a hash of the repo contents.
 
     The hash can be used to test for repository equivalence. Useful for
@@ -980,22 +981,28 @@ def mozrepohash(ui, repo, no_raw=False):
     h_obsstore.update(b'obsstore')
     h_obsstore.update(repo.svfs.tryread(b'obsstore'))
 
-    ui.write('revisions: %d visible; %d total\n' % (len(repo), len(urepo)))
-    ui.write('heads: %d visible; %d total\n' % (len(repo.heads()),
-                                                len(urepo.heads())))
-    ui.write('normal: %s\n' % h_default.hexdigest())
-    ui.write('unfiltered: %s\n' % h_unfiltered.hexdigest())
-    ui.write('phases: %s\n' % h_phases.hexdigest())
-    ui.write('heads: %s\n' % h_heads.hexdigest())
-    ui.write('unfiltered heads: %s\n' % h_heads_unfiltered.hexdigest())
-    ui.write('pushlog: %s\n' % h_pushlog.hexdigest())
+    # Output with formatting
+    fm = ui.formatter('mozrepohash', opts)
+    fm.startitem()
+    fm.write('revisions_visible', 'visible revisions: %d\n', len(repo))
+    fm.write('revisions_total', 'total revisions: %d\n', len(urepo))
+    fm.write('heads_visible', 'visible heads: %d\n', len(repo.heads()))
+    fm.write('heads_total', 'total heads: %d\n', len(urepo.heads()))
+    fm.write('normal', 'normal repo hash: %s\n', h_default.hexdigest())
+    fm.write('unfiltered', 'unfiltered repo hash: %s\n', h_unfiltered.hexdigest())
+    fm.write('phases', 'phases hash: %s\n', h_phases.hexdigest())
+    fm.write('heads', 'heads hash: %s\n', h_heads.hexdigest())
+    fm.write('unfiltered_heads', 'unfiltered heads hash: %s\n', h_heads_unfiltered.hexdigest())
+    fm.write('pushlog', 'pushlog hash: %s\n', h_pushlog.hexdigest())
 
     if repo.svfs.exists(b'obsstore'):
-        ui.write('obsolete records count: %d\n' % len(repo.obsstore))
-        ui.write('obsolete records: %s\n' % h_obsrecords.hexdigest())
+        fm.write('obsolete_records_count', 'obsolete records count: %d\n', len(repo.obsstore))
+        fm.write('obsolete_records', 'obsolete records hash: %s\n', h_obsrecords.hexdigest())
 
         if not no_raw:
-            ui.write('obsstore: %s\n' % h_obsstore.hexdigest())
+            fm.write('obsstore', 'obsstore hash: %s\n', h_obsstore.hexdigest())
+
+    fm.end()
 
 
 def pull(orig, repo, remote, *args, **kwargs):
