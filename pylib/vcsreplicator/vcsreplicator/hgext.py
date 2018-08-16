@@ -17,12 +17,16 @@ import syslog
 import time
 import traceback
 
-import vcsreplicator.producer as vcsrproducer
+from vcsreplicator import (
+    commoncommands,
+    producer as vcsrproducer,
+)
 
 from mercurial.i18n import _
 from mercurial.node import hex
 from mercurial import (
     bundle2,
+    cmdutil,
     commands,
     configitems,
     demandimport,
@@ -60,6 +64,11 @@ testedwith = '4.3 4.4 4.5 4.6'
 cmdtable = {}
 
 command = registrar.command(cmdtable)
+
+# Register `hg mozrepohash` with the command registrar
+command('mozrepohash', [
+    ('', 'no-raw', False, 'skip hashing raw files'),
+] + cmdutil.formatteropts)(commoncommands.mozrepohash)
 
 configtable = {}
 configitem = registrar.configitem(configtable)

@@ -15,15 +15,26 @@ from mercurial.node import (
     hex,
 )
 from mercurial import (
-    branchmap,
+    cmdutil,
     error,
     hg,
     localrepo,
+    registrar,
     repoview,
 )
 
+from vcsreplicator import commoncommands
+
 testedwith = '4.5 4.6'
 minimumhgversion = '4.5'
+
+cmdtable = {}
+command = registrar.command(cmdtable)
+
+# Register `hg mozrepohash` with the command registrar
+command('mozrepohash', [
+    ('', 'no-raw', False, 'skip hashing raw files'),
+] + cmdutil.formatteropts)(commoncommands.mozrepohash)
 
 
 def computeunreplicated(repo, visibilityexceptions=None):
