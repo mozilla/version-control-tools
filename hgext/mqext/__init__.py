@@ -108,7 +108,7 @@ from mercurial import (
 )
 
 from hgext import mq
-from collections import Counter
+from collections import Counter, defaultdict, namedtuple
 
 OUR_DIR = os.path.dirname(__file__)
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
@@ -333,6 +333,43 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 fileRe = re.compile(r"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
 suckerRe = re.compile(r"[^s-]r=(\w+)")
 
+class DropoffCounter(object):
+    '''Maintain a mapping from values to counts and weights, where the weight
+drops off exponentially as "time" passes. This is useful when more recent
+contributions should be weighted higher than older ones.'''
+
+    Item = namedtuple('Item', ['name', 'count', 'weight'])
+
+    def __init__(self, factor):
+        self.factor = factor
+        self.counts = Counter()
+        self.weights = defaultdict(float)
+        self.age = 0
+
+    def add(self, value):
+        self.counts[value] += 1
+        self.weights[value] += pow(self.factor, self.age)
+
+    def advance(self):
+        self.age += 1
+
+    def most_weighted(self, n):
+        top = sorted(self.weights, key=lambda k: self.weights[k], reverse=True)
+        if len(top) > n:
+            top = top[:n]
+        return [self[key] for key in top]
+
+    def countValues(self):
+        '''Return number of distinct values stored.'''
+        return len(self.counts)
+
+    def weight(self, value):
+        return self.weights[value]
+
+    def __getitem__(self, key):
+        if key in self.counts:
+            return DropoffCounter.Item(key, self.counts[key], self.weights[key])
+
 @command('reviewers', [
     ('f', 'file', [], 'see reviewers for FILE', 'FILE'),
     ('r', 'rev', [], 'see reviewers for revisions', 'REVS'),
@@ -362,16 +399,17 @@ def reviewers(ui, repo, patchfile=None, **opts):
         reviewer = reviewer.lower()
         return ui.config('reviewers', reviewer, reviewer)
 
-    suckers = Counter()
-    changeCount = 0
+    suckers = DropoffCounter(0.95)
+    totalSuckers = 0
     enoughSuckers = 100
     for change in patch_changes(ui, repo, patchfile, **opts):
-        changeCount += 1
-        suckers.update(canon(x) for x in suckerRe.findall(change.description()))
-        if len(suckers) >= enoughSuckers:
+        for raw in suckerRe.findall(change.description()):
+            suckers.add(canon(raw))
+        if suckers.countValues() >= enoughSuckers:
             break
+        suckers.advance()
 
-    if changeCount == 0:
+    if suckers.age == 0:
         ui.write("no matching files found\n")
         return
 
@@ -379,16 +417,18 @@ def reviewers(ui, repo, patchfile=None, **opts):
         if len(suckers) == 0:
             ui.write("no reviewers found in range\n")
         else:
-            r = [ "%s x %d" % (reviewer, count) for reviewer, count in suckers.most_common(3) ]
+            r = [ "%s x %d" % (s.name, s.count) for s in suckers.most_weighted(3) ]
             ui.write(", ".join(r) + "\n")
         return
 
     ui.write("Potential reviewers:\n")
-    if (len(suckers) == 0):
+    if (suckers.countValues() == 0):
         ui.write("  none found in range (try higher --limit?)\n")
     else:
-        for (reviewer, count) in suckers.most_common(10):
-            ui.write("  %s: %d\n" % (reviewer, count))
+        top_weight = 0
+        for s in suckers.most_weighted(10):
+            top_weight = top_weight or s.weight
+            ui.write("  %s: %d (score = %d)\n" % (s.name, s.count, 10 * s.weight / top_weight))
     ui.write("\n")
 
 def fetch_bugs(url, ui, bugs):
