@@ -82,7 +82,7 @@ following config option::
   allowexchangewithapplied = true
 '''
 
-testedwith = '4.3 4.4 4.5 4.6'
+testedwith = '4.3 4.4 4.5 4.6 4.7'
 minimumhgversion = '4.3'
 
 import os
@@ -154,6 +154,18 @@ if util.safehasattr(logcmdutil, 'diffordiffstat'):
 else:
     diffordiffstat = cmdutil.diffordiffstat
 
+# TRACKING hg47
+if util.safehasattr(logcmdutil, 'getrevs'):
+    getlogrevs = logcmdutil.getrevs
+else:
+    getlogrevs = cmdutil.getlogrevs
+
+# TRACKING hg47
+if util.safehasattr(cmdutil, 'exportfile'):
+    exportfile = cmdutil.exportfile
+else:
+    exportfile = cmdutil.export
+
 bugzilla_jsonrpc_url = "https://bugzilla.mozilla.org/jsonrpc.cgi"
 
 def resolve_patchfile(ui, repo, patchspec):
@@ -190,8 +202,6 @@ def qshow(ui, repo, patchspec=None, **opts):
         # commands.diff has a bad error message
         if patchspec is None:
             patchspec = '.'
-        if patchspec not in repo and not repo.revs(patchspec).first():
-            raise error.Abort(_("Unknown patch '%s'") % patchspec)
 
         # the built-in export command does not label the diff for color
         # output, and the patch header generation is not reusable
@@ -201,7 +211,7 @@ def qshow(ui, repo, patchspec=None, **opts):
         temp = patch.diff
         try:
             patch.diff = empty_diff
-            cmdutil.export(repo, repo.revs(patchspec), fp=ui)
+            exportfile(repo, repo.revs(patchspec), fp=ui)
         finally:
             patch.diff = temp
 
@@ -231,20 +241,11 @@ def at_most(gen, seen, limit):
         seen.add(result)
         yield result
 
-def cmdutil_getlogrevs(repo, pats, opts):
-    result = cmdutil.getlogrevs(repo, pats, opts)
-    if not result:
-        return result
-    if len(result) == 2:
-        return result
-    revs, _, filematcher = result
-    return revs, filematcher
-        
 def get_logrevs_for_files(repo, files, found, opts):
     limit = opts['limit'] or 1000000
     seen = set()
 
-    revs, filematcher = cmdutil_getlogrevs(repo, files, {'limit': limit})
+    revs = cmdutil_getlogrevs(repo, files, {'limit': limit})[0]
     for rev in at_most(revs, seen, limit):
         yield rev
 
@@ -256,7 +257,7 @@ def get_logrevs_for_files(repo, files, found, opts):
     # incompatible with --follow.
     files = [f for f in files if 'path:' in f]
 
-    revs, filematcher = cmdutil_getlogrevs(repo, files, {'follow': True, 'limit': limit - len(seen)})
+    revs = getlogrevs(repo, files, {'follow': True, 'limit': limit - len(seen)})[0]
     for rev in at_most(revs, seen, limit):
         yield rev
 
@@ -346,8 +347,8 @@ def patch_changes(ui, repo, found, patchfile=None, **opts):
     if opts.get('dir'):
         exactFiles = ['glob:' + opts['dir'] + '/**']
     else:
-        matchfn = scmutil.match(repo[None], changedFiles, default='relglob')
-        exactFiles = ['path:' + path for path in repo.walk(matchfn)]
+        matchfn = scmutil.match(repo['.'], changedFiles, default='relglob')
+        exactFiles = ['path:' + path for path in repo['.'].walk(matchfn)]
         if len(exactFiles) == 0:
             return
 
