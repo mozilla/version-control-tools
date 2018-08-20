@@ -35,7 +35,7 @@ Pre-announcements should be made to
 
 Deployment-time announcements should be made in ``#vcs``. In addition, the
 on-duty Sheriff (they will have ``|Sheriffduty`` appended to their IRC nick)
-should be notified. Anyone in ``#releng`` with ``|buildduty`` in their IRC
+should be notified. Anyone in ``#ci`` with ``|buildduty`` in their IRC
 nick should also be notified. Sending an email to ``sheriffs@mozilla.org``
 can't also hurt.
 
