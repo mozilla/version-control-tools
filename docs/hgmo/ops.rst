@@ -380,11 +380,17 @@ Mercurial data. If the output from this command is identical across machines,
 then the underlying repository stores should be identical.
 
 To mass collect hashes of all repositories, you can run something like
-the following::
+the following on an hgssh host::
 
    $ /var/hg/version-control-tools/scripts/find-hg-repos.py /repo/hg/mozilla/ | \
      sudo -u hg -g hg parallel --progress --res /var/tmp/repohash \
-     /var/hg/venv_tools/bin/hg --config extensions.hgmo=/var/hg/version-control-tools/hgext/hgmo -R /repo/hg/mozilla/{} mozrepohash
+     /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/{} mozrepohash
+
+or the following on an hgweb host::
+
+   $ /var/hg/version-control-tools/scripts/find-hg-repos.py /repo/hg/mozilla/ | \
+     sudo -u hg -g hg parallel --progress --res /var/tmp/repohash \
+     /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/{} mozrepohash
 
 This command will use GNU parallel to run ``hg mozrepohash`` on all repositories
 found by the ``find-hg-repos.py`` script and write the results into
@@ -393,7 +399,7 @@ found by the ``find-hg-repos.py`` script and write the results into
 You can then ``rsync`` those results to a central machine and compare
 output::
 
-   $ for h in hgweb{1,2,4,5}.dmz.mdc1.mozilla.com; do \
+   $ for h in hgweb{1,2,3,4}.dmz.mdc1.mozilla.com; do \
        rsync -avz --delete-after --exclude stderr $h:/var/tmp/repohash/ $h/ \
      done
 
