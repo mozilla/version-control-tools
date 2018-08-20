@@ -119,4 +119,4 @@
   tasks:
     - name: Reminder
       debug:
-        msg: "Please ask buildduty in #ci to issue a no-op reconfig of the buildbot scheduler, and file a bug in Taskcluster: Service Request to reset the branch in mozilla-taskcluster."
+        msg: "Please file a bug in Taskcluster: Service Request to reset the branch in mozilla-taskcluster."
