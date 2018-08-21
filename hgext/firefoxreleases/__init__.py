@@ -30,11 +30,11 @@ from mozhg.util import (
 )
 
 
-minimumhgversion = '4.3'
-testedwith = '4.3 4.4 4.5 4.6'
+minimumhgversion = '4.6'
+testedwith = '4.6'
 
 configtable = {}
-configitem  = registrar.configitem(configtable)
+configitem = registrar.configitem(configtable)
 
 configitem('mozilla', 'enablefirefoxreleases',  # deprecated, use firefox_releasing
            default=configitems.dynamicdefault)
@@ -43,16 +43,14 @@ configitem('mozilla', 'firefox_releasing',
 configitem('mozilla', 'firefoxreleasesdb',
            default=configitems.dynamicdefault)
 
+revsetpredicate = registrar.revsetpredicate()
+
 
 def extsetup(ui):
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
 
     setattr(webcommands, 'firefoxreleases', firefox_releases_web_command)
     webcommands.__all__.append('firefoxreleases')
-
-    # TODO remove once we can use @revsetpredicate from extensions
-    revset.symbols['firefoxrelease'] = revset_firefoxrelease
-    revset.safesymbols.add('firefoxrelease')
 
 
 def db_for_repo(repo):
@@ -113,37 +111,20 @@ def release_configurations(db, repo):
         fltr=lambda build: build.revision in repo)
 
 
-def firefox_releases_web_command(web, *args):
+def firefox_releases_web_command(web):
     """Show information about Firefox releases."""
 
-    # TRACKING hg46
-    if util.safehasattr(web, 'sendtemplate'):
-        req = web.req
-    else:
-        req, tmpl = args
+    req = web.req
 
     repo = web.repo
 
     db = db_for_repo(repo)
     if not db:
         error_message = 'Firefox release info not available'
-        # TRACKING hg46
-        # the templater is no longer callable in hg46.
-        # # instead use the generate method
-        if util.safehasattr(web, 'sendtemplate'):
-            return web.sendtemplate('error', error=error_message)
-        else:
-            return tmpl('error', error=error_message)
+        return web.sendtemplate('error', error=error_message)
 
 
-    # TRACKING hg46
-    # hgweb requests no longer accept form data. The same data
-    # will be passed in as a query string parameter
-    if not hasattr(req, 'form'):
-        platform = req.qsparams['platform'] if 'platform' in req.qsparams else None
-    else:
-        platform = req.form['platform'][0] if 'platform' in req.form else None
-
+    platform = req.qsparams['platform'] if 'platform' in req.qsparams else None
     builds = []
 
     for build in release_builds(db, repo):
@@ -160,12 +141,7 @@ def firefox_releases_web_command(web, *args):
         entry['anchor'] = build_anchor(build)
         releases.append(entry)
 
-    # TRACKING hg46
-    if util.safehasattr(web, 'sendtemplate'):
-        return web.sendtemplate('firefoxreleases', releases=releases)
-    else:
-        return tmpl('firefoxreleases', releases=releases)
-
+    return web.sendtemplate('firefoxreleases', releases=releases)
 
 
 def release_config(build):
@@ -177,15 +153,9 @@ def build_anchor(build):
                          build.build_id)
 
 
-def changesetentry(orig, web, *args):
+def changesetentry(orig, web, ctx):
     """Add metadata for an individual changeset in hgweb."""
-    # TRACKING hg46
-    if len(args) == 1:
-        ctx = args[-1]
-        d = orig(web, ctx)
-    else:
-        req, tmpl, ctx = args
-        d = orig(web, req, tmpl, ctx)
+    d = orig(web, ctx)
 
     repo = web.repo
 
@@ -315,6 +285,7 @@ def release_info_for_changeset(db, repo, ctx):
     }
 
 
+@revsetpredicate('firefoxrelease')
 def revset_firefoxrelease(repo, subset, x):
     """``firefoxrelease([channel=], [platform=])
 
