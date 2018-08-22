@@ -275,6 +275,12 @@ def unifyrepo(ui, settings, **opts):
         if rev0s and node not in rev0s:
             raise error.Abort('repository has different rev 0: %s\n' % source['name'])
 
+        # Verify pushlog exists
+        pushlog = getattr(repo, 'pushlog', None)
+        if not pushlog:
+            raise error.Abort('pushlog API not available',
+                              hint='is the pushlog extension loaded?')
+
         rev0s.add(node)
 
     # Ensure the staging repo has all changesets from the source repos.
@@ -311,9 +317,6 @@ def unifyrepo(ui, settings, **opts):
         path = source['path']
         sourcerepo = hg.repository(ui, path=source['path'])
         pushlog = getattr(sourcerepo, 'pushlog', None)
-        if not pushlog:
-            raise error.Abort('pushlog API not available',
-                              hint='is the pushlog extension loaded?')
 
         index = sourcerepo.changelog.index
         revnode = {}
