@@ -37,6 +37,7 @@ def get_check_classes(hook):
     # so we don't have to enumerate them all.
     from mozhghooks.check import (
         advertise_upgrade,
+        merge_day,
         prevent_cross_channel_messages,
         prevent_ftl_changes,
         prevent_subrepos,
@@ -51,6 +52,7 @@ def get_check_classes(hook):
     # TODO check to hook mapping should also be automatically discovered.
     if hook == 'pretxnchangegroup':
         return (
+            merge_day.MergeDayCheck,
             prevent_cross_channel_messages.XChannelMessageCheck,
             prevent_ftl_changes.FTLCheck,
             prevent_subrepos.PreventSubReposCheck,
