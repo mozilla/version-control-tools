@@ -308,6 +308,7 @@ def unifyrepo(ui, settings, **opts):
     # and filter later because we want to be sure we have the earliest known
     # push data for a given node.
     for source in conf.sources:
+        path = source['path']
         sourcerepo = hg.repository(ui, path=source['path'])
         pushlog = getattr(sourcerepo, 'pushlog', None)
         if not pushlog:
