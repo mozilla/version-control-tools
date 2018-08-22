@@ -272,7 +272,7 @@ def unifyrepo(ui, settings):
         # Verify
         node = repo[0].node()
         if rev0s and node not in rev0s:
-            ui.warn('repository has different rev 0: %s\n' % source['name'])
+            raise error.Abort('repository has different rev 0: %s\n' % source['name'])
 
         rev0s.add(node)
 
