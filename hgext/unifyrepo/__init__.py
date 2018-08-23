@@ -251,9 +251,10 @@ def newpushes(repo, unifiedpushes):
 
 
 @command('unifyrepo', [
-    ], 'unifyrepo settings',
+    ('', 'skipreplicate', False, 'Flag to disable `hg replicatesync` on successful unification'),
+], 'unifyrepo settings',
     norepo=True)
-def unifyrepo(ui, settings):
+def unifyrepo(ui, settings, **opts):
     """Unify the contents of multiple source repositories using settings.
 
     The settings file is a Mercurial config file (basically an INI file).
@@ -477,13 +478,14 @@ def unifyrepo(ui, settings):
             bm.clear()
             bm.applychanges(destrepo, tr, books.items())
 
-    # This is a bit hacky. Pushlog and bookmarks aren't currently replicated
-    # via the normal hooks mechanism because we use the low-level APIs to
-    # write them. So, we send a replication message to sync the entire repo.
-    try:
-        vcsr = extensions.find('vcsreplicator')
-    except KeyError:
-        raise error.Abort('vcsreplicator extension not installed; '
-                          'pushlog and bookmarks may not be replicated properly')
+    if not opts.get('skipreplicate'):
+        # This is a bit hacky. Pushlog and bookmarks aren't currently replicated
+        # via the normal hooks mechanism because we use the low-level APIs to
+        # write them. So, we send a replication message to sync the entire repo.
+        try:
+            vcsr = extensions.find('vcsreplicator')
+        except KeyError:
+            raise error.Abort('vcsreplicator extension not installed; '
+                              'pushlog and bookmarks may not be replicated properly')
 
-    vcsr.replicatecommand(destrepo.ui, destrepo)
+        vcsr.replicatecommand(destrepo.ui, destrepo)
