@@ -1,4 +1,4 @@
-  $ cat > $HGRCPATH << EOF
+  $ cat >> $HGRCPATH << EOF
   > [extensions]
   > unifyrepo = $TESTDIR/hgext/unifyrepo/__init__.py
   > pushlog = $TESTDIR/hgext/pushlog/
@@ -194,21 +194,21 @@ Perform unification and examine graph structure. We should see:
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files
-  new changesets *:* (glob)
+  new changesets 082ed5a15c23:849054522f6d
   pulling $TESTTMP/servers/unifyrepo2 into $TESTTMP/servers/stagerepo
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets *:* (glob)
+  new changesets c82636ead3ee:b0dd06b54e65
   pulling $TESTTMP/servers/unifyrepo3 into $TESTTMP/servers/stagerepo
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets *:* (glob)
+  new changesets fef1d0f689fc:bd139f07f0da
   obtained pushlog info for 4/4 revisions from 3 pushes from unifyrepo1
   obtained pushlog info for 4/4 revisions from 2 pushes from unifyrepo2
   obtained pushlog info for 4/4 revisions from 4 pushes from unifyrepo3
@@ -223,19 +223,19 @@ Perform unification and examine graph structure. We should see:
   adding manifests
   adding file changes
   added 2 changesets with 2 changes to 1 files
-  new changesets *:* (glob)
+  new changesets 082ed5a15c23:1a65f2b9519d
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets *:* (glob)
+  new changesets c82636ead3ee:b0dd06b54e65
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets *:* (glob)
+  new changesets fef1d0f689fc:bd139f07f0da
   inserting 5 pushlog entries
   writing 2 bookmarks
 
