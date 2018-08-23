@@ -82,15 +82,12 @@ from mercurial import (
     util,
 )
 
+minimumhgversion = '4.6'
+testedwith = '4.6'
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
 
 class unifyconfig(object):
@@ -474,13 +471,14 @@ def unifyrepo(ui, settings, **opts):
     # Write bookmarks.
     ui.write('writing %d bookmarks\n' % len(books))
 
-    with destrepo.lock():
-        with destrepo.transaction('bookmarks') as tr:
-            bm = bookmarks.bmstore(destrepo)
-            # Mass replacing may not be the proper strategy. But it works for
-            # our current use case.
-            bm.clear()
-            bm.applychanges(destrepo, tr, books.items())
+    with destrepo.wlock():
+        with destrepo.lock():
+            with destrepo.transaction('bookmarks') as tr:
+                bm = bookmarks.bmstore(destrepo)
+                # Mass replacing may not be the proper strategy. But it works for
+                # our current use case.
+                bm.clear()
+                bm.applychanges(destrepo, tr, books.items())
 
     if not opts.get('skipreplicate'):
         # This is a bit hacky. Pushlog and bookmarks aren't currently replicated
