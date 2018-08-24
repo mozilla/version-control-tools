@@ -27,16 +27,11 @@ with demandimport.deactivated():
     import requests  # noqa
 
 
-testedwith = '4.3 4.4 4.5 4.6'
+testedwith = '4.4 4.5 4.6 4.7'
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
 REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
