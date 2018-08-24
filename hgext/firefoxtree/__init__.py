@@ -118,11 +118,14 @@ configitems = import_module('mercurial.configitems')
 # TRACKING hg46
 logcmdutil = import_module('mercurial.logcmdutil')
 
+# TRACKING hg47
+templateutil = import_module('mercurial.templateutil')
+
 wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.2 4.3 4.4 4.5 4.6'
+testedwith = '4.2 4.3 4.4 4.5 4.6 4.7'
 minimumhgversion = '4.2'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
@@ -611,8 +614,13 @@ def template_fxheads(repo, ctx, templ, cache, **args):
         return []
 
     res = set(tag for tag, node, tree, uri in labels if node == ctx.node())
+    sortedres = sorted(res)
 
-    return sorted(res)
+    # TRACKING hg47
+    if templateutil:
+        return templateutil.hybridlist(sortedres, 'log.tag')
+    else:
+        return sortedres
 
 
 def extsetup(ui):
