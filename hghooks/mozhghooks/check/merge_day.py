@@ -52,7 +52,7 @@ class MergeDayCheck(PreTxnChangegroupCheck):
         return os.environ['USER'] in ('stage-ffxbld-merge', 'ffxbld-merge')
 
     def pre(self, node):
-        pass
+        self._unified = _get_unified_repo(self.ui)
 
     def check(self, ctx):
         if not self.repo_metadata['firefox']:
@@ -63,11 +63,9 @@ class MergeDayCheck(PreTxnChangegroupCheck):
             )
             return False
 
-        unified = _get_unified_repo(ctx.repo().ui)
-
         # If this commits has already landed in another tree,
         # it must be part of the merge.
-        if ctx.node() in unified:
+        if ctx.node() in self._unified:
             return True
 
         if len(ctx.parents()) == 2:
