@@ -3,7 +3,6 @@
 
 """Replicate repository group owner."""
 
-import grp
 import os
 
 from mercurial.i18n import _
@@ -11,7 +10,7 @@ from mercurial import (
     exchange,
     extensions,
     sshpeer,
-    util,
+    wireprotov1server,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -23,27 +22,14 @@ from mozhg.util import (
     repo_owner,
 )
 
-# TRACKING hg46 wireproto -> wireprotov1server
-wireproto = import_module('mercurial.wireprotov1server')
-if not wireproto:
-    wireproto = import_module('mercurial.wireproto')
+minimumhgversion = '4.6'
+testedwith = '4.6 4.7'
 
 
-minimumhgversion = '4.5'
-testedwith = '4.5 4.6'
-
-
-@wireproto.wireprotocommand('mozowner', '')
+@wireprotov1server.wireprotocommand('mozowner', '', permission='pull')
 def moz_owner_command(repo, proto):
     """Obtain the group owner of the repository."""
     return repo_owner(repo)
-
-
-# TRACKING hg46 wireproto.permissions moved into @wireproto.wireprotocommand
-if util.safehasattr(wireproto, 'permissions'):
-    wireproto.permissions['mozowner'] = 'pull'
-else:
-    wireproto.commands['mozowner'].permission = 'pull'
 
 
 def _capabilities(orig, *args, **kwargs):
@@ -52,13 +38,7 @@ def _capabilities(orig, *args, **kwargs):
     return caps
 
 
-# TRACKING hg46
-if util.safehasattr(sshpeer, 'sshv1peer'):
-    sshpeerbase = sshpeer.sshv1peer
-else:
-    sshpeerbase = sshpeer.sshpeer
-
-class sshv1peer(sshpeerbase):
+class sshv1peer(sshpeer.sshv1peer):
     def mozowner(self):
         self.requirecap('moz-owner', _('moz-owner'))
         return self._call('mozowner')
@@ -83,12 +63,7 @@ def exchange_pull_owner(orig, pullop):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireproto, '_capabilities', _capabilities)
+    extensions.wrapfunction(wireprotov1server, '_capabilities', _capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchange_pull_owner)
 
-    # TRACKING hg46
-    if util.safehasattr(sshpeer, 'sshv1peer'):
-        sshpeer.sshv1peer = sshv1peer
-    else:
-        sshpeer.sshpeer = sshv1peer
-        sshpeer.instance = sshv1peer
+    sshpeer.sshv1peer = sshv1peer
