@@ -80,7 +80,6 @@ from mercurial import (
     bookmarks,
     cmdutil,
     commands,
-    demandimport,
     error,
     exchange,
     extensions,
@@ -640,10 +639,6 @@ def extsetup(ui):
     }
 
     templatekw.keywords.update(keywords)
-
-    # dockeywords was removed in 3.6.
-    if hasattr(templatekw, 'dockeywords'):
-        templatekw.dockeywords.update(keywords)
 
 
 def reposetup(ui, repo):
