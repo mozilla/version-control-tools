@@ -8,6 +8,10 @@ This article is a guide on conducting code review at Mozilla using MozReview,
 a repository-based code-review system based on
 `Review Board <https://www.reviewboard.org/>`_.
 
+.. warning::
+
+   Mozreview has been replaced by a `Phabricator instance <https://moz-conduit.readthedocs.io/en/latest/phabricator-user.html>`_.
+
 For the quick and impatient who just want to look at the web interface,
 it lives at https://reviewboard.mozilla.org/. Log in via Bugzilla. Read
 on to learn how to create new review requests and to conduct code review
