@@ -96,7 +96,6 @@ acceptable.
 
 MISSING_IRCNICK = '''
 You don't have a Mozilla IRC nickname defined in your Mercurial config file.
-You will need to add your nick in order to push commits to MozReview.
 
 (Relevant config option: mozilla.ircnick)
 '''
@@ -240,49 +239,11 @@ Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
 '''.strip()
 
 CODEREVIEW_INFO = '''
-Commits to Mozilla projects are typically sent to MozReview. This is the
+Commits to Mozilla projects are typically sent to Phabricator. This is the
 preferred code review tool at Mozilla.
+Phabricator installation instructions are here
+http://moz-conduit.readthedocs.io/en/latest/phabricator-user.html
 
-Some still practice a legacy code review workflow that uploads patches
-to Bugzilla.
-
-1. MozReview only (preferred)
-2. Both MozReview and Bugzilla
-3. Bugzilla only
-
-Which code review tools will you be submitting code to? $$ &1 $$ &2 $$ &3
-'''.strip()
-
-MISSING_BUGZILLA_CREDENTIALS = '''
-You do not have a Bugzilla API Key defined in your Mercurial config.
-
-In order to communicate with Bugzilla and services (like MozReview) that
-use Bugzilla for authentication, you'll need to supply an API Key.
-
-The Bugzilla API Key is optional. However, if you don't supply one,
-certain features may not work and/or you'll be prompted for one.
-
-You should only need to configure a Bugzilla API Key once.
-'''.lstrip()
-
-BUGZILLA_API_KEY_INSTRUCTIONS = '''
-Bugzilla API Keys can only be obtained through the Bugzilla web interface.
-
-Please perform the following steps:
-
-  1) Open https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey
-  2) Generate a new API Key
-  3) Copy the generated key and paste it here
-'''.lstrip()
-
-LEGACY_BUGZILLA_CREDENTIALS_DETECTED = '''
-Your existing Mercurial config uses a legacy method for defining Bugzilla
-credentials. Bugzilla API Keys are the most secure and preferred method
-for defining Bugzilla credentials. Bugzilla API Keys are also required
-if you have enabled 2 Factor Authentication in Bugzilla.
-
-For security reasons, the legacy credentials are being removed from the
-config.
 '''.lstrip()
 
 PUSHTOTRY_INFO = '''
@@ -1066,67 +1027,10 @@ def _checksecurity(ui, cw, hgversion):
 
 
 def _checkcodereview(ui, cw):
-    # We don't check for bzexport if reviewboard is enabled because
-    # bzexport is legacy.
-    if ui.hasconfig('extensions', 'reviewboard'):
-        return
-
     if ui.promptchoice('Will you be submitting commits to Mozilla (Yn)? $$ &Yes $$ &No'):
         return
 
-    confrb = False
-    answer = uipromptchoice(ui, CODEREVIEW_INFO, default=0) + 1
-    if answer in (1, 2):
-        _enableext(cw, 'reviewboard', _vctextpath('reviewboard', 'client.py'))
-        confrb = True
-
-    if answer in (2, 3):
-        _enableext(cw, 'bzexport', _vctextpath('bzexport'))
-
-    # Now verify Bugzilla credentials and other config foo is set.
-    bzuser = ui.config('bugzilla', 'username')
-    bzapikey = ui.config('bugzilla', 'apikey')
-
-    if not bzuser or not bzapikey:
-        ui.write(MISSING_BUGZILLA_CREDENTIALS)
-
-    if not bzuser:
-        bzuser = ui.prompt('What is your Bugzilla email address? (optional)', default='')
-
-    if bzuser and not bzapikey:
-        ui.write(BUGZILLA_API_KEY_INSTRUCTIONS)
-        bzapikey = ui.prompt('Please enter a Bugzilla API Key: (optional)', default='')
-
-
-    if any(ui.hasconfig('bugzilla', c) for c in ('password', 'userid', 'cookie')):
-        ui.write(LEGACY_BUGZILLA_CREDENTIALS_DETECTED)
-
-    for c in ('password', 'userid', 'cookie'):
-        try:
-            del cw.c['bugzilla'][c]
-        except KeyError:
-            pass
-
-    prompt = ('Configure the "review" path so you can `hg push review` commits to '
-             'Mozilla for review (Yn)? $$ &Yes $$ &No')
-    if not ui.config('paths', 'review') and not ui.promptchoice(prompt):
-        cw.c.setdefault('paths', {})
-        cw.c['paths']['review'] = 'https://reviewboard-hg.mozilla.org/autoreview'
-
-    if not ui.config('mozilla', 'ircnick'):
-        ircnick = ui.prompt('What is your IRC nick? ', default=None)
-        if ircnick:
-            cw.c.setdefault('mozilla', {})
-            cw.c['mozilla']['ircnick'] = ircnick
-
-    if bzuser or bzapikey:
-        if 'bugzilla' not in cw.c:
-            cw.c['bugzilla'] = {}
-
-    if bzuser:
-        cw.c['bugzilla']['username'] = bzuser
-    if bzapikey:
-        cw.c['bugzilla']['apikey'] = bzapikey
+    ui.write(CODEREVIEW_INFO)
 
 
 def _checkmultiplevct(ui, cw):
