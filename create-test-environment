@@ -1,14 +1,5 @@
 #!/bin/bash
 
-set -e
-
-if [ -n "$MOZREVIEW_BUILD_FORKS" ]; then
-    # include --forks switch to build scripts
-    FORKS="--forks=$MOZREVIEW_BUILD_FORKS"
-else
-    FORKS=''
-fi
-
 set +e
 # Quick and dirty check for SSL support provided with this Python.  We check
 # this way because some distros have backported the necessary SSL support
@@ -21,40 +12,6 @@ set -e
 if [ "$sslcheck" -ne 0 ]; then
   echo "Python version does not support verifying SSL certificates for secure"
   echo "downloads!  Please upgrade your version of Python."
-  exit 1
-fi
-
-# We need node.js for tools required to package/install Review Board
-# (eg. lessc, uglifyjs)
-if ! type npm >/dev/null 2>&1; then
-  echo "npm not found.  Please install node.js."
-  exit 1
-fi
-
-# Some Linux distros use 'nodejs' instead of 'node' as the executable
-if type node >/dev/null 2>&1; then
-    node_bin=node
-elif type nodejs >/dev/null 2>&1; then
-    node_bin=nodejs
-else
-    echo "Failed to determine node executable name."
-    exit 1
-fi
-
-# Check the node.js version - lessc needs 0.12
-function version {
-    echo "$@" | sed "s/^v//" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
-}
-if [ $(version `${node_bin} -v`) -lt $(version "0.12") ]; then
-    echo "WARNING node.js is too old."
-    echo "WARNING Found $(${node_bin} -v), lessc wants v0.12+"
-fi
-
-# More annoyingly we need msgfmt which is part of gettext.
-if ! type msgfmt >/dev/null 2>&1; then
-  echo "msgfmt not found.  Please install the gettext package."
-  echo "On OSX you can use homebrew to install this:"
-  echo "  brew install gettext && brew link gettext --force"
   exit 1
 fi
 
@@ -84,33 +41,6 @@ cd ../..
 
 pip install --upgrade --require-hashes -r test-requirements.txt
 
-if [ ! -d reviewboard-fork ]; then
-  echo "Cloning Review Board"
-  hg clone https://hg.mozilla.org/webtools/reviewboard reviewboard-fork
-fi
-
-if [ ! -d ${VENV}/node ]; then
-    mkdir ${VENV}/node
-fi
-cd ${VENV}/node
-npm init -y >/dev/null
-npm install less@^2.7.0 uglify-js@^3.1.0
-cd ${VENV}
-for FN in lessc uglifyjs; do
-    if [ ! -e bin/${FN} ]; then
-        ln -s ../node/node_modules/.bin/${FN} bin/${FN}
-    fi
-done
-cd ..
-
-cd reviewboard-fork
-hg pull -u
-cd djblets
-python setup.py develop
-cd ../reviewboard
-python setup.py develop
-cd ../..
-
 cd hgserver/hgmolib
 python setup.py develop
 cd ../..
@@ -132,10 +62,6 @@ python setup.py develop
 cd ../..
 
 cd pylib/mozautomation
-python setup.py develop
-cd ../..
-
-cd pylib/mozreview
 python setup.py develop
 cd ../..
 
@@ -187,7 +113,7 @@ if [ -z "${NO_DOCKER}" ]; then
   echo "This could take a while and may consume a lot of internet bandwidth."
   echo "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
 
-  ./d0cker build-all $FORKS || {
+  ./d0cker build-all || {
     echo "You will not be able to run tests that require Docker.";
     echo "Please see https://docs.docker.com/installation/ for how to install Docker.";
     echo "When Docker is installed, re-run this script";

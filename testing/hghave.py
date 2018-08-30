@@ -67,21 +67,6 @@ def has_hgmodocker():
     )
     return has_docker() and have_docker_images(images)
 
-
-@check('mozreviewdocker', 'Require mozreview Docker pieces')
-def has_mozreviewdocker():
-    images = (
-        'bmoweb',
-        'hgrb',
-        'hgweb',
-        'ldap',
-        'pulse',
-        'rbweb',
-        'treestatus',
-    )
-    return has_docker() and have_docker_images(images)
-
-
 @check('eslint', 'Require eslint')
 def has_eslint():
     from distutils.spawn import find_executable

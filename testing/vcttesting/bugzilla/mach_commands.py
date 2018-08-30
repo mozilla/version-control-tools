@@ -23,16 +23,6 @@ class BugzillaCommands(object):
 
             self.b = Bugzilla(self.base_url, username=username, password=password)
 
-        elif 'MOZREVIEW_HOME' in os.environ:
-            # Delay import to facilitate module use in limited virtualenvs.
-            from vcttesting.mozreview import MozReview
-
-            mr = MozReview(os.environ['MOZREVIEW_HOME'])
-            username = os.environ.get('BUGZILLA_USERNAME')
-            password = os.environ.get('BUGZILLA_PASSWORD')
-
-            self.b = mr.get_bugzilla(username=username, password=password)
-
         else:
             raise Exception('Do not know which Bugzilla instance to talk to. '
                     'Set BUGZILLA_URL or MOZREVIEW_HOME environment variables.')

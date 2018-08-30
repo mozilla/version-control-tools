@@ -49,14 +49,6 @@ class DockerCommands(object):
     def build_hgmo(self):
         self.d.build_hgmo(verbose=True)
 
-    @Command('build-mozreview', category='docker',
-        description='Build Docker images required for MozReview')
-    @CommandArgument('--forks', type=int,
-                     help='Number of parallel build processes to use. '
-                          '(default=unlimited)')
-    def build_mozreview(self, forks=None):
-        self.d.build_mozreview(verbose=True, max_workers=forks)
-
     @Command('start-bmo', category='docker',
         description='Start a bugzilla.mozilla.org instance')
     @CommandArgument('cluster', help='Name to give to this instance')

@@ -64,7 +64,6 @@ UNIT_TEST_IGNORES = (
     'pylib/pycodestyle',
     'pylib/pyflakes',
     'pylib/requests',
-    'pylib/mozreview',
 )
 
 COVERAGE_OMIT = (
@@ -232,13 +231,8 @@ def docker_requirements_for_test(path):
        Requires images to run Bugzilla
     hgmo
        Requires images to run hg.mozilla.org
-    mozreview
-       Requires images to run mozreview
     """
-    docker_keywords = (
-        b'MozReviewTest',
-        b'MozReviewWebDriverTest',
-    )
+    docker_keywords = ()
 
     res = set()
 
@@ -248,10 +242,6 @@ def docker_requirements_for_test(path):
         if b'#require hgmodocker' in content:
             res.add('hgmo')
 
-        if b'#require mozreviewdocker' in content:
-            res.add('bmo')
-            res.add('mozreview')
-
         if b'#require bmodocker' in content:
             res.add('bmo')
 
@@ -259,7 +249,6 @@ def docker_requirements_for_test(path):
             if keyword in content:
                 # This could probably be defined better.
                 res.add('hgmo')
-                res.add('mozreview')
 
     return res
 
@@ -305,21 +294,10 @@ def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
             verbose=verbose,
             use_last=use_last,
             hgmo='hgmo' in requirements,
-            mozreview='mozreview' in requirements,
             bmo='bmo' in requirements)
 
     t_end = time.time()
     print('got Docker images in %.2fs' % (t_end - t_start))
-    if 'mozreview' in requirements:
-        env['DOCKER_PULSE_IMAGE'] = mr_images['pulse']
-        env['DOCKER_HGRB_IMAGE'] = mr_images['hgrb']
-        env['DOCKER_RBWEB_IMAGE'] = mr_images['rbweb']
-        env['DOCKER_TREESTATUS_IMAGE'] = mr_images['treestatus']
-        env['DOCKER_LDAP_IMAGE'] = mr_images['ldap']
-        if 'hgmo' not in requirements:
-            env['DOCKER_HGWEB_IMAGE'] = mr_images['hgweb']
-        if 'bmo' not in requirements:
-            env['DOCKER_BMOWEB_IMAGE'] = mr_images['bmoweb']
 
     if 'hgmo' in requirements:
         env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
