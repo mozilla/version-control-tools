@@ -122,15 +122,13 @@ shelve
    Enables uncommitted work to be saved to a standalone file without
    being committed to the repository.
 
-3rd Party Extensions You Should Highly Consider
-===============================================
-
 chg
 ---
 
-`chg <https://bitbucket.org/yuja/chg/>`_ is a C wrapper for the ``hg``
-command. Typically, when you type ``hg``, a new Python process is created,
-Mercurial is loaded, and your requested command runs and the process exits.
+`chg <https://www.mercurial-scm.org/repo/hg/file/tip/contrib/chg/README>`_
+is a C wrapper for the ``hg`` command. Typically, when you type ``hg``,
+a new Python process is created, Mercurial is loaded, and your requested
+command runs and the process exits.
 
 With ``chg``, a Mercurial *command server* background process is created
 that runs Mercurial. When you type ``chg``, a C program connects to that
@@ -164,10 +162,20 @@ example::
    sys     0m0.004s
 
 Here, we see ~100ms wall time improvement with chg activated. That may not
-sound likea lot, but you will notice.
+sound like a lot, but you will notice.
 
-Additional 3rd Party Extensions to Consider
-===========================================
+To install ``chg``, you will need to clone the `canonical Mercurial repo 
+<https://mercurial-scm.org/repo/hg>` and run the following commands:
+
+  $ hg clone https://mercurial-scm.org/repo/hg hgrepo
+  $ cd hgrepo/contrib/chg
+  $ make
+  $ make install
+
+See `here <https://www.mercurial-scm.org/wiki/CHg>` for more information.
+
+3rd Party Extensions You Should Highly Consider
+===============================================
 
 evolve
 ------
