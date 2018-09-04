@@ -9,7 +9,7 @@ Wizard-Based Configuration
 
 If you already have a Firefox repository like
 `mozilla-central <https://hg.mozilla.org/mozilla-central>`_ cloned, you
-can run ``mach mercurial-setup`` from it and a guided wizard will walk
+can run ``mach vcs-setup`` from it and a guided wizard will walk
 you through configuring Mercurial for optimal use on Mozilla projects.
 Configuring Mercurial for MozReview is part of this wizard.
 

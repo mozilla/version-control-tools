@@ -48,7 +48,7 @@ in the
 `version-control-tools <https://hg.mozilla.org/hgcustom/version-control-tools>`_
 repository. You will need to clone this repository to your local machine.
 
-If you have a Firefox repository cloned, run ``mach mercurial-setup`` from it
+If you have a Firefox repository cloned, run ``mach vcs-setup`` from it
 and it will clone version-control-tools to ``~/.mozbuild/version-control-tools``.
 
 To clone version-control-tools manually::

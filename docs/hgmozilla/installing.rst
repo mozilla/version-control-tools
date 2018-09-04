@@ -184,7 +184,7 @@ in place, run::
 If it detects problems, correct them.
 
 If you have a clone of the Firefox repository, you are highly encouraged
-to run `mach mercurial-setup` to launch an interactive wizard that will
+to run `mach vcs-setup` to launch an interactive wizard that will
 help you optimally configure Mercurial for use at Mozilla.
 
 Reasons to Upgrade

@@ -12,14 +12,14 @@ Guided Installation of Extensions
 =================================
 
 If you have a copy of the Firefox source repository, you can run
-`./mach mercurial-setup` to run an interactive wizard that will
+`./mach vcs-setup` to run an interactive wizard that will
 guide you through the process of configuring Mercurial.
 
 .. important::
 
-   `mach mercurial-setup` is the recommended way to configure Mercurial
+   `mach vcs-setup` is the recommended way to configure Mercurial
    for use at Mozilla. The sections below effectively duplicate the
-   work that `mach mercurial-setup` does for you.
+   work that `mach vcs-setup` does for you.
 
 Installing Extensions
 =====================
