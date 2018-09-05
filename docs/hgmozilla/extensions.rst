@@ -164,15 +164,9 @@ example::
 Here, we see ~100ms wall time improvement with chg activated. That may not
 sound like a lot, but you will notice.
 
-To install ``chg``, you will need to clone the `canonical Mercurial repo 
-<https://mercurial-scm.org/repo/hg>` and run the following commands:
-
-  $ hg clone https://mercurial-scm.org/repo/hg hgrepo
-  $ cd hgrepo/contrib/chg
-  $ make
-  $ make install
-
-See `here <https://www.mercurial-scm.org/wiki/CHg>` for more information.
+If you have installed Mercurial through a package manager (such as Homebrew
+or APT) you may already have ``chg`` installed. For more information, see 
+`here <https://www.mercurial-scm.org/wiki/CHg>`_.
 
 3rd Party Extensions You Should Highly Consider
 ===============================================
