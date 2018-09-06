@@ -2,7 +2,9 @@
 Description=Aggregate Mercurial repositories
 After=network.target remote-fs.target nss-lookup.target
 PartOf=hg-master.target
-OnFailure=mail-unit-output@%n.service
+
+# Disabled due to Bug 1480203 - re-enable once resolved
+#OnFailure=mail-unit-output@%n.service
 
 # We only want to have a single master at a time. Look for a file with the
 # current hostname in it indicating that we are the master.
