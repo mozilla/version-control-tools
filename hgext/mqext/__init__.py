@@ -240,6 +240,79 @@ def get_logrevs_for_files(repo, files, opts):
     for rev in revs:
         yield rev
 
+def choose_changes(ui, repo, patchfile, opts):
+    if opts.get('file'):
+        changedFiles = fullpaths(ui, repo, opts['file'])
+        return (changedFiles, 'file', opts['file'])
+
+    if opts.get('dir'):
+        changedFiles = opts['dir']  # For --debug printout only
+        return (changedFiles, 'dir', opts['dir'])
+
+    if opts.get('rev'):
+        revs = scmutil.revrange(repo, opts['rev'])
+        if not revs:
+            raise error.Abort("no changes found")
+        filesInRevs = set()
+        for rev in revs:
+            for f in repo[rev].files():
+                filesInRevs.add(f)
+        changedFiles = sorted(filesInRevs)
+        return (changedFiles, 'rev', opts['rev'])
+
+    diff = None
+    changedFiles = None
+    if patchfile is not None:
+        source = None
+        if hasattr(patchfile, 'getvalue'):
+            diff = patchfile.getvalue()
+            source = ('patchdata', None)
+        else:
+            try:
+                diff = url.open(ui, patchfile).read()
+                source = ('patch', patchfile)
+            except IOError:
+                if hasattr(repo, 'mq'):
+                    q = repo.mq
+                    if q:
+                        diff = url.open(ui, q.lookup(patchfile)).read()
+                        source = ('mqpatch', patchfile)
+    else:
+        # try using:
+        #  1. current diff (if nonempty)
+        #  2. top applied patch in mq patch queue (if mq enabled)
+        #  3. parent of working directory
+        ui.pushbuffer()
+        commands.diff(ui, repo, git=True)
+        diff = ui.popbuffer()
+        changedFiles = fileRe.findall(diff)
+        if len(changedFiles) > 0:
+            source = ('current diff', None)
+        else:
+            changedFiles = None
+            diff = None
+
+        if hasattr(repo, 'mq') and repo.mq:
+            ui.pushbuffer()
+            try:
+                commands.diff(ui, repo, change="qtip", git=True)
+            except error.RepoLookupError:
+                pass
+            diff = ui.popbuffer()
+            if diff == '':
+                diff = None
+            else:
+                source = ('qtip', None)
+
+        if diff is None:
+            changedFiles = sorted(repo['.'].files())
+            source = ('rev', '.')
+
+    if changedFiles is None:
+        changedFiles = fileRe.findall(diff)
+
+    return (changedFiles, source[0], source[1])
+
 def patch_changes(ui, repo, patchfile=None, **opts):
     '''Given a patch, look at what files it changes, and map a function over
     the changesets that touch overlapping files.
@@ -253,61 +326,15 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     Alternatively, the -f option may be used to pass in one or more files
     that will be used directly.
     '''
+    (changedFiles, source, source_info) = choose_changes(ui, repo, patchfile, opts)
+    if ui.verbose:
+        ui.write("Patch source: %s" % source)
+        if source_info is not None:
+            ui.write(" %r" % (source_info,))
+        ui.write("\n")
 
-    if opts.get('file'):
-        changedFiles = fullpaths(ui, repo, opts['file'])
-    elif opts.get('dir'):
-        changedFiles = opts['dir']  # For --debug printout only
-    elif opts.get('rev'):
-        revs = scmutil.revrange(repo, opts['rev'])
-        if not revs:
-            raise error.Abort("no changes found")
-        filesInRevs = set()
-        for rev in revs:
-            for f in repo[rev].files():
-                filesInRevs.add(f)
-        changedFiles = sorted(filesInRevs)
-    else:
-        if patchfile is None:
-            # we should use the current diff, or if that is empty, the top
-            # applied patch in the patch queue
-            ui.pushbuffer()
-            commands.diff(ui, repo, git=True)
-            diff = ui.popbuffer()
-            changedFiles = fileRe.findall(diff)
-            if len(changedFiles) > 0:
-                source = "current diff"
-            elif repo.mq:
-                source = "top patch in mq queue"
-                ui.pushbuffer()
-                try:
-                    commands.diff(ui, repo, change="qtip", git=True)
-                except error.RepoLookupError:
-                    raise error.Abort("no current diff, no mq patch to use")
-                diff = ui.popbuffer()
-            else:
-                raise error.Abort("no changes found")
-        else:
-            if hasattr(patchfile, 'getvalue'):
-                diff = patchfile.getvalue()
-                source = "patch data"
-            else:
-                try:
-                    diff = url.open(ui, patchfile).read()
-                    source = "patch file %s" % patchfile
-                except IOError:
-                    q = repo.mq
-                    if q:
-                        diff = url.open(ui, q.lookup(patchfile)).read()
-                        source = "mq patch %s" % patchfile
-                    else:
-                        pass
-
-        changedFiles = fileRe.findall(diff)
-        if ui.verbose:
-            ui.write("Patch source: %s\n" % source)
-        if len(changedFiles) == 0:
-            ui.write("Warning: no modified files found in patch. Did you mean to use the -f option?\n")
+    if len(changedFiles) == 0:
+        ui.write("Warning: no modified files found in patch. Did you mean to use the -f option?\n")
 
     if ui.verbose:
         ui.write("Using files:\n")
@@ -426,7 +453,7 @@ def reviewers(ui, repo, patchfile=None, **opts):
         ui.write("  none found in range (try higher --limit?)\n")
     else:
         top_weight = 0
-        for s in suckers.most_weighted(10):
+        for s in suckers.most_weighted(5):
             top_weight = top_weight or s.weight
             ui.write("  %s: %d (score = %d)\n" % (s.name, s.count, 10 * s.weight / top_weight))
     ui.write("\n")
