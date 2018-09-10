@@ -7,7 +7,6 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..'))
 sys.path.insert(0, os.path.join(ROOT, 'pylib', 'mozautomation'))
 sys.path.insert(0, os.path.join(ROOT, 'pylib', 'mozhg'))
-sys.path.insert(0, os.path.join(ROOT, 'pylib', 'reviewboardmods'))
 
 extensions = [
     'sphinx.ext.autodoc',

@@ -43,7 +43,6 @@ def HGEXT_BOOTSTRAP():
         'pylib/pycodestyle',
         'pylib/pyflakes',
         'pylib/requests',
-        'pylib/reviewboardmods',
     ]
     for p in lib_paths:
         full = os.path.normpath(os.path.join(root, p))
