@@ -41,7 +41,6 @@ Table of Contents
 
    devguide/index
    hgmods/index
-   mozreview
    headless-repositories
    hgmozilla/index
    hgmo/index

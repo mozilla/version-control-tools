@@ -68,15 +68,6 @@ qimportbz
 The qimportbz extension allows you to easily import patches from
 Bugzilla.
 
-reviewboard
-===========
-
-The reviewboard extension provides a Mozilla-centric workflow for
-performing code review with ReviewBoard and Bugzilla.
-
-This extension is a component of :ref:`MozReview <mozreview>`, Mozilla's
-code review service.
-
 serverlog
 =========
 

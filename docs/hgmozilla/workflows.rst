@@ -214,8 +214,6 @@ However, it also has numerous setbacks:
   harder-to-review commits.
 * Performance on large repositories can be horrible.
 * The extension isn't actively developed and bugs often go unfixed.
-* MQ doesn't work as well with :ref:`MozReview <mozreview>` as
-  head-based workflows.
 
 .. important::
 

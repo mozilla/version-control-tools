@@ -44,7 +44,7 @@ the server intercepts the incoming data and siphons it off to an
 external store. A pointer to this external data is stored, allowing
 the repository to serve up this data to clients that request it.
 
-Mozilla plans to use headless repositories for Try and MozReview, which
+Mozilla plans to use headless repositories for Try, which
 share similar models of many clients writing to a central server with
 limited, well-defined clients for that data.
 

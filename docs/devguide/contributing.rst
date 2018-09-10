@@ -24,8 +24,6 @@ following IRC channels on ``irc.mozilla.org``:
 #vcs
    Where everybody who maintains all the version control properties
    hangs out.
-#mozreview
-   Where developers and users of MozReview lurk.
 
 Just pop in a channel, ask a question, and wait for someone to answer.
 The channels can be quiet for hours at a time, so please stick around
@@ -34,10 +32,11 @@ if nobody replies at first.
 Submitting Patches for Review
 =============================
 
-We use :ref:`MozReview <mozreview>` for conducting code review. Follow
-the :ref:`mozreview_user` to configure your Mercurial client. Then, ``hg
-push ssh://reviewboard-hg.mozilla.org/version-control-tools`` to
-initiate the code review process.
+We use https://phabricator.services.mozilla.com/ for conducting code review.
+
+See https://moz-conduit.readthedocs.io/en/latest/phabricator-user.html for
+information on how to configure Phabricator at Mozilla. You will want
+to use the ``rVCT`` repository for review.
 
 Before submitting patches for review, please :ref:`run the tests
 <devguide_testing>` and verify things still work. Please also read the

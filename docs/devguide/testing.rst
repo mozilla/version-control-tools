@@ -22,8 +22,7 @@ The test driver is responsible for identifying which flavor a particular
 file is.
 
 Many tests interact with services running locally, commonly inside
-Docker containers. For example, MozReview tests create Bugzilla, Pulse,
-and Mercurial servers. **Running actual services is encouraged over
+Docker containers. **Running actual services is encouraged over
 mocking.**
 
 Running
@@ -152,9 +151,8 @@ a subpackage or module for each service you may want to interact with.
 
 To facilitate testing from *t tests*, there are various command line
 tools for interacting with specific services. For example, the
-``mozreview`` tool allows you to start up and stop ``mozreview``
-instances. The ``bugzilla`` tool allows you to perform common
-actions against a Bugzilla instance, such as create a bug.
+``bugzilla`` tool allows you to start up and stop Bugzilla instances
+and perform common actions against them, such as create a bug.
 
 These APIs and scripts exist only to support testing. Their APIs and
 arguments are not considered stable. They should not be relied on

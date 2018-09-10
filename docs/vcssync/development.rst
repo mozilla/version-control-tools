@@ -21,7 +21,7 @@ vcssync
    to version control synchronization.
 
 Code reviews for everything in version-control-tools should be conducted
-with MozReview. Reviews should be directed at ``gps`` or ``glob``.
+with Phabricator. Reviews should be directed at ``gps`` or ``glob``.
 
 Terraform configs for AWS infrastructure for VCS Sync lives in the
 `devservices-aws repo <https://github.com/mozilla-platform-ops/devservices-aws>`_,

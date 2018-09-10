@@ -121,40 +121,6 @@ hg replicatesync
    ``/usr/bin/hg`` so Python package dependencies required for
    replication are loaded.
 
-Creating New Review Repositories
-================================
-
-In order to conduct code review in MozReview, a special review repository
-must be configured.
-
-Creating new review repositories is simple::
-
-  $ ./deploy mozreview-create-repo
-
-Then, simply enter requested data in the prompts and the review repository
-should be created.
-
-.. note::
-
-   This requires root SSH access to reviewboard-hg1.dmz.scl.mozilla.com
-   and for the specified Bugzilla account to have admin privileges on
-   reviewboard.mozilla.org.
-
-Stripping Changesets from a Review Repository
-=============================================
-
-It is sometimes necessary to remove traces of a changeset from a **review**
-repository. This can be accomplished by running a command from a shell on
-a reviewboard-hg server::
-
-   $ cd /repo/hg/mozilla/<repo>
-   $ sudo -u hg /var/hg/venv_pash/bin/hg --config extensions.strip= strip -r <revision>
-
-.. important::
-
-   If the ``hg`` from the ``pash`` virtualenv isn't used, the pushlog may get
-   corrupted when running ``hg strip``.
-
 Marking Repositories as Read-only
 =================================
 

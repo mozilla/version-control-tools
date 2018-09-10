@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
 
     vcttesting.bugzilla
-    vcttesting.reviewboard
 
 Submodules
 ----------
@@ -24,22 +23,6 @@ vcttesting.docker_mach_commands module
 --------------------------------------
 
 .. automodule:: vcttesting.docker_mach_commands
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vcttesting.mozreview module
----------------------------
-
-.. automodule:: vcttesting.mozreview
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vcttesting.mozreview_mach_commands module
------------------------------------------
-
-.. automodule:: vcttesting.mozreview_mach_commands
     :members:
     :undoc-members:
     :show-inheritance:
