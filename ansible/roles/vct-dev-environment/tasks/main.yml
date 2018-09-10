@@ -2,7 +2,6 @@
 ---
 
 - include: docker.yml
-- include: nodejs.yml
 
 # Grab virtualenv deps listed at http://mozilla-version-control-tools.readthedocs.io/en/latest/devguide/environment.html#ubuntu-requirements
 - name: install python and test env dependencies

@@ -1,3 +1,0 @@
----
-- name: systemd daemon reload
-  command: /bin/systemctl daemon-reload

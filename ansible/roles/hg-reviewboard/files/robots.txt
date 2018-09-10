@@ -1,9 +1,0 @@
-User-agent: *
-
-Disallow: /*/annotate/
-Disallow: /*/graph
-Disallow: /*/graph/
-Disallow: /*/archive/
-Disallow: /*/diff/
-Disallow: /*/comparison/
-Disallow: /*/raw-*

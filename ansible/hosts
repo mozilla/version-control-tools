@@ -1,9 +1,3 @@
-reviewboardadm.private.scl3.mozilla.com ansible_sudo=true
-reviewboard-hg2.dmz.scl3.mozilla.com ansible_sudo=yes
-
-[rbweb-prod]
-reviewboard[1:2].webapp.scl3.mozilla.com ansible_ssh_user=root
-
 [hgweb-prod]
 hgweb[1:4].dmz.mdc1.mozilla.com ansible_sudo=yes
 

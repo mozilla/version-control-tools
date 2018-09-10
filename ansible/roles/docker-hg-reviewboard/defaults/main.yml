@@ -1,5 +1,0 @@
----
-domain: localhost
-ldap_uri: ldap://ldap:389/
-bind_dn: cn=admin,dc=mozilla
-bind_pw: password

@@ -1,6 +1,0 @@
----
-dependencies:
-  - { role: rbweb }
-  - { role: mercurial-yum }
-  - { role: mozreview-virtualenv, venv: /venv }
-
