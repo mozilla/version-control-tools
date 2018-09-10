@@ -27,7 +27,6 @@ Popen = subprocess.Popen
 PIPE = subprocess.PIPE
 
 HG = '/var/hg/venv_pash/bin/hg'
-MR_ASSOCIATE_LDAP = '/var/hg/version-control-tools/scripts/mozreview-associate-ldap'
 
 SUCCESSFUL_AUTH = '''
 A SSH connection has been successfully established.
@@ -566,93 +565,6 @@ def edit_repo(cname, repo_name, do_quick_delete):
     return
 
 
-def mozreview_ldap_associate(args):
-    try:
-        # Python 2.6 doesn't have subprocess.check_output :(
-        with open(os.devnull, 'w') as devnull:
-            proc = subprocess.Popen([HG, 'config', 'reviewboard'],
-                                    stdout=subprocess.PIPE,
-                                    stderr=devnull,
-                                    cwd='/')
-            output, unused_err = proc.communicate()
-            retcode = proc.poll()
-        if retcode:
-            raise Exception('error calling `hg config`')
-
-        config = {}
-        for line in output.splitlines():
-            line = line.strip()
-            k, v = line.split('=', 1)
-            assert k.startswith('reviewboard.')
-            config[k[len('reviewboard.'):]] = v
-
-        for k in ('url', 'username', 'password'):
-            if k not in config:
-                raise KeyError(k)
-    except Exception:
-        # We do NOT print the exception here because it may leak config file
-        # content, which contains passwords. This is a paranoid approach.
-        # Hopefully we never have to debug this...
-        print('error reading Mercurial config; please report this error')
-        return 1
-
-    print('The following LDAP account will be associated with MozReview:')
-    print('')
-    print('  %s' % os.environ['USER'])
-    print('')
-    print('By SSHing into this machine, you have proved ownership of that')
-    print('LDAP account. We will need Bugzilla credentials to prove ownership')
-    print('of a Bugzilla account. These credentials are NOT stored on the')
-    print('server.')
-    print('')
-
-    if not args:
-        print('Enter your Bugzilla e-mail address:')
-        user = sys.stdin.readline()
-    else:
-        user = args[0]
-        print('Bugzilla e-mail address: %s' % user)
-
-    user = user.strip()
-    if not user:
-        print('No username; aborting')
-        return 1
-
-    print('Enter a Bugzilla API Key:')
-    apikey = sys.stdin.readline().strip()
-    if not apikey:
-        print('No API Key; aborting')
-        return 1
-
-    ldap_username = os.environ['USER']
-
-    data = json.dumps({
-        'rb_url': config['url'],
-        'rb_username': config['username'],
-        'rb_password': config['password'],
-        'ldap_username': ldap_username,
-        'bz_username': user,
-        'bz_apikey': apikey,
-    }, encoding='utf-8')
-
-    print('associating LDAP account %s with Bugzilla account %s...' % (
-        ldap_username, user))
-    proc = subprocess.Popen(['/var/hg/venv_pash/bin/python2.7', MR_ASSOCIATE_LDAP],
-                            stdin=PIPE, stderr=subprocess.STDOUT, cwd='/')
-    proc.communicate(data)
-    ret = proc.poll()
-    if ret:
-        print('error occurred!')
-        print('Verify you can log into MozReview at %s' % config['url'])
-        print('Verify the Bugzilla API Key specified is valid.')
-        print('Seek help in #mozreview if this error persists')
-        return 1
-
-    print('LDAP account successfully associated!')
-    print('exiting')
-    return 0
-
-
 def serve(cname, enable_repo_config=False, enable_repo_group=False,
           enable_user_repos=False,
           enable_mozreview_ldap_associate=False):
@@ -742,12 +654,6 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
         if os.path.exists(hgrc):
             with open(hgrc, 'rb') as fh:
                 sys.stdout.write(fh.read())
-    elif args[0] == 'mozreview-ldap-associate':
-        if not enable_mozreview_ldap_associate:
-            print('mozreview-ldap-associate command not available')
-            sys.exit(1)
-
-        sys.exit(mozreview_ldap_associate(args[1:]))
     else:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
         sys.stderr.write(INVALID_SSH_COMMAND)
