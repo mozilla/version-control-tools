@@ -4,15 +4,13 @@
   stat: path=/vct
   register: vct_dir
 
-- name: install epel package repository (CentOS 7 only)
+- name: install epel package repository
   yum: name=epel-release
        state=present
-  when: ansible_distribution_major_version == '7'
 
 - name: install supervisor
   yum: name=supervisor
        state=present
-  when: ansible_distribution_major_version == '7'
 
 - name: create supervisor config directory
   file: path=/etc/supervisor.d

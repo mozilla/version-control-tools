@@ -7,14 +7,12 @@
 # We download and verify the checksum of the RPMs otherwise we are
 # susceptible to a MitM attack.
 
-- name: download IUS community configuration RPMs (CentOS 7)
+- name: download IUS community configuration RPMs
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/CentOS7/{{ item.name }}
            dest=/var/tmp/{{ item.dest }}
            sha256sum={{ item.sha256 }}
   with_items:
     - { name: ius-release-1.0-14.ius.centos7.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: ec12c81b83c4c57faad496d70782b3b9dd6da2b2d4b585985f3c7da0e93c2979 }
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
 
-- name: configure IUS Community Repos (CentOS 7)
+- name: configure IUS Community Repos
   command: yum localinstall -y /var/tmp/ius-release-1.0-14.rpm
-  when: ansible_distribution_major_version == '7'
