@@ -53,14 +53,3 @@ if not on_rtd:
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-# Set up Django environment so we can load Review Board modules for
-# documenting.
-sys.path.insert(0, os.path.dirname(__file__))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'reviewboard.settings')
-
-# We should fix the ReadTheDocs config to make this work.
-try:
-    import reviewboard
-except ImportError:
-    pass
-
