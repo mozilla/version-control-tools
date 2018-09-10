@@ -269,16 +269,6 @@ class Docker(object):
             files = subprocess.check_output(
                 args, env=env, cwd=ROOT, stderr=null).splitlines()
 
-        # Add files from the nested reviewboard-fork repo.
-        fork_path = os.path.join(ROOT, 'reviewboard-fork')
-        if os.path.exists(fork_path):
-            with open(os.devnull, 'wb') as null:
-                fork_files = subprocess.check_output(
-                    args, env=env, stderr=null, cwd=fork_path
-                ).splitlines()
-                for f in fork_files:
-                    files.append(os.path.join('reviewboard-fork', f))
-
         # Add untracked files from extra-files directory. This can be used
         # as a means to add files that aren't tracked by version control for
         # whatever reason.
