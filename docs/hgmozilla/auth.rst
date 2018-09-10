@@ -19,9 +19,6 @@ In your SSH config (likely ``~/.ssh/config``), add the following::
    Host hg.mozilla.org
      User me@mozilla.com
 
-   Host reviewboard-hg.mozilla.org
-     User me@mozilla.com
-
 .. tip::
    Be sure to replace ``me@mozilla.com`` with your Mozilla-registered
    LDAP account that is configured for SSH access to Mercurial.
@@ -42,19 +39,6 @@ The fingerprints of the host keys for ``hg.mozilla.org`` are as follows:
    4096 SHA256:RX2OK8A1KNWdxyu6ibIPeEGLBzc5vyQW/wd7RKjBehc hg.mozilla.org
    4096 SHA1:p2MGe4wSw8ZnQ5J9ShBk/6VA+Co hg.mozilla.org
    4096 MD5:1c:f9:cf:76:de:b8:46:d6:5a:a3:00:8d:3b:0c:53:77 hg.mozilla.org
-
-And for ``reviewboard-hg.mozilla.org``:
-
-.. code::
-
-   ED25519 (server preferred key)
-   256 SHA256:4zGDMk+ftX6ZmYX5A25HxqbtujOvv+MQGj99u931dwA reviewboard-hg.mozilla.org
-   256 SHA1:5K5e1UWQluIlbgsTDBUwY5k4Xqk reviewboard-hg.mozilla.org
-   256 MD5:0b:4c:0d:7e:3e:79:5a:6a:c9:bb:a2:3f:5d:d8:83:d9 reviewboard-hg.mozilla.org
-
-   RSA
-   SHA256:O6C9zLi4leD/mb4lPNmR50R1ampZgeEi7StDEbZDmyA
-   MD5:a6:13:ae:35:2c:20:2b:8d:f4:8d:8e:d7:a8:55:67:97
 
 A GPG signed document stating asserting the validity of these keys can
 be verified:
