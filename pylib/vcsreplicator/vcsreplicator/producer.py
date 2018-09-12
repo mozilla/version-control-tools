@@ -9,9 +9,10 @@ import logging
 import time
 
 from kafka.producer.base import Producer as KafkaProducer
+from kafka.common import KafkaError
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('kafka.producer')
 
 MESSAGE_HEADER_V1 = b'1\n'
 
@@ -45,8 +46,17 @@ class Producer(KafkaProducer):
         j = json.dumps(o, sort_keys=True)
         msg = b''.join([MESSAGE_HEADER_V1, j])
 
-        return super(Producer, self).send_messages(
-            self.topic, partition, msg)
+        try:
+            return super(Producer, self).send_messages(
+                self.topic, partition, msg)
+
+        except KafkaError:
+            logger.exception('error sending message to Kafka; '
+                             'reinitializing client to retry')
+            self.client.reinit()
+
+            return super(Producer, self).send_messages(
+                self.topic, partition, msg)
 
 
 def send_heartbeat(producer, partition):
