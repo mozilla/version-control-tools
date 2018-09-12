@@ -39,10 +39,6 @@ with Files('hgext/qimportbz/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: qimportbz')
     FINAL = True
 
-with Files('hgext/reviewboard/**'):
-    BUG_COMPONENT = ('Developer Services', 'MozReview')
-    FINAL = True
-
 with Files('hghooks/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
