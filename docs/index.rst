@@ -8,8 +8,7 @@ Welcome to Mozilla's version control tools repository! Inside, you will
 find all kinds of code to support the development of code at Mozilla.
 
 This repository contains the code that Mozilla uses in production to
-power `hg.mozilla.org <https://hg.mozilla.org/>`_,
-`reviewboard.mozilla.org <https://reviewboard.mozilla.org>`_, Autoland,
+power `hg.mozilla.org <https://hg.mozilla.org/>`_, Autoland,
 version control synchronization, and other sites and services.
 
 The canonical repository is
