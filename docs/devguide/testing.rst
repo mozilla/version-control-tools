@@ -56,7 +56,7 @@ Test a single file::
 
 Run all tests in a directory::
 
-  $ ./run-tests hgext/reviewboard
+  $ ./run-tests hgext/pushlog
 
 Run a test in debug mode (see progress, interact with a debugger)::
 
