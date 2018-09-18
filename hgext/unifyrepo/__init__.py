@@ -284,23 +284,6 @@ def unifyrepo(ui, settings, **opts):
 
     stageui = ui.copy()
 
-    # Enable aggressive merge deltas on the stage repo to minimize manifest delta
-    # size. This could make delta chains very long. So we may want to institute a
-    # delta chain cap on the destination repo. But this will ensure the stage repo
-    # has the most efficient/compact representation of deltas. Pulling from this
-    # repo will also inherit the optimal delta, so we don't need to enable
-    # aggressivemergedeltas on the destination repo.
-    stageui.setconfig('format', 'aggressivemergedeltas', True)
-
-    stagerepo = hg.repository(stageui, path=conf.stagepath,
-                              create=not os.path.exists(conf.stagepath))
-
-    for source in conf.sources:
-        path = source['path']
-        sourcepeer = hg.peer(ui, {}, path)
-        ui.write('pulling %s into %s\n' % (path, conf.stagepath))
-        exchange.pull(stagerepo, sourcepeer)
-
     # Now collect all the changeset data with pushlog info.
     # node -> (when, source, rev, who, pushid)
     nodepushinfo = {}
@@ -416,6 +399,23 @@ def unifyrepo(ui, settings, **opts):
     pullpushinfo = {k: v for k, v in inversenodeinfo.iteritems() if not destcl.hasnode(v)}
 
     ui.write('%d/%d nodes will be pulled\n' % (len(pullpushinfo), len(inversenodeinfo)))
+
+    # Enable aggressive merge deltas on the stage repo to minimize manifest delta
+    # size. This could make delta chains very long. So we may want to institute a
+    # delta chain cap on the destination repo. But this will ensure the stage repo
+    # has the most efficient/compact representation of deltas. Pulling from this
+    # repo will also inherit the optimal delta, so we don't need to enable
+    # aggressivemergedeltas on the destination repo.
+    stageui.setconfig('format', 'aggressivemergedeltas', True)
+
+    stagerepo = hg.repository(stageui, path=conf.stagepath,
+                              create=not os.path.exists(conf.stagepath))
+
+    for source in conf.sources:
+        path = source['path']
+        sourcepeer = hg.peer(ui, {}, path)
+        ui.write('pulling %s into %s\n' % (path, conf.stagepath))
+        exchange.pull(stagerepo, sourcepeer)
 
     pullnodes = list(emitfastforwardnodes(stagerepo, pullpushinfo))
     unifiedpushes = list(unifypushes(inversenodeinfo))

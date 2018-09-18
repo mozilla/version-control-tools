@@ -92,6 +92,14 @@ Fill the origin repos with some commits
 Activate the unification daemon
 
   $ hgmo exec hgssh sudo -u hg-aggregate -g hg-aggregate /var/hg/venv_tools/bin/python -u /var/hg/version-control-tools/hgext/unifyrepo/unify-daemon.py /var/hg/venv_tools/bin/hg /etc/mercurial/unify-mozilla-unified.ini --maximum 1
+  obtained pushlog info for 4/4 revisions from 4 pushes from repo1
+  obtained pushlog info for 4/4 revisions from 4 pushes from repo2
+  obtained pushlog info for 4/4 revisions from 4 pushes from repo3
+  aggregating 4/4 revisions for 1 heads from repo1
+  aggregating 4/4 revisions for 1 heads from repo2
+  aggregating 4/4 revisions for 1 heads from repo3
+  aggregating 10/10 nodes from 12 original pushes
+  10/10 nodes will be pulled
   pulling /repo/hg/mozilla/repo1 into /repo/hg/mozilla/stage
   searching for changes
   adding changesets
@@ -116,14 +124,6 @@ Activate the unification daemon
   added 3 changesets with 0 changes to 1 files (+1 heads)
   new changesets d781fe32e4e7:a8614ce316d1
   recorded changegroup in replication log in * (glob)
-  obtained pushlog info for 4/4 revisions from 4 pushes from repo1
-  obtained pushlog info for 4/4 revisions from 4 pushes from repo2
-  obtained pushlog info for 4/4 revisions from 4 pushes from repo3
-  aggregating 4/4 revisions for 1 heads from repo1
-  aggregating 4/4 revisions for 1 heads from repo2
-  aggregating 4/4 revisions for 1 heads from repo3
-  aggregating 10/10 nodes from 12 original pushes
-  10/10 nodes will be pulled
   consolidated into 3 pulls from 10 unique pushes
   adding changesets
   adding manifests

@@ -188,6 +188,14 @@ Perform unification and examine graph structure. We should see:
 +   - Common origin commit for the repo
 
   $ hg unifyrepo ../unifyconfig --skipreplicate
+  obtained pushlog info for 4/4 revisions from 3 pushes from unifyrepo1
+  obtained pushlog info for 4/4 revisions from 2 pushes from unifyrepo2
+  obtained pushlog info for 4/4 revisions from 4 pushes from unifyrepo3
+  aggregating 3/4 revisions for 0 heads from unifyrepo1
+  aggregating 4/4 revisions for 1 heads from unifyrepo2
+  aggregating 4/4 revisions for 1 heads from unifyrepo3
+  aggregating 9/10 nodes from 9 original pushes
+  8/9 nodes will be pulled
   pulling $TESTTMP/servers/unifyrepo1 into $TESTTMP/servers/stagerepo
   searching for changes
   adding changesets
@@ -209,14 +217,6 @@ Perform unification and examine graph structure. We should see:
   adding file changes
   added 3 changesets with 3 changes to 1 files (+1 heads)
   new changesets fef1d0f689fc:bd139f07f0da
-  obtained pushlog info for 4/4 revisions from 3 pushes from unifyrepo1
-  obtained pushlog info for 4/4 revisions from 2 pushes from unifyrepo2
-  obtained pushlog info for 4/4 revisions from 4 pushes from unifyrepo3
-  aggregating 3/4 revisions for 0 heads from unifyrepo1
-  aggregating 4/4 revisions for 1 heads from unifyrepo2
-  aggregating 4/4 revisions for 1 heads from unifyrepo3
-  aggregating 9/10 nodes from 9 original pushes
-  8/9 nodes will be pulled
   consolidated into 3 pulls from 6 unique pushes
   searching for changes
   adding changesets
