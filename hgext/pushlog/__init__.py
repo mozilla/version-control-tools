@@ -597,7 +597,7 @@ class pushlog(object):
             else:
                 max_push_id = self.lastpushid(conn=c)
 
-            inner_q += 'AND id <= ?'
+            inner_q += 'AND id <= ? '
             args.append(max_push_id)
 
             if reverse:
