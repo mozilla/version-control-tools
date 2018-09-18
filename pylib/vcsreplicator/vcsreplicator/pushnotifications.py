@@ -107,7 +107,7 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
 
 
 def _get_pushlog_info(hgclient, public_url, revs):
-    template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate}\n'
+    template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate|hgdate}\n'
     args = hglib.util.cmdbuilder(b'log', hidden=True, r=revs, template=template)
     out = hgclient.rawcommand(args)
 
@@ -126,7 +126,9 @@ def _get_pushlog_info(hgclient, public_url, revs):
             continue
 
         pushid = int(pushid)
-        pushtime = int(pushtime)
+
+        # `hgdate` format is "timestamp offset"
+        pushtime = int(pushtime.split()[0])
 
         q = 'startID=%d&endID=%d' % (pushid - 1, pushid)
 
