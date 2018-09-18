@@ -60,6 +60,7 @@ from mercurial import (
     error,
     node,
     obsolete,
+    obsutil,
     patch,
     registrar,
     revset,
@@ -78,24 +79,17 @@ import bz
 from mozautomation.commitparser import BUG_RE
 from mozhg.rewrite import newparents, replacechangesets
 
-testedwith = '4.2 4.3 4.4 4.5 4.6'
-minimumhgversion = '4.2'
+testedwith = '4.4 4.5 4.6 4.7'
+
+# marker.prednode added in 4.4. (The backcompat precnode was removed in 4.7.)
+minimumhgversion = '4.4'
+
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzexport'
 
+alldiffopts = cmdutil.diffopts + cmdutil.diffopts2
+
 cmdtable = {}
-
-try:
-    # Mercurial 4.3+
-    alldiffopts = cmdutil.diffopts + cmdutil.diffopts2
-except AttributeError:
-    alldiffopts = commands.diffopts + commands.diffopts2
-
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
 # TRACKING hg46
 configitems = import_module('mercurial.configitems')
@@ -149,17 +143,6 @@ newbug_opts = [
 ]
 
 
-# Mercurial 4.3 introduced obsutil and moved some functionality there.
-# TODO remove this once support for Mercurial 4.2 is dropped.
-def obsmod():
-    try:
-        from mercurial import obsutil
-        obsutil.marker
-        return obsutil
-    except ImportError:
-        return obsolete
-
-
 def _basechange(repo, subset):
     repo = repo.unfiltered()
 
@@ -170,30 +153,28 @@ def _basechange(repo, subset):
     except AttributeError:
         obs_precursors = repo.obsstore.precursors
 
+    successors = repo.obsstore.successors
+
     result = set()
     for n in subset:
         base = repo[n].node()
         while True:
-            mod = obsmod()
-            precursors = [mod.marker(repo, m)
+            precursors = [obsutil.marker(repo, m)
                           for m in obs_precursors.get(base, ())]
-            if len(precursors) == 0:
+            if not precursors:
                 break
 
-            # Multiple precursors means a join point. Pick the first precursor.
+            # Multiple predecessors means a join point. Pick the first predecessor.
             pre = min(precursors, key=lambda m: m.date())
 
             # Multiple successors means a split. If we are the first successor,
             # keep going. Otherwise, stop here.
-            if base != min(pre.succnodes(), key=lambda n: repo[n].date()):
-                break
+            succs = [obsutil.marker(repo, m) for m in successors[pre.prednode()]]
+            if len(succs) > 1:
+                if base != min(succs, key=lambda m: m.date()):
+                    break
 
-            # TRACKING hg46
-            # hg 4.6 replaced marker.precnode -> marker.prednode
-            try:
-                base = pre.prednode()
-            except AttributeError:
-                base = pre.precnode()
+            base = pre.prednode()
 
         result.add(base)
 
@@ -201,10 +182,10 @@ def _basechange(repo, subset):
 
 def revset_bzbasechange(repo, subset, x):
     """``bzbasechange(NODE)``
-    (EXPERIMENTAL) A precursor changeset that uniquely represents the given node. Computed by
-    tracing back through precursors' first successors until a divergent fork is
-    found, or there are no more precursors (in which case the final precursor
-    is used). A divergent fork is where a node is not its precursor's first
+    (EXPERIMENTAL) A predecessor changeset that uniquely represents the given node. Computed by
+    tracing back through predecessors' first successors until a divergent fork is
+    found, or there are no more predecessors (in which case the final predecessor
+    is used). A divergent fork is where a node is not its predecessor's first
     successor.
 
     """
@@ -436,11 +417,7 @@ field_re = re.compile(r'@([^@]+)@')
 
 
 def edit(ui, text):
-    # TRACKING HG43
-    try:
-        return ui.edit(text, ui.username(), action='bzexport').decode('utf-8')
-    except TypeError:
-        return ui.edit(text, ui.username()).decode('utf-8')
+    return ui.edit(text, ui.username(), action='bzexport').decode('utf-8')
 
 def edit_form(ui, repo, fields, template_name):
     template_fields = []
@@ -994,8 +971,8 @@ def patch_id(ui, repo, rev):
     ctx = scmutil.revsingle(repo, rev)
     fullrepo = repo.unfiltered()
 
-    base = scmutil.revsingle(fullrepo, 'bzbasechange(%s)' % rev)
-    return 'base-' + node.short(base.node())
+    base = fullrepo.anyrevs(['bzbasechange(%s)' % rev]).last()
+    return 'base-' + node.short(base)
 
 @command('bzexport', [
          ('d', 'description', '', 'Bugzilla attachment description'),
