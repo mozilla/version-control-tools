@@ -13,7 +13,7 @@ from mercurial import (
     extensions,
     registrar,
     revset,
-    util,
+    templateutil,
 )
 from mercurial.hgweb import (
     webcommands,
@@ -31,7 +31,7 @@ from mozhg.util import (
 
 
 minimumhgversion = '4.6'
-testedwith = '4.6'
+testedwith = '4.6 4.7'
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -111,6 +111,16 @@ def release_configurations(db, repo):
         fltr=lambda build: build.revision in repo)
 
 
+def _releases_mapped_generator(context, builds):
+    """Generates build object mappings for use in the template layer
+    """
+    for i, build in enumerate(builds):
+        entry = build._asdict()
+        entry['parity'] = str(i % 2)
+        entry['anchor'] = build_anchor(build)
+        yield entry
+
+
 def firefox_releases_web_command(web):
     """Show information about Firefox releases."""
 
@@ -123,7 +133,6 @@ def firefox_releases_web_command(web):
         error_message = 'Firefox release info not available'
         return web.sendtemplate('error', error=error_message)
 
-
     platform = req.qsparams['platform'] if 'platform' in req.qsparams else None
     builds = []
 
@@ -133,15 +142,9 @@ def firefox_releases_web_command(web):
 
         builds.append(build)
 
-    releases = []
+    releases_mapping_generator = templateutil.mappinggenerator(_releases_mapped_generator, args=(builds,))
 
-    for i, build in enumerate(builds):
-        entry = build._asdict()
-        entry['parity'] = str(i % 2)
-        entry['anchor'] = build_anchor(build)
-        releases.append(entry)
-
-    return web.sendtemplate('firefoxreleases', releases=releases)
+    return web.sendtemplate('firefoxreleases', releases=releases_mapping_generator)
 
 
 def release_config(build):
