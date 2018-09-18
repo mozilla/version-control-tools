@@ -137,7 +137,7 @@ def firefox_releases_web_command(web):
 
     for i, build in enumerate(builds):
         entry = build._asdict()
-        entry['parity'] = 'parity%d' % (i % 2)
+        entry['parity'] = str(i % 2)
         entry['anchor'] = build_anchor(build)
         releases.append(entry)
 

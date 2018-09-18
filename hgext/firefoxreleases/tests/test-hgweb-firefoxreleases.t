@@ -86,21 +86,21 @@ Page showing table of Firefox releases is available
     <th>Version</th>
     <th>Files</th>
   </tr>
-  <tr id="4e0f86874d25nightlylinux6420170527000000" class="parityparity0">
+  <tr id="4e0f86874d25nightlylinux6420170527000000" class="parity0">
   <td class="firefoxreleasefixed"><a href="/rev/4e0f86874d2556a19bcb5b6d090d24a720229178">4e0f86874d25</a></td>
   <td class="firefoxreleasefixed">20170527000000</td>
   <td>nightly</td>
   <td>linux64</td>
   <td>57.0a1</td>
   <td><a href="https://example.com/build2/">files</a></td>
-  </tr><tr id="dc94f7af4edanightlywin6420170527000000" class="parityparity1">
+  </tr><tr id="dc94f7af4edanightlywin6420170527000000" class="parity1">
   <td class="firefoxreleasefixed"><a href="/rev/dc94f7af4edae241d4382901b48cb67e43c445e1">dc94f7af4eda</a></td>
   <td class="firefoxreleasefixed">20170527000000</td>
   <td>nightly</td>
   <td>win64</td>
   <td>56.0a1</td>
   <td><a href="https://example.com/build1/">files</a></td>
-  </tr><tr id="94086d65796fnightlywin3220170526000000" class="parityparity0">
+  </tr><tr id="94086d65796fnightlywin3220170526000000" class="parity0">
   <td class="firefoxreleasefixed"><a href="/rev/94086d65796fd7fc8f957a2c5548db17a13f1f1f">94086d65796f</a></td>
   <td class="firefoxreleasefixed">20170526000000</td>
   <td>nightly</td>
