@@ -75,7 +75,7 @@ with open('/etc/mercurial/pushdataaggregator.ini', 'wb') as fh:
 
         fh.write(line)
 
-with open('/etc/mercurial/pushdataaggregator_groups', 'wb') as fh:
+with open('/repo/hg/pushdataaggregator_groups', 'wb') as fh:
     fh.write('\n'.join(monitor_groups))
 
 # Update the notification daemon settings.

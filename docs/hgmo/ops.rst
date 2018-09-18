@@ -313,7 +313,7 @@ case, it effectively no-ops. If you are paranoid. make a backup copy of
 Mirrors in ``pushdataaggregator_groups`` File
 =============================================
 
-On the SSH servers, the ``/etc/mercurial/pushdataaggregator_groups`` file
+On the SSH servers, the ``/repo/hg/pushdataaggregator_groups`` file
 lists all hgweb mirrors that must have acknowledged replication of a message
 before that message is re-published to ``replicatedpushdata`` Kafka topic.
 This topic is then used to publish events to Pulse, SNS, etc.
