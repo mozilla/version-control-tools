@@ -424,16 +424,16 @@ def pushlog_html(web):
 
     parity = paritygen(web.stripecount)
 
-    data = dict(
-        changenav=templateutil.mappinggenerator(pushlog_changenav),
-        rev=0,
-        entries=lambda **x: changelist(limit=0, **x),
-        latestentry=lambda **x: changelist(limit=1, **x),
-        startdate=req.qsparams.get('startdate', '1 week ago'),
-        enddate=req.qsparams.get('enddate', 'now'),
-        querydescription=query.description(),
-        archives=web.archivelist("tip")
-    )
+    data = {
+        'changenav': templateutil.mappinggenerator(pushlog_changenav),
+        'rev': 0,
+        'entries': lambda **x: changelist(limit=0, **x),
+        'latestentry': lambda **x: changelist(limit=1, **x),
+        'startdate': req.qsparams.get('startdate', '1 week ago'),
+        'enddate': req.qsparams.get('enddate', 'now'),
+        'querydescription': query.description(),
+        'archives': web.archivelist("tip"),
+    }
 
     return web.sendtemplate('pushlog', **data)
 
