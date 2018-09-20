@@ -1,5 +1,6 @@
 from datetime import datetime
 from math import ceil
+import collections
 import os
 import re
 import sys
@@ -18,6 +19,7 @@ from mercurial import (
     scmutil,
     templatefilters,
     templateutil,
+    util,
 )
 
 sys.path.append(os.path.dirname(__file__))
@@ -297,6 +299,7 @@ def feedentrygenerator(_context, entries, repo, url, urlbase):
             'files': templateutil.mappinglist(filesgen),
         }
 
+
 def pushlog_feed(web):
     """WebCommand for producing the ATOM feed of the pushlog."""
     req = web.req
@@ -334,6 +337,84 @@ def pushlog_feed(web):
     return web.sendtemplate('pushlog', **data)
 
 
+def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushcount=None):
+    """Creates an entry to be yielded in the `changelist` generator
+
+    `pushcount` will be non-None when we are generating an entry for the first change
+    in a given push
+    """
+    repo = web.repo
+    n = ctx.node()
+    ctxfiles = ctx.files()
+    firstchange = pushcount is not None
+
+    mergerollupval = templateutil.mappinglist(
+        [{'count': pushcount}]
+        if firstchange and mergehidden == 'hidden'
+        else []
+    )
+
+    pushval = templateutil.mappinglist(
+        [{"date": localdate(date), "user": user}]
+        if firstchange
+        else []
+    )
+
+    # TRACKING hg47
+    # Call the function with whichever signature is correct
+    if util.versiontuple(n=2) >= (4, 7):
+        filediffs = webutil.listfilediffs(ctxfiles, node, len(ctxfiles))
+    else:
+        filediffs = webutil.listfilediffs(web.tmpl, ctxfiles, node, len(ctxfiles))
+
+    return {
+        "author": ctx.user(),
+        "desc": ctx.description(),
+        "files": filediffs,
+        "rev": ctx.rev(),
+        "node": hex(n),
+        "parents": [c.hex() for c in ctx.parents()],
+        "tags": webutil.nodetagsdict(repo, n),
+        "branches": webutil.nodebranchdict(repo, ctx),
+        "inbranch": webutil.nodeinbranch(repo, ctx),
+        "hidden": mergehidden,
+        "mergerollup": mergerollupval,
+        "id": pushid,
+        "parity": parity,
+        "push": pushval,
+    }
+
+
+def handle_entries_for_push(web, samepush, p):
+    '''Displays pushlog changelist entries for a single push
+
+    The main use of this function is to ensure the first changeset
+    for a given push receives extra required information, namely
+    the information needed to populate the `mergerollup` and `push`
+    fields. These fields are only present on the first changeset in
+    a push, and show the number of changesets merged in this push
+    (if the push was a merge) and the user who pushed the change,
+    respectively.
+    '''
+    pushcount = len(samepush)
+
+    pushid, user, date, node = samepush.popleft()
+    ctx = scmutil.revsingle(web.repo, node)
+    multiple_parents = len([c for c in ctx.parents() if c.node() != nullid]) > 1
+    mergehidden = "hidden" if multiple_parents else ""
+
+    # Yield the initial entry, which contains special information such as
+    # the number of changesets merged in this push
+    yield create_entry(ctx, web, pushid, user, date, node, mergehidden, p,
+                       pushcount=pushcount)
+
+    # Yield all other entries for the given push
+    for pushid, user, date, node in samepush:
+        ctx = scmutil.revsingle(web.repo, node)
+        yield create_entry(ctx, web, pushid, user, date, node, mergehidden, p,
+                           pushcount=None)
+
+
 def pushlog_changenav(_context, query):
     '''Generator which yields changelist navigation fields for the pushlog
     '''
@@ -353,81 +434,96 @@ def pushlog_changenav(_context, query):
         yield {'page': numpages, 'label': "Last"}
 
 
+def pushlog_changelist(_context, web, query, tiponly):
+    '''Generator which yields a entries in a changelist for the pushlog
+    '''
+    parity = paritygen(web.stripecount)
+    p = next(parity)
+
+    # Iterate over query entries if we have not reached the limit and
+    # the node is visible in the repo
+    visiblequeryentries = (
+        (pushid, user, date, node)
+        for pushid, user, date, node in query.entries
+        if scmutil.isrevsymbol(web.repo, node)
+    )
+
+    # FIFO queue. Accumulate pushes as we need to
+    # count how many entries correspond with a given push
+    samepush = collections.deque()
+
+    # Get the first element of the query
+    # return if there are no entries
+    try:
+        pushid, user, date, node = next(visiblequeryentries)
+
+        lastid = pushid
+        samepush.append(
+            (pushid, user, date, node)
+        )
+    except StopIteration:
+        return
+
+    # Iterate over all the non-hidden entries and aggregate
+    # them together per unique pushid
+    for allentry in visiblequeryentries:
+        pushid, user, date, node = allentry
+
+        # If the entries both come from the same push, add to the accumulated set of entries
+        if pushid == lastid:
+            samepush.append(allentry)
+
+        # Once the pushid's are different, yield the result
+        else:
+            # If this is the first changeset for this push, put the change in the queue
+            firstpush = len(samepush) == 0
+
+            if firstpush:
+                samepush.append(allentry)
+
+            for entry in handle_entries_for_push(web, samepush, p):
+                yield entry
+
+                if tiponly:
+                    return
+
+            # Set the lastid
+            lastid = pushid
+
+            # Swap parity once we are on to processing another push
+            p = next(parity)
+
+            # Reset the aggregation of entries, as we are now processing a new push
+            samepush = collections.deque()
+
+            # If this was not the first push, the current entry needs processing
+            # Add it to the queue here
+            if not firstpush:
+                samepush.append(allentry)
+
+    # We don't need to display the remaining entries on the page if there are none
+    if not samepush:
+        return
+
+    # Display the remaining entries for the page
+    for entry in handle_entries_for_push(web, samepush, p):
+        yield entry
+
+        if tiponly:
+            return
+
+
 def pushlog_html(web):
     """WebCommand for producing the HTML view of the pushlog."""
     req = web.req
-    tmpl = web.tmpl
 
     query = pushlog_setup(web.repo, req)
-
-    def changelist(limit=0, **map):
-        # useless fallback
-        listfilediffs = lambda a,b,c: []
-        if hasattr(webutil, 'listfilediffs'):
-            listfilediffs = lambda a,b,c: webutil.listfilediffs(a,b,c, len(b))
-        elif hasattr(web, 'listfilediffs'):
-            listfilediffs = web.listfilediffs
-
-        lastid = None
-        l = []
-        mergehidden = ""
-        p = 0
-        currentpush = None
-        for pushid, user, date, node in query.entries:
-            if isinstance(node, unicode):
-                node = node.encode('utf-8')
-
-            try:
-                ctx = web.repo[node]
-            # Changeset is hidden.
-            except error.FilteredRepoLookupError:
-                continue
-            n = ctx.node()
-            entry = {"author": ctx.user(),
-                     "desc": ctx.description(),
-                     "files": listfilediffs(tmpl, ctx.files(), n),
-                     "rev": ctx.rev(),
-                     "node": hex(n),
-                     "parents": [c.hex() for c in ctx.parents()],
-                     "tags": webutil.nodetagsdict(web.repo, n),
-                     "branches": webutil.nodebranchdict(web.repo, ctx),
-                     "inbranch": webutil.nodeinbranch(web.repo, ctx),
-                     "hidden": "",
-                     "push": [],
-                     "mergerollup": [],
-                     "id": pushid
-                     }
-            if pushid != lastid:
-                lastid = pushid
-                p = parity.next()
-                entry["push"] = [{"user": user,
-                                  "date": localdate(date)}]
-                if len([c for c in ctx.parents() if c.node() != nullid]) > 1:
-                    mergehidden = "hidden"
-                    entry["mergerollup"] = [{"count": 0}]
-                else:
-                    mergehidden = ""
-                currentpush = entry
-            else:
-                entry["hidden"] = mergehidden
-                if mergehidden:
-                    currentpush["mergerollup"][0]["count"] += 1
-            entry["parity"] = p
-            l.append(entry)
-
-        if limit > 0:
-            l = l[:limit]
-
-        for e in l:
-            yield e
-
-    parity = paritygen(web.stripecount)
 
     data = {
         'changenav': templateutil.mappinggenerator(pushlog_changenav, args=(query,)),
         'rev': 0,
-        'entries': lambda **x: changelist(limit=0, **x),
-        'latestentry': lambda **x: changelist(limit=1, **x),
+        'entries': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, False)),
+        'latestentry': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, True)),
         'startdate': req.qsparams.get('startdate', '1 week ago'),
         'enddate': req.qsparams.get('enddate', 'now'),
         'querydescription': query.description(),
@@ -475,7 +571,7 @@ def pushes_worker(query, repo, full):
                 'branch': ctx.branch(),
                 'parents': [c.hex() for c in ctx.parents()],
                 'tags': ctx.tags(),
-                'files': ctx.files()
+                'files': ctx.files(),
             }
 
             # Only expose obsolescence metadata if the repo has some.
@@ -486,7 +582,6 @@ def pushes_worker(query, repo, full):
                 if precursors:
                     node['precursors'] = precursors
 
-        # we get the pushes in reverse order
         pushes[pushid].setdefault(nodekey, []).insert(0, node)
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
