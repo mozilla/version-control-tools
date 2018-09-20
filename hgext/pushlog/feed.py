@@ -275,6 +275,11 @@ def pushlog_setup(repo, req):
     return query
 
 
+def isotime(timestamp):
+    '''Returns the ISO format of the given timestamp'''
+    return datetime.utcfromtimestamp(timestamp).isoformat() + 'Z'
+
+
 def pushlog_feed(web):
     """WebCommand for producing the ATOM feed of the pushlog."""
     req = web.req
@@ -284,7 +289,6 @@ def pushlog_feed(web):
     web.tmpl = web.templater(req)
 
     query = pushlog_setup(web.repo, req)
-    isotime = lambda x: datetime.utcfromtimestamp(x).isoformat() + 'Z'
 
     if query.entries:
         dt = isotime(query.entries[0][2])
