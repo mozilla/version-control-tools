@@ -14,6 +14,10 @@
     - name: capture host key
       slurp: src=/etc/mercurial/ssh/ssh_host_rsa_key.pub
       register: mirror_host_key
+      
+    - name: capture hg-deploy-bot password
+      slurp: src=/repo/hg/hg-deploy-bot.pw
+      register: hg_deploy_bot_pw
 
 - hosts: localhost
   gather_facts: no
@@ -42,6 +46,7 @@
            nick=hg-deploy-bot
            color=red
            msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}"
+           passwd={{ hg_deploy_bot_pw }}
       run_once: true
 
 - hosts: hgweb-prod
@@ -131,4 +136,5 @@
            nick=hg-deploy-bot
            color=red
            msg="Finished deploy of hooks and extensions to hg.mozilla.org"
+           passwd={{ hg_deploy_bot_pw }}
       run_once: true
