@@ -702,3 +702,7 @@ as only one changeset was pushed by this user
           "user": "luser"
       }
   }
+
+Confirm no errors in log
+
+  $ cat ../hg-test/error.log
