@@ -39,6 +39,15 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
+# TRACKING hg47
+dateutil = import_module('mercurial.utils.dateutil')
+if dateutil:
+    makedate = dateutil.makedate
+    matchdate = dateutil.matchdate
+else:
+    makedate = util.makedate
+    matchdate = util.matchdate
+
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
@@ -207,7 +216,7 @@ def addpushmetadata(repo, ctx, d):
     if push:
         d['pushid'] = push.pushid
         d['pushuser'] = push.user
-        d['pushdate'] = util.makedate(push.when)
+        d['pushdate'] = makedate(push.when)
         d['pushnodes'] = push.nodes
         d['pushhead'] = push.nodes[-1]
 
@@ -915,7 +924,7 @@ def revset_pushdate(repo, subset, x):
     l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
 
     ds = revset.getstring(l[0], 'pushdate requires a string argument')
-    dm = util.matchdate(ds)
+    dm = matchdate(ds)
 
     def getrevs():
         to_rev = repo.changelog.rev
@@ -1039,7 +1048,7 @@ def template_pushuser(repo, ctx, templ, cache, **args):
 def template_pushdate(repo, ctx, templ, cache, **args):
     """:pushdate: Date information. When this changeset was pushed."""
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
-    return util.makedate(when) if when else None
+    return makedate(when) if when else None
 
 def template_pushbasenode(repo, ctx, templ, cache, **args):
     """:pushbasenode: String. The changeset identification hash, as a 40 digit
