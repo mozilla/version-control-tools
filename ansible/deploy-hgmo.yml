@@ -46,7 +46,7 @@
            nick=hg-deploy-bot
            color=red
            msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}"
-           passwd={{ hg_deploy_bot_pw }}
+           passwd="{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].hg_deploy_bot_pw.content | b64decode }}"
       run_once: true
 
 - hosts: hgweb-prod
@@ -136,5 +136,5 @@
            nick=hg-deploy-bot
            color=red
            msg="Finished deploy of hooks and extensions to hg.mozilla.org"
-           passwd={{ hg_deploy_bot_pw }}
+           passwd="{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].hg_deploy_bot_pw.content | b64decode }}"
       run_once: true
