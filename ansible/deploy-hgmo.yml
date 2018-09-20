@@ -31,7 +31,7 @@
       when: vct_node_phase.stdout != 'public'
 
     - name: capture changes since last time
-      local_action: command hg --cwd {{ vct }} log -r {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
+      local_action: command hg --cwd {{ vct }} log -r {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
     - name: check if mozbuild chroot is available
@@ -45,8 +45,8 @@
            channel="#vcs"
            nick=hg-deploy-bot
            color=red
-           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].previous_vct_node.content | b64decode }}"
-           passwd="{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].hg_deploy_bot_pw.content | b64decode }}"
+           msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}"
+           passwd="{{ hostvars[groups['hgssh-prod-master'][0]].hg_deploy_bot_pw.content | b64decode }}"
       run_once: true
 
 - hosts: hgweb-prod
@@ -60,8 +60,8 @@
         # We have to use hostvars to reference variables on other hosts.
         # slurp captures content in base64 encoded form. Decode it
         # before it is passed in.
-        mirror_private_key: "{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].mirror_private_key.content | b64decode }}",
-        mirror_host_key: "{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].mirror_host_key.content | b64decode }}",
+        mirror_private_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_private_key.content | b64decode }}",
+        mirror_host_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_host_key.content | b64decode }}",
         # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
         mirror_ips: ["63.245.215.25", "63.245.215.102"],
         vct_node: "{{ lookup('file', '../.vctnode') }}",
@@ -136,5 +136,5 @@
            nick=hg-deploy-bot
            color=red
            msg="Finished deploy of hooks and extensions to hg.mozilla.org"
-           passwd="{{ hostvars['hgssh1.dmz.mdc1.mozilla.com'].hg_deploy_bot_pw.content | b64decode }}"
+           passwd="{{ hostvars[groups['hgssh-prod-master'][0]].hg_deploy_bot_pw.content | b64decode }}"
       run_once: true
