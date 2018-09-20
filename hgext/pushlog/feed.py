@@ -331,27 +331,6 @@ def pushlog_html(web):
 
     query = pushlog_setup(web.repo, req)
 
-    # these three functions are in webutil in newer hg, but not in hg 1.0
-    def nodetagsdict(repo, node):
-        return [{"name": i} for i in repo.nodetags(node)]
-
-    def nodebranchdict(repo, ctx):
-        branches = []
-        branch = ctx.branch()
-        # If this is an empty repo, ctx.node() == nullid,
-        # ctx.branch() == 'default', but branchmap is
-        # an empty dict. Using dict.get avoids a traceback.
-        if repo.branchmap().get(branch) == ctx.node():
-            branches.append({'name': branch})
-        return branches
-
-    def nodeinbranch(repo, ctx):
-        branches = []
-        branch = ctx.branch()
-        if branch != 'default' and repo.branchmap().get(branch) != ctx.node():
-            branches.append({'name': branch})
-        return branches
-
     def changenav():
         nav = []
         numpages = int(ceil(query.totalentries / float(PUSHES_PER_PAGE)))
@@ -397,9 +376,9 @@ def pushlog_html(web):
                      "rev": ctx.rev(),
                      "node": hex(n),
                      "parents": [c.hex() for c in ctx.parents()],
-                     "tags": nodetagsdict(web.repo, n),
-                     "branches": nodebranchdict(web.repo, ctx),
-                     "inbranch": nodeinbranch(web.repo, ctx),
+                     "tags": webutil.nodetagsdict(web.repo, n),
+                     "branches": webutil.nodebranchdict(web.repo, ctx),
+                     "inbranch": webutil.nodeinbranch(web.repo, ctx),
                      "hidden": "",
                      "push": [],
                      "mergerollup": [],
