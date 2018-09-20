@@ -22,7 +22,6 @@ from mercurial import (
     localrepo,
     registrar,
     revset,
-    templatekw,
     util,
 )
 from mercurial.hgweb import (
@@ -1033,36 +1032,70 @@ def _getpushinfo(repo, ctx, cache):
 
     return cache['nodetopush'].get(ctx.hex(), (None, None, None, None))
 
-def template_pushid(repo, ctx, templ, cache, **args):
+
+keywords = {}
+templatekeyword = registrar.templatekeyword(keywords)
+
+
+@templatekeyword('pushid', requires={'repo', 'ctx', 'cache'})
+def template_pushid(context, mapping):
     """:pushid: Integer. The unique identifier for the push that introduced
     this changeset.
     """
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+    cache = context.resource(mapping, 'cache')
+
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return pushid
 
-def template_pushuser(repo, ctx, templ, cache, **args):
+
+@templatekeyword('pushuser', requires={'repo', 'ctx', 'cache'})
+def template_pushuser(context, mapping):
     """:pushuser: String. The user who pushed this changeset."""
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+    cache = context.resource(mapping, 'cache')
+
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return who
 
-def template_pushdate(repo, ctx, templ, cache, **args):
+
+@templatekeyword('pushdate', requires={'repo', 'ctx', 'cache'})
+def template_pushdate(context, mapping):
     """:pushdate: Date information. When this changeset was pushed."""
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+    cache = context.resource(mapping, 'cache')
+
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return makedate(when) if when else None
 
-def template_pushbasenode(repo, ctx, templ, cache, **args):
+
+@templatekeyword('pushbasenode', requires={'repo', 'context', 'cache'})
+def template_pushbasenode(context, mapping):
     """:pushbasenode: String. The changeset identification hash, as a 40 digit
     hexadecimal string, that was the first/base node for the push this
     changeset was part of.
     """
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+    cache = context.resource(mapping, 'cache')
+
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return nodes[0] if nodes else None
 
-def template_pushheadnode(repo, ctx, templ, cache, **args):
+
+@templatekeyword('pushheadnode', requires={'repo', 'ctx', 'mapping'})
+def template_pushheadnode(context, mapping):
     """:pushheadnode: String. The changeset identification hash, as a 40 digit
     hexadecimal string, that was the head for the push this changeset was
     part of.
     """
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+    cache = context.resource(mapping, 'cache')
+
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return nodes[-1] if nodes else None
 
@@ -1074,16 +1107,6 @@ def verifypushlog(ui, repo):
 def extsetup(ui):
     extensions.wrapfunction(wireproto, '_capabilities', capabilities)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
-
-    keywords = {
-        'pushid': template_pushid,
-        'pushuser': template_pushuser,
-        'pushdate': template_pushdate,
-        'pushbasenode': template_pushbasenode,
-        'pushheadnode': template_pushheadnode,
-    }
-
-    templatekw.keywords.update(keywords)
 
     extensions.wrapfunction(webutil, 'commonentry', commonentry)
 
