@@ -73,17 +73,15 @@ from mercurial.node import (
 from mercurial import (
     bookmarks,
     config,
-    cmdutil,
     error,
     exchange,
     extensions,
     hg,
     registrar,
-    util,
 )
 
 minimumhgversion = '4.6'
-testedwith = '4.6'
+testedwith = '4.6 4.7'
 
 cmdtable = {}
 
@@ -475,9 +473,13 @@ def unifyrepo(ui, settings, **opts):
         with destrepo.lock():
             with destrepo.transaction('bookmarks') as tr:
                 bm = bookmarks.bmstore(destrepo)
+                books.update({
+                    book: None  # delete any bookmarks not found in the update
+                    for book in bm.keys()
+                    if book not in books
+                })
                 # Mass replacing may not be the proper strategy. But it works for
                 # our current use case.
-                bm.clear()
                 bm.applychanges(destrepo, tr, books.items())
 
     if not opts.get('skipreplicate'):
