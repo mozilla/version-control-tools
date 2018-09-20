@@ -162,9 +162,9 @@ def exchangepullpushlog(orig, pullop):
     lines = pullop.remote._call('pushlog', firstpush=str(fetchfrom))
     lines = iter(lines.splitlines())
 
-    statusline = lines.next()
+    statusline = next(lines)
     if statusline[0] == '0':
-        raise Abort('remote error fetching pushlog: %s' % lines.next())
+        raise Abort('remote error fetching pushlog: %s' % next(lines))
     elif statusline != '1':
         raise Abort('error fetching pushlog: unexpected response: %s\n' %
             statusline)
