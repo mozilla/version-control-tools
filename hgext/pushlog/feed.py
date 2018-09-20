@@ -334,32 +334,31 @@ def pushlog_feed(web):
     return web.sendtemplate('pushlog', **data)
 
 
+def pushlog_changenav(_context, query):
+    '''Generator which yields changelist navigation fields for the pushlog
+    '''
+    numpages = int(ceil(query.totalentries / float(PUSHES_PER_PAGE)))
+    start = max(1, query.page - PUSHES_PER_PAGE/2)
+    end = min(numpages + 1, query.page + PUSHES_PER_PAGE/2)
+
+    if query.page != 1:
+        yield {'page': 1, 'label': "First"}
+        yield {'page': query.page - 1, 'label': "Prev"}
+
+    for i in range(start, end):
+        yield {'page': i, 'label': str(i)}
+
+    if query.page != numpages:
+        yield {'page': query.page + 1, 'label': "Next"}
+        yield {'page': numpages, 'label': "Last"}
+
+
 def pushlog_html(web):
     """WebCommand for producing the HTML view of the pushlog."""
     req = web.req
     tmpl = web.tmpl
 
     query = pushlog_setup(web.repo, req)
-
-    def pushlog_changenav(*args):
-        '''Generator which yields changelist navigation fields for the pushlog
-        '''
-        numpages = int(ceil(query.totalentries / float(PUSHES_PER_PAGE)))
-        start = max(1, query.page - PUSHES_PER_PAGE/2)
-        end = min(numpages + 1, query.page + PUSHES_PER_PAGE/2)
-
-        if query.page != 1:
-            yield {'page': 1, 'label': "First"}
-            yield {'page': query.page - 1, 'label': "Prev"}
-
-        for i in range(start, end):
-            yield {'page': i, 'label': str(i)}
-
-        if query.page != numpages:
-            yield {'page': query.page + 1, 'label': "Next"}
-            yield {'page': numpages, 'label': "Last"}
-
-
 
     def changelist(limit=0, **map):
         # useless fallback
@@ -425,7 +424,7 @@ def pushlog_html(web):
     parity = paritygen(web.stripecount)
 
     data = {
-        'changenav': templateutil.mappinggenerator(pushlog_changenav),
+        'changenav': templateutil.mappinggenerator(pushlog_changenav, args=(query,)),
         'rev': 0,
         'entries': lambda **x: changelist(limit=0, **x),
         'latestentry': lambda **x: changelist(limit=1, **x),
