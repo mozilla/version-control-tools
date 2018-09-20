@@ -304,7 +304,7 @@ def pushlog_feed(web):
     }
 
     entries = data['entries']
-    for id, user, date, node in query.entries:
+    for pushid, user, date, node in query.entries:
         try:
             ctx = web.repo[node]
         # Changeset is hidden.
@@ -360,7 +360,7 @@ def pushlog_html(web):
         mergehidden = ""
         p = 0
         currentpush = None
-        for id, user, date, node in query.entries:
+        for pushid, user, date, node in query.entries:
             if isinstance(node, unicode):
                 node = node.encode('utf-8')
 
@@ -382,10 +382,10 @@ def pushlog_html(web):
                      "hidden": "",
                      "push": [],
                      "mergerollup": [],
-                     "id": id
+                     "id": pushid
                      }
-            if id != lastid:
-                lastid = id
+            if pushid != lastid:
+                lastid = pushid
                 p = parity.next()
                 entry["push"] = [{"user": user,
                                   "date": localdate(date)}]
@@ -429,13 +429,13 @@ def pushes_worker(query, repo, full):
     to a map of data about the push."""
     haveobs = bool(repo.obsstore)
     pushes = {}
-    for id, user, date, node in query.entries:
-        id = str(id)
+    for pushid, user, date, node in query.entries:
+        pushid = str(pushid)
 
         # Create the pushes entry first. It is OK to have empty
         # pushes if nodes from the pushlog no longer exist.
-        if id not in pushes:
-            pushes[id] = {
+        if pushid not in pushes:
+            pushes[pushid] = {
                 'user': user,
                 'date': date,
                 'changesets': [],
@@ -474,7 +474,7 @@ def pushes_worker(query, repo, full):
                     node['precursors'] = precursors
 
         # we get the pushes in reverse order
-        pushes[id].setdefault(nodekey, []).insert(0, node)
+        pushes[pushid].setdefault(nodekey, []).insert(0, node)
 
     return {'pushes': pushes, 'lastpushid': query.lastpushid}
 
