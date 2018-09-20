@@ -482,34 +482,6 @@ Hidden changesets dropped in feed
     </content>
    </entry>
    <entry>
-    <title>Changeset d313a202a85e114000f669c2fcb49ad42376ac04</title>
-    <id>http://www.selenic.com/mercurial/#changeset-d313a202a85e114000f669c2fcb49ad42376ac04</id>
-    <link href="http://*:$HGPORT/server/rev/d313a202a85e114000f669c2fcb49ad42376ac04"/> (glob)
-    <updated>*Z</updated> (glob)
-    <author>
-     <name>user@example.com</name>
-    </author>
-    <content type="xhtml">
-     <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">file2</li></ul>
-     </div>
-    </content>
-   </entry>
-   <entry>
-    <title>Changeset ae13d9da6966307c98b60987fb4fedc2e2f29736</title>
-    <id>http://www.selenic.com/mercurial/#changeset-ae13d9da6966307c98b60987fb4fedc2e2f29736</id>
-    <link href="http://*:$HGPORT/server/rev/ae13d9da6966307c98b60987fb4fedc2e2f29736"/> (glob)
-    <updated>*Z</updated> (glob)
-    <author>
-     <name>user@example.com</name>
-    </author>
-    <content type="xhtml">
-     <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">file2</li></ul>
-     </div>
-    </content>
-   </entry>
-   <entry>
     <title>Changeset 96ee1d7354c4ad7372047672c36a1f561e3a6a4c</title>
     <id>http://www.selenic.com/mercurial/#changeset-96ee1d7354c4ad7372047672c36a1f561e3a6a4c</id>
     <link href="*:$HGPORT/server/rev/96ee1d7354c4ad7372047672c36a1f561e3a6a4c"/> (glob)

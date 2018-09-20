@@ -15,7 +15,9 @@ from mercurial.node import hex, nullid
 from mercurial import (
     demandimport,
     error,
+    scmutil,
     templatefilters,
+    templateutil,
 )
 
 sys.path.append(os.path.dirname(__file__))
@@ -280,6 +282,21 @@ def isotime(timestamp):
     return datetime.utcfromtimestamp(timestamp).isoformat() + 'Z'
 
 
+def feedentrygenerator(_context, entries, repo, url, urlbase):
+    """Generator of mappings for pushlog feed entries field
+    """
+    for pushid, user, date, node in entries:
+        ctx = scmutil.revsingle(repo, node)
+        filesgen = [{'name': fn} for fn in ctx.files()]
+        yield {
+            'node': node,
+            'date': isotime(date),
+            'user': xmlescape(user),
+            'urlbase': urlbase,
+            'url': url,
+            'files': templateutil.mappinglist(filesgen),
+        }
+
 def pushlog_feed(web):
     """WebCommand for producing the ATOM feed of the pushlog."""
     req = web.req
@@ -299,30 +316,19 @@ def pushlog_feed(web):
     if not url.endswith('/'):
         url += '/'
 
+    queryentries = (
+        (pushid, user, date, node)
+        for (pushid, user, date, node) in query.entries
+        if scmutil.isrevsymbol(web.repo, node)
+    )
+
     data = {
         'urlbase': query.urlbase,
         'url': url,
         'repo': query.reponame,
         'date': dt,
-        'entries': [],
+        'entries': templateutil.mappinggenerator(feedentrygenerator, args=(queryentries, web.repo, url, query.urlbase)),
     }
-
-    entries = data['entries']
-    for pushid, user, date, node in query.entries:
-        try:
-            ctx = web.repo[node]
-        # Changeset is hidden.
-        except error.FilteredRepoLookupError:
-            pass
-
-        entries.append({
-            'node': node,
-            'date': isotime(date),
-            'user': xmlescape(user),
-            'urlbase': query.urlbase,
-            'url': url,
-            'files': [{'name': fn} for fn in ctx.files()],
-        })
 
     web.res.headers['Content-Type'] = ATOM_MIMETYPE
     return web.sendtemplate('pushlog', **data)
