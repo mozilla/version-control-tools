@@ -174,29 +174,36 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
     description = encoding.fromlocal(ctx.description())
 
-    d['bugs'] = []
-    for bug in commitparser.parse_bugs(description):
-        d['bugs'].append({
-            'no': str(bug),
-            'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug,
-        })
+    def bugsgen(_context):
+        '''Generator for bugs list'''
+        for bug in commitparser.parse_bugs(description):
+            yield {
+                'no': str(bug),
+                'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug,
+            }
 
-    d['reviewers'] = []
-    for reviewer in commitparser.parse_reviewers(description):
-        d['reviewers'].append({
-            'name': reviewer,
-            'revset': 'reviewer(%s)' % reviewer,
-        })
+    def reviewersgen(_context):
+        '''Generator for reviewers list'''
+        for reviewer in commitparser.parse_reviewers(description):
+            yield {
+                'name': reviewer,
+                'revset': 'reviewer(%s)' % reviewer,
+            }
 
-    d['backsoutnodes'] = []
-    backouts = commitparser.parse_backouts(description)
-    if backouts:
-        for node in backouts[0]:
-            try:
-                bctx = scmutil.revsymbol(repo, node)
-                d['backsoutnodes'].append({'node': bctx.hex()})
-            except error.RepoLookupError:
-                pass
+    def backoutsgen(_context):
+        '''Generator for backouts list'''
+        backouts = commitparser.parse_backouts(description)
+        if backouts:
+            for node in backouts[0]:
+                try:
+                    bctx = scmutil.revsymbol(repo, node)
+                    yield {'node': bctx.hex()}
+                except error.RepoLookupError:
+                    pass
+
+    d['reviewers'] = templateutil.mappinggenerator(reviewersgen)
+    d['bugs'] = templateutil.mappinggenerator(bugsgen)
+    d['backsoutnodes'] = templateutil.mappinggenerator(backoutsgen)
 
     # Repositories can define which TreeHerder repository they are associated
     # with.
