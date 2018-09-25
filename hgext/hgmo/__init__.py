@@ -472,7 +472,6 @@ def headdivergencewebcommand(web):
 
 def automationrelevancewebcommand(web):
     req = web.req
-    tmpl = web.templater(req)
 
     if 'node' not in req.qsparams:
         return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
