@@ -195,7 +195,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     if backouts:
         for node in backouts[0]:
             try:
-                bctx = repo[node]
+                bctx = scmutil.revsymbol(repo, node)
                 d['backsoutnodes'].append({'node': bctx.hex()})
             except error.RepoLookupError:
                 pass
@@ -385,7 +385,7 @@ def infowebcommand(web):
 
     csets = []
     for node in nodes:
-        ctx = web.repo[node]
+        ctx = scmutil.revsymbol(web.repo, node)
         csets.append({
             'rev': ctx.rev(),
             'node': ctx.hex(),
@@ -421,7 +421,7 @@ def headdivergencewebcommand(web):
     repo = web.repo
 
     paths = set(req.qsparams.getall('p'))
-    basectx = repo[req.qsparams['node']]
+    basectx = scmutil.revsymbol(repo, req.qsparams['node'])
 
     # Find how much this repo has changed since the requested changeset.
     # Our heuristic is to find the descendant head with the highest revision
@@ -576,12 +576,12 @@ def isancestorwebcommand(web):
     node = req.qsparams['node']
 
     try:
-        headctx = web.repo[head]
+        headctx = scmutil.revsingle(web.repo, head)
     except error.RepoLookupError:
         raise ErrorResponse(HTTP_NOT_FOUND, 'unknown head revision %s' % head)
 
     try:
-        testctx = web.repo[node]
+        testctx = scmutil.revsingle(web.repo, node)
     except error.RepoLookupError:
         raise ErrorResponse(HTTP_NOT_FOUND, 'unknown node revision %s' % node)
 
