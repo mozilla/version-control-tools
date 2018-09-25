@@ -137,7 +137,7 @@ background process and executes Mercurial commands.
 **chg can drastically speed up Mercurial.** This is because the overhead
 for launching a new Python process is high (often over 50ms) and the
 overhead for loading Mercurial state into that process can also be high.
-With ``chg``, you may this cost once and all subsequent commands
+With ``chg``, you pay this cost once and all subsequent commands
 effectively eliminate the Python and Mercurial startup overhead. For
 example::
 
@@ -179,12 +179,12 @@ opens up new workflows that harness Mercurial's ability to record how
 changesets *evolve* over time.
 
 Typically, when history is rewritten, new commits are created and the old
-ones are discarded. With the ``evolve`` extension enabled, Mercurial intsead
+ones are discarded. With the ``evolve`` extension enabled, Mercurial instead
 hides the old commits and writes metadata holding the relationship between
 old and new commits. This metadata can be transferred between clients,
 allowing clients to make intelligent decisions about how to recover from
 rewritten history. For example, if a force push is performed, a client
-will now exactly what rebase to perform to mimic what was done elsewhere.
+will know exactly what rebase to perform to mimic what was done elsewhere.
 
 The ``evolve`` extension also enables useful Mercurial commands such as
 ``hg previous``, ``hg next``, and ``hg amend`` (which is a shortcut for
