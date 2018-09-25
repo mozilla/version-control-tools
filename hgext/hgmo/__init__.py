@@ -604,6 +604,7 @@ def isancestorwebcommand(web):
 def repoinfowebcommand(web):
     group_owner = repo_owner(web.repo)
     return web.sendtemplate('repoinfo',
+                            archives=web.archivelist('tip'),
                             groupowner=group_owner)
 
 
