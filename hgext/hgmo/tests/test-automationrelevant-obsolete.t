@@ -93,71 +93,72 @@ Unless --hidden is used
   summary:     file1 2
   
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/3208166ea109 --no-headers
+  $ http http://localhost:$HGPORT/json-automationrelevance/3208166ea109 --no-headers --body-file body
   200
-  
+
+  $ python -m json.tool < body
   {
-    "changesets": [
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "file1 1",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "file1"
-        ],
-        "node": "11743f8081842eb047711e85120177ed46be343e",
-        "parents": [
-          "d406a5ad38f255efb8657338e56a2bd6b8149cca"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
-        "pushid": 3,
-        "pushuser": "testuser",
-        "rev": 3,
-        "reviewers": []
-      },
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "file1 2",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "file1"
-        ],
-        "node": "3208166ea10954e86c390c32fe6f7166f06161b2",
-        "parents": [
-          "11743f8081842eb047711e85120177ed46be343e"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
-        "pushid": 3,
-        "pushuser": "testuser",
-        "rev": 4,
-        "reviewers": []
-      }
-    ],
-    "visible": false
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "file1 1",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "file1"
+              ],
+              "node": "11743f8081842eb047711e85120177ed46be343e",
+              "parents": [
+                  "d406a5ad38f255efb8657338e56a2bd6b8149cca"
+              ],
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 3,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "file1 2",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "file1"
+              ],
+              "node": "3208166ea10954e86c390c32fe6f7166f06161b2",
+              "parents": [
+                  "11743f8081842eb047711e85120177ed46be343e"
+              ],
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "3208166ea10954e86c390c32fe6f7166f06161b2",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 4,
+              "reviewers": []
+          }
+      ],
+      "visible": false
   }
 
   $ cd ..

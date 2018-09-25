@@ -105,9 +105,7 @@ from mercurial.hgweb import (
 )
 from mercurial.hgweb.common import (
     ErrorResponse,
-    HTTP_OK,
     HTTP_NOT_FOUND,
-    statusmessage,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -555,13 +553,11 @@ def automationrelevancewebcommand(web):
         visible = None
 
     data = {
-        'changesets': csets,
+        'changesets': templateutil.mappinglist(csets),
         'visible': visible,
     }
 
-    web.res.status = statusmessage(HTTP_OK)
-    web.res.setbodygen(stream_json(data))
-    return web.res.sendresponse()
+    return web.sendtemplate('automationrelevance', **data)
 
 
 def isancestorwebcommand(web):

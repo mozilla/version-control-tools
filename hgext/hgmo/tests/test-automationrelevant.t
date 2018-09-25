@@ -124,101 +124,102 @@ Draft from previous push base not included unless config option changes behavior
 
 web command for exposing automation relevance works
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/tip --header content-type
+  $ http http://localhost:$HGPORT/json-automationrelevance/tip --header content-type --body-file body
   200
   content-type: application/json
-  
+
+  $ python -m json.tool < body
   {
-    "changesets": [
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "push 2 commit 1",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "foo"
-        ],
-        "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
-        "parents": [
-          "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
-        "pushid": 3,
-        "pushuser": "testuser",
-        "rev": 3,
-        "reviewers": []
-      },
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "push 2 commit 2",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "foo"
-        ],
-        "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
-        "parents": [
-          "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
-        "pushid": 3,
-        "pushuser": "testuser",
-        "rev": 4,
-        "reviewers": []
-      },
-      {
-        "author": "test",
-        "backsoutnodes": [],
-        "bugs": [],
-        "date": [
-          0.0,
-          0
-        ],
-        "desc": "push 2 commit 3",
-        "extra": {
-          "branch": "default"
-        },
-        "files": [
-          "foo"
-        ],
-        "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
-        "parents": [
-          "66a66c6c6ae312ec88240754300468a6cea8f71d"
-        ],
-        "pushdate": [
-          \d+, (re)
-          0
-        ],
-        "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
-        "pushid": 3,
-        "pushuser": "testuser",
-        "rev": 5,
-        "reviewers": []
-      }
-    ],
-    "visible": true
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 1",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+              "parents": [
+                  "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
+              ],
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 3,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 2",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+              "parents": [
+                  "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
+              ],
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 4,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 3",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "parents": [
+                  "66a66c6c6ae312ec88240754300468a6cea8f71d"
+              ],
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 5,
+              "reviewers": []
+          }
+      ],
+      "visible": true
   }
 
 

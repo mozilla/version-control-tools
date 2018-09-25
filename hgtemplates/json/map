@@ -293,3 +293,7 @@ firefoxreleasebuild = '\{
 repoinfo = '\{
   "group_owner": {groupowner|json}
   }'
+automationrelevance = '\{
+  "changesets": {changesets|json},
+  "visible": {visible|json}
+  }'
