@@ -95,6 +95,7 @@ from mercurial import (
     revset,
     scmutil,
     templatefilters,
+    templateutil,
     util,
     wireprotov1server,
 )
@@ -398,7 +399,7 @@ def infowebcommand(web):
             'files': ctx.files(),
         })
 
-    return web.sendtemplate('info', csets=csets)
+    return web.sendtemplate('info', csets=templateutil.mappinglist(csets))
 
 
 def headdivergencewebcommand(web):
