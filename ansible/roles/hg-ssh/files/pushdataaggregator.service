@@ -17,7 +17,20 @@ PrivateTmp=true
 # --max-polls causes process to self-exit after N * 1s. This is to mitigate
 # a memory leak tracked by 1302564.
 ExecStart=/var/hg/venv_tools/bin/vcsreplicator-aggregator --max-polls 1800 /etc/mercurial/pushdataaggregator.ini
+
 Restart=always
+
+# Wait more than default of 100ms to restart. This gives bad Kafka state a
+# little bit more time to recover in case a failure in it is responsible for
+# process exiting.
+RestartSec=3
+
+# Allow service to bounce more than normal due to intermittent
+# Kafka availability. We take StartLimitBurst and RestartSec into account
+# to effectively allow bouncing for up to N seconds.
+StartLimitInterval=300
+StartLimitBurst=20
+
 TimeoutStopSec=60
 
 SyslogIdentifier=pushdataaggregator
