@@ -14,7 +14,7 @@ from ..checks import (
 
 FTL_DRIVERS = [
     ("Francesco Lodolo", "flod"),
-    ("Zibi Braniecki", "gandalf"),
+    ("Zibi Braniecki", "zbraniecki"),
     ("Axel Hecht", "pike"),
     ("Stas Malolepszy", "stas")
 ]

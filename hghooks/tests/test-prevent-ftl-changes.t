@@ -22,7 +22,7 @@ Commit adding an FTL file without appropriate reviewer errors
   one of the L10n Drivers.
   Please, request review from either:
       - Francesco Lodolo (:flod)
-      - Zibi Braniecki (:gandalf)
+      - Zibi Braniecki (:zbraniecki)
       - Axel Hecht (:pike)
       - Stas Malolepszy (:stas)
   ********************************************************
