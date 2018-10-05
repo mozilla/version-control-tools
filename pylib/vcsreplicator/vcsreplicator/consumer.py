@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import binascii
 import errno
+import functools
 import io
 import json
 import logging
@@ -138,6 +139,30 @@ def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
         signal.signal(signal.SIGTERM, oldterm)
 
 
+def repofilter(message_handler):
+    """Decorator for wrap message handler functions to ignore
+    messages from filtered repositories.
+    """
+    @functools.wraps(message_handler)
+    def filterwrapper(config, payload):
+        repo = payload.get('path')
+
+        # No repo in payload, heartbeat message
+        if not repo:
+            return
+
+        res = config.filter(repo)
+
+        if not res.passes_filter:
+            logger.warn('repo %s filtered by rule %s' % (repo, res.rule))
+            return
+
+        return message_handler(config, payload)
+
+    return filterwrapper
+
+
+@repofilter
 def handle_message_main(config, payload):
     """Process a decoded event message.
 
@@ -198,6 +223,7 @@ def handle_message_main(config, payload):
     raise ValueError('unrecognized message type: %s' % payload['name'])
 
 
+@repofilter
 def handle_message_heads(config, payload):
     """Process a decoded event message.
 

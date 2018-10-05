@@ -63,6 +63,20 @@ topic = replicatedpushdata
 group = snsnotifier
 EOF
 
+cat >> filtered-consumer.ini << EOF
+[consumer]
+hosts = ${KAFKA_0_HOSTPORT}, ${KAFKA_1_HOSTPORT}, ${KAFKA_2_HOSTPORT}
+connect_timeout = 5
+poll_timeout = 0.2
+client_id = filteredconsumer-local
+topic = pushdata
+group = filteredconsumer
+[replicationrules]
+include.projects = re:\{moz\}/projects/.*
+include.central = path:{moz}/mozilla-central
+exclude.unified = path:{moz}/mozilla-unified
+exclude.users = re:\{moz\}/users/.*
+EOF
 }
 
 alias consumer='vcsreplicator-consumer $TESTTMP/vcsreplicator.ini'
@@ -70,3 +84,4 @@ alias papendingconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-pend
 alias paconsumer='vcsreplicator-consumer $TESTTMP/pushdataaggregator-consumer.ini'
 alias pulseconsumer='vcsreplicator-consumer $TESTTMP/pulse-consumer.ini'
 alias snsconsumer='vcsreplicator-consumer $TESTTMP/sns-consumer.ini'
+alias filteredconsumer='vcsreplicator-consumer $TESTTMP/filtered-consumer.ini'
