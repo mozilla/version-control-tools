@@ -6,10 +6,20 @@ from __future__ import absolute_import, unicode_literals
 
 from ConfigParser import RawConfigParser
 import os
+import re
 import time
 
 from kafka import SimpleClient
 from kafka.common import KafkaUnavailableError
+
+
+def create_namedgroup(name, rule):
+    '''Returns a regex group with name `name` that must match `rule`
+    '''
+    return '(?P<{name}>{rule})'.format(
+        name=name,
+        rule=rule
+    )
 
 
 class Config(object):
@@ -46,6 +56,40 @@ class Config(object):
             self._replication_path_rewrites = self.c.items('replicationpathrewrites')
         else:
             self._replication_path_rewrites = []
+
+        if self.c.has_section('replicationrules'):
+            re_includes, re_excludes = [], []
+            self.path_includes, self.path_excludes = {}, {}
+            for key, value in self.c.items('replicationrules'):
+                (behaviour, name), (ruletype, rule) = key.split('.'), value.split(':')
+
+                if ruletype == 're':
+                    # Decide which list is correct and append to it
+                    restore = re_includes if behaviour == 'include' else re_excludes
+                    restore.append((name, rule))
+
+                elif ruletype == 'path':
+                    exstore = self.path_includes if behaviour == 'include' else self.path_excludes
+                    exstore[rule] = name
+                else:
+                    raise Exception('bad ruletype %s' % ruletype)
+
+            # Create the in/out rules as an `or` of all the rules
+            includes_string = '|'.join(
+                create_namedgroup(name, rule)
+                for name, rule in re_includes
+            )
+            excludes_string = '|'.join(
+                create_namedgroup(name, rule)
+                for name, rule in re_excludes
+            )
+
+            self.include_regex = re.compile(includes_string) if includes_string else None
+            self.exclude_regex = re.compile(excludes_string) if excludes_string else None
+
+            self.has_filters = bool(self.path_includes or self.path_excludes or self.include_regex or self.exclude_regex)
+        else:
+            self.has_filters = False
 
     @property
     def hg_path(self):
