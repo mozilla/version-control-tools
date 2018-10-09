@@ -37,6 +37,7 @@
   with_items:
     - entrypoint.py
     - entrypoint-solo
+    - set-config-option
     - set-mirror-key.py
 
 - name: Install IP address documents for prioritizing streamed clone bundles

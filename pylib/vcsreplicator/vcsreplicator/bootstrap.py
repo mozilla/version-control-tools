@@ -197,9 +197,18 @@ def hgweb():
 
     consumer = KafkaConsumer(**consumer_config)
 
+    outputdata = collections.defaultdict(list)
+
     # We will remove repos from this set as we replicate them
     # Once this is an empty set we are done
-    repositories_to_clone = set(hgssh_data['repositories'])
+    repositories_to_clone = set()
+    for repo in hgssh_data['repositories']:
+        filterresult = config.filter(repo)
+
+        if filterresult.passes_filter:
+            repositories_to_clone.add(repo)
+        else:
+            outputdata[repo].append('filtered by rule %s' % filterresult.rule)
 
     extra_messages = collections.defaultdict(collections.deque)  # maps repo names to extra processing messages
     clone_futures_repo_mapping = {}  # maps cloning futures to repo names
@@ -253,8 +262,6 @@ def hgweb():
 
     logger.info('finished retrieving messages from Kafka')
 
-    outputdata = collections.defaultdict(list)
-
     # Process the previously collected messages
     with futures.ThreadPoolExecutor(args.workers) as e:
         for partition, messages in sorted(aggregate_messages_by_topicpartition.items()):
@@ -287,8 +294,10 @@ def hgweb():
                     # Remove the repo from the set of repos
                     # which have not been scheduled to sync
                     repositories_to_clone.remove(payload['path'])
-                else:
+                elif payload['path'] not in outputdata:
                     # If the repo is not in the list of repositories to clone,
+                    # and the repo is not in the outputdata object (ie hasn't
+                    # errored out, by being filtered or otherwise),
                     # then we have already scheduled the repo sync and we will
                     # need to process this message once the sync completes.
                     extra_messages[payload['path']].append((config, payload))

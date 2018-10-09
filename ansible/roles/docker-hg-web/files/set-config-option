@@ -1,0 +1,24 @@
+#!/var/hg/venv_tools/bin/python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import ConfigParser
+import os
+import sys
+
+configpath, section, key, value = sys.argv[1:]
+
+
+c = ConfigParser.ConfigParser()
+
+if os.path.exists(configpath):
+    c.read(configpath)
+
+if not c.has_section(section):
+    c.add_section(section)
+
+c.set(section, key, value)
+
+with open(configpath, 'wb') as fh:
+    c.write(fh)
