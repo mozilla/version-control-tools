@@ -5,12 +5,17 @@
 from __future__ import absolute_import, unicode_literals
 
 from ConfigParser import RawConfigParser
+import collections
 import os
 import re
 import time
 
 from kafka import SimpleClient
 from kafka.common import KafkaUnavailableError
+
+# Holds a boolean indicating if a repo was filtered and the
+# name of the rule that allowed/disallowed the filtering
+RepoFilterResult = collections.namedtuple('RepoFilterResult', ('passes_filter', 'rule'))
 
 
 def create_namedgroup(name, rule):
@@ -100,7 +105,7 @@ class Config(object):
         return 'hg'
 
     def parse_wire_repo_path(self, path):
-        """Parse a normalized repository path into a local path."""  
+        """Parse a normalized repository path into a local path."""
         for source, dest in self._path_rewrites:
             if path.startswith(source):
                 return path.replace(source, dest)
@@ -130,6 +135,38 @@ class Config(object):
                 return dest + path[len(source):]
 
         return None
+
+    def filter(self, repo):
+        """Returns a RepoFilterResult indicating if the repo should be filtered out
+        of the set and which rule performed the include/exclude.
+
+        If the repo was not touched by any rule, we default to disallowing the repo
+        to be replicated. This rule is called "noinclude". If there were no
+        filters defined at all, we pass the filter. This rule is called "nofilter".
+        """
+        if not self.has_filters:
+            return RepoFilterResult(True, 'nofilter')
+
+        if repo in self.path_includes:
+            return RepoFilterResult(True, self.path_includes[repo])
+
+        if repo in self.path_excludes:
+            return RepoFilterResult(False, self.path_excludes[repo])
+
+        includematch = self.include_regex.match(repo) if self.include_regex else None
+        excludematch = self.exclude_regex.match(repo) if self.exclude_regex else None
+
+        # Repo passes through filter if matching an include rule
+        # and not matching an exclude rule
+        if includematch and not excludematch:
+            return RepoFilterResult(True, includematch.groupdict().keys()[0])
+
+        # Return specific exclude rule if there was a match
+        if excludematch:
+            return RepoFilterResult(False, excludematch.groupdict().keys()[0])
+
+        # Use "noinclude" if we didn't get a match for an include rule
+        return RepoFilterResult(False, 'noinclude')
 
     def get_client_from_section(self, section, timeout=-1):
         """Obtain a KafkaClient from a config section.
