@@ -12,7 +12,6 @@ to the right place!
 
    installing
    extensions
-   auth
    dag
    workflows
    bookmarks
@@ -20,5 +19,6 @@ to the right place!
    firefoxtree
    unifiedrepo
    firefoxworkflow
+   auth
    automation
    issues
