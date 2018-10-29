@@ -20,10 +20,11 @@ Mercurial SSH session is logged in syslog
   * hgweb: *:* END_SSH_COMMAND * * (glob)
   * hgweb: *:* BEGIN_SSH_COMMAND between (glob)
   * hgweb: *:* END_SSH_COMMAND * * (glob)
+  * hgweb: *:* BEGIN_SSH_COMMAND protocaps (glob) (hg47 !)
+  * hgweb: *:* END_SSH_COMMAND * * (glob) (hg47 !)
   * hgweb: *:* BEGIN_SSH_COMMAND batch (glob)
   * hgweb: *:* END_SSH_COMMAND * * (glob)
   * hgweb: *:* BEGIN_SSH_COMMAND getbundle (glob)
-  * hgweb: *:* END_SSH_COMMAND * * (glob)
   * hgweb: *:* END_SSH_COMMAND * * (glob)
   * hgweb: *: END_SSH_SESSION * * (glob)
 

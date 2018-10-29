@@ -202,7 +202,7 @@ from mercurial.hgweb import (
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-testedwith = '4.6'
+testedwith = '4.6 4.7'
 minimumhgversion = '4.6'
 
 configtable = {}
