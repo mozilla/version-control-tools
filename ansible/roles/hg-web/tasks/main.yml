@@ -227,8 +227,11 @@
 # in. If we did pull in dependencies, there is a potential MITM since
 # pip secures download of 3rd party packages.
 # --force-reinstall is there for completeness.
-- name: install vcsreplicator into virtualenv
+- name: install vcsreplicator into replication virtualenv
   command: /var/hg/venv_replication/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+
+- name: install vcsreplicator into hgweb virtualenv
+  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
 
 - name: install mozautomation into tools virtualenv
   command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/mozautomation
