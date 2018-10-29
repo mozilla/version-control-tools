@@ -189,38 +189,21 @@ from mercurial import (
     error,
     extensions,
     registrar,
-    util,
+    wireprotoserver,
+    wireprototypes,
+    wireprotov1server,
 )
 from mercurial.hgweb import (
     hgweb_mod,
     hgwebdir_mod,
+    protocol,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-from mozhg.util import import_module
-
-# TRACKING hg46 mercurial.hgweb.protocol effectively renamed to
-# mercurial.wireprotoserver
-protocol = import_module('mercurial.hgweb.protocol')
-wireprotoserver = import_module('mercurial.wireprotoserver')
-
-# TRACKING hg46 mercurial.sshserver renamed to mercurial.wireprotoserver
-sshserver = import_module('mercurial.sshserver')
-
-# TRACKING hg46 mercurial.wireprototypes introduced this version
-wireprototypes = import_module('mercurial.wireprototypes')
-
-# TRACKING hg46 mercurial.wireprotov1server contains unified code for
-# dispatching a wire protocol command
-wireprotov1server = import_module('mercurial.wireprotov1server')
-
-# TRACKING hg46 mercurial.wireproto split up and renamed
-wireproto = import_module('mercurial.wireproto')
-
-testedwith = '4.5 4.6'
-minimumhgversion = '4.5'
+testedwith = '4.6'
+minimumhgversion = '4.6'
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -243,21 +226,6 @@ configitem('serverlog', 'syslog.ident',
            default='hgweb')
 configitem('serverlog', 'syslog.facility',
            'LOG_LOCAL2')
-
-# TRACKING hg46 module removed in 4.6
-if protocol:
-    origcall = protocol.call
-
-
-def protocolcall(repo, req, cmd):
-    """Wraps mercurial.hgweb.protocol to record requests."""
-
-    # TODO figure out why our custom attribute is getting lost in
-    # production.
-    if hasattr(repo, '_serverlog'):
-        logevent(repo.ui, repo._serverlog, 'BEGIN_PROTOCOL', cmd)
-
-    return origcall(repo, req, cmd)
 
 
 class fileobjectproxy(object):
@@ -427,20 +395,13 @@ def logsyslog(ui, message):
 
 
 class hgwebwrapped(hgweb_mod.hgweb):
-    def _runwsgi(self, *args):
-        # TRACKING hg46 (req, repo) -> (req, res, repo)
-        if len(args) == 3:
-            req, res, repo = args
-        else:
-            req, repo = args
-
+    def _runwsgi(self, req, res, repo):
         serverlog = {
             'requestid': str(uuid.uuid1()),
             'writecount': 0,
         }
 
-        # TRACKING hg46 req.env renamed to req.rawenv.
-        env = req.rawenv if util.safehasattr(req, 'rawenv') else req.env
+        env = req.rawenv
 
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
@@ -470,7 +431,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         lastlogamount = 0
 
         try:
-            for what in super(hgwebwrapped, self)._runwsgi(*args):
+            for what in super(hgwebwrapped, self)._runwsgi(req, res, repo):
                 sl['writecount'] += len(what)
                 yield what
 
@@ -498,19 +459,11 @@ class hgwebwrapped(hgweb_mod.hgweb):
                      '%.3f' % deltacpu)
 
 
-# TRACKING hg46 sshserver.sshserver moved to wireprotoserver.sshserver
-sshservermod = wireprotoserver if wireprotoserver else sshserver
-
-
-class sshserverwrapped(sshservermod.sshserver):
+class sshserverwrapped(wireprotoserver.sshserver):
     """Wrap sshserver class to record events."""
 
     def serve_forever(self):
-        # TRACKING hg46 self.repo renamed to self._repo.
-        if util.safehasattr(self, '_repo'):
-            repo = self._repo
-        else:
-            repo = self.repo
+        repo = self._repo
 
         serverlog = {
             'sessionid': str(uuid.uuid1()),
@@ -522,9 +475,7 @@ class sshserverwrapped(sshservermod.sshserver):
         # methods.
         repo._serverlog = serverlog
 
-        # TRACKING hg46 we rely on hacked version of fout file handle in 4.6+.
-        if util.safehasattr(self, '_fout'):
-            self._fout = fileobjectproxy(self._fout, serverlog)
+        self._fout = fileobjectproxy(self._fout, serverlog)
 
         logevent(repo.ui, serverlog, 'BEGIN_SSH_SESSION',
                  serverlog['path'],
@@ -552,43 +503,8 @@ class sshserverwrapped(sshservermod.sshserver):
 
             self._serverlog = None
 
-    # TRACKING hg46 this method doesn't exist on 4.6+.
-    def serve_one(self):
-        self._serverlog['requestid'] = str(uuid.uuid1())
-
-        origdispatch = wireproto.dispatch
-
-        def dispatch(repo, proto, cmd):
-            logevent(repo.ui, self._serverlog, 'BEGIN_SSH_COMMAND', cmd)
-            return origdispatch(repo, proto, cmd)
-
-        startusage = resource.getrusage(resource.RUSAGE_SELF)
-        startcpu = startusage.ru_utime + startusage.ru_stime
-        starttime = time.time()
-
-        wireproto.dispatch = dispatch
-        try:
-            return super(sshserverwrapped, self).serve_one()
-        finally:
-            endtime = time.time()
-            endusage = resource.getrusage(resource.RUSAGE_SELF)
-            endcpu = endusage.ru_utime + endusage.ru_stime
-
-            deltatime = endtime - starttime
-            deltacpu = endcpu - startcpu
-
-            logevent(self.repo.ui, self._serverlog, 'END_SSH_COMMAND',
-                     '%.3f' % deltatime,
-                     '%.3f' % deltacpu)
-
-            wireproto.dispatch = origdispatch
-            self._serverlog['requestid'] = ''
-
 
 def extsetup(ui):
-    if protocol:
-        protocol.call = protocolcall
-
     if wireprotov1server:
         extensions.wrapfunction(wireprotov1server, 'dispatch',
                                 wrappeddispatch)
@@ -626,4 +542,4 @@ def extsetup(ui):
             break
 
     if ui.configbool('serverlog', 'ssh'):
-        sshservermod.sshserver = sshserverwrapped
+        wireprotoserver.sshserver = sshserverwrapped
