@@ -38,7 +38,7 @@ from mozhg.util import import_module
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
 
-testedwith = '4.1 4.2 4.3 4.4 4.5 4.6'
+testedwith = '4.1 4.2 4.3 4.4 4.5 4.6 4.7'
 
 cmdtable = {}
 
@@ -64,6 +64,13 @@ if util.safehasattr(revlog, 'parsemeta'):
 else:
     parsemeta = filelog.parsemeta
 
+# TRACKING hg47
+dateutil = import_module('mercurial.utils.dateutil')
+if dateutil:
+    datestr = dateutil.datestr
+else:
+    datestr = util.datestr
+
 REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
 
@@ -73,7 +80,7 @@ def _ctx_summary(ctx):
         '',
         _('changeset: %s') % ctx.hex(),
         _('user:      %s') % ctx.user(),
-        _('date:      %s') % util.datestr(ctx.date()),
+        _('date:      %s') % datestr(ctx.date()),
         _('summary:   %s') % ctx.description().splitlines()[0],
     ]
 
@@ -494,9 +501,9 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
         raise error.Abort(_('unable to determine source revisions'))
 
     if dest:
-        destctx = repo[dest]
+        destctx = scmutil.revsymbol(repo, dest)
     else:
-        destctx = repo['tip']
+        destctx = scmutil.revsymbol(repo, 'tip')
 
     # Backdoor for testing to force static URL.
     sourceurl = ui.config('overlay', 'sourceurl', sourceurl)
