@@ -41,6 +41,15 @@ navshort = '{before%navshortentry}{after%navshortentry}'
 navgraph = '{before%navgraphentry}{after%navgraphentry}'
 filenav = '{before%filenaventry}{after%filenaventry}'
 
+updirentry = '
+  <tr class="fileline">
+    <td class="name">
+      <a href="{url|urlescape}file/{symrev}{up|urlescape}{sessionvars%urlparameter}">[up]</a>
+    </td>
+    <td class="size"></td>
+    <td class="permissions">drwxr-xr-x</td>
+  </tr>'
+
 direntry = '
   <tr class="fileline">
     <td class="name">

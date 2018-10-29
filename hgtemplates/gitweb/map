@@ -59,6 +59,16 @@ fileellipses = '...'
 changelogentry = changelogentry.tmpl
 changeset = changeset.tmpl
 manifest = manifest.tmpl
+updirentry = '
+  <tr class="parity{upparity}">
+    <td style="font-family:monospace">drwxr-xr-x</td>
+    <td style="font-family:monospace"></td>
+    <td style="font-family:monospace"></td>
+    <td>
+      <a href="{url|urlescape}file/{symrev}{up|urlescape}{sessionvars%urlparameter}">[up]</a>
+    </td>
+    <td class="link">&nbsp;</td>
+  </tr>'
 direntry = '
   <tr class="parity{parity}">
     <td style="font-family:monospace">drwxr-xr-x</td>

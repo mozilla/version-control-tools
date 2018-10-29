@@ -9,7 +9,7 @@ Create a repo so we can test differences against v-c-t
 Run script to apply our templates changes
 
   $ $TESTDIR/hgtemplates/.patches/mozify-templates.py \
-  >   $TESTDIR/venv/mercurials/4.6.2/lib/python2.7/site-packages/mercurial/templates \
+  >   $TESTDIR/venv/mercurials/4.7.2/lib/python2.7/site-packages/mercurial/templates \
   >   $TESTDIR/hgtemplates \
   >   `pwd`/hgtemplates
   adding atom/bookmarkentry.tmpl
@@ -200,9 +200,9 @@ Run script to apply our templates changes
   applying patch from stdin
   applying patch logo.patch
   applying patch from stdin
+  patching file hgtemplates/static/style-gitweb.css
+  Hunk #1 succeeded at 78 with fuzz 1 (offset 1 lines).
   applying patch pushlog-header.patch
-  applying patch from stdin
-  applying patch missing-graph-link.patch
   applying patch from stdin
   applying patch link-atom.patch
   applying patch from stdin
@@ -227,7 +227,7 @@ Run script to apply our templates changes
   applying patch misc.patch
   applying patch from stdin
   patching file hgtemplates/gitweb_mozilla/map
-  Hunk #3 succeeded at 292 with fuzz 1 (offset 12 lines).
+  Hunk #3 succeeded at 302 with fuzz 1 (offset 22 lines).
 
 And replace the working directory with what is in this repository, modulo the
 patches.

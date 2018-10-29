@@ -15,7 +15,11 @@ cset_shortnode = '{labelcset(shortest(node, nodelen))}'
 # Treat branch and tags specially so we don't display "default" or "tip"
 cset_namespace = '{ifeq(namespace, "branches", names_branches, ifeq(namespace, "tags", names_tags, names_others))}'
 names_branches = '{ifeq(branch, "default", "", " ({label('log.{colorname}', branch)})")}'
-names_tags = '{if(names % "{ifeq(name, 'tip', '', name)}", " ({label('log.{colorname}', join(names % "{ifeq(name, 'tip', '', name)}", ' '))})")}'
+names_tags = '{if(filter_tags(names),
+                  " ({label('log.{colorname}', join(filter_tags(names), ' '))})")}'
 names_others = '{if(names, " ({label('log.{colorname}', join(names, ' '))})")}'
 
 cset_shortdesc = '{label("log.description", desc|firstline)}'
+
+[templatealias]
+filter_tags(names) = filter(names, ifeq(name, 'tip', '', name))

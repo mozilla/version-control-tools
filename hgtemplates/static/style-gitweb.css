@@ -74,6 +74,7 @@ div#hint {
   background: #ffc;
   border: 1px solid yellow;
   border-radius: 5px;
+  z-index: 15;
 }
 
 .logo {

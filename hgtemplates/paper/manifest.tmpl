@@ -46,11 +46,7 @@
 </tr>
 </thead>
 <tbody class="stripes2">
-<tr class="fileline">
-  <td class="name"><a href="{url|urlescape}file/{symrev}{up|urlescape}{sessionvars%urlparameter}">[up]</a></td>
-  <td class="size"></td>
-  <td class="permissions">drwxr-xr-x</td>
-</tr>
+{ifeq(path, up, '', updirentry)}
 {dentries%direntry}
 {fentries%fileentry}
 </tbody>

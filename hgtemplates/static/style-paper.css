@@ -90,6 +90,7 @@ form.search div#hint {
   font-size: 70%;
   border: 1px solid yellow;
   border-radius: 5px;
+  z-index: 15;
 }
 
 form.search:hover div#hint { display: block; }

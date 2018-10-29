@@ -30,13 +30,7 @@ files |
 
 <div class="title">{path|escape} {alltags}</div>
 <table cellspacing="0">
-<tr class="parity{upparity}">
-<td style="font-family:monospace">drwxr-xr-x</td>
-<td style="font-family:monospace"></td>
-<td style="font-family:monospace"></td>
-<td><a href="{url|urlescape}file/{symrev}{up|urlescape}{sessionvars%urlparameter}">[up]</a></td>
-<td class="link">&nbsp;</td>
-</tr>
+{ifeq(path, up, '', updirentry)}
 {dentries%direntry}
 {fentries%fileentry}
 </table>
