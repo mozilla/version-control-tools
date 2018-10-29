@@ -23,6 +23,12 @@ AllowAgentForwarding no
 # We have no need for TCP forwarding, so disable it.
 AllowTcpForwarding no
 
+# Send messages to idle clients periodically to keep connection alive.
+# This is needed to keep clients from timing out during large pushes,
+# when some hooks may take dozens of seconds or even minutes to complete.
+ClientAliveInterval 10
+ClientAliveCountMax 6
+
 # Use a separate set of keys from the host SSH.
 # Keys are in order of preference.
 HostKey /etc/mercurial/ssh/ssh_host_ed25519_key
