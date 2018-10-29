@@ -51,7 +51,7 @@ Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
 minimumhgversion = '4.6'
-testedwith = '4.6 4.7'
+testedwith = '4.6 4.7 4.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
@@ -243,7 +243,11 @@ def make_abort(repo, conn):
     """Make a function to be called when a Mercurial transaction aborts."""
     def pushlog_tr_abort(tr):
         if tr:
-            tr.report('rolling back pushlog\n')
+            # TRACKING hg48 - report is now private
+            if util.safehasattr(tr, '_report'):
+                tr._report('rolling back pushlog\n')
+            else:
+                tr.report('rolling back pushlog\n')
 
         conn.close()
 

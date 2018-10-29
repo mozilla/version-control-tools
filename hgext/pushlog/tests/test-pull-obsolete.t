@@ -104,6 +104,7 @@ Cloning normally will receive obsolete data
   added 3 changesets with 3 changes to 3 files
   1 new obsolescence markers
   new changesets 96ee1d7354c4:a129f82339bb (?)
+  new changesets 96ee1d7354c4:a129f82339bb (3 drafts) (hg48 !)
 
 Default behavior of pushlog is to stop applying incoming push data when it sees
 an unknown changeset. Since hidden changesets aren't transferred normally,
@@ -124,6 +125,7 @@ Pushlog stops at 80c2c663cb83 because it is hidden
 
 An uncompressed clone transfers obsolete changesets and markers
 
+#if no-hg48
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-obsolete2
   streaming all changes
   5 files to transfer, * KB of data (glob)
@@ -132,17 +134,35 @@ An uncompressed clone transfers obsolete changesets and markers
   no changes found
   1 new obsolescence markers
 
+#else
+  $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-obsolete2
+  streaming all changes
+  10 files to transfer, 1.49 KB of data
+  transferred 1.49 KB in * seconds (* KB/sec) (glob)
+
+#endif
+
   $ hg -R clone-obsolete2 debugobsolete
   80c2c663cb8364f6898662a8379cb25df3ebe719 a129f82339bb933c4d72353c44bb29eb685f3d1e 0 (* +0000) {*'user': 'test'} (glob)
 
 There is a bug in Mercurial where the phase isn't preserved as part of stream clone.
 This means that the pushlog will see everything because all changesets are public.
+This bug has been fixed in versions 4.8+.
 
+#if no-hg48
   $ hg -R clone-obsolete2 log -T '{rev} {node} {phase}\n'
   3 a129f82339bb933c4d72353c44bb29eb685f3d1e public
   2 80c2c663cb8364f6898662a8379cb25df3ebe719 public
   1 ae13d9da6966307c98b60987fb4fedc2e2f29736 public
   0 96ee1d7354c4ad7372047672c36a1f561e3a6a4c public
+
+#else
+  $ hg -R clone-obsolete2 log -T '{rev} {node} {phase}\n'
+  3 a129f82339bb933c4d72353c44bb29eb685f3d1e draft
+  1 ae13d9da6966307c98b60987fb4fedc2e2f29736 draft
+  0 96ee1d7354c4ad7372047672c36a1f561e3a6a4c draft
+
+#endif
 
   $ hg -R clone-obsolete2 --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
   pulling from ssh://user@dummy/$TESTTMP/server
@@ -161,6 +181,7 @@ for hidden changesets should still be fetched.
 
 (This test can be deleted once Mercurial is not buggy.)
 
+#if no-hg48
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
   streaming all changes
   5 files to transfer, 1.19 KB of data
@@ -169,7 +190,16 @@ for hidden changesets should still be fetched.
   no changes found
   1 new obsolescence markers
 
+#else
+  $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
+  streaming all changes
+  10 files to transfer, 1.49 KB of data
+  transferred 1.49 KB in * seconds (* KB/sec) (glob)
+
+#endif
+
   $ hg -R clone-phasehack phase --draft --force -r 0:tip
+  no phases changed (hg48 !)
 
   $ hg -R clone-phasehack --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
   pulling from ssh://user@dummy/$TESTTMP/server
@@ -197,7 +227,8 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
   1 new obsolescence markers
   received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
-  new changesets 96ee1d7354c4:a129f82339bb (?)
+  new changesets 96ee1d7354c4:a129f82339bb (no-hg48 !)
+  new changesets 96ee1d7354c4:a129f82339bb (3 drafts) (hg48 !)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog pull-empty
@@ -207,6 +238,7 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
 Now do a similar test where we simulate an incremental pull after obsolescence has
 been introduced on the server. Here, remote-hidden changesets are known locally.
 
+#if no-hg48
   $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
   streaming all changes
   5 files to transfer, 1.19 KB of data
@@ -214,9 +246,18 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   searching for changes
   no changes found
   1 new obsolescence markers
+
+#else
+  $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
+  streaming all changes
+  10 files to transfer, 1.49 KB of data
+  transferred 1.49 KB in * seconds (* KB/sec) (glob)
+#endif
+
   $ rm incremental-pull/.hg/store/obsstore
   $ hg -R incremental-pull --config extensions.strip= strip -r a129f82339bb --no-backup
   $ hg -R incremental-pull phase --force --draft -r 0:tip
+  no phases changed (hg48 !)
 
   $ hg -R incremental-pull --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
   pulling from ssh://user@dummy/$TESTTMP/server
@@ -229,6 +270,7 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   added 4 pushes
   obsoleted 1 changesets (?)
   new changesets a129f82339bb (?)
+  new changesets a129f82339bb (1 drafts) (hg48 !)
   (run 'hg update' to get a working copy)
 
 We'll apply the pushlog for the locally-known but now-hidden changeset
