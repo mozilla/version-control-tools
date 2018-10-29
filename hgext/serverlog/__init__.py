@@ -196,7 +196,6 @@ from mercurial import (
 from mercurial.hgweb import (
     hgweb_mod,
     hgwebdir_mod,
-    protocol,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
