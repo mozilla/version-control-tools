@@ -26,10 +26,10 @@ futures==3.0.3 \
 idna==2.5 \
     --hash=sha256:cc19709fd6d0cbfed39ea875d29ba6d4e22c0cebc510a76d6302a28385e8bb70
 
-Mercurial==4.6.2 \
-    --hash=sha256:958e9029acaf542f6c4e341e63e17eb8c8c99d4a6d0766ec8403cfe25bf0c4ce \
-    --hash=sha256:57a582baf1e36c4e0a05b0a20c25c8ca1c8704dbeddf9cec7447088834f9de08 \
-    --hash=sha256:1cd04ea0200b3cfad7dfd8f149aca6ac8ac2209c423c27258cf4a1ded8e366af
+Mercurial==4.7.2 \
+    --hash=sha256:c5857460b9e1d1f65ccb94deecb5b103acdafbf4755f473d6d340e102082d65e \
+    --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
+    --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb
 
 # Dependency of bloxtool.
 pyaml==17.10.0 \
