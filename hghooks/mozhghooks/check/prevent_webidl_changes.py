@@ -10,6 +10,14 @@ from mozautomation.commitparser import (
     parse_requal_reviewers,
     is_backout,
 )
+from mozhg.util import import_module
+
+# TRACKING hg47
+stringutil = import_module('mercurial.utils.stringutil')
+if stringutil:
+    email = stringutil.email
+else:
+    email = util.email
 
 from ..checks import (
     PreTxnChangegroupCheck,
@@ -90,7 +98,7 @@ class WebIDLCheck(PreTxnChangegroupCheck):
             return True
 
         # Allow patches authored by peers
-        if is_peer_email(util.email(ctx.user())):
+        if is_peer_email(email(ctx.user())):
             return True
 
         # Categorise files
