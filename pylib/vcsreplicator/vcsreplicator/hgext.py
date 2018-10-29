@@ -59,7 +59,7 @@ with demandimport.deactivated():
 
 base85 = policy.importmod('base85')
 
-testedwith = '4.3 4.4 4.5 4.6'
+testedwith = '4.3 4.4 4.5 4.6 4.7'
 
 cmdtable = {}
 

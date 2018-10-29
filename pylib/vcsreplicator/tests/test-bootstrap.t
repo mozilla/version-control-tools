@@ -281,7 +281,7 @@ will be an indication of a successful bootstrap
 
 Confirm commits replicated to hgweb host
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central log
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/mozilla-central log
   changeset:   1:89e594ce6b79
   tag:         tip
   user:        Test User <someone@example.com>
@@ -294,7 +294,7 @@ Confirm commits replicated to hgweb host
   summary:     initial m-c
   
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/testrepo log
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/testrepo log
   changeset:   0:77538e1ce4be
   tag:         tip
   user:        Test User <someone@example.com>

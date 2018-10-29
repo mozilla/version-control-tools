@@ -91,7 +91,7 @@ Create initial repo content
 Verify pushlog state on hgweb machine
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
   0:77538e1ce4be draft 1 user@example.com
   1:ba1c6c2be69c draft 1 user@example.com
   2:a9e729deb87c draft 1 user@example.com
@@ -159,7 +159,7 @@ Obsolescence markers should have gotten pulled on hgweb mirror
 
 The pushlog should have new push
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
   0:77538e1ce4be draft 1 user@example.com
   1:ba1c6c2be69c draft 1 user@example.com
   2:a9e729deb87c draft 1 user@example.com
@@ -227,7 +227,7 @@ Pushing a changeset then hiding it works
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
   6ddbc9389e710d9b4f3c880d7c99320f9581dbd5 042a67bdbae8a8b4c4b071303ad92484cf1746b0 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
   0:77538e1ce4be draft 1 user@example.com
   1:ba1c6c2be69c draft 1 user@example.com
   2:a9e729deb87c draft 1 user@example.com
@@ -246,7 +246,7 @@ Blowing away the repo on hgweb and re-cloning should retain pushlog and hidden c
   wrote synchronization message into replication log
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
-  $ hgmo exec hgweb0 /var/hg/venv_tools/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'
   0:77538e1ce4be draft 1 user@example.com
   1:ba1c6c2be69c draft 1 user@example.com
   2:a9e729deb87c draft 1 user@example.com
@@ -311,7 +311,8 @@ hgweb advertise marker exchange
   $ http --no-headers "${HGWEB_0_URL}integration/autoland?cmd=capabilities"
   200
   
-  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch streamreqs=generaldelta,revlogv1 bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 httppostargs httpmediatype=0.1rx,0.1tx,0.2tx compression=zstd,zlib pushlog moz-owner
+  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch streamreqs=generaldelta,revlogv1 bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 httppostargs httpmediatype=0.1rx,0.1tx,0.2tx compression=zstd,zlib pushlog moz-owner (no-hg47 !)
+  batch branchmap bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps%0Arev-branch-cache changegroupsubset compression=zstd,zlib getbundle httpheader=6144 httpmediatype=0.1rx,0.1tx,0.2tx httppostargs known lookup moz-owner pushkey pushlog streamreqs=generaldelta,revlogv1 unbundle=HG10GZ,HG10BZ,HG10UN unbundlehash (hg47 !)
 
 Allow this user to send obsolescence markers (since the per-repo hgrc will get replicated
 and take precedence on the mirror, we need to add the allowed user from the replication
@@ -357,7 +358,8 @@ hgweb should still advertise marker exchange
   $ http --no-headers "${HGWEB_0_URL}integration/autoland?cmd=capabilities"
   200
   
-  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch streamreqs=generaldelta,revlogv1 bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 httppostargs httpmediatype=0.1rx,0.1tx,0.2tx compression=zstd,zlib pushlog moz-owner
+  lookup changegroupsubset branchmap pushkey known getbundle unbundlehash batch streamreqs=generaldelta,revlogv1 bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps unbundle=HG10GZ,HG10BZ,HG10UN httpheader=6144 httppostargs httpmediatype=0.1rx,0.1tx,0.2tx compression=zstd,zlib pushlog moz-owner (no-hg47 !)
+  batch branchmap bundle2=HG20%0Abookmarks%0Achangegroup%3D01%2C02%0Adigests%3Dmd5%2Csha1%2Csha512%0Aerror%3Dabort%2Cunsupportedcontent%2Cpushraced%2Cpushkey%0Ahgtagsfnodes%0Alistkeys%0Aobsmarkers%3DV0%2CV1%0Aphases%3Dheads%0Apushkey%0Aremote-changegroup%3Dhttp%2Chttps%0Arev-branch-cache changegroupsubset compression=zstd,zlib getbundle httpheader=6144 httpmediatype=0.1rx,0.1tx,0.2tx httppostargs known lookup moz-owner pushkey pushlog streamreqs=generaldelta,revlogv1 unbundle=HG10GZ,HG10BZ,HG10UN unbundlehash (hg47 !)
 
   $ cd ..
 

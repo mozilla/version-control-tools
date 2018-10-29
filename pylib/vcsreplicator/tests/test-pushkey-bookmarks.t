@@ -89,8 +89,9 @@ Creating a bookmark will write a pushkey message
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
+  exporting bookmark my-bookmark (hg47 !)
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
-  exporting bookmark my-bookmark
+  exporting bookmark my-bookmark (no-hg47 !)
   [1]
 
   $ consumer --dump --partition 2
@@ -139,11 +140,12 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  updating bookmark my-bookmark (hg47 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b593873bfa63c7129e02a21becc299ff0
   remote: recorded changegroup in replication log in \d\.\d+s (re)
-  updating bookmark my-bookmark
+  updating bookmark my-bookmark (no-hg47 !)
 
   $ consumer --dump
   - _created: \d+\.\d+ (re)
@@ -306,8 +308,9 @@ Now test bookmark divergence
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
+  exporting bookmark divergent (hg47 !)
   remote: recorded updates to bookmarks in replication log in \d+\.\d+s (re)
-  exporting bookmark divergent
+  exporting bookmark divergent (no-hg47 !)
   [1]
 
   $ consumer --dump --partition 2
@@ -348,11 +351,12 @@ Now test bookmark divergence
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
   remote: recorded push in pushlog
+  updating bookmark divergent (hg47 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e84fdf206e79496713b3a56eae2e16c490475cc8
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
-  updating bookmark divergent
+  updating bookmark divergent (no-hg47 !)
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
