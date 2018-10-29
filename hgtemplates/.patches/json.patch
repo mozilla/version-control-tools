@@ -76,7 +76,7 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
    }'
  changesetbranch = '{name|utf8|json}'
  changesetbookmark = '{bookmark|utf8|json}'
-@@ -240,3 +279,18 @@ indexentry = '\{
+@@ -240,3 +279,22 @@ indexentry = '\{
    "lastchange": {lastchange|json},
    "labels": {labels|json}
    }'
@@ -94,4 +94,8 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
 +  }'
 +repoinfo = '\{
 +  "group_owner": {groupowner|json}
++  }'
++automationrelevance = '\{
++  "changesets": {changesets|json},
++  "visible": {visible|json}
 +  }'
