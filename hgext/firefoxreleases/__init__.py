@@ -211,6 +211,17 @@ def changesetentry(orig, web, ctx):
     if 'firefox_releases_first' in d and 'firefox_releases_last' in d:
         d['have_first_and_last_firefox_releases'] = True
 
+    # Do some template fixes
+    # TODO build via a generator
+    if 'firefox_releases_first' in d:
+        d['firefox_releases_first'] = templateutil.mappinglist(d['firefox_releases_first'])
+
+    if 'firefox_releases_last' in d:
+        d['firefox_releases_last'] = templateutil.mappinglist(d['firefox_releases_last'])
+
+    if 'firefox_releases_here' in d:
+        d['firefox_releases_here'] = templateutil.mappinglist(d['firefox_releases_here'])
+
     return d
 
 
