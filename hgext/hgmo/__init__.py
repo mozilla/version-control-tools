@@ -96,6 +96,7 @@ from mercurial import (
     scmutil,
     templatefilters,
     templateutil,
+    util,
     wireprotov1server,
 )
 from mercurial.hgweb import (
@@ -534,7 +535,13 @@ def automationrelevancewebcommand(web):
                 if k == 'files':
                     entry['files'] = sorted(ctx.files())
                 elif k == 'allparents':
-                    iterator = v().itermaps(ctx)
+                    # TRACKING hg48
+                    # generic template keyword args needed (context, mapping)
+                    # they are not actually used, so `None, None` is sufficient
+                    if util.versiontuple(n=2) >= (4, 8):
+                        iterator = v(None, None).itermaps(ctx)
+                    else:
+                        iterator = v().itermaps(ctx)
 
                     entry['parents'] = [p['node'] for p in iterator]
                     del entry['allparents']
