@@ -986,7 +986,13 @@ def _checksecurity(ui, cw, hgversion):
         if hg39:
             cw.c.setdefault('hostsecurity', {})
             for k, v in sorted(MODERN_FINGERPRINTS.items()):
-                if porting and k not in cw.c.get('hostfingerprints', {}):
+                old_key = k
+                new_key = '%s:fingerprints' % k
+
+                have_key = (old_key in cw.c.get('hostfingerprints', {})
+                            or new_key in cw.c['hostsecurity'])
+
+                if porting and not have_key:
                     continue
 
                 cw.c['hostsecurity']['%s:fingerprints' % k] = v
