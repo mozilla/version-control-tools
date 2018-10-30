@@ -149,11 +149,12 @@
         group=root
         mode=0750
 
-- name: copy Mercurial source package from local machine
-  copy: src={{ vct }}/extra-files/mercurial-4.5.3+9-1ed250f701ee.tar.gz
-        dest=/var/tmp/pip/mercurial-4.5.3+9-1ed250f701ee.tar.gz
-        owner=root
-        group=root
+# Uncomment and update to use custom Mercurial package.
+#- name: copy Mercurial source package from local machine
+#  copy: src={{ vct }}/extra-files/mercurial-4.5.3+9-1ed250f701ee.tar.gz
+#        dest=/var/tmp/pip/mercurial-4.5.3+9-1ed250f701ee.tar.gz
+#        owner=root
+#        group=root
 
 # We run a lot of our Python out of our virtualenvs because that is how you
 # are supposed to do Python.
