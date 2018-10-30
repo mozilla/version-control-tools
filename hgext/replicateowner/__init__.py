@@ -18,12 +18,11 @@ ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozhg.util import (
-    import_module,
     repo_owner,
 )
 
 minimumhgversion = '4.6'
-testedwith = '4.6 4.7'
+testedwith = '4.6 4.7 4.8'
 
 
 @wireprotov1server.wireprotocommand('mozowner', '', permission='pull')
