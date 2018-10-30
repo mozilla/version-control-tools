@@ -9,7 +9,6 @@ unrelated repository into a sub-directory of another.
 
 from __future__ import absolute_import
 
-import inspect
 import os
 import shlex
 import subprocess
@@ -17,7 +16,7 @@ import subprocess
 from mercurial.i18n import _
 from mercurial.node import bin, hex, short
 from mercurial import (
-    cmdutil,
+    configitems,
     context,
     error,
     exchange,
@@ -29,34 +28,27 @@ from mercurial import (
     store,
     util,
 )
+from mercurial.utils import (
+    dateutil,
+)
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozhg.util import import_module
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
-
-testedwith = '4.1 4.2 4.3 4.4 4.5 4.6 4.7'
+testedwith = '4.7'
 
 cmdtable = {}
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('overlay', 'sourceurl',
-               default=configitems.dynamicdefault)
+configitem('overlay', 'sourceurl',
+           default=configitems.dynamicdefault)
+
 
 # TRACKING hg46
 if util.safehasattr(revlog, 'parsemeta'):
@@ -80,7 +72,7 @@ def _ctx_summary(ctx):
         '',
         _('changeset: %s') % ctx.hex(),
         _('user:      %s') % ctx.user(),
-        _('date:      %s') % datestr(ctx.date()),
+        _('date:      %s') % dateutil.datestr(ctx.date()),
         _('summary:   %s') % ctx.description().splitlines()[0],
     ]
 
@@ -249,21 +241,10 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
         if renamed:
             copied = '%s%s' % (prefix, renamed[0])
 
-        # TRACKING hg45 Mercurial 4.5 renamed memctx to changectx and made
-        # the argument positional instead of named.
-        spec = inspect.getargspec(context.memfilectx.__init__)
-
-        if 'changectx' in spec.args:
-            return context.memfilectx(repo, memctx, path, data,
-                                      islink=islink,
-                                      isexec=isexec,
-                                      copied=copied)
-        else:
-            return context.memfilectx(repo, path, data,
-                                      islink=islink,
-                                      isexec=isexec,
-                                      copied=copied,
-                                      memctx=memctx)
+        return context.memfilectx(repo, memctx, path, data,
+                                  islink=islink,
+                                  isexec=isexec,
+                                  copied=copied)
 
     parents = [destctx.node(), None]
     files = ['%s%s' % (prefix, f) for f in sourcectx.files()]
