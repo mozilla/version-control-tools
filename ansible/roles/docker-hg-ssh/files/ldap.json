@@ -1,6 +1,7 @@
 {
   "username": "cn=admin,dc=mozilla",
   "password": "password",
+  "starttls": false,
   "url": "%url%",
   "write_url": "%writeurl%"
 }
