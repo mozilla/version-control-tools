@@ -9,14 +9,12 @@ import urllib
 
 from mercurial.i18n import _
 from mercurial import (
-    cmdutil,
     commands,
     demandimport,
     encoding,
     error,
     extensions,
     registrar,
-    util,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
@@ -27,7 +25,7 @@ with demandimport.deactivated():
     import requests  # noqa
 
 
-testedwith = '4.4 4.5 4.6 4.7'
+testedwith = '4.4 4.5 4.6 4.7 4.8'
 
 cmdtable = {}
 
