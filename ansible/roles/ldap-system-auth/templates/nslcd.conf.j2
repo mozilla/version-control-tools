@@ -1,4 +1,9 @@
 uri {{ ldap_uri | mandatory }}
+
+{% if ldap_starttls | mandatory -%}
+ssl start_tls
+{%- endif %}
+
 base {{ basedn | mandatory }}
 binddn {{ bind_dn | mandatory }}
 bindpw {{ bind_pw | mandatory }}
