@@ -121,7 +121,7 @@ from mozhg.util import (
 from mercurial.wireprotoserver import httpv1protocolhandler as webproto
 
 minimumhgversion = '4.7'
-testedwith = '4.7'
+testedwith = '4.7 4.8'
 
 cmdtable = {}
 
@@ -733,7 +733,7 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     if opts['pipemode']:
         data = json.loads(ui.fin.read())
 
-        repo = hg.repository(ui, path=data['repo'])
+        repo = hg.repository(ui, path=bytes(data['repo']))
         ctx = scmutil.revsingle(repo, bytes(data['node']))
 
         paths = data['paths']
