@@ -94,6 +94,7 @@
         bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}",
         bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}",
         ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}",
+        ldap_starttls: "{{ (ldap_config.content | b64decode | from_json).starttls | default(True) }}",
         hgweb_hosts: "{{ groups['hgweb-prod'] }}",
         pulse_user: "{{ (pulse_config.content | b64decode | from_json).user }}",
         pulse_password: "{{ (pulse_config.content | b64decode | from_json).password }}",
