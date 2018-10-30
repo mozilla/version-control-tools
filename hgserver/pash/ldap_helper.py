@@ -19,6 +19,10 @@ def ldap_connect(ldap_url):
     try:
         settings = get_ldap_settings()
         ldap_conn = ldap.initialize(ldap_url)
+
+        if settings.get('starttls', True):
+            ldap_conn.start_tls_s()
+
         ldap_conn.simple_bind_s(settings['username'], settings['password'])
         return ldap_conn
     except Exception:
