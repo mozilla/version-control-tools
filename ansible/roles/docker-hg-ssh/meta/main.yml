@@ -9,6 +9,7 @@ dependencies:
   - {
       role: hg-ssh,
       ldap_uri: 'ldap://ldap:389/',
+      ldap_starttls: false,
       sshd_hg_port: 22,
       hgweb_hosts: [],
       kafka_broker_id: 1024,
@@ -18,5 +19,5 @@ dependencies:
       sns_endpoint_url: 'http://localhost:5002',
       awsevents_access_key_id: docker_sns_access_key,
       awsevents_secret_access_key: docker_sns_secret_access_key,
-      zk_servers: { localhost: dummy }
+      zk_servers: { localhost: dummy },
     }
