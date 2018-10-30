@@ -96,7 +96,6 @@ from mercurial import (
     scmutil,
     templatefilters,
     templateutil,
-    util,
     wireprotov1server,
 )
 from mercurial.hgweb import (
@@ -120,8 +119,8 @@ from mozhg.util import (
 
 from mercurial.wireprotoserver import httpv1protocolhandler as webproto
 
-minimumhgversion = '4.6'
-testedwith = '4.6 4.7'
+minimumhgversion = '4.7'
+testedwith = '4.7'
 
 cmdtable = {}
 
@@ -535,11 +534,7 @@ def automationrelevancewebcommand(web):
                 if k == 'files':
                     entry['files'] = sorted(ctx.files())
                 elif k == 'allparents':
-                    # TRACKING hg46
-                    if util.safehasattr(web, 'sendtemplate'):
-                        iterator = v().itermaps(ctx)
-                    else:
-                        iterator = v()
+                    iterator = v().itermaps(ctx)
 
                     entry['parents'] = [p['node'] for p in iterator]
                     del entry['allparents']
