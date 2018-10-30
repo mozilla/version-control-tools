@@ -49,7 +49,7 @@ except ImportError:
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7'
+testedwith = '3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8'
 minimumhgversion = '3.7'
 
 cmdtable = {}
@@ -94,6 +94,7 @@ def supported_hg():
         (4, 5),
         (4, 6),
         (4, 7),
+        (4, 8),
     )
 
 
@@ -680,7 +681,12 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             raise error.Abort('sparse profile %s does not exist at revision '
                               '%s' % (sparse_profile, checkoutrevision))
 
-        old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread('sparse'))
+        # TRACKING hg48 - parseconfig takes `action` param
+        if util.versiontuple(n=2) >= (4, 8):
+            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread('sparse'), 'sparse')
+        else:
+            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread('sparse'))
+
         old_includes, old_excludes, old_profiles = old_config
 
         if old_profiles == {sparse_profile} and not old_includes and not \
