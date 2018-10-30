@@ -20,7 +20,6 @@ from mercurial import (
     context,
     error,
     exchange,
-    filelog,
     hg,
     registrar,
     revlog,
@@ -37,7 +36,8 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
 from mozhg.util import import_module
 
-testedwith = '4.7'
+testedwith = '4.7 4.8'
+minimumhgversion = '4.7'
 
 cmdtable = {}
 
@@ -49,19 +49,13 @@ configitem = registrar.configitem(configtable)
 configitem('overlay', 'sourceurl',
            default=configitems.dynamicdefault)
 
-
-# TRACKING hg46
-if util.safehasattr(revlog, 'parsemeta'):
+# TRACKING hg48
+# parsemeta is now in storageutil
+storageutil = import_module('mercurial.utils.storageutil')
+if util.safehasattr(storageutil, 'parsemeta'):
+    parsemeta = storageutil.parsemeta
+else:
     parsemeta = revlog.parsemeta
-else:
-    parsemeta = filelog.parsemeta
-
-# TRACKING hg47
-dateutil = import_module('mercurial.utils.dateutil')
-if dateutil:
-    datestr = dateutil.datestr
-else:
-    datestr = util.datestr
 
 REVISION_KEY = 'subtree_revision'
 SOURCE_KEY = 'subtree_source'
