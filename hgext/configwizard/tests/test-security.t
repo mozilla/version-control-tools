@@ -123,3 +123,22 @@ Modern Mercurial doesn't need to pin fingerprints
 
 
 #endif
+
+#if hg39
+Old fingerprint in [hostsecurity] is updated
+
+  $ cat > .hgrc << EOF
+  > [hostsecurity]
+  > hg.mozilla.org:fingerprints = sha256:aa:bb:cc:dd
+  > EOF
+
+  $ hg --config configwizard.steps=security,configchange configwizard
+  This wizard will guide you through configuring Mercurial for an optimal
+  experience contributing to Mozilla projects.
+  
+  The wizard makes no changes without your permission.
+  
+  To begin, press the enter/return key.
+   <RETURN>
+
+#endif
