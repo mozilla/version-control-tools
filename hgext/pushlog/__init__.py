@@ -23,35 +23,24 @@ from mercurial import (
     registrar,
     revset,
     util,
+    wireprotov1server as wireproto,
 )
 from mercurial.hgweb import (
     webutil,
+)
+from mercurial.utils import (
+    dateutil,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-from mozhg.util import import_module
-
-# TRACKING hg46
-wireproto = import_module('mercurial.wireprotov1server')
-if not wireproto:
-    wireproto = import_module('mercurial.wireproto')
-
-# TRACKING hg47
-dateutil = import_module('mercurial.utils.dateutil')
-if dateutil:
-    makedate = dateutil.makedate
-    matchdate = dateutil.matchdate
-else:
-    makedate = util.makedate
-    matchdate = util.matchdate
 
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
-minimumhgversion = '4.6'
-testedwith = '4.6 4.7 4.8'
+minimumhgversion = '4.7'
+testedwith = '4.7 4.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
@@ -93,7 +82,7 @@ def capabilities(orig, repo, proto):
     caps.append('pushlog')
     return caps
 
-@wireproto.wireprotocommand('pushlog', 'firstpush')
+@wireproto.wireprotocommand('pushlog', 'firstpush', permission='pull')
 def pushlogwireproto(repo, proto, firstpush):
     """Return pushlog data from a start offset.
 
@@ -127,18 +116,6 @@ def pushlogwireproto(repo, proto, firstpush):
     except Exception as e:
         return '\n'.join(['0', str(e)])
 
-
-# TRACKING hg46
-# 4.5.3 added wireproto.permissions.
-# 4.6 removed it and factored permissions into @wireprotocommand. We bypass
-# @wireprotocommand for now and set the permission on the command entry.
-if util.safehasattr(wireproto, 'permissions'):
-    wireproto.permissions['pushlog'] = 'pull'
-else:
-    try:
-        wireproto.commands['pushlog'].permission = 'pull'
-    except AttributeError:
-        pass
 
 def exchangepullpushlog(orig, pullop):
     """This is called during pull to fetch pushlog data.
@@ -215,7 +192,7 @@ def addpushmetadata(repo, ctx, d):
     if push:
         d['pushid'] = push.pushid
         d['pushuser'] = push.user
-        d['pushdate'] = makedate(push.when)
+        d['pushdate'] = dateutil.makedate(push.when)
         d['pushnodes'] = push.nodes
         d['pushhead'] = push.nodes[-1]
 
@@ -927,7 +904,7 @@ def revset_pushdate(repo, subset, x):
     l = revset.getargs(x, 1, 1, 'pushdate requires one argument')
 
     ds = revset.getstring(l[0], 'pushdate requires a string argument')
-    dm = matchdate(ds)
+    dm = dateutil.matchdate(ds)
 
     def getrevs():
         to_rev = repo.changelog.rev
@@ -1073,7 +1050,7 @@ def template_pushdate(context, mapping):
     cache = context.resource(mapping, 'cache')
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
-    return makedate(when) if when else None
+    return dateutil.makedate(when) if when else None
 
 
 @templatekeyword('pushbasenode', requires={'repo', 'context', 'cache'})

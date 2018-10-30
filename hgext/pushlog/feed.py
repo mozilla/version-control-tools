@@ -19,7 +19,6 @@ from mercurial import (
     scmutil,
     templatefilters,
     templateutil,
-    util,
 )
 
 sys.path.append(os.path.dirname(__file__))
@@ -29,8 +28,8 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.6 4.7 4.8'
-minimumhgversion = '4.6'
+testedwith = '4.7 4.8'
+minimumhgversion = '4.7'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
@@ -360,12 +359,7 @@ def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushco
         else []
     )
 
-    # TRACKING hg47
-    # Call the function with whichever signature is correct
-    if util.versiontuple(n=2) >= (4, 7):
-        filediffs = webutil.listfilediffs(ctxfiles, node, len(ctxfiles))
-    else:
-        filediffs = webutil.listfilediffs(web.tmpl, ctxfiles, node, len(ctxfiles))
+    filediffs = webutil.listfilediffs(ctxfiles, node, len(ctxfiles))
 
     return {
         "author": ctx.user(),
