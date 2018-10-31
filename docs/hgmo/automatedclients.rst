@@ -83,7 +83,7 @@ It is common for clients to want to know when a change occurs on
 hg.mozilla.org so that they can do something in reaction to it.
 
 There are two mechanisms for determining when changes occur:
-:ref:`subscription-based notifications <hgmo_notifications>` and
+:ref:`subscription-based notifications <hgmo_notification>` and
 polling HTTP-based APIs on hg.mozilla.org.
 
 For the push-based notifications, clients can subscribe to e.g.
