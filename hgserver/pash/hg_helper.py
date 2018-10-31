@@ -164,7 +164,10 @@ GROUP_REPOS = {
     },
     'scm_l10n': {
         'Localization Repos (releases/l10n/*, others)',
-    }
+    },
+    'scm_versioncontrol': {
+        'Version Control Tools (hgcustom/version-control-tools)'
+    },
 }
 
 
