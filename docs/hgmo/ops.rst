@@ -476,7 +476,7 @@ the load on the hg.mozilla.org servers.
 This service only runs on the master server.
 
 pushdataaggregator-pending.service
---------------------------
+----------------------------------
 
 This systemd service monitors the state of the replication mirrors and
 copies fully acknowledged/applied messages into a new Kafka topic
