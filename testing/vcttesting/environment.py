@@ -192,6 +192,21 @@ def docker_client():
     return d if d.is_alive() else None
 
 
+def create_docs():
+    """Create environment used for building docs."""
+    venv = create_virtualenv('docs')
+    process_pip_requirements(venv, 'docs-requirements.txt')
+
+    install_editable(venv, 'hghooks')
+    install_editable(venv, 'pylib/Bugsy')
+    install_editable(venv, 'pylib/mozhg')
+    install_editable(venv, 'pylib/mozhginfo')
+    install_editable(venv, 'pylib/mozautomation')
+    install_editable(venv, 'testing')
+
+    return venv
+
+
 def create_hgdev(docker_bmo=False):
     """Create an environment used for hacking on Mercurial extensions."""
     venv = create_virtualenv('hgdev')

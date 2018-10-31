@@ -12,6 +12,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(HERE, 'testing'))
 
 from vcttesting.environment import (
+    create_docs,
     create_hgdev,
     create_vcssync,
     create_xchannel,
@@ -21,6 +22,9 @@ from vcttesting.environment import (
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(title='environment', dest='environment')
+
+    sp = subparsers.add_parser('docs',
+                               help='Generate documentation')
 
     sp = subparsers.add_parser('hgdev',
                                help='Mercurial hooks and extensions')
@@ -39,7 +43,9 @@ def main():
 
     env = args.environment
 
-    if env == 'hgdev':
+    if env == 'docs':
+        info = create_docs()
+    elif env == 'hgdev':
         info = create_hgdev(docker_bmo=args.docker_bmo)
     elif env == 'vcssync':
         info = create_vcssync()
