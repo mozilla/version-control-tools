@@ -47,11 +47,20 @@ Table of Contents
    vcssync/index
    cross-channel-l10n/index
 
+Python Module Documentation
+===========================
+
+* :ref:`All Python Modules <modindex>`
+
+.. toctree::
+
+   mozautomation/mozautomation
+   mozhg/mozhg
+   vcttesting/modules
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
