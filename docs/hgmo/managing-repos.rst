@@ -134,7 +134,7 @@ changesets evolve over time and allows old, obsoleted commits to disappear
 from the repository.
 
 Obsolescence is an aspect of
-:ref:`changeset evolution <http://evolution.experimentalworks.net/doc/>`.
+`changeset evolution <http://evolution.experimentalworks.net/doc/>`_.
 
 There are downsides to enabling obsolescence:
 
