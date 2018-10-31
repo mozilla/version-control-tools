@@ -72,9 +72,9 @@ Once you have a changeset (or several!) that you'd like to get checked into
 a Mozilla repository, you'll need to share them with others in order to get
 them reviewed and landed.
 
-When working with mozilla-central, pushing your changesets to MozReview is
-the primary method of sharing. See the
-:ref:`MozReview documentation <mozreview>` for more information.
+When working with mozilla-central, pushing your changesets to user
+repositories is the primary method of sharing. See
+:ref:`hgmo_managing_repos` for more information about user repositories.
 
 Collaborating / Sharing Bookmarks
 =================================
