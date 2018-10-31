@@ -91,6 +91,8 @@ LimitRequestFields 1000
     # Enable HSTS unless for HG clients.
     <If "-z env('HG_PROTOCOL')">
         Header set Strict-Transport-Security max-age=31536000
+        # Disable content sniffing
+        Header set X-Content-Type-Options "nosniff"
     </If>
 
     # Reftest analyzer needs a lot of exceptions to work. Bug 1200501
