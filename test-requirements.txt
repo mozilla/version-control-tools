@@ -1,4 +1,3 @@
--r docs-requirements.txt
 -r deploy-requirements.txt
 
 amqp==1.4.8 \
