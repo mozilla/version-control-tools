@@ -3,3 +3,7 @@ sphinxcontrib-nwdiag==0.9.5
 sphinxcontrib-seqdiag==0.8.5
 Sphinx==1.3.3
 sphinx-rtd-theme==0.1.9
+
+# blockdiag has a dependency on setuptools, which pip-compile doesn't
+# include by default. So we need to list it here.
+setuptools
