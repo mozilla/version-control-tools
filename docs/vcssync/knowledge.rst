@@ -214,7 +214,7 @@ In many cases ``hg convert`` for performing an unidirectional conversion of
 Git to Mercurial *just works* and is arguably the tool best suited for the
 job (on the grounds that Mercurial itself knows the best way for data to
 be imported into it). That being said, we've run into a few scenarios where
-``hg convert`` on its own isn't sufficient::
+``hg convert`` on its own isn't sufficient:
 
 Removing merges from history
    We sometimes want to remove merge commits from Git history as part of

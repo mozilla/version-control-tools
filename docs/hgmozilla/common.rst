@@ -75,7 +75,7 @@ backwards compatibility guarantees of Mercurial say that the version of
 Mercurial that created a repo should always be able to read from it, even
 if common repo operations are performed by a newer version.
 
-You have 2 options for upgrading repository storage::
+You have 2 options for upgrading repository storage:
 
 1. Re-clone the repo
 2. Run ``hg debugupgraderepo``
