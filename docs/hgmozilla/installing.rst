@@ -38,7 +38,10 @@ latest stable release is always listed at
    could result in arbitrary client-side code execution when pulling
    from repositories.
 
-   Version 4.6.1 or newer should always be used.
+   Mercurial versions before 4.7.2 have a possible out-of-bounds memory
+   access that could result in security issues.
+
+   Version 4.7.2 or newer should always be used.
 
 Mercurial makes a major *X.Y* release every three months, typically around
 the first of the month. Release months are February, May, August, and
