@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import datetime
 import os
 import sys
 
@@ -26,7 +27,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'Mozilla Version Control Tools'
-copyright = u'2015, Mozilla'
+
+now = datetime.datetime.utcnow()
+copyright = u'%d, Mozilla' % now.year
 
 version = '0'
 release = '0'
