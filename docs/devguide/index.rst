@@ -11,6 +11,7 @@ come to the right place!
    :maxdepth: 2
 
    contributing
+   docs
    environment
    testing
    jenkins
