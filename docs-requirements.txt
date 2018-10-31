@@ -5,23 +5,28 @@
 #    pip-compile --generate-hashes --output-file docs-requirements.txt docs-requirements.in
 #
 alabaster==0.7.3 \
-    --hash=sha256:0703c1ea5a6af0bb6d0cec24708301334949d56ebc7f95c64028d9c66f9d8d5d
+    --hash=sha256:0703c1ea5a6af0bb6d0cec24708301334949d56ebc7f95c64028d9c66f9d8d5d \
+    # via sphinx
 babel==1.3 \
-    --hash=sha256:9f02d0357184de1f093c10012b52e7454a1008be6a5c185ab7a3307aceb1d12e
+    --hash=sha256:9f02d0357184de1f093c10012b52e7454a1008be6a5c185ab7a3307aceb1d12e \
+    # via sphinx
 blockdiag==1.5.3 \
     --hash=sha256:253657d90c00cef1adaca8385c7074fe1c05cae2786dd4e1c4b333762fbf6185 \
     --hash=sha256:5ea3501fca0ca40fbacccc6f4ca177750e4b610009e021faa4868c0f6480ae8b \
     # via nwdiag, seqdiag, sphinxcontrib-blockdiag, sphinxcontrib-nwdiag, sphinxcontrib-seqdiag
 docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa \
-    --hash=sha256:dcebd4928112631626f4c4d0df59787c748404e66dda952110030ea883d3b8cd
+    --hash=sha256:dcebd4928112631626f4c4d0df59787c748404e66dda952110030ea883d3b8cd \
+    # via sphinx
 funcparserlib==0.3.6 \
     --hash=sha256:b7992eac1a3eb97b3d91faa342bfda0729e990bd8a43774c1592c091e563c91d \
     # via blockdiag
 jinja2==2.7.3 \
-    --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb
+    --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb \
+    # via sphinx
 markupsafe==0.23 \
-    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
+    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3 \
+    # via jinja2
 nwdiag==1.0.4 \
     --hash=sha256:002565875559789a2dfc5f578c07abdf44269c3f7cdf78d4809bdc4bdc2213fa \
     --hash=sha256:dc001375fb0fd3ad14aada34d3b563ca52a03c31f58d6eac0b651a5fe1da0748 \
@@ -42,12 +47,12 @@ pillow==2.7.0 \
     --hash=sha256:d75388537a4b550418c8e0c5b35fd8d1a7cf8658f8119a2ed2ad5b45e16dce92 \
     --hash=sha256:e867d1bf02a53e05aa6e57261f8dbdd83cbfdbdeb1531c205952ff52b16f5d16 \
     --hash=sha256:ec1ca32b0dacbf8f81e698f1616c89e841dc566c2236805cd108407bf664e306 \
-    --hash=sha256:f2f46ccd499cb433c32ce136fc096f858deb5c9129d64772000a94fc57af1a77
-pillowfight==0.2 \
-    --hash=sha256:15bce1925a3d66940ceb9a33c3c55de8d95462ce136c4d46e8673f2919b401d6
+    --hash=sha256:f2f46ccd499cb433c32ce136fc096f858deb5c9129d64772000a94fc57af1a77 \
+    # via blockdiag
 pygments==2.1.1 \
     --hash=sha256:05aee25c433d6155defbfbcb6c2e2b0ebf29d28138604867b62a304bd6bbb41d \
-    --hash=sha256:2df7d9a85b56e54c7c021dc98fc877bd216ead652c10da170779c004fb59c01b
+    --hash=sha256:2df7d9a85b56e54c7c021dc98fc877bd216ead652c10da170779c004fb59c01b \
+    # via sphinx
 pytz==2018.4 \
     --hash=sha256:65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555 \
     --hash=sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749 \
@@ -58,9 +63,11 @@ seqdiag==0.9.5 \
     # via sphinxcontrib-seqdiag
 six==1.10.0 \
     --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
-    --hash=sha256:105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a
+    --hash=sha256:105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a \
+    # via sphinx
 snowballstemmer==1.2.0 \
-    --hash=sha256:6d54f350e7a0e48903a4e3b6b2cabd1b43e23765fbc975065402893692954191
+    --hash=sha256:6d54f350e7a0e48903a4e3b6b2cabd1b43e23765fbc975065402893692954191 \
+    # via sphinx
 sphinx-rtd-theme==0.1.9 \
     --hash=sha256:273846f8aacac32bf9542365a593b495b68d8035c2e382c9ccedcac387c9a0a1 \
     --hash=sha256:3c38d037713bd78043486eea5bf771d71ed697ec25c09e16f49e44887f7fe184 \
