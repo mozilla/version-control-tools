@@ -59,6 +59,6 @@ Development Info
 
 Please
 `file bugs and feature requests <https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org>`_
-against the ``hg.mozilla.org` Bugzilla component.
+against the ``hg.mozilla.org`` Bugzilla component.
 
 For real time support, make noise in ``#vcs`` on ``irc.mozilla.org``.
