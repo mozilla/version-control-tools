@@ -4,14 +4,14 @@
 Configuring Authentication
 ==========================
 
-.. _auth_ssh:
-
 .. caution::
    This section is only for people who already have push access to
    Mozilla's Mercurial repository.
 
    If you don't have push access, or if you aren't sure what that is,
    you can skip this section.
+
+.. _auth_ssh:
 
 SSH Configuration
 =================
