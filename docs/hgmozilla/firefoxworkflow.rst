@@ -64,10 +64,6 @@ Push your changes to MozReview to initiate code review::
 
    $ hg push review
 
-.. important::
-
-   We assume you've followed the :ref:`mozreview_user` to configure
-   MozReview.
 
 OK. Progress on that feature is blocked waiting on review. It could
 take a while for that to happen. Let's start working on something else. We
