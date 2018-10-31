@@ -30,7 +30,7 @@ Modern Mercurial doesn't need to pin fingerprints
   +++ hgrc.new
   @@ -1,1 +1,4 @@
   +[hostfingerprints]
-  +hg.mozilla.org = 73:7f:ef:ab:68:0f:49:3f:88:91:f0:b7:06:69:fd:8f:f2:55:c9:56
+  +hg.mozilla.org = 1c:a5:7d:a1:28:db:78:f6:52:4d:c0:e6:38:9b:08:43:ec:1f:ef:64
   +bitbucket.org = 3f:d3:c5:17:23:3c:cd:f5:2d:17:76:06:93:7e:ee:97:42:21:14:aa
   +bugzilla.mozilla.org = 7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17
 
@@ -55,7 +55,7 @@ Modern Mercurial doesn't need to pin fingerprints
   +++ hgrc.new
   @@ -1,1 +1,4 @@
   +[hostsecurity]
-  +hg.mozilla.org:fingerprints = sha256:8e:ad:f7:6a:eb:44:06:15:ed:f3:e4:69:a6:64:60:37:2d:ff:98:88:37:bf:d7:b8:40:84:01:48:9c:26:ce:d9
+  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   +bitbucket.org:fingerprints = sha256:4e:65:3e:76:0f:81:59:85:5b:50:06:0c:c2:4d:3c:56:53:8b:83:3e:9b:fa:55:26:98:9a:ca:e2:25:03:92:47
   +bugzilla.mozilla.org:fingerprints = sha256:95:BA:0F:F2:C4:28:75:9D:B5:DB:4A:50:5F:29:46:A3:A9:4E:1B:56:A5:AE:10:50:C3:DD:3A:AC:73:BF:4A:D9
 
@@ -86,7 +86,7 @@ Modern Mercurial doesn't need to pin fingerprints
   @@ -1,2 +1,2 @@
    [hostfingerprints]
   -hg.mozilla.org = aa:bb:cc:dd
-  +hg.mozilla.org = 73:7f:ef:ab:68:0f:49:3f:88:91:f0:b7:06:69:fd:8f:f2:55:c9:56
+  +hg.mozilla.org = 1c:a5:7d:a1:28:db:78:f6:52:4d:c0:e6:38:9b:08:43:ec:1f:ef:64
   
   Write changes to hgrc file (Yn)?  y
 
@@ -117,7 +117,7 @@ Modern Mercurial doesn't need to pin fingerprints
   -[hostfingerprints]
   -hg.mozilla.org = aa:bb:cc:dd
   +[hostsecurity]
-  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48, sha256:8e:ad:f7:6a:eb:44:06:15:ed:f3:e4:69:a6:64:60:37:2d:ff:98:88:37:bf:d7:b8:40:84:01:48:9c:26:ce:d9
+  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   
   Write changes to hgrc file (Yn)?  y
 
@@ -147,7 +147,7 @@ Old fingerprint in [hostsecurity] is updated
   @@ -1,2 +1,2 @@
    [hostsecurity]
   -hg.mozilla.org:fingerprints = sha256:aa:bb:cc:dd
-  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48, sha256:8e:ad:f7:6a:eb:44:06:15:ed:f3:e4:69:a6:64:60:37:2d:ff:98:88:37:bf:d7:b8:40:84:01:48:9c:26:ce:d9
+  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   
   Write changes to hgrc file (Yn)?  y
 
