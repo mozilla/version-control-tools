@@ -4,9 +4,9 @@
 #
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-web/files/requirements-replication.txt ansible/roles/hg-web/files/requirements-replication.in
 #
-cbor2==4.1.0 \
-    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0 \
-    --hash=sha256:a48a1a8fa6bc51b271db63c9605de31f957396793c21332972697efd7800372c
+cbor2==4.1.1 \
+    --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
+    --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
 futures==3.0.5 \
     --hash=sha256:0542525145d5afc984c88f914a0c85c77527f65946617edb5274f72406f981df \
     --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
