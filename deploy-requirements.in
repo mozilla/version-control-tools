@@ -4,4 +4,3 @@ ansible==1.9.0.1
 boto3==1.4.1
 mach==0.5.1
 Mercurial==4.7.2
-setuptools==34.0.1
