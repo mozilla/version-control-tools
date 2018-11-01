@@ -6,16 +6,20 @@
 #
 ansible==1.9.0.1 \
     --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
-blessings==1.6 \
-    --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007 \
+blessings==1.7 \
+    --hash=sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d \
+    --hash=sha256:b1fdd7e7a675295630f9ae71527a8ebc10bfefa236b3d6aa4932ee4462c17ba3 \
+    --hash=sha256:caad5211e7ba5afe04367cdd4cfc68fa886e2e08f6f35e76b7387d2109ccea6e \
     # via mach
 boto3==1.4.1 \
     --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
 botocore==1.4.78 \
     --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7 \
     # via boto3, s3transfer
-docutils==0.12 \
-    --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa \
+docutils==0.14 \
+    --hash=sha256:02aec4bd92ab067f6ff27a38a38a41173bf01bed8f89157768c1573f53e474a6 \
+    --hash=sha256:51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274 \
+    --hash=sha256:7a4bd47eaf6596e1295ecb11361139febe29b084a87bf005bf899f9a42edc3c6 \
     # via botocore
 ecdsa==0.13 \
     --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c \
@@ -26,8 +30,9 @@ futures==3.0.5 \
 jinja2==2.7.3 \
     --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb \
     # via ansible
-jmespath==0.9.0 \
-    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815 \
+jmespath==0.9.3 \
+    --hash=sha256:6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64 \
+    --hash=sha256:f11b4461f425740a1d908e9a3f7365c3d2e569f6ca68a2ff8bc5bcd9676edd63 \
     # via boto3, botocore
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
@@ -38,14 +43,17 @@ mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
     --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
     --hash=sha256:c5857460b9e1d1f65ccb94deecb5b103acdafbf4755f473d6d340e102082d65e
-mozfile==1.1 \
-    --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e \
+mozfile==2.0.0 \
+    --hash=sha256:22a43f3bc320c3bda27e54b293c23a51660f4a00ec6959ab70ca6136d702f578 \
+    --hash=sha256:7355643fca705f43d9412d444fb59588fbbd25f0d1e7592b9482f84e3d23bc8e \
     # via mach, mozinfo
-mozinfo==0.7 \
-    --hash=sha256:d27f75b668614f28df2e61b8aa4beb6f68f3c9936fc9139fae755728f2b4844a \
+mozinfo==1.0.0 \
+    --hash=sha256:50c0ec524b21260749a103db8e8405716e4027b580a18cea1574d2424789bbe2 \
+    --hash=sha256:d5f886cbabe3266f061210076fd8a9be312580afc5efe62be10efbb9d087726e \
     # via mozprocess
-mozprocess==0.22 \
-    --hash=sha256:2d56e015a3594f06130e8c015f7ca87f3f8d83d9c4bf54588f077ce9bad9a08b \
+mozprocess==0.26 \
+    --hash=sha256:9f3d533439f7721c90547bee0ecdf421c838e5976673430f6ea37db7a789b363 \
+    --hash=sha256:9f471c45bee9ff14e936c6ee216a6cc4941223659c01fa626bce628001d8485c \
     # via mach
 paramiko==1.16.0 \
     --hash=sha256:4ea4b9dd79beabd0301277a26d5e8b54ab8f41ed12414a35f1e00ae08cf06127 \
@@ -53,16 +61,27 @@ paramiko==1.16.0 \
 pycrypto==2.6.1 \
     --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c \
     # via ansible, paramiko
-python-dateutil==2.5.3 \
-    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527 \
+python-dateutil==2.7.5 \
+    --hash=sha256:063df5763652e21de43de7d9e00ccf239f953a832941e37be541614732cdfc93 \
+    --hash=sha256:88f9287c0174266bb0d8cedd395cfba9c58e87e5ad86b2ce58859bc11be3cf02 \
     # via botocore
-pyyaml==3.12 \
-    --hash=sha256:592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab \
-    --hash=sha256:5ac82e411044fb129bae5cfbeb3ba626acb2af31a8d17d175004b70862a741a7 \
+pyyaml==3.13 \
+    --hash=sha256:3d7da3009c0f3e783b2c873687652d83b1bbfd5c88e9813fb7e5b03c0dd3108b \
+    --hash=sha256:3ef3092145e9b70e3ddd2c7ad59bdd0252a94dfe3949721633e41344de00a6bf \
+    --hash=sha256:40c71b8e076d0550b2e6380bada1f1cd1017b882f7e16f09a65be98e017f211a \
+    --hash=sha256:558dd60b890ba8fd982e05941927a3911dc409a63dcb8b634feaa0cda69330d3 \
+    --hash=sha256:a7c28b45d9f99102fa092bb213aa12e0aaf9a6a1f5e395d36166639c1f96c3a1 \
+    --hash=sha256:aa7dd4a6a427aed7df6fb7f08a580d68d9b118d90310374716ae90b710280af1 \
+    --hash=sha256:bc558586e6045763782014934bfaf39d48b8ae85a2713117d16c39864085c613 \
+    --hash=sha256:d46d7982b62e0729ad0175a9bc7e10a566fc07b224d2c79fafb5e032727eaa04 \
+    --hash=sha256:d5eef459e30b09f5a098b9cea68bebfeb268697f78d647bd255a085371ac7f3f \
+    --hash=sha256:e01d3203230e1786cd91ccfdc8f8454c8069c91bee3962ad93b87a4b2860f537 \
+    --hash=sha256:e170a9e6fcfd19021dd29845af83bb79236068bf5fd4df3327c1be18182b2531 \
     # via ansible
 s3transfer==0.1.9 \
     --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc \
     # via boto3
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
-    # via python-dateutil
+six==1.11.0 \
+    --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
+    --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
+    # via blessings, mozfile, python-dateutil
