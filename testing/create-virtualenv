@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 mkdir -p ${VENV}
 
 VIRTUALENV_VERSION=15.1.0
