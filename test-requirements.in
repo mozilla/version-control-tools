@@ -1,18 +1,49 @@
 -r deploy-requirements.in
 
+# Used by docker.py.
 backports.lzma
+
+# Used by vcsreplicator.
 cbor2
+
+# So we can obtain code coverage.
 coverage
+
+# Used by docker.py.
 docker==2.5.1
+
+# For code linting.
 flake8
+
+# Used by vcsreplicator.
 kafka-python==1.4.2
+
+# Used by Pulse/RabbitMQ interactions.
 kombu==3.0.30
+
+# Used by ansible plugin.
 lockfile
+
+# Used by docker.py.
 mechanize
+
+# Used by hgweb.
 mozbuild==0.2
+
+# Used for testing.
 nose
+
+# Used for testing.
 pytest
+
+# Used in a variety of places.
 python-hglib
+
+# Needed for tests using LDAP.
 python-ldap
+
+# Used in a variety of places.
 requests==2.10.0
+
+# Used for some Python unit tests.
 responses
