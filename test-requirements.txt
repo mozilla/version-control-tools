@@ -4,8 +4,9 @@
 #
 #    pip-compile --generate-hashes --output-file test-requirements.txt test-requirements.in
 #
-amqp==1.4.8 \
-    --hash=sha256:94d2a68227e7984bd40f5f71c6839730622aff8a4633f29ede1ffdd0d240795e \
+amqp==1.4.9 \
+    --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
+    --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908 \
     # via kombu
 ansible==1.9.0.1 \
     --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
@@ -224,8 +225,8 @@ jmespath==0.9.3 \
     --hash=sha256:6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64 \
     --hash=sha256:f11b4461f425740a1d908e9a3f7365c3d2e569f6ca68a2ff8bc5bcd9676edd63 \
     # via boto3, botocore
-jsmin==2.1.1 \
-    --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1 \
+jsmin==2.2.2 \
+    --hash=sha256:b6df99b2cd1c75d9d342e4335b535789b8da9107ec748212706ef7bbe5c2553b \
     # via mozbuild
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
