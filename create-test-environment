@@ -35,10 +35,6 @@ fi
 cd ${ROOT}
 source ${VENV}/bin/activate
 
-cd pylib/requests
-python setup.py develop
-cd ../..
-
 pip install --upgrade --require-hashes -r test-requirements.txt
 
 cd hgserver/hgmolib
