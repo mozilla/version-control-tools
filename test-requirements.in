@@ -1,36 +1,25 @@
 -r deploy-requirements.in
 
-amqp==1.4.8
-anyjson==0.3.3
 backports.lzma==0.0.3
-backports.ssl-match-hostname==3.5.0.1
 beautifulsoup4==4.3.2
 boto==2.40.0
 cbor2==4.1.0
 coverage==4.3.4
 dnspython==1.15.0
 docker==2.5.1
-docker-pycreds==0.2.1
 factory-boy==2.7.0
-fake-factory==0.7.2
 feedparser==5.1.3
 flake8==3.6.0
-jsmin==2.1.1
 kafka-python==1.4.2
 kombu==3.0.30
 lockfile==0.10.2
 Markdown==2.4.1
-mccabe==0.6.1
 mechanize==0.2.5
 mimeparse==0.1.3
-mock==1.0.1
 mozbuild==0.2
 mozlog==2.2
 nose==1.3.4
-py==1.4.31
 publicsuffix==1.1.0
-pycodestyle==2.4.0
-pyflakes==2.0.0
 pytest==3.0.2
 python-hglib==2.6.1
 python-ldap==2.4.19
@@ -39,5 +28,4 @@ recaptcha-client==1.0.6
 requests==2.10.0
 responses==0.3.0
 selenium==2.48.0
-websocket-client==0.37.0
 Whoosh==2.6.0
