@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is used to upgrade pip requirements files using pip-compile.
+
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+
+
+def process_input_file(source: pathlib.Path, dest: pathlib.Path):
+    print('processing %s' % dest)
+
+    subprocess.run([
+        'pip-compile',
+        '--generate-hashes',
+        '--emit-trusted-host',
+        '--annotate',
+        '--header',
+        '--index',
+        '--output-file', '%s' % dest,
+        '-U',
+        '%s' % source
+    ],
+    check=True, capture_output=True)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', nargs='*', default=[],
+                        help='Explicit requirements file to operate on')
+
+    args = parser.parse_args()
+
+    if not args.path:
+        files = subprocess.check_output(['hg', 'files'])
+        files = {f.strip() for f in files.splitlines() if f.strip()}
+
+        requirements = set()
+
+        for f in files:
+            if b'requirements' not in f or not f.endswith(b'.txt'):
+                continue
+
+            base = f[:-4]
+            if b'%s.in' % base in files:
+                requirements.add(os.fsdecode(f))
+
+    else:
+        for p in args.path:
+            if 'requirements' not in p or not p.endswith('.txt'):
+                print('%s does not appear to be a requirements file' % p)
+                sys.exit(1)
+
+        requirements = set(args.path)
+
+    for p in sorted(requirements):
+        assert p.endswith('.txt')
+        base = p[:-4]
+
+        source = pathlib.Path('%s.in' % base)
+        dest = pathlib.Path(p)
+
+        process_input_file(source, dest)
+
+
+if __name__ == '__main__':
+    main()
