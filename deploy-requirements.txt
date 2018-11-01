@@ -27,8 +27,9 @@ ecdsa==0.13 \
 futures==3.0.5 \
     --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b \
     # via s3transfer
-jinja2==2.7.3 \
-    --hash=sha256:2e24ac5d004db5714976a04ac0e80c6df6e47e98c354cb2c0d82f8879d4f8fdb \
+jinja2==2.10 \
+    --hash=sha256:74c935a1b8bb9a3947c50a54766a969d4846290e1e788ea44c1392163723c3bd \
+    --hash=sha256:f84be1bb0040caca4cea721fcbbbbd61f9be9464ca236387158b0feea01914a4 \
     # via ansible
 jmespath==0.9.3 \
     --hash=sha256:6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64 \
@@ -36,8 +37,8 @@ jmespath==0.9.3 \
     # via boto3, botocore
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
-markupsafe==0.23 \
-    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3 \
+markupsafe==1.0 \
+    --hash=sha256:a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665 \
     # via jinja2
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
