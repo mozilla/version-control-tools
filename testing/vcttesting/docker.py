@@ -730,14 +730,27 @@ class Docker(object):
                 output = deque(maxlen=20)
                 self.api_client.start(cid)
 
-                for s in self.api_client.attach(cid, stream=True, logs=True):
-                    for line in s.splitlines():
-                        if line != '':
-                            output.append(line)
-                            if verbose:
-                                print('%s> %s' % (repository, line))
+                # attach() can return early if network timeout occurs. See
+                # https://github.com/docker/docker-py/issues/2166. So poll
+                # container state and automatically re-attach if the container
+                # is still running.
+                while True:
+                    for s in self.api_client.attach(cid, stream=True,
+                                                    logs=True):
+                        for line in s.splitlines():
+                            if line != '':
+                                output.append(line)
+                                if verbose:
+                                    print('%s> %s' % (repository, line))
 
-                state = self.api_client.inspect_container(cid)
+                    state = self.api_client.inspect_container(cid)
+
+                    if not state['State']['Running']:
+                        break
+
+                    print('%s> (timeout waiting for output; re-attaching)' %
+                          repository)
+
                 if state['State']['ExitCode']:
                     # This should arguably be part of the exception.
                     for line in output:
