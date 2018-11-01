@@ -1,2 +1,4 @@
 cbor2
+futures
 kafka-python==1.4.2
+python-hglib
