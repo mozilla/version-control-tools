@@ -64,6 +64,7 @@ UNIT_TEST_IGNORES = (
     'pylib/pycodestyle',
     'pylib/pyflakes',
     'pylib/requests',
+    'third_party',
 )
 
 COVERAGE_OMIT = (
