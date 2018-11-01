@@ -3,8 +3,8 @@
 
 -r ../../../../pylib/vcsreplicator/requirements.in
 
-boto3==1.5.3
-boto==2.48.0
+boto3
+boto
 Mercurial==4.7.2
 python-hglib
-tabulate==0.7.5
+tabulate
