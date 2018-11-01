@@ -42,7 +42,11 @@ def HGEXT_BOOTSTRAP():
         'pylib/mozhg',
         'pylib/pycodestyle',
         'pylib/pyflakes',
-        'pylib/requests',
+        'third_party/python/certifi',
+        'third_party/python/chardet',
+        'third_party/python/idna',
+        'third_party/python/requests',
+        'third_party/python/urllib3',
     ]
     for p in lib_paths:
         full = os.path.normpath(os.path.join(root, p))
