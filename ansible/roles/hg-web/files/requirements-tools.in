@@ -3,19 +3,9 @@
 
 bloxtool==0.33
 cbor2==4.1.0
-certifi==2017.11.5
-chardet==3.0.4
 Cython==0.25.1
-# Dependency of bloxtool.
-docopt==0.6.2
 futures==3.0.3
-idna==2.5
 Mercurial==4.7.2
-# Dependency of bloxtool.
-pyaml==17.10.0
-# Dependency of bloxtool.
-PyYAML==3.12
 python-hglib==2.6.1
 requests==2.18.1
 tabulate==0.7.5
-urllib3==1.21.1
