@@ -15,12 +15,6 @@ backports.ssl-match-hostname==3.5.0.1 \
 beautifulsoup4==4.3.2 \
     --hash=sha256:a2b29bd048ca2fe54a046b29770964738872a9747003a371344a93eedf7ad58e
 
-boto3==1.4.1 \
-    --hash=sha256:0d5e1d546e3974437f3468ea96abac95ba99753830138c3fb14718c7fdf6121e
-
-botocore==1.4.78 \
-    --hash=sha256:ec05f96c71a7eb97c60ba00fb07879e45fad985736782849abf7afc2d5e960c7
-
 boto==2.40.0 \
     --hash=sha256:8a76f6874de4b3b09a1ed6d8840294954e7d4c19c0a3ef1e91e0622281e04bf1
 
@@ -55,12 +49,6 @@ feedparser==5.1.3 \
 
 flake8==2.6.2 \
     --hash=sha256:7ac3bbaac27174d95bc4734ed23a07de567ffbcf4fc7e316854b4f3015d4fd15
-
-futures==3.0.5 \
-    --hash=sha256:f7f16b6bf9653a918a03f1f2c2d62aac0cd64b1bc088e93ea279517f6b61120b
-
-jmespath==0.9.0 \
-    --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815
 
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
@@ -123,9 +111,6 @@ pyflakes==1.5.0 \
 pytest==3.0.2 \
     --hash=sha256:4b0872d00159dd8d7a27c4a45a2be77aac8a6e70c3af9a7c76c040c3e3715b9d
 
-python-dateutil==2.5.3 \
-    --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
-
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 
@@ -144,9 +129,6 @@ requests==2.10.0 \
 
 responses==0.3.0 \
     --hash=sha256:6c5eb915bcf763b677b8e51cdb68c8474127a9b60e49e6e240b05ec5e449c43b
-
-s3transfer==0.1.9 \
-    --hash=sha256:17114f393101a6c4a49318429b9facede6183ec52fd14ca54e09aa496da56fbc
 
 selenium==2.48.0 \
     --hash=sha256:30b97338c0d9f1e60e72ecee0579b0f0845d55025342c3d5ccb224fb8a07b787
