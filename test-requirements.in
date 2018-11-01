@@ -17,4 +17,3 @@ python-hglib
 python-ldap
 requests==2.10.0
 responses
-selenium
