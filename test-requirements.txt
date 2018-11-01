@@ -47,8 +47,8 @@ feedparser==5.1.3 \
     --hash=sha256:ad543639e89d43685e2f1d3b6e48711562eec3be379e6958a920fbeaf4c63bce \
     --hash=sha256:a49ec89ebdb4234de473ad36792bf8da3a8640b8a263afda2eac510ff4908c92
 
-flake8==2.6.2 \
-    --hash=sha256:7ac3bbaac27174d95bc4734ed23a07de567ffbcf4fc7e316854b4f3015d4fd15
+flake8==3.6.0 \
+    --hash=sha256:c01f8a3963b3571a8e6bd7a4063359aff90749e160778e03817cd9b71c9e07d2
 
 jsmin==2.1.1 \
     --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
@@ -65,8 +65,8 @@ lockfile==0.10.2 \
 Markdown==2.4.1 \
     --hash=sha256:812ec5249f45edc31330b7fb06e52aaf6ab2d83aa27047df7cb6837ef2d269b6
 
-mccabe==0.3.1 \
-    --hash=sha256:bd6c080fb372aebcb0ce19e35ddac744f2abf5a7befa207db2d1097d48efe63a
+mccabe==0.6.1 \
+    --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42
 
 mechanize==0.2.5 \
     --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766
@@ -93,11 +93,11 @@ py==1.4.31 \
 publicsuffix==1.1.0 \
     --hash=sha256:ae77593d269e1e5131723259cc1142c25690c20c59f2e98f67e227228028bda9
 
-pycodestyle==2.2.0 \
-    --hash=sha256:60c4e1c36f301ac539a550a29e9d16862069ec240472d86e5e71c4fc645829cb
+pycodestyle==2.4.0 \
+    --hash=sha256:cbc619d09254895b0d12c2c691e237b2e91e9b2ecf5e84c26b35400f93dcfb83
 
-pyflakes==1.5.0 \
-    --hash=sha256:cc5eadfb38041f8366128786b4ca12700ed05bbf1403d808e89d57d67a3875a7
+pyflakes==2.0.0 \
+    --hash=sha256:f661252913bc1dbe7fcfcbf0af0db3f42ab65aabd1a6ca68fe5d466bace94dae
 
 pytest==3.0.2 \
     --hash=sha256:4b0872d00159dd8d7a27c4a45a2be77aac8a6e70c3af9a7c76c040c3e3715b9d
