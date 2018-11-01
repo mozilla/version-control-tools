@@ -10,7 +10,7 @@ cbor2
 coverage
 
 # Used by docker.py.
-docker==2.5.1
+docker<2.6
 
 # For code linting.
 flake8
