@@ -179,6 +179,16 @@
            venv=/var/hg/venv_tools_py3
            requirements=../roles/hg-web/files/requirements-tools-py3.txt
 
+# mod_wsgi is a Python package. But pip-compile doesn't like it for some reason.
+# We install it into the virtualenv as a one-off.
+- name: download mod_wsgi
+  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/mod_wsgi-4.5.22.tar.gz
+           dest=/var/tmp/mod_wsgi-4.5.22.tar.gz
+           sha256sum=d8205b1ebe6042e21a7a59fbfe10c4c5a12753bac531879758bdf2fa8e2bf301
+
+- name: install mod_wsgi
+  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/tmp/mod_wsgi-4.5.22.tar.gz
+
 # We have a chicken and egg problem with the prevent_hgweb_changes hook, which
 # is globally installed. If the hook isn't present, Mercurial won't allow
 # incoming changes. But the hook is part of v-c-t. How can we run a hook that
