@@ -5,31 +5,43 @@
 #    pip-compile --generate-hashes --output-file ansible/roles/docker-hg-ssh/files/requirements-testing.txt ansible/roles/docker-hg-ssh/files/requirements-testing.in
 #
 boto==2.43.0 \
-    --hash=sha256:cd915c35287e06dd8e25b5e33f5da173dca48c56dafac2547414758ddd53ea1f
+    --hash=sha256:cd915c35287e06dd8e25b5e33f5da173dca48c56dafac2547414758ddd53ea1f \
+    # via moto
 click==6.6 \
-    --hash=sha256:fcf697e1fd4b567d817c69dab10a4035937fe6af175c05fd6806b69f74cbc6c4
+    --hash=sha256:fcf697e1fd4b567d817c69dab10a4035937fe6af175c05fd6806b69f74cbc6c4 \
+    # via flask
 flask==0.11.1 \
     --hash=sha256:a4f97abd30d289e548434ef42317a793f58087be1989eab96f2c647470e77000
 httpretty==0.8.10 \
-    --hash=sha256:77cbd62e20cb47f1c66125531aedcb80c3141dc10c5b24779389693cfc8bc3a2
+    --hash=sha256:77cbd62e20cb47f1c66125531aedcb80c3141dc10c5b24779389693cfc8bc3a2 \
+    # via moto
 itsdangerous==0.24 \
-    --hash=sha256:cbb3fcf8d3e33df861709ecaf89d9e6629cff0a217bc2848f1b41cd30d360519
+    --hash=sha256:cbb3fcf8d3e33df861709ecaf89d9e6629cff0a217bc2848f1b41cd30d360519 \
+    # via flask
 jinja2==2.8 \
-    --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4495bd536b4
+    --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4495bd536b4 \
+    # via flask, moto
 markupsafe==0.23 \
-    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
+    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3 \
+    # via jinja2
 moto==0.4.30 \
     --hash=sha256:5e7bd23228c65ba334e8b79756a7a8abc17e1c04313e0f39d4145f1dc70dee04
 python-dateutil==2.6.0 \
-    --hash=sha256:537bf2a8f8ce6f6862ad705cd68f9e405c0b5db014aa40fa29eab4335d4b1716
+    --hash=sha256:537bf2a8f8ce6f6862ad705cd68f9e405c0b5db014aa40fa29eab4335d4b1716 \
+    # via moto
 pytz==2018.4 \
     --hash=sha256:65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555 \
-    --hash=sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749
+    --hash=sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749 \
+    # via moto
 requests==2.11.1 \
-    --hash=sha256:545c4855cd9d7c12671444326337013766f4eea6068c3f0307fb2dc2696d580e
+    --hash=sha256:545c4855cd9d7c12671444326337013766f4eea6068c3f0307fb2dc2696d580e \
+    # via moto
 six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
+    # via moto, python-dateutil
 werkzeug==0.11.11 \
-    --hash=sha256:eb3108af06aed08fb2f4fc883f2adf04c8f4997f6368517591b2becf15ae0da2
+    --hash=sha256:eb3108af06aed08fb2f4fc883f2adf04c8f4997f6368517591b2becf15ae0da2 \
+    # via flask, moto
 xmltodict==0.10.2 \
-    --hash=sha256:fc518ccf9adbbb917a2ddcb386be852ae6dd36935e1e8b9a3e760201abfdbf77
+    --hash=sha256:fc518ccf9adbbb917a2ddcb386be852ae6dd36935e1e8b9a3e760201abfdbf77 \
+    # via moto
