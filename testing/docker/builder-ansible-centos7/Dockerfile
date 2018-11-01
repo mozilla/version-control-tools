@@ -4,7 +4,17 @@
 
 FROM secure:mozsecure:centos7:sha256 9f2f77ffd1614d29e5cc403c677eb726ede859f78e16017d608593cbbc3f0d2e:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20171101-docker.tar.xz
 
-RUN yum update -y && yum install -y gcc libyaml-devel python-devel rsync tar && yum clean all
+RUN yum update -y && \
+    yum install -y \
+        gcc \
+        libffi-devel \
+        libyaml-devel \
+        make \
+        openssl-devel \
+        python-devel \
+        rsync \
+        tar && \
+    yum clean all
 
 # Pin setuptools and pip because we've historically had issues with newer versions.
 # Plus, pinning ensures reproducibility over time.
