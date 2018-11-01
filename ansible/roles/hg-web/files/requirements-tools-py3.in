@@ -1,4 +1,4 @@
-cbor2==4.1.0
-datadiff==2.0.0
+cbor2
+datadiff
 requests
-voluptuous==0.10.5
+voluptuous

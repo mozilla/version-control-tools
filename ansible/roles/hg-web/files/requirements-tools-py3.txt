@@ -4,9 +4,9 @@
 #
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-web/files/requirements-tools-py3.txt ansible/roles/hg-web/files/requirements-tools-py3.in
 #
-cbor2==4.1.0 \
-    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0 \
-    --hash=sha256:a48a1a8fa6bc51b271db63c9605de31f957396793c21332972697efd7800372c
+cbor2==4.1.1 \
+    --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
+    --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
 certifi==2018.10.15 \
     --hash=sha256:339dc09518b07e2fa7eda5450740925974815557727d6bd35d319c1524a04a4c \
     --hash=sha256:6d58c986d22b038c8c0df30d639f23a3e6d172a05c3583e766f4c0b785c0986a \
@@ -28,5 +28,6 @@ urllib3==1.24 \
     --hash=sha256:41c3db2fc01e5b907288010dec72f9d0a74e37d6994e6eb56849f59fea2265ae \
     --hash=sha256:8819bba37a02d143296a4d032373c4dd4aca11f6d4c9973335ca75f9c8475f59 \
     # via requests
-voluptuous==0.10.5 \
-    --hash=sha256:7a7466f8dc3666a292d186d1d871a47bf2120836ccb900d5ba904674957a2396
+voluptuous==0.11.5 \
+    --hash=sha256:303542b3fc07fb52ec3d7a1c614b329cdbee13a9d681935353d8ea56a7bfa9f1 \
+    --hash=sha256:567a56286ef82a9d7ae0628c5842f65f516abcb496e74f3f59f1d7b28df314ef
