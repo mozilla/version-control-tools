@@ -23,14 +23,14 @@ docutils==0.12 \
     --hash=sha256:c7db717810ab6965f66c8cf0398a98c9d8df982da39b4cd7f162911eb89596fa \
     # via botocore
 futures==3.0.3 \
-    --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4 \
-    # via s3transfer
+    --hash=sha256:04afa2a06ab7dcca9d81717b420a7a14826061e9b2614a5c77dd24c75ccf97e4
 jmespath==0.9.0 \
     --hash=sha256:ade5261b0d7d34b6f53accc91e6881b579b40161ed575e6ac465de5edad32815 \
     # via boto3, botocore
 kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 kombu==3.0.35 \
+    --hash=sha256:22ab336a17962717a5d9470547e5508d4bcf1b6ec10cd9486868daf4e5edb727 \
     --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \

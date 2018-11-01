@@ -1,11 +1,10 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
+-r ../../../../pylib/vcsreplicator/requirements.in
+
 boto3==1.5.3
 boto==2.48.0
-cbor2==4.1.0
-kafka-python==1.4.2
-kombu==3.0.35
 Mercurial==4.7.2
-python-hglib==2.6.1
+python-hglib
 tabulate==0.7.5
