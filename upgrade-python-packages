@@ -15,6 +15,9 @@ import sys
 def process_input_file(source: pathlib.Path, dest: pathlib.Path):
     print('processing %s' % dest)
 
+    env = dict(os.environ)
+    env['CUSTOM_COMPILE_COMMAND'] = sys.argv[0]
+
     subprocess.run([
         'pip-compile',
         '--generate-hashes',
@@ -26,7 +29,7 @@ def process_input_file(source: pathlib.Path, dest: pathlib.Path):
         '-U',
         '%s' % source
     ],
-    check=True, capture_output=True)
+    check=True, capture_output=True, env=env)
 
 
 def main():
