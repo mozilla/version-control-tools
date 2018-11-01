@@ -40,9 +40,7 @@ from coverage.data import CoverageData
 
 from .util import (
     limited_threadpoolexecutor,
-    wait_for_amqp,
     wait_for_http,
-    wait_for_ssh,
 )
 from .vctutil import (
     get_and_write_vct_node,
