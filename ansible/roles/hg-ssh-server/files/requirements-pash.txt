@@ -5,12 +5,22 @@
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-ssh-server/files/requirements-pash.txt ansible/roles/hg-ssh-server/files/requirements-pash.in
 #
 kafka-python==1.4.2 \
+    --hash=sha256:6a5c516f540f4b13b78c64a85dd42dc38fe29257e2fae6393fc5daff9106389b \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
     --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
     --hash=sha256:c5857460b9e1d1f65ccb94deecb5b103acdafbf4755f473d6d340e102082d65e
-python-ldap==2.4.20 \
-    --hash=sha256:4b8891539a3171d993cf7896b632ff088a4c707ae85ac3c77db1454f7949f3e2
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+pyasn1-modules==0.2.2 \
+    --hash=sha256:a0cf3e1842e7c60fde97cb22d275eb6f9524f5c5250489e292529de841417547 \
+    --hash=sha256:a38a8811ea784c0136abfdba73963876328f66172db21a05a82f9515909bfb4e \
+    # via python-ldap
+pyasn1==0.4.4 \
+    --hash=sha256:b9d3abc5031e61927c82d4d96c1cec1e55676c1a991623cfed28faea73cdd7ca \
+    --hash=sha256:f58f2a3d12fd754aa123e9fa74fb7345333000a035f3921dbdaa08597aa53137 \
+    # via pyasn1-modules, python-ldap
+python-ldap==3.1.0 \
+    --hash=sha256:41975e79406502c092732c57ef0c2c2eb318d91e8e765f81f5d4ab6c1db727c5
+six==1.11.0 \
+    --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
+    --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb
