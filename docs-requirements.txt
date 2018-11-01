@@ -235,12 +235,10 @@ webcolors==1.8.1 \
     --hash=sha256:030562f624467a9901f0b455fef05486a88cfb5daa1e356bd4aacea043850b59 \
     --hash=sha256:b3b88e5ef2b35fa9e01e3fabe99dddf49da074459c44774c59f3ccab3be4f121 \
     # via blockdiag
-websocket-client==0.53.0 \
-    --hash=sha256:c42b71b68f9ef151433d6dcc6a7cb98ac72d2ad1e3a74981ca22bc5d9134f166 \
-    --hash=sha256:f5889b1d0a994258cfcbc8f2dc3e457f6fc7b32a8d74873033d12e4eab4bdf63 \
+websocket-client==0.54.0 \
+    --hash=sha256:8c8bf2d4f800c3ed952df206b18c28f7070d9e3dcbd6ca6291127574f57ee786 \
+    --hash=sha256:e51562c91ddb8148e791f0155fdb01325d99bb52c4cdbb291aee7a3563fd0849 \
     # via docker
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==40.5.0 \
-    --hash=sha256:2a2a200f4a760adbded23a091a00be2eca4e28efed65c6120ea275f7e89a1eab \
-    --hash=sha256:e329a5c458c6acb5edc2b5c4ad44280c053ba827dc82fd5e84a83e22bb05460d
+# setuptools
