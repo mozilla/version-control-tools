@@ -176,8 +176,9 @@ cryptography==2.3.1 \
     --hash=sha256:e79ab4485b99eacb2166f3212218dd858258f374855e1568f728462b0e6ee0d9 \
     --hash=sha256:f995d3667301e1754c57b04e0bae6f0fa9d710697a9f8d6712e8cca02550910f \
     # via paramiko
-docker-pycreds==0.2.1 \
-    --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9 \
+docker-pycreds==0.3.0 \
+    --hash=sha256:0a941b290764ea7286bd77f54c0ace43b86a8acd6eb9ead3de9840af52384079 \
+    --hash=sha256:8b0e956c8d206f832b06aa93a710ba2c3bcbacb5a314449c040b0b814355bbff \
     # via docker
 docker==2.5.1 \
     --hash=sha256:7b587fa841218b0f27e41d1f1ec61398bd0a8a0cc364f3ab3c08290fa8d59e71
@@ -395,6 +396,7 @@ webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923 \
     # via html5lib
-websocket-client==0.37.0 \
-    --hash=sha256:678b246d816b94018af5297e72915160e2feb042e0cde1a9397f502ac3a52f41 \
+websocket-client==0.53.0 \
+    --hash=sha256:c42b71b68f9ef151433d6dcc6a7cb98ac72d2ad1e3a74981ca22bc5d9134f166 \
+    --hash=sha256:f5889b1d0a994258cfcbc8f2dc3e457f6fc7b32a8d74873033d12e4eab4bdf63 \
     # via docker
