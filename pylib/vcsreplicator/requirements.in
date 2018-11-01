@@ -1,5 +1,5 @@
 cbor2
 futures
 kafka-python==1.4.2
-kombu==3.0.30
+kombu==3.0.35
 python-hglib
