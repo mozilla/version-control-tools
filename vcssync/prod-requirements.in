@@ -1,0 +1,12 @@
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+
+amqp==1.4.9
+anyjson==0.3.3
+dulwich==0.16.1
+github3.py==0.9.6
+kombu==3.0.37
+Mercurial==4.7.2
+python-hglib==2.6.1
+requests==2.13.0
+uritemplate==3.0.0
+uritemplate.py==3.0.2
