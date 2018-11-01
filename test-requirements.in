@@ -34,8 +34,5 @@ python-hglib
 # Needed for tests using LDAP.
 python-ldap
 
-# Used in a variety of places.
-requests==2.10.0
-
 # Used for some Python unit tests.
 responses
