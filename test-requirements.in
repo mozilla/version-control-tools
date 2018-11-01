@@ -1,10 +1,8 @@
 -r deploy-requirements.in
+-r pylib/vcsreplicator/requirements.in
 
 # Used by docker.py.
 backports.lzma
-
-# Used by vcsreplicator.
-cbor2
 
 # So we can obtain code coverage.
 coverage
@@ -14,9 +12,6 @@ docker<2.6
 
 # For code linting.
 flake8
-
-# Used by vcsreplicator.
-kafka-python==1.4.2
 
 # Used by Pulse/RabbitMQ interactions.
 kombu==3.0.30
