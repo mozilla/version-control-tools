@@ -4,8 +4,8 @@
 #
 #    pip-compile --generate-hashes --output-file deploy-requirements.txt deploy-requirements.in
 #
-ansible==1.9.0.1 \
-    --hash=sha256:b2193fd9a4061ab624fa67311796419a759de06b4f321d37169b22ba3831331c
+ansible==1.9.4 \
+    --hash=sha256:972c2face49f1577bd0ff7989440bfe2820e66fb10d7579915cc536bccfa6fe3
 asn1crypto==0.24.0 \
     --hash=sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87 \
     --hash=sha256:9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49 \
