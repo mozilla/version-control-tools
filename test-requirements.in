@@ -1,7 +1,6 @@
 -r deploy-requirements.in
 
 backports.lzma
-boto
 cbor2
 coverage
 docker==2.5.1
