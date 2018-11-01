@@ -4,7 +4,7 @@
 
 # Builds a Python chroot suitable for hgweb.
 
-FROM secure:mozsecure:centos7:sha256 9f2f77ffd1614d29e5cc403c677eb726ede859f78e16017d608593cbbc3f0d2e:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20171101-docker.tar.xz
+FROM secure:mozsecure:centos7:sha256 48cc2d545136115b38f38ee5f80d51db391fee2610f8300b280b35422db63af7:https://s3-us-west-2.amazonaws.com/moz-packages/docker-images/centos-7-20181101-docker.tar.xz
 
 RUN yum update -y
 
