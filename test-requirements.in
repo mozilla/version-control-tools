@@ -10,7 +10,6 @@ kombu==3.0.30
 lockfile
 mechanize
 mozbuild==0.2
-mozlog
 nose
 pytest
 python-hglib
