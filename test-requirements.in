@@ -8,7 +8,7 @@ backports.lzma
 coverage
 
 # Used by docker.py.
-docker<2.6
+docker
 
 # For code linting.
 flake8
