@@ -4,12 +4,12 @@
 #
 #    pip-compile --generate-hashes --output-file ansible/roles/hg-web/files/requirements-hgweb.txt ansible/roles/hg-web/files/requirements-hgweb.in
 #
-cbor2==4.1.0 \
-    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0 \
-    --hash=sha256:a48a1a8fa6bc51b271db63c9605de31f957396793c21332972697efd7800372c
-ipaddress==1.0.16 \
-    --hash=sha256:5a3182b322a706525c46282ca6f064d27a02cffbd449f9f47416f1dc96aa71b0 \
-    --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
+cbor2==4.1.1 \
+    --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
+    --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
+ipaddress==1.0.22 \
+    --hash=sha256:64b28eec5e78e7510698f6d4da08800a5c575caa4a286c93d651c5d3ff7b6794 \
+    --hash=sha256:b146c751ea45cad6188dd6cf2d9b757f6f4f8d6ffb96a023e6f2e26eea02a72c
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
     --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
