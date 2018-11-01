@@ -4,4 +4,4 @@
 cbor2
 ipaddress
 Mercurial==4.7.2
-Pygments==2.1.1
+Pygments==2.1.3
