@@ -1,0 +1,27 @@
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+
+ansible==1.9.0.1
+appdirs==1.4.0
+blessings==1.6
+botocore==1.4.78
+boto3==1.4.1
+docutils==0.12
+ecdsa==0.13
+futures==3.0.5
+Jinja2==2.7.3
+jmespath==0.9.0
+mach==0.5.1
+MarkupSafe==0.23
+Mercurial==4.7.2
+mozfile==1.1
+mozinfo==0.7
+mozprocess==0.22
+packaging==16.8
+paramiko==1.16.0
+PyYAML==3.12
+pycrypto==2.6.1
+pyparsing==2.1.10
+python-dateutil==2.5.3
+s3transfer==0.1.9
+setuptools==34.0.1
+six==1.10.0
