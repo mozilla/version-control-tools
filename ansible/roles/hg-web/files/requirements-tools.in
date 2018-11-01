@@ -2,10 +2,10 @@
 --find-links /var/tmp/pip
 
 bloxtool==0.33
-cbor2==4.1.0
+cbor2
 Cython==0.25.1
-futures==3.0.3
+futures
 Mercurial==4.7.2
-python-hglib==2.6.1
-requests==2.18.1
-tabulate==0.7.5
+python-hglib
+requests
+tabulate
