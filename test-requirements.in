@@ -13,9 +13,6 @@ docker<2.6
 # For code linting.
 flake8
 
-# Used by Pulse/RabbitMQ interactions.
-kombu==3.0.30
-
 # Used by ansible plugin.
 lockfile
 
