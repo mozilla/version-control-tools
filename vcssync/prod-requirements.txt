@@ -8,7 +8,8 @@ amqp==1.4.9 \
     --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
 anyjson==0.3.3 \
-    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba
+    --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
+    # via kombu
 dulwich==0.16.1 \
     --hash=sha256:470d0feec9d4e7aba091c02f62db7f9cc6549ffe3f623a8039f96f584159da05
 github3.py==0.9.6 \
@@ -28,8 +29,10 @@ requests==2.13.0 \
     --hash=sha256:5722cd09762faa01276230270ff16af7acf7c5c45d623868d9ba116f15791ce8
 uritemplate.py==3.0.2 \
     --hash=sha256:a0c459569e80678c473175666e0d1b3af5bc9a13f84463ec74f808f3dd12ca47 \
-    --hash=sha256:e0cdeb0f55ec18e1580974e8017cd188549aacc2aba664ae756adb390b9d45b4
+    --hash=sha256:e0cdeb0f55ec18e1580974e8017cd188549aacc2aba664ae756adb390b9d45b4 \
+    # via github3.py
 uritemplate==3.0.0 \
     --hash=sha256:01c69f4fe8ed503b2951bef85d996a9d22434d2431584b5b107b2981ff416fbd \
     --hash=sha256:1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd \
-    --hash=sha256:c02643cebe23fc8adb5e6becffe201185bf06c40bda5c0b4028a93f1527d011d
+    --hash=sha256:c02643cebe23fc8adb5e6becffe201185bf06c40bda5c0b4028a93f1527d011d \
+    # via uritemplate.py
