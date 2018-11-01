@@ -4,10 +4,10 @@
 # Used to load replication state file.
 cbor2
 
-futures==3.0.5
+futures
 kafka-python==1.4.2
 Mercurial==4.7.2
-python-hglib==2.6.1
-PyYAML==3.12
-six==1.10.0
-tabulate==0.7.5
+python-hglib
+PyYAML
+six
+tabulate
