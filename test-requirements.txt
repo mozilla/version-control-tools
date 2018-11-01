@@ -16,8 +16,8 @@ asn1crypto==0.24.0 \
     --hash=sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87 \
     --hash=sha256:9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49 \
     # via cryptography
-backports.lzma==0.0.3 \
-    --hash=sha256:bac58aec8d39ac3d22250840fb24830d0e4a0ef05ad8f3f09172dc0cc80cdbca
+backports.lzma==0.0.13 \
+    --hash=sha256:50829db66f0445442f6c796bba0ca62d1f87f54760c4682b6d1489e729a43744
 backports.ssl-match-hostname==3.5.0.1 \
     --hash=sha256:502ad98707319f4a51fa2ca1c677bd659008d27ded9f6380c79e8932e38dcdf2 \
     # via docker
@@ -69,8 +69,9 @@ botocore==1.12.35 \
     --hash=sha256:1a1d528ed30afc9d6364855e6f701862d6cc8ba5231b422c8c83ff8ab4e8a832 \
     --hash=sha256:a5c93a7182b7f0c447014c15b1df6ac840677e9258f8505ecedff9b66a539a51 \
     # via boto3, s3transfer
-cbor2==4.1.0 \
-    --hash=sha256:1c41231272a76714f437fcd93e772a94a2cd6fef212f3d62bc05091aeb5047f0
+cbor2==4.1.1 \
+    --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
+    --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
 cffi==1.11.5 \
     --hash=sha256:151b7eefd035c56b2b2e1eb9963c90c6302dc15fbd8c1c0a83a163ff2c7d7743 \
     --hash=sha256:1553d1e99f035ace1c0544050622b7bc963374a00c467edafac50ad7bd276aef \
@@ -108,10 +109,40 @@ cffi==1.11.5 \
 configparser==3.5.0 \
     --hash=sha256:5308b47021bc2340965c371f0f058cc6971a04502638d4244225c49d80db273a \
     # via flake8
-coverage==4.3.4 \
-    --hash=sha256:36407249a0b6669c6ad4425b0f29685579df745480c03afa70f101f09f4eead3 \
-    --hash=sha256:ca36d83cd591d027952e5019149c4386e7058cd674bf8cb52dc622f768d689e9 \
-    --hash=sha256:f99066d76274800145a2e658026b30962eb5079346249197e88b55c9a7855e6a
+coverage==4.5.1 \
+    --hash=sha256:03481e81d558d30d230bc12999e3edffe392d244349a90f4ef9b88425fac74ba \
+    --hash=sha256:0b136648de27201056c1869a6c0d4e23f464750fd9a9ba9750b8336a244429ed \
+    --hash=sha256:0bf8cbbd71adfff0ef1f3a1531e6402d13b7b01ac50a79c97ca15f030dba6306 \
+    --hash=sha256:10a46017fef60e16694a30627319f38a2b9b52e90182dddb6e37dcdab0f4bf95 \
+    --hash=sha256:198626739a79b09fa0a2f06e083ffd12eb55449b5f8bfdbeed1df4910b2ca640 \
+    --hash=sha256:23d341cdd4a0371820eb2b0bd6b88f5003a7438bbedb33688cd33b8eae59affd \
+    --hash=sha256:28b2191e7283f4f3568962e373b47ef7f0392993bb6660d079c62bd50fe9d162 \
+    --hash=sha256:2a5b73210bad5279ddb558d9a2bfedc7f4bf6ad7f3c988641d83c40293deaec1 \
+    --hash=sha256:2eb564bbf7816a9d68dd3369a510be3327f1c618d2357fa6b1216994c2e3d508 \
+    --hash=sha256:337ded681dd2ef9ca04ef5d93cfc87e52e09db2594c296b4a0a3662cb1b41249 \
+    --hash=sha256:3a2184c6d797a125dca8367878d3b9a178b6fdd05fdc2d35d758c3006a1cd694 \
+    --hash=sha256:3c79a6f7b95751cdebcd9037e4d06f8d5a9b60e4ed0cd231342aa8ad7124882a \
+    --hash=sha256:3d72c20bd105022d29b14a7d628462ebdc61de2f303322c0212a054352f3b287 \
+    --hash=sha256:3eb42bf89a6be7deb64116dd1cc4b08171734d721e7a7e57ad64cc4ef29ed2f1 \
+    --hash=sha256:4635a184d0bbe537aa185a34193898eee409332a8ccb27eea36f262566585000 \
+    --hash=sha256:56e448f051a201c5ebbaa86a5efd0ca90d327204d8b059ab25ad0f35fbfd79f1 \
+    --hash=sha256:5a13ea7911ff5e1796b6d5e4fbbf6952381a611209b736d48e675c2756f3f74e \
+    --hash=sha256:69bf008a06b76619d3c3f3b1983f5145c75a305a0fea513aca094cae5c40a8f5 \
+    --hash=sha256:6bc583dc18d5979dc0f6cec26a8603129de0304d5ae1f17e57a12834e7235062 \
+    --hash=sha256:701cd6093d63e6b8ad7009d8a92425428bc4d6e7ab8d75efbb665c806c1d79ba \
+    --hash=sha256:7608a3dd5d73cb06c531b8925e0ef8d3de31fed2544a7de6c63960a1e73ea4bc \
+    --hash=sha256:76ecd006d1d8f739430ec50cc872889af1f9c1b6b8f48e29941814b09b0fd3cc \
+    --hash=sha256:7aa36d2b844a3e4a4b356708d79fd2c260281a7390d678a10b91ca595ddc9e99 \
+    --hash=sha256:7d3f553904b0c5c016d1dad058a7554c7ac4c91a789fca496e7d8347ad040653 \
+    --hash=sha256:7e1fe19bd6dce69d9fd159d8e4a80a8f52101380d5d3a4d374b6d3eae0e5de9c \
+    --hash=sha256:8c3cb8c35ec4d9506979b4cf90ee9918bc2e49f84189d9bf5c36c0c1119c6558 \
+    --hash=sha256:9d6dd10d49e01571bf6e147d3b505141ffc093a06756c60b053a859cb2128b1f \
+    --hash=sha256:be6cfcd8053d13f5f5eeb284aa8a814220c3da1b0078fa859011c7fffd86dab9 \
+    --hash=sha256:c1bb572fab8208c400adaf06a8133ac0712179a334c09224fb11393e920abcdd \
+    --hash=sha256:de4418dadaa1c01d497e539210cb6baa015965526ff5afc078c57ca69160108d \
+    --hash=sha256:e05cb4d9aad6233d67e0541caa7e511fa4047ed7750ec2510d466e806e0255d6 \
+    --hash=sha256:f05a636b4564104120111800021a92e43397bc12a5c72fed7036be8556e0029e \
+    --hash=sha256:f3f501f345f24383c0000395b26b726e46758b71393267aeae0bd36f8b3ade80
 cryptography==2.3.1 \
     --hash=sha256:02602e1672b62e803e08617ec286041cc453e8d43f093a5f4162095506bc0beb \
     --hash=sha256:10b48e848e1edb93c1d3b797c83c72b4c387ab0eb4330aaa26da8049a6cbede0 \
@@ -150,11 +181,16 @@ enum34==1.1.6 \
     --hash=sha256:8ad8c4783bf61ded74527bffb48ed9b54166685e4230386a9ed9b1279e2df5b1 \
     # via cryptography, flake8
 flake8==3.6.0 \
+    --hash=sha256:6a35f5b8761f45c5513e3405f110a86bea57982c3b75b766ce7b65217abe1670 \
     --hash=sha256:c01f8a3963b3571a8e6bd7a4063359aff90749e160778e03817cd9b71c9e07d2
 futures==3.2.0 \
     --hash=sha256:9ec02aa7d674acb8618afb127e27fde7fc68994c0437ad759fa094a574adb265 \
     --hash=sha256:ec0a6cb848cc212002b9828c3e34c675e0c9ff6741dc445cab6fdd4e1085d1f1 \
     # via s3transfer
+html5lib==1.0.1 \
+    --hash=sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3 \
+    --hash=sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736 \
+    # via mechanize
 idna==2.7 \
     --hash=sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e \
     --hash=sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16 \
@@ -178,8 +214,9 @@ kafka-python==1.4.2 \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
 kombu==3.0.30 \
     --hash=sha256:fecb34edf4852064f385dbf53969047b22353d3608a576497dd05f71b943fae6
-lockfile==0.10.2 \
-    --hash=sha256:81ee2d4b0923a2ee3e51b93af0db82efa3f049c7435a00549f9a3ba22cf70cbf
+lockfile==0.12.2 \
+    --hash=sha256:6aed02de03cba24efabcd600b30540140634fc06cfa603822d508d5361e9f799 \
+    --hash=sha256:6c3cb24f344923d30b2785d5ad75182c8ea7ac1b6171b08657258ec7429d50fa
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
 markupsafe==1.0 \
@@ -188,8 +225,9 @@ markupsafe==1.0 \
 mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
     # via flake8
-mechanize==0.2.5 \
-    --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766
+mechanize==0.3.7 \
+    --hash=sha256:630e241204a57ca4b026c1e8d1a9b61ca0500929b28e82dab7c0763c650a8717 \
+    --hash=sha256:ee66e1a6af790898894dd0318914ced413d94f46a54f881eb337081ff9702cd2
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
     --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
@@ -212,8 +250,10 @@ mozprocess==0.26 \
     --hash=sha256:9f3d533439f7721c90547bee0ecdf421c838e5976673430f6ea37db7a789b363 \
     --hash=sha256:9f471c45bee9ff14e936c6ee216a6cc4941223659c01fa626bce628001d8485c \
     # via mach
-nose==1.3.4 \
-    --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56
+nose==1.3.7 \
+    --hash=sha256:9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac \
+    --hash=sha256:dadcddc0aefbf99eea214e0f1232b94f2fa9bd98fa8353711dacb112bfcbbb2a \
+    --hash=sha256:f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98
 paramiko==2.4.2 \
     --hash=sha256:3c16b2bfb4c0d810b24c40155dbfd113c0521e7e6ee593d704e84b4c658a1f3b \
     --hash=sha256:a8975a7df3560c9f1e2b43dc54ebd40fd00a7017392ca5445ce7df409f900fcb \
@@ -293,11 +333,15 @@ s3transfer==0.1.13 \
 six==1.11.0 \
     --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
     --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
-    # via bcrypt, blessings, cryptography, docker, docker-pycreds, mozfile, pynacl, python-dateutil, responses, websocket-client
+    # via bcrypt, blessings, cryptography, docker, docker-pycreds, html5lib, mozfile, pynacl, python-dateutil, responses, websocket-client
 urllib3==1.24 \
     --hash=sha256:41c3db2fc01e5b907288010dec72f9d0a74e37d6994e6eb56849f59fea2265ae \
     --hash=sha256:8819bba37a02d143296a4d032373c4dd4aca11f6d4c9973335ca75f9c8475f59 \
     # via botocore
+webencodings==0.5.1 \
+    --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
+    --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923 \
+    # via html5lib
 websocket-client==0.37.0 \
     --hash=sha256:678b246d816b94018af5297e72915160e2feb042e0cde1a9397f502ac3a52f41 \
     # via docker
