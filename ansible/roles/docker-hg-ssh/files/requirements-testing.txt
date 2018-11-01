@@ -4,36 +4,61 @@
 #
 #    pip-compile --generate-hashes --output-file ansible/roles/docker-hg-ssh/files/requirements-testing.txt ansible/roles/docker-hg-ssh/files/requirements-testing.in
 #
-boto==2.43.0 \
-    --hash=sha256:cd915c35287e06dd8e25b5e33f5da173dca48c56dafac2547414758ddd53ea1f \
+boto==2.49.0 \
+    --hash=sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8 \
+    --hash=sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a \
     # via moto
+certifi==2018.10.15 \
+    --hash=sha256:339dc09518b07e2fa7eda5450740925974815557727d6bd35d319c1524a04a4c \
+    --hash=sha256:6d58c986d22b038c8c0df30d639f23a3e6d172a05c3583e766f4c0b785c0986a \
+    # via requests
+chardet==3.0.4 \
+    --hash=sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae \
+    --hash=sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691 \
+    # via requests
 httpretty==0.8.10 \
+    --hash=sha256:474a72722d66841f0e59cee285d837e1c6263be5be7bf2f8e824fc849a99adda \
     --hash=sha256:77cbd62e20cb47f1c66125531aedcb80c3141dc10c5b24779389693cfc8bc3a2 \
     # via moto
-jinja2==2.8 \
-    --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4495bd536b4 \
+idna==2.7 \
+    --hash=sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e \
+    --hash=sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16 \
+    # via requests
+jinja2==2.10 \
+    --hash=sha256:74c935a1b8bb9a3947c50a54766a969d4846290e1e788ea44c1392163723c3bd \
+    --hash=sha256:f84be1bb0040caca4cea721fcbbbbd61f9be9464ca236387158b0feea01914a4 \
     # via moto
-markupsafe==0.23 \
-    --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3 \
+markupsafe==1.0 \
+    --hash=sha256:a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665 \
     # via jinja2
 moto==0.4.30 \
-    --hash=sha256:5e7bd23228c65ba334e8b79756a7a8abc17e1c04313e0f39d4145f1dc70dee04
-python-dateutil==2.6.0 \
-    --hash=sha256:537bf2a8f8ce6f6862ad705cd68f9e405c0b5db014aa40fa29eab4335d4b1716 \
+    --hash=sha256:5e7bd23228c65ba334e8b79756a7a8abc17e1c04313e0f39d4145f1dc70dee04 \
+    --hash=sha256:8575b5d19fff0c6046692de6deb2a77968e34eea8a97d6c7e1b2be2148e4867e
+python-dateutil==2.7.5 \
+    --hash=sha256:063df5763652e21de43de7d9e00ccf239f953a832941e37be541614732cdfc93 \
+    --hash=sha256:88f9287c0174266bb0d8cedd395cfba9c58e87e5ad86b2ce58859bc11be3cf02 \
     # via moto
-pytz==2018.4 \
-    --hash=sha256:65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555 \
-    --hash=sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749 \
+pytz==2018.7 \
+    --hash=sha256:31cb35c89bd7d333cd32c5f278fca91b523b0834369e757f4c5641ea252236ca \
+    --hash=sha256:8e0f8568c118d3077b46be7d654cc8167fa916092e28320cde048e54bfc9f1e6 \
     # via moto
-requests==2.11.1 \
-    --hash=sha256:545c4855cd9d7c12671444326337013766f4eea6068c3f0307fb2dc2696d580e \
+requests==2.20.0 \
+    --hash=sha256:99dcfdaaeb17caf6e526f32b6a7b780461512ab3f1d992187801694cba42770c \
+    --hash=sha256:a84b8c9ab6239b578f22d1c21d51b696dcfe004032bb80ea832398d6909d7279 \
     # via moto
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
+six==1.11.0 \
+    --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
+    --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
     # via moto, python-dateutil
-werkzeug==0.11.11 \
-    --hash=sha256:eb3108af06aed08fb2f4fc883f2adf04c8f4997f6368517591b2becf15ae0da2 \
+urllib3==1.24 \
+    --hash=sha256:41c3db2fc01e5b907288010dec72f9d0a74e37d6994e6eb56849f59fea2265ae \
+    --hash=sha256:8819bba37a02d143296a4d032373c4dd4aca11f6d4c9973335ca75f9c8475f59 \
+    # via requests
+werkzeug==0.14.1 \
+    --hash=sha256:c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c \
+    --hash=sha256:d5da73735293558eb1651ee2fddc4d0dedcfa06538b8813a2e20011583c9e49b \
     # via moto
-xmltodict==0.10.2 \
-    --hash=sha256:fc518ccf9adbbb917a2ddcb386be852ae6dd36935e1e8b9a3e760201abfdbf77 \
+xmltodict==0.11.0 \
+    --hash=sha256:8f8d7d40aa28d83f4109a7e8aa86e67a4df202d9538be40c0cb1d70da527b0df \
+    --hash=sha256:add07d92089ff611badec526912747cf87afd4f9447af6661aca074eeaf32615 \
     # via moto
