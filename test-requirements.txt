@@ -261,10 +261,14 @@ paramiko==2.4.2 \
 py==1.4.31 \
     --hash=sha256:4a3e4f3000c123835ac39cab5ccc510642153bc47bc1f13e2bbb53039540ae69 \
     # via pytest
+pyasn1-modules==0.2.2 \
+    --hash=sha256:a0cf3e1842e7c60fde97cb22d275eb6f9524f5c5250489e292529de841417547 \
+    --hash=sha256:a38a8811ea784c0136abfdba73963876328f66172db21a05a82f9515909bfb4e \
+    # via python-ldap
 pyasn1==0.4.4 \
     --hash=sha256:b9d3abc5031e61927c82d4d96c1cec1e55676c1a991623cfed28faea73cdd7ca \
     --hash=sha256:f58f2a3d12fd754aa123e9fa74fb7345333000a035f3921dbdaa08597aa53137 \
-    # via paramiko
+    # via paramiko, pyasn1-modules, python-ldap
 pycodestyle==2.4.0 \
     --hash=sha256:cbc619d09254895b0d12c2c691e237b2e91e9b2ecf5e84c26b35400f93dcfb83 \
     # via flake8
@@ -306,8 +310,8 @@ python-dateutil==2.7.5 \
     # via botocore
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
-python-ldap==2.4.19 \
-    --hash=sha256:02fddb3accbfb54e40ff47a59457e422b253f9fb6cd64bb3851b349295fab048
+python-ldap==3.1.0 \
+    --hash=sha256:41975e79406502c092732c57ef0c2c2eb318d91e8e765f81f5d4ab6c1db727c5
 pyyaml==3.13 \
     --hash=sha256:3d7da3009c0f3e783b2c873687652d83b1bbfd5c88e9813fb7e5b03c0dd3108b \
     --hash=sha256:3ef3092145e9b70e3ddd2c7ad59bdd0252a94dfe3949721633e41344de00a6bf \
