@@ -4,6 +4,8 @@
 #
 #    ./upgrade-python-packages
 #
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+--find-links /var/tmp/pip
 bloxtool==0.33 \
     --hash=sha256:52d21777d6b3ee476c0571b63c4f96e90f596531e331708384adf9899cf746d5
 cbor2==4.1.1 \

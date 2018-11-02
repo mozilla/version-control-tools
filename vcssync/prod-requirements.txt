@@ -4,6 +4,7 @@
 #
 #    ./upgrade-python-packages
 #
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 amqp==1.4.9 \
     --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908

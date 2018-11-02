@@ -31,6 +31,29 @@ def process_input_file(source: pathlib.Path, dest: pathlib.Path):
     ],
     check=True, capture_output=True, env=env)
 
+    # pip-compile doesn't preserve --find-links from input file. So do
+    # that manually.
+    with source.open('rb') as fh:
+        find_links = []
+        for line in fh:
+            if line.startswith(b'--find-links'):
+                find_links.append(line)
+
+    if find_links:
+        with dest.open('rb') as fh:
+            dest_lines = []
+            in_header = True
+
+            for line in fh:
+                if in_header and not line.startswith(b'#'):
+                    in_header = False
+                    dest_lines.extend(find_links)
+
+                dest_lines.append(line)
+
+        with dest.open('wb') as fh:
+            fh.write(b''.join(dest_lines))
+
 
 def main():
     parser = argparse.ArgumentParser()

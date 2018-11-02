@@ -4,6 +4,8 @@
 #
 #    ./upgrade-python-packages
 #
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+--find-links /var/tmp/pip
 cbor2==4.1.1 \
     --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
     --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
