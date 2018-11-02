@@ -1,0 +1,2 @@
+# Pinned to 1.9 because 2.0 is ~2x slower :/
+ansible<1.10

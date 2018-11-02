@@ -1,6 +1,6 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
--r ansible/files/requirements-ansible-1.9.in
+-r ansible/files/requirements-ansible.in
 
 boto3
 mach==0.5.1
