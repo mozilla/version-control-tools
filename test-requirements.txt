@@ -8,8 +8,8 @@ amqp==1.4.9 \
     --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908 \
     # via kombu
-ansible==2.3.3.0 \
-    --hash=sha256:da2a715f6ca14a76001cc0f4bd1e44024328b3c2dad2c946dc9c7ed2d7c30afa
+ansible==2.4.6.0 \
+    --hash=sha256:f8cb44f76710faf88fc7dc0c703a3f39fe8a3bb1b98eb70506ef2cddf7e3e0c0
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
     # via kombu
@@ -184,7 +184,7 @@ cryptography==2.3.1 \
     --hash=sha256:e4aecdd9d5a3d06c337894c9a6e2961898d3f64fe54ca920a72234a3de0f9cb3 \
     --hash=sha256:e79ab4485b99eacb2166f3212218dd858258f374855e1568f728462b0e6ee0d9 \
     --hash=sha256:f995d3667301e1754c57b04e0bae6f0fa9d710697a9f8d6712e8cca02550910f \
-    # via paramiko
+    # via ansible, paramiko
 docker-pycreds==0.3.0 \
     --hash=sha256:0a941b290764ea7286bd77f54c0ace43b86a8acd6eb9ead3de9840af52384079 \
     --hash=sha256:8b0e956c8d206f832b06aa93a710ba2c3bcbacb5a314449c040b0b814355bbff \
@@ -323,9 +323,6 @@ pycodestyle==2.4.0 \
 pycparser==2.19 \
     --hash=sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3 \
     # via cffi
-pycrypto==2.6.1 \
-    --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c \
-    # via ansible
 pyflakes==2.0.0 \
     --hash=sha256:9a7662ec724d0120012f6e29d6248ae3727d821bba522a0e6b356eff19126a49 \
     --hash=sha256:f661252913bc1dbe7fcfcbf0af0db3f42ab65aabd1a6ca68fe5d466bace94dae \
