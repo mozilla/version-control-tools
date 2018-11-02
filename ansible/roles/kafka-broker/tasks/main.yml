@@ -33,7 +33,7 @@
         shell=/bin/bash
         createhome=no
         home=/var/run/zookeeper
-  when: "{{ inventory_hostname not in ignore_zookeeper_user | default([]) }}"
+  when: inventory_hostname not in ignore_zookeeper_user | default([])
 
 - name: create config directories for Kafka and ZooKeeper
   file: path={{ item }}
