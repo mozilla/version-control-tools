@@ -4,8 +4,8 @@
 #
 #    ./upgrade-python-packages
 #
-ansible==2.2.3.0 \
-    --hash=sha256:de18ab1cf0712252e928dd1226b2c058d5345ef7377a01e0601a268fcd512a90
+ansible==2.3.3.0 \
+    --hash=sha256:da2a715f6ca14a76001cc0f4bd1e44024328b3c2dad2c946dc9c7ed2d7c30afa
 asn1crypto==0.24.0 \
     --hash=sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87 \
     --hash=sha256:9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49 \

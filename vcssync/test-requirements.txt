@@ -7,8 +7,8 @@
 amqp==1.4.9 \
     --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
-ansible==2.2.3.0 \
-    --hash=sha256:de18ab1cf0712252e928dd1226b2c058d5345ef7377a01e0601a268fcd512a90
+ansible==2.3.3.0 \
+    --hash=sha256:da2a715f6ca14a76001cc0f4bd1e44024328b3c2dad2c946dc9c7ed2d7c30afa
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
     # via kombu
