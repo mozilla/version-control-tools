@@ -748,8 +748,9 @@ class Docker(object):
                     if not state['State']['Running']:
                         break
 
-                    print('%s> (timeout waiting for output; re-attaching)' %
-                          repository)
+                    if verbose:
+                        print('%s> (timeout waiting for output; re-attaching)' %
+                              repository)
 
                 if state['State']['ExitCode']:
                     # This should arguably be part of the exception.
