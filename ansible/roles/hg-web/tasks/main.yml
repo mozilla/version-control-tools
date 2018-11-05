@@ -263,6 +263,9 @@
     - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_replication, path: hgserver/hgmolib, pth: hgmolib }
 
+- name: synchronize hg templates
+  command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
@@ -500,9 +503,6 @@
            enabled=yes
            state=started
   when: vct_dir.stat.exists == False
-
-- name: synchronize hg templates
-  command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
 
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
