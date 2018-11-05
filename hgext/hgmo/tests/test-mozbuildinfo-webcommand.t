@@ -35,7 +35,10 @@ Web command isn't available unless enabled
   200
   content-type: application/json
   
-  {"error": "moz.build evaluation is not enabled for this repo"}
+  {"error": "moz.build evaluation is not enabled for this repo"} (no-hg48 !)
+  { (hg48 !)
+  "error": "moz.build evaluation is not enabled for this repo" (hg48 !)
+  } (hg48 !)
 
 Confirm no errors in log
 
@@ -60,7 +63,10 @@ Web command errors unless a wrapper is defined
   200
   content-type: application/json
   
-  {"error": "moz.build wrapper command not defined; refusing to execute"}
+  {"error": "moz.build wrapper command not defined; refusing to execute"} (no-hg48 !)
+  { (hg48 !)
+  "error": "moz.build wrapper command not defined; refusing to execute" (hg48 !)
+  } (hg48 !)
 
 Confirm no errors in log
 
@@ -178,7 +184,10 @@ Restart the server with a bad wrapper command
   200
   content-type: application/json
   
-  {"error": "unable to invoke moz.build info process"}
+  {"error": "unable to invoke moz.build info process"} (no-hg48 !)
+  { (hg48 !)
+  "error": "unable to invoke moz.build info process" (hg48 !)
+  } (hg48 !)
 
 Confirm no errors in log
 
@@ -199,7 +208,10 @@ Restart the server with a wrapper that doesn't emit JSON
   200
   content-type: application/json
   
-  {"error": "invalid JSON returned; report this error"}
+  {"error": "invalid JSON returned; report this error"} (no-hg48 !)
+  { (hg48 !)
+  "error": "invalid JSON returned; report this error" (hg48 !)
+  } (hg48 !)
 
 
 Confirm no errors in log

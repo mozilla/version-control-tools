@@ -85,7 +85,10 @@ Unknown head revision raises reasonable error
   404
   content-type: application/json
   
-  "unknown head revision foobar"
+  "unknown head revision foobar" (no-hg48 !)
+  { (hg48 !)
+  "error": "unknown head revision foobar" (hg48 !)
+  } (hg48 !)
 
   $ cat ../server/error.log
 
@@ -95,7 +98,10 @@ Unknown test revision raises reasonable error
   404
   content-type: application/json
   
-  "unknown node revision foobar"
+  "unknown node revision foobar" (no-hg48 !)
+  { (hg48 !)
+  "error": "unknown node revision foobar" (hg48 !)
+  } (hg48 !)
 
 Confirm no errors in log
 

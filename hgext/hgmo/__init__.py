@@ -311,12 +311,22 @@ def mozbuildinfowebcommand(web):
     # But this requires not having the JSON formatter from the
     # pushlog/feed.py extension.
     if not web.configbool('hgmo', 'mozbuildinfoenabled', False):
-        return web.sendtemplate('error',
-                                error={'error': 'moz.build evaluation is not enabled for this repo'})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error',
+                                    error='moz.build evaluation is not enabled for this repo')
+        else:
+            return web.sendtemplate('error',
+                                    error={'error': 'moz.build evaluation is not enabled for this repo'})
 
     if not web.config('hgmo', 'mozbuildinfowrapper'):
-        return web.sendtemplate('error',
-                                error={'error': 'moz.build wrapper command not defined; refusing to execute'})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error',
+                                    error='moz.build wrapper command not defined; refusing to execute')
+        else:
+            return web.sendtemplate('error',
+                                    error={'error': 'moz.build wrapper command not defined; refusing to execute'})
 
     rev = 'tip'
     if 'node' in req.qsparams:
@@ -356,14 +366,23 @@ def mozbuildinfowebcommand(web):
     except OSError as e:
         repo.ui.log('error invoking moz.build info process: %s\n' % e.errno)
 
-        return web.sendtemplate('error', error={'error': 'unable to invoke moz.build info process'})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error='unable to invoke moz.build info process')
+        else:
+            return web.sendtemplate('error', error={'error': 'unable to invoke moz.build info process'})
 
     stdout, stderr = p.communicate(pipedata)
 
     if p.returncode:
         repo.ui.log('failure obtaining moz.build info: stdout: %s; '
                     'stderr: %s\n' % (stdout, stderr))
-        return web.sendtemplate('error', error={'error': 'unable to obtain moz.build info \n\n%s\n\n%s' % (stdout, stderr)})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error='unable to obtain moz.build info \n\n%s\n\n%s' % (stdout, stderr))
+        else:
+            return web.sendtemplate('error', error={'error': 'unable to obtain moz.build info \n\n%s\n\n%s' % (stdout, stderr)})
+
     elif stderr.strip():
         repo.ui.log('moz.build evaluation output: %s\n' % stderr.strip())
 
@@ -371,7 +390,11 @@ def mozbuildinfowebcommand(web):
         web.res.setbodygen(stream_json(json.loads(stdout)))
         return web.res.sendresponse()
     except Exception:
-        return web.sendtemplate('error', error={'error': 'invalid JSON returned; report this error'})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error='invalid JSON returned; report this error')
+        else:
+            return web.sendtemplate('error', error={'error': 'invalid JSON returned; report this error'})
 
 
 def infowebcommand(web):
@@ -384,7 +407,11 @@ def infowebcommand(web):
     req = web.req
 
     if 'node' not in req.qsparams:
-        return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error="missing parameter 'node'")
+        else:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
 
     nodes = req.qsparams.getall('node')
 
@@ -421,7 +448,11 @@ def headdivergencewebcommand(web):
     req = web.req
 
     if 'node' not in req.qsparams:
-        return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error="missing parameter 'node'")
+        else:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
 
     repo = web.repo
 
@@ -479,7 +510,11 @@ def automationrelevancewebcommand(web):
     req = web.req
 
     if 'node' not in req.qsparams:
-        return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+        # TRACKING hg48
+        if util.versiontuple(n=2) >= (4, 8):
+            return web.sendtemplate('error', error="missing parameter 'node'")
+        else:
+            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
 
     repo = web.repo
     deletefields = {
