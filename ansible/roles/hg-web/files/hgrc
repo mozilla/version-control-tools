@@ -22,6 +22,7 @@ allow_archive = bz2 gz zip
 templates = /repo_local/mozilla/hg_templates/
 encoding = UTF-8
 baseurl = https://hg.mozilla.org/
+staticurl = /static/
 maxchanges = 20
 guessmime = True
 

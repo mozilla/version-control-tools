@@ -27,4 +27,12 @@
   $ head -n 1 body
   a { text-decoration:none; }
 
+Repositories reference /static/ for static URLs
+
+  $ http ${HGWEB_0_URL}mozilla-central | grep static
+  <link rel="icon" href="/static/hgicon.png" type="image/png" />
+  <link rel="stylesheet" href="/static/style-gitweb.css" type="text/css" />
+  <script type="text/javascript" src="/static/mercurial.js"></script>
+              <img src="/static/moz-logo-bw-rgb.svg" alt="mercurial" />
+
   $ hgmo clean
