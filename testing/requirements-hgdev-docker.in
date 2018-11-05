@@ -1,0 +1,9 @@
+-r requirements-hgdev.in
+
+backports.lzma==0.0.8
+backports.ssl-match-hostname==3.5.0.1
+docker==2.5.1
+docker-pycreds==0.2.1
+mechanize==0.2.5
+six==1.10.0
+websocket-client==0.37.0
