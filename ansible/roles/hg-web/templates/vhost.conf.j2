@@ -73,14 +73,21 @@ LimitRequestFields 1000
         {% endfor %}
     </Location>
 
-    # Serve static files from templates directory straight from disk.
-    <Directory /repo/hg/hg_templates/static/>
-        Options None
+    # Serve static files straight from disk.
+    <Directory /repo/hg/htdocs/static/>
+        Options FollowSymLinks
         AllowOverride None
         Require all granted
     </Directory>
 
-    Alias /static/ /repo/hg/hg_templates/static/
+    Alias /static/ /repo/hg/htdocs/static/
+
+    # Serve static files with custom cache rules. Since on-disk files
+    # and URLs are versioned by the v-c-t revision, they are immutable
+    # and can be served with aggressive caching settings.
+    <Location /static/>
+        Header set Cache-Control "max-age=31536000, immutable"
+    </Location>
 
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""

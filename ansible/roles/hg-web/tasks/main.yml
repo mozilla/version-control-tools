@@ -266,6 +266,32 @@
 - name: synchronize hg templates
   command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
 
+- name: synchronize hg templates
+  command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
+
+- name: directory for hgweb static files
+  file: path=/repo/hg/htdocs/static
+        state=directory
+        owner=hg
+        group=hg
+        mode=0775
+
+# We need to do this before hgrc is written, as hgrc references the per-revision
+# directory.
+- name: synchronize static files to versioned directory
+  command: /usr/bin/rsync -a /repo/hg/hg_templates/static/ /repo/hg/htdocs/static/{{ vct_node | mandatory }}/
+
+- name: symlink to latest static files
+  file: src=/repo/hg/htdocs/static/{{ vct_node | mandatory }}
+        dest=/repo/hg/htdocs/static/latest
+        state=link
+        owner=hg
+        group=hg
+
+# TODO we orphan "old" revisions of static content. We could potentially
+# purge old revisions. But since the size of static content is small and there
+# is little harm to keeping the files around, it doesn't seem justified.
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
