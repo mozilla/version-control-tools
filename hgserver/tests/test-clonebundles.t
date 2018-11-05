@@ -61,31 +61,33 @@ And raises during upload since we don't have credentials in the test env
       result = self.fn(*self.args, **self.kwargs)
     File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in upload_to_s3 (re)
       key.load()
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/factory.py", line 505, in do_action
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/factory.py", line \d+, in do_action (re)
       response = action(self, *args, **kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/action.py", line 83, in __call__
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/action.py", line \d+, in __call__ (re)
       response = getattr(parent.meta.client, operation_name)(**params)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line 314, in _api_call
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line \d+, in _api_call (re)
       return self._make_api_call(operation_name, kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line 599, in _make_api_call
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line \d+, in _make_api_call (re)
       operation_model, request_dict)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 148, in make_request
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in make_request (re)
       return self._send_request(request_dict, operation_model)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 173, in _send_request
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in _send_request (re)
       request = self.create_request(request_dict, operation_model)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line 157, in create_request
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in create_request (re)
       operation_name=operation_model.name)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line 227, in emit
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in emit (re)
+      return self._emitter.emit(aliased_event_name, **kwargs) (hg48 !)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in emit (re) (hg48 !)
       return self._emit(event_name, kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line 210, in _emit
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in _emit (re)
       response = handler(**kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line 90, in handler
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line \d+, in handler (re)
       return self.sign(operation_name, request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line 156, in sign
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line \d+, in sign (re)
       auth.add_auth(request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line 420, in add_auth
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line \d+, in add_auth (re)
       super(S3SigV4Auth, self).add_auth(request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line 352, in add_auth
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line \d+, in add_auth (re)
       raise NoCredentialsError
   botocore.exceptions.NoCredentialsError: Unable to locate credentials
   [1]
