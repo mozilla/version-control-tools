@@ -122,7 +122,7 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.4 4.5 4.6 4.7'
+testedwith = '4.4 4.5 4.6 4.7 4.8'
 minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
@@ -590,9 +590,24 @@ def _getcachedlabels(repo, ctx, cache):
 
     return labels
 
-@templatekeyword('fxheads')
-def template_fxheads(repo, ctx, templ, cache, **args):
+# TRACKING hg46
+if util.versiontuple(n=2) >= (4, 6):
+    fxheadsdec = templatekeyword('fxheads', requires={'repo, ctx, cache'})
+else:
+    fxheadsdec = templatekeyword('fxheads')
+
+@fxheadsdec
+def template_fxheads(*args, **kwargs):
     """:fxheads: List of strings. Firefox trees with heads on this commit."""
+    # TRACKING hg46
+    if util.versiontuple(n=2) >= (4, 6):
+        context, mapping = args
+        repo = context.resource(mapping, 'repo')
+        ctx = context.resource(mapping, 'ctx')
+        cache = context.resource(mapping, 'cache')
+    else:
+        repo, ctx, templ, cache = args
+
     labels = _getcachedlabels(repo, ctx, cache)
     if not labels:
         return []
