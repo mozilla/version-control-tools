@@ -73,6 +73,15 @@ LimitRequestFields 1000
         {% endfor %}
     </Location>
 
+    # Serve static files from templates directory straight from disk.
+    <Directory /repo/hg/hg_templates/static/>
+        Options None
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    Alias /static/ /repo/hg/hg_templates/static/
+
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
     ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
