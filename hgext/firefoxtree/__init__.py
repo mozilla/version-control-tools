@@ -80,6 +80,7 @@ from mercurial import (
     bookmarks,
     cmdutil,
     commands,
+    configitems,
     error,
     exchange,
     extensions,
@@ -111,9 +112,6 @@ from mozautomation.repository import (
 )
 from mozhg.util import import_module
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
-
 # TRACKING hg46
 logcmdutil = import_module('mercurial.logcmdutil')
 
@@ -124,32 +122,25 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.2 4.3 4.4 4.5 4.6 4.7'
-minimumhgversion = '4.2'
+testedwith = '4.4 4.5 4.6 4.7'
+minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
 MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
 COMM_ROOT_REV = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 cmdtable = {}
+configtable = {}
+keywords = {}
 
-# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+command = registrar.command(cmdtable)
+configitem = registrar.configitem(configtable)
+templatekeyword = registrar.templatekeyword(keywords)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    configitem('firefoxtree', 'servetags',
-               default=configitems.dynamicdefault)
-    configitem('firefoxtree', 'servetagsfrombookmarks',
-               default=configitems.dynamicdefault)
+configitem('firefoxtree', 'servetags',
+           default=configitems.dynamicdefault)
+configitem('firefoxtree', 'servetagsfrombookmarks',
+           default=configitems.dynamicdefault)
 
 
 shorttemplate = ''.join([
@@ -406,12 +397,7 @@ def wrappedpullobsolete(orig, pullop):
                 repo.ui.status('(removing bookmark on %s matching firefoxtree %s)\n' %
                                (short(bmstore[tag]), tag))
 
-                # TRACKING hg43 applychanges() introduced in Mercurial 4.3.
-                if util.safehasattr(bmstore, 'applychanges'):
-                    changes.append((tag, None))
-                else:
-                    del bmstore[tag]
-                    bmstore.recordchange(pullop.trmanager.transaction())
+                changes.append((tag, None))
 
                 if bmstore.active == tag:
                     repo.ui.status('(deactivating bookmark %s)\n' % tag)
@@ -435,8 +421,7 @@ def wrappedpullobsolete(orig, pullop):
             msg += '\n'
             repo.ui.status(msg)
 
-        # TRACKING hg43
-        if changes and util.safehasattr(bmstore, 'applychanges'):
+        if changes:
             bmstore.applychanges(repo, pullop.gettransaction(), changes)
 
         writefirefoxtrees(repo)
@@ -605,7 +590,7 @@ def _getcachedlabels(repo, ctx, cache):
 
     return labels
 
-
+@templatekeyword('fxheads')
 def template_fxheads(repo, ctx, templ, cache, **args):
     """:fxheads: List of strings. Firefox trees with heads on this commit."""
     labels = _getcachedlabels(repo, ctx, cache)
@@ -633,12 +618,6 @@ def extsetup(ui):
     extensions.wrapcommand(commands.table, 'pull', pullcommand)
     extensions.wrapcommand(commands.table, 'push', pushcommand)
     revset.symbols['fxheads'] = fxheadsrevset
-
-    keywords = {
-        'fxheads': template_fxheads,
-    }
-
-    templatekw.keywords.update(keywords)
 
 
 def reposetup(ui, repo):
