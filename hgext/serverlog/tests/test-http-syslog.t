@@ -20,18 +20,18 @@ Mercurial wire protocol commands and HTTP commands logged to syslog
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-repoinfo > /dev/null
 
   $ hgmo exec hgweb0 grep hgweb /var/log/hg.log
-  * hgweb: * BEGIN_REQUEST mozilla-central * /mozilla-central?cmd=capabilities (glob)
+  * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central?cmd=capabilities (glob)
   * hgweb: * BEGIN_PROTOCOL capabilities (glob)
-  * hgweb: * END_REQUEST 0 * * (glob)
-  * hgweb: * BEGIN_REQUEST mozilla-central * /mozilla-central?cmd=batch (glob)
+  * hgweb: * END_REQUEST 503 * * (glob)
+  * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central?cmd=batch (glob)
   * hgweb: * BEGIN_PROTOCOL batch (glob)
-  * hgweb: * END_REQUEST 0 * * (glob)
-  * hgweb: * BEGIN_REQUEST mozilla-central * /mozilla-central?cmd=getbundle (glob)
+  * hgweb: * END_REQUEST 42 * * (glob)
+  * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central?cmd=getbundle (glob)
   * hgweb: * BEGIN_PROTOCOL getbundle (glob)
   * hgweb: * END_REQUEST 82 * * (glob)
-  * hgweb: * BEGIN_REQUEST mozilla-central * /mozilla-central (glob)
+  * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central (glob)
   * hgweb: * END_REQUEST 3858 * * (glob)
-  * hgweb: * BEGIN_REQUEST mozilla-central * /mozilla-central/json-repoinfo (glob)
+  * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central/json-repoinfo (glob)
   * hgweb: * END_REQUEST 23 * * (glob)
 
   $ hgmo clean

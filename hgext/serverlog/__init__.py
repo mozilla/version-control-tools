@@ -405,7 +405,7 @@ class hgwebwrapped(hgweb_mod.hgweb):
         # Resolve the repository path.
         # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
         # set to the relative path of the repo (I think).
-        serverlog['path'] = env.get('REPO_NAME') or repopath(repo)
+        serverlog['path'] = req.apppath or repopath(repo)
 
         serverlog['ip'] = env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
             env.get('REMOTE_ADDR') or 'UNKNOWN'
