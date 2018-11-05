@@ -12,10 +12,11 @@ attrs==18.2.0 \
     --hash=sha256:10cbf6e27dbce8c30807caf056c8eb50917e0eaafe86347671b57254006c3e69 \
     --hash=sha256:ca4be454458f9dec299268d472aaa5a11f67a4ff70093396e1ceae9c76cf4bbb \
     # via pytest
-backports.lzma==0.0.8 \
-    --hash=sha256:200584ad5079d8ca6b1bfe14890c7be58666ab0128d8ca26cfb2669b476085f3
+backports.lzma==0.0.13 \
+    --hash=sha256:50829db66f0445442f6c796bba0ca62d1f87f54760c4682b6d1489e729a43744
 backports.ssl-match-hostname==3.5.0.1 \
-    --hash=sha256:502ad98707319f4a51fa2ca1c677bd659008d27ded9f6380c79e8932e38dcdf2
+    --hash=sha256:502ad98707319f4a51fa2ca1c677bd659008d27ded9f6380c79e8932e38dcdf2 \
+    # via docker
 blessings==1.7 \
     --hash=sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d \
     --hash=sha256:b1fdd7e7a675295630f9ae71527a8ebc10bfefa236b3d6aa4932ee4462c17ba3 \
@@ -63,12 +64,13 @@ coverage==4.5.1 \
     --hash=sha256:e05cb4d9aad6233d67e0541caa7e511fa4047ed7750ec2510d466e806e0255d6 \
     --hash=sha256:f05a636b4564104120111800021a92e43397bc12a5c72fed7036be8556e0029e \
     --hash=sha256:f3f501f345f24383c0000395b26b726e46758b71393267aeae0bd36f8b3ade80
-docker-pycreds==0.2.1 \
-    --hash=sha256:58d2688f92de5d6f1a6ac4fe25da461232f0e0a4c1212b93b256b046b2d714a9 \
-    --hash=sha256:93833a2cf280b7d8abbe1b8121530413250c6cd4ffed2c1cf085f335262f7348
-docker==2.5.1 \
-    --hash=sha256:7b587fa841218b0f27e41d1f1ec61398bd0a8a0cc364f3ab3c08290fa8d59e71 \
-    --hash=sha256:b876e6909d8d2360e0540364c3a952a62847137f4674f2439320ede16d6db880
+docker-pycreds==0.3.0 \
+    --hash=sha256:0a941b290764ea7286bd77f54c0ace43b86a8acd6eb9ead3de9840af52384079 \
+    --hash=sha256:8b0e956c8d206f832b06aa93a710ba2c3bcbacb5a314449c040b0b814355bbff \
+    # via docker
+docker==3.5.1 \
+    --hash=sha256:31421f16c01ffbd1ea7353c7e7cd7540bf2e5906d6173eb51c8fea4e0ea38b19 \
+    --hash=sha256:fbe82af9b94ccced752527c8de07fa20267f9634b48674ba478a0bb4000a0b1e
 feedparser==5.2.1 \
     --hash=sha256:bd030652c2d08532c034c27fcd7c85868e7fa3cb2b17f230a44a6bbc92519bf9 \
     --hash=sha256:cd2485472e41471632ed3029d44033ee420ad0b57111db95c240c9160a85831c \
@@ -80,6 +82,10 @@ funcsigs==1.0.2 \
 futures==3.1.1 \
     --hash=sha256:51ecb45f0add83c806c68e4b06106f90db260585b25ef2abfcda0bd95c0132fd \
     --hash=sha256:c4884a65654a7c45435063e14ae85280eb1f111d94e542396717ba9828c4337f
+html5lib==1.0.1 \
+    --hash=sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3 \
+    --hash=sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736 \
+    # via mechanize
 idna==2.7 \
     --hash=sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e \
     --hash=sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16 \
@@ -92,9 +98,9 @@ jsmin==2.2.2 \
     # via mozbuild
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
-mechanize==0.2.5 \
-    --hash=sha256:2e67b20d107b30c00ad814891a095048c35d9d8cb9541801cebe85684cc84766 \
-    --hash=sha256:84b9d9dfe34a039dab75adf33e226631f29a5267a0fdfa99a8ff035a021507f4
+mechanize==0.3.7 \
+    --hash=sha256:630e241204a57ca4b026c1e8d1a9b61ca0500929b28e82dab7c0763c650a8717 \
+    --hash=sha256:ee66e1a6af790898894dd0318914ced413d94f46a54f881eb337081ff9702cd2
 mercurial==4.7.2 \
     --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
     --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
@@ -175,12 +181,19 @@ scandir==1.9.0 \
     --hash=sha256:c9009c527929f6e25604aec39b0a43c3f831d2947d89d6caaab22f057b7055c8 \
     --hash=sha256:f5c71e29b4e2af7ccdc03a020c626ede51da471173b4a6ad1e904f2b2e04b4bd \
     # via pathlib2
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
-    --hash=sha256:105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a
+six==1.11.0 \
+    --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
+    --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
+    # via blessings, docker, docker-pycreds, html5lib, mock, more-itertools, mozfile, pathlib2, pytest, websocket-client
 urllib3==1.24.1 \
     --hash=sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39 \
     --hash=sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22 \
     # via requests
-websocket-client==0.37.0 \
-    --hash=sha256:678b246d816b94018af5297e72915160e2feb042e0cde1a9397f502ac3a52f41
+webencodings==0.5.1 \
+    --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
+    --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923 \
+    # via html5lib
+websocket-client==0.54.0 \
+    --hash=sha256:8c8bf2d4f800c3ed952df206b18c28f7070d9e3dcbd6ca6291127574f57ee786 \
+    --hash=sha256:e51562c91ddb8148e791f0155fdb01325d99bb52c4cdbb291aee7a3563fd0849 \
+    # via docker
