@@ -24,6 +24,8 @@ def find_hg_repos(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--group', help='Group owner to search for')
+    parser.add_argument('--hgrc', action='store_true',
+                        help='Find repositories having an hgrc file')
     parser.add_argument('--requirement',
                         help='Repository requirement to search for')
     parser.add_argument('--no-requirement',
@@ -51,6 +53,10 @@ if __name__ == '__main__':
         if gid is not None:
             st = os.stat(path)
             if st.st_gid != gid:
+                return False
+
+        if args.hgrc:
+            if not os.path.exists(os.path.join(path, '.hg', 'hgrc')):
                 return False
 
         if args.requirement or args.no_requirement:
