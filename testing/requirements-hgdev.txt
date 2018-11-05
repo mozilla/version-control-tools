@@ -5,8 +5,11 @@
 #    ./upgrade-python-packages
 #
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
-blessings==1.6 \
-    --hash=sha256:edc5713061f10966048bf6b40d9a514b381e0ba849c64e034c4ef6c1847d3007
+blessings==1.7 \
+    --hash=sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d \
+    --hash=sha256:b1fdd7e7a675295630f9ae71527a8ebc10bfefa236b3d6aa4932ee4462c17ba3 \
+    --hash=sha256:caad5211e7ba5afe04367cdd4cfc68fa886e2e08f6f35e76b7387d2109ccea6e \
+    # via mach
 coverage==4.3.4 \
     --hash=sha256:01406019418aabb2d4741647cc79b0e0deb0b8c5a6f936936c303e2f82ec8e5b \
     --hash=sha256:01a07b2b9212d4da3a1294436b58ac53f1d7aa445bda666648a5357048dc7ef3 \
@@ -52,8 +55,9 @@ futures==3.1.1 \
 ipaddress==1.0.16 \
     --hash=sha256:5a3182b322a706525c46282ca6f064d27a02cffbd449f9f47416f1dc96aa71b0 \
     --hash=sha256:935712800ce4760701d89ad677666cd52691fd2f6f0b340c8b4239a3c17988a5
-jsmin==2.1.1 \
-    --hash=sha256:582f70f5fef561c8d561271206f45258d0c420eec31a8628914e87c73a2192e1
+jsmin==2.2.2 \
+    --hash=sha256:b6df99b2cd1c75d9d342e4335b535789b8da9107ec748212706ef7bbe5c2553b \
+    # via mozbuild
 mach==0.5.1 \
     --hash=sha256:61bda1a1033c110f781427c479dd151a45fc45e46ce28e37fabf0d3cc2edf91e
 mercurial==4.7.2 \
@@ -65,12 +69,18 @@ mock==1.0.1 \
     --hash=sha256:b839dd2d9c117c701430c149956918a423a9863b48b09c90e30a6013e7d2f44f
 mozbuild==0.2 \
     --hash=sha256:24227608fc3c735fbb5c629d0540a600368c1d5e57013dd39272a0a5c9cccb13
-mozfile==1.1 \
-    --hash=sha256:e1d8505c9d575051e0831ee659a982a2bbfaec37013dc946d60a3071a442888e
-mozinfo==0.7 \
-    --hash=sha256:d27f75b668614f28df2e61b8aa4beb6f68f3c9936fc9139fae755728f2b4844a
-mozprocess==0.22 \
-    --hash=sha256:2d56e015a3594f06130e8c015f7ca87f3f8d83d9c4bf54588f077ce9bad9a08b
+mozfile==2.0.0 \
+    --hash=sha256:22a43f3bc320c3bda27e54b293c23a51660f4a00ec6959ab70ca6136d702f578 \
+    --hash=sha256:7355643fca705f43d9412d444fb59588fbbd25f0d1e7592b9482f84e3d23bc8e \
+    # via mach, mozbuild, mozinfo
+mozinfo==1.0.0 \
+    --hash=sha256:50c0ec524b21260749a103db8e8405716e4027b580a18cea1574d2424789bbe2 \
+    --hash=sha256:d5f886cbabe3266f061210076fd8a9be312580afc5efe62be10efbb9d087726e \
+    # via mozprocess
+mozprocess==0.26 \
+    --hash=sha256:9f3d533439f7721c90547bee0ecdf421c838e5976673430f6ea37db7a789b363 \
+    --hash=sha256:9f471c45bee9ff14e936c6ee216a6cc4941223659c01fa626bce628001d8485c \
+    # via mach
 nose==1.3.4 \
     --hash=sha256:76bc63a4e2d5e5a0df77ca7d18f0f56e2c46cfb62b71103ba92a92c79fab1e03 \
     --hash=sha256:78b03116badd0dbb2ed4dedc96a4a3d42138b94bb89fc2eb99f7f3bdfd199f56 \
@@ -95,3 +105,7 @@ redo==1.6 \
 requests==2.10.0 \
     --hash=sha256:09bc1b5f3a56cd8c48d433213a8cba51a67d12936568f73b5f1793fcb0c0979e \
     --hash=sha256:63f1815788157130cee16a933b2ee184038e975f0017306d723ac326b5525b54
+six==1.11.0 \
+    --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
+    --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
+    # via blessings, mozfile
