@@ -35,6 +35,7 @@
 - name: install Docker support files
   copy: src={{ item }} dest=/{{ item }} owner=root group=root mode=0755
   with_items:
+    - enable-fastannotate
     - entrypoint.py
     - entrypoint-solo
     - set-config-option
