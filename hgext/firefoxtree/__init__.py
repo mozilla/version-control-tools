@@ -606,7 +606,9 @@ def template_fxheads(*args, **kwargs):
         ctx = context.resource(mapping, 'ctx')
         cache = context.resource(mapping, 'cache')
     else:
-        repo, ctx, templ, cache = args
+        repo = kwargs['repo']
+        ctx = kwargs['ctx']
+        cache = kwargs['cache']
 
     labels = _getcachedlabels(repo, ctx, cache)
     if not labels:
