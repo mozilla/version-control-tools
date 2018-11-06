@@ -5,6 +5,6 @@
 
 boto3
 boto
-Mercurial==4.7.2
+Mercurial==4.8
 python-hglib
 tabulate
