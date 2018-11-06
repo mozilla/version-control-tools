@@ -15,10 +15,10 @@ futures==3.2.0 \
 kafka-python==1.4.2 \
     --hash=sha256:6a5c516f540f4b13b78c64a85dd42dc38fe29257e2fae6393fc5daff9106389b \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
-mercurial==4.7.2 \
-    --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
-    --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
-    --hash=sha256:c5857460b9e1d1f65ccb94deecb5b103acdafbf4755f473d6d340e102082d65e
+mercurial==4.8 \
+    --hash=sha256:039c3ba92f37a6eb2868443c675bd3fac2b0057d10ded5443980e5862ceeecfb \
+    --hash=sha256:c56b403ad3b83ea91f3758c6df25b9f77deb4affada6c63160b3d325dc923f03 \
+    --hash=sha256:c8efb32a6b3ccdce7d032b4e227cc07dfacdbe653ce2844c27b5def531628a7d
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 pyyaml==3.13 \

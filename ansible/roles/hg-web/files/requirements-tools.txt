@@ -53,10 +53,10 @@ idna==2.7 \
     --hash=sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e \
     --hash=sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16 \
     # via requests
-mercurial==4.7.2 \
-    --hash=sha256:97f0594216f2348a2e37b2ad8a56eade044e741153fee8c584487e9934ca09fb \
-    --hash=sha256:b289ee0f56a1089716d22acecce12620c841d83e4ea5c6725006ce78c56f2a31 \
-    --hash=sha256:c5857460b9e1d1f65ccb94deecb5b103acdafbf4755f473d6d340e102082d65e
+mercurial==4.8 \
+    --hash=sha256:039c3ba92f37a6eb2868443c675bd3fac2b0057d10ded5443980e5862ceeecfb \
+    --hash=sha256:c56b403ad3b83ea91f3758c6df25b9f77deb4affada6c63160b3d325dc923f03 \
+    --hash=sha256:c8efb32a6b3ccdce7d032b4e227cc07dfacdbe653ce2844c27b5def531628a7d
 pyaml==17.12.1 \
     --hash=sha256:66623c52f34d83a2c0fc963e08e8b9d0c13d88404e3b43b1852ef71eda19afa3 \
     --hash=sha256:f83fc302c52c6b83a15345792693ae0b5bc07ad19f59e318b7617d7123d62990 \
@@ -81,7 +81,7 @@ requests==2.20.0 \
     --hash=sha256:a84b8c9ab6239b578f22d1c21d51b696dcfe004032bb80ea832398d6909d7279
 tabulate==0.8.2 \
     --hash=sha256:e4ca13f26d0a6be2a2915428dc21e732f1e44dad7f76d7030b2ef1ec251cf7f2
-urllib3==1.24 \
-    --hash=sha256:41c3db2fc01e5b907288010dec72f9d0a74e37d6994e6eb56849f59fea2265ae \
-    --hash=sha256:8819bba37a02d143296a4d032373c4dd4aca11f6d4c9973335ca75f9c8475f59 \
+urllib3==1.24.1 \
+    --hash=sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39 \
+    --hash=sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22 \
     # via requests

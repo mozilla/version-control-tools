@@ -3,5 +3,5 @@
 
 cbor2
 ipaddress
-Mercurial==4.7.2
+Mercurial==4.8
 Pygments==2.1.3
