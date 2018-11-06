@@ -2,10 +2,10 @@
 # to replace some keywords with 'lkeyword', for 'labelled keyword'
 
 [templates]
-changeset = '{cset}{branches}{bookmarks}{tags}{parents}{user}{ldate}{ltroubles}{lobsfate}{summary}\n'
+changeset = '{cset}{branches}{bookmarks}{tags}{parents}{luser}{ldate}{ltroubles}{lobsfate}{summary}\n'
 changeset_quiet = '{lnode}'
-changeset_verbose = '{cset}{branches}{bookmarks}{tags}{parents}{user}{ldate}{ltroubles}{lobsfate}{lfiles}{lfile_copies_switch}{description}\n'
-changeset_debug = '{fullcset}{branches}{bookmarks}{tags}{lphase}{parents}{manifest}{user}{ldate}{ltroubles}{lobsfate}{lfile_mods}{lfile_adds}{lfile_dels}{lfile_copies_switch}{extras}{description}\n'
+changeset_verbose = '{cset}{branches}{bookmarks}{tags}{parents}{luser}{ldate}{ltroubles}{lobsfate}{lfiles}{lfile_copies_switch}{description}\n'
+changeset_debug = '{fullcset}{branches}{bookmarks}{tags}{lphase}{parents}{manifest}{luser}{ldate}{ltroubles}{lobsfate}{lfile_mods}{lfile_adds}{lfile_dels}{lfile_copies_switch}{extras}{description}\n'
 
 # File templates
 lfiles = '{if(files,
@@ -54,8 +54,8 @@ tag = '{label("log.tag",
 bookmark = '{label("log.bookmark",
                    "bookmark:    {bookmark}")}\n'
 
-user = '{label("log.user",
-               "user:        {author}")}\n'
+luser = '{label("log.user",
+                "user:        {author}")}\n'
 
 summary = '{if(desc|strip, "{label('log.summary',
                                    'summary:     {desc|firstline}')}\n")}'
@@ -74,7 +74,7 @@ description = '{if(desc|strip, "{label('ui.note log.description',
                                 {label('ui.note log.description',
                                        '{desc|strip}')}\n\n")}'
 
-status = '{status} {path}\n{if(copy, "  {copy}\n")}'
+status = '{status} {path|relpath}\n{if(source, "  {source|relpath}\n")}'
 
 # Obsfate templates, it would be removed once we introduce the obsfate
 # template fragment

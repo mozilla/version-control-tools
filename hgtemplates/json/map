@@ -1,4 +1,6 @@
+default = 'shortlog'
 mimetype = 'application/json'
+
 
 error = '{error|json}'
 info = '\{
@@ -296,4 +298,7 @@ repoinfo = '\{
 automationrelevance = '\{
   "changesets": {changesets|json},
   "visible": {visible|json}
+  }'
+error = '\{
+  "error": {error|utf8|json}
   }'

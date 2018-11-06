@@ -2,9 +2,9 @@
 
 [templates]
 # Override base templates
-changeset = '{cset}{branches}{bookmarks}{tags}{parents}{user}{ldate}{summary}{lfiles}\n'
-changeset_verbose = '{cset}{branches}{bookmarks}{tags}{parents}{user}{ldate}{description}{lfiles}\n'
-changeset_debug = '{fullcset}{branches}{bookmarks}{tags}{lphase}{parents}{manifest}{user}{ldate}{extras}{description}{lfiles}\n'
+changeset = '{cset}{branches}{bookmarks}{tags}{parents}{luser}{ldate}{summary}{lfiles}\n'
+changeset_verbose = '{cset}{branches}{bookmarks}{tags}{parents}{luser}{ldate}{description}{lfiles}\n'
+changeset_debug = '{fullcset}{branches}{bookmarks}{tags}{lphase}{parents}{manifest}{luser}{ldate}{extras}{description}{lfiles}\n'
 
 # Override the file templates
 lfiles = '{if(files,
