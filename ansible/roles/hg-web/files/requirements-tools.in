@@ -3,7 +3,6 @@
 
 bloxtool==0.33
 cbor2
-Cython==0.25.1
 futures
 Mercurial==4.8
 python-hglib

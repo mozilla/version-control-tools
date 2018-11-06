@@ -9,8 +9,6 @@
   with_items:
     # This is likely already installed, but needed for Docker.
     - cronie
-    # To compile hg-experimental extensions.
-    - gcc-c++
     - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
@@ -18,14 +16,10 @@
     - libcap
     # Secures processes, especially moz.build evaluation.
     - libcgroup
-    # To compile hg-experimental extensions.
-    - lz4-devel
     # We use logrotate to control log files
     - logrotate
     - openssh-clients
     - openssh-server
-    # To compile hg-experimental extensions.
-    - openssl-devel
     - python-devel
     - python36u
     - python36u-pip
@@ -215,23 +209,6 @@
 - name: delete ignored files from version-control-tools repo (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
   when: vct_dir.stat.exists == False
-
-- name: set up hg-experimental repo, with 3rd party extensions
-  hg: repo=https://bitbucket.org/facebook/hg-experimental
-      dest=/var/hg/hg-experimental
-      revision=96a2689c228369c52904dc46aa124787090195d7
-      force=yes
-      purge=yes
-      executable=/var/hg/venv_hgweb/bin/hg
-
-- name: delete ignored files from hg-experimental repo
-  command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/hg-experimental purge --all
-
-- name: build C extensions from hg-experimental repo
-  command: /var/hg/venv_tools/bin/python setup.py build_py -c -d . build_clib build_ext -i chdir=/var/hg/hg-experimental
-
-- name: install linelog C extension into hgweb virtualenv
-  command: cp -a /var/hg/hg-experimental/linelog.so /var/hg/venv_hgweb/lib/python2.7/site-packages/linelog.so
 
 # pip doesn't reinstall the same version unless --upgrade is passed.
 # We need to pass --no-deps to prevent dependencies from getting pulled

@@ -3,11 +3,13 @@
 # by default.
 
 [extensions]
-fastannotate = /var/hg/hg-experimental/fastannotate
-linkrevcache = /var/hg/hg-experimental/hgext3rd/linkrevcache.py
+fastannotate =
 
 [fastannotate]
 mainbranch = default
 
 # Enable integration with hgweb.
 modes = hgweb
+
+# serve the annotate cache via wire protocol
+server = True
