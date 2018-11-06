@@ -30,7 +30,7 @@ Mercurial wire protocol commands and HTTP commands logged to syslog
   * hgweb: * BEGIN_PROTOCOL getbundle (glob)
   * hgweb: * END_REQUEST 82 * * (glob)
   * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central (glob)
-  * hgweb: * END_REQUEST 3858 * * (glob)
+  * hgweb: * END_REQUEST 3822 * * (glob)
   * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central/json-repoinfo (glob)
   * hgweb: * END_REQUEST 23 * * (glob)
 
