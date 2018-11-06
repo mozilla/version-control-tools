@@ -942,6 +942,14 @@ def filelog(orig, web):
         tmpl.__class__ = orig_class
 
 
+def hgwebfastannotate(orig, req, fctx, ui):
+    import hgext.fastannotate.support as fasupport
+
+    diffopts = webutil.difffeatureopts(req, ui, 'annotate')
+
+    return fasupport._doannotate(fctx, diffopts=diffopts)
+
+
 def extsetup(ui):
     extensions.wrapfunction(exchange, 'pull', pull)
     extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
@@ -987,3 +995,20 @@ def extsetup(ui):
 
     setattr(webcommands, 'repoinfo', repoinfowebcommand)
     webcommands.__all__.append('repoinfo')
+
+    # fastannotate in Mercurial 4.8 has buggy hgweb support. Fix that.
+    try:
+        fastannotate = extensions.find('fastannotate')
+    except KeyError:
+        fastannotate = None
+
+    if fastannotate:
+        import hgext.fastannotate.support as fasupport
+        try:
+            extensions.unwrapfunction(webutil, 'annotate',
+                                      fasupport._hgwebannotate)
+        except ValueError:
+            pass
+
+        extensions.wrapfunction(webutil, 'annotate',
+                                hgwebfastannotate)
