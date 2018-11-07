@@ -88,14 +88,9 @@ def getsparse():
 
 def supported_hg():
     '''Returns True if the Mercurial version is supported for robustcheckout'''
-    return util.versiontuple(n=2) in (
-        (4, 3),
-        (4, 4),
-        (4, 5),
-        (4, 6),
-        (4, 7),
-        (4, 8),
-    )
+    return '.'.join(
+        str(v) for v in util.versiontuple(n=2)
+    ) in testedwith.split()
 
 
 if os.name == 'nt':
