@@ -996,17 +996,29 @@ def extsetup(ui):
     setattr(webcommands, 'repoinfo', repoinfowebcommand)
     webcommands.__all__.append('repoinfo')
 
-    # fastannotate in Mercurial 4.8 has buggy hgweb support. Fix that.
+
+def reposetup(ui, repo):
+    import hgext.fastannotate.support as fasupport
+
+    # fastannotate in Mercurial 4.8 has buggy hgweb support. We always remove
+    # its monkeypatch if present.
+    try:
+        extensions.unwrapfunction(webutil, 'annotate',
+                                  fasupport._hgwebannotate)
+    except ValueError:
+        pass
+
+    # And we install our own if fastannotate is enabled.
     try:
         fastannotate = extensions.find('fastannotate')
     except KeyError:
         fastannotate = None
 
-    if fastannotate:
-        import hgext.fastannotate.support as fasupport
+    if fastannotate and 'hgweb' in ui.configlist('fastannotate', 'modes'):
+        # Guard against recursive chaining, since we're in reposetup().
         try:
             extensions.unwrapfunction(webutil, 'annotate',
-                                      fasupport._hgwebannotate)
+                                      hgwebfastannotate)
         except ValueError:
             pass
 
