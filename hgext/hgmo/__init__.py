@@ -998,7 +998,10 @@ def extsetup(ui):
 
 
 def reposetup(ui, repo):
-    import hgext.fastannotate.support as fasupport
+    fasupport = import_module('hgext.fastannotate.support')
+
+    if not fasupport:
+        return
 
     # fastannotate in Mercurial 4.8 has buggy hgweb support. We always remove
     # its monkeypatch if present.
