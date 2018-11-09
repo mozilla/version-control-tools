@@ -91,6 +91,10 @@ bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.or
 # this limit.
 httppostargs = true
 
+# Wire protocol v2 support.
+web.apiserver = true
+web.api.http-v2 = true
+
 [obshacks]
 # Enable the user that runs hgweb and performs replication to exchange
 # obsolescence markers, even if not enabled for regular users.
