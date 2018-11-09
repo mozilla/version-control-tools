@@ -16,7 +16,6 @@ from mercurial import (
     demandimport,
     error,
     hg,
-    localrepo,
     ui as uimod,
     util,
 )
@@ -318,7 +317,7 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
 
-testedwith = '4.3 4.4 4.5 4.6 4.7'
+testedwith = '4.3 4.4 4.5 4.6 4.7 4.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
@@ -839,7 +838,7 @@ def _checkevolve(ui, cw, hg_version):
             return
 
         try:
-            local_evolve_repo = localrepo.localrepository(ui, local_evolve_path)
+            local_evolve_repo = hg.repository(ui, local_evolve_path)
 
             # Pull the latest stable, update to tip
             hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=('stable',))
