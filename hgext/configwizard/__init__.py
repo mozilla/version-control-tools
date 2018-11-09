@@ -412,6 +412,11 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     hgversion = util.versiontuple(n=3)
 
+    # The point release version can be None for e.g. X.Y versions. Normalize
+    # to make tuple compares work.
+    if hgversion[2] is None:
+        hgversion = (hgversion[0], hgversion[1], 0)
+
     if hgversion < MINIMUM_SUPPORTED_VERSION:
         ui.warn(VERSION_TOO_OLD % (
             hgversion[0], hgversion[1],
