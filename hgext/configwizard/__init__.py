@@ -784,7 +784,9 @@ def _checkcurses(ui, cw):
 
 
 def _checkhistoryediting(ui, cw):
-    if all(ui.hasconfig('extensions', e) for e in ('histedit', 'rebase')):
+    extensions = {'histedit', 'rebase'}
+
+    if all(ui.hasconfig('extensions', e) for e in extensions):
         return
 
     if ui.promptchoice('Enable history rewriting commands (Yn)? $$ &Yes $$ &No'):
@@ -793,8 +795,8 @@ def _checkhistoryediting(ui, cw):
     if 'extensions' not in cw.c:
         cw.c['extensions'] = {}
 
-    cw.c['extensions']['histedit'] = ''
-    cw.c['extensions']['rebase'] = ''
+    for ext in sorted(extensions):
+        cw.c['extensions'][ext] = ''
 
 
 def _checkevolve(ui, cw, hg_version):
