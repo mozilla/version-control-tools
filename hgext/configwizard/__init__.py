@@ -256,6 +256,32 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+HISTORY_EDITING_INFO = '''
+Various extensions provide functionality to rewrite repository history. These
+enable more powerful - and often more productive - workflows.
+
+If history rewriting is enabled, the following extensions will be enabled:
+
+absorb
+   `hg absorb` automatically squashes/folds uncommitted changes in the working
+   directory into the appropriate previous changeset. Learn more at
+   https://gregoryszorc.com/blog/2018/11/05/absorbing-commit-changes-in-mercurial-4.8/.
+
+histedit
+   `hg histedit` allows interactive editing of previous changesets. It presents
+   you a list of changesets and allows you to pick actions to perform on each
+   changeset. Actions include reordering changesets, dropping changesets,
+   folding multiple changesets together, and editing the commit message for
+   a changeset.
+
+rebase
+   `hg rebase` allows re-parenting changesets from one "branch" of a DAG
+   to another. The command is typically used to "move" changesets based on
+   an older changeset to be based on the newest changeset.
+
+Would you like to enable these history editing extensions (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 
 EVOLVE_INFO_WARNING = '''
 The evolve extension is an experimental extension for faster and
@@ -459,7 +485,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkcurses(ui, cw)
 
     if 'historyediting' in runsteps:
-        _checkhistoryediting(ui, cw)
+        _checkhistoryediting(ui, cw, hgversion)
 
     if 'evolve' in runsteps:
         _checkevolve(ui, cw, hgversion)
@@ -787,13 +813,16 @@ def _checkcurses(ui, cw):
     cw.c['ui']['interface'] = 'curses'
 
 
-def _checkhistoryediting(ui, cw):
+def _checkhistoryediting(ui, cw, hg_version):
     extensions = {'histedit', 'rebase'}
+
+    if hg_version >= (4, 8, 0):
+        extensions.add('absorb')
 
     if all(ui.hasconfig('extensions', e) for e in extensions):
         return
 
-    if ui.promptchoice('Enable history rewriting commands (Yn)? $$ &Yes $$ &No'):
+    if uipromptchoice(ui, HISTORY_EDITING_INFO):
         return
 
     if 'extensions' not in cw.c:
