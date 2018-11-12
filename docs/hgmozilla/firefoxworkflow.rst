@@ -60,10 +60,9 @@ Make more changes and keep committing::
    $ hg commit
    <another commit message>
 
-Push your changes to MozReview to initiate code review::
-
-   $ hg push review
-
+Push your changes to Phabricator to initiate code review. See the `the Phabricator
+documentation <https://moz-conduit.readthedocs.io/en/latest/phabricator-user.html>`_
+for more information.
 
 OK. Progress on that feature is blocked waiting on review. It could
 take a while for that to happen. Let's start working on something else. We
