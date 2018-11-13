@@ -166,6 +166,15 @@ def purgewrapper(orig, ui, *args, **kwargs):
         return orig(ui, *args, **kwargs)
 
 
+def peerlookup(remote, v):
+    # TRACKING hg46 4.6 added commandexecutor API.
+    if util.safehasattr(remote, 'commandexecutor'):
+        with remote.commandexecutor() as e:
+            return e.callcommand('lookup', {'key': v}).result()
+    else:
+        return remote.lookup(v)
+
+
 @command('robustcheckout', [
     ('', 'upstream', '', 'URL of upstream repo to clone from'),
     ('r', 'revision', '', 'Revision to check out'),
@@ -529,7 +538,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
     try:
         clonepeer = hg.peer(ui, {}, cloneurl)
-        rootnode = clonepeer.lookup('0')
+        rootnode = peerlookup(clonepeer, '0')
     except error.RepoLookupError:
         raise error.Abort('unable to resolve root revision from clone '
                           'source')
@@ -657,7 +666,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         remote = None
         try:
             remote = hg.peer(repo, {}, url)
-            pullrevs = [remote.lookup(revision or branch)]
+            pullrevs = [peerlookup(remote, revision or branch)]
             checkoutrevision = hex(pullrevs[0])
             if branch:
                 ui.warn('(remote resolved %s to %s; '
