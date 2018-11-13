@@ -150,25 +150,26 @@ continue with the history editing.
 Once all the changes are made, you'll want to submit to Phabricator for review
 once more. Then we're back to waiting.
 
-Then we're back to waiting.
-
-Autolanding
------------
+Landing Code
+------------
 
 You finally get review and can land your changes!
 
-The easiest way to do this is through the use of Autoland. You can access
-Autoland through the ``Land Commits`` option of the ``Automation`` menu.
-Clicking this button displays a dialog containing a list of commits to be
-landed. MozReview will attempt to automatically rewrite the commit messages
-to reflect who reviewed which commit. If everything looks good, click the
-``OK`` button and the autolander will land your commits for you.
+The easiest way to do this is through the use of Lando. You can access
+Lando through ``View stack in Lando`` on the right of your Phabricator review.
+Clicking this button takes the user to a menu which displays the stack of
+changesets to land, the history of previous landing attempts and a big green
+"Preview Landing" button. Clicking this button will allow you to check that
+the state of the changesets is appropriate for landing, and that there are
+no landing warnings. If there are landing warnings but you feel the stack
+can still land despite them, simply check the radio box to acknowledge
+the risks and proceed as usual.
 
-Autoland will attempt to rebase you commits on the head of the ``autoland``
+Lando will attempt to rebase you commits on the head of the ``autoland``
 repo for you automatically. If it can't do this (say there was a file merge
-conflict during the base), an error will (eventually) be displayed in MozReview
-and you will have to rebase yourself and push the result back to MozReview
-and try the autoland request again.
+conflict during the base), an error will (eventually) be displayed in the
+Lando landing attempt history and you will have to rebase yourself and push
+the result back to Lando and try the request again.
 
 .. note::
 
@@ -176,11 +177,14 @@ and try the autoland request again.
    will be removing *integration repos* in the future so the history of
    mozilla-central isn't linear and free of merge commits.
 
-If Autoland succeeds, *Pulsebot* will comment in your bug that your
+If Lando succeeds, *Pulsebot* will comment in your bug that your
 changes have landed. Unfortunately, there is not currently any notification
-that Autoland has failed outside of MozReview, so if the trees are open
+that Lando has failed outside of Lando itself, so if the trees are open
 and your changes have not landed within a few minutes, please check back
 in MozReview to see if any errors have occurred.
+
+For more detailed information, please reference the
+`Lando user guide <https://moz-conduit.readthedocs.io/en/latest/lando-user.html>`_.
 
 Manual Reviewer Attribution and Landing
 ---------------------------------------
