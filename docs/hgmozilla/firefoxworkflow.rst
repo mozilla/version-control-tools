@@ -146,10 +146,7 @@ continue with the history editing.
 
    Advanced users can use the
    `evolve extension <https://bitbucket.org/marmoute/mutable-history>`
-   to edit changesets in place. Because this is still an experimental
-   feature, it isn't documented here.
-
-Once all the changes are made, you'll want to submit for review again::
+   to edit changesets in place.
 
    $ hg push review
 
