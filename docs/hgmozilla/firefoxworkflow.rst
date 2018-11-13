@@ -75,7 +75,6 @@ we've event started.::
    $ hg commit
    <change stuff>
    $ hg commit
-   $ hg push review
 
 Changing Code After Reviews
 ---------------------------
@@ -148,7 +147,8 @@ continue with the history editing.
    `evolve extension <https://bitbucket.org/marmoute/mutable-history>`
    to edit changesets in place.
 
-   $ hg push review
+Once all the changes are made, you'll want to submit to Phabricator for review
+once more. Then we're back to waiting.
 
 Then we're back to waiting.
 
