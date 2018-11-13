@@ -133,7 +133,7 @@ You'll then need to:
 2. Set the action on these *fixup changesets* to ``roll`` so they
    are fully absorbed into the changeset that came before.
 
-Alterantively, you can edit changes directly. Again, use ``hg histedit``.
+Alternatively, you can edit changes directly. Again, use ``hg histedit``.
 But this time, change the action of the changesets you want to modify to
 ``edit``. Mercurial will print some things and will leave you with a
 shell. The *working directory* will have been updated to the state of
