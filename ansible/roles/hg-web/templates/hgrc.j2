@@ -77,6 +77,7 @@ replicateowner = /var/hg/version-control-tools/hgext/replicateowner
 serverlog = /var/hg/version-control-tools/hgext/serverlog
 hgmo = /var/hg/version-control-tools/hgext/hgmo
 vcsreplicator-hgweb = /var/hg/version-control-tools/pylib/vcsreplicator/vcsreplicator/hgwebext.py
+wireprotocache = /var/hg/version-control-tools/hgext/wireprotocache
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
@@ -108,3 +109,23 @@ pullclonebundlesmanifest = true
 
 [mozilla]
 firefoxreleasesdb = /var/hg/fxreleases/db.db
+
+[wireprotocache]
+plugin = s3
+
+[wireprotocache.s3]
+access_key_id = {{ s3_cache_access_key_id | mandatory }}
+secret_access_key = {{ s3_cache_secret_key | mandatory }}
+
+bucket = {{ s3_cache_bucket | mandatory }}
+region = {{ s3_cache_region | mandatory }}
+
+# Private by default. Bucket IAM policy can override.
+cacheacl = private
+
+redirecttargets = {{ s3_cache_redirect_targets | mandatory }}
+
+# Caching small responses doesn't make much sense, as the overhead
+# from having the client make a new HTTP request will often be
+# higher than transferring data inline.
+minimumobjectsize = 65536

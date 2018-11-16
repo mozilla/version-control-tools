@@ -30,3 +30,9 @@ chroot_mozbuild_exists: False
 bloxtool_user: bloxtool_user
 bloxtool_password: bloxtool_password
 bloxtool_url: https://bloxtool
+
+s3_cache_access_key_id: dummy_aws_access_key_id
+s3_cache_secret_key: dummy_aws_secret_key
+s3_cache_bucket: moz-hg-wireproto-cache-testing
+s3_cache_region: us-west-1
+s3_cache_redirect_targets: https://s3-us-west-1.amazonaws.com/moz-hg-wireproto-cache-testing/
