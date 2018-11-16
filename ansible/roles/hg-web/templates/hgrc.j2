@@ -114,8 +114,8 @@ firefoxreleasesdb = /var/hg/fxreleases/db.db
 plugin = s3
 
 [wireprotocache.s3]
-access_key_id = {{ s3_cache_access_key_id | mandatory }}
-secret_access_key = {{ s3_cache_secret_key | mandatory }}
+access-key-id = {{ s3_cache_access_key_id | mandatory }}
+secret-access-key = {{ s3_cache_secret_key | mandatory }}
 
 bucket = {{ s3_cache_bucket | mandatory }}
 region = {{ s3_cache_region | mandatory }}
