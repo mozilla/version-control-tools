@@ -77,7 +77,9 @@ replicateowner = /var/hg/version-control-tools/hgext/replicateowner
 serverlog = /var/hg/version-control-tools/hgext/serverlog
 hgmo = /var/hg/version-control-tools/hgext/hgmo
 vcsreplicator-hgweb = /var/hg/version-control-tools/pylib/vcsreplicator/vcsreplicator/hgwebext.py
-wireprotocache = /var/hg/version-control-tools/hgext/wireprotocache
+
+# Disabled until proxy ACL is in place.
+#wireprotocache = /var/hg/version-control-tools/hgext/wireprotocache
 
 [interhg]
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
