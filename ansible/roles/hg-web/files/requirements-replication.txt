@@ -6,12 +6,28 @@
 #
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
+boto3==1.9.46 \
+    --hash=sha256:477d2837ae31269c9a8994d449f61cac26d0669b080504898240600afe044cc5 \
+    --hash=sha256:c6b016e59819a276ce0000477025bd2142776bcd573ae315194eb7bc1e13b711
+botocore==1.12.46 \
+    --hash=sha256:aabce87b8f01745712ac4b0504ce8dc119d39e67ffc05ab2ef05b417e3ca0de5 \
+    --hash=sha256:cb518da8f2d6c5a4f499261e8ab52e149c016b805bca8c104b38dda106d27ff5 \
+    # via boto3, s3transfer
 cbor2==4.1.1 \
     --hash=sha256:0ea840a7aac8cc18f2e9b9ae3cbc38420ae8696f56becde11c3d57289153ff72 \
     --hash=sha256:85fcf3d2cf1f2bf8538dca43f879e6aa61d74beea49412e137cc5d56f9de103c
+docutils==0.14 \
+    --hash=sha256:02aec4bd92ab067f6ff27a38a38a41173bf01bed8f89157768c1573f53e474a6 \
+    --hash=sha256:51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274 \
+    --hash=sha256:7a4bd47eaf6596e1295ecb11361139febe29b084a87bf005bf899f9a42edc3c6 \
+    # via botocore
 futures==3.2.0 \
     --hash=sha256:9ec02aa7d674acb8618afb127e27fde7fc68994c0437ad759fa094a574adb265 \
     --hash=sha256:ec0a6cb848cc212002b9828c3e34c675e0c9ff6741dc445cab6fdd4e1085d1f1
+jmespath==0.9.3 \
+    --hash=sha256:6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64 \
+    --hash=sha256:f11b4461f425740a1d908e9a3f7365c3d2e569f6ca68a2ff8bc5bcd9676edd63 \
+    # via boto3, botocore
 kafka-python==1.4.2 \
     --hash=sha256:6a5c516f540f4b13b78c64a85dd42dc38fe29257e2fae6393fc5daff9106389b \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
@@ -19,6 +35,10 @@ mercurial==4.8 \
     --hash=sha256:039c3ba92f37a6eb2868443c675bd3fac2b0057d10ded5443980e5862ceeecfb \
     --hash=sha256:c56b403ad3b83ea91f3758c6df25b9f77deb4affada6c63160b3d325dc923f03 \
     --hash=sha256:c8efb32a6b3ccdce7d032b4e227cc07dfacdbe653ce2844c27b5def531628a7d
+python-dateutil==2.7.5 \
+    --hash=sha256:063df5763652e21de43de7d9e00ccf239f953a832941e37be541614732cdfc93 \
+    --hash=sha256:88f9287c0174266bb0d8cedd395cfba9c58e87e5ad86b2ce58859bc11be3cf02 \
+    # via botocore
 python-hglib==2.6.1 \
     --hash=sha256:7c1fa0cb4d332dd6ec8409b04787ceba4623e97fb378656f7cab0b996c6ca3b2
 pyyaml==3.13 \
@@ -33,8 +53,16 @@ pyyaml==3.13 \
     --hash=sha256:d5eef459e30b09f5a098b9cea68bebfeb268697f78d647bd255a085371ac7f3f \
     --hash=sha256:e01d3203230e1786cd91ccfdc8f8454c8069c91bee3962ad93b87a4b2860f537 \
     --hash=sha256:e170a9e6fcfd19021dd29845af83bb79236068bf5fd4df3327c1be18182b2531
+s3transfer==0.1.13 \
+    --hash=sha256:90dc18e028989c609146e241ea153250be451e05ecc0c2832565231dacdf59c1 \
+    --hash=sha256:c7a9ec356982d5e9ab2d4b46391a7d6a950e2b04c472419f5fdec70cc0ada72f \
+    # via boto3
 six==1.11.0 \
     --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
     --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb
 tabulate==0.8.2 \
     --hash=sha256:e4ca13f26d0a6be2a2915428dc21e732f1e44dad7f76d7030b2ef1ec251cf7f2
+urllib3==1.24.1 \
+    --hash=sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39 \
+    --hash=sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22 \
+    # via botocore

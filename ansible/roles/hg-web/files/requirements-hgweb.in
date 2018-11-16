@@ -1,6 +1,7 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
+boto3
 cbor2
 ipaddress
 Mercurial==4.8

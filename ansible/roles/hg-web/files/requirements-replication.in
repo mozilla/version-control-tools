@@ -4,6 +4,9 @@
 # Used to load replication state file.
 cbor2
 
+# Needed because wireproto caching extension is enabled globally.
+boto3
+
 futures
 kafka-python==1.4.2
 Mercurial==4.8

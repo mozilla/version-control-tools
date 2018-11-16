@@ -1,6 +1,9 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
+# Needed because wireproto caching extension is enabled globally.
+boto3
+
 bloxtool==0.33
 cbor2
 futures
