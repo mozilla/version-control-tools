@@ -16,6 +16,11 @@ mach==0.5.1
 Mercurial==4.8
 mock
 
+# For wireprotocache s3
+Flask
+moto
+simplejson
+
 # For moz.build reading in hgmo extension.
 mozbuild==0.2
 

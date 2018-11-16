@@ -103,4 +103,25 @@ def has_internet():
         return False
 
 
+@check('motoserver', 'moto AWS mock server')
+def has_s3():
+    '''Assert the boto3 mock library `moto` is available,
+    as well as the `Flask` dependency which enables running
+    a mock S3 server
+    '''
+    try:
+        import moto
+        moto.mock_s3
+
+        import flask
+        flask.Flask
+
+        import simplejson
+        simplejson.__version__
+
+        return True
+    except (ImportError, AttributeError):
+        pass
+    return False
+
 require(sys.argv[1:])
