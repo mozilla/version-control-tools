@@ -219,6 +219,13 @@
         group=hg
         mode=0775
 
+- name: create directory for bootstrap logs
+  file: path=/var/log/vcsrbootstrap
+        state=directory
+        owner=hg
+        group=hg
+        mode=0775
+
 - name: write list of repositories to generate bundles for
   copy: src=bundle-repos
         dest=/repo/hg/bundles/repos

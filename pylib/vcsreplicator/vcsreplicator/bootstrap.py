@@ -32,12 +32,28 @@ from .consumer import (
 
 REPOS_DIR = '/repo/hg/mozilla'
 
-logger = logging.getLogger('vcsreplicator.bootstrap')
+formatter = logging.Formatter('%(asctime)s %(name)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+formatter.converter = time.gmtime
 
-# Quiet down the vcsreplicator.consumer logger when these scripts are running
+logger = logging.getLogger('vcsreplicator.bootstrap')
+main_file_handler = logging.FileHandler('/var/log/vcsrbootstrap/bootstrap.log')
+main_file_handler.setFormatter(formatter)
+main_stdout_handler = logging.StreamHandler(sys.stdout)
+main_stdout_handler.setFormatter(formatter)
+logger.addHandler(main_file_handler)
+logger.addHandler(main_stdout_handler)
+logger.setLevel(logging.INFO)
+
+# Send vcsreplicator consumer logs to a separate file
 consumer_logger = logging.getLogger('vcsreplicator.consumer')
-null_handler = logging.FileHandler('/dev/null')
-consumer_logger.addHandler(null_handler)
+consumer_handler = logging.FileHandler('/var/log/vcsrbootstrap/consumer.log')
+consumer_logger.addHandler(consumer_handler)
+
+# Send kafka-python logs to a separate file
+kafka_logger = logging.getLogger('kafka')
+kafka_handler = logging.FileHandler('/var/log/vcsrbootstrap/kafka.log')
+kafka_handler.setLevel(logging.DEBUG)
+kafka_logger.addHandler(kafka_handler)
 
 
 def clone_repo(config, path, requirements, hgrc, heads):
@@ -149,15 +165,6 @@ def hgweb():
     vcsreplicator config path on the CLI and takes a JSON data structure
     on stdin'''
     import argparse
-
-    # Configure logging
-    logger.setLevel(logging.INFO)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)s %(message)s')
-    formatter.converter = time.gmtime
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
 
     # Parse CLI args
     parser = argparse.ArgumentParser()

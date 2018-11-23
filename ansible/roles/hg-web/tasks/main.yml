@@ -614,6 +614,13 @@
         group=root
         mode=0755
 
+- name: create directory for bootstrap logs
+  file: path=/var/log/vcsrbootstrap
+        state=directory
+        owner=hg
+        group=hg
+        mode=0775
+
 - name: directory for repos deleted through vcsreplicator
   file: path=/repo/hg/todelete
         owner=hg
