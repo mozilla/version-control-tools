@@ -315,6 +315,11 @@ except AttributeError:
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
+from mozhg.util import import_module
+
+# TRACKING hg47
+templateutil = import_module('mercurial.templateutil')
+
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
 with demandimport.deactivated():
@@ -340,8 +345,8 @@ with demandimport.deactivated():
 
 bz_available = False
 
-testedwith = '4.3 4.4 4.5 4.6'
-minimumhgversion = '4.3'
+testedwith = '4.4 4.5 4.6 4.7'
+minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
 cmdtable = {}
@@ -1105,21 +1110,35 @@ def template_bug(repo, ctx, **args):
 @templatekeyword('bugs')
 def template_bugs(repo, ctx, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
-    return parse_bugs(ctx.description())
+    bugs = parse_bugs(ctx.description())
+
+    # TRACKING hg47
+    if templateutil:
+        bugs = templateutil.hybridlist(bugs, 'bugs')
+
+    return bugs
 
 
 @templatekeyword('reviewer')
 def template_reviewer(repo, ctx, **args):
     """:reviewer: String. The first reviewer of this changeset."""
-    reviewers = list(parse_reviewers(ctx.description()))
-    return reviewers[0] if reviewers else None
+    reviewers = parse_reviewers(ctx.description())
+    try:
+        first_reviewer = next(reviewers)
+        return first_reviewer
+    except StopIteration:
+        return None
 
 
 @templatekeyword('reviewers')
 def template_reviewers(repo, ctx, **args):
     """:reviewers: List of strings. The reviewers associated with tis
     changeset."""
-    return parse_reviewers(ctx.description())
+    # TRACKING hg47
+    if templateutil:
+        return templateutil.mappinggenerator(parse_reviewers, args=(ctx.description(),))
+    else:
+        return parse_reviewers(ctx.description())
 
 
 def _compute_first_version(repo, ctx, what, cache):
@@ -1295,8 +1314,13 @@ def template_pushdates(repo, ctx, **args):
     """:pushdates: List of date information. The dates this changeset was
     pushed to various trees."""
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
+    pushdates = [util.makedate(p[2]) for p in pushes]
 
-    return [util.makedate(p[2]) for p in pushes]
+    # TRACKING hg47
+    if templateutil:
+        pushdates = templateutil.hybridlist(pushdates, 'pushdates')
+
+    return pushdates
 
 
 def template_pushheaddates(repo, ctx, **args):
@@ -1304,20 +1328,37 @@ def template_pushheaddates(repo, ctx, **args):
     was pushed to various trees as a push head."""
     node = ctx.node()
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
+    pushheaddates = [util.makedate(p[2]) for p in pushes if str(p[4]) == node]
 
-    return [util.makedate(p[2]) for p in pushes if str(p[4]) == node]
+    # TRACKING hg47
+    if templateutil:
+        pushheaddates = templateutil.hybridlist(pushheaddates, 'pushheaddates')
+
+    return pushheaddates
 
 
 def template_trees(repo, ctx, **args):
     """:trees: List of strings. Trees this changeset has landed in.
     """
-    return [p[0] for p in repo.changetracker.pushes_for_changeset(ctx.node())]
+    trees = [p[0] for p in repo.changetracker.pushes_for_changeset(ctx.node())]
+
+    # TRACKING hg47
+    if templateutil:
+        trees = templateutil.hybridlist(trees, 'trees')
+
+    return trees
 
 
 def template_reltrees(repo, ctx, **args):
     """:reltrees: List of strings. Release trees this changeset has landed in.
     """
-    return [t for t in template_trees(repo, ctx, **args) if t in RELEASE_TREES]
+    reltrees = [t for t in template_trees(repo, ctx, **args) if t in RELEASE_TREES]
+
+    # TRACKING hg47
+    if templateutil:
+        reltrees = templateutil.hybridlist(reltrees, 'reltrees')
+
+    return reltrees
 
 
 # [gps] This function may not be necessary. However, I was unable to figure out
