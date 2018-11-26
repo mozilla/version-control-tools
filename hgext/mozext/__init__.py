@@ -320,6 +320,14 @@ from mozhg.util import import_module
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
 
+# TRACKING hg47
+# util.makedate -> utils.dateutils.makedate
+dateutil = import_module('mercurial.utils.dateutil')
+if dateutil:
+    makedate = dateutil.makedate
+else:
+    makedate = util.makedate
+
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
 with demandimport.deactivated():
@@ -1307,14 +1315,14 @@ def template_firstpushdate(repo, ctx, **args):
     if not pushes:
         return None
 
-    return util.makedate(pushes[0][2])
+    return makedate(pushes[0][2])
 
 
 def template_pushdates(repo, ctx, **args):
     """:pushdates: List of date information. The dates this changeset was
     pushed to various trees."""
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushdates = [util.makedate(p[2]) for p in pushes]
+    pushdates = [makedate(p[2]) for p in pushes]
 
     # TRACKING hg47
     if templateutil:
@@ -1328,7 +1336,7 @@ def template_pushheaddates(repo, ctx, **args):
     was pushed to various trees as a push head."""
     node = ctx.node()
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushheaddates = [util.makedate(p[2]) for p in pushes if str(p[4]) == node]
+    pushheaddates = [makedate(p[2]) for p in pushes if str(p[4]) == node]
 
     # TRACKING hg47
     if templateutil:
