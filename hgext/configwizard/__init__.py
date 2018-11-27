@@ -237,6 +237,21 @@ b) perform head/bookmark-based development (as opposed to mq)
 Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+FORMATSOURCE_INFO = '''
+The extension provides a way to run code-formatting tools in a way that avoids
+conflicts related to this formatting when merging/rebasing code across the
+reformatting.
+We encourage you to use this extension specially for formatting and managing C/C++
+source code. An example of a .hgrc configuration that uses our embedded clang-format
+utility from 'mach' is as follows:
+[format-source]
+clang-format = [Path To Mozilla Repo]/mach clang-format -assume-filename=$HG_FILENAME -p
+clang-format:configpaths = .clang-format, .clang-format-ignore
+clang-format:fileext = .cpp, .c, .h
+
+Would you like to activate format-source (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 CODEREVIEW_INFO = '''
 Commits to Mozilla projects are typically sent to Phabricator. This is the
 preferred code review tool at Mozilla.
@@ -415,6 +430,7 @@ wizardsteps = set([
     'blackbox',
     'security',
     'firefoxtree',
+    'format-source',
     'wip',
     'codereview',
     'pushtotry',
@@ -503,6 +519,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
+
+    if 'format-source' in runsteps:
+        _promptvctextension(ui, cw, 'format-source', FORMATSOURCE_INFO)
 
     if 'wip' in runsteps:
         _checkwip(ui, cw)
