@@ -13,8 +13,8 @@ Rejecting format-source doesn't enable it
   
   To begin, press the enter/return key.
    <RETURN>
-  The extension provides a way to run code-formatting tools in a way that avoids
-  conflicts related to this formatting when merging/rebasing code across the
+  The "format-source" extension provides a way to run code-formatting tools in a way that
+  avoids conflicts related to this formatting when merging/rebasing code across the
   reformatting.
   We encourage you to use this extension specially for formatting and managing C/C++
   source code. An example of a .hgrc configuration that uses our embedded clang-format
@@ -49,8 +49,8 @@ format-source enabled when requested
   
   To begin, press the enter/return key.
    <RETURN>
-  The extension provides a way to run code-formatting tools in a way that avoids
-  conflicts related to this formatting when merging/rebasing code across the
+  The "format-source" extension provides a way to run code-formatting tools in a way that
+  avoids conflicts related to this formatting when merging/rebasing code across the
   reformatting.
   We encourage you to use this extension specially for formatting and managing C/C++
   source code. An example of a .hgrc configuration that uses our embedded clang-format
