@@ -7,8 +7,4 @@ import os
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', '..', '..', 'bootstrap.py'))
 
-config = "/repo/hg/webroot_wsgi/releases/gaia-l10n/v2_1/hgweb.config"
-
-from mercurial.hgweb import hgweb
-
-application = hgweb(config)
+application = make_application(OUR_DIR)

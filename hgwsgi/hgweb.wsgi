@@ -6,9 +6,4 @@ import os
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, 'bootstrap.py'))
 
-# Path to repo or hgweb config to serve (see 'hg help hgweb')
-config = "/repo/hg/webroot_wsgi/hgweb.config"
-
-from mercurial.hgweb import hgweb
-
-application = hgweb(config)
+application = make_application(OUR_DIR)

@@ -7,3 +7,12 @@
 import os
 
 os.environ['HGENCODING'] = 'UTF-8'
+
+
+from mercurial.hgweb import hgweb
+
+
+def make_application(wsgi_dir):
+    config = os.path.join(wsgi_dir, 'hgweb.config')
+
+    return hgweb(config)
