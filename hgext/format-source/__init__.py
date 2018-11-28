@@ -132,7 +132,23 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
         matcher = scmutil.match(wctx, pats, opts)
         files = list(wctx.matches(matcher))
 
-        batchformat(repo, wctx, tool, shell_tool, file_ext, files)
+        if util.versiontuple(n=2) >= (4, 7):
+            # In 4.7 we have ui.makeprogress
+            with ui.makeprogress(
+                    _('formatting'), unit=_('files'),
+                    total=len(files)) as progress:
+                proc = worker.worker(ui, 0.1, batchformat,
+                                     (repo, wctx, tool, shell_tool, file_ext),
+                                     files)
+                for filepath in proc:
+                    progress.increment(item=filepath)
+        else:
+            proc = worker.worker(ui, 0.1, batchformat,
+                                 (repo, wctx, tool, shell_tool, file_ext),
+                                 files)
+            # Wait for everything to finish
+            for filepath in proc:
+                pass
 
         # update the storage to mark formated file as formatted
         with repo.wvfs(file_storage_path, mode='ab') as storage:
@@ -175,6 +191,7 @@ def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
             with repo.wvfs(filepath, 'wb') as formatted_file:
                 formatted_file.write(newcontent)
             wctx.filectx(filepath).setflags(False, 'x' in flags)
+        yield filepath
 
 def run_tools(ui, root, tool, cmd, filepath, filename):
     """Run the a formatter tool on a specific file"""
