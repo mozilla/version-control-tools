@@ -3,3 +3,7 @@
 
 # This file contains common code that is executed by every hgweb.wsgi
 # WSGI entrypoint.
+
+import os
+
+os.environ['HGENCODING'] = 'UTF-8'

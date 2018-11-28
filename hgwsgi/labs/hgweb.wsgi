@@ -11,7 +11,5 @@ config = "/repo/hg/webroot_wsgi/labs/hgweb.config"
 
 from mercurial.hgweb import hgweb
 
-os.environ["HGENCODING"] = "UTF-8"
-
 application = hgweb(config)
 

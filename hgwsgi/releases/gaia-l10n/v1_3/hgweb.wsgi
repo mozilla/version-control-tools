@@ -11,7 +11,5 @@ config = "/repo/hg/webroot_wsgi/releases/gaia-l10n/v1_3/hgweb.config"
 
 from mercurial.hgweb import hgweb
 
-os.environ["HGENCODING"] = "UTF-8"
-
 application = hgweb(config)
 
