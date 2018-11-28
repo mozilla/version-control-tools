@@ -97,7 +97,9 @@ from mercurial import (
     templatefilters,
     templateutil,
     util,
+    wireprototypes,
     wireprotov1server,
+    wireprotov2server,
 )
 from mercurial.hgweb import (
     request as requestmod,
@@ -957,6 +959,56 @@ def hgwebfastannotate(orig, req, fctx, ui):
     diffopts = webutil.difffeatureopts(req, ui, 'annotate')
 
     return fasupport._doannotate(fctx, diffopts=diffopts)
+
+
+# TRACKING hg49 need a custom wire protocol command to serve cache files
+# to facilitate faster partial clones.
+@wireprotov2server.wireprotocommand(
+    'mozrawcachefiles',
+    args={
+        'files': {
+            'type': 'set',
+            'default': lambda: set(),
+            'example': [b'hgtagsfnodes', b'manifestlog'],
+        },
+    },
+    permission='pull')
+def mozrawcachefiles(repo, proto, files):
+    from mercurial import cacheutil
+
+    # We assume that this establishes a reasonable filter on cache
+    # files and the data being exposed is not "private."
+    cachefiles = cacheutil.cachetocopy(repo)
+
+    sendfiles = []
+    totalsize = 0
+
+    for cache in cachefiles:
+        if files and cache not in files:
+            continue
+
+        if not repo.cachevfs.exists(cache):
+            continue
+
+        data = repo.cachevfs.read(cache)
+
+        sendfiles.append((b'cache', cache, data))
+        totalsize += len(data)
+
+    # The format is the same as the rawstorefiledata command.
+    yield {
+        b'filecount': len(sendfiles),
+        b'totalsize': totalsize,
+    }
+
+    for location, name, data in sendfiles:
+        yield {
+            b'location': location,
+            b'path': name,
+            b'size': len(data),
+        }
+
+        yield wireprototypes.indefinitebytestringresponse([data])
 
 
 def extsetup(ui):
