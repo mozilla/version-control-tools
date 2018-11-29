@@ -63,6 +63,13 @@ from mercurial import (
 
 from mercurial.i18n import _
 
+OUR_DIR = os.path.dirname(__file__)
+execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+
+from mozhg.util import (
+    is_firefox_repo,
+)
+
 __version__ = '0.1.0.dev'
 testedwith = '4.4.2 4.5.3 4.6.2 4.7.2 4.8'
 minimumhgversion = '4.4'
@@ -81,6 +88,22 @@ if util.safehasattr(registrar, 'configitem'):
     configitem('format-source', '.*', default=None, generic=True)
 
 file_storage_path = '.hg-format-source'
+
+
+def return_default_clang_format(repo):
+    clang_format_cmd = os.path.join(
+        repo.root,
+        "mach") + " clang-format" + " -assume-filename=$HG_FILENAME -p"
+    clang_format_cfgpaths = ['.clang-format', '.clang-format-ignore']
+    clang_fortmat_fileext = ('.cpp', '.c', '.cc', '.h')
+
+    return clang_format_cmd, clang_format_cfgpaths, clang_fortmat_fileext
+
+
+def should_use_default(repo, tool):
+    return tool == 'clang-format' and not repo.ui.config(
+        'format-source', tool) and is_firefox_repo(repo)
+
 
 @command('format-source',
         [] + commands.walkopts + commands.commitopts + commands.commitopts2,
@@ -116,9 +139,18 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
         # formating tool
         if ' ' in tool:
             raise error.Abort(_("tool name cannot contain space: '%s'") % tool)
-        shell_tool = repo.ui.config('format-source', tool)
-        tool_config_files = repo.ui.configlist('format-source', '%s:configpaths' % tool)
-        file_ext = tuple(repo.ui.configlist('format-source', '%s:fileext' % tool))
+
+        # if tool was not specified in the cfg maybe we can use our mozilla firefox in tree clang-format tool
+        if should_use_default(repo, tool):
+            shell_tool, tool_config_files, file_ext = return_default_clang_format(
+                repo)
+        else:
+            shell_tool = repo.ui.config('format-source', tool)
+            tool_config_files = repo.ui.configlist('format-source',
+                                                   '%s:configpaths' % tool)
+            file_ext = tuple(
+                repo.ui.configlist('format-source', '%s:fileext' % tool))
+
         if not shell_tool:
             msg = _("unknown format tool: %s (no 'format-source.%s' config)")
             raise error.Abort(msg.format(tool, tool))
@@ -177,7 +209,8 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
 
 def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
     for filepath in files:
-        if not filepath.endswith(tuple(file_ext)):
+        if not filepath.endswith(file_ext):
+            repo.ui.debug("batchformat skip: {}\n".format(filepath))
             continue
         flags = wctx.flags(filepath)
         if 'l' in flags:
@@ -307,17 +340,30 @@ def apply_formating(repo, formatting, fctx):
     for tool, matcher in sorted(formatting.items()):
         # matches?
         if matcher(fctx.path()):
+            if should_use_default(repo, tool):
+                shell_tool, _, supported_file_ext = return_default_clang_format(
+                    repo)
+            else:
+                shell_tool = repo.ui.config('format-source', tool)
+                supported_file_ext = tuple(
+                    repo.ui.configlist('format-source', '%s:fileext' % tool))
+
             if data is None:
                 data = fctx.data()
-            shell_tool = repo.ui.config('format-source', tool)
+
+            if not fctx.path().endswith(supported_file_ext):
+                repo.ui.debug('Apply formatting skipping: {}\n'.format(fctx.path()))
+                continue
+
             if not shell_tool:
                 msg = _("format-source, no command defined for '%s',"
                         " skipping formating: '%s'\n")
                 msg %= (tool, fctx.path())
                 repo.ui.warn(msg)
                 continue
-            _, file_ext = os.path.splitext(fctx.path())
-            with tempfile.NamedTemporaryFile(delete=True, suffix=file_ext if file_ext else "", mode='wb') as f:
+            # Determine the extension of the file to pass it to the temp file
+            _, fileext = os.path.splitext(fctx.path())
+            with tempfile.NamedTemporaryFile(delete=True, suffix=fileext, mode='wb') as f:
                 f.write(data)
                 f.flush()
                 data = run_tools(repo.ui, repo.root, tool,
@@ -348,6 +394,8 @@ def _update_filemerge_content(repo, fcd, fco, fca):
     ances = fca._changectx
     all = allformatted(repo, local, other, ances)
     local_formating, other_formating, full_formating = all
+
+    repo.ui.debug('Files to be: {} {} {}\n'.format(fcd.path(), fco.path(), fca.path()))
     apply_formating(repo, local_formating, fco)
     apply_formating(repo, other_formating, fcd)
     apply_formating(repo, full_formating, fca)

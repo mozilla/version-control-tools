@@ -249,6 +249,8 @@ clang-format = [Path To Mozilla Repo]/mach clang-format -assume-filename=$HG_FIL
 clang-format:configpaths = .clang-format, .clang-format-ignore
 clang-format:fileext = .cpp, .c, .h
 
+If `clang-format` is not present under `[format-source]` a default configuration will be used
+that is embedded in this extension. The default configuration can be used in most cases.
 Would you like to activate format-source (Yn)? $$ &Yes $$ &No
 '''.strip()
 
