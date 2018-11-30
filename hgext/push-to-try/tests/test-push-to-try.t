@@ -51,7 +51,8 @@ state.
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 1 changesets, 1 total revisions
+  1 files, 1 changesets, 1 total revisions (no-hg48 !)
+  checked 1 changesets with 1 changes to 1 files (hg48 !)
 
 Test the uncommited changes made it to our remote.
 
