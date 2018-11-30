@@ -213,6 +213,14 @@ In new versions of Mercurial, the revset expression `unstable` has been renamed 
 We will update the alias for you so it uses the new keyword.
 '''.lstrip()
 
+SMARTANNOTATE_INFO = '''
+The ``hg smart-annotate`` command provides experimental support for
+viewing the annotate information while skipping certain changesets,
+such as code-formatting changes.
+
+Would you like to install the `hg smart-annotate` alias (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 FIREFOXTREE_INFO = '''
 The firefoxtree extension makes interacting with the multiple Firefox
 repositories easier:
@@ -434,6 +442,7 @@ wizardsteps = set([
     'firefoxtree',
     'format-source',
     'wip',
+    'smartannotate',
     'codereview',
     'pushtotry',
     'multiplevct',
@@ -527,6 +536,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'wip' in runsteps:
         _checkwip(ui, cw)
+
+    if 'smartannotate' in runsteps:
+        _checksmartannotate(ui, cw)
 
     if 'codereview' in runsteps:
         _checkcodereview(ui, cw)
@@ -1022,6 +1034,27 @@ def _set_color(cw, name, value):
         cw.c['color'] = {}
     if name not in cw.c['color']:
         cw.c['color'][name] = value
+
+
+def _checksmartannotate(ui, cw):
+    havesmartannotate_alias = ui.hasconfig('alias', 'smart-annotate')
+
+    if not havesmartannotate_alias and uipromptchoice(ui, SMARTANNOTATE_INFO):
+        return
+
+    cw.c.setdefault('alias', {})
+    cw.c.setdefault('revsetalias', {})
+    cw.c.setdefault('extdata', {})
+
+    cw.c['alias']['smart-annotate'] = 'annotate -w --skip ignored_changesets'
+
+    cw.c['revsetalias']['ignored_changesets'] = 'desc("ignore-this-changeset") or extdata(get_ignored_changesets)'
+
+    cw.c['extdata']['get_ignored_changesets'] = (
+        'shell:cat '
+        '`hg root`/.hg-annotate-ignore-revs '
+        '2> /dev/null || true'
+    )
 
 
 def _checksecurity(ui, cw, hgversion):
