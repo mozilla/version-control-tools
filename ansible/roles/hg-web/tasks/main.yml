@@ -9,6 +9,7 @@
   with_items:
     # This is likely already installed, but needed for Docker.
     - cronie
+    - gcc
     - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
