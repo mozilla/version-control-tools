@@ -20,7 +20,7 @@ Rejecting format-source doesn't enable it
   source code. An example of a .hgrc configuration that uses our embedded clang-format
   utility from 'mach' is as follows:
   [format-source]
-  clang-format = [Path To Mozilla Repo]/mach clang-format -assume-filename=$HG_FILENAME -p
+  clang-format = [Path To Mozilla Repo]/mach clang-format --assume-filename $HG_FILENAME -p
   clang-format:configpaths = .clang-format, .clang-format-ignore
   clang-format:fileext = .cpp, .c, .h
   
@@ -56,7 +56,7 @@ format-source enabled when requested
   source code. An example of a .hgrc configuration that uses our embedded clang-format
   utility from 'mach' is as follows:
   [format-source]
-  clang-format = [Path To Mozilla Repo]/mach clang-format -assume-filename=$HG_FILENAME -p
+  clang-format = [Path To Mozilla Repo]/mach clang-format --assume-filename $HG_FILENAME -p
   clang-format:configpaths = .clang-format, .clang-format-ignore
   clang-format:fileext = .cpp, .c, .h
   

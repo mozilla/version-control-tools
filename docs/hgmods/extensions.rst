@@ -59,7 +59,7 @@ reformatting.
 
 Example:
     [format-source]
-    clang-format = [Path To Mozilla Repo]/mach clang-format -assume-filename=$HG_FILENAME -p
+    clang-format = [Path To Mozilla Repo]/mach clang-format --assume-filename $HG_FILENAME -p
     clang-format:configpaths = .clang-format, .clang-format-ignore
     clang-format:fileext = .cpp, .c, .h
 

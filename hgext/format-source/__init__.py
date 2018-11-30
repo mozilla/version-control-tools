@@ -93,7 +93,7 @@ file_storage_path = '.hg-format-source'
 def return_default_clang_format(repo):
     clang_format_cmd = os.path.join(
         repo.root,
-        "mach") + " clang-format" + " -assume-filename=$HG_FILENAME -p"
+        "mach") + " clang-format" + " --assume-filename $HG_FILENAME -p"
     clang_format_cfgpaths = ['.clang-format', '.clang-format-ignore']
     clang_fortmat_fileext = ('.cpp', '.c', '.cc', '.h')
 
@@ -366,8 +366,10 @@ def apply_formating(repo, formatting, fctx):
             with tempfile.NamedTemporaryFile(delete=True, suffix=fileext, mode='wb') as f:
                 f.write(data)
                 f.flush()
-                data = run_tools(repo.ui, repo.root, tool,
-                                 shell_tool, f.name, fctx.path())
+                formatted_data = run_tools(repo.ui, repo.root, tool,
+                                           shell_tool, f.name, fctx.path())
+                if len(formatted_data) > 0:
+                    data = formatted_data
     if data is not None:
         fctx.data = lambda: data
 
