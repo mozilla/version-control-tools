@@ -286,7 +286,25 @@ Saying "yes" to clone the repo will clone it.
   generaldelta
 
 TODO build user WSGI file generation into replication system
-  $ hgmo exec hgweb0 /usr/local/bin/make_user_wsgi_dirs.sh
+  $ hgmo exec hgweb0 /usr/local/bin/make_user_wsgi_dirs.py
+
+  $ hgmo exec hgweb0 cat /repo/hg/webroot_wsgi/users/user_example.com/hgweb.config
+  [web]
+  baseurl = https://hg.mozilla.org/users/user_example.com
+  [paths]
+  / = /repo/hg/mozilla/users/user_example.com/*
+
+  $ hgmo exec hgweb0 cat /repo/hg/webroot_wsgi/users/user_example.com/hgweb.wsgi
+  #!/usr/bin/env python
+  # This software may be used and distributed according to the terms of the
+  # GNU General Public License version 2 or any later version.
+  
+  import os
+  
+  OUR_DIR = os.path.normpath(os.path.dirname(__file__))
+  execfile(os.path.join(OUR_DIR, '..', '..', 'bootstrap.py'))
+  
+  application = make_application(OUR_DIR)
 
 We are able to clone from the newly-created repo
 

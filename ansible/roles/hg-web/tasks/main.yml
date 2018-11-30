@@ -349,10 +349,10 @@
   command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
 
 - name: install the script that creates user repo wsgi files
-  copy: src=make_user_wsgi_dirs.sh dest=/usr/local/bin/make_user_wsgi_dirs.sh mode=0755
+  copy: src=make_user_wsgi_dirs.py dest=/usr/local/bin/make_user_wsgi_dirs.py mode=0755
 
 - name: install the cronjob that runs the user repo wsgi file creation script
-  cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.sh" name="Generate user wsgi files"
+  cron: minute="*/2" user=hg job="/usr/local/bin/make_user_wsgi_dirs.py" name="Generate user wsgi files"
 
 - name: add logrotate httpd config
   copy: src=logrotate.conf dest=/etc/logrotate.d/hg-httpd-logrotate
