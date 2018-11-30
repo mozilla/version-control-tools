@@ -29,6 +29,10 @@ def hg_executable():
 
 
 def get_and_write_vct_node():
+    if not os.path.exists(os.path.join(ROOT, '.hg')):
+        raise Exception('version-control-tools directory must be a Mercurial '
+                        'checkout')
+
     env = dict(os.environ)
     env['HGRCPATH'] = '/dev/null'
     args = [hg_executable(), '-R', ROOT, 'log', '-r', '.', '-T', '{node|short}']
