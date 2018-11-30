@@ -347,7 +347,8 @@ class Docker(object):
         tag = '%s-%s' % (tagprefix,
                          hashlib.sha256('%s%s' % (url, digest)).hexdigest())
         for image in self._get_sorted_images():
-            for repotag in image['RepoTags']:
+            repotags = image['RepoTags'] or []
+            for repotag in repotags:
                 r, t = repotag.split(':')
                 if r == repository and t == tag:
                     return image['Id']
@@ -410,7 +411,8 @@ class Docker(object):
         """
         if use_last:
             for image in self._get_sorted_images():
-                for repotag in image['RepoTags']:
+                repotags = image['RepoTags'] or []
+                for repotag in repotags:
                     repo, tag = repotag.split(':', 1)
                     if repo == name:
                         return image['Id']
@@ -530,7 +532,8 @@ class Docker(object):
                 have_tag = False
                 for i in self.api_client.images():
                     if i['Id'] == full_image:
-                        for repotag in i['RepoTags']:
+                        repotags = i['RepoTags'] or []
+                        for repotag in repotags:
                             repo, tag = repotag.split(':')
                             if repo == name:
                                 have_tag = True
@@ -578,7 +581,8 @@ class Docker(object):
         # duplication is therefore warranted.
         if use_last:
             for image in self._get_sorted_images():
-                for repotag in image['RepoTags']:
+                repotags = image['RepoTags'] or []
+                for repotag in repotags:
                     repo, tag = repotag.split(':', 1)
                     if repo in missing:
                         images[repo] = image['Id']
@@ -590,7 +594,8 @@ class Docker(object):
         missing_ansibles = {k: ansibles[k] for k in missing if k in ansibles}
         start_images = {}
         for image in self._get_sorted_images():
-            for repotag in image['RepoTags']:
+            repotags = image['RepoTags'] or []
+            for repotag in repotags:
                 repo, tag = repotag.split(':', 1)
                 if repo in missing_ansibles:
                     start_images[repo] = image['Id']
@@ -1053,7 +1058,8 @@ class Docker(object):
             if iid in ignore_images:
                 continue
 
-            for repotag in i['RepoTags']:
+            repotags = i['RepoTags'] or []
+            for repotag in repotags:
                 repo, tag = repotag.split(':')
                 if repo in relevant_repos:
                     to_delete[iid] = repo
