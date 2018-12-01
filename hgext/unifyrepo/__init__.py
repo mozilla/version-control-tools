@@ -69,6 +69,7 @@ import os
 
 from mercurial.node import (
     bin,
+    hex,
 )
 from mercurial import (
     bookmarks,
@@ -339,7 +340,8 @@ def unifyrepo(ui, settings, **opts):
     # Now verify that every node in the source repos has pushlog data.
     missingpl = allnodes - set(nodepushinfo.keys())
     if missingpl:
-        raise error.Abort('missing pushlog info for %d nodes\n' % len(missingpl))
+        raise error.Abort('missing pushlog info for %d nodes: %s\n' % (
+            len(missingpl), ', '.join(sorted(hex(n) for n in missingpl))))
 
     # Filter out changesets we aren't aggregating.
     # We also use this pass to identify which nodes to bookmark.
