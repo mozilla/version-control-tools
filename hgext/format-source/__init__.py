@@ -91,12 +91,16 @@ file_storage_path = '.hg-format-source'
 
 
 def return_default_clang_format(repo):
-    clang_format_cmd = os.path.join(
-        repo.root,
-        "mach") + " clang-format" + " --assume-filename $HG_FILENAME -p"
+    arguments = ['clang-format', '--assume-filename', '$HG_FILENAME', '-p']
+
+    # On windows we need this to call the command in a shell, see Bug 1511594
+    if os.name == 'nt':
+        clang_format_cmd = 'sh mach' + ' '.join(arguments)
+    else:
+        clang_format_cmd = os.path.join(repo.root, "mach") + ' '.join(arguments)
+
     clang_format_cfgpaths = ['.clang-format', '.clang-format-ignore']
     clang_fortmat_fileext = ('.cpp', '.c', '.cc', '.h')
-
     return clang_format_cmd, clang_format_cfgpaths, clang_fortmat_fileext
 
 
@@ -217,7 +221,7 @@ def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
             # links should just be skipped
             repo.ui.warn(_('Skipping symlink, %s\n') % filepath)
             continue
-        newcontent = run_tools(repo.ui, repo.root, tool, shell_tool, filepath, filepath)
+        newcontent = run_tools(repo, tool, shell_tool, filepath, filepath)
         # if the formating tool returned an empty string then do not write it
         if len(newcontent):
             # XXX we could do the whole commit in memory
@@ -226,18 +230,29 @@ def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
             wctx.filectx(filepath).setflags(False, 'x' in flags)
         yield filepath
 
-def run_tools(ui, root, tool, cmd, filepath, filename):
+def run_tools(repo, tool, cmd, filepath, filename):
     """Run the a formatter tool on a specific file"""
     env = encoding.environ.copy()
-    env['HG_FILENAME'] = filename
+    ui = repo.ui
+    if os.name == 'nt' and should_use_default(repo, tool):
+        filename_to_use = filename.replace("/", "\\\\")
+        filepath_to_use = filepath.replace("\\", "\\\\")
+        # ENV doesn't work on windows as it does on POSIX
+        cmd_to_use = cmd.replace('$HG_FILENAME', filename_to_use)
+    else:
+        filename_to_use = filename
+        filepath_to_use = filepath
+        cmd_to_use = cmd
+        env['HG_FILENAME'] = filename_to_use
+
     # XXX escape special character in filepath
-    format_cmd = "%s %s" % (cmd, filepath)
+    format_cmd = "%s %s" % (cmd_to_use, filepath_to_use)
     ui.debug('running %s\n' % format_cmd)
     ui.pushbuffer(subproc=True)
     try:
         ui.system(format_cmd,
                   environ=env,
-                  cwd=root,
+                  cwd=repo.root,
                   onerr=error.Abort,
                   errprefix=tool)
     finally:
@@ -363,13 +378,17 @@ def apply_formating(repo, formatting, fctx):
                 continue
             # Determine the extension of the file to pass it to the temp file
             _, fileext = os.path.splitext(fctx.path())
-            with tempfile.NamedTemporaryFile(delete=True, suffix=fileext, mode='wb') as f:
-                f.write(data)
-                f.flush()
-                formatted_data = run_tools(repo.ui, repo.root, tool,
-                                           shell_tool, f.name, fctx.path())
-                if len(formatted_data) > 0:
-                    data = formatted_data
+            tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=fileext, mode='wb')
+            tmp_file.write(data)
+            tmp_file.flush()
+            tmp_file.close()
+            formatted_data = run_tools(repo, tool, shell_tool, tmp_file.name, fctx.path())
+            # delete the tmp file
+            os.remove(tmp_file.name)
+
+            if len(formatted_data) > 0:
+                data = formatted_data
+
     if data is not None:
         fctx.data = lambda: data
 
