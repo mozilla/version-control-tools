@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Caveat: any variable inside curly braces will be interpolated by terraform!
+# 
+# Sets up YUM EPEL repo, installs prereqs
+
+BUCKET=${s3_metadata_bucket}
+USERNAMES=${usernames}
+
+function epel_bootstrap() {
+    cat <<EOM > /etc/yum.repos.d/epel-bootstrap.repo
+[epel]
+name=Bootstrap EPEL
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-\$releasever&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgcheck=0
+EOM
+    yum --enablerepo=epel -y install epel-release
+    rm -f /etc/yum.repos.d/epel-bootstrap.repo
+}
+
+## Test for OS, install dependencies
+if [ -f /etc/centos-release ]; then
+    epel_bootstrap
+    yum update -y
+    yum install -y python-pip jq curl
+elif [ -f /etc/redhat-release ]; then
+    epel_bootstrap
+    yum update -y
+    yum install -y python-pip jq curl
+elif [ -f /etc/debian_version ]; then
+    apt-get update -y
+    apt-get install -y python-pip jq curl
+fi
+
+## Install awscli
+pip install --upgrade awscli
+
+TMPDIR=$(mktemp -d)
+
+for USER in $(echo "$USERNAMES" | tr , ' ')
+do
+    aws s3 cp s3://$BUCKET/ssh-pubkeys/$USER $TMPDIR/$USER-key
+    adduser --group $USER
+    mkdir /home/$USER/.ssh
+    touch /home/$USER/.ssh/authorized_keys
+    cat $TMPDIR/$USER-key >> /home/$USER/.ssh/authorized_keys
+done
