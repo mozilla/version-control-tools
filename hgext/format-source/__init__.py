@@ -95,9 +95,9 @@ def return_default_clang_format(repo):
 
     # On windows we need this to call the command in a shell, see Bug 1511594
     if os.name == 'nt':
-        clang_format_cmd = 'sh mach' + ' '.join(arguments)
+        clang_format_cmd = ' '.join(['sh', 'mach'] + arguments)
     else:
-        clang_format_cmd = os.path.join(repo.root, "mach") + ' '.join(arguments)
+        clang_format_cmd = ' '.join([os.path.join(repo.root, "mach")] + arguments)
 
     clang_format_cfgpaths = ['.clang-format', '.clang-format-ignore']
     clang_fortmat_fileext = ('.cpp', '.c', '.cc', '.h')
