@@ -18,3 +18,5 @@ venv/
 \.vctnode$
 \.testtimes$
 mozreviewpulse/.cache
+terraform/\.terraform/.*
+terraform/terraform.tfstate*
