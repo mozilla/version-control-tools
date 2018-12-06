@@ -74,6 +74,7 @@ moz.build info. In fact, the wrapper command itself can be defined as this
 string. Of course, no security will be provided.
 """
 
+import hashlib
 import json
 import os
 import subprocess
@@ -81,7 +82,10 @@ import types
 
 from mercurial.i18n import _
 from mercurial.node import bin, short
-from mercurial.utils import dateutil
+from mercurial.utils import (
+    cborutil,
+    dateutil,
+)
 from mercurial import (
     bookmarks,
     commands,
@@ -91,6 +95,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    pycompat,
     registrar,
     revset,
     scmutil,
@@ -1011,6 +1016,46 @@ def mozrawcachefiles(repo, proto, files):
         yield wireprototypes.indefinitebytestringresponse([data])
 
 
+def rawstorefiledata_cache_fn(repo, proto, cacher, **args):
+    # Only cache if we request changelog + manifestlog with no path filter.
+    # Caching is hard and restricting what is cached is safer.
+    if set(args.get('files', [])) != {'changelog', 'manifestlog'}:
+        return None
+
+    if args.get('pathfilter'):
+        return None
+
+    state = {
+        b'globalversion': wireprotov2server.GLOBAL_CACHE_VERSION,
+        b'localversion': 'moz0',
+        b'command': b'rawstorefiledata',
+        # TODO this needs to change when we support different wire protocol
+        # versions.
+        b'mediatype': wireprotov2server.FRAMINGTYPE,
+        b'version': wireprotov2server.HTTP_WIREPROTO_V2,
+        b'repo': repo.root,
+    }
+
+    # Hashing the entire changelog could take a while, since it can be
+    # dozens or hundreds of megabytes. As a proxy, we hash the first few
+    # bytes of the changelog (to pull in revlog flags) and the DAG heads
+    # in the changelog.
+    cl = repo.unfiltered().changelog
+
+    with cl.opener(cl.indexfile, 'rb') as fh:
+        state[b'changeloghead'] = fh.read(32768)
+
+    state[b'changelogheads'] = cl.heads()
+
+    cacher.adjustcachekeystate(state)
+
+    hasher = hashlib.sha1()
+    for chunk in cborutil.streamencode(state):
+        hasher.update(chunk)
+
+    return pycompat.sysbytes(hasher.hexdigest())
+
+
 def extsetup(ui):
     # TRACKING hg49 4.8 would emit bytearray instances against PEP-3333.
     extensions.wrapfunction(requestmod.wsgiresponse, 'sendresponse',
@@ -1060,6 +1105,9 @@ def extsetup(ui):
 
     setattr(webcommands, 'repoinfo', repoinfowebcommand)
     webcommands.__all__.append('repoinfo')
+
+    # Teach rawstorefiledata command to cache.
+    wireprotov2server.COMMANDS[b'rawstorefiledata'].cachekeyfn = rawstorefiledata_cache_fn
 
 
 def reposetup(ui, repo):
