@@ -301,7 +301,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
 
         # We break out overall operations primarily by their network interaction
         # We have variants within for working directory operations.
-        if 'clone' in behaviors:
+        if 'clone' in behaviors and 'create-store' in behaviors:
             record_op('overall_clone')
 
             if 'sparse-update' in behaviors:
@@ -309,7 +309,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
             else:
                 record_op('overall_clone_fullcheckout')
 
-        elif 'pull' in behaviors:
+        elif 'pull' in behaviors or 'clone' in behaviors:
             record_op('overall_pull')
 
             if 'sparse-update' in behaviors:
@@ -608,6 +608,9 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
         if upstream:
             ui.write('(cloning from upstream repo %s)\n' % upstream)
+
+        if not storevfs.exists():
+            behaviors.add('create-store')
 
         try:
             with timeit('clone', 'clone'):
