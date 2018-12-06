@@ -39,7 +39,7 @@ resource "aws_s3_bucket" "hg_bundles" {
   # Send access logs to S3 so we can audit and monitor.
   logging {
     target_bucket = "moz-hg-logging-${data.aws_region.provider-region.name}"
-    target_prefix = "s3/hg-bundles/"
+    target_prefix = "s3/hg/"
   }
 
   # Objects automatically expire after 1 week.
