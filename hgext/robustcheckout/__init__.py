@@ -786,29 +786,6 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
     ui.write('updated to %s\n' % checkoutrevision)
 
-    # HACK workaround https://bz.mercurial-scm.org/show_bug.cgi?id=5905
-    # and https://bugzilla.mozilla.org/show_bug.cgi?id=1462323.
-    #
-    # hg.mozilla.org's load balancer may route requests to different origin
-    # servers, thus exposing inconsistent state of repositories to the peer.
-    # This confuses Mercurial into promoting draft changesets to public. And
-    # this confuses various processes that rely on changeset phases being
-    # accurate.
-    #
-    # Our hack is to verify that changesets on non-publishing repositories are
-    # draft and to nuke the repo if they are wrong. We only apply this hack to
-    # the Try repo because it is the only repo where we can safely assume
-    # that the requested revision must be draft. This is because CI is triggered
-    # from special changesets that when pushed are always heads. And since the
-    # repo is non-publishing, these changesets should never be public.
-    if url in ('https://hg.mozilla.org/try',
-               'https://hg.mozilla.org/try-comm-central'):
-        if repo[checkoutrevision].phase() == phases.public:
-            ui.write(_('error: phase of revision is public; this is likely '
-                       'a manifestation of bug 1462323; the task will be '
-                       'retried\n'))
-            return EXIT_PURGE_CACHE
-
     return None
 
 
