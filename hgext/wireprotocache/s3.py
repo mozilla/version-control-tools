@@ -48,6 +48,7 @@ from mercurial import (
     wireprototypes,
 )
 from mercurial.utils import (
+    cborutil,
     interfaceutil,
 )
 
@@ -217,7 +218,24 @@ class s3wireprotocache(object):
         '''
         # TODO stream objects via multipart upload or otherwise to avoid excessive buffering
         if not self.cachehit:
-            self.buffered.extend(self.encodefn(obj))
+
+            # Some commands may emit special objects that hold a generator of raw
+            # chunks, which should be encoded as an indefinite length bytestring.
+            # Consuming the generator would exhaust it. So, our strategy is
+            # to manually encode to raw chunks, store the raw chunks in our
+            # buffer, then emit each chunk as a pre-encoded response, thus
+            # bypassing the double encoding of the data.
+            # TODO this is all a bit wonky and we need better APIs upstream for
+            # transparently handling indefinite length responses.
+            if isinstance(obj, wireprototypes.indefinitebytestringresponse):
+                for chunk in cborutil.streamencodebytestringfromiter(obj.chunks):
+                    self.buffered.append(chunk)
+                    yield wireprototypes.encodedresponse(chunk)
+
+                return
+            else:
+                self.buffered.extend(self.encodefn(obj))
+
         yield obj
 
     def onfinished(self):
