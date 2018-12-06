@@ -38,7 +38,7 @@ provider "aws" {
 # ~/.aws/credentials file, in the `hgaws` profile
 provider "aws" {
   alias = "awsprovider-us-west-1"
-  region = "us-west-2"
+  region = "us-west-1"
   profile = "hgaws"
 }
 
@@ -89,6 +89,11 @@ resource "aws_iam_user" "user-gps" {
   name = "gps"
 }
 
+# This user is used to upload to S3.
+resource "aws_iam_user" "hgbundler" {
+  name = "hgbundler"
+}
+
 # Set an IAM policy for the remote state bucket and key
 data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
   statement {
@@ -131,6 +136,52 @@ resource "aws_s3_bucket_policy" "metadata-bucket-policy" {
   provider = "aws.awsprovider-us-west-2"
   bucket = "${aws_s3_bucket.metadata-bucket.bucket}"
   policy = "${data.aws_iam_policy_document.metadata-bucket-policy-definition.json}"
+}
+
+# Configure S3 buckets for bundles and caching
+module "s3-east1" {
+  source = "./modules/s3"
+  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  
+  providers = {
+    aws = "aws.awsprovider-us-east-1"
+  }
+}
+
+module "s3-east2" {
+  source = "./modules/s3"
+  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  
+  providers = {
+    aws = "aws.awsprovider-us-east-2"
+  }
+}
+
+module "s3-west1" {
+  source = "./modules/s3"
+  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  
+  providers = {
+    aws = "aws.awsprovider-us-west-1"
+  }
+}
+
+module "s3-west2" {
+  source = "./modules/s3"
+  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  
+  providers = {
+    aws = "aws.awsprovider-us-west-2"
+  }
+}
+
+module "s3-eu1" {
+  source = "./modules/s3"
+  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  
+  providers = {
+    aws = "aws.awsprovider-eu-central-1"
+  }
 }
 
 # Configure a CI-only hgweb mirror environment in us-west-2
