@@ -64,21 +64,6 @@ and push operations.
 
 This feature is similar to Git remote refs.
 
-Static Analysis
-===============
-
-This extension provides static analysis to patches. Currently, only Python
-style checking is performed.
-
-To perform style checking for a single patch, run `hg critic`. By default,
-this will analyze the current working directory. If the working directory is
-clean, the tip changeset will be analyzed. By default, only changed lines are
-reported on.
-
-Static analysis is also performed automatically during qrefresh and commit
-operations. To disable this behavior, add "noautocritic = True" to the
-[mozext] section in your hgrc.
-
 Pushlog Data
 ============
 
@@ -240,14 +225,6 @@ mozext.ircnick
    Your Mozilla IRC nickname. This string value will be used to look for
    your reviews and patches.
 
-mozext.noautocritic
-   When this boolean flag is true, the code critic hook will not run
-   during commit and qrefresh operations.
-
-mozext.critic_merges
-   When this boolean flag is true, the code critic hook will run on merges.
-   By default, the hook does not run on merges.
-
 mozext.disable_local_database
    When this boolean flag is true, the local SQLite database indexing
    useful lookups (such as bugs and pushlog info) is not enabled.
@@ -372,11 +349,7 @@ configitem('mozext', 'headless',
            default=configitems.dynamicdefault)
 configitem('mozext', 'ircnick',
            default=None)
-configitem('mozext', 'critic_merges',
-           default=None)
 configitem('mozext', 'disable_local_database',
-           default=False)
-configitem('mozext', 'noautocritic',
            default=False)
 configitem('mozext', 'reject_pushes_with_repo_names',
            default=False)
@@ -479,35 +452,6 @@ def exchangepullpushlog(orig, pullop):
         repo.ui.status('added %d pushes\n' % len(pushes))
 
     return res
-
-def critique(ui, repo, entire=False, node=None, **kwargs):
-    """Perform a critique of a changeset."""
-    with demandimport.deactivated():
-        from flake8.engine import get_style_guide
-        from pycodestyle import DiffReport, parse_udiff
-
-        style = get_style_guide(parse_argv=False, ignore='E128')
-
-        ctx = repo[node]
-
-        if not entire:
-            diff = ''.join(ctx.diff())
-            style.options.selected_lines = {}
-            for k, v in parse_udiff(diff).items():
-                if k.startswith('./'):
-                    k = k[2:]
-
-                style.options.selected_lines[k] = v
-
-            style.options.report = DiffReport(style.options)
-
-        deleted = repo.status(ctx.p1().node(), ctx.node())[2]
-        files = [f for f in ctx.files()
-                 if f.endswith('.py') and f not in deleted]
-        for f in files:
-            data = ctx.filectx(f).data()
-            style.input_file(f, lines=data.splitlines())
-
 
 @command('moztrees', [], _('hg moztrees'), norepo=True)
 def moztrees(ui, **opts):
@@ -627,23 +571,6 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
 
     import webbrowser
     webbrowser.get('firefox').open(url)
-
-
-@command('critic',
-    [('e', 'entire', False,
-        _('Report on entire file content, not just changed parts'),
-        ''
-    )],
-    _('hg critic [REV]')
-)
-def critic(ui, repo, rev='.', entire=False, **opts):
-    """Perform a critique of changeset(s).
-
-    This will perform static analysis on changeset(s) and report any issues
-    found.
-    """
-    for r in scmutil.revrange(repo, [rev]):
-        critique(ui, repo, node=r, entire=entire, **opts)
 
 
 @command('pushlogsync', [
@@ -799,16 +726,6 @@ def prunerelbranches(ui, repo):
     from this repository.
     """
     repo.prune_relbranch_refs()
-
-
-def critic_hook(ui, repo, node=None, **opts):
-    # By default, don't run hook on merges.
-    ctx = repo[node]
-    if len(ctx.parents()) > 1 and not ui.configbool('mozext', 'critic_merges'):
-        return 0
-
-    critique(ui, repo, node=node, **opts)
-    return 0
 
 
 def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
@@ -1603,10 +1520,6 @@ def reposetup(ui, repo):
 
 
     repo.__class__ = remotestrackingrepo
-
-    if not ui.configbool('mozext', 'noautocritic'):
-        ui.setconfig('hooks', 'commit.critic', critic_hook)
-        ui.setconfig('hooks', 'qrefresh.critic', critic_hook)
 
     if ui.configbool('mozext', 'reject_pushes_with_repo_names'):
         ui.setconfig('hooks', 'prepushkey.reject_repo_names',
