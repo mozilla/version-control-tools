@@ -889,9 +889,9 @@ def processbundlesmanifest(orig, repo, proto):
                 region = ipentry['region']
 
                 filtered = [l for l in origlines if 'ec2region=%s' % region in l]
-                # No manifest entries for this region. Ignore match and try others.
+                # No manifest entries for this region.
                 if not filtered:
-                    continue
+                    return manifest
 
                 # We prioritize stream clone bundles to AWS clients because they are
                 # the fastest way to clone and we want our automation to be fast.
