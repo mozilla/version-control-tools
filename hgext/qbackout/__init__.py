@@ -34,7 +34,7 @@ if not getattr(cmdutil, 'bailifchanged', None):
 if 'mercurial.scmutil' not in sys.modules:
     import mercurial.cmdutil as scmutil
 
-testedwith = '3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7'
+testedwith = '3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qbackout'
 
 cmdtable = {}
@@ -236,7 +236,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
                     orig_desc_cset = r
                     orig_author = r.user()
                     break
-            r = repo[m.group(1)]
+            r = scmutil.revsingle(repo, m.group(1))
 
         bugs = parse_bugs(cset.description())
         allbugs.update(bugs)

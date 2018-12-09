@@ -72,9 +72,17 @@ Folding together multiple commits into a single backout changeset:
   Backed out changeset 5b367719b421
   Backed out changeset 22355b867c01
 
+Backing out backout
+
+  $ hg oops -r 3
+  checking for uncommitted changes
+  backing out 9dc236bc7914
+  applying patch from stdin
+
 Backouts should be 'test' user, re-applies should be original user:
 
   $ hg log --template '<{author}> {desc|firstline}\n'
+  <author2> commit 2
   <test> Backed out 2 changesets
   <author3> commit 3
   <author2> commit 2
@@ -90,7 +98,7 @@ Clean up
 
   $ hg graft -f -r 1+2
   grafting * (glob)
-  merging file1.txt
+  note: graft of 1:22355b867c01 created no changes to commit
   grafting * (glob)
   merging file2.txt
 
