@@ -117,7 +117,7 @@ rewritten accordingly
       b'totalitems': 1
     },
     {
-      b'linknode': b'\x16\x81\xc3?\x9f\x80Q\xcf\xfd\x8c#\xa6\xd4\x08\x18-\xf8\xf3\xa1f',
+      b'linknode': b'c\x9c\x89\x90\xd6\xa5l\xbc\x951\xfbY@\xdb\x0e$8\xf13b',
       b'node': b'.\xd2\xa3\x91*\x0b$P C\xea\xe8N\xe4\xb2y\xc1\x8b\x90\xdd'
     }
   ]
@@ -137,8 +137,16 @@ rewritten accordingly
   sending filesdata command
   response: gen[
     {
-      b'totalitems': 0,
-      b'totalpaths': 0
+      b'totalitems': 1,
+      b'totalpaths': 1
+    },
+    {
+      b'path': b'dupe-file',
+      b'totalitems': 1
+    },
+    {
+      b'linknode': b'c\x9c\x89\x90\xd6\xa5l\xbc\x951\xfbY@\xdb\x0e$8\xf13b',
+      b'node': b'.\xd2\xa3\x91*\x0b$P C\xea\xe8N\xe4\xb2y\xc1\x8b\x90\xdd'
     }
   ]
 

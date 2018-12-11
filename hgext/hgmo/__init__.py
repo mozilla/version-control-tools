@@ -74,6 +74,7 @@ moz.build info. In fact, the wrapper command itself can be defined as this
 string. Of course, no security will be provided.
 """
 
+import collections
 import hashlib
 import json
 import os
@@ -1016,6 +1017,106 @@ def mozrawcachefiles(repo, proto, files):
         yield wireprototypes.indefinitebytestringresponse([data])
 
 
+# TRACKING hg49 filesdata command in 4.8 has bugs. We work around with custom
+# command implementation.
+
+def emitfilerevisions(repo, path, revisions, linknodes, fields):
+    for revision in revisions:
+        d = {
+            b'node': revision.node,
+        }
+
+        if b'parents' in fields:
+            d[b'parents'] = [revision.p1node, revision.p2node]
+
+        if b'linknode' in fields:
+            d[b'linknode'] = linknodes[revision.node]
+
+        followingmeta = []
+        followingdata = []
+
+        if b'revision' in fields:
+            if revision.revision is not None:
+                followingmeta.append((b'revision', len(revision.revision)))
+                followingdata.append(revision.revision)
+            else:
+                d[b'deltabasenode'] = revision.basenode
+                followingmeta.append((b'delta', len(revision.delta)))
+                followingdata.append(revision.delta)
+
+        if followingmeta:
+            d[b'fieldsfollowing'] = followingmeta
+
+        yield d
+
+        for extra in followingdata:
+            yield extra
+
+
+def filesdata(repo, proto, haveparents, fields, pathfilter, revisions):
+    # TODO This should operate on a repo that exposes obsolete changesets. There
+    # is a race between a client making a push that obsoletes a changeset and
+    # another client fetching files data for that changeset. If a client has a
+    # changeset, it should probably be allowed to access files data for that
+    # changeset.
+
+    outgoing = wireprotov2server.resolvenodes(repo, revisions)
+    filematcher = wireprotov2server.makefilematcher(repo, pathfilter)
+
+    # path -> {fnode: linknode}
+    fnodes = collections.defaultdict(dict)
+
+    # We collect the set of relevant file revisions by iterating the changeset
+    # revisions and either walking the set of files recorded in the changeset
+    # or by walking the manifest at that revision. There is probably room for a
+    # storage-level API to request this data, as it can be expensive to compute
+    # and would benefit from caching or alternate storage from what revlogs
+    # provide.
+    for node in outgoing:
+        ctx = repo[node]
+        mctx = ctx.manifestctx()
+        md = mctx.read()
+
+        if haveparents:
+            checkpaths = ctx.files()
+        else:
+            checkpaths = md.keys()
+
+        for path in checkpaths:
+            fnode = md[path]
+
+            if path in fnodes and fnode in fnodes[path]:
+                continue
+
+            if not filematcher(path):
+                continue
+
+            fnodes[path].setdefault(fnode, node)
+
+    yield {
+        b'totalpaths': len(fnodes),
+        b'totalitems': sum(len(v) for v in fnodes.values())
+    }
+
+    for path, filenodes in sorted(fnodes.items()):
+        try:
+            store = wireprotov2server.getfilestore(repo, proto, path)
+        except wireprotov2server.FileAccessError as e:
+            raise error.WireprotoCommandError(e.msg, e.args)
+
+        yield {
+            b'path': path,
+            b'totalitems': len(filenodes),
+        }
+
+        revisions = store.emitrevisions(filenodes.keys(),
+                                        revisiondata=b'revision' in fields,
+                                        assumehaveparentrevisions=haveparents)
+
+        for o in emitfilerevisions(repo, path, revisions, filenodes, fields):
+            yield o
+
+
 def rawstorefiledata_cache_fn(repo, proto, cacher, **args):
     # Only cache if we request changelog + manifestlog with no path filter.
     # Caching is hard and restricting what is cached is safer.
@@ -1105,6 +1206,9 @@ def extsetup(ui):
 
     setattr(webcommands, 'repoinfo', repoinfowebcommand)
     webcommands.__all__.append('repoinfo')
+
+    # TRACKING hg49 install custom filesdata command handler to work around bugs.
+    wireprotov2server.COMMANDS[b'filesdata'].func = filesdata
 
     # Teach rawstorefiledata command to cache.
     wireprotov2server.COMMANDS[b'rawstorefiledata'].cachekeyfn = rawstorefiledata_cache_fn
