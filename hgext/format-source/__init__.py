@@ -233,6 +233,7 @@ def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
 def run_tools(repo, tool, cmd, filepath, filename):
     """Run the a formatter tool on a specific file"""
     env = encoding.environ.copy()
+    env['DISABLE_TELEMETRY'] = '1'
     ui = repo.ui
     if os.name == 'nt' and should_use_default(repo, tool):
         filename_to_use = filename.replace("/", "\\\\")
