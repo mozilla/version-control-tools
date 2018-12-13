@@ -82,7 +82,7 @@ following config option::
   allowexchangewithapplied = true
 '''
 
-testedwith = '4.3 4.4 4.5 4.6 4.7'
+testedwith = '4.3 4.4 4.5 4.6 4.7 4.8'
 minimumhgversion = '4.3'
 
 import os
