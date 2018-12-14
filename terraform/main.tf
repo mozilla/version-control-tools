@@ -85,10 +85,6 @@ resource "aws_iam_user" "user-cosheehan" {
   name = "cosheehan"
 }
 
-resource "aws_iam_user" "user-gps" {
-  name = "gps"
-}
-
 # This user is used to upload to S3.
 resource "aws_iam_user" "hgbundler" {
   name = "hgbundler"
@@ -101,7 +97,6 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
       type = "AWS"
       identifiers = [
         "${aws_iam_user.user-cosheehan.arn}",
-        "${aws_iam_user.user-gps.arn}",
       ]
     }
     effect = "Allow"
@@ -118,7 +113,6 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
       type = "AWS"
       identifiers = [
         "${aws_iam_user.user-cosheehan.arn}",
-        "${aws_iam_user.user-gps.arn}",
       ]
     }
     effect = "Allow"
@@ -142,7 +136,7 @@ resource "aws_s3_bucket_policy" "metadata-bucket-policy" {
 module "s3-east1" {
   source = "./modules/s3"
   bundler_arn = "${aws_iam_user.hgbundler.arn}"
-  
+
   providers = {
     aws = "aws.awsprovider-us-east-1"
   }
@@ -151,7 +145,7 @@ module "s3-east1" {
 module "s3-east2" {
   source = "./modules/s3"
   bundler_arn = "${aws_iam_user.hgbundler.arn}"
-  
+
   providers = {
     aws = "aws.awsprovider-us-east-2"
   }
@@ -160,7 +154,7 @@ module "s3-east2" {
 module "s3-west1" {
   source = "./modules/s3"
   bundler_arn = "${aws_iam_user.hgbundler.arn}"
-  
+
   providers = {
     aws = "aws.awsprovider-us-west-1"
   }
@@ -169,7 +163,7 @@ module "s3-west1" {
 module "s3-west2" {
   source = "./modules/s3"
   bundler_arn = "${aws_iam_user.hgbundler.arn}"
-  
+
   providers = {
     aws = "aws.awsprovider-us-west-2"
   }
@@ -178,7 +172,7 @@ module "s3-west2" {
 module "s3-eu1" {
   source = "./modules/s3"
   bundler_arn = "${aws_iam_user.hgbundler.arn}"
-  
+
   providers = {
     aws = "aws.awsprovider-eu-central-1"
   }
@@ -193,7 +187,6 @@ module "ci-only-west2" {
   cidr_block = "10.191.5.0/24"
   environment_users = [
     "${aws_iam_user.user-cosheehan.name}",
-    "${aws_iam_user.user-gps.arn}",
   ]
   metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
   mirror_ami = "${var.centos7_amis["us-west-2"]}"
