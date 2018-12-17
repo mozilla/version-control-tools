@@ -9,23 +9,6 @@ data "aws_vpn_gateway" "mdc-vpn-gate" {
   }
 }
 
-// Read the template file and fill with user info
-data "template_file" "bastioninit" {
-  template = "${file("${path.module}/user_data.tmpl")}"
-  
-  vars {
-    s3_metadata_bucket = "${var.metadata_bucket_name}"
-    usernames = "${join(",", var.environment_users)}"
-  }
-}
-
-data "template_cloudinit_config" "bastioninit-config" {
-  part {
-    content = "${data.template_file.bastioninit.rendered}"
-    content_type = "text/cloud-config"
-  }
-}
-
 # Create a VPC for the private CI hgweb instances
 resource "aws_vpc" "hgci-vpc" {
   cidr_block = "${var.cidr_block}"
@@ -167,7 +150,7 @@ module "bastion" {
   bastion_ami = "${var.bastion_ami}"
   environment_users = "${var.environment_users}"
   subnet_id = "${module.pubsubnet-a.subnet_id}"
-  user_data = "${data.template_cloudinit_config.bastioninit-config.rendered}"
+  user_data = "${file("${path.module}/user_data.yml")}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 }
 
@@ -243,7 +226,7 @@ module "test-hgweb-mirror" {
     "${aws_security_group.hgci-securitygroup.id}",
   ]
   subnet_id = "${module.privsubnet-a.subnet_id}"
-  user_data = "${data.template_cloudinit_config.bastioninit-config.rendered}"
+  user_data = "${file("${path.module}/user_data.yml")}"
 }
 
 # Create a network ACL for the VPC
