@@ -85,7 +85,50 @@ Explicit exclude "filterrepo" for testing, include everything else
 Run hgssh bootstrap procedure and confirm the format of the returned data
 We send the output to a file for use in the hgweb bootstrap procedure
 
-  $ hgmo exec hgssh sudo -u hg -g hg /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 1 > $TESTTMP/hgssh.json
+  $ hgmo exec hgssh sudo -u hg -g hg /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 1 --output /home/hg/hgssh.json > $TESTTMP/hgssh.json
+  $ hgmo exec hgssh sudo -u hg -g hg cat /home/hg/hgssh.json | python -m json.tool
+  {
+      "offsets": {
+          "0": [
+              6,
+              8
+          ],
+          "1": [
+              0,
+              0
+          ],
+          "2": [
+              10,
+              12
+          ],
+          "3": [
+              0,
+              0
+          ],
+          "4": [
+              0,
+              0
+          ],
+          "5": [
+              0,
+              0
+          ],
+          "6": [
+              0,
+              0
+          ],
+          "7": [
+              0,
+              0
+          ]
+      },
+      "repositories": [
+          "{moz}/deleterepo",
+          "{moz}/filterrepo",
+          "{moz}/mozilla-central",
+          "{moz}/testrepo"
+      ]
+  }
   $ cat $TESTTMP/hgssh.json | python -m json.tool
   {
       "offsets": {

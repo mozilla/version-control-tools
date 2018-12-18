@@ -58,6 +58,7 @@ def hgssh():
     parser.add_argument('hg', help='Path to hg executable for use in bootstrap process')
     parser.add_argument('--workers', help='Number of concurrent workers to use for publishing messages', type=int,
                         default=multiprocessing.cpu_count())
+    parser.add_argument('--output', help='Output file path for hgssh JSON')
     args = parser.parse_args()
 
     config = Config(filename=args.config)
@@ -135,6 +136,12 @@ def hgssh():
 
     print(json.dumps(output))
     logger.info('hgssh bootstrap process complete!')
+
+    # Send output to a file if requested
+    if args.output:
+        logger.info('writing output to %s' % args.output)
+        with open(args.output, 'w') as f:
+            json.dump(output, f)
 
 
 def hgweb():
