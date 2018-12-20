@@ -31,6 +31,9 @@ mozbuild==0.2
 # Used for testing.
 nose
 
+# Used for color in test suite
+Pygments==2.3.1
+
 # Used for testing.
 pytest
 
