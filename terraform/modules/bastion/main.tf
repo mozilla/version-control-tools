@@ -8,13 +8,17 @@ resource "aws_security_group" "hgci-bastion-securitygroup" {
   vpc_id = "${var.vpc_id}"
 
   ingress {
-    description = "SSH access in"
+    description = "SSH access in from MozVPN"
     from_port = 22
     protocol = "tcp"
     to_port = 22
 
     cidr_blocks = [
-      "0.0.0.0/0",
+      "10.48.240.0/23",
+      "10.48.242.0/23",
+      "10.50.240.0/23",
+      "10.50.242.0/23",
+      "10.64.0.0/16",
     ]
   }
 
@@ -46,15 +50,5 @@ resource "aws_instance" "hgci-bastion" {
 
   tags {
     Name = "Bastion host A"
-  }
-}
-
-resource "aws_eip" "hgci-bastion-eip" {
-  depends_on = ["aws_instance.hgci-bastion"]
-  instance = "${aws_instance.hgci-bastion.id}"
-  vpc = true
-
-  tags {
-    Name = "Bastion host elastic IP"
   }
 }
