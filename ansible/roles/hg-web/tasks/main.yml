@@ -346,7 +346,11 @@
   command: /usr/bin/rsync -a --delete --filter='P users/' /var/hg/version-control-tools/hgwsgi/ /repo/hg/webroot_wsgi/
 
 - name: set ownership of wsgi files
-  command: /bin/chown -R hg:hg /repo/hg/webroot_wsgi
+  file:
+    path: /repo/hg/webroot_wsgi
+    recurse: yes
+    owner: hg
+    group: hg
 
 - name: install the script that creates user repo wsgi files
   copy: src=make_user_wsgi_dirs.py dest=/usr/local/bin/make_user_wsgi_dirs.py mode=0755
@@ -517,7 +521,11 @@
     - { search: DEPLOYDATE, replace: "{{ ansible_date_time.iso8601 }}" }
 
 - name: adjust file permissions for hg templates
-  command: /bin/chown -R hg:hg /repo/hg/hg_templates
+  file:
+    path: /repo/hg/hg_templates
+    recurse: yes
+    owner: hg
+    group: hg
 
 - name: directory for Firefox release scraper
   file: path=/var/hg/fxreleases
