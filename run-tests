@@ -342,8 +342,7 @@ if __name__ == '__main__':
 
             hg_path = os.path.join(mercurials_dir, version, 'bin', 'hg')
 
-            common_args = list(orig_args) + ['--with-hg', hg_path]
-            common_args[0] = RUNTESTS
+            common_args = [RUNTESTS] + ['--with-hg', hg_path]
 
             tests_docker = sorted(t for t in tests if t in docker_tests)
             tests_no_docker = sorted(t for t in tests if t not in docker_tests)
