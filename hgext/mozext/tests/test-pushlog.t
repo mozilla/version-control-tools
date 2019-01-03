@@ -61,3 +61,19 @@ Pull via ssh:// will not fetch pushlog
   added 1 changesets with 1 changes to 1 files
   cannot fetch pushlog when pulling via ssh://; you should be pulling via https://
   new changesets 96ee1d7354c4 (?)
+
+Test pushlog revsets and templates
+
+  $ cd clonehttp
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > mozext = $TESTDIR/hgext/mozext
+  > EOF
+  $ hg log -T'{rev}\n'
+  0
+  $ hg log -r'firstpushdate("> now")'
+  $ hg log -r'pushdate("> now")'
+  $ hg log -r'firstpushdate("-1")' -T'{rev}\n'
+  0
+  $ hg log -r'pushdate("-1")' -T'{rev} {firstpushdate|shortdate}\n'
+  0 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)

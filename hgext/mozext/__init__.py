@@ -299,11 +299,15 @@ templateutil = import_module('mercurial.templateutil')
 
 # TRACKING hg47
 # util.makedate -> utils.dateutils.makedate
+# util.matchdate -> utils.dateutils.matchdate
 dateutil = import_module('mercurial.utils.dateutil')
 if dateutil:
     makedate = dateutil.makedate
+    matchdate = dateutil.matchdate
 else:
     makedate = util.makedate
+    matchdate = util.matchdate
+
 
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
@@ -903,7 +907,7 @@ def revset_firstpushdate(repo, subset, x):
     Changesets that were initially pushed according to the date spec provided.
     """
     ds = revset.getstring(x, _('firstpushdate() requires a string'))
-    dm = util.matchdate(ds)
+    dm = matchdate(ds)
 
     def fltr(x):
         pushes = list(repo.changetracker.pushes_for_changeset(repo[x].node()))
@@ -947,7 +951,7 @@ def revset_pushdate(repo, subset, x):
     All pushes are examined.
     """
     ds = revset.getstring(x, _('pushdate() requires a string'))
-    dm = util.matchdate(ds)
+    dm = matchdate(ds)
 
     def fltr(x):
         for push in repo.changetracker.pushes_for_changeset(repo[x].node()):
