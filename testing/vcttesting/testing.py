@@ -5,6 +5,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import errno
+import json
 import os
 import re
 import subprocess
@@ -364,14 +365,12 @@ def get_hg_version(hg):
     env = dict(os.environ)
     env[b'HGPLAIN'] = b'1'
     env[b'HGRCPATH'] = b'/dev/null'
-    out = subprocess.check_output('%s --version' % hg,
+    out = subprocess.check_output('%s version -T json' % hg,
                                   env=env, shell=True)
-    out = out.splitlines()[0]
-    match = re.search('version ([^\+\)]+)', out)
-    if not match:
-        return None
 
-    return match.group(1)
+    # index 0 because Mercurial's JSON templates always emit
+    # a list, with a single element in our case
+    return json.loads(out)[0]['ver']
 
 
 def remove_err_files(tests):
