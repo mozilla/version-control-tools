@@ -1030,13 +1030,15 @@ def bzexport(ui, repo, *args, **opts):
                 ui.write("Warning: ignoring --%s option when not creating a bug\n" % o)
 
     contents = StringIO()
-    o = {
-        'context': ui.configint("bzexport", "unified", 8),
+    o = opts.copy()
+    o.update({
+        'unified': ui.configint("bzexport", "unified", None),
         'showfunc': ui.configbool("bzexport", "showfunc", True),
         'git': ui.configbool("bzexport", "git", True),
-    }
-    o.update(opts)
+    })
     diffopts = patch.diffopts(ui, o)
+    if diffopts.context is None:
+        diffopts.context = 8
     description_from_patch = None
 
     revs = scmutil.revrange(repo, [rev])
