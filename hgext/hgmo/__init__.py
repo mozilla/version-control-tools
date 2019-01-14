@@ -840,6 +840,26 @@ def stream_clone_cmp(a, b):
     return 0
 
 
+def filter_manifest_for_aws_region(manifest, region):
+    """Filter a clonebundles manifest by region
+
+    The returned manifest will be sorted to prioritize clone bundles
+    for the specified AWS region.
+    """
+    filtered = [l for l in manifest.data.splitlines() if 'ec2region=%s' % region in l]
+    # No manifest entries for this region.
+    if not filtered:
+        return manifest
+
+    # We prioritize stream clone bundles to AWS clients because they are
+    # the fastest way to clone and we want our automation to be fast.
+    filtered = sorted(filtered, cmp=stream_clone_cmp)
+
+    # We got a match. Write out the filtered manifest (with a trailing newline).
+    filtered.append('')
+    return '\n'.join(filtered)
+
+
 def processbundlesmanifest(orig, repo, proto):
     """Wraps wireproto.clonebundles.
 
@@ -887,18 +907,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 region = ipentry['region']
 
-                filtered = [l for l in manifest.data.splitlines() if 'ec2region=%s' % region in l]
-                # No manifest entries for this region.
-                if not filtered:
-                    return manifest
-
-                # We prioritize stream clone bundles to AWS clients because they are
-                # the fastest way to clone and we want our automation to be fast.
-                filtered = sorted(filtered, cmp=stream_clone_cmp)
-
-                # We got a match. Write out the filtered manifest (with a trailing newline).
-                filtered.append('')
-                return '\n'.join(filtered)
+                return filter_manifest_for_aws_region(manifest, region)
 
         except Exception as e:
             repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
