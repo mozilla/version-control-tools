@@ -872,11 +872,9 @@ def processbundlesmanifest(orig, repo, proto):
     else:
         sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
 
-    origlines = manifest.data.splitlines()
-
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
-    if awspath and any('ec2region=' in l for l in origlines):
+    if awspath and 'ec2region=' in manifest.data:
         try:
             with open(awspath, 'rb') as fh:
                 awsdata = json.load(fh)
@@ -889,7 +887,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 region = ipentry['region']
 
-                filtered = [l for l in origlines if 'ec2region=%s' % region in l]
+                filtered = [l for l in manifest.data.splitlines() if 'ec2region=%s' % region in l]
                 # No manifest entries for this region.
                 if not filtered:
                     return manifest
@@ -916,7 +914,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
-                    origlines = sorted(origlines, cmp=stream_clone_cmp)
+                    origlines = sorted(manifest.data.splitlines(), cmp=stream_clone_cmp)
                     origlines.append('')
                     return '\n'.join(origlines)
 
