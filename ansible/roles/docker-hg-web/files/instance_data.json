@@ -1,0 +1,70 @@
+{
+ "base64_encoded_keys": [],
+ "ds": {
+  "_doc": "EXPERIMENTAL: The structure and format of content scoped under the 'ds' key may change in subsequent releases of cloud-init.",
+  "meta_data": {
+   "ami-id": "ami-0bbe6b35405ecebdb",
+   "ami-launch-index": "0",
+   "ami-manifest-path": "(unknown)",
+   "block-device-mapping": {
+    "ami": "/dev/sda1",
+    "ephemeral0": "sdb",
+    "ephemeral1": "sdc",
+    "root": "/dev/sda1"
+   },
+   "hostname": "ip-10-191-5-9",
+   "instance-action": "none",
+   "instance-id": "i-00000000000000000000",
+   "instance-type": "t2.micro",
+   "local-hostname": "ip-10-191-5-9",
+   "local-ipv4": "10.191.5.9",
+   "mac": "00:00:00:00:00:00",
+   "metrics": {
+    "vhostmd": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+   },
+   "network": {
+    "interfaces": {
+     "macs": {
+      "02:08:38:92:8a:ba": {
+       "device-number": "0",
+       "interface-id": "eni-00000000000000000",
+       "local-hostname": "ip-10-191-0-0",
+       "local-ipv4s": "10.191.0.0",
+       "mac": "00:00:00:00:00:00",
+       "owner-id": "000000000000",
+       "security-group-ids": "sg-securitygroup",
+       "security-groups": "hgci-bastion-securitygroup",
+       "subnet-id": "subnet-subnet",
+       "subnet-ipv4-cidr-block": "10.191.5.0/27",
+       "vpc-id": "vpc-virtualprivatecloud",
+       "vpc-ipv4-cidr-block": "10.191.5.0/24",
+       "vpc-ipv4-cidr-blocks": "10.191.5.0/24"
+      }
+     }
+    }
+   },
+   "placement": {
+    "availability-zone": "us-west-2a"
+   },
+   "profile": "default-hvm",
+   "reservation-id": "r-00000000000000000",
+   "security-groups": "hgci-bastion-securitygroup",
+   "services": {
+    "domain": "amazonaws.com",
+    "partition": "aws"
+   }
+  }
+ },
+ "sensitive_keys": [],
+ "v1": {
+  "availability-zone": "us-west-2a",
+  "availability_zone": "us-west-2a",
+  "cloud-name": "aws",
+  "cloud_name": "aws",
+  "instance-id": "i-instance",
+  "instance_id": "i-instance",
+  "local-hostname": "ip-10-191-5-9",
+  "local_hostname": "ip-10-191-5-9",
+  "region": "us-west-2"
+ }
+}

@@ -46,6 +46,7 @@
   with_items:
     - moz-ip-ranges.txt
     - aws-ip-ranges.json
+    - instance_data.json
 
 # We have an additional virtualenv in Docker to run moz.build info
 # directly from hgweb without the secure execution environment we

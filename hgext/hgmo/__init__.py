@@ -162,6 +162,10 @@ configitem('hgmo', 'pullclonebundlesmanifest',
 configitem('hgmo', 'replacebookmarks',
            default=configitems.dynamicdefault)
 
+# TODO update this to /run/cloud-init/instance_data.json once
+# we can upgrade cloud-init to 18.4+ on CentOS7
+INSTANCE_DATA_PATH = '/var/hg/instance_data.json'
+
 
 @templatefilters.templatefilter('mozlink')
 def mozlink(text):
@@ -891,6 +895,18 @@ def processbundlesmanifest(orig, repo, proto):
         return manifest
     else:
         sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
+
+    # If the request originates from a private IP address, and we are running on
+    # a cloud instance, we should be serving traffic to private instances in CI.
+    # Grab the region from the instance_data.json object and serve the correct
+    # manifest accordingly
+    if sourceip.is_private and os.path.exists(INSTANCE_DATA_PATH):
+        with open(INSTANCE_DATA_PATH, 'rb') as fh:
+            instance_data = json.load(fh)
+
+        region = instance_data['v1']['region']
+
+        return filter_manifest_for_aws_region(manifest, region)
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
