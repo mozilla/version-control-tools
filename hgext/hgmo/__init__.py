@@ -828,6 +828,18 @@ def pull(orig, repo, remote, *args, **kwargs):
     return res
 
 
+def stream_clone_cmp(a, b):
+    """Comparison function to prioritize stream bundles"""
+    packed = 'BUNDLESPEC=none-packed1'
+
+    if packed in a and packed not in b:
+        return -1
+    if packed in b and packed not in a:
+        return 1
+
+    return 0
+
+
 def processbundlesmanifest(orig, repo, proto):
     """Wraps wireproto.clonebundles.
 
@@ -849,18 +861,6 @@ def processbundlesmanifest(orig, repo, proto):
     awspath = repo.ui.config('hgmo', 'awsippath')
     if not awspath and not mozpath:
         return manifest
-
-    else:
-        def stream_clone_cmp(a, b):
-            '''Comparison function to prioritize stream bundles'''
-            packed = 'BUNDLESPEC=none-packed1'
-
-            if packed in a and packed not in b:
-                return -1
-            if packed in b and packed not in a:
-                return 1
-
-            return 0
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
     # actual source IP, so prefer it.
