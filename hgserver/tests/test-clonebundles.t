@@ -187,15 +187,19 @@ Fetching with an AWS us-west-2 IP will limit to same region URLs
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
   
 
+
 Fetching with a private IP and a cloud metadata file indicating host region is us-west-2 will limit to same region URLs
 
-  $ http --no-headers --request-header "X-Cluster-Client-IP: 10.144.1.1" ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
+  $ test_cloud_instance hgweb0 on
+  $ http --no-headers --request-header "Remote-Addr: 10.144.1.1" ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-2
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
   
+
+  $ test_cloud_instance hgweb0 off
 
 Fetching with an AWS IP from "other" region returns full list
 

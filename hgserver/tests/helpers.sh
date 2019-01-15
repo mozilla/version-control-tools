@@ -62,5 +62,13 @@ ssh = ssh -F `pwd`/ssh_config -i `pwd`/l3user -l l3user@example.com
 EOF
 }
 
+test_cloud_instance() {
+  # Use `$ test_cloud_instance <server> <on/off>` to test behaviour of cloud based instances
+  if [ "$2" = "on" ]; then
+    hgmo exec $1 mv /var/hg/test_instance_data.json /var/hg/instance_data.json
+  else
+    hgmo exec $1 mv /var/hg/instance_data.json /var/hg/test_instance_data.json
+  fi
+}
 alias standarduserssh='ssh -F ssh_config -i testuser -l user@example.com -p $HGPORT'
 alias pulseconsumer='vcsreplicator-consumer $TESTTMP/pulse-consumer.ini'
