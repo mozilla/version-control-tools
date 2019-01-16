@@ -1,0 +1,91 @@
+# The host is assumed to have the hg-web role applied.
+# Add the name of the host you wish to bootstrap to the "bootstrap"
+# Ansible inventory group.
+#
+# Usage:
+#   $ ansible-playbook -i hosts bootstrap-hgweb.yml
+---
+- hosts: hgssh-prod-master
+  become: true
+  tasks:
+    - name: execute hgssh bootstrap procedure
+      command: /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 5 --output /var/hg/hgssh.json
+      become_user: hg
+
+    - name: get hgssh bootstrap object
+      slurp: src=/var/hg/hgssh.json
+      become_user: hg
+      register: hgsshjson
+
+- hosts: bootstrap
+  become: true
+  tasks:
+    - name: turn off vcsreplicator
+      service: name=vcsreplicator@{{ item }}.service
+               state=stopped
+      with_items:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+
+    - name: move hgssh json to hgweb
+      copy: content="{{ hostvars[groups["hgssh-prod-master"][0]].hgsshjson.content | b64decode }}"
+            dest=/etc/mercurial/hgssh.json
+            mode=0775
+            group=hg
+            owner=hg
+
+    - name: disable try repo in replication rules
+      ini_file:
+        path: /etc/mercurial/vcsreplicator.ini
+        section: replicationrules
+        option: include.tryrepos
+        state: absent
+
+    - block:
+        - name: Execute hgweb bootstrap procedure
+          command: /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /etc/mercurial/hgssh.json --workers 8
+          become_user: hg
+      rescue:
+        # If a repo is filtered from replication on a host, this registers as a failure
+        # TODO make replication filtering a non-failure
+        - debug:
+            msg: "Something went wrong with the bootstrap procedure, check the output log for details"
+
+    # TODO remove this try repo hack
+    # Cloning the try repo via pulls (how vcsreplicator works) is inordinately slow.
+    # Work around this using a stream clone for the try repos, and then regex
+    # replace the rule in the replication rules filter
+    - name: clone try repo
+      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=all clone -U --stream https://hg.mozilla.org/try /repo/hg/mozilla/try
+      become_user: hg
+
+    - name: clone try-comm repo
+      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=all clone -U --stream https://hg.mozilla.org/try-comm-central /repo/hg/mozilla/try-comm-central
+      become_user: hg
+
+    - name: enable try repo in replication rules
+      ini_file:
+        path: /etc/mercurial/vcsreplicator.ini
+        section: replicationrules
+        option: include.tryrepos
+        value: 're:\{moz\}/try.*'
+        state: present
+
+    - name: turn on vcsreplicator
+      service: name=vcsreplicator@{{ item }}.service
+               state=started
+      with_items:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'

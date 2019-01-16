@@ -16,3 +16,6 @@ hgweb-prod
 
 [servovcssync]
 servo-vcs-sync.mozops.net ansible_ssh_user=centos ansible_become=yes
+
+# Add hosts to this group to run the bootstrap procedure
+[bootstrap]
