@@ -1,0 +1,10 @@
+[replicationrules]
+include.top = re:\{moz\}/((mozilla-(central|unified))|comm-central)$
+include.ciadmin = re:\{moz\}/build/(ci-admin|ci-configuration)$
+include.integration = re:\{moz\}/integration/(autoland|mozilla-inbound)$
+include.projects = re:\{moz\}/projects/(ash|birch|elm|holly|jamun|larch|maple|nss|nss-try|oak|pine)$
+include.releases = re:\{moz\}/releases/mozilla-(beta|esr52|esr60|release)$
+include.tryrepos = re:\{moz\}/try.*
+include.vct = path:{moz}/hgcustom/version-control-tools
+# TODO remove once this is no longer needed for testing
+include.sheehan-vct = path:{moz}/users/cosheehan_mozilla.com/version-control-tools
