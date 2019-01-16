@@ -51,86 +51,92 @@
 
 - hosts: hgweb-prod
   tasks:
-    - name: capture bloxtool config
-      slurp: src=/etc/mercurial/bloxtool.json
-      register: bloxtool_config
+    - name: deploy to hg-web
+      when: skip_hgweb == False
+      block:
+        - name: capture bloxtool config
+          slurp: src=/etc/mercurial/bloxtool.json
+          register: bloxtool_config
 
-    - name: capture aws s3 cache key
-      slurp: src=/etc/mercurial/s3cacher.json
-      register: s3cacher_config
+        - name: capture aws s3 cache key
+          slurp: src=/etc/mercurial/s3cacher.json
+          register: s3cacher_config
 
-    - name: apply hg-web role
-      include_role:
-        name: hg-web
-      vars:
-        # We have to use hostvars to reference variables on other hosts.
-        # slurp captures content in base64 encoded form. Decode it
-        # before it is passed in.
-        mirror_private_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_private_key.content | b64decode }}"
-        mirror_host_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_host_key.content | b64decode }}"
-        # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
-        mirror_ips: ["63.245.215.25", "63.245.215.102"]
-        vct_node: "{{ lookup('file', '../.vctnode') }}"
-        chroot_mozbuild_exists: "{{ hostvars['localhost'].chroot_mozbuild.stat.exists }}"
-        bloxtool_user: "{{ (bloxtool_config.content | b64decode | from_json).user }}"
-        bloxtool_password: "{{ (bloxtool_config.content | b64decode | from_json).password }}"
-        bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}"
-        s3_cache_access_key_id: "{{ (s3cacher_config.content | b64decode | from_json).access_key_id }}"
-        s3_cache_secret_key: "{{ (s3cacher_config.content | b64decode | from_json).secret_access_key }}"
+        - name: apply hg-web role
+          include_role:
+            name: hg-web
+          vars:
+            # We have to use hostvars to reference variables on other hosts.
+            # slurp captures content in base64 encoded form. Decode it
+            # before it is passed in.
+            mirror_private_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_private_key.content | b64decode }}"
+            mirror_host_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_host_key.content | b64decode }}"
+            # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
+            mirror_ips: ["63.245.215.25", "63.245.215.102"]
+            vct_node: "{{ lookup('file', '../.vctnode') }}"
+            chroot_mozbuild_exists: "{{ hostvars['localhost'].chroot_mozbuild.stat.exists }}"
+            bloxtool_user: "{{ (bloxtool_config.content | b64decode | from_json).user }}"
+            bloxtool_password: "{{ (bloxtool_config.content | b64decode | from_json).password }}"
+            bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}"
+            s3_cache_access_key_id: "{{ (s3cacher_config.content | b64decode | from_json).access_key_id }}"
+            s3_cache_secret_key: "{{ (s3cacher_config.content | b64decode | from_json).secret_access_key }}"
 
 - hosts: hgssh-prod
   tasks:
-    # Until we integrate secrets with Ansible, the LDAP config is
-    # pre-defined on the server.
-    - name: capture LDAP config
-      slurp: src=/etc/mercurial/ldap.json
-      register: ldap_config
+    - name: deploy to hg-ssh
+      when: skip_hgssh == False
+      block:
+        # Until we integrate secrets with Ansible, the LDAP config is
+        # pre-defined on the server.
+        - name: capture LDAP config
+          slurp: src=/etc/mercurial/ldap.json
+          register: ldap_config
 
-    # Ditto for the Pulse config.
-    - name: capture Pulse config
-      slurp: src=/etc/mercurial/pulse.json
-      register: pulse_config
+        # Ditto for the Pulse config.
+        - name: capture Pulse config
+          slurp: src=/etc/mercurial/pulse.json
+          register: pulse_config
 
-    - name: capture aws events config
-      slurp: src=/etc/mercurial/awsevents.json
-      register: awsevents_config
+        - name: capture aws events config
+          slurp: src=/etc/mercurial/awsevents.json
+          register: awsevents_config
 
-    - name: apply hg-ssh role
-      include_role:
-        name: hg-ssh
-      vars:
-        bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}"
-        bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}"
-        ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}"
-        ldap_starttls: "{{ (ldap_config.content | b64decode | from_json).starttls | default(True) }}"
-        hgweb_hosts: "{{ groups['hgweb-prod'] }}"
-        pulse_user: "{{ (pulse_config.content | b64decode | from_json).user }}"
-        pulse_password: "{{ (pulse_config.content | b64decode | from_json).password }}"
-        awsevents_access_key_id: "{{ (awsevents_config.content | b64decode | from_json).access_key_id }}"
-        awsevents_secret_access_key: "{{ (awsevents_config.content | b64decode | from_json).secret_access_key }}"
+        - name: apply hg-ssh role
+          include_role:
+            name: hg-ssh
+          vars:
+            bind_dn: "{{ (ldap_config.content | b64decode | from_json).username }}"
+            bind_pw: "{{ (ldap_config.content | b64decode | from_json).password }}"
+            ldap_uri: "{{ (ldap_config.content | b64decode | from_json).url }}"
+            ldap_starttls: "{{ (ldap_config.content | b64decode | from_json).starttls | default(True) }}"
+            hgweb_hosts: "{{ groups['hgweb-prod'] }}"
+            pulse_user: "{{ (pulse_config.content | b64decode | from_json).user }}"
+            pulse_password: "{{ (pulse_config.content | b64decode | from_json).password }}"
+            awsevents_access_key_id: "{{ (awsevents_config.content | b64decode | from_json).access_key_id }}"
+            awsevents_secret_access_key: "{{ (awsevents_config.content | b64decode | from_json).secret_access_key }}"
 
-    - name: discover kafka topics
-      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
-      register: kafka_topics
-      when: ansible_hostname == 'hgssh1'
+        - name: discover kafka topics
+          command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
+          register: kafka_topics
+          when: ansible_hostname == 'hgssh1'
 
-    - name: create kafka topics
-      command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item.topic }} --partitions {{ item.partitions }} --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
-      when: ansible_hostname == 'hgssh1' and item.topic not in kafka_topics.stdout_lines
-      with_items:
-        - { topic: pushdata, partitions: 8 }
-        - { topic: pushlog, partitions: 1 }
-        # copy of messages from "pushdata" once they are acknowledged by mirrors
-        - { topic: replicatedpushdatapending, partitions: 1 }
-        - { topic: replicatedpushdata, partitions: 1 }
+        - name: create kafka topics
+          command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item.topic }} --partitions {{ item.partitions }} --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
+          when: ansible_hostname == 'hgssh1' and item.topic not in kafka_topics.stdout_lines
+          with_items:
+            - { topic: pushdata, partitions: 8 }
+            - { topic: pushlog, partitions: 1 }
+            # copy of messages from "pushdata" once they are acknowledged by mirrors
+            - { topic: replicatedpushdatapending, partitions: 1 }
+            - { topic: replicatedpushdata, partitions: 1 }
 
-    - name: record deployment of this changeset
-      copy: dest=/etc/mercurial/deployed_vct_changeset
-            content={{ lookup('file', '../.vctnode') }}
-            owner=root
-            group=root
-            mode=0644
-      when: ansible_hostname == 'hgssh1'
+        - name: record deployment of this changeset
+          copy: dest=/etc/mercurial/deployed_vct_changeset
+                content={{ lookup('file', '../.vctnode') }}
+                owner=root
+                group=root
+                mode=0644
+          when: ansible_hostname == 'hgssh1'
 
 - hosts: localhost
   gather_facts: no
