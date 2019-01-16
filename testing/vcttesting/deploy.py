@@ -46,9 +46,11 @@ def run_playbook(name, extra_vars=None, verbosity=0):
     return subprocess.call(args, cwd=ANSIBLE)
 
 
-def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, verbosity=0):
+def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
+                verbosity=0):
     """Deploy to hg.mozilla.org."""
     extra = {
+        'skip_mirrors': skip_mirrors,
         'skip_hgssh': skip_hgssh,
         'skip_hgweb': skip_hgweb,
         'vct': ROOT,
