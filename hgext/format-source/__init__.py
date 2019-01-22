@@ -71,7 +71,7 @@ from mozhg.util import (
 )
 
 __version__ = '0.1.0.dev'
-testedwith = '4.4.2 4.5.3 4.6.2 4.7.2 4.8'
+testedwith = '4.4 4.5 4.6 4.7 4.8 4.9'
 minimumhgversion = '4.4'
 
 cmdtable = {}

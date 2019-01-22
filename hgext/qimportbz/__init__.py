@@ -55,7 +55,7 @@ import pb
 import scp
 
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20qimportbz'
-testedwith = '4.2 4.3 4.4 4.5 4.6 4.7 4.8'
+testedwith = '4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9'
 minimumhgversion = '4.2'
 
 
