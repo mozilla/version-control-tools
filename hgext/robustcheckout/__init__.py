@@ -49,7 +49,7 @@ except ImportError:
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = '4.3 4.4 4.5 4.6 4.7 4.8'
+testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9'
 minimumhgversion = '4.3'
 
 cmdtable = {}

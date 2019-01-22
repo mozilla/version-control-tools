@@ -32,6 +32,7 @@ Shared store should be a modern repo
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
 Test a variation where the local repo still exists
@@ -60,6 +61,7 @@ Test a variation where the local repo still exists
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
   $ rm -rf share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3
@@ -75,6 +77,7 @@ Test behavior when fncache is missing
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
   $ cat > share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires << EOF
@@ -95,6 +98,7 @@ Test behavior when fncache is missing
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
   $ cat > share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires << EOF
@@ -114,6 +118,7 @@ Test behavior when fncache is missing
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
 Confirm no errors in log
