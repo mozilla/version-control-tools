@@ -210,7 +210,7 @@ resource "aws_acm_certificate" "hgcert" {
 }
 
 # Configure a CI-only hgweb mirror environment in us-west-2
-module "ci-only-west2" {
+module "ci-only-uw2" {
   source = "./modules/ci-only"
 
   cidr_block = "10.191.5.0/24"
