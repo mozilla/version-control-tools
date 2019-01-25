@@ -67,7 +67,7 @@ resource "aws_route_table" "hgci-pub-routetable" {
 
 # Custom DHCP rules to query internal DNS
 resource "aws_vpc_dhcp_options" "dhcp-options" {
-  domain_name_servers = ["10.48.75.120", "169.254.169.253"]
+  domain_name_servers = ["10.48.75.120"]
 
   tags {
     Name = "DHCP options for internal DNS"
