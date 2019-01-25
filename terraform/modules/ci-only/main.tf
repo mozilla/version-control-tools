@@ -108,7 +108,7 @@ module "pubsubnet-c" {
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 }
 
-# Private subnets to hold 
+# Private subnets to hold
 module "privsubnet-a" {
   source = "../privsubnet"
 
@@ -142,18 +142,6 @@ module "privsubnet-c" {
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
 }
 
-module "bastion" {
-  source = "../bastion"
-
-  awsregion = "${var.awsregion}"
-  availability_zone = "a"
-  bastion_ami = "${var.bastion_ami}"
-  environment_users = "${var.environment_users}"
-  subnet_id = "${module.pubsubnet-a.subnet_id}"
-  user_data = "${file("${path.module}/user_data.yml")}"
-  vpc_id = "${aws_vpc.hgci-vpc.id}"
-}
-
 # Create a security group for the private CI instances
 # Use these rules to INCLUDE traffic
 resource "aws_security_group" "hgci-securitygroup" {
@@ -163,37 +151,17 @@ resource "aws_security_group" "hgci-securitygroup" {
 
   # Incoming rules
   ingress {
-    description = "SSH to instance from Bastion host"
+    description = "SSH to instances from MozVPN"
 
     from_port = 22
     protocol = "tcp"
     to_port = 22
-    security_groups = [
-      "${module.bastion.security_group_id}",
-    ]
-  }
-
-  ingress {
-    description = "HTTP between Bastion (TESTING)"
-
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-
-    security_groups = [
-      "${module.bastion.security_group_id}"
-    ]
-  }
-
-  ingress {
-    description = "HTTPS between Bastion (TESTING)"
-
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-
-    security_groups = [
-      "${module.bastion.security_group_id}"
+    cidr_blocks = [
+      "10.48.240.0/23",
+      "10.48.242.0/23",
+      "10.50.240.0/23",
+      "10.50.242.0/23",
+      "10.64.0.0/16",
     ]
   }
 
@@ -252,7 +220,7 @@ resource "aws_network_acl" "hgci-networkacl" {
     rule_no = 10
     to_port = 22
   }
-  
+
   # Allow outgoing https
   egress {
     cidr_block = "${var.cidr_block}"
@@ -262,7 +230,7 @@ resource "aws_network_acl" "hgci-networkacl" {
     rule_no = 20
     to_port = 443
   }
-  
+
   # Allow outgoing SSH
   egress {
     cidr_block = "${var.cidr_block}"
@@ -272,7 +240,7 @@ resource "aws_network_acl" "hgci-networkacl" {
     rule_no = 30
     to_port = 22
   }
-  
+
   # Deny everything else
   ingress {
     action = "deny"

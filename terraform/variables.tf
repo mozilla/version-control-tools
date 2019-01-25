@@ -7,11 +7,3 @@ variable "centos7_amis" {
         us-west-2 = "ami-3ecc8f46"
     }
 }
-
-variable "ubuntu18_amis" {
-  description = "Ubuntu 18.04 AMI IDs for various AWS regions"
-  type = "map"
-  default = {
-    us-west-2 = "ami-0bbe6b35405ecebdb"
-  }
-}

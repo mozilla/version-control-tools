@@ -183,7 +183,6 @@ module "ci-only-west2" {
   source = "./modules/ci-only"
 
   awsregion = "us-west-2"
-  bastion_ami = "${var.ubuntu18_amis["us-west-2"]}"
   cidr_block = "10.191.5.0/24"
   environment_users = [
     "${aws_iam_user.user-cosheehan.name}",
