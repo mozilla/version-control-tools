@@ -182,7 +182,6 @@ module "s3-eu1" {
 module "ci-only-west2" {
   source = "./modules/ci-only"
 
-  awsregion = "us-west-2"
   cidr_block = "10.191.5.0/24"
   environment_users = [
     "${aws_iam_user.user-cosheehan.name}",

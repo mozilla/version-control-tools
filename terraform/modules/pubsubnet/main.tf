@@ -1,5 +1,7 @@
+data "aws_region" "current" {}
+
 resource "aws_subnet" "pubsubnet" {
-  availability_zone = "${var.awsregion}${var.availability_zone}"
+  availability_zone = "${data.aws_region.current.name}${var.availability_zone}"
   cidr_block = "${var.cidr_block}"
   map_public_ip_on_launch = false
   vpc_id = "${var.vpc_id}"

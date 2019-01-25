@@ -2,10 +2,6 @@ variable "availability_zone" {
   description = "AZ for the subnet ('a', 'b' or 'c')"
 }
 
-variable "awsregion" {
-  description = "AWS region of the VPC"
-}
-
 variable "cidr_block" {
   description = "CIDR block for this subnet"
 }

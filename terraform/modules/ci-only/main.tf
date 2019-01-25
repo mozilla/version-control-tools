@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 # Grab VPN gateway via the `Name` tag
 # don't track this under Terraform as it
 # will likely never change and would require
@@ -82,7 +84,6 @@ module "pubsubnet-a" {
   source = "../pubsubnet"
 
   availability_zone = "a"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 0)}"
   route_table_id = "${aws_route_table.hgci-pub-routetable.id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -92,7 +93,6 @@ module "pubsubnet-b" {
   source = "../pubsubnet"
 
   availability_zone = "b"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 1)}"
   route_table_id = "${aws_route_table.hgci-pub-routetable.id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -102,7 +102,6 @@ module "pubsubnet-c" {
   source = "../pubsubnet"
 
   availability_zone = "c"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 2)}"
   route_table_id = "${aws_route_table.hgci-pub-routetable.id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -113,7 +112,6 @@ module "privsubnet-a" {
   source = "../privsubnet"
 
   availability_zone = "a"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 3)}"
   nat_gateway_id = "${module.pubsubnet-a.nat_gateway_id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -124,7 +122,6 @@ module "privsubnet-b" {
   source = "../privsubnet"
 
   availability_zone = "b"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 4)}"
   nat_gateway_id = "${module.pubsubnet-b.nat_gateway_id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -135,7 +132,6 @@ module "privsubnet-c" {
   source = "../privsubnet"
 
   availability_zone = "c"
-  awsregion = "${var.awsregion}"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 5)}"
   nat_gateway_id = "${module.pubsubnet-c.nat_gateway_id}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
@@ -186,7 +182,6 @@ resource "aws_security_group" "hgci-securitygroup" {
 module "test-hgweb-mirror" {
   source = "../hgweb-mirror"
 
-  awsregion = "${var.awsregion}"
   availability_zone = "a"
   environment_users = "${var.environment_users}"
   mirror_ami = "${var.mirror_ami}"
