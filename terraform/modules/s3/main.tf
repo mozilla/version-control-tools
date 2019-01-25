@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 # This data source retrieves information about the
 # aws provider for this module instance
 data "aws_region" "provider-region" {}
@@ -5,7 +9,7 @@ data "aws_region" "provider-region" {}
 resource "aws_s3_bucket" "moz-hg-logging" {
   bucket = "moz-hg-logging-${data.aws_region.provider-region.name}"
   acl = "log-delivery-write"
-  
+
   tags {
       App = "hgmo"
       Env = "prod"
