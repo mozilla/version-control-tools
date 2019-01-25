@@ -188,6 +188,7 @@ module "ci-only-west2" {
   ]
   metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
   mirror_ami = "${var.centos7_amis["us-west-2"]}"
+  taskcluster_vpc_cidr = "10.144.0.0/16"
 
   providers = {
     aws = "aws.awsprovider-us-west-2"

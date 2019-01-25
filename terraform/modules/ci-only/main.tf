@@ -114,6 +114,7 @@ module "privsubnet-a" {
   availability_zone = "a"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 3)}"
   nat_gateway_id = "${module.pubsubnet-a.nat_gateway_id}"
+  taskcluster_vpc_cidr = "${var.taskcluster_vpc_cidr}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
 }
@@ -124,6 +125,7 @@ module "privsubnet-b" {
   availability_zone = "b"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 4)}"
   nat_gateway_id = "${module.pubsubnet-b.nat_gateway_id}"
+  taskcluster_vpc_cidr = "${var.taskcluster_vpc_cidr}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
 }
@@ -134,6 +136,7 @@ module "privsubnet-c" {
   availability_zone = "c"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 5)}"
   nat_gateway_id = "${module.pubsubnet-c.nat_gateway_id}"
+  taskcluster_vpc_cidr = "${var.taskcluster_vpc_cidr}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
 }

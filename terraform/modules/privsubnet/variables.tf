@@ -10,6 +10,10 @@ variable "nat_gateway_id" {
   description = "ID of NAT gateway to route outgoing internet traffic through"
 }
 
+variable "taskcluster_vpc_cidr" {
+  description = "CIDR block of the Taskcluster VPC in the same AWS region"
+}
+
 variable "vpn_gateway_id" {
   description = "ID of VPN gateway to send relevant traffic through"
 }

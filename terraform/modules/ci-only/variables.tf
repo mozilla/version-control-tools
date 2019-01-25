@@ -1,5 +1,5 @@
 variable "cidr_block" {
-  description = "CIDR prefix for the VPC. Corresponds to the 16 bit netmask of the VPC"
+  description = "CIDR block for the VPC"
 }
 
 variable "environment_users" {
@@ -13,4 +13,8 @@ variable "metadata_bucket_name" {
 
 variable "mirror_ami" {
   description = "AMI ID for mirror instances"
+}
+
+variable "taskcluster_vpc_cidr" {
+  description = "CIDR block of the Taskcluster VPC in the same AWS region"
 }
