@@ -1,3 +1,7 @@
+variable "certificate_arn" {
+  description = "SSL certificate ARN"
+}
+
 variable "cidr_block" {
   description = "CIDR block for the VPC"
 }
@@ -13,6 +17,10 @@ variable "metadata_bucket_name" {
 
 variable "mirror_ami" {
   description = "AMI ID for mirror instances"
+}
+
+variable "route53_zone_id" {
+  description = "Route53 private hosted zone ID"
 }
 
 variable "taskcluster_vpc_cidr" {

@@ -178,6 +178,37 @@ module "s3-eu1" {
   }
 }
 
+resource "aws_route53_zone" "hgmointernal-zone" {
+  name = "hgmointernal.com"
+  comment = "Domain name for private CI instances"
+
+  tags {
+    Name = "hgmo internal hosted zone"
+  }
+}
+
+resource "aws_route53_zone" "hgzone" {
+  name = "hgmointernal.net"
+  comment = "hg internal public hosted zone"
+
+  tags {
+    Name = "hgmo internal public hosted zone"
+  }
+}
+
+resource "aws_acm_certificate" "hgcert" {
+  domain_name = "*.hgmointernal.net"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name = "hg certificate"
+  }
+}
+
 # Configure a CI-only hgweb mirror environment in us-west-2
 module "ci-only-west2" {
   source = "./modules/ci-only"
@@ -188,6 +219,8 @@ module "ci-only-west2" {
   ]
   metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
   mirror_ami = "${var.centos7_amis["us-west-2"]}"
+  certificate_arn = "${aws_acm_certificate.hgcert.arn}"
+  route53_zone_id = "${aws_route53_zone.hgzone.id}"
   taskcluster_vpc_cidr = "10.144.0.0/16"
 
   providers = {

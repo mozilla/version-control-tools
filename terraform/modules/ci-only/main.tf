@@ -253,6 +253,18 @@ module "test-hgweb-mirror" {
   user_data = "${file("${path.module}/user_data.yml")}"
 }
 
+resource "aws_route53_record" "uw2record" {
+  name = "${data.aws_region.current.name}.hgmointernal.net"
+  type = "A"
+  zone_id = "${var.route53_zone_id}"
+
+  alias {
+    evaluate_target_health = true
+    name = "${aws_lb.internal-lb.dns_name}"
+    zone_id = "${aws_lb.internal-lb.zone_id}"
+  }
+}
+
 # Create a network ACL for the VPC
 # Use these rules to EXCLUDE traffic
 resource "aws_network_acl" "hgci-networkacl" {
