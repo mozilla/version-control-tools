@@ -141,6 +141,36 @@ module "privsubnet-c" {
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
 }
 
+resource "aws_security_group" "lb-securitygroup" {
+  name = "lb-securitygroup"
+  description = "Set security rules for application load balancer"
+  vpc_id = "${aws_vpc.hgci-vpc.id}"
+
+  # Allow traffic from our VPC to LB listener port
+  ingress {
+    from_port = 443
+    protocol = "tcp"
+    to_port = 443
+    cidr_blocks = ["${aws_vpc.hgci-vpc.cidr_block}"]
+  }
+
+  # Allow traffic from Taskcluster VPC to LB listener port
+  ingress {
+    from_port = 443
+    protocol = "tcp"
+    to_port = 443
+    cidr_blocks = ["${var.taskcluster_vpc_cidr}"]
+  }
+
+  # Allow traffic to instances on health check/listener port (80)
+  egress {
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+    security_groups = ["${aws_security_group.hgci-securitygroup.id}"]
+  }
+}
+
 # Create a security group for the private CI instances
 # Use these rules to INCLUDE traffic
 resource "aws_security_group" "hgci-securitygroup" {
@@ -190,6 +220,23 @@ resource "aws_security_group" "hgci-securitygroup" {
 
   tags {
     Name = "CI-only hgweb security group"
+  }
+}
+
+# Load balancer for traffic in this region
+resource "aws_lb" "internal-lb" {
+  name = "${data.aws_region.current.name}-lb"
+  internal = true
+  load_balancer_type = "application"
+  security_groups = ["${aws_security_group.lb-securitygroup.id}"]
+  subnets = [
+    "${module.privsubnet-a.subnet_id}",
+    "${module.privsubnet-b.subnet_id}",
+    "${module.privsubnet-c.subnet_id}",
+  ]
+
+  tags {
+    Name = "${data.aws_region.current.name} hg load balancer"
   }
 }
 
