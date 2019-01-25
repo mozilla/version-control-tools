@@ -15,9 +15,8 @@ data "aws_vpn_gateway" "mdc-vpn-gate" {
 resource "aws_vpc" "hgci-vpc" {
   cidr_block = "${var.cidr_block}"
 
-  # Enable DNS lookups but do not assign DNS records
-  # to new instances
-  enable_dns_hostnames = false
+  # Enable DNS
+  enable_dns_hostnames = true
   enable_dns_support = true
 
   tags {
