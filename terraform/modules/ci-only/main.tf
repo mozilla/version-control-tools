@@ -164,6 +164,17 @@ resource "aws_security_group" "hgci-securitygroup" {
     ]
   }
 
+  ingress {
+    description = "All traffic from Taskcluster VPC"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+
+    cidr_blocks = [
+      "${var.taskcluster_vpc_cidr}",
+    ]
+  }
+
   # Outgoing rules
   egress {
     description = "Allow all outgoing"
