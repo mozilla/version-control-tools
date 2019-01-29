@@ -42,6 +42,10 @@ diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/
 +        <td>Build team projects</td>
 +    </tr>
 +    <tr>
++        <td><a href="/ci">ci</a></td>
++        <td>Firefox CI related repositories</td>
++    </tr>
++    <tr>
 +        <td><a href="/experimental">experimental</a></td>
 +        <td>Playground for version control wizards</td>
 +    </tr>
