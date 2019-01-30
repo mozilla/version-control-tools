@@ -8,9 +8,13 @@ import contextlib
 import os
 import time
 
+from mercurial.node import short
 from mercurial import (
+    encoding,
     error,
 )
+
+import mozautomation.commitparser as commitparser
 
 
 def import_module(name):
@@ -136,6 +140,28 @@ def repo_owner(repo):
             group = '<unknown>'
 
     return group
+
+
+def get_backoutbynode(ext_name, repo, ctx):
+    """Look for changesets that back out this one."""
+    # We limit the distance we search for backouts because an exhaustive
+    # search could be very intensive. e.g. you load up the root commit
+    # on a repository with 200,000 changesets and that commit is never
+    # backed out. This finds most backouts because backouts typically happen
+    # shortly after a bad commit is introduced.
+    thisshort = short(ctx.node())
+    count = 0
+    searchlimit = repo.ui.configint(ext_name, 'backoutsearchlimit', 100)
+    for bctx in repo.set('%ld::', [ctx.rev()]):
+        count += 1
+        if count >= searchlimit:
+            break
+
+        backouts = commitparser.parse_backouts(
+            encoding.fromlocal(bctx.description()))
+        if backouts and thisshort in backouts[0]:
+            return bctx.hex()
+    return None
 
 
 class timers(object):

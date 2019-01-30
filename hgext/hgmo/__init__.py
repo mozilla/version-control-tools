@@ -82,7 +82,7 @@ import subprocess
 import types
 
 from mercurial.i18n import _
-from mercurial.node import bin, short
+from mercurial.node import bin
 from mercurial.utils import (
     cborutil,
     dateutil,
@@ -125,6 +125,7 @@ import mozautomation.commitparser as commitparser
 from mozhg.util import (
     import_module,
     repo_owner,
+    get_backoutbynode,
 )
 
 from mercurial.wireprotoserver import httpv1protocolhandler as webproto
@@ -277,26 +278,9 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     except error.LookupError:
         pass
 
-    # Look for changesets that back out this one.
-    #
-    # We limit the distance we search for backouts because an exhaustive
-    # search could be very intensive. e.g. you load up the root commit
-    # on a repository with 200,000 changesets and that commit is never
-    # backed out. This finds most backouts because backouts typically happen
-    # shortly after a bad commit is introduced.
-    thisshort = short(ctx.node())
-    count = 0
-    searchlimit = repo.ui.configint('hgmo', 'backoutsearchlimit', 100)
-    for bctx in repo.set('%ld::', [ctx.rev()]):
-        count += 1
-        if count >= searchlimit:
-            break
-
-        backouts = commitparser.parse_backouts(
-            encoding.fromlocal(bctx.description()))
-        if backouts and thisshort in backouts[0]:
-            d['backedoutbynode'] = bctx.hex()
-            break
+    backout_node = get_backoutbynode('hgmo', repo, ctx)
+    if backout_node is not None:
+        d['backedoutbynode'] = backout_node
 
 
 def changesetentry(orig, web, ctx):

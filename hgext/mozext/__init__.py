@@ -292,7 +292,10 @@ except AttributeError:
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 
-from mozhg.util import import_module
+from mozhg.util import (
+    import_module,
+    get_backoutbynode,
+)
 
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
@@ -357,6 +360,8 @@ configitem('mozext', 'disable_local_database',
            default=False)
 configitem('mozext', 'reject_pushes_with_repo_names',
            default=False)
+configitem('mozext', 'backoutsearchlimit',
+           default=configitems.dynamicdefault)
 
 colortable = {
     'buildstatus.success': 'green',
@@ -1036,6 +1041,11 @@ def template_bug(repo, ctx, **args):
     return bugs[0] if bugs else None
 
 
+@templatekeyword('backedoutby')
+def template_backedoutby(repo, ctx, **args):
+    return get_backoutbynode('mozext', repo, ctx)
+
+
 @templatekeyword('bugs')
 def template_bugs(repo, ctx, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
@@ -1346,7 +1356,6 @@ def extsetup(ui):
         templatekw.keywords['pushheaddates'] = template_pushheaddates
         templatekw.keywords['trees'] = template_trees
         templatekw.keywords['reltrees'] = template_reltrees
-
 
 def reposetup(ui, repo):
     """Custom repository implementation.
