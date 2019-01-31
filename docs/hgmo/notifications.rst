@@ -165,13 +165,13 @@ An example message payload for is as follows::
      "data": {
        "repo_url": "https://hg.mozilla.org/try",
        "heads": ["eb6d9371407416e488d2b2783a5a79f8364330c8"],
-       "pushlog_pushes": {
+       "pushlog_pushes": [{
          "time": 14609750810,
          "pushid": 120040,
          "user": "tlin@mozilla.com",
          "push_json_url": "https://hg.mozilla.org/try/json-pushes?version=2&startID=120039&endID=120040",
          "push_full_json_url": "https://hg.mozilla.org/try/json-pushes?version=2&full=1&startID=120039&endID=120040"
-       }
+       }]
      }
    }
 
@@ -210,8 +210,6 @@ The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
    String denoting the message type.
 ``data``
    Dictionary holding details about the event.
-
-The message types and their data are described later in this document.
 
 SNS Notifications
 =================
