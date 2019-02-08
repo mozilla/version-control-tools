@@ -2,21 +2,20 @@
 users:
   - name: cosheehan
     lock_passwd: true
-    primary_group: cosheehan
     groups: sudo
     shell: /bin/bash
     sudo:  ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDF1QPKh9Qe7uLewUXKJj66zwYngDJM3UbmyO/6jhdFSbsSB1528THQjZYjemj1JyWmvuKk7lCEJD06alGMN54jEm0qccjZEQc1jQ3ZIa6YZpEjHyFuqgIrTVj3N6LXBBbENOdSFt+V3WGRNw9cXq30rr8vD6tmk4+IjXgTHuTqyGCfTBIx48qvbC7CszF8CkoQYFGOHMpP9R/VN3BjTnOSf9ULIqyxZ0BNJ+SMtMYn+DKefOiNNtYsDz5GcjbJFnGidAw3/Zqpz19wrfKwIDfIBgAgrrYAMzYOawCFWINevhGbQUuUJNXk78ZC6ouiaenvtsPgC1hnxth3neazS0sX69wKIYP1ECZLK86dm4fSKVqkazjI2TyQ7T9NHAEbO0i6XUQhAaXC6hbTCa7uLknJY4/NkAL0s9G70lTlw/uRFhhlK44/fW5c7tURbgw5N3mGO5dYWL0xzFECSfQkiSWZBSBviD9rUh6FVRxFVpPE+HpDhEtVd0HoybXnFXr7Zrayfv6K4Xsls5JSrf149YVKr/mrXYbIY8MzaFRDO9Q9yoiNZcbIVe8wVhq+1afUA7ME/xbDzBxlaXmwflhs8lfeOgG8d9rgsgrXsRZFuIi2KLM420iaWk+/yhzjhg/ZrJ/2DFRKCbMdO3SYkBFwPr+QDQYs83nliGhuNqS4KTZMsw==
-
   - name: hg
+    lock_passwd: true
     shell: /bin/bash
-    primary_group: hg
 
 runcmd:
   # for now we need to copy the instance_data.json object on first boot
   # this is because cloud-init did not persist the instance_data.json
   # object until version 18.4, and version 18.2 is the latest available
   # on CentOS7
-  - [ "cp", "/run/cloud-init/instance_data.json", "/var/hg/instance_data.json" ]
+  - [ "mkdir", "/var/hg" ]
+  - [ "cp", "/run/cloud-init/instance-data.json", "/var/hg/instance_data.json" ]
   - [ "chown", "hg:hg", "/var/hg/instance_data.json" ]
