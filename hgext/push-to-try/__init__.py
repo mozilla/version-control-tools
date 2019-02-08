@@ -30,11 +30,17 @@ minimumhgversion = '4.4'
 
 @command('push-to-try', [
     ('m', 'message', '', 'commit message to use', 'MESSAGE'),
-    ('s', 'server', 'ssh://hg.mozilla.org/try', 'push destination', 'URL'),
+    ('s', 'server', '', 'push destination', 'URL'),
 ], '-m MESSAGE -s URL')
 def push_to_try(ui, repo, server, message=None):
 
     nodate = ui.configbool('push-to-try', 'nodate')
+
+    if server is None:
+        if 'try' in ui.paths:
+            server = 'try'
+        else:
+            server = 'ssh://hg.mozilla.org/try'
 
     if not message:
         ui.status("STOP! A commit message is required.\n")
