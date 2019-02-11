@@ -212,6 +212,14 @@ resource "aws_security_group" "hgci-securitygroup" {
     ]
   }
 
+  ingress {
+    description = "All traffic within group"
+    from_port = 0
+    protocol = "-1"
+    to_port = 0
+    self = true
+  }
+
   # Outgoing rules
   egress {
     description = "Allow all outgoing"
