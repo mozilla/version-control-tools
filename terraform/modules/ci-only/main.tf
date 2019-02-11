@@ -172,6 +172,10 @@ resource "aws_security_group" "lb-securitygroup" {
     to_port = 80
     security_groups = ["${aws_security_group.hgci-securitygroup.id}"]
   }
+
+  tags {
+    Name = "load balancer security group"
+  }
 }
 
 # Create a security group for the private CI instances
