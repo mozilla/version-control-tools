@@ -36,7 +36,7 @@ def push_to_try(ui, repo, server, message=None):
 
     nodate = ui.configbool('push-to-try', 'nodate')
 
-    if server is None:
+    if not server:
         if 'try' in ui.paths:
             server = 'try'
         else:
