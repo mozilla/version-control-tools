@@ -158,7 +158,7 @@ push
 Examples
 --------
 
-An example message payload for is as follows::
+An example message payload is as follows::
 
    {
      "type": "changegroup.1",
@@ -174,6 +174,9 @@ An example message payload for is as follows::
        }]
      }
    }
+
+This data structure would be available at ``message['payload']`` in a Pulse
+message, for example.
 
 Pulse Notifications
 ===================
@@ -204,12 +207,17 @@ multiple event types.
    Consumers should either ignore unknown message types or fail fast when
    encountering one.
 
-The ``exchange/hgpushes/v2`` exchange has a payload with the following keys:
+Messages on the ``exchange/hgpushes/v2`` exchange have the following structure:
 
-``type``
-   String denoting the message type.
-``data``
-   Dictionary holding details about the event.
+```js
+{
+    "_meta": {}, // private
+    "payload": {
+        "type": .., // String denoting the message type.
+        "data": { .. }, // Dictionary holding details about the event, as above
+    }
+}
+```
 
 SNS Notifications
 =================
