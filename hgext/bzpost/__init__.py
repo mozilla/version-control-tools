@@ -155,7 +155,7 @@ def wrappedpushbookmark(orig, pushop):
 
         bugsmap.setdefault(bugs[0], []).append(ctx.hex())
         lastbug = bugs[0]
-        lastnode = ctx.hex()
+    lastnode = pushop.repo[pushop.outgoing.missing[-1]].hex()
 
     if not bugsmap:
         return result
