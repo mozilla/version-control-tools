@@ -115,6 +115,10 @@ hg replicatesync
    Run this if mirrors ever get out of sync with the master. It should be
    harmless to run this on any repo at any time.
 
+hg -R <repo> replicatedelete
+   Atomically delete this repo from the ssh master and all mirrors. The repo
+   will be moved to a non-public location and removed.
+
 .. important::
 
    You will need to run ``/var/hg/venv_tools/bin/hg`` instead of
