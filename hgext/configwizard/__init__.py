@@ -245,6 +245,12 @@ b) perform head/bookmark-based development (as opposed to mq)
 Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+CLANG_FORMAT_INFO = '''
+The "clang-format" extension provides execution of clang-format at the commit steps.
+It relies on ./mach clang-format directly.
+Would you like to activate clang-format (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 FORMATSOURCE_INFO = '''
 The "format-source" extension provides a way to run code-formatting tools in a way that
 avoids conflicts related to this formatting when merging/rebasing code across the
@@ -448,6 +454,7 @@ wizardsteps = set([
     'multiplevct',
     'configchange',
     'permissions',
+    'clang-format',
 ])
 
 
@@ -530,6 +537,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'firefoxtree' in runsteps:
         _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
+
+    if 'clang-format' in runsteps:
+        _promptvctextension(ui, cw, 'clang-format', CLANG_FORMAT_INFO)
 
     if 'format-source' in runsteps:
         _promptvctextension(ui, cw, 'format-source', FORMATSOURCE_INFO)
