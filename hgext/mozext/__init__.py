@@ -750,7 +750,7 @@ def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
 
     return False
 
-def pull(orig, repo, remote, *args, **kwargs):
+def wrappedpull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to add remote tracking refs."""
     if not hasattr(repo, 'changetracker'):
         return orig(repo, remote, *args, **kwargs)
@@ -777,7 +777,7 @@ def pull(orig, repo, remote, *args, **kwargs):
 
     return res
 
-def push(orig, repo, remote, *args, **kwargs):
+def wrappedpush(orig, repo, remote, *args, **kwargs):
     if not hasattr(repo, 'changetracker'):
         return orig(repo, remote, *args, **kwargs)
 
@@ -1330,8 +1330,8 @@ def extsetup(ui):
     except KeyError:
         pass
 
-    extensions.wrapfunction(exchange, 'pull', pull)
-    extensions.wrapfunction(exchange, 'push', push)
+    extensions.wrapfunction(exchange, 'pull', wrappedpull)
+    extensions.wrapfunction(exchange, 'push', wrappedpush)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
     if not ui.configbool('mozext', 'disable_local_database'):
