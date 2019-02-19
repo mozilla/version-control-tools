@@ -1,0 +1,20 @@
+This repository contains a Mercurial extension (and supplementary libraries)
+that override hg commit to run clang-format as a hook.
+
+To activate the extension, place the following in your .hgrc:
+
+  [extensions]
+  clang-format = /path/to/version-control-tools/hgext/clang-format
+
+Once activated, run `hg help clang-format` for information about this extension.
+
+Mercurial hooks are much harder because
+With the precommit hook, as the node arg isn't part of the method profile,
+we don't know which files are going to be modified.
+
+With the pretxncommit hook, we are able to retrieve the list of modified/added
+ files using repo[node].changeset()[3].
+However, once the changes have been done, as the repo is locked, we cannot add
+back the changes in the repo.
+
+
