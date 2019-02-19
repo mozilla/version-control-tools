@@ -12,8 +12,7 @@ Create the testing repo
 Create the fake mach
 It will take the file and add something at the end of the file
 
-
-  $ cat << EOF > mach
+  $ cat > mach << EOF
   > #!/bin/sh
   > filename=\$3
   > echo "Reformatting '\$filename'"
@@ -70,31 +69,31 @@ Rebase (should not run the hook)
   Reformatting 'dir-2/bar.cpp'
   $ grep -q "int clang_format=42" dir-2/bar.cpp
   $ hg log --graph
-  @  changeset:   3:b0fbd9def0e3
+  @  changeset:   3:059cd3ee4b4d
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   2:95690b3319a1
+  o  changeset:   2:0088d44a4e42
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   1:1d54f3d82651
+  o  changeset:   1:a23f48517f2e
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add bar.cpp before the hook is set
   |
-  o  changeset:   0:a3a45b056201
+  o  changeset:   0:7ee4c4e22a8d
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add mach
   
   $ hg rebase -s 2 -d 0
-  rebasing 2:95690b3319a1 "second commit"
-  rebasing 3:b0fbd9def0e3 "third commit" (tip)
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/95690b3319a1-5827bfda-rebase.hg
+  rebasing 2:0088d44a4e42 "second commit"
+  rebasing 3:059cd3ee4b4d "third commit" (tip)
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/0088d44a4e42-bbfa5a85-rebase.hg
   $ hg export -r 1|grep -v -q "int clang_format=42"
   $ hg export -r 2|grep -q "int clang_format=42"
   $ hg export -r 3|grep -q "int clang_format=42"
@@ -106,42 +105,47 @@ Update (should not run the hook)
   $ hg export -r 1|grep -v -q "int clang_format=42"
   $ hg export -r 2|grep -q "int clang_format=42"
   $ hg rebase -s 1 -d 3
-  rebasing 1:1d54f3d82651 "Add bar.cpp before the hook is set"
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/1d54f3d82651-d3024fe4-rebase.hg
+  rebasing 1:a23f48517f2e "Add bar.cpp before the hook is set"
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/a23f48517f2e-a25c03d1-rebase.hg
   $ hg update -r tip
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
 Histedit
+
   $ echo "histedit =" >> $HGRCPATH
-  $ hg histedit --commands - 2>&1 << EOF
-  > mess c53048a4bfcd a
-  > pick a96e0d222810 c
-  > pick a3a45b056201 f
-  > pick 8cf6684113a7 d
+  $ cat > histeditcommands << EOF
+  > mess 866d807fd982 3
+  > pick fdf8beeead16 2
+  > pick 7ee4c4e22a8d 0
+  > pick bc49f9b033d1 1
   > EOF
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/a3a45b056201-11e8b9e2-histedit.hg
+  $ hg histedit --commands histeditcommands
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/7ee4c4e22a8d-1462040c-histedit.hg
   $ hg log --graph
-  @  changeset:   3:a0090a232748
+  @  changeset:   3:72c566e9cf17
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   2:205cd4d3abf5
+  o  changeset:   2:cfc3e492707a
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add mach
   |
-  o  changeset:   1:3dd5a8ab22d3
+  o  changeset:   1:77a3ec17cbe9
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   0:805d736bb819
+  o  changeset:   0:3e55a2746795
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add bar.cpp before the hook is set
   
   $ hg export -r 0|grep -v -q "int clang_format=42"
+
 Check that histedit didn't run mach again
-  $ test $(hg export -r 3|grep -c 'int clang_format=42') -eq 1
+
+  $ hg export -r 3|grep -c 'int clang_format=42'
+  1
