@@ -28,6 +28,17 @@ testedwith = '4.4 4.5 4.6 4.7 4.8 4.9'
 minimumhgversion = '4.4'
 
 
+def call_clang_format(repo, changed_files):
+    '''Call `./mach clang-format` on the changed files'''
+    mach_path = os.path.join(repo.root, 'mach')
+    arguments = ['clang-format', '-p'] + changed_files
+    if os.name == 'nt':
+        clang_format_cmd = ['sh', 'mach'] + arguments
+    else:
+        clang_format_cmd = [mach_path] + arguments
+    subprocess.call(clang_format_cmd)
+
+
 def wrappedcommit(orig, repo, *args, **kwargs):
     try:
         path_matcher = args[3]
@@ -43,7 +54,6 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         lock = repo.wlock()
         status = repo.status(match=path_matcher)
         changed_files = sorted(status.modified + status.added)
-        mach_path = os.path.join(repo.root, 'mach')
 
         if not is_firefox_repo(repo) or not changed_files:
             # this isn't a firefox repo, don't run clang-format
@@ -52,12 +62,8 @@ def wrappedcommit(orig, repo, *args, **kwargs):
             lock.release()
             return orig(repo, *args, **kwargs)
 
-        arguments = ['clang-format', '-p'] + changed_files
-        if os.name == 'nt':
-            clang_format_cmd = ['sh', 'mach'] + arguments
-        else:
-            clang_format_cmd = [mach_path] + arguments
-        subprocess.call(clang_format_cmd)
+        call_clang_format(repo, changed_files)
+
     except Exception as e:
         repo.ui.warn('Exception %s\n' % str(e))
 
