@@ -1,0 +1,27 @@
+---
+# Ansible role to configure a TICK stack monitoring host
+- name: download packages for InfluxDB
+  get_url:
+    dest: /var/tmp/{{ item.package }}
+    url: https://dl.influxdata.com/{{ item.program }}/releases/{{ item.package }}
+    sha256sum: "{{ item.sha256 }}"
+  with_items:
+    - { program: influxdb,   package: influxdb-1.7.3.x86_64.rpm,   sha256: 2dc688239fc394a82c4dfaaa6340d438229a8315e21f412a0accf1f0eb700ec4 }
+    - { program: chronograf, package: chronograf-1.7.7.x86_64.rpm, sha256: 872a73bc9ad230498c045bddbbde5bff15a27b521084a90cef99f971f227f4be }
+
+- name: install InfluxDB packages
+  yum:
+    name: /var/tmp/{{ item }}
+    state: present
+  with_items:
+    - influxdb-1.7.3.x86_64.rpm
+    - chronograf-1.7.7.x86_64.rpm
+
+- name: start monitoring services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - influxdb
+    - chronograf
