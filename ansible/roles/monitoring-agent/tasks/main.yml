@@ -1,0 +1,22 @@
+---
+- name: download Telegraf
+  get_url:
+    dest: /var/tmp/telegraf-1.9.4-1.x86_64.rpm
+    url: https://dl.influxdata.com/telegraf/releases/telegraf-1.9.4-1.x86_64.rpm
+    sha256sum: d2403d2c31806470d321c67443684549d4926badbb6cc4f0f64f9f4d997f3eec
+
+- name: install Telegraf
+  yum:
+    name: /var/tmp/telegraf-1.9.4-1.x86_64.rpm
+    state: present
+
+- name: install Telegraf config file
+  copy:
+    src: telegraf.conf
+    dest: /etc/telegraf/telegraf.conf
+
+- name: start the Telegraf service
+  service:
+    name: telegraf
+    state: started
+    enabled: yes
