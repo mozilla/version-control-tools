@@ -1,4 +1,4 @@
-Create the testing repo
+ Create the testing repo
 
   $ . $TESTDIR/testing/firefoxrepos.sh
   $ makefirefoxreposserver root $HGPORT
@@ -94,16 +94,16 @@ Rebase (should not run the hook)
   rebasing 2:0088d44a4e42 "second commit"
   rebasing 3:059cd3ee4b4d "third commit" (tip)
   saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/0088d44a4e42-bbfa5a85-rebase.hg
-  $ hg export -r 1|grep -v -q "int clang_format=42"
-  $ hg export -r 2|grep -q "int clang_format=42"
-  $ hg export -r 3|grep -q "int clang_format=42"
+  $ hg export -r 1 | grep -v -q "int clang_format=42"
+  $ hg export -r 2 | grep -q "int clang_format=42"
+  $ hg export -r 3 | grep -q "int clang_format=42"
 
 Update (should not run the hook)
 
   $ hg update -r 2
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  $ hg export -r 1|grep -v -q "int clang_format=42"
-  $ hg export -r 2|grep -q "int clang_format=42"
+  $ hg export -r 1 | grep -v -q "int clang_format=42"
+  $ hg export -r 2 | grep -q "int clang_format=42"
   $ hg rebase -s 1 -d 3
   rebasing 1:a23f48517f2e "Add bar.cpp before the hook is set"
   saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/a23f48517f2e-a25c03d1-rebase.hg
@@ -143,9 +143,26 @@ Histedit
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add bar.cpp before the hook is set
   
-  $ hg export -r 0|grep -v -q "int clang_format=42"
+  $ hg export -r 0 | grep -v -q "int clang_format=42"
 
 Check that histedit didn't run mach again
 
   $ hg export -r 3|grep -c 'int clang_format=42'
   1
+
+Make a change and amend, confirming mach ran
+
+  $ cat > asdf.cpp << EOF
+  > int foo(int a) { printf("bar\n"); }
+  > EOF
+  $ hg add asdf.cpp
+  $ hg commit -m "Initial commit for asdf.cpp"
+  Reformatting 'asdf.cpp'
+  $ echo "int a=2;" >> asdf.cpp
+  $ hg -q commit --amend asdf.cpp
+  Reformatting 'asdf.cpp'
+  $ cat asdf.cpp
+  int foo(int a) { printf("bar\n"); }
+  int clang_format=42;
+  int a=2;
+  int clang_format=42;

@@ -13,9 +13,11 @@ import os
 import subprocess
 
 from mercurial import (
+    cmdutil,
     extensions,
     localrepo,
-    match
+    match,
+    scmutil,
 )
 
 OUR_DIR = os.path.dirname(__file__)
@@ -72,5 +74,25 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         return orig(repo, *args, **kwargs)
 
 
+def wrappedamend(orig, ui, repo, old, extra, pats, opts):
+    '''Wraps cmdutil.amend to run clang-format during `hg commit --amend`'''
+    wctx = repo[None]
+    matcher = scmutil.match(wctx, pats, opts)
+    filestoamend = [f for f in wctx.files() if matcher(f)]
+
+    if not is_firefox_repo(repo) or not filestoamend:
+        return orig(ui, repo, old, extra, pats, opts)
+
+    try:
+        with repo.wlock():
+            call_clang_format(repo, filestoamend)
+
+    except Exception as e:
+        repo.ui.warn('Exception %s\n' % str(e))
+
+    return orig(ui, repo, old, extra, pats, opts)
+
+
 def extsetup(ui):
     extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
+    extensions.wrapfunction(cmdutil, 'amend', wrappedamend)
