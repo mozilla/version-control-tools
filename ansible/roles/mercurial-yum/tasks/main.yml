@@ -11,6 +11,7 @@
 - name: Install patch package
   yum: name=patch state=present
 
-# The yum module is slow. Run commands manually.
 - name: installed Mercurial
-  command: /usr/bin/yum localinstall -y /var/tmp/mercurial-4.8-1.x86_64.rpm
+  yum:
+    name: /var/tmp/mercurial-4.8-1.x86_64.rpm
+    state: present

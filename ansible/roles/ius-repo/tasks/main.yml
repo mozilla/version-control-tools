@@ -15,4 +15,6 @@
     - { name: ius-release-1.0-14.ius.centos7.noarch.rpm, dest: ius-release-1.0-14.rpm, sha256: ec12c81b83c4c57faad496d70782b3b9dd6da2b2d4b585985f3c7da0e93c2979 }
 
 - name: configure IUS Community Repos
-  command: yum localinstall -y /var/tmp/ius-release-1.0-14.rpm
+  yum:
+    name: /var/tmp/ius-release-1.0-14.rpm
+    state: present
