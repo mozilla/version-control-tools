@@ -230,7 +230,9 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         # Don't print Perfherder link on non-publishing repos (like Try)
         # because the previous push likely has nothing to do with this
         # push.
-        if push and push.nodes and repo.ui.configbool('phases', 'publish', True):
+        # Changeset on autoland are in the phase 'draft' until they get merged
+        # to mozilla-central.
+        if push and push.nodes and (repo.ui.configbool('phases', 'publish', True) or treeherder == 'autoland'):
             lastpushhead = repo[push.nodes[0]].hex()
             d['perfherderurl'] = (
                 'https://treeherder.mozilla.org/perf.html#/compare?'

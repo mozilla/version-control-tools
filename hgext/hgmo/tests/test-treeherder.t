@@ -25,6 +25,29 @@ No Treeherder link unless the repository defines its Treeherder repo
   $ grep perfherder body
   [1]
 
+No Treeherder link if non-publishing phase and not autoland (e.g. Try)
+
+  $ cat > .hg/hgrc << EOF
+  > [mozilla]
+  > treeherder_repo = try
+  > [phases]
+  > publish = False
+  > EOF
+  $ hg serve -d -p $HGPORT1 --pid-file hg.pid --hgmo -E error-phases-try.log
+  $ grep '>treeherder' body
+  [1]
+
+Treeherder link if non-publishing phase and autoland
+
+  $ cat > .hg/hgrc << EOF
+  > [mozilla]
+  > treeherder_repo = autoland
+  > [phases]
+  > publish = False
+  > EOF
+  $ hg serve -d -p $HGPORT1 --pid-file hg.pid --hgmo -E error-phases-autoland.log
+  <tr><td>treeherder</td><td>autoland@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/#/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/#/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
+
 Configure the Treeherder repo
 
   $ cd server
