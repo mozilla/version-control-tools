@@ -120,6 +120,10 @@ LimitRequestFields 1000
         Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/ https://taskcluster-artifacts.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:"
     </Location>
 
+    <Location "/mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer-structured.xhtml">
+        Header set Content-Security-Policy "default-src 'none'; connect-src 'self' https://archive.mozilla.org/ https://public-artifacts.taskcluster.net/ https://queue.taskcluster.net/ https://taskcluster-artifacts.net/; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:"
+    </Location>
+
     <If "-n env('HG_PROTOCOL')">
         Header unset Content-Security-Policy
     </If>
