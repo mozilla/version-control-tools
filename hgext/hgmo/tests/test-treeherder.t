@@ -25,57 +25,84 @@ No Treeherder link unless the repository defines its Treeherder repo
   $ grep perfherder body
   [1]
 
-No Treeherder link if non-publishing phase and not autoland (e.g. Try)
+Treeherder link but no perfherder link if non-publishing phase and not autoland (e.g. Try)
 
+  $ cd server
   $ cat > .hg/hgrc << EOF
+  > [extensions]
+  > hgmo = $TESTDIR/hgext/hgmo 
+  > [web]
+  > push_ssl = False
+  > allow_push = *
   > [mozilla]
   > treeherder_repo = try
   > [phases]
   > publish = False
   > EOF
-  $ hg serve -d -p $HGPORT1 --pid-file hg.pid --hgmo -E error-phases-try.log
+  $ hg serve -d -p $HGPORT2 --pid-file hg.pid --hgmo -E error-phases-try.log
+  $ cat hg.pid >> $DAEMON_PIDS
+
+  $ cd ..
+  $ http http://localhost:$HGPORT2/rev/be788785547b --body-file body > /dev/null
   $ grep '>treeherder' body
+  <tr><td>treeherder</td><td>try@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/#/jobs?repo=try&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/#/jobs?repo=try&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
+
+  $ grep perfherder body
   [1]
 
-Treeherder link if non-publishing phase and autoland
+Treeherder link and perfherder link if non-publishing phase and autoland
 
+  $ cd server
   $ cat > .hg/hgrc << EOF
+  > [extensions]
+  > hgmo = $TESTDIR/hgext/hgmo 
+  > [web]
+  > push_ssl = False
+  > allow_push = *
   > [mozilla]
   > treeherder_repo = autoland
   > [phases]
   > publish = False
   > EOF
-  $ hg serve -d -p $HGPORT1 --pid-file hg.pid --hgmo -E error-phases-autoland.log
+  $ hg serve -d -p $HGPORT3 --pid-file hg.pid --hgmo -E error-phases-autoland.log
+  $ cat hg.pid >> $DAEMON_PIDS
+
+  $ cd ..
+  $ http http://localhost:$HGPORT3/rev/be788785547b --body-file body > /dev/null
+  $ grep '>treeherder' body
   <tr><td>treeherder</td><td>autoland@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/#/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/#/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
 
-Configure the Treeherder repo
+  $ grep perfherder body
+  <tr><td>perfherder</td><td>[<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=1" target="_blank">talos</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=2" target="_blank">build metrics</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>
+
+Treeherder link and perfherder link if publishing phase
 
   $ cd server
-  $ cat >> .hg/hgrc << EOF
+  $ cat > .hg/hgrc << EOF
+  > [extensions]
+  > hgmo = $TESTDIR/hgext/hgmo 
+  > [web]
+  > push_ssl = False
+  > allow_push = *
   > [mozilla]
   > treeherder_repo = mozilla-central
+  > [phases]
+  > publish = True
   > EOF
-
-Confirm no errors in log
-
-  $ cat error.log
-
-Start a new server so the config is refreshed
-
-  $ hg serve -d -p $HGPORT1 --pid-file hg.pid --hgmo -E error2.log
+  $ hg serve -d -p $HGPORT4 --pid-file hg.pid --hgmo -E error-publishing.log
   $ cat hg.pid >> $DAEMON_PIDS
+
   $ cd ..
-
-Treeherder results link should be exposed
-(Note the SHA-1 is different, as TreeHerder indexes by push head)
-
-  $ http http://localhost:$HGPORT1/rev/be788785547b --body-file body > /dev/null
+  $ http http://localhost:$HGPORT4/rev/be788785547b --body-file body > /dev/null
   $ grep '>treeherder' body
   <tr><td>treeherder</td><td>mozilla-central@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
 
   $ grep perfherder body
   <tr><td>perfherder</td><td>[<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=1" target="_blank">talos</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=2" target="_blank">build metrics</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>
 
-Confirm no errors in log
+Confirm no errors in logs
 
-  $ cat ./server/error2.log
+  $ cat server/error.log
+  $ cat server/error-phases-autoland.log
+  $ cat server/error-phases-try.log
+  $ cat server/error-publishing.log
