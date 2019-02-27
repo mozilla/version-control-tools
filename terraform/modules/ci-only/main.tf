@@ -248,6 +248,16 @@ resource "aws_security_group_rule" "rule-allowout" {
   ]
 }
 
+resource "aws_security_group_rule" "rule-hgci-lb" {
+  description = "All traffic from load balancers"
+  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
+  type = "ingress"
+  from_port = 0
+  protocol = "-1"
+  to_port = 0
+  source_security_group_id = "${aws_security_group.lb-securitygroup.id}"
+}
+
 # Load balancer for traffic in this region
 resource "aws_lb" "internal-lb" {
   name = "${data.aws_region.current.name}-lb"
