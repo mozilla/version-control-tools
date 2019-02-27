@@ -2,7 +2,6 @@
 dependencies:
   - ius-repo
   - mercurial-yum
-  - monitoring-agent
   - {
       role: kafka-broker,
       kafka_host_name: "{{ inventory_hostname }}",

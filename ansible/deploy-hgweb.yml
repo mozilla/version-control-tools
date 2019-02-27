@@ -27,3 +27,7 @@
       bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}"
       s3_cache_access_key_id: "{{ (s3cacher_config.content | b64decode | from_json).access_key_id }}"
       s3_cache_secret_key: "{{ (s3cacher_config.content | b64decode | from_json).secret_access_key }}"
+
+  - name: apply monitoring-agent role
+    include_role:
+      name: monitoring-agent
