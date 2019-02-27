@@ -149,33 +149,39 @@ resource "aws_security_group" "lb-securitygroup" {
   description = "Set security rules for application load balancer"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 
-  # Allow traffic from our VPC to LB listener port
-  ingress {
-    from_port = 443
-    protocol = "tcp"
-    to_port = 443
-    cidr_blocks = ["${aws_vpc.hgci-vpc.cidr_block}"]
-  }
-
-  # Allow traffic from Taskcluster VPC to LB listener port
-  ingress {
-    from_port = 443
-    protocol = "tcp"
-    to_port = 443
-    cidr_blocks = ["${var.taskcluster_vpc_cidr}"]
-  }
-
-  # Allow traffic to instances on health check/listener port (80)
-  egress {
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-    security_groups = ["${aws_security_group.hgci-securitygroup.id}"]
-  }
-
   tags {
     Name = "load balancer security group"
   }
+}
+
+resource "aws_security_group_rule" "rule-hgvpc-lb" {
+  description = "Allow traffic from our VPC to LB listener port"
+  security_group_id = "${aws_security_group.lb-securitygroup.id}"
+  type = "ingress"
+  from_port = 443
+  protocol = "tcp"
+  to_port = 443
+  cidr_blocks = ["${aws_vpc.hgci-vpc.cidr_block}"]
+}
+
+resource "aws_security_group_rule" "rule-tcvpc-lb" {
+  description = "Allow traffic from Taskcluster VPC to LB listener port"
+  security_group_id = "${aws_security_group.lb-securitygroup.id}"
+  type = "ingress"
+  from_port = 443
+  protocol = "tcp"
+  to_port = 443
+  cidr_blocks = ["${var.taskcluster_vpc_cidr}"]
+}
+
+resource "aws_security_group_rule" "rule-lb-listener" {
+  description = "Allow traffic to instances on health check/listener port (80)"
+  security_group_id = "${aws_security_group.lb-securitygroup.id}"
+  type = "egress"
+  from_port = 80
+  protocol = "tcp"
+  to_port = 80
+  source_security_group_id = "${aws_security_group.hgci-securitygroup.id}"
 }
 
 # Create a security group for the private CI instances
@@ -185,57 +191,61 @@ resource "aws_security_group" "hgci-securitygroup" {
   description = "Set security rules for private CI-only hgweb instances"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 
-  # Incoming rules
-  ingress {
-    description = "SSH to instances from MozVPN"
-
-    from_port = 22
-    protocol = "tcp"
-    to_port = 22
-    cidr_blocks = [
-      "10.48.240.0/23",
-      "10.48.242.0/23",
-      "10.50.240.0/23",
-      "10.50.242.0/23",
-      "10.64.0.0/16",
-    ]
-  }
-
-  ingress {
-    description = "All traffic from Taskcluster VPC"
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-
-    cidr_blocks = [
-      "${var.taskcluster_vpc_cidr}",
-    ]
-  }
-
-  ingress {
-    description = "All traffic within group"
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-    self = true
-  }
-
-  # Outgoing rules
-  egress {
-    description = "Allow all outgoing"
-
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
-  }
-
   tags {
     Name = "CI-only hgweb security group"
   }
+}
+
+resource "aws_security_group_rule" "rule-mozvpn-hgci" {
+  description = "SSH to instances from MozVPN"
+  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
+  type = "ingress"
+  from_port = 22
+  protocol = "tcp"
+  to_port = 22
+  cidr_blocks = [
+    "10.48.240.0/23",
+    "10.48.242.0/23",
+    "10.50.240.0/23",
+    "10.50.242.0/23",
+    "10.64.0.0/16",
+  ]
+}
+
+resource "aws_security_group_rule" "rule-tcvpc-hgci" {
+  description = "All traffic from Taskcluster VPC"
+  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
+  type = "ingress"
+  from_port = 0
+  to_port = 0
+  protocol = "-1"
+
+  cidr_blocks = [
+    "${var.taskcluster_vpc_cidr}",
+  ]
+}
+
+resource "aws_security_group_rule" "rule-allowself" {
+  description = "All traffic within group"
+  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
+  type = "ingress"
+  from_port = 0
+  protocol = "-1"
+  to_port = 0
+  self = true
+}
+
+resource "aws_security_group_rule" "rule-allowout" {
+  description = "Allow all outgoing"
+  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
+  type = "egress"
+  from_port = 0
+  protocol = "-1"
+  to_port = 0
+
+  cidr_blocks = [
+    "0.0.0.0/0"
+  ]
 }
 
 # Load balancer for traffic in this region
