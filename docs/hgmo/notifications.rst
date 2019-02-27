@@ -207,17 +207,15 @@ multiple event types.
    Consumers should either ignore unknown message types or fail fast when
    encountering one.
 
-Messages on the ``exchange/hgpushes/v2`` exchange have the following structure:
+Messages on the ``exchange/hgpushes/v2`` exchange have the following structure::
 
-```js
-{
-    "_meta": {}, // private
-    "payload": {
-        "type": .., // String denoting the message type.
-        "data": { .. }, // Dictionary holding details about the event, as above
+    {
+        "_meta": {}, // private
+        "payload": {
+            "type": .., // String denoting the message type.
+            "data": { .. }, // Dictionary holding details about the event, as above
+        }
     }
-}
-```
 
 SNS Notifications
 =================
