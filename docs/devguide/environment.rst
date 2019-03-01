@@ -33,7 +33,6 @@ installed:
 * build-essential
 * git
 * python-dev
-* npm
 * libcurl4-openssl-dev
 * libffi-dev
 * liblzma-dev
@@ -50,7 +49,7 @@ extensions that are part of the virtualenv.
 
 You can install these dependencies by running::
 
-   $ sudo apt-get install build-essential git python-dev npm \
+   $ sudo apt-get install build-essential git python-dev \
      libcurl4-openssl-dev libffi-dev liblzma-dev \
      libsasl2-dev libldap2-dev libssl-dev python3 sqlite3 zlib1g-dev \
      mercurial
