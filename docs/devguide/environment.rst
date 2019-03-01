@@ -57,7 +57,9 @@ You can install these dependencies by running::
 You will also need to install Docker for a number of test and dev
 environments to work. See the
 `official Docker instructions <https://docs.docker.com/install/linux/docker-ce/ubuntu/>`_
-for more.
+for more. You will likely need to go through the
+`post installation steps for Linux <https://docs.docker.com/install/linux/linux-postinstall/>`_
+as well.
 
 .. _devguide_create_env:
 
