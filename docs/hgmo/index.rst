@@ -15,7 +15,6 @@ hg.mozilla.org
    automatedclients
    bundleclone
    contributing
-   mozbuildinfo
    firefoxreleases
    replication
    replication-history

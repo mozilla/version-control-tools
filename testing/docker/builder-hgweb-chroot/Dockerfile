@@ -75,9 +75,5 @@ ADD hgrc /python/etc/mercurial/hgrc
 RUN mkdir /python/repo_local
 RUN ln -s /repo/hg /python/repo_local/mozilla
 
-# Compile our executor program.
-ADD mozbuild-eval.c /mozbuild-eval.c
-RUN gcc -Wall -Wextra -Werror -o /mozbuild-eval -lcgroup /mozbuild-eval.c
-
 ADD bootstrap /bootstrap
 CMD ["/bootstrap"]

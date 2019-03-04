@@ -37,7 +37,6 @@
   with_items:
     - enable-fastannotate
     - entrypoint.py
-    - entrypoint-solo
     - set-config-option
     - set-mirror-key.py
 
