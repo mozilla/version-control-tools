@@ -360,8 +360,8 @@ hgAccountEnabled=FALSE shows account disabled message
   This commonly occurs due to account inactivity (you need to SSH
   into hg.mozilla.org every few months to keep your account active).
   
-  To restore Mercurial access, please file a MOC Service Request
-  bug (http://tinyurl.com/njcfhma) and request hg access be restored
+  To restore Mercurial access, please file a LDAP
+  bug (https://tinyurl.com/yxufmrro) and request hg access be restored
   for hgdisabled@example.com.
 
 Failure to connect to LDAP mirror locks us out
