@@ -2,33 +2,37 @@
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
-"""help dealing with code source reformating
+"""help dealing with code source reformatting
 
 The extension provides a way to run code-formatting tools in a way that avoids
 conflicts related to this formatting when merging/rebasing code across the
 reformatting.
 
-A new `format-source` command is provided, to apply code formatting tool on
-some specific files. This information is recorded into the repository and
-reused when merging. The client doing the merge needs the extension for this
-logic to kick in.
+A new `format-source` command is provided to register a code formatting tool to
+be applied to merges and rebases of files matching a given pattern. This
+information is recorded into the repository and reused when merging or
+rebasing. The client doing the merge needs the extension for this logic to kick
+in.
 
-Code formatting tools have to be registered in the configuration. The tool
-"name" will be used to identify a specific command accross all repositories.
-It is mapped to a command line that must output the formatted content on its
-standard output.
+Code formatting tools have to be registered in the global configuration file,
+though they may be overridden in per-repository configuration files. The tool
+"name" will be used to identify a specific command line that must output the
+formatted content on its standard output.
 
-For each tool a list of files affecting the result of the formatting can be
-configured with the "configpaths" suboption, which is read and registered at
-"hg format-source" time.  Any change in those files should trigger
-reformatting.
+Per-tool configuration files (eg .clang-format) may be specified with the
+"configpaths" suboption, which is read and registered at "hg format-source"
+time. Note that any change in those files will trigger reformatting.
+
+File matching may be restricted to a set of file extensions with the "fileext"
+subooption.
 
 Example::
 
     [format-source]
     json = python -m json.tool
-    clang = clang-format -style=Mozilla
-    clang:configpaths = .clang-format, .clang-format-ignore
+    clang-format = /usr/bin/clang-format -style=Mozilla
+    clang-format:configpaths = .clang-format, .clang-format-ignore
+    clang-format:fileext = .cpp, .c, .h
 
 We do not support specifying the mapping of tool name to tool command in the
 repository itself for security reasons.
@@ -100,8 +104,8 @@ def return_default_clang_format(repo):
         clang_format_cmd = ' '.join([os.path.join(repo.root, "mach")] + arguments)
 
     clang_format_cfgpaths = ['.clang-format', '.clang-format-ignore']
-    clang_fortmat_fileext = ('.cpp', '.c', '.cc', '.h')
-    return clang_format_cmd, clang_format_cfgpaths, clang_fortmat_fileext
+    clang_format_fileext = ('.cpp', '.c', '.cc', '.h')
+    return clang_format_cmd, clang_format_cfgpaths, clang_format_fileext
 
 
 def should_use_default(repo, tool):
@@ -113,13 +117,17 @@ def should_use_default(repo, tool):
         [] + commands.walkopts + commands.commitopts + commands.commitopts2,
         _('TOOL FILES+'))
 def cmd_format_source(ui, repo, tool, *pats, **opts):
-    """format source file using a registered tools
+    """register a tool to format source files during merges and rebases
 
-    This command run TOOL on FILES and record this information in a commit to
-    help with future merge.
+    Record a mapping from the given file pattern FILES to a source formatting
+    tool TOOL. Mappings are stored in the version-controlled file
+    (automatically committed when format-source is used) .hg-format-source in
+    the root of the checkout. The mapping causes TOOL to be run on FILES during
+    future merge and rebase operations.
 
     The actual command run for TOOL needs to be registered in the config. See
-    :hg:`help -e formatsource` for details.
+    :hg:`help -e format-source` for details.
+
     """
     if repo.getcwd():
         msg = _("format-source must be run from repository root")
@@ -140,7 +148,7 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
 
     # lock the repo to make sure no content is changed
     with repo.wlock():
-        # formating tool
+        # formatting tool
         if ' ' in tool:
             raise error.Abort(_("tool name cannot contain space: '%s'") % tool)
 
@@ -186,11 +194,11 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
             for filepath in proc:
                 pass
 
-        # update the storage to mark formated file as formatted
+        # update the storage to mark formatted file as formatted
         with repo.wvfs(file_storage_path, mode='ab') as storage:
             for pattern in pats:
                 # XXX if pattern was relative, we need to reroot it from the
-                # repository root. For now we constrainted the command to run
+                # repository root. For now we constrained the command to run
                 # at the root of the repository.
                 data = {'tool': encoding.unifromlocal(tool),
                         'pattern': encoding.unifromlocal(pattern)}
@@ -222,7 +230,7 @@ def batchformat(repo, wctx, tool, shell_tool, file_ext, files):
             repo.ui.warn(_('Skipping symlink, %s\n') % filepath)
             continue
         newcontent = run_tools(repo, tool, shell_tool, filepath, filepath)
-        # if the formating tool returned an empty string then do not write it
+        # if the formatting tool returned an empty string then do not write it
         if len(newcontent):
             # XXX we could do the whole commit in memory
             with repo.wvfs(filepath, 'wb') as formatted_file:
@@ -246,7 +254,7 @@ def run_tools(repo, tool, cmd, filepath, filename):
         cmd_to_use = cmd
         env['HG_FILENAME'] = filename_to_use
 
-    # XXX escape special character in filepath
+    # XXX escape special characters in filepath
     format_cmd = "%s %s" % (cmd_to_use, filepath_to_use)
     ui.debug('running %s\n' % format_cmd)
     ui.pushbuffer(subproc=True)
@@ -300,7 +308,7 @@ def formatted(repo, old_ctx, new_ctx):
     return new_formatting
 
 def allformatted(repo, local, other, ancestor):
-    """return a mapping of formatting needed for all involved changeset
+    """return a mapping of formatting needed for all involved changesets
     """
 
     cachekey = (local.node, other.node(), ancestor.node())
@@ -309,18 +317,18 @@ def allformatted(repo, local, other, ancestor):
     if cached is not None:
         return cached
 
-    local_formating = formatted(repo, ancestor, local)
-    other_formating = formatted(repo, ancestor, other)
-    full_formating = local_formating.copy()
-    for key, value in other_formating.iteritems():
-        if key in local_formating:
-            value = value | local_formating[key]
-        full_formating[key] = value
+    local_formatting = formatted(repo, ancestor, local)
+    other_formatting = formatted(repo, ancestor, other)
+    full_formatting = local_formatting.copy()
+    for key, value in other_formatting.iteritems():
+        if key in local_formatting:
+            value = value | local_formatting[key]
+        full_formatting[key] = value
 
     all = [
-        (local, local_formating),
-        (other, other_formating),
-        (ancestor, full_formating)
+        (local, local_formatting),
+        (other, other_formatting),
+        (ancestor, full_formatting)
     ]
     for ctx, formatting in all:
         for tool, patterns in formatting.iteritems():
@@ -332,7 +340,7 @@ def allformatted(repo, local, other, ancestor):
     return final
 
 def rootedmatch(repo, ctx, patterns):
-    """match patterns agains the root of a repository"""
+    """match patterns against the root of a repository"""
     # rework of basectx.match to ignore current working directory
 
     # Only a case insensitive filesystem needs magic to translate user input
@@ -350,7 +358,7 @@ def rootedmatch(repo, ctx, patterns):
         return match.match(repo.root, repo.root, patterns, default='glob',
                            auditor=repo.auditor, ctx=ctx, icasefs=icasefs)
 
-def apply_formating(repo, formatting, fctx):
+def apply_formatting(repo, formatting, fctx):
     """apply formatting to a file context (if applicable)"""
     data = None
     for tool, matcher in sorted(formatting.items()):
@@ -373,7 +381,7 @@ def apply_formating(repo, formatting, fctx):
 
             if not shell_tool:
                 msg = _("format-source, no command defined for '%s',"
-                        " skipping formating: '%s'\n")
+                        " skipping formatting: '%s'\n")
                 msg %= (tool, fctx.path())
                 repo.ui.warn(msg)
                 continue
@@ -396,14 +404,14 @@ def apply_formating(repo, formatting, fctx):
 
 def wrap_filemerge44(origfunc, premerge, repo, wctx, mynode, orig, fcd, fco, fca,
                    *args, **kwargs):
-    """wrap the file merge logic to apply formatting on files that needs them"""
+    """wrap the file merge logic to apply formatting to files that need it"""
     _update_filemerge_content(repo, fcd, fco, fca)
     return origfunc(premerge, repo, wctx, mynode, orig, fcd, fco, fca,
                     *args, **kwargs)
 
 def wrap_filemerge43(origfunc, premerge, repo, mynode, orig, fcd, fco, fca,
                    *args, **kwargs):
-    """wrap the file merge logic to apply formatting on files that needs them"""
+    """wrap the file merge logic to apply formatting to files that needs it"""
     _update_filemerge_content(repo, fcd, fco, fca)
     return origfunc(premerge, repo, mynode, orig, fcd, fco, fca,
                     *args, **kwargs)
@@ -415,12 +423,12 @@ def _update_filemerge_content(repo, fcd, fco, fca):
     other = fco._changectx
     ances = fca._changectx
     all = allformatted(repo, local, other, ances)
-    local_formating, other_formating, full_formating = all
+    local_formatting, other_formatting, full_formatting = all
 
     repo.ui.debug('Files to be: {} {} {}\n'.format(fcd.path(), fco.path(), fca.path()))
-    apply_formating(repo, local_formating, fco)
-    apply_formating(repo, other_formating, fcd)
-    apply_formating(repo, full_formating, fca)
+    apply_formatting(repo, local_formatting, fco)
+    apply_formatting(repo, other_formatting, fcd)
+    apply_formatting(repo, full_formatting, fca)
 
     if 'data' in vars(fcd): # XXX hacky way to check if data overwritten
         file_path = repo.wvfs.join(fcd.path())
