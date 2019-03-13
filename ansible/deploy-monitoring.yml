@@ -1,0 +1,4 @@
+---
+- hosts: monitoring
+  roles:
+    - monitoring-host

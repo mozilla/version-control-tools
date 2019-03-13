@@ -15,6 +15,9 @@ hgssh-prod
 hgweb-prod
 hgweb-mirrors
 
+[monitoring]
+10.191.5.155 ansible_sudo=yes ansible_become=yes
+
 [reviewbot]
 54.244.13.202 ansible_ssh_user=ubuntu ansible_become=yes ansible_python_interpreter=/usr/bin/python2.7
 
