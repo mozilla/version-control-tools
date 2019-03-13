@@ -11,8 +11,8 @@
     state: present
 
 - name: install Telegraf config file
-  copy:
-    src: telegraf.conf
+  template:
+    src: telegraf.conf.j2
     dest: /etc/telegraf/telegraf.conf
 
 - name: fix httpd access log permissions
