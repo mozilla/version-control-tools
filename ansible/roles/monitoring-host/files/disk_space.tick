@@ -1,0 +1,17 @@
+// Dataframe
+var data = stream
+    |from()
+        .measurement('disk')
+        .where(lambda: isPresent("used_percent"))
+        .groupBy('host')
+
+// Thresholds
+var alert = data
+    |alert()
+        .warn(lambda: "used_percent" > 90)
+        .crit(lambda: "used_percent" > 95)
+        .message('[{{ index .Tags "host" }}] disk usage is {{ .Level }}: {{ index .Fields "used_percent" }}% ({{ index .Fields "free" }}/{{ index .Fields "total" }} remaining)')
+
+// Alert
+alert
+    .log('/var/log/kapacitor/alerts.log')
