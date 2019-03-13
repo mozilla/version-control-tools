@@ -1,0 +1,36 @@
+var process_count_consumer = 9
+var process_count_headsconsumer = 1
+
+// Dataframe
+var consumer = stream
+    |from()
+        .measurement('procstat_lookup')
+        .where(lambda: isPresent("pattern") AND "pattern" == 'vcsreplicator-consumer')
+        .groupBy('host')
+    |alert()
+        .message('[{{ index .Tags "host" }}] vcsreplicator consumer is {{ .Level }}: {{ index .Fields "pid_count" }}/' + string(process_count) + ' vcsreplicator processes running')
+        .crit(lambda: int("pid_count") != process_count_consumer)
+        .log('/var/log/kapacitor/alerts.log')
+
+var headconsumer = stream
+    |from()
+        .measurement('procstat_lookup')
+        .where(lambda: isPresent("pattern") AND "pattern" == 'vcsreplicator-headsconsumer')
+        .groupBy('host')
+
+// Thresholds
+var consumer_alert = consumer
+    |alert()
+        .message('[{{ index .Tags "host" }}] vcsreplicator consumer is {{ .Level }}: {{ index .Fields "pid_count" }}/' + string(process_count_consumer) + ' vcsreplicator processes running')
+        .crit(lambda: "pid_count" != process_count_consumer)
+
+var headsconsumer_alert = headconsumer
+    |alert()
+        .message('[{{ index .Tags "host" }}] vcsreplicator heads is {{ .Level }}: {{ index .Fields "pid_count" }}/' + string(process_count_headsconsumer) + ' heads processes running')
+        .crit(lambda: "pid_count" != process_count_headsconsumer)
+
+// Alert
+consumer_alert
+    .log('/var/log/kapacitor/alerts.log')
+headsconsumer_alert
+    .log('/var/log/kapacitor/alerts.log')
