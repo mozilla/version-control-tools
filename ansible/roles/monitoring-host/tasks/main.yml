@@ -28,3 +28,31 @@
     - influxdb
     - chronograf
     - kapacitor
+
+- name: create directory for Kapacitor tasks
+  file:
+    path: /etc/kapacitor/tasks
+    state: directory
+    owner: kapacitor
+    group: kapacitor
+    mode: 0755
+
+- name: move Kapacitor tasks to host
+  copy:
+    src: "{{ item }}"
+    dest: /etc/kapacitor/tasks/{{ item }}
+    owner: kapacitor
+    group: kapacitor
+  with_items:
+    - disk_space.tick
+    - load.tick
+    - vcsreplicator_consumer_lag.tick
+    - vcsreplicator_processes.tick
+
+- name: create Kapacitor tasks
+  command: /usr/bin/kapacitor define {{ item }} -tick /etc/kapacitor/tasks/{{ item }}.tick
+  with_items:
+    - disk_space
+    - load
+    - vcsreplicator_consumer_lag
+    - vcsreplicator_processes
