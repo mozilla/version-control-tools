@@ -74,7 +74,7 @@ def check_consumer_lag():
 
     if args.telegraf:
         telegraf_data = create_telegraf_json(offsets)
-        print(json.dumps(telegraf_data))
+        print(json.dumps(telegraf_data, sort_keys=True))
         sys.exit(0)
 
     exitcode = 0
