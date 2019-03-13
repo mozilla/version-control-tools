@@ -41,29 +41,12 @@ from_beginning = true
 [[inputs.processes]]
 
 # Enable the Procstat input plugin
+# to monitor the vcsreplicator processes
 [[inputs.procstat]]
-systemd_unit = "vcsreplicator@0.service"
+pattern = "vcsreplicator-consumer"
 
 [[inputs.procstat]]
-systemd_unit = "vcsreplicator@1.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@2.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@3.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@4.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@5.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@6.service"
-
-[[inputs.procstat]]
-systemd_unit = "vcsreplicator@7.service"
+pattern = "vcsreplicator-headsconsumer"
 
 # Enable the System input plugin
 [[inputs.system]]
