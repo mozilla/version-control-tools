@@ -165,6 +165,60 @@ Resuming consumers clears check
   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
 
+Output can be formatted for consumption by Telegraf
+
+  $ check --telegraf | python -m json.tool
+  [
+      {
+          "available": 1,
+          "lag_time": 0.0,
+          "offset": 1,
+          "partition": 0
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 1
+      },
+      {
+          "available": 1,
+          "lag_time": 0.0,
+          "offset": 1,
+          "partition": 2
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 3
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 4
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 5
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 6
+      },
+      {
+          "available": 0,
+          "lag_time": 0.0,
+          "offset": 0,
+          "partition": 7
+      }
+  ]
+
 Cleanup
 
   $ hgmo clean

@@ -7,6 +7,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import argparse
+import json
 import sys
 
 from .aggregator import (
@@ -19,6 +20,21 @@ from .config import (
 from .consumer import (
     consumer_offsets_and_lag,
 )
+
+
+def create_telegraf_json(offsets):
+    '''Format the output of `consumer_offsets_and_lag` for consumption
+    by the Telegraf `exec` plugin
+    '''
+    return [
+        {
+            'partition': partition,
+            'offset': offset,
+            'available': available,
+            'lag_time': lag_time,
+        }
+        for partition, (offset, available, lag_time) in offsets.items()
+    ]
 
 
 def check_consumer_lag():
@@ -37,6 +53,8 @@ def check_consumer_lag():
                  'issued')
     parser.add_argument('--critical-lag-time', default=60.0, type=float,
             help='Time behind after which an error will be issued')
+    parser.add_argument('--telegraf', action='store_true',
+            help='Output data for consumption by Telegraf')
 
     args = parser.parse_args()
 
@@ -53,6 +71,11 @@ def check_consumer_lag():
         print('WARNING - exception fetching offsets: %s' % e)
         print('')
         raise
+
+    if args.telegraf:
+        telegraf_data = create_telegraf_json(offsets)
+        print(json.dumps(telegraf_data))
+        sys.exit(0)
 
     exitcode = 0
     good = 0
