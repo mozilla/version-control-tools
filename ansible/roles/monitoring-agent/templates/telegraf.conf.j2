@@ -22,6 +22,31 @@ mount_points = [
 # Enable the DiskIO input plugin
 [[inputs.diskio]]
 
+# Monitor Kafka consumer lag via the exec plugin
+[[inputs.exec]]
+commands = [
+  "/var/hg/venv_replication/bin/check_vcsreplicator_lag --telegraf /etc/mercurial/vcsreplicator.ini"
+]
+
+data_format = "json"
+timeout = "60s"
+name_suffix = "_vcsreplicator_consumer"
+tag_keys = [
+  "partition",
+]
+
+[[inputs.exec]]
+commands = [
+  "/var/hg/venv_replication/bin/check_vcsreplicator_lag --telegraf /etc/mercurial/vcsreplicator-pending.ini"
+]
+
+data_format = "json"
+timeout = "60s"
+name_suffix = "_vcsreplicator_headsconsumer"
+tag_keys = [
+  "partition",
+]
+
 # Enable Logparser inputs plugin
 [[inputs.logparser]]
 files = ["/var/log/httpd/hg.mozilla.org/access_log"]
