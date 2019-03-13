@@ -1,0 +1,32 @@
+var alerts_log = '/var/log/kapacitor/alerts.log'
+
+// Dataframe
+var dataframe = stream
+    |from()
+        .measurement('exec_vcsreplicator')
+        .groupBy('host', 'partition')
+    |eval(lambda: int("available") - int("offset"))
+        .as('message_lag')
+
+// Thresholds
+var alert_message_lag = dataframe
+    |alert()
+        .warn(lambda: "message_lag" > 5)
+        .crit(lambda: "message_lag" > 10)
+        .warnReset(lambda: "message_lag" < 2)
+        .critReset(lambda: "message_lag" < 2)
+        .message('[{{ index .Tags "host" }}] vcsreplicator {{ index .Tags "partition" }} is {{ .Level }}: lagging by {{ index .Fields "message_lag" }} messages')
+
+var alert_time_lag = dataframe
+    |alert()
+        .warn(lambda: "lag_time" > 30)
+        .crit(lambda: "lag_time" > 60)
+        .warnReset(lambda: "lag_time" <= 3)
+        .critReset(lambda: "lag_time" <= 3)
+        .message('[{{ index .Tags "host" }}] vcsreplicator {{ .partition }} is {{ .Level }}: lagging by {{ .lag_time }} messages')
+
+// Alert
+alert_time_lag
+    .log(alerts_log)
+alert_message_lag
+    .log(alerts_log)
