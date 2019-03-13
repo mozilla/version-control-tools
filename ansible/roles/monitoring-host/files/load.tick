@@ -1,0 +1,21 @@
+// Dataframe
+var data = stream
+    |from()
+        .measurement('system')
+        .where(lambda: isPresent("load1") AND isPresent("load5") AND isPresent("load15"))
+        .groupBy('host')
+
+// Thresholds
+var alert = data
+    |alert()
+        .warn(lambda: "load1"  >= 20)
+        .warn(lambda: "load5"  >= 25)
+        .warn(lambda: "load15" >= 40)
+        .crit(lambda: "load1"  >= 25)
+        .crit(lambda: "load5"  >= 50)
+        .crit(lambda: "load15" >= 50)
+        .message('[{{ index .Tags "host" }}] load is {{ .Level }}: {{ index .Tags "load1" }}, {{ index .Tags "load5" }}, {{ index .Tags "load15" }}')
+
+// Alert
+alert
+    .log('/var/log/kapacitor/alerts.log')
