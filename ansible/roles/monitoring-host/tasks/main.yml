@@ -8,6 +8,7 @@
   with_items:
     - { program: influxdb,   package: influxdb-1.7.3.x86_64.rpm,   sha256: 2dc688239fc394a82c4dfaaa6340d438229a8315e21f412a0accf1f0eb700ec4 }
     - { program: chronograf, package: chronograf-1.7.7.x86_64.rpm, sha256: 872a73bc9ad230498c045bddbbde5bff15a27b521084a90cef99f971f227f4be }
+    - { program: kapacitor,  package: kapacitor-1.5.2.x86_64.rpm,  sha256: 297ef31572ee9844e5a27d036019afca4c8e0201af096aa0b4ca5c4654fe38ab }
 
 - name: install InfluxDB packages
   yum:
@@ -16,6 +17,7 @@
   with_items:
     - influxdb-1.7.3.x86_64.rpm
     - chronograf-1.7.7.x86_64.rpm
+    - kapacitor-1.5.2.x86_64.rpm
 
 - name: start monitoring services
   service:
@@ -25,3 +27,4 @@
   with_items:
     - influxdb
     - chronograf
+    - kapacitor
