@@ -22,6 +22,7 @@ import socket
 import ssl
 import time
 import urllib2
+import urlparse
 
 from mercurial.i18n import _
 from mercurial.node import hex, nullid
@@ -335,6 +336,8 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
             else:
                 record_op('overall_nopull_populatedwdir')
 
+        server_url = urlparse.urlparse(url).netloc
+
         if 'TASKCLUSTER_INSTANCE_TYPE' in os.environ:
             perfherder = {
                 'framework': {
@@ -348,6 +351,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
                     'value': duration,
                     'lowerIsBetter': True,
                     'shouldAlert': False,
+                    'serverUrl': server_url,
                     'extraOptions': [os.environ['TASKCLUSTER_INSTANCE_TYPE']],
                     'subtests': [],
                 })
