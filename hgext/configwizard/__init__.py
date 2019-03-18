@@ -838,12 +838,9 @@ def _checkpager(ui, cw, hg_version):
                 cw.c['pager']['attend-%s' % a] = 'true'
 
 
-def _checkcurses(ui, cw):
-    if ui.hasconfig('ui', 'interface'):
-        return
-
-    # curses isn't available on all platforms. Don't prompt if not
-    # available.
+def _try_curses_import():
+    '''Attempt to import curses, returning `True`
+    on success'''
     with demandimport.deactivated():
         try:
             import curses
@@ -851,9 +848,18 @@ def _checkcurses(ui, cw):
             try:
                 import wcurses
             except Exception:
-                return
+                return False
 
-    if uipromptchoice(ui, CURSES_INFO):
+    return True
+
+
+def _checkcurses(ui, cw):
+    if ui.hasconfig('ui', 'interface'):
+        return
+
+    # curses isn't available on all platforms. Don't prompt if not
+    # available.
+    if _try_curses_import() and uipromptchoice(ui, CURSES_INFO):
         return
 
     cw.c.setdefault('ui', {})
