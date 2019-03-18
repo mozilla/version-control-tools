@@ -685,6 +685,11 @@ def _checktweakdefaults(ui, cw):
 
         cw.c['ui']['tweakdefaults'] = 'true'
 
+        # Determine if curses is available on the system
+        # and use the text interface if unavailable
+        if not _try_curses_import():
+            cw.c['ui']['interface'] = 'text'
+
 
 def _promptnativeextension(ui, cw, ext, msg):
     if ui.hasconfig('extensions', ext):
