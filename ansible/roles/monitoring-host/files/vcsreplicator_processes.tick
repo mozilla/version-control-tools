@@ -7,10 +7,6 @@ var consumer = stream
         .measurement('procstat_lookup')
         .where(lambda: isPresent("pattern") AND "pattern" == 'vcsreplicator-consumer')
         .groupBy('host')
-    |alert()
-        .message('[{{ index .Tags "host" }}] vcsreplicator consumer is {{ .Level }}: {{ index .Fields "pid_count" }}/' + string(process_count) + ' vcsreplicator processes running')
-        .crit(lambda: int("pid_count") != process_count_consumer)
-        .log('/var/log/kapacitor/alerts.log')
 
 var headconsumer = stream
     |from()
