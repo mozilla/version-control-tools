@@ -18,18 +18,20 @@ Create and seed repository
 
 Ensure bundle creation script raises during bundle generation
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles missing
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles missing
   Traceback (most recent call last):
-    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
+    File "/var/hg/venv_bundles/bin/generate-hg-s3-bundles", line \d+, in <module> (re)
+      sys.exit(main())
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in main (re)
       paths[repo] = generate_bundles(repo, upload=upload, **opts)
-    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in generate_bundles (re)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in generate_bundles (re)
       hg_stat = os.stat(os.path.join(repo_full, '.hg'))
   OSError: [Errno 2] No such file or directory: '/repo/hg/mozilla/missing/.hg'
   [1]
 
 And raises during upload since we don't have credentials in the test env
 
-  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_bundles/bin/python -u /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central
+  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 PYTHONUNBUFFERED=1 /var/hg/venv_bundles/bin/generate-hg-s3-bundles mozilla-central
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   1 changesets found
   1 changesets found
@@ -51,15 +53,17 @@ And raises during upload since we don't have credentials in the test env
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
   Traceback (most recent call last):
-    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in <module> (re)
+    File "/var/hg/venv_bundles/bin/generate-hg-s3-bundles", line \d+, in <module> (re)
+      sys.exit(main())
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in main (re)
       paths[repo] = generate_bundles(repo, upload=upload, **opts)
-    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in generate_bundles (re)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in generate_bundles (re)
       f.result()
     File "/var/hg/venv_bundles/lib/python2.7/site-packages/concurrent/futures/_base.py", line \d+, in result (re)
       return self.__get_result()
     File "/var/hg/venv_bundles/lib/python2.7/site-packages/concurrent/futures/thread.py", line \d+, in run (re)
       result = self.fn(*self.args, **self.kwargs)
-    File "/var/hg/version-control-tools/scripts/generate-hg-s3-bundles", line \d+, in upload_to_s3 (re)
+    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in upload_to_s3 (re)
       key.load()
     File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/factory.py", line \d+, in do_action (re)
       response = action(self, *args, **kwargs)
@@ -101,7 +105,7 @@ The manifest should be empty because there were no successful uploads
 
 An index.html and bundles.json document should be produced
 
-  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_bundles/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles mozilla-central --no-upload
+  $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_bundles/bin/generate-hg-s3-bundles mozilla-central --no-upload
   wrote synchronization message into replication log
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
@@ -121,7 +125,7 @@ The clonebundles.manifest file should exist though
 
 Now do a fully working run
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 A subsequent bundle generation should produce a backup clonebundles.manifest.old file
@@ -262,7 +266,7 @@ The copyfrom=x field copies bundles from another repo
   $ hg push > /dev/null
   $ cd ..
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles --no-upload 'try copyfrom=mozilla-central'
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload 'try copyfrom=mozilla-central'
   copying /repo/hg/mozilla/mozilla-central/.hg/clonebundles.manifest -> /repo/hg/mozilla/try/.hg/clonebundles.manifest
   ignoring repo try in index because no gzip bundle
 
@@ -296,7 +300,7 @@ zstd-max bundles created when requested
   $ hg commit -m zstd-max
   $ hg push >/dev/null
   $ cd ..
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/python /var/hg/version-control-tools/scripts/generate-hg-s3-bundles 'mozilla-central zstd_max' --no-upload > /dev/null
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles 'mozilla-central zstd_max' --no-upload > /dev/null
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central?cmd=clonebundles

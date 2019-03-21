@@ -11,10 +11,15 @@ setup(
     url='https://mozilla-version-control-tools.readthedocs.io/',
     author='Mozilla',
     author_email='dev-version-control@lists.mozilla.org',
-    licence='MPL 2.0',
+    license='MPL 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 2.7',
     ],
+    entry_points={
+        'console_scripts': [
+            'generate-hg-s3-bundles=hgmolib.generate_hg_s3_bundles:main',
+        ]
+    }
 )

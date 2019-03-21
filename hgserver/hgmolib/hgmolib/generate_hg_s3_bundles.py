@@ -263,7 +263,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
 
     # Create directory to hold bundle files.
     try:
-        os.makedirs(bundle_path, 0755)
+        os.makedirs(bundle_path, 0o755)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -391,8 +391,8 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     # permissions.
     # TODO we can't do this yet since the "hg" user isn't a member of the
     # scm_* groups.
-    #os.chown(clonebundles_path, uid, gid)
-    os.chmod(clonebundles_path, 0664)
+    # os.chown(clonebundles_path, uid, gid)
+    os.chmod(clonebundles_path, 0o664)
 
     # Replicate manifest to mirrors.
     subprocess.check_call([HG, 'replicatesync'], cwd=repo_full)
@@ -485,7 +485,7 @@ def upload_json_manifest(data):
         )
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', help='file to read repository list from')
     parser.add_argument('--no-upload', action='store_true',
@@ -531,3 +531,7 @@ if __name__ == '__main__':
     # and alert when the bundle generation process is busted.
     with open(os.path.join(BUNDLE_ROOT, 'lastrun'), 'w') as fh:
         fh.write('%sZ\n' % datetime.datetime.utcnow().isoformat())
+
+
+if __name__ == '__main__':
+    main()

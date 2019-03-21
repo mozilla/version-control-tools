@@ -144,7 +144,6 @@
     - { venv: venv_bundles, path: pylib/mozautomation, pth: mozautomation }
     - { venv: venv_pash, path: hgserver/hgmolib, pth: hgmolib }
     - { venv: venv_tools, path: hgserver/hgmolib, pth: hgmolib }
-    - { venv: venv_bundles, path: hgserver/hgmolib, pth: hgmolib }
 
 - name: determine if v-c-t clone is present
   stat: path=/var/hg/version-control-tools/.hg
@@ -175,6 +174,9 @@
 
 - name: install vcsreplicator into bundles virtualenv
   command: /var/hg/venv_bundles/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+
+- name: install hgmolib into bundles virtualenv
+  command: /var/hg/venv_bundles/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/hgserver/hgmolib
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf
