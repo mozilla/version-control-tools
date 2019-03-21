@@ -50,7 +50,7 @@
     - vcsreplicator_processes.tick
 
 - name: create Kapacitor tasks
-  command: /usr/bin/kapacitor define {{ item }} -tick /etc/kapacitor/tasks/{{ item }}.tick
+  command: /usr/bin/kapacitor define {{ item }} -tick /etc/kapacitor/tasks/{{ item }}.tick -dbrp "telegraf"."autogen"
   with_items:
     - disk_space
     - load
