@@ -1,15 +1,22 @@
 var alerts_log = '/var/log/kapacitor/alerts.log'
 
 // Dataframe
-var dataframe = stream
+var dataframe_consumer = stream
     |from()
-        .measurement('exec_vcsreplicator')
+        .measurement('exec_vcsreplicator_consumer')
+        .groupBy('host', 'partition')
+    |eval(lambda: int("available") - int("offset"))
+        .as('message_lag')
+
+var dataframe_heads = stream
+    |from()
+        .measurement('exec_vcsreplicator_headsconsumer')
         .groupBy('host', 'partition')
     |eval(lambda: int("available") - int("offset"))
         .as('message_lag')
 
 // Thresholds
-var alert_message_lag = dataframe
+var alert_message_lag_consumer = dataframe_consumer
     |alert()
         .warn(lambda: "message_lag" > 5)
         .crit(lambda: "message_lag" > 10)
@@ -17,16 +24,40 @@ var alert_message_lag = dataframe
         .critReset(lambda: "message_lag" < 2)
         .message('[{{ index .Tags "host" }}] vcsreplicator {{ index .Tags "partition" }} is {{ .Level }}: lagging by {{ index .Fields "message_lag" }} messages')
 
-var alert_time_lag = dataframe
+var alert_time_lag_consumer = dataframe_consumer
     |alert()
         .warn(lambda: "lag_time" > 30)
         .crit(lambda: "lag_time" > 60)
         .warnReset(lambda: "lag_time" <= 3)
         .critReset(lambda: "lag_time" <= 3)
-        .message('[{{ index .Tags "host" }}] vcsreplicator {{ .partition }} is {{ .Level }}: lagging by {{ .lag_time }} messages')
+        .message('[{{ index .Tags "host" }}] vcsreplicator-consumer partition {{ index .Tags "partition" }} is {{ .Level }}: lagging by {{ .lag_time }} messages')
+
+var alert_message_lag_heads = dataframe_heads
+    |alert()
+        .warn(lambda: "message_lag" > 5)
+        .crit(lambda: "message_lag" > 10)
+        .warnReset(lambda: "message_lag" < 2)
+        .critReset(lambda: "message_lag" < 2)
+        .message('[{{ index .Tags "host" }}] vcsreplicator-heads partition {{ index .Tags "partition" }} is {{ .Level }}: lagging by {{ index .Fields "message_lag" }} messages')
+
+var alert_time_lag_heads = dataframe_heads
+    |alert()
+        .warn(lambda: "lag_time" > 30)
+        .crit(lambda: "lag_time" > 60)
+        .warnReset(lambda: "lag_time" <= 3)
+        .critReset(lambda: "lag_time" <= 3)
+        .message('[{{ index .Tags "host" }}] vcsreplicator-heads partition {{ index .Tags "partition" }} is {{ .Level }}: lagging by {{ index .Fields "lag_time" }} messages')
 
 // Alert
-alert_time_lag
+alert_time_lag_consumer
     .log(alerts_log)
-alert_message_lag
+    .slack()
+alert_message_lag_consumer
     .log(alerts_log)
+    .slack()
+alert_time_lag_heads
+    .log(alerts_log)
+    .slack()
+alert_message_lag_heads
+    .log(alerts_log)
+    .slack()
