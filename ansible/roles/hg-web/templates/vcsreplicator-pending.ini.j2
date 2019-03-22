@@ -14,3 +14,7 @@ group = {{ ansible_hostname }}
 
 [path_rewrites]
 {moz} = /repo/hg/mozilla
+
+{% if replication_filters == True %}
+{% include 'mirror-filters.j2' %}
+{% endif %}
