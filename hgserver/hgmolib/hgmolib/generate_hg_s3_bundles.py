@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -517,8 +516,12 @@ def main():
 
     paths = {}
 
-    for repo, opts in repos:
-        paths[repo] = generate_bundles(repo, upload=upload, **opts)
+    try:
+        for repo, opts in repos:
+            paths[repo] = generate_bundles(repo, upload=upload, **opts)
+    except (botocore.exceptions.NoCredentialsError, OSError) as e:
+        print('%s: %s' % (e.__class__.__name__, e))
+        return 1
 
     html_index = generate_index(paths)
     json_manifest = generate_json_manifest(paths)
@@ -532,6 +535,3 @@ def main():
     with open(os.path.join(BUNDLE_ROOT, 'lastrun'), 'w') as fh:
         fh.write('%sZ\n' % datetime.datetime.utcnow().isoformat())
 
-
-if __name__ == '__main__':
-    main()

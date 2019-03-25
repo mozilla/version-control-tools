@@ -19,13 +19,6 @@ Create and seed repository
 Ensure bundle creation script raises during bundle generation
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles missing
-  Traceback (most recent call last):
-    File "/var/hg/venv_bundles/bin/generate-hg-s3-bundles", line \d+, in <module> (re)
-      sys.exit(main())
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in main (re)
-      paths[repo] = generate_bundles(repo, upload=upload, **opts)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in generate_bundles (re)
-      hg_stat = os.stat(os.path.join(repo_full, '.hg'))
   OSError: [Errno 2] No such file or directory: '/repo/hg/mozilla/missing/.hg'
   [1]
 
@@ -52,48 +45,7 @@ And raises during upload since we don't have credentials in the test env
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
-  Traceback (most recent call last):
-    File "/var/hg/venv_bundles/bin/generate-hg-s3-bundles", line \d+, in <module> (re)
-      sys.exit(main())
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in main (re)
-      paths[repo] = generate_bundles(repo, upload=upload, **opts)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in generate_bundles (re)
-      f.result()
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/concurrent/futures/_base.py", line \d+, in result (re)
-      return self.__get_result()
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/concurrent/futures/thread.py", line \d+, in run (re)
-      result = self.fn(*self.args, **self.kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/hgmolib/generate_hg_s3_bundles.py", line \d+, in upload_to_s3 (re)
-      key.load()
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/factory.py", line \d+, in do_action (re)
-      response = action(self, *args, **kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/boto3/resources/action.py", line \d+, in __call__ (re)
-      response = getattr(parent.meta.client, operation_name)(**params)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line \d+, in _api_call (re)
-      return self._make_api_call(operation_name, kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/client.py", line \d+, in _make_api_call (re)
-      operation_model, request_dict)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in make_request (re)
-      return self._send_request(request_dict, operation_model)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in _send_request (re)
-      request = self.create_request(request_dict, operation_model)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/endpoint.py", line \d+, in create_request (re)
-      operation_name=operation_model.name)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in emit (re)
-      return self._emitter.emit(aliased_event_name, **kwargs) (hg48 !)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in emit (re) (hg48 !)
-      return self._emit(event_name, kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/hooks.py", line \d+, in _emit (re)
-      response = handler(**kwargs)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line \d+, in handler (re)
-      return self.sign(operation_name, request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/signers.py", line \d+, in sign (re)
-      auth.add_auth(request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line \d+, in add_auth (re)
-      super(S3SigV4Auth, self).add_auth(request)
-    File "/var/hg/venv_bundles/lib/python2.7/site-packages/botocore/auth.py", line \d+, in add_auth (re)
-      raise NoCredentialsError
-  botocore.exceptions.NoCredentialsError: Unable to locate credentials
+  NoCredentialsError: Unable to locate credentials
   [1]
 
 The manifest should be empty because there were no successful uploads
