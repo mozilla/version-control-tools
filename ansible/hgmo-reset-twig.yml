@@ -99,7 +99,7 @@
 
     - name: Show revision
       debug: var=hg_log.stdout.split('\n')
-    
+
 - hosts: hgssh-prod-master:hgweb-prod
   gather_facts: no
   tasks:
@@ -113,10 +113,3 @@
             state=absent
       when: old_st.stat.exists
       tags: cleanup
-
-- hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Reminder
-      debug:
-        msg: "Please file a bug in Taskcluster: Service Request to reset the branch in mozilla-taskcluster."
