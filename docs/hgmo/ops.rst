@@ -190,17 +190,20 @@ To work around this slowness, we periodically remove old heads. We do this
 by performing dummy merges. The procedure for this is as follows::
 
    # Clone the Try repo. This will be very slow unless --uncompressed is used.
-   hg clone --uncompressed -U https://hg.mozilla.org/try
-   cd try
+   $ hg clone --uncompressed -U https://hg.mozilla.org/try
+   $ cd try
    # Verify heads to merge (this could take a while on first run)
-   hg log -r 'head() and branch(default) and not public()'
+   $ hg log -r 'head() and branch(default) and not public()'
    # Capture the list of heads to merge
-   hg log -r 'head() and branch(default) and not public()' -T '{node}\n' > heads
+   $ hg log -r 'head() and branch(default) and not public()' -T '{node}\n' > heads
    # Update the working directory to the revision to be merged into. A recent
    # mozilla-central revision is typically fine.
-   hg up <revision>
+   $ hg up <revision>
    # Do the merge by invoking `hg debugsetparents` repeatedly
-   for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
+   $ for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
+   # Push to try without scheduling any jobs
+   # You may wish to post in IRC or Slack with a notice as well
+   $ hg push -r . ssh://hg.mozilla.org/try
 
 Clonebundles Management
 =======================
