@@ -3,4 +3,4 @@
   service:
     name: telegraf
     state: restarted
-    ignore_errors: True
+  ignore_errors: True
