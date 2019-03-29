@@ -82,6 +82,10 @@ Run tests 1 at a time::
 
   $ ./run-tests -j1
 
+By default, certain flaky tests do not run in the test suite. You can run them anyways with::
+
+  $ ./run-tests --run-flaky
+
 Authoring Tests
 ===============
 
