@@ -1,0 +1,26 @@
+# List of "flaky" tests in version-control-tools
+# Everything in bzexport
+# Everything in bzpost
+
+# mozext test fails on pre-4.7 Mercurial due to pushlog dependency
+test-pushlog.t
+
+# robustcheckout test fails on post-4.7 Mercurial due to changes in hgweb
+test-server-failure.t
+
+# hghooks test fails when attempting to `hg strip`. Mostly unrelated to actual test
+test-prevent-webidl-changes.t
+
+# hgserver test shows bookmark as not-replicated, despite being replicated in later output
+test-bookmarks-replication.t
+
+# vcsreplicator bootstrap procedure test intermittently fails due to the concurrent
+# code printing the same lines in a non-deterministic order
+test-bootstrap.t
+
+# vcsreplicator sns test hangs for unknown reasons
+test-sns-notifier.t
+
+# vcsreplicator test for failure in Kafka availability fails to push early in the
+# test, but succeeds later down the line.
+test-cluster-unavailable.t
