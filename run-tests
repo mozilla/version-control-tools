@@ -73,6 +73,8 @@ if __name__ == '__main__':
              '(skips Selenium tests)')
     parser.add_argument('--no-docker', action='store_true',
         help='Only run tests that do not require Docker')
+    parser.add_argument('--run-flaky', action='store_true',
+        help='Run tests marked as intermittent failures')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -92,6 +94,7 @@ if __name__ == '__main__':
         '--use-last-images',
         '--headless',
         '--no-docker',
+        '--run-flaky',
     }
     hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
@@ -166,6 +169,11 @@ if __name__ == '__main__':
                     requested_tests.append(test)
 
             continue
+
+    # Add `--blacklist=testing/flaky-tests.txt` to the command line
+    if not options.run_flaky:
+        flaky_tests_path = os.path.join(HERE, 'testing', 'flaky-tests.txt')
+        hg_harness_args.extend(['--blacklist', flaky_tests_path])
 
     run_hg_tests = []
     run_unit_tests = []
