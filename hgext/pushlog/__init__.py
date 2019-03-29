@@ -39,8 +39,8 @@ execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
-minimumhgversion = '4.7'
-testedwith = '4.7 4.8'
+minimumhgversion = '4.8'
+testedwith = '4.8'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
 
 cmdtable = {}
