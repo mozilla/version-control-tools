@@ -70,7 +70,8 @@ from mercurial import (
 from hgext import mq
 
 OUR_DIR = os.path.dirname(__file__)
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+    exec(f.read())
 
 from mozhg.util import import_module
 

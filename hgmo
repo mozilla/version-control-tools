@@ -11,7 +11,8 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def main(args):
     if 'VIRTUAL_ENV' not in os.environ:
         activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
-        execfile(activate, dict(__file__=activate))
+        with open(activate) as f:
+            exec(f.read(), dict(__file__=activate))
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
 
     from mach.main import Mach

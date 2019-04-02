@@ -12,7 +12,8 @@ from mercurial import (
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
-execfile(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py')) as f:
+    exec(f.read())
 
 from mozhg.rewrite import (
     newparents,

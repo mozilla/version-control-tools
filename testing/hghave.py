@@ -24,7 +24,8 @@ if 'REPO_ROOT' not in globals():
 
 # We import Mercurial's own ``hghave.py`` so we can declare our own checks.
 HGHAVE_PY = os.path.join(REPO_ROOT, 'pylib', 'mercurial-support', 'hghave.py')
-execfile(HGHAVE_PY)
+with open(HGHAVE_PY) as f:
+    exec(f.read())
 
 # Need to supplement sys.path because PYTHONPATH isn't set properly
 # from the context of run-tests.py. This is very hacky.

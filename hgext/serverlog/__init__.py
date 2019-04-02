@@ -199,7 +199,8 @@ from mercurial.hgweb import (
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+    exec(f.read())
 
 testedwith = '4.7 4.8'
 minimumhgversion = '4.7'

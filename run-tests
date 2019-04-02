@@ -24,7 +24,8 @@ RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
 if __name__ == '__main__':
     if 'VIRTUAL_ENV' not in os.environ:
         activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
-        execfile(activate, dict(__file__=activate))
+        with open(activate) as f:
+            exec(f.read(), dict(__file__=activate))
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
         os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 

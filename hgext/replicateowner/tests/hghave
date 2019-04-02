@@ -4,4 +4,5 @@ import os
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 REPO_ROOT = os.path.join(HERE, '..', '..', '..')
-execfile(os.path.join(REPO_ROOT, 'testing', 'hghave.py'))
+with open(os.path.join(REPO_ROOT, 'testing', 'hghave.py')) as f:
+    exec(f.read())

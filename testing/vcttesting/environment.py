@@ -75,7 +75,8 @@ def create_virtualenv(name):
 
 def activate_virtualenv(venv):
     """Activate a virtualenv in the current Python process."""
-    execfile(venv['activate_this'], dict(__file__=venv['activate_this']))
+    with open(venv['activate_this']) as f:
+        exec(f.read(), dict(__file__=venv['activate_this']))
 
 
 def process_pip_requirements(venv, requirements):

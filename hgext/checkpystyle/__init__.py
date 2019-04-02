@@ -8,7 +8,8 @@ import os
 from mercurial import demandimport
 
 OUR_DIR = os.path.dirname(__file__)
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+    exec(f.read())
 
 testedwith = '3.9 4.0 4.1 4.2'
 minimumhgversion = '3.9'

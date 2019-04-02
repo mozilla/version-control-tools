@@ -65,7 +65,8 @@ from mercurial.hgweb.common import (
 
 OUR_DIR = os.path.dirname(__file__)
 ROOT = os.path.normpath(os.path.join(OUR_DIR, '..', '..'))
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+    exec(f.read())
 
 import mozautomation.commitparser as commitparser
 from mozhg.util import (

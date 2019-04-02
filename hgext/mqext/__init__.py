@@ -111,7 +111,8 @@ from hgext import mq
 from collections import Counter, defaultdict, namedtuple
 
 OUR_DIR = os.path.dirname(__file__)
-execfile(os.path.join(OUR_DIR, '..', 'bootstrap.py'))
+with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+    exec(f.read())
 
 from mozautomation.commitparser import BUG_RE
 from mozhg.util import import_module
