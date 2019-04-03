@@ -810,7 +810,7 @@ def update_patch(ui, repo, rev, bug, update_patch, rename_patch, interactive):
 
         if changed:
             newmessage = '\n'.join(msg).encode('utf-8')
-            if repo[rev] == repo['.']:
+            if repo[rev] == repo[b'.']:
                 opts = {
                     'amend': True,
                     'git': True,

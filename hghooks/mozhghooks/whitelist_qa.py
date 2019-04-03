@@ -36,7 +36,7 @@ def hook(ui, repo, node=None, source=None, **kwargs):
         return 0
 
     rev = repo[node].rev()
-    tip = repo['tip'].rev()
+    tip = repo[b'tip'].rev()
     branches = set(repo[i].branch() for i in range(rev, tip + 1))
     if 'production' in branches and os.environ['USER'] not in ALLOWED_USERS:
         print "** you (%s) are not allowed to push to the production branch" \

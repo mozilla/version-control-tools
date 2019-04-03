@@ -15,7 +15,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
 
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo[node].rev()
-    tipctx = repo['tip']
+    tipctx = repo[b'tip']
     tip = tipctx.rev()
     tip_node = tipctx.hex()
 
@@ -45,7 +45,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         # if specifying a try build and talos jobs are enabled, suggest that
         # user use compareperf
         if treeherder_repo == 'try':
-            msg = repo['tip'].description()
+            msg = repo[b'tip'].description()
             if ((' -t ' in msg or ' --talos ' in msg) and '-t none' not in msg
                 and '--talos none' not in msg):
                 ui.write('\nIt looks like this try push has talos jobs. Compare '

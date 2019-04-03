@@ -10,7 +10,7 @@ def hook(ui, repo, node, source=None, **kwargs):
         return 0
 
     # Leave uplifts alone.
-    if 'a=release' in repo['tip'].description().lower():
+    if 'a=release' in repo[b'tip'].description().lower():
         return 0
 
     nspr_nodes = []

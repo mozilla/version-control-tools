@@ -49,7 +49,7 @@ def hook(ui, repo, node, source=None, **kwargs):
 
     # all changesets from node to 'tip' inclusive are part of this push
     rev = repo[node].rev()
-    tip = repo['tip'].rev()
+    tip = repo[b'tip'].rev()
     for i in range(rev, tip+1):
         ctx = repo[i]
         for changedFile in ctx.files():

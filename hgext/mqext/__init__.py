@@ -306,7 +306,7 @@ def choose_changes(ui, repo, patchfile, opts):
                 source = ('qtip', None)
 
         if diff is None:
-            changedFiles = sorted(repo['.'].files())
+            changedFiles = sorted(repo[b'.'].files())
             source = ('rev', '.')
 
     if changedFiles is None:
@@ -350,8 +350,8 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         exactFiles = ['glob:' + opts['dir'] + '/**']
     else:
         paths = [p + '/**' if os.path.isdir(p) else p for p in changedFiles]
-        matchfn = scmutil.match(repo['.'], paths, default='relglob')
-        exactFiles = ['path:' + path for path in repo['.'].walk(matchfn)]
+        matchfn = scmutil.match(repo[b'.'], paths, default='relglob')
+        exactFiles = ['path:' + path for path in repo[b'.'].walk(matchfn)]
         if len(exactFiles) == 0:
             return
 

@@ -50,7 +50,7 @@ def hook(ui, repo, node, source=None, **kwargs):
         .format(
             parent=short(repo[node].p1().node()),
             first=short(repo[node].node()),
-            tip=short(repo['tip'].node())
+            tip=short(repo[b'tip'].node())
         ))
 
     # Make non-fatal on l10n repos for now because their tools are known to not

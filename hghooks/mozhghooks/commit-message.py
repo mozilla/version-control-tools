@@ -129,7 +129,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
 
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo[node].rev()
-    tip = repo['tip'].rev()
+    tip = repo[b'tip'].rev()
     rejecting = False
 
     for i in reversed(xrange(rev, tip + 1)):

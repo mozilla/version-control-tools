@@ -24,7 +24,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
     if source in ('pull', 'strip'):
         return 0
 
-    if 'a=css-image-only' not in repo['tip'].description().lower():
+    if 'a=css-image-only' not in repo[b'tip'].description().lower():
         # We only care if the 'css-image-only' approval message was used
         return 0
 

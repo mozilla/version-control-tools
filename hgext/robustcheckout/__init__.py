@@ -734,7 +734,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
     # Update the working directory.
 
-    if repo['.'].node() == nullid:
+    if repo[b'.'].node() == nullid:
         behaviors.add('empty-wdir')
     else:
         behaviors.add('populated-wdir')

@@ -332,7 +332,7 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     if tree and not revs:
         repo.ui.status(_('no revisions specified to push; '
             'using . to avoid pushing multiple heads\n'))
-        revs = [repo['.'].node()]
+        revs = [repo[b'.'].node()]
 
     res = orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
             **kwargs)

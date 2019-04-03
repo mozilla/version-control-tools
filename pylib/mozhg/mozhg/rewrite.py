@@ -309,7 +309,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic='replacing'):
                 obsolete.createmarkers(repo, markers)
 
         # Move the working directory to the new node, if applicable.
-        wdirrev = repo['.'].rev()
+        wdirrev = repo[b'.'].rev()
         if wdirrev in revmap:
             hg.updaterepo(repo, repo[revmap[wdirrev]].node(), True)
 
