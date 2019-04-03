@@ -33,6 +33,8 @@ clonebundles.manifest should not be transferred by default
   undo.branch
   undo.desc
   undo.dirstate
+  wcache (hg49 !)
+
 
 Even if enabled and the server doesn't have a clonebundles.manifest
 
@@ -52,6 +54,8 @@ Even if enabled and the server doesn't have a clonebundles.manifest
   undo.branch
   undo.desc
   undo.dirstate
+  wcache (hg49 !)
+
 
 Sanity check that clone bundles manifest is served properly
 
@@ -95,6 +99,7 @@ clonebundles.manifest should not be transferred by default
   undo.branch
   undo.desc
   undo.dirstate
+  wcache (hg49 !)
 
 enabling config option pulls the manifest
 
@@ -132,6 +137,8 @@ A missing manifest results in the local file being deleted
   undo.branch
   undo.desc
   undo.dirstate
+  wcache (hg49 !)
+
 
 Confirm no errors in log
 

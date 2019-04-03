@@ -41,10 +41,10 @@
 
   $ ls .hg/cache/
   branch2-served
-  checkisexec
-  checklink
-  checklink-target
-  checknoexec
+  checkisexec (hg48 !)
+  checklink (hg48 !)
+  checklink-target (hg48 !)
+  checknoexec (hg48 !)
   hgtagsfnodes1
   manifestfulltextcache
   rbc-names-v1
