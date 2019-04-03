@@ -28,9 +28,11 @@ Accessing an empty repo should not have created the pushlog db
 
   $ ls .hg
   00changelog.i
+  cache (hg49 !)
   hgrc
   requires
   store
+  wcache (hg49 !)
 
 Accessing a read-only repository should also succeed
 
@@ -49,10 +51,12 @@ Create an empty database and test variations with that
 
   $ ls .hg
   00changelog.i
+  cache (hg49 !)
   hgrc
   pushlog2.db
   requires
   store
+  wcache (hg49 !)
 
   $ http http://localhost:$HGPORT/server/json-pushes --header content-type
   200

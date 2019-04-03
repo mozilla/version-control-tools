@@ -17,8 +17,10 @@ Cloning over SSH with no pushlog file should work
 
   $ ls server/.hg
   00changelog.i
+  cache (hg49 !)
   requires
   store
+  wcache (hg49 !)
 
   $ hg clone ssh://user@dummy/$TESTTMP/server clone-ssh1
   no changes found
@@ -30,8 +32,10 @@ No pushlog file should have been created for read-only operations
 
   $ ls server/.hg
   00changelog.i
+  cache (hg49 !)
   requires
   store
+  wcache (hg49 !)
 
 Cloning over HTTP with no pushlog file should work
 
@@ -45,8 +49,10 @@ No pushlog file should have been created for read-only operations
 
   $ ls server/.hg
   00changelog.i
+  cache (hg49 !)
   requires
   store
+  wcache (hg49 !)
 
 Confirm no errors in log
 
