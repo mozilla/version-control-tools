@@ -15,6 +15,7 @@ Creating a repository should record an event saying so
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -48,6 +49,7 @@ Creating a repository should record an event saying so
   fncache
   generaldelta
   revlogv1
+  sparserevlog (hg49 !)
   store
 
 Cleanup

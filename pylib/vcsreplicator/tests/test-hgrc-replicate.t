@@ -61,8 +61,10 @@ Replicating hgrc without hgrc file will delete file
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla/mozilla-central/.hg
   00changelog.i
+  cache (hg49 !)
   requires
   store
+  wcache (hg49 !)
 
 Unicode in hgrc is preserved
 

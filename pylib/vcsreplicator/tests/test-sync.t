@@ -35,6 +35,7 @@
     - fncache
     - generaldelta
     - revlogv1
+    - sparserevlog (hg49 !)
     - store
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
