@@ -21,14 +21,15 @@ vcssync
    to version control synchronization.
 
 Code reviews for everything in version-control-tools should be conducted
-with Phabricator. Reviews should be directed at ``gps`` or ``glob``.
+with Phabricator. Reviews should be directed at ``sheehan``, ``glob``,
+``smacleod`` or ``lars``.
 
 Terraform configs for AWS infrastructure for VCS Sync lives in the
 `devservices-aws repo <https://github.com/mozilla-platform-ops/devservices-aws>`_,
 specifically in the ``vcssync`` directory. Change proposals are submitted
 via GitHub Pull Requests. Reviews are typically handled by someone
-on the Ops Team, namely ``fubar``, ``dividehex``, or ``dhouse. For new
-infrastructure, ``gps`` or ``glob`` should likely take a look.
+on the Ops Team, namely ``fubar``, ``dividehex``, or ``dhouse``. For new
+infrastructure, ``sheehan`` or ``glob`` should likely take a look.
 
 Creating a Development and Testing Environment
 ==============================================

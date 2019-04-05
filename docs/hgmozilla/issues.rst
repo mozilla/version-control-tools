@@ -72,7 +72,7 @@ For the Impatient
 =================
 
 In a hurry and don't want to spend the time to report a proper bug? Ping
-*gps* on irc.mozilla.org and he'll do the right thing if he can.
+*sheehan* on irc.mozilla.org and he'll do the right thing if he can.
 
 Ways to Make Bug Reports More Useful
 ====================================
