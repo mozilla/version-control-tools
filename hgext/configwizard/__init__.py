@@ -320,15 +320,22 @@ Would you like to enable these history editing extensions (Yn)? $$ &Yes $$ &No
 
 
 EVOLVE_INFO_WARNING = '''
-The evolve extension is an experimental extension for faster and
+The evolve extension is a Mercurial extension for faster and
 safer mutable history. It implements the changeset evolution concept
 for Mercurial, allowing for safe and simple history re-writing. It
 includes some new commands such as fold, prune and amend which may
 improve your user experience with Mercurial.
 
-The evolve extension is recommended but is still experimental.
-Although its goal is to improve stability, usage may result in weird
-project states and complicate certain workflows.
+The evolve extension is recommended for working with Firefox repositories.
+More information about changeset evolution can be found by running:
+
+  $ hg help evolution
+
+as well as:
+
+  $ hg help -e evolve
+
+once the `evolve` extension is enabled.
 
 (Relevant config option: extensions.evolve)
 
