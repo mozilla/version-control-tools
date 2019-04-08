@@ -29,13 +29,29 @@ from mozhg.util import is_firefox_repo
 
 testedwith = '4.4 4.5 4.6 4.7 4.8 4.9'
 minimumhgversion = '4.4'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'
+buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
 
 
 def call_clang_format(repo, changed_files):
     '''Call `./mach clang-format` on the changed files'''
+    # We have also a copy of this list in:
+    # python/mozbuild/mozbuild/mach_commands.py
+    # tools/lint/hooks_clang_format.py
+    # release-services/src/staticanalysis/bot/static_analysis_bot/config.py
+    # Too heavy to import the full class just for this variable
+    extensions = (".cpp", ".c", ".cc", ".h", ".m", ".mm")
+    path_list = []
+    for filename in sorted(changed_files):
+        # Ignore files unsupported in clang-format
+        if filename.endswith(extensions):
+            path_list.append(filename)
+
+    if not path_list:
+        # No files have been touched
+        return
+
     mach_path = os.path.join(repo.root, 'mach')
-    arguments = ['clang-format', '-p'] + changed_files
+    arguments = ['clang-format', '-p'] + path_list
     if os.name == 'nt':
         clang_format_cmd = ['sh', 'mach'] + arguments
     else:
