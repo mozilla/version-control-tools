@@ -214,9 +214,9 @@ resource "aws_acm_certificate" "hgcert" {
   }
 }
 
-# Configure a CI-only hgweb mirror environment in us-west-2
-module "ci-only-uw2" {
-  source = "./modules/ci-only"
+# Configure AWS VPC in us-west-2
+module "vpc-uw2" {
+  source = "./modules/aws-vpc"
 
   cidr_block = "10.191.5.0/24"
   environment_users = [
