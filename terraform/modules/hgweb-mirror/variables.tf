@@ -6,6 +6,10 @@ variable "availability_zone" {
   description = "AZ in which to deploy the instance (a, b or c)"
 }
 
+variable "elb_target_group_arn" {
+  description = "ARN of target group for this hgweb mirror"
+}
+
 variable "instance_type" {
   description = "EC2 instance type"
 }

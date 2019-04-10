@@ -20,3 +20,9 @@ resource "aws_instance" "hgweb-mirror" {
     Name = "hgweb instance"
   }
 }
+
+resource "aws_lb_target_group_attachment" "mirror-attachment" {
+  target_group_arn = "${var.elb_target_group_arn}"
+  target_id = "${aws_instance.hgweb-mirror.id}"
+  port = 80
+}

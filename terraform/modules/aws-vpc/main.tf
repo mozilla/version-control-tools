@@ -297,12 +297,6 @@ resource "aws_lb_target_group" "http-mirror-target-group" {
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 }
 
-resource "aws_lb_target_group_attachment" "mirror-attachment" {
-  target_group_arn = "${aws_lb_target_group.http-mirror-target-group.arn}"
-  target_id = "${module.test-hgweb-mirror.instance_id}"
-  port = 80
-}
-
 resource "aws_lb_listener" "mirror-https-listener" {
   load_balancer_arn = "${aws_lb.internal-lb.arn}"
   port = 443
@@ -320,6 +314,7 @@ module "test-hgweb-mirror" {
   source = "../hgweb-mirror"
 
   availability_zone = "a"
+  elb_target_group_arn = "${aws_lb_target_group.http-mirror-target-group.arn}"
   instance_type = "c5d.xlarge"
   mirror_ami = "${var.mirror_ami}"
   security_group_ids = [
