@@ -402,7 +402,7 @@ resource "aws_network_acl" "hgci-networkacl" {
 
 resource "aws_instance" "monitoring-host" {
   ami = "${var.mirror_ami}"
-  instance_type = "c4.xlarge"
+  instance_type = "c4.2xlarge"
   subnet_id = "${module.privsubnet-b.subnet_id}"
   vpc_security_group_ids = [
     "${aws_security_group.hgci-securitygroup.id}",
