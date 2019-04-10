@@ -310,7 +310,7 @@ resource "aws_lb_listener" "mirror-https-listener" {
   }
 }
 
-module "test-hgweb-mirror" {
+module "hgweb-mirror-a" {
   source = "../hgweb-mirror"
 
   availability_zone = "a"
