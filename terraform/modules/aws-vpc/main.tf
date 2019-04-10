@@ -324,6 +324,20 @@ module "test-hgweb-mirror" {
   user_data = "${file("${path.module}/user_data.yml")}"
 }
 
+module "hgweb-mirror-b" {
+  source = "../hgweb-mirror"
+
+  availability_zone = "b"
+  elb_target_group_arn = "${aws_lb_target_group.http-mirror-target-group.arn}"
+  instance_type = "c5d.xlarge"
+  mirror_ami = "${var.mirror_ami}"
+  security_group_ids = [
+    "${aws_security_group.hgci-securitygroup.id}",
+  ]
+  subnet_id = "${module.privsubnet-b.subnet_id}"
+  user_data = "${file("${path.module}/user_data.yml")}"
+}
+
 resource "aws_route53_record" "uw2record" {
   name = "${data.aws_region.current.name}.hgmointernal.net"
   type = "A"
