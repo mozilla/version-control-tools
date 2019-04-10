@@ -10,6 +10,10 @@ variable "environment_users" {
   description = "Authorized users within VCS environmentss"
 }
 
+variable "instance_type" {
+  description = "EC2 instance type"
+}
+
 variable "mirror_ami" {
   description = "AMI ID for mirror instances"
 }

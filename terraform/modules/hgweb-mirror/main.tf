@@ -4,7 +4,7 @@
 
 resource "aws_instance" "hgweb-mirror" {
   ami = "${var.mirror_ami}"
-  instance_type = "c5d.2xlarge"
+  instance_type = "${var.instance_type}"
   subnet_id = "${var.subnet_id}"
   vpc_security_group_ids = ["${var.security_group_ids}"]
 

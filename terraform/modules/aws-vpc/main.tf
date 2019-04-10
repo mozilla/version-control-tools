@@ -321,6 +321,7 @@ module "test-hgweb-mirror" {
 
   availability_zone = "a"
   environment_users = "${var.environment_users}"
+  instance_type = "c5d.xlarge"
   mirror_ami = "${var.mirror_ami}"
   security_group_ids = [
     "${aws_security_group.hgci-securitygroup.id}",
