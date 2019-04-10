@@ -10,11 +10,6 @@ variable "cidr_block" {
   description = "CIDR block for the VPC"
 }
 
-variable "environment_users" {
-  description = "List of users in this environment"
-  type = "list"
-}
-
 variable "metadata_bucket_name" {
   description = "Name of the metadata bucket"
 }

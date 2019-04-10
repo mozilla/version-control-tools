@@ -219,9 +219,6 @@ module "vpc-uw2" {
   source = "./modules/aws-vpc"
 
   cidr_block = "10.191.5.0/24"
-  environment_users = [
-    "${aws_iam_user.user-cosheehan.name}",
-  ]
   metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
   mirror_ami = "${var.centos7_amis["us-west-2"]}"
   certificate_arn = "${aws_acm_certificate.hgcert.arn}"

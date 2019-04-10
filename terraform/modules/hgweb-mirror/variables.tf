@@ -6,10 +6,6 @@ variable "availability_zone" {
   description = "AZ in which to deploy the instance (a, b or c)"
 }
 
-variable "environment_users" {
-  description = "Authorized users within VCS environmentss"
-}
-
 variable "instance_type" {
   description = "EC2 instance type"
 }
