@@ -103,23 +103,18 @@ def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
     """
     count = [0]
 
+    class ShutDownException(Exception):
+        pass
+
     def signal_exit(signum, frame):
         logger.warn('received signal %d' % signum)
-        count[0] += 1
-
-        if count[0] == 1:
-            logger.warn('exiting gracefully')
-            return
-
-        # If this is a subsequent signal, convert to forceful exit.
-        logger.warn('already received exit signal; forcefully aborting')
-        sys.exit(1)
+        raise ShutDownException()
 
     oldint = signal.signal(signal.SIGINT, signal_exit)
     oldterm = signal.signal(signal.SIGTERM, signal_exit)
 
     try:
-        while not count[0]:
+        while True:
             r = consumer.get_message(timeout=timeout)
             if r:
                 partition, message, payload = r
@@ -128,12 +123,10 @@ def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
                 message_handler(config, payload)
                 # Only commit offset from partition message came from.
                 consumer.commit(partitions=[partition])
-
             if onetime:
                 break
-
-        if not onetime:
-            logger.warn('exiting from main consume loop')
+    except ShutDownException:
+        logger.warn('exiting from main consume loop')
     finally:
         signal.signal(signal.SIGINT, oldint)
         signal.signal(signal.SIGTERM, oldterm)
