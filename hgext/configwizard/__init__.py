@@ -273,6 +273,12 @@ that is embedded in this extension. The default configuration can be used in mos
 Would you like to activate format-source (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+FORMATSOURCE_DISABLE_INFO = '''
+Removing extensions.format-source since it\'s no longer needed. For the moment we
+want to disable format-source since the big format of Gecko has been performed.
+We will re-enable this when we will need it again.\n
+'''
+
 CODEREVIEW_INFO = '''
 Commits to Mozilla projects are typically sent to Phabricator. This is the
 preferred code review tool at Mozilla.
@@ -554,7 +560,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _promptvctextension(ui, cw, 'clang-format', CLANG_FORMAT_INFO)
 
     if 'format-source' in runsteps:
-        _promptvctextension(ui, cw, 'format-source', FORMATSOURCE_INFO)
+        _checkformatsource(ui, cw)
 
     if 'wip' in runsteps:
         _checkwip(ui, cw)
@@ -771,6 +777,18 @@ def _checkcolor(ui, cw, hg_version):
     else:
         _promptnativeextension(ui, cw, 'color',
                                'Enable color output to your terminal')
+
+
+def _checkformatsource(ui, cw):
+    disable_format_source = True
+
+    if disable_format_source:
+        ext = cw.c.get('extensions', {})
+        if 'format-source' in ext:
+            ui.write(FORMATSOURCE_DISABLE_INFO)
+            del ext['format-source']
+    else:
+        _promptvctextension(ui, cw, 'format-source', FORMATSOURCE_INFO)
 
 
 def _checkpager(ui, cw, hg_version):
