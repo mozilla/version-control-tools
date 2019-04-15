@@ -72,6 +72,36 @@ class DeployCommands(object):
 
         return reclone(repo)
 
+    @Command('hgweb-bootstrap', category='deploy',
+             description='Bootstrap a new hgweb machine')
+    @CommandArgument('--instance',
+                     help='Instance type to bootstrap (hgweb, mirror or none)')
+    @CommandArgument('--hgweb-workers', type=int,
+                     help='Number of concurrent workers for hgweb bootstrap procedure')
+    @CommandArgument('--hgssh-workers', type=int,
+                     help='Number of concurrent workers for hgssh bootstrap procedure')
+    @CommandArgument('--verbosity', type=int,
+                     help='How verbose to be with output')
+    def hgweb_bootstrap(self, instance=None, hgweb_workers=None, hgssh_workers=None,
+                        verbosity=None):
+        from vcttesting.deploy import run_playbook
+
+        # Create extra_vars dict using only non-`None` values
+        # Ansible defaults only work if the value is undefined
+        extra_vars = {
+            key: val
+            for key, val in {
+                ('instance', instance),
+                ('hgweb_workers', hgweb_workers),
+                ('hgssh_workers', hgssh_workers),
+            }
+            if val is not None
+        }
+
+        return run_playbook('bootstrap-hgweb',
+                            extra_vars=extra_vars,
+                            verbosity=verbosity)
+
     @Command('reviewbot', category='deploy')
     @CommandArgument('--verbosity', type=int, default=0,
                      help='How verbose to be with output')
