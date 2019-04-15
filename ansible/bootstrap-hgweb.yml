@@ -18,7 +18,7 @@
       register: mirror_host_key
 
     - name: execute hgssh bootstrap procedure
-      command: /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 5 --output /home/hg/hgssh.json
+      command: /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers {{ hgssh_workers | default(5) }} --output /home/hg/hgssh.json
       become_user: hg
 
     - name: get hgssh bootstrap object
@@ -70,7 +70,7 @@
 
     - block:
         - name: Execute hgweb bootstrap procedure
-          command: /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /etc/mercurial/hgssh.json --workers 8
+          command: /var/hg/venv_replication/bin/vcsreplicator-bootstrap-hgweb /etc/mercurial/vcsreplicator.ini /etc/mercurial/hgssh.json --workers {{ hgweb_workers | default(8) }}
           become_user: hg
       rescue:
         # If a repo is filtered from replication on a host, this registers as a failure
