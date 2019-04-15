@@ -1,5 +1,5 @@
 ---
-- hosts: hgweb-mirrors
+- hosts: "{{ var_hostgroup | default('hgweb-mirrors') }}"
   tasks:
   - name: apply hgweb role with replication filters
     include_role:

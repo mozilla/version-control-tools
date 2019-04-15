@@ -1,5 +1,5 @@
 ---
-- hosts: hgweb-prod
+- hosts: "{{ var_hostgroup | default('hgweb-prod') }}"
   tasks:
   - name: capture bloxtool config
     slurp: src=/etc/mercurial/bloxtool.json
