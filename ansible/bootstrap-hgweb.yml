@@ -2,8 +2,13 @@
 # Add the name of the host you wish to bootstrap to the "bootstrap"
 # Ansible inventory group.
 #
+# instance: optionally bootstrap config for mirror or regular hgweb host. default: none
+# ssh_workers: specify number of hgssh workers to use. default: 5
+# hgweb_workers: specify number of hgweb workers to use. default: 8
+#
 # Usage:
-#   $ ansible-playbook -i hosts bootstrap-hgweb.yml
+#   $ ansible-playbook -i hosts bootstrap-hgweb.yml [-e instance=mirror]
+#        [-e ssh_workers=8] [-e hgweb_workers=8]
 ---
 - hosts: hgssh-prod-master
   become: true
