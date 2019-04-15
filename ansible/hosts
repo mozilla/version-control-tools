@@ -14,6 +14,7 @@ hgssh1.dmz.mdc1.mozilla.com ansible_become=yes
 hgssh-prod
 hgweb-prod
 hgweb-mirrors
+bootstrap
 
 [monitoring]
 10.191.5.155 ansible_sudo=yes ansible_become=yes

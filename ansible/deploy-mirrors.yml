@@ -1,6 +1,11 @@
 ---
 - hosts: "{{ var_hostgroup | default('hgweb-mirrors') }}"
   tasks:
+  - name: set SELinux to permissive mode
+    selinux:
+      policy: targeted
+      state: permissive
+
   - name: apply hgweb role with replication filters
     include_role:
       name: hg-web

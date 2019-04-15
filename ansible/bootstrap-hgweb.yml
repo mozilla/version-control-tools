@@ -8,14 +8,35 @@
 - hosts: hgssh-prod-master
   become: true
   tasks:
+    # We need to write this out on clients.
+    - name: capture mirror key
+      slurp: src=/etc/mercurial/mirror
+      register: mirror_private_key
+
+    - name: capture host key
+      slurp: src=/etc/mercurial/ssh/ssh_host_rsa_key.pub
+      register: mirror_host_key
+
     - name: execute hgssh bootstrap procedure
-      command: /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 5 --output /var/hg/hgssh.json
+      command: /var/hg/venv_tools/bin/vcsreplicator-bootstrap-hgssh /etc/mercurial/hgrc /var/hg/venv_pash/bin/hg --workers 5 --output /home/hg/hgssh.json
       become_user: hg
 
     - name: get hgssh bootstrap object
-      slurp: src=/var/hg/hgssh.json
+      slurp: src=/home/hg/hgssh.json
       become_user: hg
       register: hgsshjson
+
+- name: bootstrap an hgweb instance
+  import_playbook: deploy-hgweb.yml
+  vars:
+    var_hostgroup: bootstrap
+  when: instance == 'hgweb'
+
+- name: bootstrap an hgweb mirror
+  import_playbook: deploy-mirrors.yml
+  vars:
+    var_hostgroup: bootstrap
+  when: instance == 'mirror'
 
 - hosts: bootstrap
   become: true
