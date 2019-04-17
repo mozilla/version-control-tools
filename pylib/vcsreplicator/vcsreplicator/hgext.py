@@ -59,7 +59,7 @@ with demandimport.deactivated():
 
 base85 = policy.importmod('base85')
 
-testedwith = '4.3 4.4 4.5 4.6 4.7 4.8'
+testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9'
 
 cmdtable = {}
 
@@ -552,9 +552,6 @@ def wireprotodispatch(orig, repo, proto, command):
 
     class unfilteroncerepo(origclass):
         def filtered(self, name, *args, **kwargs):
-            if name != 'served':
-                raise error.Abort('wtf: %s' % name)
-
             unfiltered = self.unfiltered()
             unfiltered.__class__ = origclass
             return unfiltered
@@ -566,9 +563,22 @@ def wireprotodispatch(orig, repo, proto, command):
         urepo.__class__ = origclass
 
 
+def wrapped_getdispatchrepo(orig, repo, proto, command):
+    '''Wraps `wireproto.getdispatchrepo` to serve the unfiltered repository'''
+    unfiltereduser = repo.ui.config('replication', 'unfiltereduser')
+    if not unfiltereduser or unfiltereduser != os.environ.get('USER'):
+        return orig(repo, proto, command)
+
+    permission = wireproto.commands[command].permission
+    if permission == 'pull':
+        return repo.unfiltered()
+    return orig(repo, proto, command)
+
+
 def extsetup(ui):
     extensions.wrapfunction(wireproto, 'dispatch', wireprotodispatch)
     extensions.wrapcommand(commands.table, 'init', initcommand)
+    extensions.wrapfunction(wireproto, 'getdispatchrepo', wrapped_getdispatchrepo)
 
     if _ORIG_PHASE_HEADS_HANDLER:
         bundle2.parthandlermapping['phase-heads'] = phase_heads_handler
