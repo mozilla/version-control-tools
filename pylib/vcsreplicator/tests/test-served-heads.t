@@ -181,10 +181,9 @@ But it isn't available on hgweb because the updates heads aren't written out
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-rev/36638cc83b4d9084a2a38f41f345da73390ad05b
   404
   
-  "filtered revision '36638cc83b4d9084a2a38f41f345da73390ad05b' (not in 'replicatedserved' subset)" (no-hg48 !)
-  { (hg48 !)
-  "error": "filtered revision '36638cc83b4d9084a2a38f41f345da73390ad05b' (not in 'replicatedserved' subset)" (hg48 !)
-  } (hg48 !)
+  {
+  "error": "filtered revision '36638cc83b4d9084a2a38f41f345da73390ad05b' (not in 'replicatedserved' subset)"
+  }
 
 And the pushlog doesn't expose it
 

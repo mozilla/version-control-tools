@@ -136,8 +136,7 @@ Commit message with multiple lines works
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
   remote: recorded push in pushlog
-  remote: 1 new obsolescence markers (hg44 !)
-  remote: 2 new obsolescence markers (no-hg44 !)
+  remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/821cb8db71235562a3ee752f0b67502e93835a9f

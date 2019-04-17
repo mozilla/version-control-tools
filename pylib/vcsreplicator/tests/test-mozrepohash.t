@@ -129,9 +129,8 @@ Adding a bookmark changes the hash
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/repo
   searching for changes
   no changes found
-  exporting bookmark mymark (hg47 !)
+  exporting bookmark mymark
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
-  exporting bookmark mymark (no-hg47 !)
   [1]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag

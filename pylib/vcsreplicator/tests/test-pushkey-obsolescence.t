@@ -108,8 +108,7 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 2 changesets with 2 changes to 2 files
-  vcsreplicator.consumer   > new changesets 442ce5a124e0:11bec8a6b2a3 (2 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 442ce5a124e0:11bec8a6b2a3 (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 442ce5a124e0:11bec8a6b2a3 (2 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -192,8 +191,7 @@ Changegroup message written
   vcsreplicator.consumer   > added 2 changesets with 1 changes to 2 files (+1 heads)
   vcsreplicator.consumer   > 1 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 1 changesets
-  vcsreplicator.consumer   > new changesets 5dfb8fc50086:67b45555a21f (2 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 5dfb8fc50086:67b45555a21f (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 5dfb8fc50086:67b45555a21f (2 drafts)
   vcsreplicator.consumer   > (run 'hg heads' to see heads)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -304,8 +302,7 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads)
-  vcsreplicator.consumer   > new changesets de9a6dc9203d (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets de9a6dc9203d (no-hg48 !)
+  vcsreplicator.consumer   > new changesets de9a6dc9203d (1 drafts)
   vcsreplicator.consumer   > (run 'hg heads' to see heads)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer mismatch between expected and actual changeset count: expected 1, got 2
@@ -375,8 +372,7 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer   > added 1 changesets with 0 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > 1 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 1 changesets
-  vcsreplicator.consumer   > new changesets 33e52188e177 (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 33e52188e177 (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 33e52188e177 (1 drafts)
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
@@ -503,8 +499,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > new changesets 3694f932529e (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 3694f932529e (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 3694f932529e (1 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
@@ -524,8 +519,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > new changesets 63d556ea5b9f (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 63d556ea5b9f (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 63d556ea5b9f (1 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
@@ -545,8 +539,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 2 files
-  vcsreplicator.consumer   > new changesets 87d2d20529e7 (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 87d2d20529e7 (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 87d2d20529e7 (1 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/obs
@@ -569,8 +562,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > added 2 changesets with 0 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > 2 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 2 changesets
-  vcsreplicator.consumer   > new changesets 274cd1d986ab:27eddb78301f (2 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 274cd1d986ab:27eddb78301f (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 274cd1d986ab:27eddb78301f (2 drafts)
   vcsreplicator.consumer   > (run 'hg heads .' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs
@@ -598,8 +590,7 @@ Now let's check what happens when replication is lagging
   vcsreplicator.consumer   > added 2 changesets with 0 changes to 2 files (+1 heads)
   vcsreplicator.consumer   > 2 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 2 changesets
-  vcsreplicator.consumer   > new changesets 4dabe70969ca:84b66e579087 (2 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 4dabe70969ca:84b66e579087 (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 4dabe70969ca:84b66e579087 (2 drafts)
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/obs

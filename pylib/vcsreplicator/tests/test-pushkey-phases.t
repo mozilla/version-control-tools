@@ -84,8 +84,7 @@ There should be no pushkey on a push with a draft changeset
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > new changesets 77538e1ce4be (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 77538e1ce4be (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 77538e1ce4be (1 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -194,8 +193,7 @@ accurate)
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 2 changesets with 2 changes to 1 files
-  vcsreplicator.consumer   > new changesets 7dea706c1724:fde0c4117655 (1 drafts) (hg48 !)
-  vcsreplicator.consumer   > new changesets 7dea706c1724:fde0c4117655 (no-hg48 !)
+  vcsreplicator.consumer   > new changesets 7dea706c1724:fde0c4117655 (1 drafts)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 2 changesets into $TESTTMP/repos/mozilla-central
@@ -271,7 +269,7 @@ Pulling first changegroup will find its phase
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > new changesets 58017affcc65
-  vcsreplicator.consumer   > 1 local changesets published (hg47 !)
+  vcsreplicator.consumer   > 1 local changesets published
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central

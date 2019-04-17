@@ -75,7 +75,7 @@ Phases should be updated on normal push
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > new changesets 77538e1ce4be (hg44 !)
+  vcsreplicator.consumer   > new changesets 77538e1ce4be
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -89,9 +89,8 @@ Creating a bookmark will write a pushkey message
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
-  exporting bookmark my-bookmark (hg47 !)
+  exporting bookmark my-bookmark
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
-  exporting bookmark my-bookmark (no-hg47 !)
   [1]
 
   $ consumer --dump --partition 2
@@ -140,12 +139,11 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
-  updating bookmark my-bookmark (hg47 !)
+  updating bookmark my-bookmark
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b593873bfa63c7129e02a21becc299ff0
   remote: recorded changegroup in replication log in \d\.\d+s (re)
-  updating bookmark my-bookmark (no-hg47 !)
 
   $ consumer --dump
   - _created: \d+\.\d+ (re)
@@ -183,7 +181,7 @@ Mirror gets bookmark updates when pulling the changegroup.
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
-  vcsreplicator.consumer   > new changesets 2777163b5938 (hg44 !)
+  vcsreplicator.consumer   > new changesets 2777163b5938
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -264,7 +262,7 @@ the bookmark.
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > new changesets 031adcaa8ee7 (hg44 !)
+  vcsreplicator.consumer   > new changesets 031adcaa8ee7
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -291,7 +289,7 @@ But processing the next changegroup message should advance the bookmark by 1
   vcsreplicator.consumer   > adding file changes
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
-  vcsreplicator.consumer   > new changesets e20ecd72ffa9 (hg44 !)
+  vcsreplicator.consumer   > new changesets e20ecd72ffa9
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
@@ -394,7 +392,7 @@ Now test bookmark divergence
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > adding remote bookmark divergent
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
-  vcsreplicator.consumer   > new changesets e84fdf206e79 (hg44 !)
+  vcsreplicator.consumer   > new changesets e84fdf206e79
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
