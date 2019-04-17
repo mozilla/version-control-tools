@@ -4,5 +4,5 @@
 boto3
 cbor2
 ipaddress
-Mercurial==4.8
+Mercurial==4.9.1
 Pygments==2.1.3
