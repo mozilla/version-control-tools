@@ -1,0 +1,35 @@
+# Monitor Kafka aggregator lag
+[[inputs.exec]]
+commands = [
+  "/var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag --telegraf /etc/mercurial/pushdataaggregator.ini"
+]
+
+data_format = "json"
+timeout = "60s"
+name_suffix = "_vcsreplicator_aggregator"
+tag_keys = [
+  "partition"
+]
+
+[[inputs.exec]]
+commands = [
+  "/var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag --telegraf /etc/mercurial/pushdataaggregator-pending.ini"
+]
+
+data_format = "json"
+timeout = "60s"
+name_suffix = "_vcsreplicator_aggregator_pending"
+tag_keys = [
+  "partition"
+]
+
+# Enable the Procstat input plugin to monitor
+# vcsreplicator processes
+[[inputs.procstat]]
+pattern = "vcsreplicator-aggregator"
+
+[[inputs.procstat]]
+pattern = "vcsreplicator-pulse-notifier"
+
+[[inputs.procstat]]
+pattern = "vcsreplicator-sns-notifier"
