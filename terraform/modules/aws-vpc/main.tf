@@ -220,6 +220,9 @@ resource "aws_security_group_rule" "rule-telegraf-hgci" {
   to_port = 8086
   protocol = "tcp"
   cidr_blocks = [
+    "10.48.74.19/32",
+    "10.48.74.45/32",
+    "10.48.74.46/32",
     "10.48.74.51/32",
     "10.48.74.52/32",
     "10.48.74.53/32",
