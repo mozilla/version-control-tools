@@ -2,3 +2,7 @@ creation_rules:
   - path_regex: ".*"
     gcp_kms: "projects/hgmo-236019/locations/global/keyRings/hgmo-keyring/cryptoKeys/version-control-tools-secrets"
     encrypted_suffix: "_encrypted"
+
+# Add files that must be auto-decrypted by `./deploy` to this list
+files:
+  - ansible/roles/monitoring-agent/defaults/main.yml
