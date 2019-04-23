@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: ".*"
+    gcp_kms: "projects/hgmo-236019/locations/global/keyRings/hgmo-keyring/cryptoKeys/version-control-tools-secrets"
+    encrypted_suffix: "_encrypted"
