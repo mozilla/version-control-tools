@@ -183,15 +183,6 @@ module "s3-eu1" {
   }
 }
 
-resource "aws_route53_zone" "hgmointernal-zone" {
-  name = "hgmointernal.com"
-  comment = "Domain name for private CI instances"
-
-  tags {
-    Name = "hgmo internal hosted zone"
-  }
-}
-
 resource "aws_route53_zone" "hgzone" {
   name = "hgmointernal.net"
   comment = "hg internal public hosted zone"
