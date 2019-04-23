@@ -22,7 +22,7 @@ from .consumer import (
 )
 
 
-def create_telegraf_json(offsets):
+def create_consumer_telegraf_json(offsets):
     '''Format the output of `consumer_offsets_and_lag` for consumption
     by the Telegraf `exec` plugin
     '''
@@ -34,6 +34,21 @@ def create_telegraf_json(offsets):
             'lag_time': lag_time,
         }
         for partition, (offset, available, lag_time) in offsets.items()
+    ]
+
+
+def create_aggregator_telegraf_json(consumed, acked):
+    '''Format the output of `get_aggregation_counts` for consumption
+    by the Telegraf `exec` plugin
+    '''
+    partitions = consumed.keys()
+    return [
+        {
+            'partition': partition,
+            'consumed_offset': consumed[partition],
+            'acked_offset': acked[partition],
+        }
+        for partition in partitions
     ]
 
 
@@ -73,7 +88,7 @@ def check_consumer_lag():
         raise
 
     if args.telegraf:
-        telegraf_data = create_telegraf_json(offsets)
+        telegraf_data = create_consumer_telegraf_json(offsets)
         print(json.dumps(telegraf_data, sort_keys=True))
         sys.exit(0)
 
@@ -163,6 +178,8 @@ def check_aggregator_lag():
     parser.add_argument('--critical-count', default=50, type=int,
                         help='Total number of messages behind after which a '
                              'critical will be reported')
+    parser.add_argument('--telegraf', action='store_true',
+                        help='Output data for consumption by Telegraf')
 
     args = parser.parse_args()
 
@@ -182,6 +199,11 @@ def check_aggregator_lag():
         print('WARNING - exception fetching data: %s' % e)
         print('')
         raise
+
+    if args.telegraf:
+        telegraf_data = create_aggregator_telegraf_json(consumed, acked)
+        print(json.dumps(telegraf_data, sort_keys=True))
+        sys.exit(0)
 
     message_count = sum(counts.values())
 

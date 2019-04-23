@@ -4,6 +4,7 @@
   $ vcsrenv
 
   $ alias check='hgmo exec hgssh /var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag /etc/mercurial/pushdataaggregator-pending.ini'
+  $ alias checkaggregator='hgmo exec hgssh /var/hg/venv_tools/bin/check_vcsreplicator_aggregator_lag /etc/mercurial/pushdataaggregator.ini'
 
 Check should be OK by default
 
@@ -112,6 +113,61 @@ Resuming aggregator clears check
   
   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for details about this check.
+
+Output can be formatted for consumption by Telegraf
+
+  $ check --telegraf | python -m json.tool
+  [
+      {
+          "acked_offset": 2,
+          "consumed_offset": 2,
+          "partition": 0
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 1
+      },
+      {
+          "acked_offset": 2,
+          "consumed_offset": 2,
+          "partition": 2
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 3
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 4
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 5
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 6
+      },
+      {
+          "acked_offset": 1,
+          "consumed_offset": 1,
+          "partition": 7
+      }
+  ]
+
+  $ checkaggregator --telegraf | python -m json.tool
+  [
+      {
+          "acked_offset": 10,
+          "consumed_offset": 10,
+          "partition": 0
+      }
+  ]
 
 Cleanup
 
