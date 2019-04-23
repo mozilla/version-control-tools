@@ -34,6 +34,13 @@ mount_points = [
 [[outputs.influxdb]]
 urls = ["http://10.191.5.155:8086"]
 
+[[outputs.influxdb]]
+urls = ["{{ influxdb_url_encrypted }}"]
+database = "{{ influxdb_database_encrypted }}"
+skip_database_creation = "{{ influxdb_skip_database_creation }}"
+username = "{{ influxdb_username_encrypted }}"
+password = "{{ influxdb_password_encrypted }}"
+
 {% if hosttype == "hgweb" %}
 {% include 'hgweb.conf.j2' %}
 {% elif hosttype == "hgssh" %}
