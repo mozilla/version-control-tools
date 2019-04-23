@@ -20,3 +20,4 @@ hg.mozilla.org
    replication-history
    ops
    upgrading
+   ssl-cert-update
