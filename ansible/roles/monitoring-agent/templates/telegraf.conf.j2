@@ -3,10 +3,6 @@
 logfile = "/var/log/telegraf/telegraf.log"
 debug = true
 
-# Enable the Apache plugin
-[[inputs.apache]]
-urls = ["http://127.0.0.1/server-status?auto"]
-
 # Enable the cpu plugin
 [[inputs.cpu]]
 percpu = true
@@ -22,40 +18,6 @@ mount_points = [
 # Enable the DiskIO input plugin
 [[inputs.diskio]]
 
-# Monitor Kafka consumer lag via the exec plugin
-[[inputs.exec]]
-commands = [
-  "/var/hg/venv_replication/bin/check_vcsreplicator_lag --telegraf /etc/mercurial/vcsreplicator.ini"
-]
-
-data_format = "json"
-timeout = "60s"
-name_suffix = "_vcsreplicator_consumer"
-tag_keys = [
-  "partition",
-]
-
-[[inputs.exec]]
-commands = [
-  "/var/hg/venv_replication/bin/check_vcsreplicator_lag --telegraf /etc/mercurial/vcsreplicator-pending.ini"
-]
-
-data_format = "json"
-timeout = "60s"
-name_suffix = "_vcsreplicator_headsconsumer"
-tag_keys = [
-  "partition",
-]
-
-# Enable Logparser inputs plugin
-[[inputs.logparser]]
-files = ["/var/log/httpd/hg.mozilla.org/access_log"]
-from_beginning = true
-
-    [inputs.logparser.grok]
-    patterns = ["%{COMBINED_LOG_FORMAT}"]
-    measurement = "apache_access_log"
-
 # Enable the Mem input plugin
 [[inputs.mem]]
 
@@ -65,17 +27,13 @@ from_beginning = true
 # Enable the Processes input plugin
 [[inputs.processes]]
 
-# Enable the Procstat input plugin
-# to monitor the vcsreplicator processes
-[[inputs.procstat]]
-pattern = "vcsreplicator-consumer"
-
-[[inputs.procstat]]
-pattern = "vcsreplicator-headsconsumer"
-
 # Enable the System input plugin
 [[inputs.system]]
 
 # Send metrics to InfluxDB
 [[outputs.influxdb]]
 urls = ["http://10.191.5.155:8086"]
+
+{% if hosttype == "hgweb" %}
+{% include 'hgweb.conf.j2' %}
+{% endif %}
