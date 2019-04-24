@@ -7,10 +7,30 @@ from __future__ import absolute_import, unicode_literals
 import os
 import subprocess
 import sys
+import yaml
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+
+
+def decrypt_sops_files():
+    '''Decrypt all files with encrypted keys in the repo.
+
+    All files found in the list under the "files" key of the
+    `.sops.yaml` file will have all secrets with an
+    "_encrypted" suffix decrypted.
+    '''
+    with open(os.path.join(ROOT, '.sops.yaml')) as f:
+        files = yaml.safe_load(f).get('files')
+
+    if not files:
+        return
+
+    for path in files:
+        subprocess.call([
+            'sops', '--in-place', '--decrypt', path,
+        ], cwd=ROOT)
 
 
 def hg_executable():

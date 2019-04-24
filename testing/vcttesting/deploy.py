@@ -17,6 +17,7 @@ import zipfile
 import boto3
 
 from .vctutil import (
+    decrypt_sops_files,
     get_and_write_vct_node,
 )
 
@@ -49,6 +50,8 @@ def run_playbook(name, extra_vars=None, verbosity=0):
 def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
                 verbosity=0):
     """Deploy to hg.mozilla.org."""
+    decrypt_sops_files()
+
     extra = {
         'skip_mirrors': skip_mirrors,
         'skip_hgssh': skip_hgssh,
