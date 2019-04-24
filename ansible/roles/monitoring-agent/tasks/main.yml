@@ -20,6 +20,7 @@
   file:
     path: /var/log/httpd
     mode: 0701
+  when: hosttype == 'hgweb'
 
 - name: start the Telegraf service
   service:
