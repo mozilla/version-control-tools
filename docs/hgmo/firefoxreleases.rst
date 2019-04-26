@@ -7,12 +7,6 @@ Firefox Release Data
 hg.mozilla.org has facilities for aggregating and exposing information about
 Firefox releases performed from Mercurial changesets.
 
-.. important::
-
-   This feature is currently experimental and implementation details may
-   change. If you would like the feature to stabilize, please ping *gps*
-   in ``#vcs`` on irc.mozilla.org.
-
 This feature is currently only enabled on the
 `mozilla-central <https://hg.mozilla.org/mozilla-central>`_ repository.
 
