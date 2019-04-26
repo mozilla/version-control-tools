@@ -29,7 +29,7 @@ And raises during upload since we don't have credentials in the test env
   1 changesets found
   1 changesets found
   writing 328 bytes for 3 files
-  bundle requirements: generaldelta, revlogv1
+  bundle requirements: generaldelta, revlogv1, sparserevlog
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.packed1.hg
