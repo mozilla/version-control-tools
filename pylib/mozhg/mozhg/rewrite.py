@@ -79,10 +79,18 @@ def preservefilectx(oldctx):
             spec = inspect.getargspec(context.memfilectx.__init__)
 
             if 'changectx' in spec.args:
-                return context.memfilectx(repo, memctx, path, fctx.data(),
-                                          islink=islink,
-                                          isexec=isexec,
-                                          copied=copied)
+                # TRACKING hg50
+                # `copied` renamed to `copysource`
+                if util.versiontuple(n=2) >= (5, 0):
+                    return context.memfilectx(repo, memctx, path, fctx.data(),
+                                              islink=islink,
+                                              isexec=isexec,
+                                              copysource=copied)
+                else:
+                    return context.memfilectx(repo, memctx, path, fctx.data(),
+                                              islink=islink,
+                                              isexec=isexec,
+                                              copied=copied)
             else:
                 return context.memfilectx(repo, path, fctx.data(),
                                           islink=islink,
