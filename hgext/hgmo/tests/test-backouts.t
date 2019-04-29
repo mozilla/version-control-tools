@@ -28,14 +28,14 @@ Backed out commits should show warnings
   [1]
 
   $ grep x2620 body
-  <a href="/">Mercurial</a>  / changeset / 6c9721b3b4df &#x2620;
+  <a href="/">Mercurial</a>  / changeset / 6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2 &#x2620;
   <tr><td colspan="2" style="background:#ff3333;"><strong>&#x2620;&#x2620; backed out by <a style="font-family: monospace" href="/rev/f8c8d5d22c7d">f8c8d5d22c7d</a> &#x2620; &#x2620;</strong></td></tr>
 
 Backout commit links to backed out commit
 
   $ http http://localhost:$HGPORT/rev/f8c8d5d22c7d --body-file body > /dev/null
   $ grep '<td>backs out' body
-  <tr><td>backs out</td><td><a style="font-family: monospace" href="/rev/6c9721b3b4df">6c9721b3b4df</a></td></tr>
+  <tr><td>backs out</td><td><a style="font-family: monospace" href="/rev/6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2">6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2</a></td></tr>
 
 Reference a backed out node that doesn't exist (bug 1257152)
 

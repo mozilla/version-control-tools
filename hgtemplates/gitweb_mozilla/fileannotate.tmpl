@@ -1,5 +1,5 @@
 {header}
-<title>{repo|escape}: {file|escape}@{node|short} (annotated)</title>
+<title>{repo|escape}: {file|escape}@{node} (annotated)</title>
 <link rel="alternate" type="application/atom+xml"
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
 <link rel="alternate" type="application/rss+xml"
@@ -55,7 +55,7 @@ annotate |
 {branch%filerevbranch}
 <tr>
  <td>changeset {rev}</td>
- <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
+ <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">{node}</a></td>
 </tr>
 {parent%fileannotateparent}
 {child%fileannotatechild}

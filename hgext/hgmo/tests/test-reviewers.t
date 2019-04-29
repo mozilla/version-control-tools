@@ -34,8 +34,8 @@ Reviewer revset works
 
   $ http http://localhost:$HGPORT/log?rev=reviewer%28gps%29 --body-file body > /dev/null
   $ grep '<a href="/rev/' body
-  <a href="/rev/e32726f11326">diff</a><br/>
-  <a href="/rev/b2695d7dbd02">diff</a><br/>
+  <a href="/rev/e32726f113266cd8bcba4360a7671f3d1fc96800">diff</a><br/>
+  <a href="/rev/b2695d7dbd02c29410a7d96c9ade26d9564fca6e">diff</a><br/>
 
 Confirm no errors in log
 

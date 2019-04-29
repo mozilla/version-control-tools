@@ -1,5 +1,5 @@
 {header}
-<title>{repo|escape}: changeset {rev}:{node|short}</title>
+<title>{repo|escape}: changeset {rev}:{node}</title>
 <link rel="alternate" type="application/atom+xml"
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
 <link rel="alternate" type="application/rss+xml"
@@ -13,7 +13,7 @@
         <img src="{staticurl|urlescape}{logoimg}" alt="mercurial" />
     </a>
 </div>
-<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset / {node|short} {if(backedoutbynode, '&#x2620;')}
+<a href="/">Mercurial</a> {pathdef%breadcrumb} / changeset / {node} {if(backedoutbynode, '&#x2620;')}
 </div>
 
 <div class="page_nav">
@@ -46,13 +46,13 @@ changeset |
 {branch%changesetbranch}
 <tr>
  <td>changeset {rev}</td>
- <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></td>
+ <td style="font-family:monospace"><a class="list" href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">{node}</a></td>
 </tr>
 {if(obsolete, succsandmarkers%obsfateentry)}
 {if(instabilities, whyunstable%whyunstableentry)}
 {ifeq(count(parent), '2', parent%changesetparentdiff, parent%changesetparent)}
 {child%changesetchild}
-<tr><td>push id</td><td>{if(pushid, '<a href="{url|urlescape}pushloghtml?changeset={node|short}">{pushid}</a>', 'unknown')}</td></tr>
+<tr><td>push id</td><td>{if(pushid, '<a href="{url|urlescape}pushloghtml?changeset={node}">{pushid}</a>', 'unknown')}</td></tr>
 <tr><td>push user</td><td>{if(pushuser, pushuser|escape, 'unknown')}</td></tr>
 <tr><td>push date</td><td>{if(pushdate, pushdate|rfc822date, 'unknown')}</td></tr>
 {if(convertsourcepath, '<tr><td>converted from</td><td><a href="{convertsourcepath}/rev/{convertsourcenode}">{convertsourcenode}</a></td></tr>')}
