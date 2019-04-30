@@ -9,7 +9,7 @@ Sanity check the html output
   content-type: text/html; charset=ascii
 
   $ grep 7127e784b4ba body
-  <tr class="pushlogentry parity0  id31"><td></td><td><a href="/hg-test/rev/7127e784b4ba">7127e784b4ba</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
+  <tr class="pushlogentry parity0  id31"><td></td><td><a href="/hg-test/rev/7127e784b4ba3a5cf792b433b19d527e2bd0b44a">7127e784b4ba3a5cf792b433b19d527e2bd0b44a</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
 
 Get all JSON data
 
