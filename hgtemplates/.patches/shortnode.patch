@@ -137,9 +137,7 @@ diff --git a/hgtemplates/gitweb_mozilla/filerevision.tmpl b/hgtemplates/gitweb_m
 diff --git a/hgtemplates/gitweb_mozilla/graphentry.tmpl b/hgtemplates/gitweb_mozilla/graphentry.tmpl
 --- a/hgtemplates/gitweb_mozilla/graphentry.tmpl
 +++ b/hgtemplates/gitweb_mozilla/graphentry.tmpl
-@@ -1,7 +1,7 @@
--<li class="parity{parity}" data-node="{node|short}">
-+<li class="parity{parity}" data-node="{node}">
+@@ -2,6 +2,6 @@
   <div class="fg">
    <span class="desc">
 -   <a class="list" href="{url|urlescape}rev/{node|short}{sessionvars%urlparameter}"><b>{desc|strip|firstline|escape|nonempty}</b></a>
