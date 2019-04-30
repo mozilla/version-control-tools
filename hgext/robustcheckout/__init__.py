@@ -50,7 +50,7 @@ except ImportError:
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9'
+testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0'
 minimumhgversion = '4.3'
 
 cmdtable = {}
@@ -717,7 +717,12 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             old_sparse_fn = getattr(repo.dirstate, '_sparsematchfn', None)
             if old_sparse_fn is not None:
                 assert supported_hg(), 'Mercurial version not supported (must be 4.3+)'
-                repo.dirstate._sparsematchfn = lambda: matchmod.always(repo.root, '')
+                # TRACKING hg50
+                # Arguments passed to `matchmod.always` were unused and have been removed
+                if util.versiontuple(n=2) >= (5, 0):
+                    repo.dirstate._sparsematchfn = lambda: matchmod.always()
+                else:
+                    repo.dirstate._sparsematchfn = lambda: matchmod.always(repo.root, '')
 
             with timeit('purge', 'purge'):
                 if purgeext.purge(ui, repo, all=True, abort_on_err=True,
