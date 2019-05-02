@@ -233,6 +233,8 @@ Always test against the version of Mercurial we have deployed to hg.mo
   Hunk #3 succeeded at 302 with fuzz 1 (offset 22 lines).
   applying patch shortnode.patch
   applying patch from stdin
+  applying patch mailmap.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.

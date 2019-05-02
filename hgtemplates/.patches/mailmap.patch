@@ -1,0 +1,107 @@
+# HG changeset patch
+# User test
+# Date 0 0
+#      Thu Jan 01 00:00:00 1970 +0000
+# Node ID 0a9df329a4fe6fa719ca330eda9fbf7bf8573115
+# Parent  b570e3843d47eff87504fb006f5b6dc509dae55a
+use mailmap everywhere
+
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/changelogentry.tmpl
+--- a/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/changelogentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -7,7 +7,7 @@
+ <a href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">diff</a><br/>
+ <a href="{url|urlescape}file/{node}{sessionvars%urlparameter}">browse</a>
+ </div>
+-<cite>{author|obfuscate}</cite> - {date|rfc822date} - rev {rev}<br/>
++<cite>{mailmap(author)|obfuscate}</cite> - {date|rfc822date} - rev {rev}<br/>
+ {if(pushid, 'Push <a href="{url|urlescape}pushloghtml?changeset={node}">{pushid}</a> by {pushuser|escape} at {pushdate|rfc822date}<br />')}
+ </div>
+ <div class="log_body description">{desc|strip|escape|mozlink}
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/changeset.tmpl
+--- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -41,7 +41,7 @@
+ <div class="title_text">
+ <table cellspacing="0">
+ {if(backedoutbynode, '<tr><td colspan="2" style="background:#ff3333;"><strong>&#x2620;&#x2620; backed out by <a style="font-family: monospace" href="{url|urlescape}rev/{backedoutbynode|short}">{backedoutbynode|short}</a> &#x2620; &#x2620;</strong></td></tr>')}
+-<tr><td>author</td><td>{author|obfuscate}</td></tr>
++<tr><td>author</td><td>{mailmap(author)|obfuscate}</td></tr>
+ <tr><td></td><td class="date age">{date|rfc822date}</td></tr>
+ {branch%changesetbranch}
+ <tr>
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/fileannotate.tmpl
+--- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -46,7 +46,7 @@
+ <table cellspacing="0">
+ <tr>
+  <td>author</td>
+- <td>{author|obfuscate}</td>
++ <td>{mailmap(author)|obfuscate}</td>
+ </tr>
+ <tr>
+  <td></td>
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/filerevision.tmpl
+--- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -46,7 +46,7 @@
+ <table cellspacing="0">
+ <tr>
+  <td>author</td>
+- <td>{author|obfuscate}</td>
++ <td>{mailmap(author)|obfuscate}</td>
+ </tr>
+ <tr>
+  <td></td>
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/graphentry.tmpl
+--- a/hgtemplates/gitweb_mozilla/graphentry.tmpl	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/graphentry.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,6 @@
+    <a class="list" href="{url|urlescape}rev/{node}{sessionvars%urlparameter}"><b>{desc|strip|firstline|escape|nonempty}</b></a>
+   </span>
+   {alltags}
+-  <div class="info">{date|age}, by {author|person}</div>
++  <div class="info">{date|age}, by {mailmap(author)|person}</div>
+  </div>
+ </li>
+diff -r b570e3843d47 -r 0a9df329a4fe hgtemplates/gitweb_mozilla/map
+--- a/hgtemplates/gitweb_mozilla/map	Fri Apr 26 13:27:39 2019 -0400
++++ b/hgtemplates/gitweb_mozilla/map	Thu Jan 01 00:00:00 1970 +0000
+@@ -117,7 +117,7 @@
+             {node}</a>
+           {desc|escape|mozlink|firstline}
+         </div>
+-        <div><em>{author|obfuscate}</em></div>
++        <div><em>{mailmap(author)|obfuscate}</em></div>
+         <div>parents: {parents%annotateparent}</div>
+         <a href="{url|urlescape}diff/{node}/{file|urlescape}{sessionvars%urlparameter}">diff</a>
+         <a href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">changeset</a>
+@@ -307,13 +307,13 @@
+     </td>
+     <td>{node}<br/><i class="age">{date|isodate}</i></td>
+     <td>
+-      <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
++      <strong><cite>{mailmap(author)|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
+       {alltags}
+     </td>
+   </tr>'
+ pushinfo = '<cite>{user}<br/><span class="date">{date|date}</span></cite>'
+ mergehidden = '<br/>← {count} merge changesets <a class="expand hideid{id}" href="#">[Collapse]</a>'
+-pushlogentry = '<tr class="pushlogentry parity{parity} {hidden} id{id}"><td>{push%pushinfo}</td><td><a href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">{node}</a></td><td><strong>{author|person} &mdash; {desc|strip|escape|mozlink|firstline|addbreaks}</strong> <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>{mergerollup%mergehidden}</td></tr>\n'
++pushlogentry = '<tr class="pushlogentry parity{parity} {hidden} id{id}"><td>{push%pushinfo}</td><td><a href="{url|urlescape}rev/{node}{sessionvars%urlparameter}">{node}</a></td><td><strong>{mailmap(author)|person} &mdash; {desc|strip|escape|mozlink|firstline|addbreaks}</strong> <span class="logtags">{inbranch%inbranchtag}{branches%branchtag}{tags%tagtag}</span>{mergerollup%mergehidden}</td></tr>\n'
+ filelogentry = '
+   <tr class="parity{if(patch, '1', '{parity}')}">
+     <td class="link">
+@@ -325,9 +325,9 @@
+       {node}<br/>created <i>{date|isodate}</i>{rename%filelogrename}
+       {if(pushdate, '<br/>pushed <i>{pushdate|isodate}</i>', '<br/>pushed <i>unknown</i>')}
+     </td>
+-    <td><i>{author|person}</i></td>
++    <td><i>{mailmap(author)|person}</i></td>
+     <td>
+-      <strong><cite>{author|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
++      <strong><cite>{mailmap(author)|person}</cite> - {desc|strip|escape|mozlink|firstline}</strong>
+       {alltags}
+     </td>
+   </tr>
