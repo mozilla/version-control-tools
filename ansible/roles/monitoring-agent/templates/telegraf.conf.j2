@@ -41,6 +41,10 @@ skip_database_creation = {{ influxdb_skip_database_creation | to_json }}
 username = "{{ influxdb_username_encrypted }}"
 password = "{{ influxdb_password_encrypted }}"
 
+{% if inventory_hostname in zk_servers %}
+{% include 'kafka.conf.j2' %}
+{% endif %}
+
 {% if hosttype == "hgweb" %}
 {% include 'hgweb.conf.j2' %}
 {% elif hosttype == "hgssh" %}
