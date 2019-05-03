@@ -411,24 +411,3 @@ resource "aws_network_acl" "hgci-networkacl" {
     Name = "hg AWS network ACLs"
   }
 }
-
-resource "aws_instance" "monitoring-host" {
-  ami = "${var.mirror_ami}"
-  instance_type = "c4.2xlarge"
-  subnet_id = "${module.privsubnet-b.subnet_id}"
-  vpc_security_group_ids = [
-    "${aws_security_group.hgci-securitygroup.id}",
-  ]
-
-  user_data = "${file("${path.module}/user_data.yml")}"
-
-  root_block_device {
-    delete_on_termination = true
-    volume_size = 100
-    volume_type = "standard"
-  }
-
-  tags {
-    Name = "monitoring instance"
-  }
-}
