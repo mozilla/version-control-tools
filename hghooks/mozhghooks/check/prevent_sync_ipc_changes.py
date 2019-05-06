@@ -25,12 +25,9 @@ from ..checks import (
 
 IPC_PEERS = [
     dict(name='Andrew McCreight', nick=['mccr8'], email=['continuation@gmail.com']),
-    dict(name='Ben Kelly', nick=['bkelly'], email=['bkelly@mozilla.com', 'ben@wanderview.com']),
-    dict(name='Bill McCloskey', nick=['billm'], email=['billm@mozilla.com']),
-    dict(name='David Anderson', nick=['dvander'], email=['danderson@mozilla.com', 'dvander@alliedmods.net']),
-    dict(name='Jed David', nick=['jld'], email=['jld@mozilla.com']),
-    dict(name='Kan-Ru Chen', nick=['kanru'], email=['kchen@mozilla.com', 'kanru@kanru.info']),
+    dict(name='Jed Davis', nick=['jld'], email=['jld@mozilla.com']),
     dict(name='Nathan Froyd', nick=['froydnj'], email=['nfroyd@mozilla.com']),
+    dict(name='Nika Layzell', nick=['nika'], email=['nika@thelayzells.com']),
 ]
 
 MISSING_REVIEW = """

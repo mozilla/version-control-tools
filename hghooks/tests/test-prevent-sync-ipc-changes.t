@@ -39,12 +39,9 @@ Editing the sync-messages.ini file without any review should fail
   
   Please, request review from either:
     - Andrew McCreight (:mccr8)
-    - Ben Kelly (:bkelly)
-    - Bill McCloskey (:billm)
-    - David Anderson (:dvander)
-    - Jed David (:jld)
-    - Kan-Ru Chen (:kanru)
+    - Jed Davis (:jld)
     - Nathan Froyd (:froydnj)
+    - Nika Layzell (:nika)
   ************************************************************************
   
   transaction abort!
@@ -68,12 +65,9 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   
   Please, request review from either:
     - Andrew McCreight (:mccr8)
-    - Ben Kelly (:bkelly)
-    - Bill McCloskey (:billm)
-    - David Anderson (:dvander)
-    - Jed David (:jld)
-    - Kan-Ru Chen (:kanru)
+    - Jed Davis (:jld)
     - Nathan Froyd (:froydnj)
+    - Nika Layzell (:nika)
   ************************************************************************
   
   transaction abort!
@@ -83,7 +77,7 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
 
 Editing the sync-messages.ini file with /IPC/ peer review should pass
 
-  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=billm'
+  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=jld'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes
