@@ -22,7 +22,7 @@ Mercurial wire protocol commands and HTTP commands logged to syslog
   $ hgmo exec hgweb0 grep hgweb /var/log/hg.log
   * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central?cmd=capabilities (glob)
   * hgweb: * BEGIN_PROTOCOL capabilities (glob)
-  * hgweb: * END_REQUEST 503 * * (glob)
+  * hgweb: * END_REQUEST 516 * * (glob)
   * hgweb: * BEGIN_REQUEST /mozilla-central * /mozilla-central?cmd=batch (glob)
   * hgweb: * BEGIN_PROTOCOL batch (glob)
   * hgweb: * END_REQUEST 42 * * (glob)
