@@ -208,6 +208,14 @@
     - pushdataaggregator.ini
     - pushdataaggregator-pending.ini
 
+- name: install `pushdataaggregator_groups` file
+  copy:
+    src: pushdataaggregator_groups
+    dest: /repo/hg/pushdataaggregator_groups
+    owner: root
+    group: root
+    mode: 0644
+
 - name: install repo-push script
   copy: src={{ vct }}/scripts/repo-push.sh
         dest=/usr/local/bin/repo-push.sh
