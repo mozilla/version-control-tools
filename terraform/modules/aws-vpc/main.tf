@@ -302,7 +302,7 @@ module "hgweb-mirror-b" {
   user_data = "${file("${path.module}/user_data.yml")}"
 }
 
-resource "aws_route53_record" "uw2record" {
+resource "aws_route53_record" "dns-record" {
   name = "${data.aws_region.current.name}.hgmointernal.net"
   type = "A"
   zone_id = "${var.route53_zone_id}"
