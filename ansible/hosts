@@ -26,3 +26,5 @@ servo-vcs-sync.mozops.net ansible_ssh_user=centos ansible_become=yes
 
 # Add hosts to this group to run the bootstrap procedure
 [bootstrap]
+10.191.11.158 ansible_sudo=yes ansible_become=yes
+10.191.11.108 ansible_sudo=yes ansible_become=yes
