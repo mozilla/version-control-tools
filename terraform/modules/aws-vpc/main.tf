@@ -11,7 +11,7 @@ data "aws_region" "current" {}
 data "aws_vpn_gateway" "mdc-vpn-gate" {
   filter {
     name = "tag:Name"
-    values = ["to-mdc's"]
+    values = ["to-mdc's", "to-mdc"]
   }
 }
 
