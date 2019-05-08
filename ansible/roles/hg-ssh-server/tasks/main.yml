@@ -136,7 +136,6 @@
     # Install pash.py first to ensure SSH root login works.
     - pash.py
     - hg_helper.py
-    - ldap_helper.py
     - pash_wrapper
     - repo_group.py
     - sh_helper.py

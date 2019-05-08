@@ -11,7 +11,7 @@ import re
 import shlex
 import subprocess
 
-from ldap_helper import (
+from hgmolib.ldap_helper import (
     get_ldap_attribute,
     get_ldap_settings,
     get_scm_groups,
