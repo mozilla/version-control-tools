@@ -192,24 +192,6 @@ resource "aws_security_group_rule" "rule-mozvpn-hgci" {
   ]
 }
 
-resource "aws_security_group_rule" "rule-telegraf-hgci" {
-  description = "Allow traffic from the Telegraf agent in mdc1"
-  security_group_id = "${aws_security_group.hgci-securitygroup.id}"
-  type = "ingress"
-  from_port = 8086
-  to_port = 8086
-  protocol = "tcp"
-  cidr_blocks = [
-    "10.48.74.19/32",
-    "10.48.74.45/32",
-    "10.48.74.46/32",
-    "10.48.74.51/32",
-    "10.48.74.52/32",
-    "10.48.74.53/32",
-    "10.48.74.54/32",
-  ]
-}
-
 resource "aws_security_group_rule" "rule-tcvpc-hgci" {
   description = "All traffic from Taskcluster VPC"
   security_group_id = "${aws_security_group.hgci-securitygroup.id}"
