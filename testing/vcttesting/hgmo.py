@@ -65,7 +65,7 @@ class HgCluster(object):
         'hgext/serverlog/__init__.py': '/var/hg/version-control-tools/hgext/serverlog/__init__.py',
         'hgserver/pash/pash.py': '/usr/local/bin/pash.py',
         'hgserver/pash/hg_helper.py': '/usr/local/bin/hg_helper.py',
-        'hgserver/pash/ldap_helper.py': '/usr/local/bin/ldap_helper.py',
+        'hgserver/hgmolib/hgmolib/ldap_helper.py': '/usr/local/bin/ldap_helper.py',
         'hgserver/pash/repo_group.py': '/usr/local/bin/repo_group.py',
         'hgserver/pash/sh_helper.py': '/usr/local/bin/sh_helper.py',
     }

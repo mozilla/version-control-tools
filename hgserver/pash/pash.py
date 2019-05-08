@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 import hg_helper
-import ldap_helper
+from hgmolib import ldap_helper
 
 NO_HG_ACCESS = '''
 A SSH connection has been established and your account (%s)
