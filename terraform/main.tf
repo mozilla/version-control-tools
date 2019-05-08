@@ -206,3 +206,19 @@ module "vpc-uw2" {
     aws = "aws.awsprovider-us-west-2"
   }
 }
+
+# Configure AWS VPC in us-west-1
+module "vpc-uw1" {
+  source = "./modules/aws-vpc"
+
+  cidr_block = "10.191.11.0/24"
+  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
+  mirror_ami = "${var.centos7_amis["us-west-1"]}"
+  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  taskcluster_vpc_cidr = "10.143.0.0/16"
+
+  providers = {
+    aws = "aws.awsprovider-us-west-1"
+  }
+}
+
