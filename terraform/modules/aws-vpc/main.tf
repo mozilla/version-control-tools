@@ -238,6 +238,19 @@ resource "aws_security_group_rule" "rule-hgci-lb" {
   source_security_group_id = "${aws_security_group.lb-securitygroup.id}"
 }
 
+resource "aws_acm_certificate" "hgcert" {
+  domain_name = "*.hgmointernal.net"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags {
+    Name = "hg certificate"
+  }
+}
+
 # Load balancer for traffic in this region
 resource "aws_lb" "internal-lb" {
   name = "${data.aws_region.current.name}-lb"
@@ -266,7 +279,7 @@ resource "aws_lb_listener" "mirror-https-listener" {
   port = 443
   protocol = "HTTPS"
   ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = "${var.certificate_arn}"
+  certificate_arn = "${aws_acm_certificate.hgcert.arn}"
 
   default_action {
     type = "forward"

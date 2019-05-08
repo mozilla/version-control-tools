@@ -192,19 +192,6 @@ resource "aws_route53_zone" "hgzone" {
   }
 }
 
-resource "aws_acm_certificate" "hgcert" {
-  domain_name = "*.hgmointernal.net"
-  validation_method = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags {
-    Name = "hg certificate"
-  }
-}
-
 # Configure AWS VPC in us-west-2
 module "vpc-uw2" {
   source = "./modules/aws-vpc"
@@ -212,7 +199,6 @@ module "vpc-uw2" {
   cidr_block = "10.191.5.0/24"
   metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
   mirror_ami = "${var.centos7_amis["us-west-2"]}"
-  certificate_arn = "${aws_acm_certificate.hgcert.arn}"
   route53_zone_id = "${aws_route53_zone.hgzone.id}"
   taskcluster_vpc_cidr = "10.144.0.0/16"
 
