@@ -101,15 +101,6 @@ module "pubsubnet-b" {
   vpc_id = "${aws_vpc.hgci-vpc.id}"
 }
 
-module "pubsubnet-c" {
-  source = "../pubsubnet"
-
-  availability_zone = "c"
-  cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 2)}"
-  route_table_id = "${aws_route_table.hgci-pub-routetable.id}"
-  vpc_id = "${aws_vpc.hgci-vpc.id}"
-}
-
 # Private subnets to hold
 module "privsubnet-a" {
   source = "../privsubnet"
@@ -128,17 +119,6 @@ module "privsubnet-b" {
   availability_zone = "b"
   cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 4)}"
   nat_gateway_id = "${module.pubsubnet-b.nat_gateway_id}"
-  taskcluster_vpc_cidr = "${var.taskcluster_vpc_cidr}"
-  vpc_id = "${aws_vpc.hgci-vpc.id}"
-  vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
-}
-
-module "privsubnet-c" {
-  source = "../privsubnet"
-
-  availability_zone = "c"
-  cidr_block = "${cidrsubnet("${var.cidr_block}", 3, 5)}"
-  nat_gateway_id = "${module.pubsubnet-c.nat_gateway_id}"
   taskcluster_vpc_cidr = "${var.taskcluster_vpc_cidr}"
   vpc_id = "${aws_vpc.hgci-vpc.id}"
   vpn_gateway_id = "${data.aws_vpn_gateway.mdc-vpn-gate.id}"
@@ -285,7 +265,6 @@ resource "aws_lb" "internal-lb" {
   subnets = [
     "${module.privsubnet-a.subnet_id}",
     "${module.privsubnet-b.subnet_id}",
-    "${module.privsubnet-c.subnet_id}",
   ]
 
   tags {
@@ -361,10 +340,8 @@ resource "aws_network_acl" "hgci-networkacl" {
   subnet_ids = [
     "${module.privsubnet-a.subnet_id}",
     "${module.privsubnet-b.subnet_id}",
-    "${module.privsubnet-c.subnet_id}",
     "${module.pubsubnet-a.subnet_id}",
     "${module.pubsubnet-b.subnet_id}",
-    "${module.pubsubnet-c.subnet_id}",
   ]
 
   # Allow SSH in from the world
