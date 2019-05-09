@@ -85,6 +85,9 @@ class DeployCommands(object):
     def hgweb_bootstrap(self, instance=None, hgweb_workers=None, hgssh_workers=None,
                         verbosity=None):
         from vcttesting.deploy import run_playbook
+        from vcttesting.vctutil import decrypt_sops_files
+
+        decrypt_sops_files()
 
         # Create extra_vars dict using only non-`None` values
         # Ansible defaults only work if the value is undefined
