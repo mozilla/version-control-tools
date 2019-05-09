@@ -292,7 +292,7 @@ module "hgweb-mirror-a" {
 
   availability_zone = "a"
   elb_target_group_arn = "${aws_lb_target_group.http-mirror-target-group.arn}"
-  instance_type = "c5d.xlarge"
+  instance_type = "c5d.2xlarge"
   mirror_ami = "${var.mirror_ami}"
   security_group_ids = [
     "${aws_security_group.hgci-securitygroup.id}",
@@ -306,7 +306,7 @@ module "hgweb-mirror-b" {
 
   availability_zone = "b"
   elb_target_group_arn = "${aws_lb_target_group.http-mirror-target-group.arn}"
-  instance_type = "c5d.xlarge"
+  instance_type = "c5d.2xlarge"
   mirror_ami = "${var.mirror_ami}"
   security_group_ids = [
     "${aws_security_group.hgci-securitygroup.id}",
