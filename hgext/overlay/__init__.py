@@ -385,7 +385,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
     with destrepo.lock():
         with destrepo.transaction('overlay'):
             for i, rev in enumerate(sourcerevs):
-                ui.progress(_('revisions'), i + 1, total=len(sourcerevs))
+                ui.makeprogress(_('revisions'), i + 1, total=len(sourcerevs))
                 sourcectx = sourcerepo[rev]
                 node = _overlayrev(sourcerepo, sourceurl, sourcectx,
                                    destrepo, destctx, prefix)
@@ -394,7 +394,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
                                              short(node), summary))
                 destctx = destrepo[node]
 
-            ui.progress(_('revisions'), None)
+            ui.makeprogress(_('revisions'), None)
 
 
 def _mirrorrepo(ui, repo, url):

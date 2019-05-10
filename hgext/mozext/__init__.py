@@ -313,6 +313,18 @@ else:
     matchdate = util.matchdate
 
 
+# TRACKING hg47
+# ui.progress -> ui.makeprogress
+def makeprogress(ui, *args, **kwargs):
+    """In HG47, the call to `ui.progress` was replaced with `ui.makeprogress`.
+    This method ensures the correct version of the method is called by inspecting
+    the ui object for the existance of the new `ui.makeprogress method`"""
+    if util.safehasattr(ui, "makeprogress"):
+        return ui.makeprogress(*args, **kwargs)
+    else:
+        return ui.progress(*args, **kwargs)
+
+
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
 with demandimport.deactivated():
@@ -605,9 +617,9 @@ def syncpushinfo(ui, repo, tree=None, **opts):
 
     for i, tree in enumerate(sorted(REPOS)):
         repo.changetracker.load_pushlog(tree)
-        ui.progress('pushlogsync', i, total=len(REPOS))
+        makeprogress(ui, 'pushlogsync', i, total=len(REPOS))
 
-    ui.progress('pushlogsync', None)
+    makeprogress(ui, 'pushlogsync', None)
 
 
 def print_changeset_pushes(ui, repo, rev, all=False):
@@ -1504,14 +1516,14 @@ def reposetup(ui, repo):
                 return
 
             for rev in self:
-                ui.progress('changeset', rev, total=len(self))
+                makeprogress(ui, 'changeset', rev, total=len(self))
                 ctx = self[rev]
                 bugs = parse_bugs(ctx.description())
                 if bugs:
                     self.changetracker.associate_bugs_with_changeset(bugs,
                         ctx.node())
 
-            ui.progress('changeset', None)
+            makeprogress(ui, 'changeset', None)
 
         def prune_relbranch_refs(self):
             todelete = [bm for bm in self._bookmarks.keys()
