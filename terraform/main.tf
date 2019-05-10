@@ -222,3 +222,17 @@ module "vpc-uw1" {
   }
 }
 
+# Configure AWS VPC in us-east-1
+module "vpc-ue1" {
+  source = "./modules/aws-vpc"
+
+  cidr_block = "10.191.12.0/24"
+  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
+  mirror_ami = "${var.centos7_amis["us-east-1"]}"
+  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  taskcluster_vpc_cidr = "10.145.0.0/16"
+
+  providers = {
+    aws = "aws.awsprovider-us-east-1"
+  }
+}
