@@ -27,4 +27,4 @@ runcmd:
   # on CentOS7
   - [ "mkdir", "/var/hg" ]
   - [ "cp", "/run/cloud-init/instance-data.json", "/var/hg/instance_data.json" ]
-  - [ "chown", "hg:hg", "/var/hg/instance_data.json" ]
+  - [ "chown", "hg:hg", "-R", "/var/hg" ]
