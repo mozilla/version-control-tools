@@ -17,6 +17,10 @@ resource "aws_instance" "hgweb-mirror" {
     volume_type = "standard"
   }
 
+  lifecycle {
+    ignore_changes = ["user_data"]
+  }
+
   tags {
     Name = "hgweb instance"
   }
