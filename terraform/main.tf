@@ -251,3 +251,18 @@ module "vpc-ue2" {
     aws = "aws.awsprovider-us-east-2"
   }
 }
+
+# Configure AWS VPC in eu-central-1
+module "vpc-ec1" {
+  source = "./modules/aws-vpc"
+
+  cidr_block = "10.191.14.0/24"
+  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
+  mirror_ami = "${var.centos7_amis["eu-central-1"]}"
+  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  taskcluster_vpc_cidr = "10.147.0.0/16"
+
+  providers = {
+    aws = "aws.awsprovider-eu-central-1"
+  }
+}
