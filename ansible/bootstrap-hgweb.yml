@@ -31,6 +31,13 @@
       become_user: hg
       register: hgsshjson
 
+- hosts: bootstrap
+  become: true
+  tasks:
+    - name: set hostname
+      hostname:
+        name: "{{ bootstrap_hostname }}"
+
 - name: bootstrap an hgweb instance
   import_playbook: deploy-hgweb.yml
   vars:
