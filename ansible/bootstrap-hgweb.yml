@@ -115,6 +115,14 @@
         value: 're:\{moz\}/try.*'
         state: present
 
+    - name: fix permissions on instance_data.json
+      file:
+        path: /var/hg/instance_data.json
+        owner: hg
+        group: hg
+        mode: 0600
+        state: file
+
     - name: turn on vcsreplicator
       service: name=vcsreplicator@{{ item }}.service
                state=started
