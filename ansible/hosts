@@ -19,10 +19,15 @@ hgssh1.dmz.mdc1.mozilla.com ansible_become=yes
 10.191.12.152 ansible_sudo=yes ansible_become=yes
 10.191.12.125 ansible_sudo=yes ansible_become=yes
 
+[ci-ue2]
+10.191.13.121 ansible_sudo=yes ansible_become=yes
+10.191.13.150 ansible_sudo=yes ansible_become=yes
+
 [hgweb-mirrors:children]
 ci-uw1
 ci-uw2
 ci-ue1
+ci-ue2
 
 [hgmo:children]
 hgssh-prod
@@ -38,5 +43,3 @@ servo-vcs-sync.mozops.net ansible_ssh_user=centos ansible_become=yes
 
 # Add hosts to this group to run the bootstrap procedure
 [bootstrap]
-10.191.13.121 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ue2-a-1
-10.191.13.150 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ue2-b-1
