@@ -43,5 +43,5 @@ servo-vcs-sync.mozops.net ansible_ssh_user=centos ansible_become=yes
 
 # Add hosts to this group to run the bootstrap procedure
 [bootstrap]
-10.191.13.121 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ue2-a-1
-10.191.13.150 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ue2-b-1
+10.191.13.121 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ec1-a-1
+10.191.13.150 ansible_sudo=yes ansible_become=yes bootstrap_hostname=hgweb-priv-ec1-b-1
