@@ -8,26 +8,30 @@ hgssh[1:3].dmz.mdc1.mozilla.com ansible_become=yes
 hgssh1.dmz.mdc1.mozilla.com ansible_become=yes
 
 [ci-uw2]
-10.191.5.126 ansible_sudo=yes ansible_become=yes
-10.191.5.137 ansible_sudo=yes ansible_become=yes
+10.191.5.126
+10.191.5.137
 
 [ci-uw1]
-10.191.11.157 ansible_sudo=yes ansible_become=yes
-10.191.11.121 ansible_sudo=yes ansible_become=yes
+10.191.11.157
+10.191.11.121
 
 [ci-ue1]
-10.191.12.152 ansible_sudo=yes ansible_become=yes
-10.191.12.125 ansible_sudo=yes ansible_become=yes
+10.191.12.152
+10.191.12.125
 
 [ci-ue2]
-10.191.13.121 ansible_sudo=yes ansible_become=yes
-10.191.13.150 ansible_sudo=yes ansible_become=yes
+10.191.13.121
+10.191.13.150
 
 [hgweb-mirrors:children]
 ci-uw1
 ci-uw2
 ci-ue1
 ci-ue2
+
+[hgweb-mirrors:vars]
+ansible_sudo=yes
+ansible_become=yes
 
 [hgmo:children]
 hgssh-prod
