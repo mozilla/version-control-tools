@@ -48,13 +48,17 @@ var alert_time_lag_heads = dataframe_heads
 
 // Alert
 alert_time_lag_consumer
+        .stateChangesOnly(2m)
         .slack()
 
 alert_message_lag_consumer
+        .stateChangesOnly(2m)
         .slack()
 
 alert_time_lag_heads
+        .stateChangesOnly(2m)
         .slack()
 
 alert_message_lag_heads
+        .stateChangesOnly(2m)
         .slack()
