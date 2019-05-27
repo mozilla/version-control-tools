@@ -10,8 +10,9 @@ var alert = data
     |alert()
         .warn(lambda: "used_percent" > 90)
         .crit(lambda: "used_percent" > 95)
-        .message('[{{ index .Tags "host" }}] disk usage is {{ .Level }}: {{ index .Fields "used_percent" | printf "%0.2f" }}% used')
+        .message('*[{{ index .Tags "host" }}]* disk usage is *{{ .Level }}*: {{ index .Fields "used_percent" | printf "%0.2f" }}% used')
 
 // Alert
 alert
-    .log('/var/log/kapacitor/alerts.log')
+        .stateChangesOnly(1h)
+        .slack()

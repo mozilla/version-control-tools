@@ -13,6 +13,20 @@ var dataframe_heads = stream
     |eval(lambda: int("available") - int("offset"))
         .as('message_lag')
 
+var dataframe_aggregator = stream
+    |from()
+        .measurement('exec_vcsreplicator_aggregator')
+        .groupBy('host', 'partition')
+    |eval(lambda: int("consumed_offset") - int("acked_offset"))
+        .as('message_lag')
+
+var dataframe_aggregator_pending = stream
+    |from()
+        .measurement('exec_vcsreplicator_aggregator_pending')
+        .groupBy('host', 'partition')
+    |eval(lambda: int("consumed_offset") - int("acked_offset"))
+        .as('message_lag')
+
 // Threshold
 var alert_message_lag_consumer = dataframe_consumer
     |alert()
@@ -46,6 +60,22 @@ var alert_time_lag_heads = dataframe_heads
         .critReset(lambda: "lag_time" <= 3)
         .message('*[{{ index .Tags "host" }}]* vcsreplicator-heads partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "lag_time" }} messages')
 
+var alert_message_lag_aggregator = dataframe_aggregator
+    |alert()
+        .warn(lambda: "message_lag" > 30)
+        .crit(lambda: "message_lag" > 50)
+        .warnReset(lambda: "message_lag" < 2)
+        .critReset(lambda: "message_lag" < 2)
+        .message('*[{{ index .Tags "host" }}]* vcsreplicator-aggregator partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
+
+var alert_message_lag_aggregator_pending = dataframe_aggregator_pending
+    |alert()
+        .warn(lambda: "message_lag" > 30)
+        .crit(lambda: "message_lag" > 50)
+        .warnReset(lambda: "message_lag" < 2)
+        .critReset(lambda: "message_lag" < 2)
+        .message('*[{{ index .Tags "host" }}]* vcsreplicator-pending partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
+
 // Alert
 alert_time_lag_consumer
         .stateChangesOnly(2m)
@@ -60,5 +90,13 @@ alert_time_lag_heads
         .slack()
 
 alert_message_lag_heads
+        .stateChangesOnly(2m)
+        .slack()
+
+alert_message_lag_aggregator
+        .stateChangesOnly(2m)
+        .slack()
+
+alert_message_lag_aggregator_pending
         .stateChangesOnly(2m)
         .slack()
