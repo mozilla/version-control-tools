@@ -27,14 +27,12 @@ from ..checks import (
 
 DOM_PEERS = [
     dict(name='Andrea Marchesini', nick=['baku'], email=['amarchesini@mozilla.com']),
+    dict(name='Andreas Farre', nick=['farre'], email=['afarre@mozilla.com']),
     dict(name='Andrew McCreight', nick=['mccr8'], email=['continuation@gmail.com']),
-    dict(name='Ben Kelly', nick=['bkelly'], email=['bkelly@mozilla.com', 'ben@wanderview.com']),
-    dict(name='Blake Kaplan', nick=['mrbkap'], email=['mrbkap@gmail.com']),
     dict(name='Bobby Holley', nick=['bholley'], email=['bholley@mozilla.com']),
     dict(name='Boris Zbarsky', nick=['bz', 'bzbarsky'], email=['bzbarsky@mit.edu']),
     dict(name='Ehsan Akhgari', nick=['ehsan'], email=['ehsan@mozilla.com', 'ehsan.akhgari@gmail.com']),
     dict(name='Henri Sivonen', nick=['hsivonen'], email=['hsivonen@hsivonen.fi']),
-    dict(name='Kyle Machulis', nick=['qdot', 'kmachulis'], email=['qdot@mozilla.com', 'kmachulis@mozilla.com', 'kyle@nonpolynomial.com']),
     dict(name='Nika Layzell', nick=['mystor', 'nika'], email=['nika@thelayzells.com']),
     dict(name='Olli Pettay', nick=['smaug'], email=['olli.pettay@helsinki.fi', 'bugs@pettay.fi']),
     dict(name='Peter Van der Beken', nick=['peterv'], email=['peterv@propagandism.org']),
