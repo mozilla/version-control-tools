@@ -1,0 +1,16 @@
+// Dataframe
+var dataframe_tryheads = stream
+    |from()
+        .measurement('exec_try_heads')
+
+// Threshold
+var alert_tryheads = dataframe_tryheads
+    |alert()
+        .warn(lambda: "value" > 40000)
+        .crit(lambda: "value" > 50000)
+        .message('Try heads count is *{{ .Level }}*: {{ index .Fields "value" }} heads')
+
+// Alert
+alert_try_heads
+        .stateChangesOnly(3d)
+        .slack()
