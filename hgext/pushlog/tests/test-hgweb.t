@@ -40,14 +40,14 @@ Push info should show up in changeset view
   <a href="/pushloghtml">pushlog</a> |
   <tr><td>push id</td><td><a href="/pushloghtml?changeset=55482a6fb4b1881fa8f746fd52cf6f096bb21c89">1</a></td></tr>
   <tr><td>push user</td><td>user1@example.com</td></tr>
-  <tr><td>push date</td><td>*</td></tr> (glob)
+  <tr><td>push date</td><td class="date age">*</td></tr> (glob)
 
   $ http http://localhost:$HGPORT/rev/6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2 --body-file body > /dev/null
   $ grep push body
   <a href="/pushloghtml">pushlog</a> |
   <tr><td>push id</td><td><a href="/pushloghtml?changeset=6c9721b3b4dfc8c1f2d3103595e8bb2ffe5b8ff2">2</a></td></tr>
   <tr><td>push user</td><td>user2@example.com</td></tr>
-  <tr><td>push date</td><td>*</td></tr> (glob)
+  <tr><td>push date</td><td class="date age">*</td></tr> (glob)
 
   $ http http://localhost:$HGPORT/log --body-file body > /dev/null
   $ grep push body
