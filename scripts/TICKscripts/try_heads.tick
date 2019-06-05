@@ -11,6 +11,6 @@ var alert_tryheads = dataframe_tryheads
         .message('Try heads count is *{{ .Level }}*: {{ index .Fields "value" }} heads')
 
 // Alert
-alert_try_heads
-        .stateChangesOnly(3d)
+alert_tryheads
+        .stateChangesOnly(72h)
         .slack()
