@@ -23,6 +23,17 @@ tag_keys = [
   "partition"
 ]
 
+[[inputs.exec]]
+commands = [
+  "/var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/try log -r 0 -T '{revset(\"head()\")|count}'"
+]
+
+data_format = "value"
+data_type = "integer"
+timeout = "5m"
+interval = "1d"
+name_suffix = "_try_heads"
+
 # Enable the Procstat input plugin to monitor
 # vcsreplicator processes
 [[inputs.procstat]]
