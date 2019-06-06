@@ -46,7 +46,7 @@
   checklink-target (hg48 !)
   checknoexec (hg48 !)
   hgtagsfnodes1
-  manifestfulltextcache
+  manifestfulltextcache (hg50 !)
   rbc-names-v1
   rbc-revs-v1
   tags2-visible

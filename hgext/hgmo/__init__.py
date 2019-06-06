@@ -78,7 +78,7 @@ from mozhg.util import (
 from mercurial.wireprotoserver import httpv1protocolhandler as webproto
 
 minimumhgversion = '4.8'
-testedwith = '4.8 4.9'
+testedwith = '4.8 4.9 5.0'
 
 cmdtable = {}
 
