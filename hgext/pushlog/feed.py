@@ -28,7 +28,7 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.8'
+testedwith = '4.8 4.9 5.0'
 minimumhgversion = '4.8'
 
 cal = pdt.Calendar()
