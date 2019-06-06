@@ -22,6 +22,7 @@ from mercurial import (
     localrepo,
     registrar,
     revset,
+    templateutil,
     util,
     wireprotov1server as wireproto,
 )
@@ -1051,7 +1052,8 @@ def template_pushdate(context, mapping):
     cache = context.resource(mapping, 'cache')
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
-    return dateutil.makedate(when) if when else None
+    return templateutil.date(dateutil.makedate(when), showfmt='%d.0%d') \
+        if when else None
 
 
 @templatekeyword('pushbasenode', requires={'repo', 'context', 'cache'})
