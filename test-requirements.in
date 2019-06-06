@@ -10,9 +10,6 @@ coverage
 # Used by docker.py.
 docker
 
-# used to test s3 wireprotocache
-Flask
-
 # For code linting.
 flake8
 
@@ -21,9 +18,6 @@ lockfile
 
 # Used by docker.py.
 mechanize
-
-# used to test s3 wireprotocache
-moto
 
 # Used by hgweb.
 mozbuild==0.2
@@ -45,7 +39,3 @@ python-ldap
 
 # Used for some Python unit tests.
 responses
-
-# used to test s3 wireprotocache
-
-simplejson
