@@ -37,7 +37,7 @@ with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
 
 from mozhg.util import import_module
 
-testedwith = '4.7 4.8'
+testedwith = '4.7 4.8 4.9 5.0'
 minimumhgversion = '4.7'
 
 cmdtable = {}
@@ -236,10 +236,17 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
         if renamed:
             copied = '%s%s' % (prefix, renamed[0])
 
-        return context.memfilectx(repo, memctx, path, data,
-                                  islink=islink,
-                                  isexec=isexec,
-                                  copied=copied)
+        # TRACKING hg50 - `copied` renamed to `copysource`
+        if util.versiontuple(n=2) >= (5, 0):
+            return context.memfilectx(repo, memctx, path, data,
+                                      islink=islink,
+                                      isexec=isexec,
+                                      copysource=copied)
+        else:
+            return context.memfilectx(repo, memctx, path, data,
+                                      islink=islink,
+                                      isexec=isexec,
+                                      copied=copied)
 
     parents = [destctx.node(), None]
     files = ['%s%s' % (prefix, f) for f in sourcectx.files()]
