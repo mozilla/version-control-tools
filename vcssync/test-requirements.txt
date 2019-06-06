@@ -238,10 +238,8 @@ markupsafe==1.1.0 \
     --hash=sha256:f82e347a72f955b7017a39708a3667f106e6ad4d10b25f237396a7115d8ed5fd \
     --hash=sha256:fb7c206e01ad85ce57feeaaa0bf784b97fa3cad0d4a5737bc5295785f5c613a1 \
     # via jinja2
-mercurial==4.8 \
-    --hash=sha256:039c3ba92f37a6eb2868443c675bd3fac2b0057d10ded5443980e5862ceeecfb \
-    --hash=sha256:c56b403ad3b83ea91f3758c6df25b9f77deb4affada6c63160b3d325dc923f03 \
-    --hash=sha256:c8efb32a6b3ccdce7d032b4e227cc07dfacdbe653ce2844c27b5def531628a7d
+mercurial==5.0.1 \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce
 mozfile==2.0.0 \
     --hash=sha256:22a43f3bc320c3bda27e54b293c23a51660f4a00ec6959ab70ca6136d702f578 \
     --hash=sha256:7355643fca705f43d9412d444fb59588fbbd25f0d1e7592b9482f84e3d23bc8e \

@@ -323,16 +323,14 @@ mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
     --hash=sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f \
     # via flake8
-mechanize==0.3.7 \
-    --hash=sha256:630e241204a57ca4b026c1e8d1a9b61ca0500929b28e82dab7c0763c650a8717 \
-    --hash=sha256:ee66e1a6af790898894dd0318914ced413d94f46a54f881eb337081ff9702cd2
-mercurial==4.8 \
-    --hash=sha256:039c3ba92f37a6eb2868443c675bd3fac2b0057d10ded5443980e5862ceeecfb \
-    --hash=sha256:c56b403ad3b83ea91f3758c6df25b9f77deb4affada6c63160b3d325dc923f03 \
-    --hash=sha256:c8efb32a6b3ccdce7d032b4e227cc07dfacdbe653ce2844c27b5def531628a7d
-mock==2.0.0 \
-    --hash=sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1 \
-    --hash=sha256:b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba \
+mechanize==0.4.2 \
+    --hash=sha256:b1f9c755867869c4be54c0d506418353b67a89c2a10fff0c933c6ac00754ebc5 \
+    --hash=sha256:b680ca1b4fabe5ef52024d120f40b8e2ed7d175ed4d67225d2c477dac7c7a58b
+mercurial==5.0.1 \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce
+mock==3.0.5 \
+    --hash=sha256:83657d894c90d5681d62155c82bda9c1187827525880eda8ff5df4ec813437c3 \
+    --hash=sha256:d157e52d4e5b938c550f39eb2fd15610db062441a9c2747d3dbfa9298211d0f8 \
     # via moto, responses
 more-itertools==4.3.0 \
     --hash=sha256:c187a73da93e7a8acc0001572aebc7e3c69daf7bf6881a2cea10650bd4420092 \
