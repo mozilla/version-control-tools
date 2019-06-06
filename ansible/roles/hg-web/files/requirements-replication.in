@@ -9,7 +9,7 @@ boto3
 
 futures
 kafka-python==1.4.2
-Mercurial==4.9.1
+mercurial==5.0.1
 python-hglib
 PyYAML
 six

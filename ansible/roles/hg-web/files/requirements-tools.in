@@ -7,7 +7,7 @@ boto3
 bloxtool==0.33
 cbor2
 futures
-Mercurial==4.9.1
+mercurial==5.0.1
 python-hglib
 requests
 tabulate

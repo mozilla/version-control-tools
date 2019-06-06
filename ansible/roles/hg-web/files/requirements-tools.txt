@@ -45,13 +45,11 @@ jmespath==0.9.4 \
     --hash=sha256:3720a4b1bd659dd2eecad0666459b9788813e032b83e7ba58578e48254e0a0e6 \
     --hash=sha256:bde2aef6f44302dfb30320115b17d030798de8c4110e28d5cf6cf91a7a31074c \
     # via boto3, botocore
-mercurial==4.9.1 \
-    --hash=sha256:1bdd21bb87d1e05fb5cd395d488d0e0cc2f2f90ce0fd248e31a03595da5ccb47 \
-    --hash=sha256:3c25abd3a32cc179500f53fef4c56d6a61767ad1b280fe659aae6c0417697d7a \
-    --hash=sha256:d6c4e5e51ffc13d6412c526690a455dffc206a81627afe6e9f59e81c3d5c1fd9
-pyaml==18.11.0 \
-    --hash=sha256:39470e99cfb7a0ef79e593fee626328283cd6d1a9c23c7e30f0d3a6933f3a235 \
-    --hash=sha256:b96292cc409e0f222b6fecff96afd2e19cfab5d1f2606344907751d42301263a \
+mercurial==5.0.1 \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce
+pyaml==19.4.1 \
+    --hash=sha256:a2dcbc4a8bb00b541efd1c5a064d93474d4f41ded1484fbb08bec9d236523931 \
+    --hash=sha256:c79ae98ececda136a034115ca178ee8bf3aa7df236c488c2f55d12f177b88f1e \
     # via bloxtool
 python-dateutil==2.8.0 \
     --hash=sha256:7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb \

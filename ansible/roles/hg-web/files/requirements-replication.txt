@@ -31,10 +31,8 @@ jmespath==0.9.4 \
 kafka-python==1.4.2 \
     --hash=sha256:6a5c516f540f4b13b78c64a85dd42dc38fe29257e2fae6393fc5daff9106389b \
     --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
-mercurial==4.9.1 \
-    --hash=sha256:1bdd21bb87d1e05fb5cd395d488d0e0cc2f2f90ce0fd248e31a03595da5ccb47 \
-    --hash=sha256:3c25abd3a32cc179500f53fef4c56d6a61767ad1b280fe659aae6c0417697d7a \
-    --hash=sha256:d6c4e5e51ffc13d6412c526690a455dffc206a81627afe6e9f59e81c3d5c1fd9
+mercurial==5.0.1 \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce
 python-dateutil==2.8.0 \
     --hash=sha256:7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb \
     --hash=sha256:c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e \
