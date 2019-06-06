@@ -32,7 +32,7 @@ from mozhg.util import (
 
 
 minimumhgversion = '4.8'
-testedwith = '4.8 4.9'
+testedwith = '4.8 4.9 5.0'
 
 configtable = {}
 configitem = registrar.configitem(configtable)

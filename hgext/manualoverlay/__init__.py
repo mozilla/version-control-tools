@@ -26,7 +26,7 @@ with demandimport.deactivated():
     import requests  # noqa
 
 
-testedwith = '4.4 4.5 4.6 4.7 4.8'
+testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
 
 cmdtable = {}
 
