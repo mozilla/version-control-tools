@@ -10,6 +10,7 @@
     # This is likely already installed, but needed for Docker.
     - cronie
     - gcc
+    - git
     - httpd
     # To build mod_wsgi from source so it can be placed in virtualenvs.
     - httpd-devel
@@ -632,3 +633,9 @@
   # Don't do this on Docker because it has its own mechanism for
   # starting.
   when: vct_dir.stat.exists == False
+
+- name: clone git-cinnabar for the cinnabarclone mercurial extension
+  git: repo=https://github.com/glandium/git-cinnabar
+       dest=/var/lib/git-cinnabar
+       version=034141c4091aa059df759a6841d7f2276ada2c08
+       force=yes

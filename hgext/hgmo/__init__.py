@@ -652,16 +652,28 @@ def pull(orig, repo, remote, *args, **kwargs):
     if not repo.ui.configbool('hgmo', 'pullclonebundlesmanifest', False):
         return res
 
-    if not remote.capable('clonebundles'):
+    has_clonebundles = remote.capable('clonebundles')
+    if not has_clonebundles:
         if repo.vfs.exists('clonebundles.manifest'):
             repo.ui.status(_('deleting local clonebundles.manifest\n'))
             repo.vfs.unlink('clonebundles.manifest')
-        return res
 
-    with repo.wlock():
-        repo.ui.status(_('pulling clonebundles manifest\n'))
-        manifest = remote._call('clonebundles')
-        repo.vfs.write('clonebundles.manifest', manifest)
+    has_cinnabarclone = remote.capable('cinnabarclone')
+    if not has_cinnabarclone:
+        if repo.vfs.exists('cinnabar.manifest'):
+            repo.ui.status(_('deleting local cinnabar.manifest\n'))
+            repo.vfs.unlink('cinnabar.manifest')
+
+    if has_clonebundles or has_cinnabarclone:
+        with repo.wlock():
+            if has_clonebundles:
+                repo.ui.status(_('pulling clonebundles manifest\n'))
+                manifest = remote._call('clonebundles')
+                repo.vfs.write('clonebundles.manifest', manifest)
+            if has_cinnabarclone:
+                repo.ui.status(_('pulling cinnabarclone manifest\n'))
+                manifest = remote._call('cinnabarclone')
+                repo.vfs.write('cinnabar.manifest', manifest)
 
     return res
 
