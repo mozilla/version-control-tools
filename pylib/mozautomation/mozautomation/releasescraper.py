@@ -170,7 +170,7 @@ def find_nightly_builds(start_day, end_day=None):
 
         build_fs = []
 
-        for day, builds in sorted(builds_by_day.iteritems()):
+        for day, builds in sorted(builds_by_day.items()):
             for build, path in builds:
                 if build != 'mozilla-central':
                     continue

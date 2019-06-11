@@ -341,7 +341,7 @@ def revset_firefoxrelease(repo, subset, x):
         return revset.baseset()
 
     def get_revs():
-        for rev, builds in release_builds_by_revision(db, repo).iteritems():
+        for rev, builds in release_builds_by_revision(db, repo).items():
             for build in builds:
                 if channels and build.channel not in channels:
                     continue

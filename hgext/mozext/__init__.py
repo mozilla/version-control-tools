@@ -728,7 +728,7 @@ def mybookmarks(ui, repo):
     prefix = '%s/' % nick
     me = ui.config('ui', 'username')
 
-    for bookmark, node in sorted(repo._bookmarks.iteritems()):
+    for bookmark, node in sorted(repo._bookmarks.items()):
         user = repo[node].user()
 
         if user != me and not bookmark.startswith(prefix):

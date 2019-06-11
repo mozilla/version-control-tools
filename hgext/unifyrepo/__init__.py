@@ -305,7 +305,7 @@ def unifyrepo(ui, settings, **opts):
             revnode[rev] = node
             allnodes.add(node)
 
-        noderev = {v: k for k, v in revnode.iteritems()}
+        noderev = {v: k for k, v in revnode.items()}
 
         localpushcount = 0
         pushnodecount = 0
@@ -375,7 +375,7 @@ def unifyrepo(ui, settings, **opts):
         ui.write('aggregating %d/%d revisions for %d heads from %s\n' % (
                  len(sourcerevs), len(cl), len(sourceheadrevs), source['name']))
 
-    nodepushinfo = {k: v for k, v in nodepushinfo.iteritems() if k in sourcenodes}
+    nodepushinfo = {k: v for k, v in nodepushinfo.items() if k in sourcenodes}
 
     ui.write('aggregating %d/%d nodes from %d original pushes\n' % (
              len(nodepushinfo), len(allnodes), pushcount))
@@ -387,7 +387,7 @@ def unifyrepo(ui, settings, **opts):
     # of each linear range inside that list.
 
     # (time, source, rev, user, pushid) -> node
-    inversenodeinfo = {v: k for k, v in nodepushinfo.iteritems()}
+    inversenodeinfo = {v: k for k, v in nodepushinfo.items()}
 
     destui = ui.copy()
     destui.setconfig('format', 'aggressivemergedeltas', True)
@@ -396,7 +396,7 @@ def unifyrepo(ui, settings, **opts):
     destrepo = hg.repository(destui, path=conf.destpath,
                              create=not os.path.exists(conf.destpath))
     destcl = destrepo.changelog
-    pullpushinfo = {k: v for k, v in inversenodeinfo.iteritems() if not destcl.hasnode(v)}
+    pullpushinfo = {k: v for k, v in inversenodeinfo.items() if not destcl.hasnode(v)}
 
     ui.write('%d/%d nodes will be pulled\n' % (len(pullpushinfo), len(inversenodeinfo)))
 

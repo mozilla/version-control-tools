@@ -141,7 +141,7 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
     sourceman = sourcectx.manifest()
     destman = destctx.manifest()
 
-    sourcefiles = set(sourceman.iterkeys())
+    sourcefiles = set(sourceman.keys())
     destfiles = set(p[len(prefix):] for p in destman if p.startswith(prefix))
 
     if sourcefiles ^ destfiles:

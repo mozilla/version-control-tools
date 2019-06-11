@@ -322,7 +322,7 @@ def allformatted(repo, local, other, ancestor):
     local_formatting = formatted(repo, ancestor, local)
     other_formatting = formatted(repo, ancestor, other)
     full_formatting = local_formatting.copy()
-    for key, value in other_formatting.iteritems():
+    for key, value in other_formatting.items():
         if key in local_formatting:
             value = value | local_formatting[key]
         full_formatting[key] = value
@@ -333,7 +333,7 @@ def allformatted(repo, local, other, ancestor):
         (ancestor, full_formatting)
     ]
     for ctx, formatting in all:
-        for tool, patterns in formatting.iteritems():
+        for tool, patterns in formatting.items():
             formatting[tool] = rootedmatch(repo, ctx, patterns)
 
     final = tuple(formatting for __, formatting in all)

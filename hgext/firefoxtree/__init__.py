@@ -725,7 +725,7 @@ def reposetup(ui, repo):
         return []
 
     def nodemap(r, node):
-        return [name for name, n in r.firefoxtrees.iteritems()
+        return [name for name, n in r.firefoxtrees.items()
                 if n == node]
 
     n = namespaces.namespace('fxtrees',

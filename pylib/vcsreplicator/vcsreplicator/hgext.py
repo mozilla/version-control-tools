@@ -276,7 +276,7 @@ def txnclosehook(ui, repo, **kwargs):
         #
         # We send these markers during the changegroup hook if it fires,
         # which should be after this hook.
-        for key, value in sorted(repo._replicationinfo['obsolescence'].iteritems()):
+        for key, value in sorted(repo._replicationinfo['obsolescence'].items()):
             sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
 
 
@@ -309,7 +309,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.status(_('recorded changegroup in replication log in %.3fs\n') %
                     duration)
 
-        for key, value in sorted(repo._replicationinfo['obsolescence'].iteritems()):
+        for key, value in sorted(repo._replicationinfo['obsolescence'].items()):
             sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
 
 

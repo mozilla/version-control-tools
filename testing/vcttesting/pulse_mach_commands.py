@@ -69,7 +69,7 @@ class PulseCommands(object):
                     'routing_key': body['_meta']['routing_key'],
                 },
             }
-            for k, v in body['payload'].iteritems():
+            for k, v in body['payload'].items():
                 d[k] = v
 
             data.append(d)

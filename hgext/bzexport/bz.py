@@ -28,7 +28,7 @@ def make_url(api_server, auth, command, args={}):
     if auth is None and not args.keys():
         return url
     params = [auth.auth()] if auth else []
-    params.extend([k + "=" + urllib.quote(str(v)) for k, v in args.iteritems()])
+    params.extend([k + "=" + urllib.quote(str(v)) for k, v in args.items()])
     return url + "?" + '&'.join(params)
 
 
