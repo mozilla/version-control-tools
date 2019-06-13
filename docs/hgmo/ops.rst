@@ -55,7 +55,7 @@ will need to:
 2. `Install the GCP SDK`_.
 3. `Install sops and go through the GCP setup steps`_.
 
-With `sops` installed, you can encrypt and decrypt files with:
+With `sops` installed, you can encrypt and decrypt files with::
 
     $ sops --decrypt path/to/file/configfile.yaml
     $ sops --encrypt path/to/file/configfile.yaml
