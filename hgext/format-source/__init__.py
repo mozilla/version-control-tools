@@ -76,7 +76,7 @@ from mozhg.util import (
 )
 
 __version__ = '0.1.0.dev'
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9'
+testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
 minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'
 
@@ -94,6 +94,16 @@ if util.safehasattr(registrar, 'configitem'):
     configitem('format-source', '.*', default=None, generic=True)
 
 file_storage_path = '.hg-format-source'
+
+
+# TRACKING hg50
+# cmdutil.add function signature changed
+def cmdutiladd(ui, repo, storage_matcher):
+    if util.versiontuple(n=2) >= (5, 0):
+        uipathfn = scmutil.getuipathfn(repo, forcerelativevalue=True)
+        cmdutil.add(ui, repo, storage_matcher, "", uipathfn, True)
+    else:
+        cmdutil.add(ui, repo, storage_matcher, "", True)
 
 
 def return_default_clang_format(repo):
@@ -213,7 +223,7 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
 
         if file_storage_path not in wctx:
             storage_matcher = scmutil.match(wctx, ['path:' + file_storage_path])
-            cmdutil.add(ui, repo, storage_matcher, '', True)
+            cmdutiladd(ui, repo, storage_matcher)
 
         # commit the whole
         with repo.lock():
