@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import json
 from mercurial import (
     commands,
     context,
@@ -52,6 +53,16 @@ def push_to_try(ui, repo, server, message=None):
         ui.status("STOP! Either try_task_config.json must be added or the commit "
                   "message must contain try syntax.\n")
         return
+
+    if 'try_task_config.json' in cctx:
+        data = repo.wvfs.tryread('try_task_config.json')
+        try:
+            # data could be an empty string if tryread failed, which will
+            # produce a ValueError here.
+            data = json.loads(data)
+        except ValueError as e:
+            ui.status("Error reading try_task_config.json: %s\n" % e.message)
+            return
 
     # Invent a temporary commit with our message.
     ui.status("Creating temporary commit for remote...\n")

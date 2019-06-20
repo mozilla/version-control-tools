@@ -21,8 +21,14 @@ Test pushing with a try_task_config.json works
   $ hg add file1.txt
   $ hg commit -m "file1.txt added"
 
+First test push should fail
   $ echo line1 > try_task_config.json
   $ hg add try_task_config.json
+  $ hg push-to-try -m "Add try_task_config.json" -s ../remote
+  Error reading try_task_config.json: No JSON object could be decoded
+
+Second test push should succeed
+  $ echo '{ "key": "this just has to be valid json" }' > try_task_config.json
   $ hg push-to-try -m "Add try_task_config.json" -s ../remote
   Creating temporary commit for remote...
   A try_task_config.json
@@ -47,7 +53,7 @@ Test try commit made it to our remote
 
   $ cd ../remote
   $ hg log
-  changeset:   1:d406ccbd602f
+  changeset:   1:6b750ec7e52b
   tag:         tip
   user:        test
   date:        Thu Jan 01 00:00:00 1970 +0000
@@ -65,4 +71,4 @@ Test try commit made it to our remote
   --- /dev/null
   +++ b/try_task_config.json
   @@ -0,0 +1,1 @@
-  +line1
+  +{ "key": "this just has to be valid json" }
