@@ -9,7 +9,6 @@
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
   with_items:
-    - git
     - sudo
     - tar
     - yum-plugin-versionlock
@@ -360,8 +359,5 @@
   ignore_errors: True
   when: vct_dir.stat.exists == False
 
-- name: clone git-cinnabar for the cinnabarclone mercurial extension
-  git: repo=https://github.com/glandium/git-cinnabar
-       dest=/var/lib/git-cinnabar
-       version=034141c4091aa059df759a6841d7f2276ada2c08
-       force=yes
+- name: install cinnabarclone
+  include: ../../../tasks/cinnabarclone.yml
