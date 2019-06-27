@@ -21,3 +21,5 @@
   changeset 2:47fdd3ef011e backs out changeset 1:907f17e15674
   $ hg log -r -2 --template '{backedoutby}\n'
   47fdd3ef011e5b86fe4ce90a88d362ac03361992
+  $ hg log -r 2 --template '{join(backsoutnodes, " ")}\n'
+  907f17e15674

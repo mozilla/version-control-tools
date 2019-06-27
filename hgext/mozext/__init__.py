@@ -333,6 +333,7 @@ with demandimport.deactivated():
     )
 
     from mozautomation.commitparser import (
+        parse_backouts,
         parse_bugs,
         parse_reviewers,
     )
@@ -1069,6 +1070,18 @@ def template_bugs(repo, ctx, **args):
         bugs = templateutil.hybridlist(bugs, 'bugs')
 
     return bugs
+
+
+@templatekeyword('backsoutnodes')
+def template_backsoutnodes(repo, ctx, **args):
+    description = encoding.fromlocal(ctx.description())
+    backouts = parse_backouts(description)
+    # return just the nodes, not the bug numbers
+    if backouts and backouts[0]:
+        # TRACKING hg47
+        if templateutil:
+            return templateutil.hybridlist(backouts[0], 'backouts')
+        return backouts[0]
 
 
 @templatekeyword('reviewer')
