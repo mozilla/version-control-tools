@@ -157,7 +157,10 @@ GROUP_REPOS = {
         'Project Repos (projects/)',
     },
     'scm_level_3': {
-        'Firefox Repos (mozilla-central, releases/*)',
+        'Firefox Repos (mozilla-central via Lando, releases/*)',
+    },
+    'scm_allow_direct_push': {
+        'Firefox Repos (mozilla-central via direct push)',
     },
     'scm_autoland': {
         'Autoland (integration/autoland)',

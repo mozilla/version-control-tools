@@ -6,3 +6,4 @@ creation_rules:
 # Add files that must be auto-decrypted by `./deploy` to this list
 files:
   - ansible/roles/monitoring-agent/defaults/main.yml
+  - ansible/roles/hg-ssh/defaults/main.yml

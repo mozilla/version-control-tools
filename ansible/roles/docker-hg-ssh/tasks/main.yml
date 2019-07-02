@@ -62,6 +62,25 @@
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_testing
            requirements=../roles/docker-hg-ssh/files/requirements-testing.txt
-           
+
 - name: install unifyrepo testing config
   copy: src=unify-mozilla-unified-testing.ini dest=/etc/mercurial/unify-mozilla-unified.ini mode=0755
+
+
+- name: set privileged push hook repos to dummy values
+  ini_file:
+    dest: /etc/mercurial/hgrc
+    section: mozilla
+    option: priviliged_push_repo_list
+    value: not-mozilla-central
+    owner: hg
+    group: hg
+
+- name: set sentry_dns to empty value
+  ini_file:
+    dest: /etc/mercurial/hgrc
+    section: mozilla
+    option: sentry_dsn
+    value: ""
+    owner: hg
+    group: hg

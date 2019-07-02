@@ -54,6 +54,9 @@ UNIT_TEST_DIRS = {
     },
     'cross-channel-l10n/tests': {
         'venvs': {'cross-channel-l10n',},
+    },
+    'hghooks/tests': {
+       'venvs': {'global'},
     }
 }
 

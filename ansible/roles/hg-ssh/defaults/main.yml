@@ -1,2 +1,14 @@
----
-pash_hostname: "hg.mozilla.org"
+pash_hostname: hg.mozilla.org
+sentry_dsn_encrypted: ENC[AES256_GCM,data:1ScBXbkTEVJo5qd8uFz28w6zQTD+TCuXox4W7tY8BSnTQ8amGH16II7Tq4RouomgpTsQO42rYCi+4I6B1B1NLj+68g==,iv:B3jcbapkh/ZOuNwD+R/artiX1b5MaUf0BDdxOPz1GLA=,tag:j0XHT9ymJRb9LwQukboWPQ==,type:str]
+sops:
+    kms: []
+    gcp_kms:
+    -   resource_id: projects/hgmo-236019/locations/global/keyRings/hgmo-keyring/cryptoKeys/version-control-tools-secrets
+        created_at: '2019-06-13T17:23:00Z'
+        enc: CiQAyBR+bLY25E29denC2eTvD68ez5vBqdUFV5wQ0PLMLWVCrCUSSQBaj+bcGKUb2d4InvImknC75KdiwvoN0xXpXdaVdVHn6zl5rEtpgb4FjjnZLRQW+N2zrPtrhhh85ioBPaDXBBM3KrwzUvGty6k=
+    azure_kv: []
+    lastmodified: '2019-06-13T17:23:01Z'
+    mac: ENC[AES256_GCM,data:DzUEPGFZJPRnzAhYixl1a3T1YuBl5JobnM1P0G/f8J7035bL36JAnExVv28cgxnuqjO1VjEsAseQc8qxk+abTiWFuS5O9blbzHN+KIk5k97mB4CVGVVRTHj1HKuK27+dLxESbsOnkWL86v8sBQ17bKT2qE/oDcCX1IGCcXl3YGw=,iv:qJm5EjcwbxjHpJAykHu6a9R0GpSOZtCDuD5raDS5xrI=,tag:qHLsPQpuOTvvlbPAd/O0eQ==,type:str]
+    pgp: []
+    encrypted_suffix: _encrypted
+    version: 3.3.0

@@ -62,6 +62,14 @@ ssh = ssh -F `pwd`/ssh_config -i `pwd`/l3user -l l3user@example.com
 EOF
 }
 
+scm4user() {
+  hgmo create-ldap-user l4user@example.com l4user 4500 'L4 User' --key-file l4user --scm-level 4
+  cat >> $HGRCPATH << EOF
+[ui]
+ssh = ssh -F `pwd`/ssh_config -i `pwd`/l4user -l l4user@example.com
+EOF
+}
+
 test_cloud_instance() {
   # Use `$ test_cloud_instance <server> <on/off>` to test behaviour of cloud based instances
   if [ "$2" = "on" ]; then

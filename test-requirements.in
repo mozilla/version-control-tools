@@ -39,3 +39,9 @@ python-ldap
 
 # Used for some Python unit tests.
 responses
+
+# used by mozhghooks/exceptional_push unit tests
+
+sentry-sdk
+
+
