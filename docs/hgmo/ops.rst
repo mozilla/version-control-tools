@@ -88,7 +88,7 @@ Restarting httpd/wsgi Processes
 If a restart of the ``httpd`` and WSGI process tree is needed, perform the
 following:
 
-1. Log in to the Zeus load balancer at https://zlb1.ops.scl3.mozilla.com:9090
+1. Log in to the Zeus load balancer at https://zlb1.external.ops.mdc1.mozilla.com:9090
 2. Find the ``hgweb-http`` pool.
 3. Mark as host as ``draining`` then click ``Update``.
 4. Poll the *draining* host for active connections by SSHing into the host
@@ -433,8 +433,8 @@ Master Server Management
 
 The current active master server is denoted by the presence of a
 ``/repo/hg/master.<hostname>`` file. e.g. the presence of
-``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` indicates that
-``hgssh4.dmz.scl3.mozilla.com`` is the active master.
+``/repo/hg/master.hgssh1.dmz.mdc1.mozilla.com`` indicates that
+``hgssh1.dmz.mdc1.mozilla.com`` is the active master.
 
 All services that should have only a single instance (running on the
 master) have systemd unit configs that prevent the unit from starting
@@ -460,10 +460,10 @@ This script looks at the status of the ``/repo/hg/master.<hostname>``
 file and the ``hg-master.target`` unit and reconciles the state of
 ``hg-master.target`` with what is wanted.
 
-For example, if ``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` exists
+For example, if ``/repo/hg/master.hgssh1.dmz.mdc1.mozilla.com`` exists
 and ``hg-master.target`` isn't active, ``hg-master-start-stop`` will
 start ``hg-master.target``. Similarly, if
-``/repo/hg/master.hgssh4.dmz.scl3.mozilla.com`` is deleted,
+``/repo/hg/master.hgssh1.dmz.mdc1.mozilla.com`` is deleted,
 ``hg-master-start-stop`` will ensure ``hg-master.target`` (and all
 associated services by extension) are stopped.
 

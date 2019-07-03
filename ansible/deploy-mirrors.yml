@@ -15,7 +15,7 @@
       # before it is passed in.
       mirror_private_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_private_key.content | b64decode }}"
       mirror_host_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_host_key.content | b64decode }}"
-      # hg-zlb.vips.scl3.mozilla.com resolves to multiple IPs.
+      # The Zeus load balancer in MDC1 resolves to multiple IPs.
       mirror_ips: ["63.245.215.25", "63.245.215.102"]
       vct_node: "{{ lookup('file', '../.vctnode') }}"
       # Comment out these variables for now, since they are managed by
