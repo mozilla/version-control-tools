@@ -118,3 +118,7 @@ Global reason file reason is printed
   remote: prechangegroup.readonly hook failed
   abort: push failed on remote
   [255]
+
+Confirm no errors in log
+
+  $ cat ../server/error.log
