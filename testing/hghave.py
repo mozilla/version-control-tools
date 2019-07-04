@@ -18,9 +18,8 @@ import os
 import sys
 import tempfile
 
-if 'REPO_ROOT' not in globals():
-    print('hghave.py included wrong. please set REPO_ROOT variable in calling script')
-    sys.exit(1)
+HERE = os.path.abspath(os.path.dirname(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(HERE, '..'))
 
 # We import Mercurial's own ``hghave.py`` so we can declare our own checks.
 HGHAVE_PY = os.path.join(REPO_ROOT, 'pylib', 'mercurial-support', 'hghave.py')

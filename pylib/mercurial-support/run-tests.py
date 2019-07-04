@@ -172,6 +172,11 @@ else:
 # For Windows support
 wifexited = getattr(os, "WIFEXITED", lambda x: False)
 
+# TRACKING MOZ
+# Add a few constant variables
+HERE = os.path.abspath(os.path.dirname(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+
 # Whether to use IPv6
 def checksocketfamily(name, port=20058):
     """return true if we can listen on localhost using family=name
@@ -1310,10 +1315,9 @@ class TTest(Test):
         if allreqs in self._have:
             return self._have.get(allreqs)
 
-        # TODO do something smarter when all other uses of hghave are gone.
-        tdir = self._testdir.replace(b'\\', b'/')
-        proc = Popen4(b'%s -c "%s/hghave %s"' %
-                      (self._shell, tdir, allreqs),
+        hghave_path = os.path.join(REPO_ROOT, 'testing', 'hghave.py')
+        proc = Popen4(b'%s -c "%s %s"' %
+                      (self._shell, hghave_path, allreqs),
                       self._testtmp, 0, self._getenv())
         stdout, stderr = proc.communicate()
         ret = proc.wait()
