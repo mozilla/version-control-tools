@@ -15,6 +15,7 @@ from mercurial import (
     lock as lockmod,
     obsolete,
     phases,
+    pycompat,
     repair,
     util,
 )
@@ -76,7 +77,7 @@ def preservefilectx(oldctx):
 
             # TRACKING hg45 memctx argument was renamed to changectx and
             # converted from a named argument to positional argument in 4.5.
-            spec = inspect.getargspec(context.memfilectx.__init__)
+            spec = pycompat.getargspec(context.memfilectx.__init__)
 
             if 'changectx' in spec.args:
                 # TRACKING hg50

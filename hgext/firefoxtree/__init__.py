@@ -86,6 +86,7 @@ from mercurial import (
     extensions,
     hg,
     namespaces,
+    pycompat,
     registrar,
     revset,
     scmutil,
@@ -123,8 +124,8 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
-minimumhgversion = '4.4'
+testedwith = '4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = '4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
 MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
@@ -309,7 +310,7 @@ def firefoxtrees(repo, proto):
 # @wireprotocommand decorator.
 
 # TRACKING hg46
-if 'permission' in inspect.getargspec(wireproto.wireprotocommand).args:
+if 'permission' in pycompat.getargspec(wireproto.wireprotocommand).args:
     firefoxtrees = wireproto.wireprotocommand('firefoxtrees', '',
                                               permission='pull')(firefoxtrees)
 else:
