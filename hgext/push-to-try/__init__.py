@@ -7,6 +7,7 @@ import json
 from mercurial import (
     commands,
     context,
+    pycompat,
     registrar,
 )
 from mercurial.i18n import _
@@ -61,7 +62,7 @@ def push_to_try(ui, repo, server, message=None):
             # produce a ValueError here.
             data = json.loads(data)
         except ValueError as e:
-            ui.status(b"Error reading try_task_config.json: %s\n" % e.message)
+            ui.status(b"Error reading try_task_config.json: could not decode as JSON\n")
             return
 
     # Invent a temporary commit with our message.

@@ -25,7 +25,7 @@ First test push should fail
   $ echo line1 > try_task_config.json
   $ hg add try_task_config.json
   $ hg push-to-try -m "Add try_task_config.json" -s ../remote
-  Error reading try_task_config.json: No JSON object could be decoded
+  Error reading try_task_config.json: could not decode as JSON
 
 Second test push should succeed
   $ echo '{ "key": "this just has to be valid json" }' > try_task_config.json
