@@ -33,7 +33,7 @@ def filesinfo(repo, ctx, paths=None):
 
     # This method only works if the repository has a moz.build file in the
     # root directory, as the moz.build file info reading mode requires one.
-    if 'moz.build' not in ctx:
+    if b'moz.build' not in ctx:
         return None
 
     paths = paths or ctx.files()
@@ -48,6 +48,6 @@ def filesinfo(repo, ctx, paths=None):
     info = br.files_info(paths)
 
     return {
-        'files': {p: f.asdict() for p, f in info.items()},
-        'aggregate': mbcontext.Files.aggregate(info),
+        b'files': {p: f.asdict() for p, f in info.items()},
+        b'aggregate': mbcontext.Files.aggregate(info),
     }

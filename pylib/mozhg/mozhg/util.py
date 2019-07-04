@@ -40,8 +40,8 @@ def import_module(name):
 # TRACKING hg43
 configitems = import_module('mercurial.configitems')
 
-FIREFOX_ROOT_NODE = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
-THUNDERBIRD_ROOT_NODE = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
+FIREFOX_ROOT_NODE = b'8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
+THUNDERBIRD_ROOT_NODE = b'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 
 def is_firefox_repo(repo):
@@ -53,7 +53,7 @@ def is_firefox_repo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.vfs.exists('IS_FIREFOX_REPO')
+    return repo.vfs.exists(b'IS_FIREFOX_REPO')
 
 
 def is_thunderbird_repo(repo):
@@ -65,7 +65,7 @@ def is_thunderbird_repo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.vfs.exists('IS_THUNDERBIRD_REPO')
+    return repo.vfs.exists(b'IS_THUNDERBIRD_REPO')
 
 
 def identify_repo(repo):
@@ -89,38 +89,38 @@ def identify_repo(repo):
        Path to the repository. If a hosted repo, this will be the repo path
        minus the hosting prefix. Else, this will be the repo's path.
     """
-    repo_root = repo.ui.config('mozilla', 'repo_root', '/repo/hg/mozilla')
-    if not repo_root.endswith('/'):
-        repo_root += '/'
+    repo_root = repo.ui.config(b'mozilla', b'repo_root', b'/repo/hg/mozilla')
+    if not repo_root.endswith(b'/'):
+        repo_root += b'/'
 
     # TRACKING hg43
     if configitems:
-        publishing = repo.ui.configbool('phases', 'publish')
+        publishing = repo.ui.configbool(b'phases', b'publish')
     else:
-        publishing = repo.ui.configbool('phases', 'publish', True)
+        publishing = repo.ui.configbool(b'phases', b'publish', True)
 
     d = {
-        'firefox': is_firefox_repo(repo),
-        'thunderbird': is_thunderbird_repo(repo),
-        'publishing': publishing,
+        b'firefox': is_firefox_repo(repo),
+        b'thunderbird': is_thunderbird_repo(repo),
+        b'publishing': publishing,
     }
 
     if repo.root.startswith(repo_root):
-        d['hosted'] = True
-        d['path'] = repo.root[len(repo_root):]
-        d['user_repo'] = d['path'].startswith('users/')
+        d[b'hosted'] = True
+        d[b'path'] = repo.root[len(repo_root):]
+        d[b'user_repo'] = d[b'path'].startswith(b'users/')
 
     else:
-        d['hosted'] = False
-        d['path'] = repo.root
-        d['user_repo'] = False
+        d[b'hosted'] = False
+        d[b'path'] = repo.root
+        d[b'user_repo'] = False
 
     # We could potentially exclude more Firefox repos from this list. For now,
     # be liberal in what we apply this label to.
-    d['firefox_releasing'] = (
-        d['firefox']
-        and repo.ui.configbool('mozilla', 'firefox_releasing', False)
-        and not d['user_repo'])
+    d[b'firefox_releasing'] = (
+        d[b'firefox']
+        and repo.ui.configbool(b'mozilla', b'firefox_releasing', False)
+        and not d[b'user_repo'])
 
     return d
 
@@ -130,14 +130,14 @@ def repo_owner(repo):
     # Module not available on Windows. So delay import.
     import grp
 
-    group = repo.vfs.tryread('moz-owner').strip()
+    group = repo.vfs.tryread(b'moz-owner').strip()
 
     if not group:
         gid = os.stat(repo.root).st_gid
         try:
-            group = grp.getgrgid(gid).gr_name
+            group = grp.getgrgid(gid).gr_name.encode('utf8')
         except KeyError:
-            group = '<unknown>'
+            group = b'<unknown>'
 
     return group
 
@@ -151,8 +151,8 @@ def get_backoutbynode(ext_name, repo, ctx):
     # shortly after a bad commit is introduced.
     thisshort = short(ctx.node())
     count = 0
-    searchlimit = repo.ui.configint(ext_name, 'backoutsearchlimit', 100)
-    for bctx in repo.set('%ld::', [ctx.rev()]):
+    searchlimit = repo.ui.configint(ext_name, b'backoutsearchlimit', 100)
+    for bctx in repo.set(b'%ld::', [ctx.rev()]):
         count += 1
         if count >= searchlimit:
             break
@@ -178,7 +178,7 @@ class timers(object):
     def __exit__(self, exc_type, exc_value, exc_tb):
         for name in sorted(self._times):
             self._ui.log(self._facility,
-                         '%s%s took %.3f seconds\n',
+                         b'%s%s took %.3f seconds\n',
                          self._prefix,
                          name,
                          self._times[name])

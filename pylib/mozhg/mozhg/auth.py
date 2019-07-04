@@ -23,21 +23,21 @@ def register_config_items(configitem):
     # TRACKING hg43
     configitems = import_module('mercurial.configitems')
 
-    configitem('bugzilla', 'username',
+    configitem(b'bugzilla', b'username',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'apikey',
+    configitem(b'bugzilla', b'apikey',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'password',
+    configitem(b'bugzilla', b'password',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'userid',
+    configitem(b'bugzilla', b'userid',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'cookie',
+    configitem(b'bugzilla', b'cookie',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'firefoxprofile',
+    configitem(b'bugzilla', b'firefoxprofile',
                default=configitems.dynamicdefault)
-    configitem('bugzilla', 'url',
+    configitem(b'bugzilla', b'url',
                default=configitems.dynamicdefault)
-    configitem('mozilla', 'trustedbmoapikeyservices',
+    configitem(b'mozilla', b'trustedbmoapikeyservices',
                default=configitems.dynamicdefault)
 
 
@@ -47,11 +47,11 @@ class BugzillaAuth(object):
     def __init__(self, userid=None, cookie=None, username=None, password=None,
                  apikey=None):
         if apikey:
-            self._type = 'apikey'
+            self._type = b'apikey'
         elif userid:
-            self._type = 'cookie'
+            self._type = b'cookie'
         else:
-            self._type = 'explicit'
+            self._type = b'explicit'
 
         self.userid = userid
         self.cookie = cookie
@@ -84,12 +84,12 @@ def getbugzillaauth(ui, require=False, profile=None):
     order.
     """
 
-    username = ui.config('bugzilla', 'username', None)
-    apikey = ui.config('bugzilla', 'apikey', None)
-    password = ui.config('bugzilla', 'password', None)
-    userid = ui.config('bugzilla', 'userid', None)
-    cookie = ui.config('bugzilla', 'cookie', None)
-    profileorder = ui.configlist('bugzilla', 'firefoxprofile', [])
+    username = ui.config(b'bugzilla', b'username', None)
+    apikey = ui.config(b'bugzilla', b'apikey', None)
+    password = ui.config(b'bugzilla', b'password', None)
+    userid = ui.config(b'bugzilla', b'userid', None)
+    cookie = ui.config(b'bugzilla', b'cookie', None)
+    profileorder = ui.configlist(b'bugzilla', b'firefoxprofile', [])
 
     if username and apikey:
         return BugzillaAuth(username=username, apikey=apikey)
@@ -100,41 +100,41 @@ def getbugzillaauth(ui, require=False, profile=None):
     if username and password:
         return BugzillaAuth(username=username, password=password)
 
-    ui.debug('searching for Bugzilla cookies in Firefox profile\n')
-    url = ui.config('bugzilla', 'url', 'https://bugzilla.mozilla.org/')
+    ui.debug(b'searching for Bugzilla cookies in Firefox profile\n')
+    url = ui.config(b'bugzilla', b'url', b'https://bugzilla.mozilla.org/')
     profilesdir = find_profiles_path()
     profiles = get_profiles(profilesdir)
 
     # If the list of profiles is explicitly defined, filter out unknown
     # profiles and sort by order.
     if profileorder:
-        profiles = [p for p in profiles if p['name'] in profileorder]
-        profiles = sorted(profiles, key=lambda p: profileorder.index(p['name']))
+        profiles = [p for p in profiles if p[b'name'] in profileorder]
+        profiles = sorted(profiles, key=lambda p: profileorder.index(p[b'name']))
 
     for p in profiles:
-        if profile and p['name'] != profile:
+        if profile and p[b'name'] != profile:
             continue
 
         try:
-            userid, cookie = get_bugzilla_login_cookie_from_profile(p['path'], url)
+            userid, cookie = get_bugzilla_login_cookie_from_profile(p[b'path'], url)
 
             if userid and cookie:
                 return BugzillaAuth(userid=userid, cookie=cookie)
         except NoSQLiteError:
-            ui.warn('SQLite unavailable. Unable to look for Bugzilla cookie.\n')
+            ui.warn(b'SQLite unavailable. Unable to look for Bugzilla cookie.\n')
             break
 
     if not username:
-        username = ui.prompt(_('Bugzilla username:'), '')
+        username = ui.prompt(_(b'bugzilla username:'), b'')
 
     if not password:
-        password = ui.getpass(_('Bugzilla password: '), '')
+        password = ui.getpass(_(b'bugzilla password: '), b'')
 
     if username and password:
         return BugzillaAuth(username=username, password=password)
 
     if require:
-        raise error.Abort(_('unable to obtain Bugzilla authentication.'))
+        raise error.Abort(_(b'unable to obtain Bugzilla authentication.'))
 
     return None
 
@@ -320,22 +320,22 @@ def configureautobmoapikeyauth(ui):
     its own [auth] section for declaring credentials for remotes. This function
     carries over the [bugzilla] entries to [auth] entries for trusted services.
     """
-    services = ui.configlist('mozilla', 'trustedbmoapikeyservices',
+    services = ui.configlist(b'mozilla', b'trustedbmoapikeyservices',
                              TRUSTEDAPIKEYSERVICES)
     if not services:
-        ui.debug('no trusted services to auto define credentials on\n')
+        ui.debug(b'no trusted services to auto define credentials on\n')
         return
 
-    username = ui.config('bugzilla', 'username', None)
-    apikey = ui.config('bugzilla', 'apikey', None)
+    username = ui.config(b'bugzilla', b'username', None)
+    apikey = ui.config(b'bugzilla', b'apikey', None)
     if not username:
-        ui.debug('Bugzilla username not defined; cannot define credentials\n')
+        ui.debug(b'bugzilla username not defined; cannot define credentials\n')
         return
 
     for i, service in enumerate(services):
-        ui.debug('automatically setting Bugzilla API Key auth %s\n' % service)
-        key = 'autobmoapikey%d' % i
-        ui.setconfig('auth', '%s.prefix' % key, service)
-        ui.setconfig('auth', '%s.username' % key, username)
+        ui.debug(b'automatically setting Bugzilla API Key auth %s\n' % service)
+        key = b'autobmoapikey%d' % i
+        ui.setconfig(b'auth', b'%s.prefix' % key, service)
+        ui.setconfig(b'auth', b'%s.username' % key, username)
         if apikey:
-            ui.setconfig('auth', '%s.password' % key, apikey)
+            ui.setconfig(b'auth', b'%s.password' % key, apikey)
