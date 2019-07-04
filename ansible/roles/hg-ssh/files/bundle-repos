@@ -1,7 +1,5 @@
 mozilla-central zstd_max
-integration/fx-team
 integration/mozilla-inbound
-integration/b2g-inbound
 releases/mozilla-release
 releases/mozilla-aurora
 releases/mozilla-beta
@@ -14,7 +12,6 @@ releases/mozilla-esr31
 mozilla-unified zstd_max
 build/tools
 build/mozharness
-build/talos
 hgcustom/version-control-tools
 comm-central zstd_max
 projects/ash
@@ -23,13 +20,5 @@ projects/holly
 projects/jamun
 projects/larch
 projects/oak
-releases/mozilla-b2g34_v2_1
-releases/mozilla-b2g37_v2_2
-releases/mozilla-b2g37_v2_2r
-releases/mozilla-b2g32_v2_0
-releases/mozilla-b2g32_v2_0m
-releases/mozilla-b2g44_v2_5
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
-incubator/stylo copyfrom=mozilla-central
-incubator/stylo-try copyfrom=mozilla-central
