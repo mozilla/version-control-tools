@@ -5,6 +5,7 @@
 
 # This script can be used to Mozilla-fy Mercurial templates.
 
+import os
 import pathlib
 import shutil
 import subprocess
@@ -61,7 +62,7 @@ GITWEB_IGNORE_REPLACEMENTS = {
 }
 
 
-def main(source_templates, vct_templates_path, new_templates_path):
+def main(source_templates, vct_templates_path, new_templates_path, hg='hg'):
     # source_templates is the canonical templates to start from.
     # vct_templates is hgtemplates/ from v-c-t.
     # new_templates_path is templates directory to write to. It could be
@@ -129,10 +130,10 @@ def main(source_templates, vct_templates_path, new_templates_path):
     # We need to track all files in the destination so `hg import` below works.
     # TODO we should perhaps be a bit more careful about committing in the case
     # where new_templates_path == vct_templates_path.
-    subprocess.run(['hg', 'addremove', '.'],
+    subprocess.run([hg, 'addremove', '.'],
                    cwd=new_templates_path,
                    check=True)
-    subprocess.run(['hg', 'commit', '-m',
+    subprocess.run([hg, 'commit', '-m',
                     'hgtemplates: synchronize vanilla templates'])
 
     # Change the logo URL.
@@ -158,7 +159,7 @@ def main(source_templates, vct_templates_path, new_templates_path):
             fh.write(s)
 
     print('committing automated transformations')
-    subprocess.run(['hg', 'commit', '-m',
+    subprocess.run([hg, 'commit', '-m',
                     'hgtemplates: perform common rewrites'],
                    cwd=new_templates_path,
                    check=True)
@@ -182,7 +183,7 @@ def main(source_templates, vct_templates_path, new_templates_path):
             print('applying patch %s' % patch_path.name)
             sys.stdout.flush()
 
-            subprocess.run(['hg', 'import', '-'],
+            subprocess.run([hg, 'import', '-'],
                            input=patch,
                            cwd=new_templates_path.parent,
                            check=True)
@@ -195,4 +196,5 @@ if __name__ == '__main__':
 
     main(pathlib.Path(source_templates),
          pathlib.Path(vct_templates),
-         pathlib.Path(new_templates))
+         pathlib.Path(new_templates),
+         hg=os.getenv('HG', 'hg'))
