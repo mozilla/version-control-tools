@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-import errno
 import os
 import re
 import socket
@@ -15,6 +14,32 @@ checks = {
     "true": (lambda: True, "yak shaving"),
     "false": (lambda: False, "nail clipper"),
 }
+
+try:
+    import msvcrt
+    msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+    msvcrt.setmode(sys.stderr.fileno(), os.O_BINARY)
+except ImportError:
+    pass
+
+stdout = getattr(sys.stdout, 'buffer', sys.stdout)
+stderr = getattr(sys.stderr, 'buffer', sys.stderr)
+
+if sys.version_info[0] >= 3:
+    def _bytespath(p):
+        if p is None:
+            return p
+        return p.encode('utf-8')
+
+    def _strpath(p):
+        if p is None:
+            return p
+        return p.decode('utf-8')
+else:
+    def _bytespath(p):
+        return p
+
+    _strpath = _bytespath
 
 def check(name, desc):
     """Registers a check function for a feature."""
@@ -74,11 +99,12 @@ def require(features):
     result = checkfeatures(features)
 
     for missing in result['missing']:
-        sys.stderr.write('skipped: unknown feature: %s\n' % missing)
+        stderr.write(('skipped: unknown feature: %s\n'
+                      % missing).encode('utf-8'))
     for msg in result['skipped']:
-        sys.stderr.write('skipped: %s\n' % msg)
+        stderr.write(('skipped: %s\n' % msg).encode('utf-8'))
     for msg in result['error']:
-        sys.stderr.write('%s\n' % msg)
+        stderr.write(('%s\n' % msg).encode('utf-8'))
 
     if result['missing']:
         sys.exit(2)
@@ -91,13 +117,8 @@ def matchoutput(cmd, regexp, ignorestatus=False):
     is matched by the supplied regular expression.
     """
     r = re.compile(regexp)
-    try:
-        p = subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
-        ret = -1
+    p = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     s = p.communicate()[0]
     ret = p.returncode
     return (ignorestatus or not ret) and r.search(s)
@@ -121,7 +142,7 @@ def has_bzr():
 
 @checkvers("bzr", "Canonical's Bazaar client >= %s", (1.14,))
 def has_bzr_range(v):
-    major, minor = v.split('.')[0:2]
+    major, minor = v.split('rc')[0].split('.')[0:2]
     try:
         import bzrlib
         return (bzrlib.__doc__ is not None
@@ -322,8 +343,8 @@ def has_svn_range(v):
 
 @check("svn", "subversion client and admin tools")
 def has_svn():
-    return matchoutput('svn --version 2>&1', br'^svn, version') and \
-        matchoutput('svnadmin --version 2>&1', br'^svnadmin, version')
+    return (matchoutput('svn --version 2>&1', br'^svn, version') and
+            matchoutput('svnadmin --version 2>&1', br'^svnadmin, version'))
 
 @check("svn-bindings", "subversion python bindings")
 def has_svn_bindings():
@@ -360,7 +381,7 @@ def has_hardlink():
     os.close(fh)
     name = tempfile.mktemp(dir='.', prefix=tempprefix)
     try:
-        util.oslink(fn, name)
+        util.oslink(_bytespath(fn), _bytespath(name))
         os.unlink(name)
         return True
     except OSError:
@@ -452,8 +473,9 @@ def has_pylint():
 
 @check("clang-format", "clang-format C code formatter")
 def has_clang_format():
-    return matchoutput("clang-format --help",
-                       br"^OVERVIEW: A tool to format C/C\+\+[^ ]+ code.")
+    m = matchoutput('clang-format --version', br'clang-format version (\d)')
+    # style changed somewhere between 4.x and 6.x
+    return m and int(m.group(1)) >= 6
 
 @check("jshint", "JSHint static code analysis tool")
 def has_jshint():
@@ -521,7 +543,7 @@ def has_defaultcacertsloaded():
 @check("tls1.2", "TLS 1.2 protocol support")
 def has_tls1_2():
     from mercurial import sslutil
-    return 'tls1.2' in sslutil.supportedprotocols
+    return b'tls1.2' in sslutil.supportedprotocols
 
 @check("windows", "Windows")
 def has_windows():
@@ -616,7 +638,7 @@ def has_debhelper():
        "debian build dependencies (run dpkg-checkbuilddeps in contrib/)")
 def has_debdeps():
     # just check exit status (ignoring output)
-    path = '%s/../contrib/debian/control' % os.environ['TESTDIR']
+    path = '%s/../contrib/packaging/debian/control' % os.environ['TESTDIR']
     return matchoutput('dpkg-checkbuilddeps %s' % path, br'')
 
 @check("demandimport", "demandimport enabled")
@@ -624,23 +646,20 @@ def has_demandimport():
     # chg disables demandimport intentionally for performance wins.
     return ((not has_chg()) and os.environ.get('HGDEMANDIMPORT') != 'disable')
 
-@check("py3k", "running with Python 3.x")
-def has_py3k():
+@checkvers("py", "Python >= %s", (2.7, 3.5, 3.6, 3.7, 3.8, 3.9))
+def has_python_range(v):
+    major, minor = v.split('.')[0:2]
+    py_major, py_minor = sys.version_info.major, sys.version_info.minor
+
+    return (py_major, py_minor) >= (int(major), int(minor))
+
+@check("py3", "running with Python 3.x")
+def has_py3():
     return 3 == sys.version_info[0]
 
 @check("py3exe", "a Python 3.x interpreter is available")
 def has_python3exe():
-    return 'PYTHON3' in os.environ
-
-@check("py3pygments", "Pygments available on Python 3.x")
-def has_py3pygments():
-    if has_py3k():
-        return has_pygments()
-    elif has_python3exe():
-        # just check exit status (ignoring output)
-        py3 = os.environ['PYTHON3']
-        return matchoutput('%s -c "import pygments"' % py3, br'')
-    return False
+    return matchoutput('python3 -V', br'^Python 3.(5|6|7|8|9)')
 
 @check("pure", "running with pure Python code")
 def has_pure():
@@ -703,11 +722,15 @@ def has_fuzzywuzzy():
 
 @check("clang-libfuzzer", "clang new enough to include libfuzzer")
 def has_clang_libfuzzer():
-    mat = matchoutput('clang --version', b'clang version (\d)')
+    mat = matchoutput('clang --version', br'clang version (\d)')
     if mat:
         # libfuzzer is new in clang 6
         return int(mat.group(1)) > 5
     return False
+
+@check("clang-6.0", "clang 6.0 with version suffix (libfuzzer included)")
+def has_clang60():
+    return matchoutput('clang-6.0 --version', br'clang version 6\.')
 
 @check("xdiff", "xdiff algorithm")
 def has_xdiff():
@@ -775,3 +798,34 @@ def has_repobundlerepo():
 @check('repofncache', 'repository has an fncache')
 def has_repofncache():
     return 'fncache' in getrepofeatures()
+
+@check('sqlite', 'sqlite3 module is available')
+def has_sqlite():
+    try:
+        import sqlite3
+        version = sqlite3.sqlite_version_info
+    except ImportError:
+        return False
+
+    if version < (3, 8, 3):
+        # WITH clause not supported
+        return False
+
+    return matchoutput('sqlite3 -version', br'^3\.\d+')
+
+@check('vcr', 'vcr http mocking library')
+def has_vcr():
+    try:
+        import vcr
+        vcr.VCR
+        return True
+    except (ImportError, AttributeError):
+        pass
+    return False
+
+@check('emacs', 'GNU Emacs')
+def has_emacs():
+    # Our emacs lisp uses `with-eval-after-load` which is new in emacs
+    # 24.4, so we allow emacs 24.4, 24.5, and 25+ (24.5 was the last
+    # 24 release)
+    return matchoutput('emacs --version', b'GNU Emacs 2(4.4|4.5|5|6|7|8|9)')
