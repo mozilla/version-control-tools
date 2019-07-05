@@ -1,0 +1,9 @@
+This repository contains a Mercurial extension (and supplementary libraries)
+that override hg commit to run eslint and prettier as a hook.
+
+To activate the extension, place the following in your .hgrc:
+
+  [extensions]
+  js-format = /path/to/version-control-tools/hgext/js-format
+
+Once activated, run `hg help js-format` for information about this extension.
