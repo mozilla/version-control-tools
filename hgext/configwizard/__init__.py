@@ -256,6 +256,12 @@ It relies on ./mach clang-format directly.
 Would you like to activate clang-format (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+JS_FORMAT_INFO = '''
+The "js-format" extension provides execution of eslint+prettier at the commit steps.
+It relies on ./mach eslint --fix directly.
+Would you like to activate js-format (Yn)? $$ &Yes $$ &No
+'''.strip()
+
 FORMATSOURCE_INFO = '''
 The "format-source" extension provides a way to run code-formatting tools in a way that
 avoids conflicts related to this formatting when merging/rebasing code across the
@@ -475,6 +481,7 @@ wizardsteps = set([
     'configchange',
     'permissions',
     'clang-format',
+    'js-format',
 ])
 
 
@@ -560,6 +567,9 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if 'clang-format' in runsteps:
         _promptvctextension(ui, cw, 'clang-format', CLANG_FORMAT_INFO)
+
+    if 'js-format' in runsteps:
+        _promptvctextension(ui, cw, 'js-format', JS_FORMAT_INFO)
 
     if 'format-source' in runsteps:
         _checkformatsource(ui, cw)
