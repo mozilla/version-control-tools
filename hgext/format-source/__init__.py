@@ -106,6 +106,15 @@ def cmdutiladd(ui, repo, storage_matcher):
         cmdutil.add(ui, repo, storage_matcher, "", True)
 
 
+def return_default_formatter(repo, tool):
+    if tool == 'clang-format':
+        return return_default_clang_format(repo)
+    if tool == 'prettier-format':
+        return return_default_prettier_format(repo)
+
+    msg = _("unknown format tool: %s (no 'format-source.%s' config)")
+    raise error.Abort(msg.format(tool, tool))
+
 def return_default_clang_format(repo):
     arguments = ['clang-format', '--assume-filename', '$HG_FILENAME', '-p']
 
@@ -120,8 +129,23 @@ def return_default_clang_format(repo):
     return clang_format_cmd, clang_format_cfgpaths, clang_format_fileext
 
 
+def return_default_prettier_format(repo):
+    arguments = ['prettier-format', '--assume-filename', '$HG_FILENAME', '-p']
+
+    # On windows we need this to call the command in a shell, see Bug 1511594
+    if os.name == 'nt':
+        prettier_format_cmd = ' '.join(['sh', 'mach'] + arguments)
+    else:
+        prettier_format_cmd = ' '.join([os.path.join(repo.root, "mach")] + arguments)
+
+    prettier_format_cfgpaths = ['.prettierrc', '.prettierignore']
+    prettier_format_fileext = ('.js', '.jsx', '.jsm')
+    return prettier_format_cmd, prettier_format_cfgpaths, prettier_format_fileext
+
+
 def should_use_default(repo, tool):
-    return tool == 'clang-format' and not repo.ui.config(
+    # Only enable formatting with prettier, to avoid unnecessary overhead.
+    return tool == 'prettier-format' and not repo.ui.config(
         'format-source', tool) and is_firefox_repo(repo)
 
 
@@ -164,10 +188,11 @@ def cmd_format_source(ui, repo, tool, *pats, **opts):
         if ' ' in tool:
             raise error.Abort(_("tool name cannot contain space: '%s'") % tool)
 
-        # if tool was not specified in the cfg maybe we can use our mozilla firefox in tree clang-format tool
+        # if tool was not specified in the cfg maybe we can use our mozilla firefox in tree
+        # clang-format and/or prettier tools
         if should_use_default(repo, tool):
-            shell_tool, tool_config_files, file_ext = return_default_clang_format(
-                repo)
+            shell_tool, tool_config_files, file_ext = return_default_formatter(
+                repo, tool)
         else:
             shell_tool = repo.ui.config('format-source', tool)
             tool_config_files = repo.ui.configlist('format-source',
@@ -377,8 +402,8 @@ def apply_formatting(repo, formatting, fctx):
         # matches?
         if matcher(fctx.path()):
             if should_use_default(repo, tool):
-                shell_tool, _, supported_file_ext = return_default_clang_format(
-                    repo)
+                shell_tool, _, supported_file_ext = return_default_formatter(
+                    repo, tool)
             else:
                 shell_tool = repo.ui.config('format-source', tool)
                 supported_file_ext = tuple(
