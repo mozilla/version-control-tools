@@ -184,25 +184,31 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             False - the tests fail and the push should be disallowed
             True - the tests succeed and the push should be accepted
         """
+        if self.privilege_level not in {ACTIVE_SCM_ALLOW_DIRECT_PUSH, ACTIVE_SCM_LEVEL_3, None}:
+            # this is some bad internal state where `privilege_level` is outside its allowed values.
+            print_banner(self.ui, "error", INTERNAL_ERROR_MESSAGE)
+            return False
+
         if self.privilege_level is None:
             return False
+
         if self.first_ctx_rev is None:
             self.first_ctx_rev = ctx.hex()[:12]
+
         if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
             return True
-        if self.privilege_level == ACTIVE_SCM_LEVEL_3:
-            # MAGIC_WORDS and a justification must be in the last commit in the changesetgroup
-            if len(ctx.children()) == 0:
-                # This is the last commit within a collection of changesets
-                # Test it for inclusion of MAGIC_WORDS and justification
-                if self._has_justification(ctx.description()):
-                    return True
-                print_banner(self.ui, "error", SCM_LEVEL_3_PUSH_ERROR_MESSAGE)
-                return False
+
+        # Level is active_scm_level_3
+        if len(ctx.children()) != 0:
             # this isn't the last commit in the changegroup. Just accept it.
             return True
-        # this is some bad internal state where `privilege_level` is outside its allowed values.
-        print_banner(self.ui, "error", INTERNAL_ERROR_MESSAGE)
+
+        # This is the last commit within a collection of changesets
+        # Test it for inclusion of MAGIC_WORDS and justification
+        if self._has_justification(ctx.description()):
+            return True
+
+        print_banner(self.ui, "error", SCM_LEVEL_3_PUSH_ERROR_MESSAGE)
         return False
 
     def post_check(self):
