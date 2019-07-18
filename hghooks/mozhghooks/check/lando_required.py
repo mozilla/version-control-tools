@@ -201,9 +201,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             return False
         if self.first_ctx_rev is None:
             self.first_ctx_rev = ctx.hex()[:12]
-        if self.privilege_level is ACTIVE_SCM_ALLOW_DIRECT_PUSH:
+        if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
             return True
-        if self.privilege_level is ACTIVE_SCM_LEVEL_3:
+        if self.privilege_level == ACTIVE_SCM_LEVEL_3:
             # MAGIC_WORDS and a justification must be in the last commit in the changesetgroup
             if len(ctx.children()) == 0:
                 # This is the last commit within a collection of changesets
@@ -219,13 +219,13 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         return False
 
     def post_check(self):
-        if self.privilege_level is ACTIVE_SCM_ALLOW_DIRECT_PUSH:
+        if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
             self._log_push_attempt(
                 SUCCESS_FOR_SCM_ALLOW_DIRECT_PUSH_LOG_MESSAGE
                 % (self.first_ctx_rev, self.user_name)
             )
             return True
-        if self.privilege_level is ACTIVE_SCM_LEVEL_3:
+        if self.privilege_level == ACTIVE_SCM_LEVEL_3:
             self._log_push_attempt(
                 SUCCESS_FOR_SCM_LEVEL_3_LOG_MESSAGE
                 % (self.first_ctx_rev, self.user_name)
