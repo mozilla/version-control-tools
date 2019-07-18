@@ -195,9 +195,7 @@ decision is non-negotiable because removing this restriction could
 result in excessive CPU usage on the server to serve data to legacy
 clients.
 
-If you see this message, one of the following is true:
-
-* Your Mercurial client is too old. You should
+If you see this message, your Mercurial client is too old. You should
   :ref:`upgrade <hgmozilla_installing>`.
 
 Uplifting / Backporting Commits
