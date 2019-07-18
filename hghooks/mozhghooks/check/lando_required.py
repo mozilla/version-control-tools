@@ -29,9 +29,9 @@ import sentry_sdk
 from hgmolib.ldap_helper import get_active_scm_groups
 
 
-class PriviligedPushCheck(PreTxnChangegroupCheck):
+class LandoRequiredCheck(PreTxnChangegroupCheck):
 
-    MAGIC_WORDS = "PRIVILEGED PUSH:"
+    MAGIC_WORDS = "MANUAL PUSH:"
     MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
         r".*(%s)\s*(.+)" % re.escape(MAGIC_WORDS)
     )
@@ -80,12 +80,12 @@ class PriviligedPushCheck(PreTxnChangegroupCheck):
 
     @property
     def name(self):
-        return "privileged_push"
+        return "lando_required"
 
     def relevant(self):
         target_repo_names = (
             x.strip()
-            for x in self.ui.config("mozilla", "priviliged_push_repo_list").split(",")
+            for x in self.ui.config("mozilla", "lando_required_repo_list").split(",")
         )
         repo_name = self.repo.root.replace("/repo/hg/mozilla/", "", 1)
         return repo_name in target_repo_names

@@ -71,7 +71,7 @@
   ini_file:
     dest: /etc/mercurial/hgrc
     section: mozilla
-    option: priviliged_push_repo_list
+    option: lando_required_repo_list
     value: not-mozilla-central
     owner: hg
     group: hg

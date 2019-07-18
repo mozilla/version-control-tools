@@ -29,7 +29,7 @@ configitem('mozilla', 'repo_root',
            default=configitems.dynamicdefault)
 configitem('mozilla', 'treeherder_repo',
            default=None)
-configitem('mozilla', 'priviliged_push_repo_list',
+configitem('mozilla', 'lando_required_repo_list',
            default='')
 configitem('mozilla', 'sentry_dsn',
            default="")
@@ -48,7 +48,7 @@ def get_check_classes(hook):
         prevent_sync_ipc_changes,
         prevent_webidl_changes,
         prevent_wptsync_changes,
-        privileged_push_check,
+        lando_required,
         single_root,
         try_task_config_file,
     )
@@ -64,7 +64,7 @@ def get_check_classes(hook):
             prevent_sync_ipc_changes.SyncIPCCheck,
             prevent_webidl_changes.WebIDLCheck,
             prevent_wptsync_changes.WPTSyncCheck,
-            privileged_push_check.PriviligedPushCheck,
+            lando_required.LandoRequiredCheck,
             single_root.SingleRootCheck,
             try_task_config_file.TryConfigCheck,
         )

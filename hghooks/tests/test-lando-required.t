@@ -76,7 +76,7 @@ provided neither MAGIC_WORDS nor a justification in their top commit.
 Pushing to not-mozilla-central should succeed if the user has ACTIVE_SCM_LEVEL_3 and
 magic words with justification
 
-  $ hg commit --amend -q -m 'PRIVILEGED PUSH: because I want to'
+  $ hg commit --amend -q -m 'MANUAL PUSH: because I want to'
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/not-mozilla-central
   searching for changes
@@ -84,18 +84,12 @@ magic words with justification
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
+  remote: Successful push: ce3b4a58cd35 by l3user@example.com (ACTIVE_SCM_LEVEL_3)
+  remote: recorded push in pushlog
   remote: 
-  remote: ********************************** ERROR ***********************************
-  remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
-  remote: followed by a sentence of justification.
-  remote: ****************************************************************************
-  remote: 
-  remote: transaction abort!
-  remote: rollback completed
-  remote: pretxnchangegroup.mozhooks hook failed
-  abort: push failed on remote
-  [255]
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/not-mozilla-central/rev/ce3b4a58cd35be233796dbc19347bc77c72da472
+  remote: recorded changegroup in replication log in *s (glob)
 
 
 Pushing multiple changesets to not-mozilla-central is accepted if the user has
@@ -108,26 +102,23 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   $ echo dummy2 >> foo
   $ hg commit -m 'dummy2'
   $ echo forceit >> foo
-  $ hg commit -m 'PRIVILEGED PUSH: because I can'
+  $ hg commit -m 'MANUAL PUSH: because I can'
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/not-mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 5 changesets with 5 changes to 1 files
+  remote: added 4 changesets with 4 changes to 1 files
+  remote: Successful push: 0c601082542d by l3user@example.com (ACTIVE_SCM_LEVEL_3)
+  remote: recorded push in pushlog
   remote: 
-  remote: ********************************** ERROR ***********************************
-  remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
-  remote: followed by a sentence of justification.
-  remote: ****************************************************************************
-  remote: 
-  remote: transaction abort!
-  remote: rollback completed
-  remote: pretxnchangegroup.mozhooks hook failed
-  abort: push failed on remote
-  [255]
+  remote: View your changes here:
+  remote:   https://hg.mozilla.org/not-mozilla-central/rev/0c601082542dc49efb346c2a5d527d2ff25d35fe
+  remote:   https://hg.mozilla.org/not-mozilla-central/rev/c2b4c0af8709609146bb57b7db7581b5dfb2a5af
+  remote:   https://hg.mozilla.org/not-mozilla-central/rev/4da11b4f9cb4f0fd8a81d444450a6510c8d33d8c
+  remote:   https://hg.mozilla.org/not-mozilla-central/rev/1235dd2aeaf5c77422c9bff30f39a2150181bd63
+  remote: recorded changegroup in replication log in *s (glob)
 
 Pushing multiple changesets to not-mozilla-central should fail if the user has
 ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is missing.
@@ -137,14 +128,14 @@ ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is m
   $ echo dummy5 >> foo
   $ hg commit -m 'dummy5'
   $ echo "no justification" >> foo
-  $ hg commit -m 'PRIVILEGED PUSH:'
+  $ hg commit -m 'MANUAL PUSH:'
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/not-mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 8 changesets with 8 changes to 1 files
+  remote: added 3 changesets with 3 changes to 1 files
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
@@ -164,7 +155,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   $ echo dummy6 >> foo
   $ hg commit -m 'dummy6'
   $ echo "justification in wrong commit" >> foo
-  $ hg commit -m 'PRIVILEGED PUSH: at least I tried'
+  $ hg commit -m 'MANUAL PUSH: at least I tried'
   $ echo dummy7 >> foo
   $ hg commit -m 'dummy7'
   $ hg push
@@ -173,7 +164,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 11 changesets with 11 changes to 1 files
+  remote: added 6 changesets with 6 changes to 1 files
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
