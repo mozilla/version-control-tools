@@ -6,8 +6,10 @@ from __future__ import absolute_import
 import re
 import os
 
-from mercurial import registrar
-from ..checks import PreTxnChangegroupCheck, print_banner
+from ..checks import (
+    PreTxnChangegroupCheck,
+    print_banner,
+)
 
 import sentry_sdk
 
