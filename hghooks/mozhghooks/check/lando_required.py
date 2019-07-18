@@ -109,10 +109,15 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         return "lando_required"
 
     def relevant(self):
+        lando_required_list = self.ui.config("mozilla", "lando_required_repo_list")
+        if not lando_required_list:
+            return False
+
         target_repo_names = (
             x.strip()
-            for x in self.ui.config("mozilla", "lando_required_repo_list").split(",")
+            for x in lando_required_list.split(",")
         )
+
         repo_name = self.repo.root.replace("/repo/hg/mozilla/", "", 1)
         return repo_name in target_repo_names
 
