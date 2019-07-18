@@ -70,6 +70,38 @@ INTERNAL_ERROR_MESSAGE = (
 ) % SUBMIT_BUGZILLA_URL
 
 
+def get_user_and_group_affiliations():
+    """Determine the user_name and fetch any group affiliations from some authority.
+    The default implementation is LDAP."""
+    user_name = os.environ.get("USER", None)
+    if not user_name:
+        return None, []
+    return user_name, get_active_scm_groups(user_name)
+
+
+def changeset_has_justification(description):
+    """Test to see if the description has appropriate magic words and justification
+    parameters:
+        description - a string containing the commit message of the top commit for the push.
+                      This string is to contain the magic words and justification
+    returns:
+        False - the magic words and/or justification are not present in the description
+        True - the magic words and justification are present and acceptable
+    """
+    result = MAGICWORDS_WITH_JUSTIFICATION_RE.search(description)
+    if result is None:
+        return False
+
+    try:
+        some_magic_words, justification = result.groups()
+        # if further processing become necessary in the future, this is an appropriate location
+        # further_acceptance_processing(description, justification)
+        return True
+    except ValueError:
+        # this is the case when the magic words are present, but the justification is not
+        return False
+
+
 class LandoRequiredCheck(PreTxnChangegroupCheck):
 
     @property
@@ -109,35 +141,6 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # the sentry_dsn was an empty string - write to stdout instead of using sentry
             self.ui.write("%s\n" % event_message)
 
-    def _get_user_and_group_affiliations(self):
-        """determine the user_name and fetch any group affiliations from some authority.
-        The default implementation is LDAP."""
-        user_name = os.environ.get("USER", None)
-        if not user_name:
-            return None, []
-        return user_name, get_active_scm_groups(user_name)
-
-    def _has_justification(self, description):
-        """Test to see if the description has appropriate magic words and justification
-        parameters:
-            description - a string containing the commit message of the top commit for the push.
-                          This string is to contain the magic words and justification
-        returns:
-            False - the magic words and/or justification are not present in the description
-            True - the magic words and justification are present and acceptable
-        """
-        result = MAGICWORDS_WITH_JUSTIFICATION_RE.search(description)
-        if result is None:
-            return False
-        try:
-            some_magic_words, justification = result.groups()
-            # if further processing become necessary in the future, this is an appropriate location
-            # further_acceptance_processing(description, justification)
-            return True
-        except ValueError:
-            # this is the case when the magic words are present, but the justification is not
-            return False
-
     def pre(self, node):
         # `privilege_level` has only three allowable states: None, ACTIVE_SCM_ALLOW_DIRECT_PUSH, and
         # ACTIVE_SCM_LEVEL_3.
@@ -147,7 +150,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # The hit on LDAP should only happen once at the beginning of the check process.
             # `pre` is the only opportunity to do so before the iteration through the
             # commits in the changegroup by the `check` method.
-            self.user_name, self.user_groups = self._get_user_and_group_affiliations()
+            self.user_name, self.user_groups = get_user_and_group_affiliations()
         except Exception as e:
             # The `_get_user_and_group_affiliations` method has raised an unexpected exception.
             # It is not likely an LDAP connection error because the `get_active_scm_groups` method
@@ -205,7 +208,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
 
         # This is the last commit within a collection of changesets
         # Test it for inclusion of MAGIC_WORDS and justification
-        if self._has_justification(ctx.description()):
+        if changeset_has_justification(ctx.description()):
             return True
 
         print_banner(self.ui, "error", SCM_LEVEL_3_PUSH_ERROR_MESSAGE)
