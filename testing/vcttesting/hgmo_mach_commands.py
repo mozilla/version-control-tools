@@ -99,7 +99,7 @@ class HgmoCommands(object):
                      help='Full name of the user')
     @CommandArgument('--key-file',
                      help='Use or create an SSH key')
-    @CommandArgument('--scm-level', type=int, choices=(1, 2, 3),
+    @CommandArgument('--scm-level', type=int, choices=(1, 2, 3, 4),
                      help='Add the user to the specified SCM level groups')
     @CommandArgument('--no-hg-access', action='store_true',
                      help='Do not grant Mercurial access to user')

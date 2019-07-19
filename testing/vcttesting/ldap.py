@@ -87,12 +87,17 @@ class LDAP(object):
             res['ssh_pubkey_filename'] = pubkey_filename
 
         if scm_level:
-            if scm_level < 1 or scm_level > 3:
-                raise ValueError('scm level must be between 1 and 3: %s' %
+            if scm_level < 1 or scm_level > 4:
+                raise ValueError('scm level must be between 1 and 3 (or 4 for '
+                                 '`scm_allow_direct_push`): %s' %
                                  scm_level)
 
             for level in range(1, scm_level + 1):
-                group = b'scm_level_%d' % level
+                if level == 4:
+                    group = b'scm_allow_direct_push'
+                else:
+                    group = b'scm_level_%d' % level
+
                 self.add_user_to_group(email, group)
                 res['ldap_groups'].add(group)
 
@@ -179,7 +184,7 @@ class LDAP(object):
 
         # MoCo LDAP has an active_* for each scm_level_* group, which we need
         # to emulate here.
-        if group.startswith('scm_level_'):
+        if group.startswith('scm_level_') or group == "scm_allow_direct_push":
             group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group
             modlist = [(ldap.MOD_ADD, b'member', str(dn))]
             self.c.modify_s(group_dn, modlist)

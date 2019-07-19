@@ -9,6 +9,7 @@
     - { name: 'scm_level_1', gid: 673 }
     - { name: 'scm_level_2', gid: 685 }
     - { name: 'scm_level_3', gid: 679 }
+    - { name: 'scm_allow_direct_push', gid: 2500 }
     - { name: 'scm_l10n', gid: 678 }
     - { name: 'scm_l10n_infra', gid: 680 }
     - { name: 'scm_sec_sensitive', gid: 686 }
