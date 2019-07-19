@@ -24,52 +24,52 @@ from mercurial import (
     util,
 )
 
-testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0'
-minimumhgversion = '4.3'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
+testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.3'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('readonly', 'globalreasonfile',
+configitem(b'readonly', b'globalreasonfile',
            default=None)
 
 
 def prechangegrouphook(ui, repo, **kwargs):
-    return checkreadonly(ui, repo, 'add changesets')
+    return checkreadonly(ui, repo, b'add changesets')
 
 
 def prepushkeyhook(ui, repo, namespace=None, **kwargs):
-    return checkreadonly(ui, repo, 'update %s' % namespace)
+    return checkreadonly(ui, repo, b'update %s' % namespace)
 
 
 def checkreadonly(ui, repo, op):
     try:
-        reporeason = repo.vfs.read('readonlyreason')
+        reporeason = repo.vfs.read(b'readonlyreason')
 
-        ui.warn(_('repository is read only\n'))
+        ui.warn(_(b'repository is read only\n'))
         if reporeason:
-            ui.warn(reporeason.strip() + '\n')
+            ui.warn(reporeason.strip() + b'\n')
 
-        ui.warn(_('refusing to %s\n') % op)
+        ui.warn(_(b'refusing to %s\n') % op)
         return True
     except IOError as e:
         if e.errno != errno.ENOENT:
             raise
 
     # Repo local file does not exist. Check global file.
-    rf = ui.config('readonly', 'globalreasonfile')
+    rf = ui.config(b'readonly', b'globalreasonfile')
     if rf:
         try:
-            with util.posixfile(rf, 'rb') as fh:
+            with util.posixfile(rf, b'rb') as fh:
                 globalreason = fh.read()
 
-            ui.warn(_('all repositories currently read only\n'))
+            ui.warn(_(b'all repositories currently read only\n'))
             if globalreason:
-                ui.warn(globalreason.strip() + '\n')
+                ui.warn(globalreason.strip() + b'\n')
 
-            ui.warn(_('refusing to %s\n') % op)
+            ui.warn(_(b'refusing to %s\n') % op)
             return True
         except IOError as e:
             if e.errno != errno.ENOENT:
@@ -83,5 +83,5 @@ def reposetup(ui, repo):
     # Ideally we'd use pretxnopen. However
     # https://bz.mercurial-scm.org/show_bug.cgi?id=4939 means hook output won't
     # be displayed. So we do it the old fashioned way.
-    ui.setconfig('hooks', 'prechangegroup.readonly', prechangegrouphook, 'readonly')
-    ui.setconfig('hooks', 'prepushkey.readonly', prepushkeyhook, 'readonly')
+    ui.setconfig(b'hooks', b'prechangegroup.readonly', prechangegrouphook, b'readonly')
+    ui.setconfig(b'hooks', b'prepushkey.readonly', prepushkeyhook, b'readonly')
