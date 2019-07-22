@@ -41,7 +41,7 @@ memberUid: autoland@example.com
 
 
 dn: cn=scm_allow_direct_push,ou=groups,dc=mozilla
-gidNumber: 2500
+gidNumber: 692
 objectClass: posixGroup
 objectClass: top
 memberUid: autoland@example.com
