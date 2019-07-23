@@ -27,8 +27,16 @@ In your SSH config (likely ``~/.ssh/config``), add the following::
      User me@mozilla.com
 
 .. tip::
-   Be sure to replace ``me@mozilla.com`` with your Mozilla-registered
+   Be sure to replace ``me@mozilla.com`` with your lowercase Mozilla-registered
    LDAP account that is configured for SSH access to Mercurial.
+   The default ssh key is id_rsa.
+   You can specify an alternate key path in the configuration file, as shown in the folowing example::
+
+   Host hg.mozilla.org
+    User me@mozilla.com
+    IdentityFile /path/to/my/key
+
+You can run ``ssh -vvv hg.mozilla.org`` to troubleshoot any key or connection related issues.
 
 The first time you connect, you will be asked to verify the host SSH
 key.
