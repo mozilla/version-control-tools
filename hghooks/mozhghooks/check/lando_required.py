@@ -128,30 +128,32 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         parameters:
             event_message - a string with the text of the event message
         """
-        if self.ui.config("mozilla", "sentry_dsn"):
-            # `sentry_sdk` doesn't like the demandimporter. Deactivate it,
-            # and only import when we need to ping Sentry.
-            with demandimport.deactivated():
-                import sentry_sdk
-
-            try:
-                sentry_sdk.init(self.ui.config("mozilla", "sentry_dsn"))
-                sentry_sdk.capture_message(event_message)
-            except Exception as e:
-                # The Sentry Documentation does not mention any exceptions that it could raise.
-                # Inspection of the unified sentry-sdk source code shows that Sentry does not define
-                # an exception hierarchy of its own. Therefore, we cannot predict what exceptions
-                # might be raised during the connection and reporting phases: we have no choice but
-                # to capture all exceptions.
-                # If connecting to Sentry or reporting via Sentry fails, we do not want to derail the
-                # users' intent on pushing.  We have nowhere to log the failure, so we notify the
-                # user with a warning and proceed as if nothing bad had happened.
-                print_banner(
-                    self.ui, "warning", SENTRY_FAILURE_WARNING_MESSAGE % repr(e)
-                )
-        else:
+        sentry_dsn = self.ui.config("mozilla", "sentry_dsn")
+        if not sentry_dsn:
             # the sentry_dsn was an empty string - write to stdout instead of using sentry
             self.ui.write("%s\n" % event_message)
+            return
+
+        # `sentry_sdk` doesn't like the demandimporter. Deactivate it,
+        # and only import when we need to ping Sentry.
+        with demandimport.deactivated():
+            import sentry_sdk
+
+        try:
+            sentry_sdk.init(sentry_dsn)
+            sentry_sdk.capture_message(event_message)
+        except Exception as e:
+            # The Sentry Documentation does not mention any exceptions that it could raise.
+            # Inspection of the unified sentry-sdk source code shows that Sentry does not define
+            # an exception hierarchy of its own. Therefore, we cannot predict what exceptions
+            # might be raised during the connection and reporting phases: we have no choice but
+            # to capture all exceptions.
+            # If connecting to Sentry or reporting via Sentry fails, we do not want to derail the
+            # users' intent on pushing.  We have nowhere to log the failure, so we notify the
+            # user with a warning and proceed as if nothing bad had happened.
+            print_banner(
+                self.ui, "warning", SENTRY_FAILURE_WARNING_MESSAGE % repr(e)
+            )
 
     def pre(self, node):
         # `privilege_level` has only three allowable states: None, ACTIVE_SCM_ALLOW_DIRECT_PUSH, and
