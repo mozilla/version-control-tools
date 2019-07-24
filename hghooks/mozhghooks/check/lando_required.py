@@ -11,7 +11,9 @@ from ..checks import (
     print_banner,
 )
 
-import sentry_sdk
+from mercurial import (
+    demandimport,
+)
 
 from hgmolib.ldap_helper import get_active_scm_groups
 
@@ -127,6 +129,11 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             event_message - a string with the text of the event message
         """
         if self.ui.config("mozilla", "sentry_dsn"):
+            # `sentry_sdk` doesn't like the demandimporter. Deactivate it,
+            # and only import when we need to ping Sentry.
+            with demandimport.deactivated():
+                import sentry_sdk
+
             try:
                 sentry_sdk.init(self.ui.config("mozilla", "sentry_dsn"))
                 sentry_sdk.capture_message(event_message)
