@@ -60,11 +60,11 @@ provided neither MAGIC_WORDS nor a justification in their top commit.
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
   remote: 
-  remote: ********************************** ERROR ***********************************
+  remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
-  remote: ****************************************************************************
+  remote: *****************************************************************************
   remote: 
   remote: transaction abort!
   remote: rollback completed
@@ -137,11 +137,11 @@ ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is m
   remote: adding file changes
   remote: added 3 changesets with 3 changes to 1 files
   remote: 
-  remote: ********************************** ERROR ***********************************
+  remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
-  remote: ****************************************************************************
+  remote: *****************************************************************************
   remote: 
   remote: transaction abort!
   remote: rollback completed
@@ -166,11 +166,11 @@ ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   remote: adding file changes
   remote: added 6 changesets with 6 changes to 1 files
   remote: 
-  remote: ********************************** ERROR ***********************************
+  remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
-  remote: ****************************************************************************
+  remote: *****************************************************************************
   remote: 
   remote: transaction abort!
   remote: rollback completed

@@ -38,7 +38,7 @@ SUBMIT_BUGZILLA_URL = "<https://mzl.la/2HX9Te2>"
 
 SCM_LEVEL_3_PUSH_ERROR_MESSAGE = (
     "Pushing directly to this repo is disallowed, please use Lando.\n"
-    'To override, in your top commit, include the literal string, "%s",\n'
+    'To override, in your head commit, include the literal string, "%s",\n'
     "followed by a sentence of justification."
 ) % MAGIC_WORDS
 

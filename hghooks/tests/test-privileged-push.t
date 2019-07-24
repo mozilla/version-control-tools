@@ -62,7 +62,7 @@ provided neither MAGIC_WORDS nor a justification in their top commit.
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
   remote: ****************************************************************************
   remote: 
@@ -87,7 +87,7 @@ magic words with justification
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
   remote: ****************************************************************************
   remote: 
@@ -119,7 +119,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
   remote: ****************************************************************************
   remote: 
@@ -148,7 +148,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is m
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
   remote: ****************************************************************************
   remote: 
@@ -177,7 +177,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   remote: 
   remote: ********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
-  remote: To override, in your top commit, include the literal string, "MANUAL PUSH:",
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
   remote: followed by a sentence of justification.
   remote: ****************************************************************************
   remote: 
