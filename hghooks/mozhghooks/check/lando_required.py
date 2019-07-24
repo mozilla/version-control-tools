@@ -26,12 +26,8 @@ ACTIVE_SCM_ALLOW_DIRECT_PUSH = "active_scm_allow_direct_push"
 
 ACTIVE_SCM_LEVEL_3 = "active_scm_level_3"
 
-SUCCESS_FOR_SCM_ALLOW_DIRECT_PUSH_LOG_MESSAGE = (
-    "Successful push: %s by %s (ACTIVE_SCM_ALLOW_DIRECT_PUSH)"
-)
-
-SUCCESS_FOR_SCM_LEVEL_3_LOG_MESSAGE = (
-    "Successful push: %s by %s (ACTIVE_SCM_LEVEL_3)"
+SENTRY_LOG_MESSAGE = (
+    '%(user)s pushed: "%(justification)s". (%(repo)s@%(node)s, %(scm_level)s)'
 )
 
 SUBMIT_BUGZILLA_URL = "<https://mzl.la/2HX9Te2>"
@@ -81,27 +77,27 @@ def get_user_and_group_affiliations():
     return user_name, get_active_scm_groups(user_name)
 
 
-def changeset_has_justification(description):
+def get_changeset_justification(description):
     """Test to see if the description has appropriate magic words and justification
     parameters:
         description - a string containing the commit message of the top commit for the push.
                       This string is to contain the magic words and justification
     returns:
-        False - the magic words and/or justification are not present in the description
-        True - the magic words and justification are present and acceptable
+        None - the magic words and/or justification are not present in the description
+        str - the justification provided for using a manual push
     """
     result = MAGICWORDS_WITH_JUSTIFICATION_RE.search(description)
     if result is None:
-        return False
+        return None
 
     try:
-        some_magic_words, justification = result.groups()
+        _magic_words, justification = result.groups()
         # if further processing become necessary in the future, this is an appropriate location
         # further_acceptance_processing(description, justification)
-        return True
+        return justification
     except ValueError:
         # this is the case when the magic words are present, but the justification is not
-        return False
+        return None
 
 
 class LandoRequiredCheck(PreTxnChangegroupCheck):
@@ -120,8 +116,8 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             for x in lando_required_list.split(",")
         )
 
-        repo_name = self.repo.root.replace("/repo/hg/mozilla/", "", 1)
-        return repo_name in target_repo_names
+        self.repo_name = self.repo.root.replace("/repo/hg/mozilla/", "", 1)
+        return self.repo_name in target_repo_names
 
     def _log_push_attempt(self, event_message):
         """send an event message to Sentry
@@ -141,7 +137,16 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
 
         try:
             sentry_sdk.init(sentry_dsn)
-            sentry_sdk.capture_message(event_message)
+
+            with sentry_sdk.push_scope() as scope:
+                scope.user = {'username': self.user_name}
+                scope.set_tag('repo', self.repo_name)
+                scope.set_tag('scm_level', self.privilege_level)
+                scope.set_extra('changeset', self.first_ctx_rev)
+                scope.set_extra('justification', self.justification)
+
+                sentry_sdk.capture_message(event_message)
+
         except Exception as e:
             # The Sentry Documentation does not mention any exceptions that it could raise.
             # Inspection of the unified sentry-sdk source code shows that Sentry does not define
@@ -160,6 +165,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         # ACTIVE_SCM_LEVEL_3.
         self.privilege_level = None
         self.first_ctx_rev = None
+        self.justification = None
         try:
             # The hit on LDAP should only happen once at the beginning of the check process.
             # `pre` is the only opportunity to do so before the iteration through the
@@ -222,27 +228,32 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
 
         # This is the last commit within a collection of changesets
         # Test it for inclusion of MAGIC_WORDS and justification
-        if changeset_has_justification(ctx.description()):
+        self.justification = get_changeset_justification(ctx.description())
+        if self.justification:
             return True
 
         print_banner(self.ui, "error", SCM_LEVEL_3_PUSH_ERROR_MESSAGE)
         return False
 
     def post_check(self):
+        if self.privilege_level not in {ACTIVE_SCM_ALLOW_DIRECT_PUSH, ACTIVE_SCM_LEVEL_3}:
+            # this is some bad internal state. At this point, `privilege_level` should have only been
+            # one of the two allowed values above.  Getting to this point indicates an unexpected value
+            # that should not happen.  Give an appropriate error message and abort.
+            print_banner(self.ui, "error", INTERNAL_ERROR_MESSAGE)
+            return False
+
+        # Users with `ACTIVE_SCM_ALLOW_DIRECT_PUSH` don't need to provide a reason for their push
         if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
-            self._log_push_attempt(
-                SUCCESS_FOR_SCM_ALLOW_DIRECT_PUSH_LOG_MESSAGE
-                % (self.first_ctx_rev, self.user_name)
-            )
-            return True
-        if self.privilege_level == ACTIVE_SCM_LEVEL_3:
-            self._log_push_attempt(
-                SUCCESS_FOR_SCM_LEVEL_3_LOG_MESSAGE
-                % (self.first_ctx_rev, self.user_name)
-            )
-            return True
-        # this is some bad internal state. At this point, `privilege_level` should have only been
-        # one of the two allowed values above.  Getting to this point indicates an unexpected value
-        # that should not happen.  Give an appropriate error message and abort.
-        print_banner(self.ui, "error", INTERNAL_ERROR_MESSAGE)
-        return False
+            self.justification = 'justification not required'
+
+        message = SENTRY_LOG_MESSAGE % {
+            'justification': self.justification,
+            'node': self.first_ctx_rev,
+            'repo': self.repo_name,
+            'scm_level': self.privilege_level.upper(),
+            'user': self.user_name,
+        }
+        self._log_push_attempt(message)
+        return True
+

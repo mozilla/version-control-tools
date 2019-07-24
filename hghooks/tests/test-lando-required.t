@@ -24,7 +24,7 @@ Pushing to not-mozilla-central should succeed if user has "active_scm_allow_dire
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Successful push: 57a078f14741 by l4user@example.com (ACTIVE_SCM_ALLOW_DIRECT_PUSH)
+  remote: l4user@example.com pushed: "justification not required". (not-mozilla-central@57a078f14741, ACTIVE_SCM_ALLOW_DIRECT_PUSH)
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
@@ -84,7 +84,7 @@ magic words with justification
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: Successful push: ce3b4a58cd35 by l3user@example.com (ACTIVE_SCM_LEVEL_3)
+  remote: l3user@example.com pushed: "because I want to". (not-mozilla-central@ce3b4a58cd35, ACTIVE_SCM_LEVEL_3)
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
@@ -110,7 +110,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: adding manifests
   remote: adding file changes
   remote: added 4 changesets with 4 changes to 1 files
-  remote: Successful push: 0c601082542d by l3user@example.com (ACTIVE_SCM_LEVEL_3)
+  remote: l3user@example.com pushed: "because I can". (not-mozilla-central@0c601082542d, ACTIVE_SCM_LEVEL_3)
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
