@@ -220,6 +220,13 @@ class Docker(object):
         # for determining where to look for opened ports.
         # This is a bit complicated because Docker can be running from a local
         # socket or or another host via something like boot2docker.
+
+        # This is wrong - the gateway returned is the _internal_ IP gateway for
+        # running containers.  docker makes no guarantee it will be routable
+        # from the host; and on MacOS this is indeed not routable.  Port mapping
+        # and querying for the HostIP should be used instead (or use a sane
+        # docker build system such as docker-compose).
+
         docker_url = urlparse.urlparse(self.api_client.base_url)
         self.docker_hostname = docker_url.hostname
         if docker_url.hostname in ('localunixsocket', 'localhost', '127.0.0.1'):
@@ -1186,8 +1193,9 @@ class Docker(object):
                 self.api_client.start(cid)
                 state = self.api_client.inspect_container(cid)
                 ports = state['NetworkSettings']['Ports']
+                hostname = ports['873/tcp'][0]['HostIp']
                 port = ports['873/tcp'][0]['HostPort']
-                url = 'rsync://%s:%s/vct-mount/' % (self.docker_hostname, port)
+                url = 'rsync://%s:%s/vct-mount/' % (hostname, port)
 
                 get_and_write_vct_node()
                 vct_paths = self._get_vct_files()
