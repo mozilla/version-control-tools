@@ -97,6 +97,18 @@ def update_access_date(mail, attr, value, conn_string_ro,
         ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
 
 
+def get_user_dn_by_mail(conn, ldap_basedn, email):
+    try:
+        user_obj = conn.search_s(
+            ldap_basedn,
+            ldap.SCOPE_SUBTREE,
+            '(mail=%s)' % email
+        )
+        return user_obj[0][0]
+    except (IndexError, ldap.NO_SUCH_OBJECT):
+        return None
+
+
 def get_scm_groups(mail):
     """Obtain SCM LDAP group membership for a specified user."""
     settings = get_ldap_settings()
@@ -124,7 +136,7 @@ def get_active_scm_groups(mail):
     if not conn:
         return None
 
-    dn = 'mail=%s,o=com,dc=mozilla' % mail
+    dn = get_user_dn_by_mail(conn, 'dc=mozilla', mail)
     fltr = '(&(cn=active_scm_*)(member=%s))' % dn
 
     result = conn.search_s('ou=groups,dc=mozilla', ldap.SCOPE_ONELEVEL,
