@@ -9,9 +9,11 @@
 import os
 import sys
 
-from mach.main import Mach
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 def main(args):
+    from mach.main import Mach
+
     m = Mach(os.getcwd())
     m.define_category('docker', 'Docker',
         'Common actions involving Docker')
@@ -22,5 +24,12 @@ def main(args):
 if __name__ == '__main__':
     # Unbuffer stdout.
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
+    if 'VIRTUAL_ENV' not in os.environ:
+        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+        with open(activate) as f:
+            exec(f.read(), dict(__file__=activate))
+        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
+        os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
     sys.exit(main(sys.argv[1:]))
