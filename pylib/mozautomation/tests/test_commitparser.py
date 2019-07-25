@@ -48,6 +48,25 @@ means that the URL used by mohawk to verify the authenticated request hashes
 differs from that used to generate the hash.'''
         self.assertEqual(parse_bugs(msg), [1235097])
 
+        # Merge numbers should not be considered bug numbers.
+        msg = '''servo: Merge #19754 - Implement element.innerText getter (from ferjm:innertext); r=mbrubeck
+
+Source-Repo: https://github.com/servo/servo
+Source-Revision: 9e64008e759a678a3971d04977c2b20b66fa8229'''
+        self.assertEqual(parse_bugs(msg), [])
+
+        msg = '''Bug 123456 - Fix all of the things
+
+Source-Repo: https://github.com/mozilla/foo'''
+        self.assertEqual(parse_bugs(msg), [123456])
+
+        msg = '''Merge #4256
+
+This fixes #9000 and bug 324521
+
+Source-Repo: https://github.com/mozilla/foo'''
+        self.assertEqual(parse_bugs(msg), [324521])
+
     def test_reviewers(self):
 
         # first with r? reviewer request syntax

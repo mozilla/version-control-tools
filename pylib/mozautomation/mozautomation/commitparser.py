@@ -96,7 +96,17 @@ DIFFERENTIAL_REVISION_RE = re.compile(r'(?P<phaburl>https://phabricator.services
 
 
 def parse_bugs(s):
-    bugs_with_duplicates = [int(m[1]) for m in BUG_RE.findall(s)]
+    is_github_repo = False
+    m = RE_SOURCE_REPO.search(s)
+    if m:
+        source_repo = m.group(1)
+
+        if source_repo.startswith('https://github.com/'):
+            is_github_repo = True
+
+    bugzilla_re = BUG_CONSERVATIVE_RE if is_github_repo else BUG_RE
+
+    bugs_with_duplicates = [int(m[1]) for m in bugzilla_re.findall(s)]
     bugs_seen = set()
     bugs_seen_add = bugs_seen.add
     bugs = [x for x in bugs_with_duplicates if not (x in bugs_seen or bugs_seen_add(x))]
