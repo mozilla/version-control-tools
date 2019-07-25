@@ -243,9 +243,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             print_banner(self.ui, "error", INTERNAL_ERROR_MESSAGE)
             return False
 
-        # Users with `ACTIVE_SCM_ALLOW_DIRECT_PUSH` don't need to provide a reason for their push
+        # We don't want notifications for scm_allow_direct_push
         if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
-            self.justification = 'justification not required'
+            return True
 
         message = SENTRY_LOG_MESSAGE % {
             'justification': self.justification,

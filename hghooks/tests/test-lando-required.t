@@ -24,7 +24,6 @@ Pushing to not-mozilla-central should succeed if user has "active_scm_allow_dire
   remote: adding manifests
   remote: adding file changes
   remote: added 1 changesets with 1 changes to 1 files
-  remote: l4user@example.com pushed: "justification not required". (not-mozilla-central@57a078f14741, ACTIVE_SCM_ALLOW_DIRECT_PUSH)
   remote: recorded push in pushlog
   remote: 
   remote: View your change here:
