@@ -67,6 +67,8 @@ INTERNAL_ERROR_MESSAGE = (
     'Include "LandoRequiredCheck: invalid privilege_level" in your error report\n'
 ) % SUBMIT_BUGZILLA_URL
 
+REV_URL = 'https://hg.mozilla.org/%(repo)s/rev/%(rev)s'
+
 
 def get_user_and_group_affiliations():
     """Determine the user_name and fetch any group affiliations from some authority.
@@ -142,8 +144,12 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
                 scope.user = {'username': self.user_name}
                 scope.set_tag('repo', self.repo_name)
                 scope.set_tag('scm_level', self.privilege_level)
-                scope.set_extra('changeset', self.first_ctx_rev)
+                scope.set_extra('changeset', self.head)
                 scope.set_extra('justification', self.justification)
+                scope.set_extra('url', REV_URL % {
+                    'repo': self.repo_name,
+                    'rev': self.head,
+                })
 
                 sentry_sdk.capture_message(event_message)
 
@@ -164,7 +170,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         # `privilege_level` has only three allowable states: None, ACTIVE_SCM_ALLOW_DIRECT_PUSH, and
         # ACTIVE_SCM_LEVEL_3.
         self.privilege_level = None
-        self.first_ctx_rev = None
+        self.head = None
         self.justification = None
         try:
             # The hit on LDAP should only happen once at the beginning of the check process.
@@ -215,8 +221,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         if self.privilege_level is None:
             return False
 
-        if self.first_ctx_rev is None:
-            self.first_ctx_rev = ctx.hex()[:12]
+        self.head = ctx.hex()
 
         if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
             return True
@@ -249,7 +254,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
 
         message = SENTRY_LOG_MESSAGE % {
             'justification': self.justification,
-            'node': self.first_ctx_rev,
+            'node': self.head[:12],
             'repo': self.repo_name,
             'scm_level': self.privilege_level.upper(),
             'user': self.user_name,

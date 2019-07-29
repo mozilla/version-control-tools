@@ -109,7 +109,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: adding manifests
   remote: adding file changes
   remote: added 4 changesets with 4 changes to 1 files
-  remote: l3user@example.com pushed: "because I can". (not-mozilla-central@0c601082542d, ACTIVE_SCM_LEVEL_3)
+  remote: l3user@example.com pushed: "because I can". (not-mozilla-central@1235dd2aeaf5, ACTIVE_SCM_LEVEL_3)
   remote: recorded push in pushlog
   remote: 
   remote: View your changes here:
