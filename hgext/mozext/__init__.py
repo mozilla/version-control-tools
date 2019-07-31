@@ -1546,26 +1546,27 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
     extensions.wrapfunction(hg, '_peerorrepo', wrapped_peerorrepo)
 
-    if not ui.configbool('mozext', 'disable_local_database'):
-        revsetpredicate('pushhead([TREE])')(revset_pushhead)
-        revsetpredicate('tree(X)')(revset_tree)
-        revsetpredicate('firstpushdate(DATE)')(revset_firstpushdate)
-        revsetpredicate('firstpushtree(X)')(revset_firstpushtree)
-        revsetpredicate('pushdate(DATE)')(revset_pushdate)
+    if ui.configbool('mozext', 'disable_local_database'):
+        return
 
-    if not ui.configbool('mozext', 'disable_local_database'):
-        templatekeyword('firstrelease', requires={'ctx', 'repo', 'cache'})(template_firstrelease)
-        templatekeyword('firstbeta', requires={'ctx', 'repo', 'cache'})(template_firstbeta)
-        templatekeyword('firstnightly', requires={'ctx', 'repo'})(template_firstnightly)
-        templatekeyword('nightlydate', requires={'ctx', 'repo'})(template_nightlydate)
-        templatekeyword('firstpushuser', requires={'ctx', 'repo'})(template_firstpushuser)
-        templatekeyword('firstpushtree', requires={'ctx', 'repo'})(template_firstpushtree)
-        templatekeyword('firstpushtreeherder', requires={'ctx', 'repo'})(template_firstpushtreeherder)
-        templatekeyword('firstpushdate', requires={'ctx', 'repo'})(template_firstpushdate)
-        templatekeyword('pushdates', requires={'ctx', 'repo'})(template_pushdates)
-        templatekeyword('pushheaddates', requires={'ctx', 'repo'})(template_pushheaddates)
-        templatekeyword('trees', requires={'ctx', 'repo'})(template_trees)
-        templatekeyword('reltrees', requires={'ctx', 'repo'})(template_reltrees)
+    revsetpredicate('pushhead([TREE])')(revset_pushhead)
+    revsetpredicate('tree(X)')(revset_tree)
+    revsetpredicate('firstpushdate(DATE)')(revset_firstpushdate)
+    revsetpredicate('firstpushtree(X)')(revset_firstpushtree)
+    revsetpredicate('pushdate(DATE)')(revset_pushdate)
+
+    templatekeyword('firstrelease', requires={'ctx', 'repo', 'cache'})(template_firstrelease)
+    templatekeyword('firstbeta', requires={'ctx', 'repo', 'cache'})(template_firstbeta)
+    templatekeyword('firstnightly', requires={'ctx', 'repo'})(template_firstnightly)
+    templatekeyword('nightlydate', requires={'ctx', 'repo'})(template_nightlydate)
+    templatekeyword('firstpushuser', requires={'ctx', 'repo'})(template_firstpushuser)
+    templatekeyword('firstpushtree', requires={'ctx', 'repo'})(template_firstpushtree)
+    templatekeyword('firstpushtreeherder', requires={'ctx', 'repo'})(template_firstpushtreeherder)
+    templatekeyword('firstpushdate', requires={'ctx', 'repo'})(template_firstpushdate)
+    templatekeyword('pushdates', requires={'ctx', 'repo'})(template_pushdates)
+    templatekeyword('pushheaddates', requires={'ctx', 'repo'})(template_pushheaddates)
+    templatekeyword('trees', requires={'ctx', 'repo'})(template_trees)
+    templatekeyword('reltrees', requires={'ctx', 'repo'})(template_reltrees)
 
 def reposetup(ui, repo):
     """Custom repository implementation.
