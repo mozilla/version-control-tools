@@ -351,8 +351,8 @@ with demandimport.deactivated():
 
 bz_available = False
 
-testedwith = '4.4 4.5 4.6 4.7'
-minimumhgversion = '4.4'
+testedwith = '4.6 4.7 4.8 4.9'
+minimumhgversion = '4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
 cmdtable = {}
@@ -1048,32 +1048,41 @@ def revset_reviewed(repo, subset, x):
     return subset.filter(lambda x: list(parse_reviewers(repo[x].description())))
 
 
-@templatekeyword('bug')
-def template_bug(repo, ctx, **args):
+@templatekeyword('bug', requires={'ctx'})
+def template_bug(context, mapping):
     """:bug: String. The bug this changeset is most associated with."""
+    ctx = context.resource(mapping, 'ctx')
+
     bugs = parse_bugs(ctx.description())
     return bugs[0] if bugs else None
 
 
-@templatekeyword('backedoutby')
-def template_backedoutby(repo, ctx, **args):
+@templatekeyword('backedoutby', requires={'repo', 'ctx'})
+def template_backedoutby(context, mapping):
+    repo = context.resource(mapping, 'repo')
+    ctx = context.resource(mapping, 'ctx')
+
     return get_backoutbynode('mozext', repo, ctx)
 
 
-@templatekeyword('bugs')
-def template_bugs(repo, ctx, **args):
+@templatekeyword('bugs', requires={'ctx'})
+def template_bugs(context, mapping, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
+    ctx = context.resource(mapping, 'ctx')
+
     bugs = parse_bugs(ctx.description())
 
     # TRACKING hg47
     if templateutil:
-        bugs = templateutil.hybridlist(bugs, 'bugs')
+        return templateutil.hybridlist(bugs, 'bugs')
+    else:
+        return bugs
 
-    return bugs
 
+@templatekeyword('backsoutnodes', requires={'ctx'})
+def template_backsoutnodes(context, mapping):
+    ctx = context.resource(mapping, 'ctx')
 
-@templatekeyword('backsoutnodes')
-def template_backsoutnodes(repo, ctx, **args):
     description = encoding.fromlocal(ctx.description())
     backouts = parse_backouts(description)
     # return just the nodes, not the bug numbers
@@ -1084,9 +1093,10 @@ def template_backsoutnodes(repo, ctx, **args):
         return backouts[0]
 
 
-@templatekeyword('reviewer')
-def template_reviewer(repo, ctx, **args):
+@templatekeyword('reviewer', requires={'ctx'})
+def template_reviewer(context, mapping):
     """:reviewer: String. The first reviewer of this changeset."""
+    ctx = context.resource(mapping, 'ctx')
     reviewers = parse_reviewers(ctx.description())
     try:
         first_reviewer = next(reviewers)
@@ -1095,15 +1105,19 @@ def template_reviewer(repo, ctx, **args):
         return None
 
 
-@templatekeyword('reviewers')
-def template_reviewers(repo, ctx, **args):
+@templatekeyword('reviewers', requires={'ctx'})
+def template_reviewers(context, mapping):
     """:reviewers: List of strings. The reviewers associated with tis
     changeset."""
+    ctx = context.resource(mapping, 'ctx')
+
+    reviewers = parse_reviewers(ctx.description())
+
     # TRACKING hg47
     if templateutil:
-        return templateutil.mappinggenerator(parse_reviewers, args=(ctx.description(),))
+        return templateutil.hybridlist(parse_reviewers(ctx.description()), 'reviewers')
     else:
-        return parse_reviewers(ctx.description())
+        return reviewers
 
 
 def _compute_first_version(repo, ctx, what, cache):
@@ -1121,18 +1135,26 @@ def _compute_first_version(repo, ctx, what, cache):
     return None
 
 
-def template_firstrelease(repo, ctx, **args):
+def template_firstrelease(context, mapping):
     """:firstrelease: String. The version of the first release channel
     release with this changeset.
     """
-    return _compute_first_version(repo, ctx, 'release', args['cache'])
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+    cache = context.resource(mapping, 'cache')
+
+    return _compute_first_version(repo, ctx, 'release', cache)
 
 
-def template_firstbeta(repo, ctx, **args):
+def template_firstbeta(context, mapping):
     """:firstbeta: String. The version of the first beta release with this
     changeset.
     """
-    return _compute_first_version(repo, ctx, 'beta', args['cache'])
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+    cache = context.resource(mapping, 'cache')
+
+    return _compute_first_version(repo, ctx, 'beta', cache)
 
 
 def _calculate_push_milestone(repo, ctx, tree):
@@ -1148,17 +1170,23 @@ def _calculate_push_milestone(repo, ctx, tree):
     return repo._revision_milestone(str(push[4]))
 
 
-def template_firstaurora(repo, ctx, **args):
+def template_firstaurora(context, mapping):
     """:firstaurora: String. The version of the first aurora release with
     this changeset.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     return _calculate_push_milestone(repo, ctx, 'aurora')
 
 
-def template_firstnightly(repo, ctx, **args):
+def template_firstnightly(context, mapping):
     """:firstnightly: String. The version of the first nightly release
     with this changeset.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     return _calculate_push_milestone(repo, ctx, 'central')
 
 
@@ -1216,23 +1244,32 @@ def _calculate_next_daily_release(repo, ctx, tree):
     return dt.date().isoformat()
 
 
-def template_auroradate(repo, ctx, **args):
+def template_auroradate(context, mapping):
     """:auroradate: String. The date of the first Aurora this
     changeset was likely first active in as a YYYY-MM-DD value.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     return _calculate_next_daily_release(repo, ctx, 'aurora')
 
 
-def template_nightlydate(repo, ctx, **args):
+def template_nightlydate(context, mapping):
     """:nightlydate: Date information. The date of the first Nightly this
     changeset was likely first active in as a YYYY-MM-DD value.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     return _calculate_next_daily_release(repo, ctx, 'central')
 
 
-def template_firstpushuser(repo, ctx, **args):
+def template_firstpushuser(context, mapping):
     """:firstpushuser: String. The first person who pushed this changeset.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
 
     if not pushes:
@@ -1241,9 +1278,12 @@ def template_firstpushuser(repo, ctx, **args):
     return pushes[0][3]
 
 
-def template_firstpushtree(repo, ctx, **args):
+def template_firstpushtree(context, mapping):
     """:firstpushtree: String. The first tree this changeset was pushed to.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
 
     if not pushes:
@@ -1252,9 +1292,12 @@ def template_firstpushtree(repo, ctx, **args):
     return pushes[0][0]
 
 
-def template_firstpushtreeherder(repo, ctx, **args):
+def template_firstpushtreeherder(context, mapping):
     """:firstpushtreeherder: String. Treeherder URL for the first push of this changeset.
     """
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
     if not pushes:
         return None
@@ -1265,9 +1308,12 @@ def template_firstpushtreeherder(repo, ctx, **args):
     return treeherder_url(tree, hex(node))
 
 
-def template_firstpushdate(repo, ctx, **args):
+def template_firstpushdate(context, mapping):
     """:firstpushdate: Date information. The date of the first push of this
     changeset."""
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
     if not pushes:
         return None
@@ -1275,9 +1321,12 @@ def template_firstpushdate(repo, ctx, **args):
     return makedate(pushes[0][2])
 
 
-def template_pushdates(repo, ctx, **args):
+def template_pushdates(context, mapping):
     """:pushdates: List of date information. The dates this changeset was
     pushed to various trees."""
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushdates = [makedate(p[2]) for p in pushes]
 
@@ -1288,9 +1337,12 @@ def template_pushdates(repo, ctx, **args):
     return pushdates
 
 
-def template_pushheaddates(repo, ctx, **args):
+def template_pushheaddates(context, mapping):
     """:pushheaddates: List of date information. The dates this changeset
     was pushed to various trees as a push head."""
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
     node = ctx.node()
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushheaddates = [makedate(p[2]) for p in pushes if str(p[4]) == node]
@@ -1302,10 +1354,18 @@ def template_pushheaddates(repo, ctx, **args):
     return pushheaddates
 
 
-def template_trees(repo, ctx, **args):
+def _trees(repo, ctx):
+    """Returns a list of trees the changeset has landed in"""
+    return [p[0] for p in repo.changetracker.pushes_for_changeset(ctx.node())]
+
+
+def template_trees(context, mapping):
     """:trees: List of strings. Trees this changeset has landed in.
     """
-    trees = [p[0] for p in repo.changetracker.pushes_for_changeset(ctx.node())]
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
+    trees = _trees(repo, ctx)
 
     # TRACKING hg47
     if templateutil:
@@ -1314,10 +1374,13 @@ def template_trees(repo, ctx, **args):
     return trees
 
 
-def template_reltrees(repo, ctx, **args):
+def template_reltrees(context, mapping):
     """:reltrees: List of strings. Release trees this changeset has landed in.
     """
-    reltrees = [t for t in template_trees(repo, ctx, **args) if t in RELEASE_TREES]
+    ctx = context.resource(mapping, 'ctx')
+    repo = context.resource(mapping, 'repo')
+
+    reltrees = [t for t in _trees(repo, ctx) if t in RELEASE_TREES]
 
     # TRACKING hg47
     if templateutil:
@@ -1361,27 +1424,27 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
 
     if not ui.configbool('mozext', 'disable_local_database'):
-        revset.symbols['pushhead'] = revset_pushhead
-        revset.symbols['tree'] = revset_tree
-        revset.symbols['firstpushdate'] = revset_firstpushdate
-        revset.symbols['firstpushtree'] = revset_firstpushtree
-        revset.symbols['pushdate'] = revset_pushdate
+        revsetpredicate('pushhead([TREE])')(revset_pushhead)
+        revsetpredicate('tree(X)')(revset_tree)
+        revsetpredicate('firstpushdate(DATE)')(revset_firstpushdate)
+        revsetpredicate('firstpushtree(X)')(revset_firstpushtree)
+        revsetpredicate('pushdate(DATE)')(revset_pushdate)
 
     if not ui.configbool('mozext', 'disable_local_database'):
-        templatekw.keywords['firstrelease'] = template_firstrelease
-        templatekw.keywords['firstbeta'] = template_firstbeta
-        templatekw.keywords['firstaurora'] = template_firstaurora
-        templatekw.keywords['firstnightly'] = template_firstnightly
-        templatekw.keywords['auroradate'] = template_auroradate
-        templatekw.keywords['nightlydate'] = template_nightlydate
-        templatekw.keywords['firstpushuser'] = template_firstpushuser
-        templatekw.keywords['firstpushtree'] = template_firstpushtree
-        templatekw.keywords['firstpushtreeherder'] = template_firstpushtreeherder
-        templatekw.keywords['firstpushdate'] = template_firstpushdate
-        templatekw.keywords['pushdates'] = template_pushdates
-        templatekw.keywords['pushheaddates'] = template_pushheaddates
-        templatekw.keywords['trees'] = template_trees
-        templatekw.keywords['reltrees'] = template_reltrees
+        templatekeyword('firstrelease', requires={'ctx', 'repo', 'cache'})(template_firstrelease)
+        templatekeyword('firstbeta', requires={'ctx', 'repo', 'cache'})(template_firstbeta)
+        templatekeyword('firstaurora', requires={'ctx', 'repo'})(template_firstaurora)
+        templatekeyword('firstnightly', requires={'ctx', 'repo'})(template_firstnightly)
+        templatekeyword('auroradate', requires={'ctx', 'repo'})(template_auroradate)
+        templatekeyword('nightlydate', requires={'ctx', 'repo'})(template_nightlydate)
+        templatekeyword('firstpushuser', requires={'ctx', 'repo'})(template_firstpushuser)
+        templatekeyword('firstpushtree', requires={'ctx', 'repo'})(template_firstpushtree)
+        templatekeyword('firstpushtreeherder', requires={'ctx', 'repo'})(template_firstpushtreeherder)
+        templatekeyword('firstpushdate', requires={'ctx', 'repo'})(template_firstpushdate)
+        templatekeyword('pushdates', requires={'ctx', 'repo'})(template_pushdates)
+        templatekeyword('pushheaddates', requires={'ctx', 'repo'})(template_pushheaddates)
+        templatekeyword('trees', requires={'ctx', 'repo'})(template_trees)
+        templatekeyword('reltrees', requires={'ctx', 'repo'})(template_reltrees)
 
 def reposetup(ui, repo):
     """Custom repository implementation.
