@@ -707,18 +707,6 @@ def mybookmarks(ui, repo):
             bookmark, repo[node].rev(), short(node)))
 
 
-@command('prunerelbranches', [], _('hg prunerelbranches'))
-def prunerelbranches(ui, repo):
-    """Prune release branch references from the local repo.
-
-    Old repos with mozext.refs_as_bookmarks but not
-    mozext.skip_relbranch_bookmarks may have undesired bookmarks pointed to
-    release branches. Running this command will prune release branch bookmarks
-    from this repository.
-    """
-    repo.prune_relbranch_refs()
-
-
 def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
         new=None, **kwargs):
     """prepushkey hook that prevents changes to reserved names.
@@ -1568,25 +1556,6 @@ def reposetup(ui, repo):
                         ctx.node())
 
             makeprogress(ui, 'changeset', None)
-
-        def prune_relbranch_refs(self):
-            todelete = [bm for bm in self._bookmarks.keys()
-                        if bm.endswith('RELBRANCH')]
-            with self.wlock(), self.lock():
-                with self.transaction('prunerelbranch') as tr:
-                    for bm in todelete:
-                        ui.warn('Removing bookmark %s\n' % bm)
-
-                    changes = [(bm, None) for bm in todelete]
-                    self._bookmarks.applychanges(self, tr, changes)
-
-                todelete = [ref for ref in self.remoterefs.keys()
-                            if ref.endswith('RELBRANCH')]
-
-                for ref in todelete:
-                    del self.remoterefs[ref]
-
-                self.remoterefs.write()
 
 
     repo.__class__ = remotestrackingrepo
