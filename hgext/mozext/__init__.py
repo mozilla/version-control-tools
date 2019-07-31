@@ -384,10 +384,6 @@ colortable = {
 }
 
 
-# Override peer path lookup such that common names magically get resolved to
-# known URIs.
-old_peerorrepo = hg._peerorrepo
-
 def get_ircnick(ui):
     headless = ui.configbool('mozext', 'headless')
     ircnick = ui.config('mozext', 'ircnick')
@@ -396,11 +392,11 @@ def get_ircnick(ui):
             'Mozilla IRC nickname to enable additional functionality.'))
     return ircnick
 
-def peerorrepo(ui, path, *args, **kwargs):
+def wrapped_peerorrepo(orig, ui, path, *args, **kwargs):
     # Always try the old mechanism first. That way if there is a local
     # path that shares the name of a magic remote the local path is accessible.
     try:
-        return old_peerorrepo(ui, path, *args, **kwargs)
+        return orig(ui, path, *args, **kwargs)
     except RepoError:
         tree, uri = resolve_trees_to_uris([path])[0]
 
@@ -408,9 +404,7 @@ def peerorrepo(ui, path, *args, **kwargs):
             raise
 
         path = uri
-        return old_peerorrepo(ui, path, *args, **kwargs)
-
-hg._peerorrepo = peerorrepo
+        return orig(ui, path, *args, **kwargs)
 
 
 def exchangepullpushlog(orig, pullop):
@@ -1358,6 +1352,7 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, 'pull', wrappedpull)
     extensions.wrapfunction(exchange, 'push', wrappedpush)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
+    extensions.wrapfunction(hg, '_peerorrepo', wrapped_peerorrepo)
 
     if not ui.configbool('mozext', 'disable_local_database'):
         revsetpredicate('pushhead([TREE])')(revset_pushhead)
