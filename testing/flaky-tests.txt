@@ -2,9 +2,6 @@
 # Everything in bzexport
 # Everything in bzpost
 
-# mozext test fails on pre-4.7 Mercurial due to pushlog dependency
-test-pushlog.t
-
 # robustcheckout test fails on post-4.7 Mercurial due to changes in hgweb
 test-server-failure.t
 
