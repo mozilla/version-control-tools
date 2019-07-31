@@ -480,24 +480,6 @@ def exchangepullpushlog(orig, pullop):
 
     return res
 
-@command('moztrees', [], _('hg moztrees'), norepo=True)
-def moztrees(ui, **opts):
-    """Show information about Mozilla source trees."""
-    longest = max(len(tree) for tree in REPOS.keys())
-    ui.write('%s  %s\n' % (_('Repo').rjust(longest), _('Aliases')))
-
-    for name in sorted(REPOS):
-        aliases = []
-        for alias, targets in TREE_ALIASES.items():
-            if len(targets) > 1:
-                continue
-
-            if targets[0] == name:
-                aliases.append(alias)
-
-        ui.write('%s: %s\n' % (name.rjust(longest),
-            ', '.join(sorted(aliases))))
-
 
 @command('treestatus', [], _('hg treestatus [TREE] ...'), norepo=True)
 def treestatus(ui, *trees, **opts):
