@@ -568,33 +568,6 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
     webbrowser.get('firefox').open(url)
 
 
-@command('pushlogsync', [
-    ('', 'reset', False, _('Wipe and repopulate the pushlog database.'), ''),
-], _('hg pushlogsync'))
-def syncpushinfo(ui, repo, tree=None, **opts):
-    """Synchronize the pushlog information for all known Gecko trees.
-
-    The pushlog info contains who, when, and where individual changesets were
-    pushed.
-
-    After running this command, you can query for push information for specific
-    changesets.
-    """
-    if not repo.changetracker:
-        ui.warn('Local database appears to be disabled.')
-        return 1
-
-    if opts['reset']:
-        repo.changetracker.wipe_pushlog()
-        return
-
-    for i, tree in enumerate(sorted(REPOS)):
-        repo.changetracker.load_pushlog(tree)
-        makeprogress(ui, 'pushlogsync', i, total=len(REPOS))
-
-    makeprogress(ui, 'pushlogsync', None)
-
-
 def print_changeset_pushes(ui, repo, rev, all=False):
     if not repo.changetracker:
         ui.warn('Local database appears to be disabled.')
