@@ -658,32 +658,6 @@ def buginfo(ui, repo, *bugs, **opts):
         ui.write('\n')
 
 
-@command('mybookmarks', [], _('hg mybookmarks'))
-def mybookmarks(ui, repo):
-    """Show bookmarks that belong to me.
-
-    A common developer workflow involves creating bookmarks to track
-    feature work. A busy repository may have bookmarks belonging to many
-    people. This command provides a mechanism to easily query for bookmarks
-    belonging to you.
-
-    A bookmark belonging to you is one whose name begins with your configured
-    IRC nick or has you as the author of the bookmark's changeset.
-    """
-    nick = get_ircnick(ui)
-    prefix = '%s/' % nick
-    me = ui.config('ui', 'username')
-
-    for bookmark, node in sorted(repo._bookmarks.items()):
-        user = repo[node].user()
-
-        if user != me and not bookmark.startswith(prefix):
-            continue
-
-        ui.write('%-50s %d:%s\n' % (
-            bookmark, repo[node].rev(), short(node)))
-
-
 def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
         new=None, **kwargs):
     """prepushkey hook that prevents changes to reserved names.
