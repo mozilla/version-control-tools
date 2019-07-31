@@ -307,7 +307,7 @@ configtable = {}
 configitem = registrar.configitem(configtable)
 
 configitem('mozext', 'headless',
-           default=configitems.dynamicdefault)
+           default=None)
 configitem('mozext', 'ircnick',
            default=None)
 configitem('mozext', 'disable_local_database',
@@ -357,7 +357,7 @@ def exchangepullpushlog(orig, pullop):
         return res
 
     # stepsdone added in Mercurial 3.2.
-    if hasattr(pullop, 'stepsdone') and 'pushlog' in pullop.stepsdone:
+    if util.safehasattr(pullop, 'stepsdone') and 'pushlog' in pullop.stepsdone:
         return res
 
     repo = pullop.repo
