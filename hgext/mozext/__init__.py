@@ -349,8 +349,6 @@ with demandimport.deactivated():
         TREE_ALIASES,
     )
 
-bz_available = False
-
 testedwith = '4.6 4.7 4.8 4.9 5.0'
 minimumhgversion = '4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
@@ -1342,13 +1340,6 @@ def template_dates(context, mapping, args):
         args[0][1]))
 
 def extsetup(ui):
-    global bz_available
-    try:
-        extensions.find('bzexport')
-        bz_available = True
-    except KeyError:
-        pass
-
     extensions.wrapfunction(exchange, 'pull', wrappedpull)
     extensions.wrapfunction(exchange, 'push', wrappedpush)
     extensions.wrapfunction(exchange, '_pullobsolete', exchangepullpushlog)
