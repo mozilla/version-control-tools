@@ -11,59 +11,6 @@ Included are commands that interface with Mozilla's automation infrastructure.
 These allow developers to quickly check the status of repositories and builds
 without having to leave the comfort of the terminal.
 
-Known Mozilla Repositories
-==========================
-
-This extension teaches Mercurial about known Mozilla repositories.
-
-Each main mozilla-central clone is given a common name. e.g. "mozilla-central"
-becomes "central" and "mozilla-inbound" becomes "inbound." In addition,
-repositories have short aliases to quickly refer to them. e.g.
-"mozilla-central" is can be references by "m-c" or "mc."
-
-The mechanism to resolve a repository string to a repository instance is
-supplemented with these known aliases. For example, to pull from
-mozilla-central, you can simply run `hg pull central`. There is no need to set
-up the [paths] section in your hgrc!
-
-To view the list of known repository aliases, run `hg moztrees`.
-
-Unified Repositories
-====================
-
-Gecko code is developed in parallel across a number of repositories that are
-cloned from the canonical repository, mozilla-central. Seasoned developers
-typically interact with multiple repositories.
-
-This extension provides mechanisms to create and maintain a single Mercurial
-repository that contains changesets from multiple "upstream" repositories.
-
-The recommended method to create a unified repository is to run `hg
-cloneunified`. This will pull changesets from all major release branches and
-mozilla-inbound.
-
-Once you have a unified repository, you can pull changesets from repositories
-by using `hg pull`, likely by specifying one of the tree aliases (see `hg
-moztrees`).
-
-One needs to be careful when pushing changesets when operating a unified
-repository. By default, `hg push` will attempt to push all local changesets not
-in a remote. This is obviously not desired (you wouldn't want to push
-mozilla-central to mozilla-beta)! Instead, you'll want to limit outgoing
-changesets to a specific head or revision. You can specify `hg push -r REV`.
-
-Remote References
-=================
-
-When pulling from known Gecko repositories, this extension automatically
-creates references to branches on the remote. These can be referenced via
-the revision <tree>/<name>. e.g. 'central/default'.
-
-Remote refs are read-only and are updated automatically during repository pull
-and push operations.
-
-This feature is similar to Git remote refs.
-
 Pushlog Data
 ============
 
@@ -72,7 +19,7 @@ Pushlog data records who pushed changesets where and when.
 
 To use this functionality, you'll need to sync pushlog data from the server to
 the local machine. This facilitates rapid data lookup and can be done by
-running `hg pushlogsync`.
+running `hg pull` from the specified repo with this extension installed.
 
 Once pushlog data is synced, you can use `hg changesetpushes` to look up push
 information for a specific changeset.
@@ -128,11 +75,13 @@ reviewed()
 tree(TREE)
    Retrieve changesets that are currently in the specified tree.
 
-   Trees are specified with a known alias. e.g. ``tree(central)``.
+   Trees are specified with a known alias, typically a tree from the `firefoxtrees`
+   extension, e.g. ``tree(central)``
 
    It's possible to see which changesets are in some tree but not others.
    e.g. to find changesets in *inbound* that haven't merged to *central*
-   yet, do ``tree(inbound) - tree(central)``.
+   yet, do ``tree(inbound) - tree(central)``. This is essentially the same
+   as ``::inbound - ::central``.
 
 Templates
 =========
@@ -153,29 +102,12 @@ firstbeta
    The version number of the first beta channel release a changeset was
    present in.
 
-firstaurora
-   The version number of the first aurora channel release a changeset was
-   present in.
-
 firstnightly
    The version number of the first nightly channel release a changeset was
    present in.
 
-auroradate
-   The date of the first Aurora a changeset was likely present in.
-
-   This value may not be accurate. The value is currently obtained by
-   querying the pushlog data to see when a changeset was pushed to this
-   channel. The date of the next Aurora is then calculated from that
-   (essentially looking for the next early morning Pacific time day).
-   Aurora releases are not always consistent. A more robust method of
-   calculation involves grabbing information from release engineering
-   servers.
-
 nightlydate
    The date of the first Nightly a changeset was likely present in.
-
-   See auroradate for accuracy information.
 
 firstpushuser
    The username of the first person who pushed this changeset.
@@ -222,8 +154,9 @@ mozext.headless
    mode is intended for server operation, not local development.
 
 mozext.ircnick
-   Your Mozilla IRC nickname. This string value will be used to look for
-   your reviews and patches.
+   Your Mozilla IRC nickname/Phabricator account name. This string value
+   will be used to look for your reviews and patches, on top of the value
+   set in ``ui.username``.
 
 mozext.disable_local_database
    When this boolean flag is true, the local SQLite database indexing
