@@ -495,38 +495,6 @@ def moztrees(ui, **opts):
             ', '.join(sorted(aliases))))
 
 
-@command('cloneunified', [], _('hg cloneunified [DEST]'), norepo=True)
-def cloneunified(ui, dest='gecko', **opts):
-    """Clone main Mozilla repositories into a unified local repository.
-
-    This command will clone the most common Mozilla repositories and will
-    add changesets and remote tracking markers into a common repository.
-
-    If the destination path is not given, 'gecko' will be used.
-
-    This command is effectively an alias for a number of other commands.
-    However, due to the way Mercurial internally stores data, it is recommended
-    to run this command to ensure optimal storage of data.
-    """
-    path = ui.expandpath(dest)
-    repo = hg.repository(ui, path, create=True)
-
-    success = False
-
-    try:
-        for tree in ('esr17', 'b2g18', 'release', 'beta', 'aurora', 'central',
-            'inbound'):
-            peer = hg.peer(ui, {}, tree)
-            ui.warn('Pulling from %s.\n' % peer.url())
-            repo.pull(peer)
-        res = hg.update(repo, repo.lookup('central/default'))
-        success = True
-        return res
-    finally:
-        if not success:
-            shutil.rmtree(path)
-
-
 @command('treestatus', [], _('hg treestatus [TREE] ...'), norepo=True)
 def treestatus(ui, *trees, **opts):
     """Show the status of the Mozilla repositories.
