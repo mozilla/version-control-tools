@@ -1126,16 +1126,6 @@ def _calculate_push_milestone(repo, ctx, tree):
     return repo._revision_milestone(str(push[4]))
 
 
-def template_firstaurora(context, mapping):
-    """:firstaurora: String. The version of the first aurora release with
-    this changeset.
-    """
-    ctx = context.resource(mapping, 'ctx')
-    repo = context.resource(mapping, 'repo')
-
-    return _calculate_push_milestone(repo, ctx, 'aurora')
-
-
 def template_firstnightly(context, mapping):
     """:firstnightly: String. The version of the first nightly release
     with this changeset.
@@ -1198,16 +1188,6 @@ def _calculate_next_daily_release(repo, ctx, tree):
         dt += datetime.timedelta(days=1)
 
     return dt.date().isoformat()
-
-
-def template_auroradate(context, mapping):
-    """:auroradate: String. The date of the first Aurora this
-    changeset was likely first active in as a YYYY-MM-DD value.
-    """
-    ctx = context.resource(mapping, 'ctx')
-    repo = context.resource(mapping, 'repo')
-
-    return _calculate_next_daily_release(repo, ctx, 'aurora')
 
 
 def template_nightlydate(context, mapping):
@@ -1389,9 +1369,7 @@ def extsetup(ui):
     if not ui.configbool('mozext', 'disable_local_database'):
         templatekeyword('firstrelease', requires={'ctx', 'repo', 'cache'})(template_firstrelease)
         templatekeyword('firstbeta', requires={'ctx', 'repo', 'cache'})(template_firstbeta)
-        templatekeyword('firstaurora', requires={'ctx', 'repo'})(template_firstaurora)
         templatekeyword('firstnightly', requires={'ctx', 'repo'})(template_firstnightly)
-        templatekeyword('auroradate', requires={'ctx', 'repo'})(template_auroradate)
         templatekeyword('nightlydate', requires={'ctx', 'repo'})(template_nightlydate)
         templatekeyword('firstpushuser', requires={'ctx', 'repo'})(template_firstpushuser)
         templatekeyword('firstpushtree', requires={'ctx', 'repo'})(template_firstpushtree)
