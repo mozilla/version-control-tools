@@ -278,7 +278,8 @@ prettier-format:fileext = .js, .jsx, .jsm
 
 If `clang-format` or `prettier-format` are not present under `[format-source]`, a default
 configuration will be used that is embedded in this extension. The default configuration
-can be used in most cases. Would you like to activate format-source (Yn)? $$ &Yes $$ &No
+can be used in most cases.
+Would you like to activate format-source (Yn)? $$ &Yes $$ &No
 '''.strip()
 
 FORMATSOURCE_DISABLE_INFO = '''
