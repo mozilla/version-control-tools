@@ -27,7 +27,7 @@ with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
 from mozhg.util import is_firefox_repo
 
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
 minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
 

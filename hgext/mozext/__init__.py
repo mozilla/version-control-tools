@@ -291,7 +291,7 @@ with demandimport.deactivated():
         TREE_ALIASES,
     )
 
-testedwith = '4.6 4.7 4.8 4.9 5.0'
+testedwith = '4.6 4.7 4.8 4.9 5.0 5.1'
 minimumhgversion = '4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 

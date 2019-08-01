@@ -76,7 +76,7 @@ from mozhg.util import (
 )
 
 __version__ = '0.1.0.dev'
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
 minimumhgversion = '4.4'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'
 
