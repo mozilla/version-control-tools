@@ -793,7 +793,7 @@ def _checkcolor(ui, cw, hg_version):
 
 
 def _checkformatsource(ui, cw):
-    disable_format_source = False
+    disable_format_source = True
 
     if disable_format_source:
         ext = cw.c.get('extensions', {})
