@@ -42,7 +42,6 @@ def get_check_classes(hook):
         advertise_upgrade,
         merge_day,
         prevent_cross_channel_messages,
-        prevent_ftl_changes,
         prevent_subrepos,
         prevent_symlinks,
         prevent_sync_ipc_changes,
@@ -58,7 +57,6 @@ def get_check_classes(hook):
         return (
             merge_day.MergeDayCheck,
             prevent_cross_channel_messages.XChannelMessageCheck,
-            prevent_ftl_changes.FTLCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
             prevent_sync_ipc_changes.SyncIPCCheck,
