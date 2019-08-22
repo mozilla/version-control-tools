@@ -16,6 +16,20 @@ Get only the latest 10 pushes via pushlog
    <title>hg-test Pushlog</title>
    <updated>*</updated> (glob)
    <entry>
+    <title>Changeset 7d352806437fb407ffaa87bcb7d2d79488801c10</title>
+    <id>http://www.selenic.com/mercurial/#changeset-7d352806437fb407ffaa87bcb7d2d79488801c10</id>
+    <link href="http://localhost:$HGPORT/hg-test/rev/7d352806437fb407ffaa87bcb7d2d79488801c10"/>
+    <updated>*</updated> (glob)
+    <author>
+     <name>luser</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">testfile&amp;hello</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
     <title>Changeset 054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</title>
     <id>http://www.selenic.com/mercurial/#changeset-054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</id>
     <link href="http://localhost:$HGPORT/hg-test/rev/054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"/>
@@ -267,6 +281,23 @@ Get only the latest 10 pushes via pushlog
      </div>
     </content>
    </entry>
+  
+  </feed>
+
+
+Get the second page of 10 pushes via pushlog/2
+  $ http "http://localhost:$HGPORT/hg-test/pushlog/2" --header content-type --body-file body
+  200
+  content-type: application/atom+xml
+
+  $ cat body
+  <?xml version="1.0" encoding="ascii"?>
+  <feed xmlns="http://www.w3.org/2005/Atom">
+   <id>http://localhost:$HGPORT/hg-test/pushlog</id>
+   <link rel="self" href="http://localhost:$HGPORT/hg-test/pushlog"/>
+   <link rel="alternate" href="http://localhost:$HGPORT/hg-test/pushloghtml"/>
+   <title>hg-test Pushlog</title>
+   <updated>*</updated> (glob)
    <entry>
     <title>Changeset f4835d42999840c490559b5f933036ee8f2ed6af</title>
     <id>http://www.selenic.com/mercurial/#changeset-f4835d42999840c490559b5f933036ee8f2ed6af</id>
@@ -295,23 +326,6 @@ Get only the latest 10 pushes via pushlog
      </div>
     </content>
    </entry>
-  
-  </feed>
-
-
-Get the second page of 10 pushes via pushlog/2
-  $ http "http://localhost:$HGPORT/hg-test/pushlog/2" --header content-type --body-file body
-  200
-  content-type: application/atom+xml
-
-  $ cat body
-  <?xml version="1.0" encoding="ascii"?>
-  <feed xmlns="http://www.w3.org/2005/Atom">
-   <id>http://localhost:$HGPORT/hg-test/pushlog</id>
-   <link rel="self" href="http://localhost:$HGPORT/hg-test/pushlog"/>
-   <link rel="alternate" href="http://localhost:$HGPORT/hg-test/pushloghtml"/>
-   <title>hg-test Pushlog</title>
-   <updated>*</updated> (glob)
    <entry>
     <title>Changeset 5af266358ee895496337d0c6f9646954c607d189</title>
     <id>http://www.selenic.com/mercurial/#changeset-5af266358ee895496337d0c6f9646954c607d189</id>
@@ -564,34 +578,6 @@ Get the second page of 10 pushes via pushlog/2
      </div>
     </content>
    </entry>
-   <entry>
-    <title>Changeset 8a354cb74bae0bcc04550e5335612bbf922ef364</title>
-    <id>http://www.selenic.com/mercurial/#changeset-8a354cb74bae0bcc04550e5335612bbf922ef364</id>
-    <link href="http://localhost:$HGPORT/hg-test/rev/8a354cb74bae0bcc04550e5335612bbf922ef364"/>
-    <updated>*</updated> (glob)
-    <author>
-     <name>someone</name>
-    </author>
-    <content type="xhtml">
-     <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">testfile</li></ul>
-     </div>
-    </content>
-   </entry>
-   <entry>
-    <title>Changeset 1980d3e0c05f3f3785168ea4dbe8da33a9de42ca</title>
-    <id>http://www.selenic.com/mercurial/#changeset-1980d3e0c05f3f3785168ea4dbe8da33a9de42ca</id>
-    <link href="http://localhost:$HGPORT/hg-test/rev/1980d3e0c05f3f3785168ea4dbe8da33a9de42ca"/>
-    <updated>*</updated> (glob)
-    <author>
-     <name>someone</name>
-    </author>
-    <content type="xhtml">
-     <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">testfile</li></ul>
-     </div>
-    </content>
-   </entry>
   
   </feed>
 
@@ -609,6 +595,20 @@ Get all ATOM data via pushlog
    <link rel="alternate" href="http://localhost:$HGPORT/hg-test/pushloghtml"/>
    <title>hg-test Pushlog</title>
    <updated>*</updated> (glob)
+   <entry>
+    <title>Changeset 7d352806437fb407ffaa87bcb7d2d79488801c10</title>
+    <id>http://www.selenic.com/mercurial/#changeset-7d352806437fb407ffaa87bcb7d2d79488801c10</id>
+    <link href="http://localhost:$HGPORT/hg-test/rev/7d352806437fb407ffaa87bcb7d2d79488801c10"/>
+    <updated>*</updated> (glob)
+    <author>
+     <name>luser</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">testfile&amp;hello</li></ul>
+     </div>
+    </content>
+   </entry>
    <entry>
     <title>Changeset 054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</title>
     <id>http://www.selenic.com/mercurial/#changeset-054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</id>
@@ -1725,6 +1725,20 @@ Get only the tips as ATOM data from pushlog?tipsonly=1
    <title>hg-test Pushlog</title>
    <updated>*</updated> (glob)
    <entry>
+    <title>Changeset 7d352806437fb407ffaa87bcb7d2d79488801c10</title>
+    <id>http://www.selenic.com/mercurial/#changeset-7d352806437fb407ffaa87bcb7d2d79488801c10</id>
+    <link href="http://localhost:$HGPORT/hg-test/rev/7d352806437fb407ffaa87bcb7d2d79488801c10"/>
+    <updated>*</updated> (glob)
+    <author>
+     <name>luser</name>
+    </author>
+    <content type="xhtml">
+     <div xmlns="http://www.w3.org/1999/xhtml">
+      <ul class="filelist"><li class="file">testfile&amp;hello</li></ul>
+     </div>
+    </content>
+   </entry>
+   <entry>
     <title>Changeset 054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</title>
     <id>http://www.selenic.com/mercurial/#changeset-054cf6e47bbe2fb7a3e4061ded6763bed4fd4550</id>
     <link href="http://localhost:$HGPORT/hg-test/rev/054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"/>
@@ -1843,20 +1857,6 @@ Get only the tips as ATOM data from pushlog?tipsonly=1
     <updated>*</updated> (glob)
     <author>
      <name>luser</name>
-    </author>
-    <content type="xhtml">
-     <div xmlns="http://www.w3.org/1999/xhtml">
-      <ul class="filelist"><li class="file">testfile</li></ul>
-     </div>
-    </content>
-   </entry>
-   <entry>
-    <title>Changeset f4835d42999840c490559b5f933036ee8f2ed6af</title>
-    <id>http://www.selenic.com/mercurial/#changeset-f4835d42999840c490559b5f933036ee8f2ed6af</id>
-    <link href="http://localhost:$HGPORT/hg-test/rev/f4835d42999840c490559b5f933036ee8f2ed6af"/>
-    <updated>*</updated> (glob)
-    <author>
-     <name>johndoe</name>
     </author>
     <content type="xhtml">
      <div xmlns="http://www.w3.org/1999/xhtml">

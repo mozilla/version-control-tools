@@ -303,6 +303,13 @@ maketestrepousers() {
   hg commit -A -m "checkin 61" --user "johndoe@cuatro"
   hg push
   sqlite3 ../hg-test/.hg/pushlog2.db 'UPDATE pushlog SET date = 1229961000, user = "johndoe" WHERE id = 31'
-  
+
+  # Push 32
+  # Filename with escape character
+  echo "checkin 61" >> testfile\&hello
+  hg commit -A -m "checkin 61" --user "luser"
+  hg push
+  sqlite3 ../hg-test/.hg/pushlog2.db 'UPDATE pushlog SET date = 1229970000, user = "luser" WHERE id = 32'
+
   export ENDTIME="2008-12-23%2010:50:00"
 }

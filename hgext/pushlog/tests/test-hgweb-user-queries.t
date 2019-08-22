@@ -79,6 +79,13 @@ Query for an individual user's pushes
           "date": 1229788200,
           "user": "luser"
       },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
+          "user": "luser"
+      },
       "5": {
           "changesets": [
               "f1af4004fca66aaf0938f50daffa9d24bbbe3f07",
@@ -329,6 +336,13 @@ Query for two users' pushes
           "date": 1229874600,
           "user": "someone"
       },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
+          "user": "luser"
+      },
       "5": {
           "changesets": [
               "f1af4004fca66aaf0938f50daffa9d24bbbe3f07",
@@ -458,6 +472,13 @@ Querying for all users' pushes + a startID should be equivalent to just querying
           ],
           "date": 1229961000,
           "user": "johndoe"
+      },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
+          "user": "luser"
       }
   }
 
@@ -555,6 +576,13 @@ Querying for all users' pushes + a startID should be equivalent to just querying
           ],
           "date": 1229961000,
           "user": "johndoe"
+      },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
+          "user": "luser"
       }
   }
 
@@ -620,6 +648,13 @@ Query for a user and a startdate
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "user": "luser"
+      },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
           "user": "luser"
       },
       "5": {

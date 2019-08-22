@@ -9,7 +9,7 @@ Sanity check the html output
   content-type: text/html; charset=ascii
 
   $ grep 7127e784b4ba body
-  <tr class="pushlogentry parity0  id31"><td></td><td><a href="/hg-test/rev/7127e784b4ba3a5cf792b433b19d527e2bd0b44a">7127e784b4ba3a5cf792b433b19d527e2bd0b44a</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
+  <tr class="pushlogentry parity1  id31"><td></td><td><a href="/hg-test/rev/7127e784b4ba3a5cf792b433b19d527e2bd0b44a">7127e784b4ba3a5cf792b433b19d527e2bd0b44a</a></td><td><strong>johndoe &mdash; checkin 60</strong> <span class="logtags"></span></td></tr>
 
 Get all JSON data
 
@@ -218,6 +218,13 @@ Get all JSON data
           ],
           "date": 1229961000,
           "user": "johndoe"
+      },
+      "32": {
+          "changesets": [
+              "7d352806437fb407ffaa87bcb7d2d79488801c10"
+          ],
+          "date": 1229970000,
+          "user": "luser"
       },
       "4": {
           "changesets": [
@@ -1059,13 +1066,32 @@ Get all JSON data with details
                   "parents": [
                       "7127e784b4ba3a5cf792b433b19d527e2bd0b44a"
                   ],
+                  "tags": []
+              }
+          ],
+          "date": 1229961000,
+          "user": "johndoe"
+      },
+      "32": {
+          "changesets": [
+              {
+                  "author": "luser",
+                  "branch": "default",
+                  "desc": "checkin 61",
+                  "files": [
+                      "testfile&hello"
+                  ],
+                  "node": "7d352806437fb407ffaa87bcb7d2d79488801c10",
+                  "parents": [
+                      "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
+                  ],
                   "tags": [
                       "tip"
                   ]
               }
           ],
-          "date": 1229961000,
-          "user": "johndoe"
+          "date": 1229970000,
+          "user": "luser"
       },
       "4": {
           "changesets": [
@@ -1363,16 +1389,8 @@ Test paging
 
   $ python -m json.tool body
   {
-      "lastpushid": 31,
+      "lastpushid": 32,
       "pushes": {
-          "22": {
-              "changesets": [
-                  "59b7f60b3a3464abb7fd3ea2bf1798960136a7fe",
-                  "f4835d42999840c490559b5f933036ee8f2ed6af"
-              ],
-              "date": 1229183400,
-              "user": "johndoe"
-          },
           "23": {
               "changesets": [
                   "773195adc944c860ad0fbb278921a6e2d27f4405",
@@ -1444,6 +1462,13 @@ Test paging
               ],
               "date": 1229961000,
               "user": "johndoe"
+          },
+          "32": {
+              "changesets": [
+                  "7d352806437fb407ffaa87bcb7d2d79488801c10"
+              ],
+              "date": 1229970000,
+              "user": "luser"
           }
       }
   }
@@ -1454,16 +1479,8 @@ Test paging
 
   $ python -m json.tool body
   {
-      "lastpushid": 31,
+      "lastpushid": 32,
       "pushes": {
-          "12": {
-              "changesets": [
-                  "1980d3e0c05f3f3785168ea4dbe8da33a9de42ca",
-                  "8a354cb74bae0bcc04550e5335612bbf922ef364"
-              ],
-              "date": 1228319400,
-              "user": "someone"
-          },
           "13": {
               "changesets": [
                   "53e334794d36467b2083d3b94fb1dc3f061d1cd9",
@@ -1535,6 +1552,14 @@ Test paging
               ],
               "date": 1229140200,
               "user": "someone"
+          },
+          "22": {
+              "changesets": [
+                  "59b7f60b3a3464abb7fd3ea2bf1798960136a7fe",
+                  "f4835d42999840c490559b5f933036ee8f2ed6af"
+              ],
+              "date": 1229183400,
+              "user": "johndoe"
           }
       }
   }
@@ -1577,7 +1602,7 @@ Format version 2 has pushes in a child object and a last push id
 
   $ python -m json.tool  body
   {
-      "lastpushid": 31,
+      "lastpushid": 32,
       "pushes": {
           "19": {
               "changesets": [

@@ -7,7 +7,7 @@ changelogentry = changelogentry.tmpl
 filelog = filelog.tmpl
 pushlog = pushlog.tmpl
 pushlogentry = pushlogentry.tmpl
-pushlogfile = '<li class="file">{name}</li>'
+pushlogfile = '<li class="file">{name|escape}</li>'
 tags = tags.tmpl
 tagentry = tagentry.tmpl
 bookmarks = bookmarks.tmpl
