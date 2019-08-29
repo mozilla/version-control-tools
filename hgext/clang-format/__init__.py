@@ -66,6 +66,12 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         # In a rebase for example
         return orig(repo, *args, **kwargs)
 
+    if 'MOZPHAB' in os.environ:
+        # We are called by the moz-phab process
+        # We don't want to reformat the commit as they have
+        # been reformatted by the initial commit
+        return orig(repo, *args, **kwargs)
+
     # In case hg changes the position of the arg
     # path_matcher will be empty in case of histedit
     assert isinstance(path_matcher, match.basematcher) or path_matcher is None
@@ -94,6 +100,13 @@ def wrappedcommit(orig, repo, *args, **kwargs):
 
 def wrappedamend(orig, ui, repo, old, extra, pats, opts):
     '''Wraps cmdutil.amend to run clang-format during `hg commit --amend`'''
+
+    if 'MOZPHAB' in os.environ:
+        # We are called by the moz-phab process
+        # We don't want to reformat the commit as they have
+        # been reformatted by the initial commit
+        return orig(ui, repo, old, extra, pats, opts)
+
     wctx = repo[None]
     matcher = scmutil.match(wctx, pats, opts)
     filestoamend = [f for f in wctx.files() if matcher(f)]
