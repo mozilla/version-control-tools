@@ -39,7 +39,7 @@ ffxbld-merge user cannot push non-merge day changes
   adding file changes
   added 1 changesets with 4 changes to 4 files
   
-  *************** ERROR ***************
+  **************************** ERROR ****************************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -51,13 +51,19 @@ ffxbld-merge user cannot push non-merge day changes
   build/mozconfig.common
   config/milestone.txt
   mobile/android/config/mozconfigs/
+  mobile/android/config/version-files/beta/version.txt
+  mobile/android/config/version-files/beta/version_display.txt
+  mobile/android/config/version-files/nightly/version.txt
+  mobile/android/config/version-files/nightly/version_display.txt
+  mobile/android/config/version-files/release/version.txt
+  mobile/android/config/version-files/release/version_display.txt
   services/sync/modules/constants.js
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  *************************************
+  ***************************************************************
   
   transaction abort!
   rollback completed
@@ -76,7 +82,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   adding file changes
   added 2 changesets with 5 changes to 5 files
   
-  *************** ERROR ***************
+  **************************** ERROR ****************************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -88,13 +94,19 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   build/mozconfig.common
   config/milestone.txt
   mobile/android/config/mozconfigs/
+  mobile/android/config/version-files/beta/version.txt
+  mobile/android/config/version-files/beta/version_display.txt
+  mobile/android/config/version-files/nightly/version.txt
+  mobile/android/config/version-files/nightly/version_display.txt
+  mobile/android/config/version-files/release/version.txt
+  mobile/android/config/version-files/release/version_display.txt
   services/sync/modules/constants.js
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  *************************************
+  ***************************************************************
   
   transaction abort!
   rollback completed
