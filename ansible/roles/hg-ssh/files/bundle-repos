@@ -15,10 +15,14 @@ build/mozharness
 hgcustom/version-control-tools
 comm-central zstd_max
 projects/ash
+projects/birch
 projects/cedar
+projects/elm
 projects/holly
 projects/jamun
 projects/larch
+projects/maple
 projects/oak
+projects/pine
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
