@@ -6,6 +6,6 @@
 
 - name: clone git-cinnabar for the cinnabarclone mercurial extension
   get_url:
-    url: https://raw.githubusercontent.com/glandium/git-cinnabar/0e18515b8429127d6a1c35d7bfe3f323c5d74f1b/mercurial/cinnabarclone.py
+    url: https://raw.githubusercontent.com/glandium/git-cinnabar/28bb4acb178e7a6326880ad39478edcc8a3c955c/mercurial/cinnabarclone.py
     dest: /var/lib/git-cinnabar/mercurial/cinnabarclone.py
-    sha256sum: e4bd91ccb85d2e30dcbc7fea2fd379ae7d9dc5bf1854ae69b24fa2d61e464d2e
+    sha256sum: 15910a23102bb0b92fb1b8cba8ac07be6ef651b36f3ae6795ee4c910a496221d
