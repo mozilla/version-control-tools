@@ -166,3 +166,23 @@ Make a change and amend, confirming mach ran
   let js_format=42;
   let a=2;
   let js_format=42;
+
+Confirm hook doesn't run when `MOZPHAB` environment variable is set
+
+  $ cat << EOF > no-hook.js
+  > function foo(a) { console.log("bar\n"); }
+  > EOF
+  $ hg add no-hook.js
+  $ MOZPHAB=1 hg commit -m "no reformat"
+  $ grep -q "let js_format=42" no-hook.js
+  [1]
+
+Ensure hook doesn't interact with non-Firefox repos
+
+  $ cd ..
+  $ mkdir non-ff
+  $ cd non-ff
+  $ hg init
+  $ echo foo > bar
+  $ hg commit -A -m initial
+  adding bar

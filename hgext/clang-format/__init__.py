@@ -66,12 +66,6 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         # In a rebase for example
         return orig(repo, *args, **kwargs)
 
-    if 'MOZPHAB' in os.environ:
-        # We are called by the moz-phab process
-        # We don't want to reformat the commit as they have
-        # been reformatted by the initial commit
-        return orig(repo, *args, **kwargs)
-
     # In case hg changes the position of the arg
     # path_matcher will be empty in case of histedit
     assert isinstance(path_matcher, match.basematcher) or path_matcher is None
@@ -81,14 +75,8 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         status = repo.status(match=path_matcher)
         changed_files = sorted(status.modified + status.added)
 
-        if not is_firefox_repo(repo) or not changed_files:
-            # this isn't a firefox repo, don't run clang-format
-            # as it is fx specific
-            # OR we don't modify any files
-            lock.release()
-            return orig(repo, *args, **kwargs)
-
-        call_clang_format(repo, changed_files)
+        if changed_files:
+            call_clang_format(repo, changed_files)
 
     except Exception as e:
         repo.ui.warn('Exception %s\n' % str(e))
@@ -100,18 +88,11 @@ def wrappedcommit(orig, repo, *args, **kwargs):
 
 def wrappedamend(orig, ui, repo, old, extra, pats, opts):
     '''Wraps cmdutil.amend to run clang-format during `hg commit --amend`'''
-
-    if 'MOZPHAB' in os.environ:
-        # We are called by the moz-phab process
-        # We don't want to reformat the commit as they have
-        # been reformatted by the initial commit
-        return orig(ui, repo, old, extra, pats, opts)
-
     wctx = repo[None]
     matcher = scmutil.match(wctx, pats, opts)
     filestoamend = [f for f in wctx.files() if matcher(f)]
 
-    if not is_firefox_repo(repo) or not filestoamend:
+    if not filestoamend:
         return orig(ui, repo, old, extra, pats, opts)
 
     try:
@@ -124,6 +105,11 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
     return orig(ui, repo, old, extra, pats, opts)
 
 
-def extsetup(ui):
+def reposetup(ui, repo):
+    # Avoid setup altogether if `moz-phab` is executing hg,
+    # or the repository is not a Firefox derivative
+    if 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
+        return
+
     extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
     extensions.wrapfunction(cmdutil, 'amend', wrappedamend)

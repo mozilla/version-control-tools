@@ -70,14 +70,8 @@ def wrappedcommit(orig, repo, *args, **kwargs):
         status = repo.status(match=path_matcher)
         changed_files = sorted(status.modified + status.added)
 
-        if not is_firefox_repo(repo) or not changed_files:
-            # this isn't a firefox repo, don't run eslint and prettier
-            # as it is fx specific
-            # OR we don't modify any files
-            lock.release()
-            return orig(repo, *args, **kwargs)
-
-        call_js_format(repo, changed_files)
+        if changed_files:
+            call_js_format(repo, changed_files)
 
     except Exception as e:
         repo.ui.warn('Exception %s\n' % str(e))
@@ -93,7 +87,7 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
     matcher = scmutil.match(wctx, pats, opts)
     filestoamend = [f for f in wctx.files() if matcher(f)]
 
-    if not is_firefox_repo(repo) or not filestoamend:
+    if not filestoamend:
         return orig(ui, repo, old, extra, pats, opts)
 
     try:
@@ -106,6 +100,11 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
     return orig(ui, repo, old, extra, pats, opts)
 
 
-def extsetup(ui):
+def reposetup(ui, repo):
+    # Avoid setup altogether if `moz-phab` is executing hg,
+    # or the repository is not a Firefox derivative
+    if 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
+        return
+
     extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
     extensions.wrapfunction(cmdutil, 'amend', wrappedamend)

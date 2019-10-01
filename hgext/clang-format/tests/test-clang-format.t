@@ -166,3 +166,23 @@ Make a change and amend, confirming mach ran
   int clang_format=42;
   int a=2;
   int clang_format=42;
+
+Confirm hook doesn't run when `MOZPHAB` environment variable is set
+
+  $ cat << EOF > no-hook.cpp
+  > int foo(int a) { printf("bar\n"); }
+  > EOF
+  $ hg add no-hook.cpp
+  $ MOZPHAB=1 hg commit -m "no reformat"
+  $ grep -q "int clang_format=42" no-hook.cpp
+  [1]
+
+Ensure hook doesn't interact with non-Firefox repos
+
+  $ cd ..
+  $ mkdir non-ff
+  $ cd non-ff
+  $ hg init
+  $ echo foo > bar
+  $ hg commit -A -m initial
+  adding bar
