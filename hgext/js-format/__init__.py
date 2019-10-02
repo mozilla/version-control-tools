@@ -102,8 +102,9 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
 
 def reposetup(ui, repo):
     # Avoid setup altogether if `moz-phab` is executing hg,
-    # or the repository is not a Firefox derivative
-    if 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
+    # or the repository is not a Firefox derivative,
+    # or the repo is not local
+    if not repo.local() or 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
         return
 
     extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
