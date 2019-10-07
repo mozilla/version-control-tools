@@ -1,5 +1,10 @@
   $ . $TESTDIR/hgext/serverlog/tests/helpers.sh
   $ localext
+  $ cat >> $HGRCPATH << EOF
+  > [serverlog]
+  > syslog = false
+  > ssh = True
+  > EOF
 
   $ hg init server
   $ hg clone ssh://user@dummy/$TESTTMP/server repo0

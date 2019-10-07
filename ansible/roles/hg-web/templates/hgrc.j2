@@ -83,7 +83,8 @@ cinnabarclone = /var/lib/git-cinnabar/mercurial/cinnabarclone.py
 a_httplinks = s|(https?://\S+)|<a href="\1">\1</a>|i
 bugzilla = s|((?:bug[\s#]*|b=#?|#)(\d{4,}))|<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=\2" title="Bug \2">\1</a>|i
 
-#[serverlog]
+[serverlog]
+hgweb = True
 #reporoot = /repo_local/mozilla/
 
 [experimental]

@@ -1,5 +1,10 @@
   $ . $TESTDIR/hgext/serverlog/tests/helpers.sh
   $ localext
+  $ cat >> $HGRCPATH << EOF
+  > [serverlog]
+  > syslog = false
+  > hgweb = True
+  > EOF
 
   $ hg init server
   $ hg -R server serve -d -p $HGPORT --pid-file hg.pid -E error.log

@@ -24,10 +24,10 @@ serverlog.reporoot
    prefix will be stripped.
 
 serverlog.hgweb
-   Whether to record requests for hgweb. Defaults to True.
+   Whether to record requests for hgweb. Defaults to False.
 
 serverlog.ssh
-   Whether to record requests for ssh server. Defaults to True.
+   Whether to record requests for ssh server. Defaults to False.
 
 serverlog.datalogsizeinterval
    Interval (in bytes) between log events when data is being streamed to
@@ -215,9 +215,9 @@ configitem('serverlog', 'blackbox.service',
 configitem('serverlog', 'reporoot',
            default='')
 configitem('serverlog', 'hgweb',
-           default=True)
+           default=False)
 configitem('serverlog', 'ssh',
-           default=True)
+           default=False)
 configitem('serverlog', 'datalogsizeinterval',
            default=10000000)
 configitem('serverlog', 'syslog',
