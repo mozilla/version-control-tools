@@ -177,7 +177,6 @@ mixed up.
 from __future__ import absolute_import
 
 import gc
-import inspect
 import os
 import resource
 import syslog
@@ -188,6 +187,7 @@ import weakref
 from mercurial import (
     error,
     extensions,
+    pycompat,
     registrar,
     wireprotoserver,
     wireprototypes,
@@ -195,7 +195,6 @@ from mercurial import (
 )
 from mercurial.hgweb import (
     hgweb_mod,
-    hgwebdir_mod,
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
@@ -276,33 +275,30 @@ def wrappeddispatch(orig, repo, proto, command):
     else:
         raise error.ProgrammingError('unhandled protocol handler: %r' % proto)
 
-    return orig(repo, proto, command)
+    # If the return type is a `pushres`, `_sshv1respondbytes` will be called twice.
+    # We only want to log a completed SSH event on the second call, so flip the
+    # `ignorecall` flag here.
+    res = orig(repo, proto, command)
+    if isinstance(res, wireprototypes.pushres):
+        repo._serverlog['ignorecall'] = True
+
+    return res
+
+
+def wrapped_getpayload(orig, self):
+    '''Wraps `sshv1protocolhandler.getpayload` to mark bytes responses as
+    non-terminating.
+    '''
+    self._fout._serverlog['ignorecall'] = True
+    return orig(self)
 
 
 def wrappedsshv1respondbytes(orig, fout, rsp):
-    # This function is called as part of the main dispatch loop *and* as part
-    # of sshv1protocolhandler.getpayload() (which is called by commands that
-    # want to read "body" data from the client). We don't want to record a
-    # completed command for the latter. There's no good way of only
-    # monkeypatching the former. So we sniff the stack for presence of
-    # getpayload() and don't do anything special in that case.
-    #
-    # In addition, Mercurial 4.6+ calls _sshv1respondbytes() twice in cases
-    # when sending a wireprototypes.pushres. The first call is always an
-    # empty string. So we sniff for that as well.
-    for f in inspect.stack():
-        frame = f[0]
-
-        # If there are multiple functions named getpayload() this could give
-        # false positives. Until it is a problem, meh.
-        if frame.f_code.co_name == r'getpayload':
-            return orig(fout, rsp)
-
-        if (wireprototypes and frame.f_code.co_name == r'_runsshserver' and
-            isinstance(frame.f_locals[r'rsp'], wireprototypes.pushres) and
-            rsp == b''):
-
-            return orig(fout, rsp)
+    # check if this response is non-terminating (ie if `wrapped_getpayload`
+    # set the flag just before this)
+    if fout._serverlog.get('ignorecall'):
+        fout._serverlog['ignorecall'] = False
+        return orig(fout, rsp)
 
     try:
         return orig(fout, rsp)
@@ -394,69 +390,70 @@ def logsyslog(ui, message):
     syslog.closelog()
 
 
-class hgwebwrapped(hgweb_mod.hgweb):
-    def _runwsgi(self, req, res, repo):
-        serverlog = {
-            'requestid': str(uuid.uuid1()),
-            'writecount': 0,
-        }
+def wrapped_runwsgi(orig, self, req, res, repo):
+    '''Wrap hgweb._runwsgi to capture timing and CPU usage information
+    '''
+    serverlog = {
+        'requestid': pycompat.bytestr(uuid.uuid1()),
+        'writecount': 0,
+    }
 
-        env = req.rawenv
+    env = req.rawenv
 
-        # Resolve the repository path.
-        # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
-        # set to the relative path of the repo (I think).
-        serverlog['path'] = req.apppath or repopath(repo)
+    # Resolve the repository path.
+    # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
+    # set to the relative path of the repo (I think).
+    serverlog['path'] = req.apppath or repopath(repo)
 
-        serverlog['ip'] = env.get('HTTP_X_CLUSTER_CLIENT_IP') or \
-            env.get('REMOTE_ADDR') or 'UNKNOWN'
+    serverlog['ip'] = env.get(b'HTTP_X_CLUSTER_CLIENT_IP') or \
+        env.get(b'REMOTE_ADDR') or b'UNKNOWN'
 
-        # Stuff a reference to the state and the bound logging method so we can
-        # record and log inside request handling.
-        self._serverlog = serverlog
-        repo._serverlog = serverlog
+    # Stuff a reference to the state and the bound logging method so we can
+    # record and log inside request handling.
+    self._serverlog = serverlog
+    repo._serverlog = serverlog
 
-        # TODO REQUEST_URI may not be defined in all WSGI environments,
-        # including wsgiref. We /could/ copy code from hgweb_mod here.
-        uri = env.get('REQUEST_URI', 'UNKNOWN')
+    # TODO REQUEST_URI may not be defined in all WSGI environments,
+    # including wsgiref. We /could/ copy code from hgweb_mod here.
+    uri = env.get(b'REQUEST_URI', b'UNKNOWN')
 
-        sl = serverlog
-        logevent(repo.ui, sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
+    sl = serverlog
+    logevent(repo.ui, sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
 
-        startusage = resource.getrusage(resource.RUSAGE_SELF)
-        startcpu = startusage.ru_utime + startusage.ru_stime
-        starttime = time.time()
+    startusage = resource.getrusage(resource.RUSAGE_SELF)
+    startcpu = startusage.ru_utime + startusage.ru_stime
+    starttime = time.time()
 
-        datasizeinterval = repo.ui.configint('serverlog', 'datalogsizeinterval')
-        lastlogamount = 0
+    datasizeinterval = repo.ui.configint(b'serverlog', b'datalogsizeinterval')
+    lastlogamount = 0
 
-        try:
-            for what in super(hgwebwrapped, self)._runwsgi(req, res, repo):
-                sl['writecount'] += len(what)
-                yield what
+    try:
+        for what in orig(self, req, res, repo):
+            sl['writecount'] += len(what)
+            yield what
 
-                if sl['writecount'] - lastlogamount > datasizeinterval:
-                    logevent(repo.ui, sl, 'WRITE_PROGRESS',
-                             '%d' % sl['writecount'])
-                    lastlogamount = sl['writecount']
-        finally:
-            # It is easy to introduce cycles in localrepository instances.
-            # Versions of Mercurial up to and including 4.5 leak repo instances
-            # in hgwebdir. We force a GC on every request to help mitigate
-            # these leaks.
-            gc.collect()
+            if sl['writecount'] - lastlogamount > datasizeinterval:
+                logevent(repo.ui, sl, 'WRITE_PROGRESS',
+                         b'%d' % sl['writecount'])
+                lastlogamount = sl['writecount']
+    finally:
+        # It is easy to introduce cycles in localrepository instances.
+        # Versions of Mercurial up to and including 4.5 leak repo instances
+        # in hgwebdir. We force a GC on every request to help mitigate
+        # these leaks.
+        gc.collect()
 
-            endtime = time.time()
-            endusage = resource.getrusage(resource.RUSAGE_SELF)
-            endcpu = endusage.ru_utime + endusage.ru_stime
+        endtime = time.time()
+        endusage = resource.getrusage(resource.RUSAGE_SELF)
+        endcpu = endusage.ru_utime + endusage.ru_stime
 
-            deltatime = endtime - starttime
-            deltacpu = endcpu - startcpu
+        deltatime = endtime - starttime
+        deltacpu = endcpu - startcpu
 
-            logevent(repo.ui, sl, 'END_REQUEST',
-                     '%d' % sl['writecount'],
-                     '%.3f' % deltatime,
-                     '%.3f' % deltacpu)
+        logevent(repo.ui, sl, 'END_REQUEST',
+                 b'%d' % sl['writecount'],
+                 b'%.3f' % deltatime,
+                 b'%.3f' % deltacpu)
 
 
 class sshserverwrapped(wireprotoserver.sshserver):
@@ -506,40 +503,21 @@ class sshserverwrapped(wireprotoserver.sshserver):
 
 def extsetup(ui):
     if wireprotov1server:
-        extensions.wrapfunction(wireprotov1server, 'dispatch',
+        extensions.wrapfunction(wireprotov1server, b'dispatch',
                                 wrappeddispatch)
 
     if wireprotoserver:
-        extensions.wrapfunction(wireprotoserver, '_sshv1respondbytes',
+        extensions.wrapfunction(wireprotoserver.sshv1protocolhandler, b'getpayload',
+                                wrapped_getpayload)
+        extensions.wrapfunction(wireprotoserver, b'_sshv1respondbytes',
                                 wrappedsshv1respondbytes)
-        extensions.wrapfunction(wireprotoserver, '_sshv1respondstream',
+        extensions.wrapfunction(wireprotoserver, b'_sshv1respondstream',
                                 wrappedsshv1respondstream)
-        extensions.wrapfunction(wireprotoserver, '_sshv1respondooberror',
+        extensions.wrapfunction(wireprotoserver, b'_sshv1respondooberror',
                                 wrappedsshv1respondooberror)
 
-    if ui.configbool('serverlog', 'hgweb'):
-        orighgweb = hgweb_mod.hgweb
-        hgweb_mod.hgweb = hgwebwrapped
-        hgwebdir_mod.hgweb = hgwebwrapped
+    if ui.configbool(b'serverlog', b'hgweb'):
+        extensions.wrapfunction(hgweb_mod.hgweb, '_runwsgi', wrapped_runwsgi)
 
-        # If running in wsgi mode, this extension may not load until
-        # hgweb_mod.hgweb.__init__ is on the stack. At that point, changing
-        # module symbols will do nothing: we need to change an actually object
-        # instance.
-        #
-        # So, we walk the stack and see if we have a hgweb_mod.hgweb instance
-        # that we need to monkeypatch.
-        for f in inspect.stack():
-            frame = f[0]
-            if 'self' not in frame.f_locals:
-                continue
-
-            s = frame.f_locals['self']
-            if not isinstance(s, orighgweb):
-                continue
-
-            s.__class__ = hgwebwrapped
-            break
-
-    if ui.configbool('serverlog', 'ssh'):
+    if ui.configbool(b'serverlog', b'ssh'):
         wireprotoserver.sshserver = sshserverwrapped
