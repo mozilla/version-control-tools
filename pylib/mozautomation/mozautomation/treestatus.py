@@ -22,6 +22,7 @@ class TreeStatus(object):
         self.motd = None
         self.tree = None
         self.reason = None
+        self.tags = None
 
         for k in d:
             if k == 'status':
@@ -32,6 +33,10 @@ class TreeStatus(object):
                 self.tree = d[k]
             elif k == 'reason':
                 self.reason = d[k]
+            elif k == 'tags':
+                self.tags = d[k]
+            elif k in ('log_id',):
+                pass
             else:
                 raise Exception('Unknown key in Tree Status response: %s' % k)
 
@@ -105,4 +110,3 @@ class TreeStatusClient(object):
 
         for d in o:
             yield TreeLog(d)
-
