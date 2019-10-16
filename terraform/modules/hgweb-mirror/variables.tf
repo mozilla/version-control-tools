@@ -20,7 +20,7 @@ variable "mirror_ami" {
 
 variable "security_group_ids" {
   description = "IDs of security groups which apply to this instance"
-  type = "list"
+  type        = list(string)
 }
 
 variable "subnet_id" {
@@ -30,3 +30,4 @@ variable "subnet_id" {
 variable "user_data" {
   description = "User data used to bootstrap instances with cloud-init"
 }
+

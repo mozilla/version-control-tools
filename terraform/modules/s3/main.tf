@@ -4,18 +4,19 @@
 
 # This data source retrieves information about the
 # aws provider for this module instance
-data "aws_region" "provider-region" {}
+data "aws_region" "provider-region" {
+}
 
 resource "aws_s3_bucket" "moz-hg-logging" {
   bucket = "moz-hg-logging-${data.aws_region.provider-region.name}"
-  acl = "log-delivery-write"
+  acl    = "log-delivery-write"
 
-  tags {
-      App = "hgmo"
-      Env = "prod"
-      Owner = "gps@mozilla.com"
-      Bugid = "1510795"
-      Name = "hg logging bucket in ${data.aws_region.provider-region.name}"
+  tags = {
+    App   = "hgmo"
+    Env   = "prod"
+    Owner = "gps@mozilla.com"
+    Bugid = "1510795"
+    Name  = "hg logging bucket in ${data.aws_region.provider-region.name}"
   }
 }
 
@@ -25,14 +26,14 @@ resource "aws_s3_bucket" "hg_bundles" {
   # Buckets are pinned to a specific region and therefore have to use
   # an explicit provider for that region.
   bucket = "moz-hg-${data.aws_region.provider-region.name}"
-  acl = "private"
+  acl    = "private"
 
-  tags {
-    App = "hgmo"
-    Env = "prod"
+  tags = {
+    App   = "hgmo"
+    Env   = "prod"
     Owner = "gps@mozilla.com"
     Bugid = "1510795"
-    Name = "hg bundles bucket in ${data.aws_region.provider-region.name}"
+    Name  = "hg bundles bucket in ${data.aws_region.provider-region.name}"
   }
 
   # Serve the auto-generated index when / is requested.
@@ -49,7 +50,7 @@ resource "aws_s3_bucket" "hg_bundles" {
   # Objects automatically expire after 1 week.
   lifecycle_rule {
     enabled = true
-    prefix = ""
+    prefix  = ""
     expiration {
       days = 7
     }
@@ -73,8 +74,8 @@ data "aws_iam_policy_document" "hg_bundles" {
       "${aws_s3_bucket.hg_bundles.arn}/*",
     ]
     principals {
-      type = "AWS"
-      identifiers = ["${var.bundler_arn}"]
+      type        = "AWS"
+      identifiers = [var.bundler_arn]
     }
   }
 
@@ -84,9 +85,9 @@ data "aws_iam_policy_document" "hg_bundles" {
     actions = [
       "s3:ListBucket",
     ]
-    resources = ["${aws_s3_bucket.hg_bundles.arn}"]
+    resources = [aws_s3_bucket.hg_bundles.arn]
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
   }
@@ -101,13 +102,14 @@ data "aws_iam_policy_document" "hg_bundles" {
       "${aws_s3_bucket.hg_bundles.arn}/*",
     ]
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "hg_bundles_policy" {
-  bucket = "${aws_s3_bucket.hg_bundles.bucket}"
-  policy = "${data.aws_iam_policy_document.hg_bundles.json}"
+  bucket = aws_s3_bucket.hg_bundles.bucket
+  policy = data.aws_iam_policy_document.hg_bundles.json
 }
+

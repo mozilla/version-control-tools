@@ -2,30 +2,29 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-
 # Configure the S3 remote state backend
 terraform {
   required_version = ">= 0.11.0"
 
   backend "s3" {
-    acl = "private"
-    bucket = "hgaws-metadata"
+    acl     = "private"
+    bucket  = "hgaws-metadata"
     encrypt = true
-    key = "tfstate/terraform.tfstate"
+    key     = "tfstate/terraform.tfstate"
     profile = "hgaws"
-    region = "us-west-2"
+    region  = "us-west-2"
   }
 }
 
 data "terraform_remote_state" "remotestate" {
   backend = "s3"
 
-  config {
-    acl = "private"
-    bucket = "hgaws-metadata"
-    key = "tfstate/terraform.tfstate"
+  config = {
+    acl     = "private"
+    bucket  = "hgaws-metadata"
+    key     = "tfstate/terraform.tfstate"
     profile = "hgaws"
-    region = "us-west-2"
+    region  = "us-west-2"
   }
 }
 
@@ -34,7 +33,7 @@ data "terraform_remote_state" "remotestate" {
 # running `terraform apply`. See link for more info
 # https://github.com/terraform-providers/terraform-provider-aws/issues/1043
 provider "aws" {
-  region = "us-west-2"
+  region  = "us-west-2"
   profile = "hgaws"
 }
 
@@ -42,45 +41,45 @@ provider "aws" {
 # Credentials for the AWS account should be set in the
 # ~/.aws/credentials file, in the `hgaws` profile
 provider "aws" {
-  alias = "awsprovider-us-west-1"
-  region = "us-west-1"
+  alias   = "awsprovider-us-west-1"
+  region  = "us-west-1"
   profile = "hgaws"
 }
 
 provider "aws" {
-  alias = "awsprovider-us-west-2"
-  region = "us-west-2"
+  alias   = "awsprovider-us-west-2"
+  region  = "us-west-2"
   profile = "hgaws"
 }
 
 provider "aws" {
-  alias = "awsprovider-us-east-1"
-  region = "us-east-1"
+  alias   = "awsprovider-us-east-1"
+  region  = "us-east-1"
   profile = "hgaws"
 }
 
 provider "aws" {
-  alias = "awsprovider-us-east-2"
-  region = "us-east-2"
+  alias   = "awsprovider-us-east-2"
+  region  = "us-east-2"
   profile = "hgaws"
 }
 
 provider "aws" {
-  alias = "awsprovider-eu-central-1"
-  region = "eu-central-1"
+  alias   = "awsprovider-eu-central-1"
+  region  = "eu-central-1"
   profile = "hgaws"
 }
 
 # Configure a bucket to hold various metadata (remote state, etc)
 resource "aws_s3_bucket" "metadata-bucket" {
   bucket = "hgaws-metadata"
-  acl = "private"
+  acl    = "private"
 
   versioning {
     enabled = true
   }
 
-  tags {
+  tags = {
     Name = "Metadata bucket for VCS"
   }
 }
@@ -101,7 +100,7 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
     principals {
       type = "AWS"
       identifiers = [
-        "${aws_iam_user.user-cosheehan.arn}",
+        aws_iam_user.user-cosheehan.arn,
       ]
     }
     effect = "Allow"
@@ -109,7 +108,7 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
       "s3:ListBucket",
     ]
     resources = [
-      "${aws_s3_bucket.metadata-bucket.arn}",
+      aws_s3_bucket.metadata-bucket.arn,
     ]
   }
 
@@ -117,7 +116,7 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
     principals {
       type = "AWS"
       identifiers = [
-        "${aws_iam_user.user-cosheehan.arn}",
+        aws_iam_user.user-cosheehan.arn,
       ]
     }
     effect = "Allow"
@@ -132,62 +131,62 @@ data "aws_iam_policy_document" "metadata-bucket-policy-definition" {
 }
 
 resource "aws_s3_bucket_policy" "metadata-bucket-policy" {
-  provider = "aws.awsprovider-us-west-2"
-  bucket = "${aws_s3_bucket.metadata-bucket.bucket}"
-  policy = "${data.aws_iam_policy_document.metadata-bucket-policy-definition.json}"
+  provider = aws.awsprovider-us-west-2
+  bucket   = aws_s3_bucket.metadata-bucket.bucket
+  policy   = data.aws_iam_policy_document.metadata-bucket-policy-definition.json
 }
 
 # Configure S3 buckets for bundles and caching
 module "s3-east1" {
-  source = "./modules/s3"
-  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  source      = "./modules/s3"
+  bundler_arn = aws_iam_user.hgbundler.arn
 
   providers = {
-    aws = "aws.awsprovider-us-east-1"
+    aws = aws.awsprovider-us-east-1
   }
 }
 
 module "s3-east2" {
-  source = "./modules/s3"
-  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  source      = "./modules/s3"
+  bundler_arn = aws_iam_user.hgbundler.arn
 
   providers = {
-    aws = "aws.awsprovider-us-east-2"
+    aws = aws.awsprovider-us-east-2
   }
 }
 
 module "s3-west1" {
-  source = "./modules/s3"
-  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  source      = "./modules/s3"
+  bundler_arn = aws_iam_user.hgbundler.arn
 
   providers = {
-    aws = "aws.awsprovider-us-west-1"
+    aws = aws.awsprovider-us-west-1
   }
 }
 
 module "s3-west2" {
-  source = "./modules/s3"
-  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  source      = "./modules/s3"
+  bundler_arn = aws_iam_user.hgbundler.arn
 
   providers = {
-    aws = "aws.awsprovider-us-west-2"
+    aws = aws.awsprovider-us-west-2
   }
 }
 
 module "s3-eu1" {
-  source = "./modules/s3"
-  bundler_arn = "${aws_iam_user.hgbundler.arn}"
+  source      = "./modules/s3"
+  bundler_arn = aws_iam_user.hgbundler.arn
 
   providers = {
-    aws = "aws.awsprovider-eu-central-1"
+    aws = aws.awsprovider-eu-central-1
   }
 }
 
 resource "aws_route53_zone" "hgzone" {
-  name = "hgmointernal.net"
+  name    = "hgmointernal.net"
   comment = "hg internal public hosted zone"
 
-  tags {
+  tags = {
     Name = "hgmo internal public hosted zone"
   }
 }
@@ -196,14 +195,14 @@ resource "aws_route53_zone" "hgzone" {
 module "vpc-uw2" {
   source = "./modules/aws-vpc"
 
-  cidr_block = "10.191.5.0/24"
-  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
-  mirror_ami = "${var.centos7_amis["us-west-2"]}"
-  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  cidr_block           = "10.191.5.0/24"
+  metadata_bucket_name = aws_s3_bucket.metadata-bucket.bucket
+  mirror_ami           = var.centos7_amis["us-west-2"]
+  route53_zone_id      = aws_route53_zone.hgzone.id
   taskcluster_vpc_cidr = "10.144.0.0/16"
 
   providers = {
-    aws = "aws.awsprovider-us-west-2"
+    aws = aws.awsprovider-us-west-2
   }
 }
 
@@ -211,14 +210,14 @@ module "vpc-uw2" {
 module "vpc-uw1" {
   source = "./modules/aws-vpc"
 
-  cidr_block = "10.191.11.0/24"
-  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
-  mirror_ami = "${var.centos7_amis["us-west-1"]}"
-  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  cidr_block           = "10.191.11.0/24"
+  metadata_bucket_name = aws_s3_bucket.metadata-bucket.bucket
+  mirror_ami           = var.centos7_amis["us-west-1"]
+  route53_zone_id      = aws_route53_zone.hgzone.id
   taskcluster_vpc_cidr = "10.143.0.0/16"
 
   providers = {
-    aws = "aws.awsprovider-us-west-1"
+    aws = aws.awsprovider-us-west-1
   }
 }
 
@@ -226,13 +225,14 @@ module "vpc-uw1" {
 module "vpc-ue1" {
   source = "./modules/aws-vpc"
 
-  cidr_block = "10.191.12.0/24"
-  metadata_bucket_name = "${aws_s3_bucket.metadata-bucket.bucket}"
-  mirror_ami = "${var.centos7_amis["us-east-1"]}"
-  route53_zone_id = "${aws_route53_zone.hgzone.id}"
+  cidr_block           = "10.191.12.0/24"
+  metadata_bucket_name = aws_s3_bucket.metadata-bucket.bucket
+  mirror_ami           = var.centos7_amis["us-east-1"]
+  route53_zone_id      = aws_route53_zone.hgzone.id
   taskcluster_vpc_cidr = "10.145.0.0/16"
 
   providers = {
-    aws = "aws.awsprovider-us-east-1"
+    aws = aws.awsprovider-us-east-1
   }
 }
+

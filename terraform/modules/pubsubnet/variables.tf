@@ -17,3 +17,4 @@ variable "route_table_id" {
 variable "vpc_id" {
   description = "ID of VPC in which the subnet will reside"
 }
+

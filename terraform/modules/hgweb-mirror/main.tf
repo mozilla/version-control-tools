@@ -3,31 +3,32 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 resource "aws_instance" "hgweb-mirror" {
-  ami = "${var.mirror_ami}"
-  instance_type = "${var.instance_type}"
-  subnet_id = "${var.subnet_id}"
-  vpc_security_group_ids = ["${var.security_group_ids}"]
-  ebs_optimized = true
+  ami                    = var.mirror_ami
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = var.security_group_ids
+  ebs_optimized          = true
 
-  user_data = "${var.user_data}"
+  user_data = var.user_data
 
   root_block_device {
     delete_on_termination = true
-    volume_size = 150
-    volume_type = "standard"
+    volume_size           = 150
+    volume_type           = "standard"
   }
 
   lifecycle {
-    ignore_changes = ["user_data"]
+    ignore_changes = [user_data]
   }
 
-  tags {
+  tags = {
     Name = "hgweb instance"
   }
 }
 
 resource "aws_lb_target_group_attachment" "mirror-attachment" {
-  target_group_arn = "${var.elb_target_group_arn}"
-  target_id = "${aws_instance.hgweb-mirror.id}"
-  port = 80
+  target_group_arn = var.elb_target_group_arn
+  target_id        = aws_instance.hgweb-mirror.id
+  port             = 80
 }
+
