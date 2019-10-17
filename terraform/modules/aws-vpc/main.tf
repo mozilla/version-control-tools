@@ -273,6 +273,19 @@ resource "aws_lb_target_group" "http-mirror-target-group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.hgci-vpc.id
+
+  # Use `/mozilla-central` here since using `/` will cause
+  # many errors when the LB follows links on the home page
+  health_check {
+    enabled             = true
+    interval            = 30
+    path                = "/mozilla-central"
+    port                = "traffic-port"
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    timeout             = 5
+    matcher             = "200"
+  }
 }
 
 resource "aws_lb_listener" "mirror-https-listener" {
