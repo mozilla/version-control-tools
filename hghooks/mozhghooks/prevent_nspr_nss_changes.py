@@ -23,6 +23,10 @@ def hook(ui, repo, node, source=None, **kwargs):
         if len(ctx.parents()) > 1:
             continue
 
+        # Permit backouts.
+        if "Backed out changeset" in ctx.description():
+            continue
+
         if any(f.startswith('nsprpub/') for f in ctx.files()):
             if 'UPGRADE_NSPR_RELEASE' not in ctx.description():
                 nspr_nodes.append(short(ctx.node()))
