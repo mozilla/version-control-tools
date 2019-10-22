@@ -4,11 +4,13 @@
 #
 #    ./upgrade-python-packages
 #
+--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
+
 amqp==1.4.9 \
     --hash=sha256:2dea4d16d073c902c3b89d9b96620fb6729ac0f7a923bbc777cb4ad827c0c61a \
     --hash=sha256:e0ed0ce6b8ffe5690a2e856c7908dc557e0e605283d6885dd1361d79f2928908
-ansible==2.5.11 \
-    --hash=sha256:44544a9e8b9c9b1ab8168a53a8131aec05636ef8fe2688732a6a0935e87c301f
+ansible==2.6.18 \
+    --hash=sha256:588e4d85ec21cddf959a66cbe62bbfcff6236a1cd44b1264b14a19d34b8dffdf
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
     # via kombu
