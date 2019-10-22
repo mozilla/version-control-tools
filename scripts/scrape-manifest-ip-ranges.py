@@ -15,6 +15,7 @@ import sys
 import time
 from pathlib import Path
 
+import dns.resolver
 import requests
 from datadiff import diff
 from voluptuous import All, Schema, Invalid as VoluptuousInvalid, truth
@@ -213,9 +214,65 @@ def get_aws_ips():
         logger.exception('Exception message: %s' % vi.error_message)
         sys.exit(1)
 
+
+def recursive_domain_query(dnsresolver: dns.resolver.Resolver, blocks: list, domain: str):
+    '''Perform a DNS query for `domain`, which may return more subdomains
+    which need to be queried.
+
+    GCP advertises it's IP address blocks via TXT DNS records. The initial domain
+    returns a list of subdomains to query. Those subdomains can contain IP address
+    blocks, or further subdomains to query for more block lists.
+    '''
+    response = dnsresolver.query(domain, rdtype='txt')
+
+    if len(response) != 1:
+        logger.warn('Initial DNS query expected 1 result (actual: %d)' % len(response))
+
+    # Parse each record in the response
+    for item in response.rrset.items:
+        for field in item.to_text().split(' '):
+            if field.startswith('ip4:'):
+                ip = field[len('ip4:'):]
+                blocks.append(ip)
+            elif field.startswith('include:'):
+                subdomain = field[len('include:'):]
+                recursive_domain_query(dnsresolver, blocks, subdomain)
+
+
+def get_gcp_ips():
+    '''Entry point for the AWS IP address scraper
+
+    Queries GCP advertised DNS records to determine GCP public IP blocks and write them
+    to disk.
+    '''
+    try:
+        gcp_ip_ranges_file = Path('/var/hg/gcp-ip-ranges.txt')
+
+        # Create a dns resolver that uses Google's nameservers
+        # Not entirely necessary but since we're querying Google's
+        # records it's probably not a bad idea
+        dnsresolver = dns.resolver.Resolver()
+        dnsresolver.nameservers = ['8.8.8.8', '8.8.4.4']
+
+        blocks = []
+
+        recursive_domain_query(dnsresolver, blocks, '_cloud-netblocks.googleusercontent.com')
+
+        if not blocks:
+            raise Exception('domain query returned no blocks')
+
+        # Write to path atomically
+        write_to_file_atomically(gcp_ip_ranges_file, '\n'.join(blocks))
+
+    except Exception as e:
+        logger.exception('Error fetching GCP records: %s' % e)
+        sys.exit(1)
+
+
 # Register possible commands
 COMMANDS = {
     'aws': get_aws_ips,
+    'gcloud': get_gcp_ips,
     'moz-offices': get_mozilla_office_ips,
 }
 
