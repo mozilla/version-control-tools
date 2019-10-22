@@ -70,6 +70,11 @@ provider "aws" {
   profile = "hgaws"
 }
 
+provider "google" {
+  project = "hgmo-236019"
+  region  = "us-central1"
+}
+
 # Configure a bucket to hold various metadata (remote state, etc)
 resource "aws_s3_bucket" "metadata-bucket" {
   bucket = "hgaws-metadata"
@@ -236,3 +241,44 @@ module "vpc-ue1" {
   }
 }
 
+# Service account to upload the bundles
+resource "google_service_account" "gcp-hgbundler" {
+  account_id   = "hgbundler"
+  display_name = "hgbundler"
+}
+
+resource "google_service_account_key" "gcp-hgbundler-key" {
+  service_account_id = google_service_account.gcp-hgbundler.id
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+# Bucket for bundles
+resource "google_storage_bucket" "gcp-bundles-uc1" {
+  name          = "moz-hg-bundles-gcp-us-central1"
+  location      = "us-central1"
+  storage_class = "STANDARD"
+
+  # Delete after 1 week inactive
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age        = 7
+      with_state = "ANY"
+    }
+  }
+
+  # Ensure bundles are around for 1 week minimum
+  retention_policy {
+    is_locked        = false
+    retention_period = 604800
+  }
+}
+
+# Allow public read access to the world for the bundles bucket
+resource "google_storage_bucket_access_control" "public-bundle-rule" {
+  bucket = google_storage_bucket.gcp-bundles-uc1.name
+  role   = "READER"
+  entity = "allUsers"
+}
