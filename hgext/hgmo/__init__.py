@@ -101,6 +101,8 @@ configitem('hgmo', 'mozippath',
            default=None)
 configitem('hgmo', 'awsippath',
            default=None)
+configitem(b'hgmo', b'gcpippath',
+           default=None)
 configitem('hgmo', 'pullclonebundlesmanifest',
            default=configitems.dynamicdefault)
 configitem('hgmo', 'replacebookmarks',
@@ -690,13 +692,13 @@ def stream_clone_cmp(a, b):
     return 0
 
 
-def filter_manifest_for_aws_region(manifest, region):
-    """Filter a clonebundles manifest by region
+def filter_manifest_for_region(manifest, region):
+    """Filter a clonebundles manifest by cloud region
 
     The returned manifest will be sorted to prioritize clone bundles
     for the specified AWS region.
     """
-    filtered = [l for l in manifest.data.splitlines() if 'ec2region=%s' % region in l]
+    filtered = [l for l in manifest.data.splitlines() if region in l]
     # No manifest entries for this region.
     if not filtered:
         return manifest
@@ -726,10 +728,11 @@ def processbundlesmanifest(orig, repo, proto):
     if not isinstance(proto, webproto):
         return manifest
 
-    # Get path for Mozilla, AWS network prefixes. Return if missing
+    # Get path for Mozilla, AWS, GCP network prefixes. Return if missing
     mozpath = repo.ui.config('hgmo', 'mozippath')
     awspath = repo.ui.config('hgmo', 'awsippath')
-    if not awspath and not mozpath:
+    gcppath = repo.ui.config(b'hgmo', b'gcpippath')
+    if not awspath and not mozpath and not gcppath:
         return manifest
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
@@ -753,7 +756,7 @@ def processbundlesmanifest(orig, repo, proto):
 
         region = instance_data['v1']['region']
 
-        return filter_manifest_for_aws_region(manifest, region)
+        return filter_manifest_for_region(manifest, b'ec2region=%s' % region)
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
@@ -770,10 +773,28 @@ def processbundlesmanifest(orig, repo, proto):
 
                 region = ipentry['region']
 
-                return filter_manifest_for_aws_region(manifest, region)
+                return filter_manifest_for_region(manifest, b'ec2region=%s' % region)
 
         except Exception as e:
-            repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
+            repo.ui.log('hgmo', 'exception filtering AWS bundle source IPs: %s\n', e)
+
+    # If the GCP IP file path is set and some line in the manifest includes a GCE region,
+    # we will check if the request came from GCP to serve optimized bundles
+    if gcppath and b'gceregion=' in manifest.data:
+        try:
+            with open(gcppath, 'rb') as f:
+                gcpdata = f.read().splitlines()
+
+            for entry in gcpdata:
+                network = ipaddress.IPv4Network(pycompat.unicode(entry))
+
+                if sourceip not in network:
+                    continue
+
+                return filter_manifest_for_region(manifest, b'gceregion=us-central1')
+
+        except Exception as e:
+            repo.ui.log(b'hgmo', b'exception filtering GCP bundle source IPs: %s\n', e)
 
     # Determine if source IP is in a Mozilla network, as we stream results to those addresses
     if mozpath:
