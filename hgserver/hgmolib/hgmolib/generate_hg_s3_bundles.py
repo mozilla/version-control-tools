@@ -17,7 +17,7 @@ import time
 import boto3
 import botocore.exceptions
 import concurrent.futures as futures
-
+import google.cloud as gcloud
 
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
@@ -47,8 +47,8 @@ CLONEBUNDLES_ORDER = [
     ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
 ]
 
-# Defines hostname and bucket where uploads should go.
-HOSTS = (
+# Defines S3 hostname and bucket where uploads should go.
+S3_HOSTS = (
     # We list Oregon (us-west-2) before N. California (us-west-1) because it is
     # cheaper.
     ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
@@ -57,6 +57,14 @@ HOSTS = (
     ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
     ('s3-eu-central-1.amazonaws.com', 'moz-hg-bundles-eu-central-1', 'eu-central-1'),
 )
+
+# Defines GCP bucket name and region where uploads should go.
+# GCP buckets all use the same prefix, unlike AWS
+GCP_HOSTS = (
+    ('moz-hg-bundles-gcp-us-central1', 'us-central1'),
+)
+
+GCS_ENDPOINT = 'https://storage.googleapis.com'
 
 CDN = 'https://hg.cdn.mozilla.net'
 
@@ -183,6 +191,46 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
             time.sleep(15)
     raise Exception('S3 upload of %s:%s not successful after %s attempts, '
                     'giving up' % (bucket_name, remote_path, attempt))
+
+
+def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
+    """Uploads a file to the bucket.
+
+    taken from https://cloud.google.com/python/
+    """
+    for _attempt in range(3):
+        try:
+            storage_client = gcloud.storage.Client()
+            bucket = storage_client.get_bucket(bucket_name)
+            blob = bucket.blob(remote_path)
+
+            if blob.exists():
+                print('resetting expiration time for %s:%s' % (bucket_name, remote_path))
+
+                # Set a temporary hold on an object and then remove the hold, to reset the
+                # retention period of the object. See below for details:
+                # https://cloud.google.com/storage/docs/bucket-lock#object-holds
+                blob.event_based_hold = True
+                blob.patch()
+
+                blob.event_based_hold = False
+                blob.patch()
+
+                print('expiration time reset for %s:%s' % (bucket_name, remote_path))
+            else:
+                print('uploading %s:%s from %s' % (bucket_name, remote_path,
+                                                   local_path))
+                blob.upload_from_filename(local_path)
+                print('uploading %s:%s completed' % (bucket_name, remote_path))
+
+            return
+
+        except socket.error as e:
+            print('%s:%s failed: %s' % (bucket_name, remote_path, e))
+            time.sleep(15)
+    else:
+        raise Exception('GCP cloud storage upload of %s:%s not successful after'
+                        '3 attempts, giving up' % (bucket_name, remote_path))
 
 
 def bundle_paths(root, repo, tag, typ):
@@ -343,10 +391,16 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     if upload:
         fs = []
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
-            for host, bucket, name in HOSTS:
+            for host, bucket, name in S3_HOSTS:
                 for t, bundle_path, remote_path in bundles:
                     print('uploading to %s/%s/%s' % (host, bucket, remote_path))
                     fs.append(e.submit(upload_to_s3, name, bucket,
+                                       bundle_path, remote_path))
+
+            for bucket, region in GCP_HOSTS:
+                for t, bundle_path, remote_path in bundles:
+                    print('uploading to %s/%s/%s'% (GCS_ENDPOINT, bucket, remote_path))
+                    fs.append(e.submit(upload_to_gcpstorage, region, bucket,
                                        bundle_path, remote_path))
 
         # Future.result() will raise if a future raised. This will
@@ -371,9 +425,17 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         clonebundles_manifest.append('%s/%s %s REQUIRESNI=true cdn=true' % (
             CDN, remote_path, params))
 
-        for host, bucket, name in HOSTS:
+        # Prefer S3 buckets over GCP buckets for the time being,
+        # so add them first
+        for host, bucket, name in S3_HOSTS:
             entry = 'https://%s/%s/%s %s ec2region=%s' % (
                 host, bucket, remote_path, params, name)
+            clonebundles_manifest.append(entry)
+
+        for bucket, name in GCP_HOSTS:
+            entry = '%s/%s/%s %s gceregion=%s' % (
+                GCS_ENDPOINT, bucket, remote_path, params, name
+            )
             clonebundles_manifest.append(entry)
 
     backup_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest.old')
@@ -438,7 +500,7 @@ def generate_index(repos):
 
 
 def upload_index(html):
-    for host, bucket, region in HOSTS:
+    for host, bucket, region in S3_HOSTS:
         client = boto3.client('s3', region_name=region)
         client.put_object(
             Bucket=bucket,
@@ -450,6 +512,12 @@ def upload_index(html):
             # less aggressive caching policy.
             CacheControl='max-age=60',
         )
+
+    for bucket, region in GCP_HOSTS:
+        client = gcloud.storage.Client()
+        gcp_bucket = client.get_bucket(bucket)
+        blob = gcp_bucket.blob('index.html')
+        blob.upload_from_string(html)
 
 
 def generate_json_manifest(repos):
@@ -473,7 +541,7 @@ def generate_json_manifest(repos):
 
 
 def upload_json_manifest(data):
-    for host, bucket, region in HOSTS:
+    for host, bucket, region in S3_HOSTS:
         c = boto3.client('s3', region_name=region)
         c.put_object(
             Bucket=bucket,
@@ -482,6 +550,12 @@ def upload_json_manifest(data):
             ContentType='application/json',
             CacheControl='max-age=60',
         )
+
+    for bucket, region in GCP_HOSTS:
+        client = gcloud.storage.Client()
+        gcp_bucket = client.get_bucket(bucket)
+        blob = gcp_bucket.blob('bundles.json')
+        blob.upload_from_string(data)
 
 
 def main():

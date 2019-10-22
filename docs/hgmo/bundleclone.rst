@@ -77,6 +77,10 @@ ec2region
    ``us-west-1``, ``us-west-2``, ``us-east-1``, ``eu-central-``.
    You should prefer the region that is closest to you.
 
+gceregion
+   The GCE region the bundle file should be served from. We only support
+   ``us-central1`` at this time.
+
 cdn
    Indicates whether the URL is on a CDN. Value is ``true`` to indicate
    the URL is a CDN. All other values or undefined values are to be
@@ -173,7 +177,7 @@ Manifest Advertisements to Mozilla Offices
 
 If the client request appears to originate from a Mozilla office network,
 we make the assumption that the network speed and bandwidth are sufficient
-to always prefer the high-speed streamed clone bundles. 
+to always prefer the high-speed streamed clone bundles.
 
 Which Repositories Have Bundles Available
 =========================================
