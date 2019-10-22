@@ -528,6 +528,29 @@
            state=started
   when: vct_dir.stat.exists == False
 
+- name: systemd service files for GCP IP scraper
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - gcp-ip-scraper.service
+    - gcp-ip-scraper.timer
+  notify: systemd daemon reload
+  when: vct_dir.stat.exists == False
+
+- name: GCP IP scraper service enabled (server only)
+  service: name=gcp-ip-scraper.timer
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
+
+- name: Run GCP IP scrape to get latest (server only)
+  service: name=gcp-ip-scraper.service
+           enabled=yes
+           state=started
+  when: vct_dir.stat.exists == False
 
 - name: install vcsreplicator config
   template: src="{{ item }}.j2"
