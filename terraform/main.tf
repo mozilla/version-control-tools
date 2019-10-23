@@ -277,8 +277,9 @@ resource "google_storage_bucket" "gcp-bundles-uc1" {
 }
 
 # Allow public read access to the world for the bundles bucket
-resource "google_storage_bucket_access_control" "public-bundle-rule" {
+resource "google_storage_bucket_iam_member" "public-bundle-rule" {
   bucket = google_storage_bucket.gcp-bundles-uc1.name
-  role   = "READER"
-  entity = "allUsers"
+  role   = "roles/storage.objectViewer"
+
+  member = "allUsers"
 }
