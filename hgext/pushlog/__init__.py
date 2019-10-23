@@ -20,6 +20,7 @@ from mercurial import (
     exchange,
     extensions,
     localrepo,
+    pycompat,
     registrar,
     revset,
     templateutil,
@@ -212,8 +213,20 @@ Push = collections.namedtuple('Push', ('pushid', 'user', 'when', 'nodes'))
 def make_post_close(repo, conn):
     """Make a function to be called when a Mercurial transaction closes."""
     def pushlog_tr_post_close(tr):
-        conn.commit()
-        conn.close()
+        for attempt in range(3):
+            try:
+                conn.commit()
+                conn.close()
+
+                return
+            except sqlite3.OperationalError as e:
+                repo.ui.write(b'error committing pushlog transaction on'
+                              b' attempt %d; retrying\n' % (attempt + 1))
+                repo.ui.log(b'pushlog', b'Exception: %s' % pycompat.bytestr(e))
+                time.sleep(attempt * 1.0)
+        else:
+            raise error.Abort(b'could not complete push due to pushlog operational errors; '
+                              b'please retry, and file a bug if the issue persists')
 
     return pushlog_tr_post_close
 
