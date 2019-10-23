@@ -30,10 +30,10 @@ var dataframe_aggregator_pending = stream
 // Threshold
 var alert_message_lag_consumer = dataframe_consumer
     |alert()
-        .warn(lambda: abs("message_lag") > 30)
-        .crit(lambda: abs("message_lag") > 50)
-        .warnReset(lambda: abs("message_lag") < 2)
-        .critReset(lambda: abs("message_lag") < 2)
+        .warn(lambda: abs(float("message_lag")) > 30.0)
+        .crit(lambda: abs(float("message_lag")) > 50.0)
+        .warnReset(lambda: abs(float("message_lag")) < 2.0)
+        .critReset(lambda: abs(float("message_lag")) < 2.0)
         .message('*[{{ index .Tags "host" }}]* vcsreplicator-consumer partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
 
 var alert_time_lag_consumer = dataframe_consumer
@@ -46,10 +46,10 @@ var alert_time_lag_consumer = dataframe_consumer
 
 var alert_message_lag_heads = dataframe_heads
     |alert()
-        .warn(lambda: abs("message_lag") > 30)
-        .crit(lambda: abs("message_lag") > 50)
-        .warnReset(lambda: abs("message_lag") < 2)
-        .critReset(lambda: abs("message_lag") < 2)
+        .warn(lambda: abs(float("message_lag")) > 30)
+        .crit(lambda: abs(float("message_lag")) > 50)
+        .warnReset(lambda: abs(float("message_lag")) < 2)
+        .critReset(lambda: abs(float("message_lag")) < 2)
         .message('*[{{ index .Tags "host" }}]* vcsreplicator-heads partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
 
 var alert_time_lag_heads = dataframe_heads
@@ -62,18 +62,18 @@ var alert_time_lag_heads = dataframe_heads
 
 var alert_message_lag_aggregator = dataframe_aggregator
     |alert()
-        .warn(lambda: abs("message_lag") > 30)
-        .crit(lambda: abs("message_lag") > 50)
-        .warnReset(lambda: abs("message_lag") < 2)
-        .critReset(lambda: abs("message_lag") < 2)
+        .warn(lambda: abs(float("message_lag")) > 30)
+        .crit(lambda: abs(float("message_lag")) > 50)
+        .warnReset(lambda: abs(float("message_lag")) < 2)
+        .critReset(lambda: abs(float("message_lag")) < 2)
         .message('*[{{ index .Tags "host" }}]* vcsreplicator-aggregator partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
 
 var alert_message_lag_aggregator_pending = dataframe_aggregator_pending
     |alert()
-        .warn(lambda: abs("message_lag") > 30)
-        .crit(lambda: abs("message_lag") > 50)
-        .warnReset(lambda: abs("message_lag") < 2)
-        .critReset(lambda: abs("message_lag") < 2)
+        .warn(lambda: abs(float("message_lag")) > 30)
+        .crit(lambda: abs(float("message_lag")) > 50)
+        .warnReset(lambda: abs(float("message_lag")) < 2)
+        .critReset(lambda: abs(float("message_lag")) < 2)
         .message('*[{{ index .Tags "host" }}]* vcsreplicator-pending partition {{ index .Tags "partition" }} is *{{ .Level }}*: lagging by {{ index .Fields "message_lag" }} messages')
 
 // Alert
