@@ -276,6 +276,12 @@ resource "google_storage_bucket" "gcp-bundles-uc1" {
   }
 }
 
+resource "google_storage_bucket_iam_member" "hgbundler-access" {
+  bucket = google_storage_bucket.gcp-bundles-uc1.name
+  role   = "roles/storage.objectAdmin"
+  member = google_service_account.gcp-hgbundler.name
+}
+
 # Allow public read access to the world for the bundles bucket
 resource "google_storage_bucket_iam_member" "public-bundle-rule" {
   bucket = google_storage_bucket.gcp-bundles-uc1.name
