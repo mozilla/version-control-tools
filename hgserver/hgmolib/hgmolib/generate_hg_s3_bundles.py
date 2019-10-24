@@ -17,7 +17,7 @@ import time
 import boto3
 import botocore.exceptions
 import concurrent.futures as futures
-import google.cloud as gcloud
+from google.cloud import storage
 
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
@@ -200,7 +200,7 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
     """
     for _attempt in range(3):
         try:
-            storage_client = gcloud.storage.Client()
+            storage_client = storage.Client()
             bucket = storage_client.get_bucket(bucket_name)
             blob = bucket.blob(remote_path)
 
@@ -514,7 +514,7 @@ def upload_index(html):
         )
 
     for bucket, region in GCP_HOSTS:
-        client = gcloud.storage.Client()
+        client = storage.Client()
         gcp_bucket = client.get_bucket(bucket)
         blob = gcp_bucket.blob('index.html')
         blob.upload_from_string(html)
@@ -552,7 +552,7 @@ def upload_json_manifest(data):
         )
 
     for bucket, region in GCP_HOSTS:
-        client = gcloud.storage.Client()
+        client = storage.Client()
         gcp_bucket = client.get_bucket(bucket)
         blob = gcp_bucket.blob('bundles.json')
         blob.upload_from_string(data)
