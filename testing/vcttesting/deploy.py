@@ -59,8 +59,15 @@ def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
         'vct': ROOT,
     }
 
-    return run_playbook('deploy-hgmo', extra_vars=extra,
+    res = run_playbook('deploy-hgmo', extra_vars=extra,
                         verbosity=verbosity)
+
+    # Wipe away encrypted secrets
+    subprocess.check_output(
+        ['hg', '-R', ROOT, 'update', '--clean', '-r', '.']
+    )
+
+    return res
 
 
 def deploy_vcs_sync(verbosity=0):
