@@ -108,6 +108,7 @@ def install_mercurials(venv, hg):
         '4.9.1',
         '5.0.1',
         '5.1',
+        '5.2rc0',
         '@',
     ]
 
