@@ -6,6 +6,7 @@ OnFailure=mail-unit-output@%n.service
 [Service]
 ExecStart=/var/hg/venv_bundles/bin/generate-hg-s3-bundles -f /repo/hg/bundles/repos
 Environment="PYTHONUNBUFFERED=1"
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/home/hg/hgbundler.json"
 Type=oneshot
 User=hg
 Group=hg
