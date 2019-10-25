@@ -124,12 +124,12 @@ wireproto = import_module('mercurial.wireprotov1server')
 if not wireproto:
     wireproto = import_module('mercurial.wireproto')
 
-testedwith = '4.6 4.7 4.8 4.9 5.0 5.1'
-minimumhgversion = '4.6'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.4'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
-MOZ_ROOT_REV = '8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
-COMM_ROOT_REV = 'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
+MOZ_ROOT_REV = b'8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
+COMM_ROOT_REV = b'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
 cmdtable = {}
 configtable = {}
@@ -139,21 +139,21 @@ command = registrar.command(cmdtable)
 configitem = registrar.configitem(configtable)
 templatekeyword = registrar.templatekeyword(keywords)
 
-configitem('firefoxtree', 'servetags',
+configitem(b'firefoxtree', b'servetags',
            default=configitems.dynamicdefault)
-configitem('firefoxtree', 'servetagsfrombookmarks',
+configitem(b'firefoxtree', b'servetagsfrombookmarks',
            default=configitems.dynamicdefault)
 
 
-shorttemplate = ''.join([
-    '{label("log.changeset", rev)}',
-    '{label("log.changeset", ":")}',
-    '{label("log.changeset", node|short)}',
-    ' ',
-    '{label("log.tag", join(fxheads, " "))}',
-    ' ',
-    '{label("log.summary", firstline(desc))}',
-    '\n',
+shorttemplate = b''.join([
+    b'{label("log.changeset", rev)}',
+    b'{label("log.changeset", ":")}',
+    b'{label("log.changeset", node|short)}',
+    b' ',
+    b'{label("log.tag", join(fxheads, " "))}',
+    b' ',
+    b'{label("log.summary", firstline(desc))}',
+    b'\n',
     ])
 
 def isfirefoxrepo(repo):
@@ -173,7 +173,7 @@ def isfirefoxrepo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.vfs.exists('IS_FIREFOX_REPO')
+    return repo.vfs.exists(b'IS_FIREFOX_REPO')
 
 # Wrap repo lookup to automagically resolve tree names to URIs.
 def peerorrepo(orig, ui, path, *args, **kwargs):
@@ -227,8 +227,8 @@ def share(orig, ui, source, *args, **kwargs):
     r = hg.repository(ui, destwvfs.base)
 
     with r.wlock():
-        with r.vfs('shared', 'ab') as fh:
-            fh.write('firefoxtrees\n')
+        with r.vfs(b'shared', b'ab') as fh:
+            fh.write(b'firefoxtrees\n')
 
     return res
 
@@ -237,8 +237,8 @@ def capabilities(orig, repo, proto):
     caps = orig(repo, proto)
 
     if isfirefoxrepo(repo) and \
-            repo.ui.configbool('firefoxtree', 'servetags', False):
-        caps.append('firefoxtrees')
+            repo.ui.configbool(b'firefoxtree', b'servetags', False):
+        caps.append(b'firefoxtrees')
 
     return caps
 
@@ -253,17 +253,17 @@ def writefirefoxtrees(repo):
             continue
 
         assert len(node) == 20
-        lines.append('%s %s' % (tree, hex(node)))
+        lines.append(b'%s %s' % (tree, hex(node)))
         trees[tree] = hex(node)
 
     with open(repo._firefoxtreespath, 'wb') as fh:
-        fh.write('\n'.join(lines))
+        fh.write(b'\n'.join(lines))
 
     # Old versions of firefoxtrees stored labels in the localtags file. Since
     # this file is read by Mercurial and has no relevance to us any more, we
     # prune relevant entries from this file so the data isn't redundant with
     # what we now write.
-    localtags = repo.vfs.tryread('localtags')
+    localtags = repo.vfs.tryread(b'localtags')
     havedata = len(localtags) > 0
     taglines  = []
     for line in localtags.splitlines():
@@ -274,7 +274,7 @@ def writefirefoxtrees(repo):
             taglines.append(line)
 
     if havedata:
-        repo.vfs.write('localtags', '\n'.join(taglines))
+        repo.vfs.write(b'localtags', b'\n'.join(taglines))
 
 
 def get_firefoxtrees(repo):
@@ -293,32 +293,32 @@ def get_firefoxtrees(repo):
 def firefoxtrees(repo, proto):
     lines = []
 
-    if repo.ui.configbool('firefoxtree', 'servetagsfrombookmarks', False):
+    if repo.ui.configbool(b'firefoxtree', b'servetagsfrombookmarks', False):
         for name, hnode in sorted(bookmarks.listbookmarks(repo).items()):
             tree, uri = resolve_trees_to_uris([name])[0]
             if not uri:
                 continue
 
-            lines.append('%s %s' % (tree.encode('ascii'), hnode))
+            lines.append(b'%s %s' % (tree.encode('utf-8'), hnode))
     else:
         for tag, node, tree, uri in get_firefoxtrees(repo):
-            lines.append('%s %s' % (tag, hex(node)))
+            lines.append(b'%s %s' % (tag, hex(node)))
 
-    return '\n'.join(lines)
+    return b'\n'.join(lines)
 
 # Mercurial 4.5.2 added a "permissions" dict. 4.6 moved this into the
 # @wireprotocommand decorator.
 
 # TRACKING hg46
 if 'permission' in pycompat.getargspec(wireproto.wireprotocommand).args:
-    firefoxtrees = wireproto.wireprotocommand('firefoxtrees', '',
-                                              permission='pull')(firefoxtrees)
+    firefoxtrees = wireproto.wireprotocommand(b'firefoxtrees', b'',
+                                              permission=b'pull')(firefoxtrees)
 else:
-    firefoxtrees = wireproto.wireprotocommand('firefoxtrees', '')(firefoxtrees)
+    firefoxtrees = wireproto.wireprotocommand(b'firefoxtrees', b'')(firefoxtrees)
 
     # TRACKING hg45
-    if util.safehasattr(wireproto, 'permissions'):
-        wireproto.permissions['firefoxtrees'] = 'pull'
+    if util.safehasattr(wireproto, b'permissions'):
+        wireproto.permissions[b'firefoxtrees'] = b'pull'
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
@@ -331,8 +331,8 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # repo.
     tree = resolve_uri_to_tree(remote.url())
     if tree and not revs:
-        repo.ui.status(_('no revisions specified to push; '
-            'using . to avoid pushing multiple heads\n'))
+        repo.ui.status(_(b'no revisions specified to push; '
+                         b'using . to avoid pushing multiple heads\n'))
         revs = [repo[b'.'].node()]
 
     res = orig(repo, remote, force=force, revs=revs, newbranch=newbranch,
@@ -356,12 +356,12 @@ def prepushoutgoinghook(*args):
     outgoing = args[0].outgoing
 
     tree = resolve_uri_to_tree(remote.url())
-    if not tree or tree == 'try':
+    if not tree or tree == b'try':
         return
 
     if len(outgoing.missingheads) > 1:
-        raise error.Abort(_('cannot push multiple heads to a Firefox tree; '
-            'limit pushed revisions using the -r argument'))
+        raise error.Abort(_(b'cannot push multiple heads to a Firefox tree; '
+                            b'limit pushed revisions using the -r argument'))
 
 def wrappedpullobsolete(orig, pullop):
     res = orig(pullop)
@@ -372,7 +372,7 @@ def wrappedpullobsolete(orig, pullop):
     if not isfirefoxrepo(repo):
         return res
 
-    if remote.capable('firefoxtrees'):
+    if remote.capable(b'firefoxtrees'):
         bmstore = bookmarks.bmstore(repo)
         # remote.local() returns a localrepository or None. If local,
         # just pass it into the wire protocol command/function to simulate
@@ -380,7 +380,7 @@ def wrappedpullobsolete(orig, pullop):
         if remote.local():
             lines = firefoxtrees(remote.local(), None).splitlines()
         else:
-            lines = remote._call('firefoxtrees').splitlines()
+            lines = remote._call(b'firefoxtrees').splitlines()
         oldtags = {}
         for tag, node, tree, uri in get_firefoxtrees(repo):
             oldtags[tag] = node
@@ -396,13 +396,13 @@ def wrappedpullobsolete(orig, pullop):
             # Wipe it out - the server takes precedence.
             if tag in bmstore:
                 oldtags[tag] = bmstore[tag]
-                repo.ui.status('(removing bookmark on %s matching firefoxtree %s)\n' %
+                repo.ui.status(b'(removing bookmark on %s matching firefoxtree %s)\n' %
                                (short(bmstore[tag]), tag))
 
                 changes.append((tag, None))
 
                 if bmstore.active == tag:
-                    repo.ui.status('(deactivating bookmark %s)\n' % tag)
+                    repo.ui.status(b'(deactivating bookmark %s)\n' % tag)
                     bookmarks.deactivate(repo)
 
             if oldtags.get(tag, None) == node:
@@ -412,15 +412,15 @@ def wrappedpullobsolete(orig, pullop):
 
             between = None
             if tag in oldtags:
-                between = len(repo.revs('%n::%n', oldtags[tag], node)) - 1
+                between = len(repo.revs(b'%n::%n', oldtags[tag], node)) - 1
 
                 if not between:
                     continue
 
-            msg = _('updated firefox tree tag %s') % tag
+            msg = _(b'updated firefox tree tag %s') % tag
             if between:
-                msg += _(' (+%d commits)') % between
-            msg += '\n'
+                msg += _(b' (+%d commits)') % between
+            msg += b'\n'
             repo.ui.status(msg)
 
         if changes:
@@ -448,7 +448,7 @@ def wrappedpullbookmarks(orig, pullop):
     """
     repo = pullop.repo
 
-    if isfirefoxrepo(repo) and pullop.remote.capable('firefoxtrees'):
+    if isfirefoxrepo(repo) and pullop.remote.capable(b'firefoxtrees'):
         pullop.remotebookmarks = {k: v for k, v in pullop.remotebookmarks.items()
                                   if not resolve_trees_to_uris([k])[0][1]}
 
@@ -469,25 +469,25 @@ def updateremoterefs(repo, remote, tree):
     # RELBRANCH and other branches if we really cared about it.
     # Maybe later.
     branchmap = remote.branchmap()
-    if 'default' not in branchmap:
+    if b'default' not in branchmap:
         return
 
     # Firefox repos should only ever have a single head in the
     # default branch.
-    defaultnodes = branchmap['default']
+    defaultnodes = branchmap[b'default']
     node = defaultnodes[-1]
 
     repo.firefoxtrees[tree] = node
     writefirefoxtrees(repo)
 
 
-def pullcommand(orig, ui, repo, source='default', **opts):
+def pullcommand(orig, ui, repo, source=b'default', **opts):
     """Wraps built-in pull command to expand special aliases."""
     if not isfirefoxrepo(repo):
         return orig(ui, repo, source=source, **opts)
 
     # The special source "fxtrees" will pull all trees we've pulled before.
-    if source == 'fxtrees':
+    if source == b'fxtrees':
         for tag, node, tree, uri in get_firefoxtrees(repo):
             res = orig(ui, repo, source=tree, **opts)
             if res:
@@ -519,9 +519,9 @@ def outgoingcommand(orig, ui, repo, dest=None, **opts):
     tree, uri = resolve_trees_to_uris([dest])[0]
     rev = opts.get('rev')
     if uri and not rev:
-        ui.status(_('no revisions specified; '
-            'using . to avoid inspecting multiple heads\n'))
-        opts['rev'] = '.'
+        ui.status(_(b'no revisions specified; '
+                    b'using . to avoid inspecting multiple heads\n'))
+        opts['rev'] = b'.'
     if uri:
         dest = uri
 
@@ -542,10 +542,10 @@ def pushcommand(orig, ui, repo, dest=None, **opts):
 
     return orig(ui, repo, dest=dest, **opts)
 
-@command('fxheads', [
-    ('T', 'template', shorttemplate,
-     _('display with template'), _('TEMPLATE')),
-    ], _('show Firefox tree heads'))
+@command(b'fxheads', [
+    (b'T', b'template', shorttemplate,
+     _(b'display with template'), _(b'TEMPLATE')),
+    ], _(b'show Firefox tree heads'))
 def fxheads(ui, repo, **opts):
     """Show last known head commits for pulled Firefox trees.
 
@@ -553,7 +553,7 @@ def fxheads(ui, repo, **opts):
     data is current.
     """
     if not isfirefoxrepo(repo):
-        raise error.Abort(_('fxheads is only available on Firefox repos'))
+        raise error.Abort(_(b'fxheads is only available on Firefox repos'))
 
     if logcmdutil:
         displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
@@ -574,29 +574,29 @@ def fxheadsrevset(repo, subset, x):
     """``fxheads()``
     Last known head commits of pulled Firefox trees.
     """
-    revset.getargs(x, 0, 0, _("fxheads takes no arguments"))
+    revset.getargs(x, 0, 0, _(b"fxheads takes no arguments"))
     r = revset.baseset(repo[node].rev()
                        for t, node, tr, u in get_firefoxtrees(repo))
     return r & subset
 
 
 def _getcachedlabels(repo, ctx, cache):
-    labels = cache.get('fxheads', None)
+    labels = cache.get(b'fxheads', None)
     if labels is None:
         if isfirefoxrepo(repo):
             labels = list(get_firefoxtrees(repo))
-            cache['fxheads'] = labels
+            cache[b'fxheads'] = labels
         else:
             labels = False
-            cache['fxheads'] = False
+            cache[b'fxheads'] = False
 
     return labels
 
 # TRACKING hg46
 if util.versiontuple(n=2) >= (4, 6):
-    fxheadsdec = templatekeyword('fxheads', requires={'repo, ctx, cache'})
+    fxheadsdec = templatekeyword(b'fxheads', requires={b'repo', b'ctx', b'cache'})
 else:
-    fxheadsdec = templatekeyword('fxheads')
+    fxheadsdec = templatekeyword(b'fxheads')
 
 @fxheadsdec
 def template_fxheads(*args, **kwargs):
@@ -604,13 +604,13 @@ def template_fxheads(*args, **kwargs):
     # TRACKING hg46
     if util.versiontuple(n=2) >= (4, 6):
         context, mapping = args
-        repo = context.resource(mapping, 'repo')
-        ctx = context.resource(mapping, 'ctx')
-        cache = context.resource(mapping, 'cache')
+        repo = context.resource(mapping, b'repo')
+        ctx = context.resource(mapping, b'ctx')
+        cache = context.resource(mapping, b'cache')
     else:
-        repo = kwargs['repo']
-        ctx = kwargs['ctx']
-        cache = kwargs['cache']
+        repo = kwargs[b'repo']
+        ctx = kwargs[b'ctx']
+        cache = kwargs[b'cache']
 
     labels = _getcachedlabels(repo, ctx, cache)
     if not labels:
@@ -621,22 +621,22 @@ def template_fxheads(*args, **kwargs):
 
     # TRACKING hg47
     if templateutil:
-        return templateutil.hybridlist(sortedres, 'log.tag')
+        return templateutil.hybridlist(sortedres, b'log.tag')
     else:
         return sortedres
 
 
 def extsetup(ui):
-    extensions.wrapfunction(hg, '_peerorrepo', peerorrepo)
-    extensions.wrapfunction(hg, 'share', share)
-    extensions.wrapfunction(exchange, 'push', push)
-    extensions.wrapfunction(exchange, '_pullobsolete', wrappedpullobsolete)
-    extensions.wrapfunction(exchange, '_pullbookmarks', wrappedpullbookmarks)
-    extensions.wrapfunction(wireproto, '_capabilities', capabilities)
-    extensions.wrapcommand(commands.table, 'outgoing', outgoingcommand)
-    extensions.wrapcommand(commands.table, 'pull', pullcommand)
-    extensions.wrapcommand(commands.table, 'push', pushcommand)
-    revset.symbols['fxheads'] = fxheadsrevset
+    extensions.wrapfunction(hg, b'_peerorrepo', peerorrepo)
+    extensions.wrapfunction(hg, b'share', share)
+    extensions.wrapfunction(exchange, b'push', push)
+    extensions.wrapfunction(exchange, b'_pullobsolete', wrappedpullobsolete)
+    extensions.wrapfunction(exchange, b'_pullbookmarks', wrappedpullbookmarks)
+    extensions.wrapfunction(wireproto, b'_capabilities', capabilities)
+    extensions.wrapcommand(commands.table, b'outgoing', outgoingcommand)
+    extensions.wrapcommand(commands.table, b'pull', pullcommand)
+    extensions.wrapcommand(commands.table, b'push', pushcommand)
+    revset.symbols[b'fxheads'] = fxheadsrevset
 
 
 def reposetup(ui, repo):
@@ -649,8 +649,8 @@ def reposetup(ui, repo):
             caps = super(firefoxtreesrepo, self)._restrictcapabilities(caps)
 
             if (isfirefoxrepo(self) and
-                    self.ui.configbool('firefoxtree', 'servetags', False)):
-                caps.add('firefoxtrees')
+                    self.ui.configbool(b'firefoxtree', b'servetags', False)):
+                caps.add(b'firefoxtrees')
 
             return caps
 
@@ -700,12 +700,12 @@ def reposetup(ui, repo):
 
         @property
         def _firefoxtreespath(self):
-            shared = {s.strip() for s in repo.vfs.tryread('shared').splitlines()}
+            shared = {s.strip() for s in repo.vfs.tryread(b'shared').splitlines()}
 
-            if 'firefoxtrees' in shared and repo.sharedpath != repo.path:
-                return os.path.join(repo.sharedpath, 'firefoxtrees')
+            if b'firefoxtrees' in shared and repo.sharedpath != repo.path:
+                return os.path.join(repo.sharedpath, b'firefoxtrees')
             else:
-                return self.vfs.join('firefoxtrees')
+                return self.vfs.join(b'firefoxtrees')
 
     repo.__class__ = firefoxtreesrepo
 
@@ -714,7 +714,7 @@ def reposetup(ui, repo):
     if not isfirefoxrepo(repo):
         return
 
-    repo.prepushoutgoinghooks.add('firefoxtree', prepushoutgoinghook)
+    repo.prepushoutgoinghooks.add(b'firefoxtree', prepushoutgoinghook)
 
     def listnames(r):
         return r.firefoxtrees.keys()
@@ -729,8 +729,8 @@ def reposetup(ui, repo):
         return [name for name, n in r.firefoxtrees.items()
                 if n == node]
 
-    n = namespaces.namespace('fxtrees',
-                             templatename='fxtree',
+    n = namespaces.namespace(b'fxtrees',
+                             templatename=b'fxtree',
                              listnames=listnames,
                              namemap=namemap,
                              nodemap=nodemap)
