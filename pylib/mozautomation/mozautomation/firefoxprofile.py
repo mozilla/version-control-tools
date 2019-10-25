@@ -38,36 +38,36 @@ def find_profiles(find_times=False):
         CSIDL_APPDATA = 26
         if not SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf):
             path = path_buf.value
-            base = os.path.join(path_buf.value, 'Mozilla', 'Firefox')
+            base = os.path.join(path_buf.value, b'Mozilla', b'Firefox')
     else:
-        base = os.path.expanduser('~/.mozilla/firefox')
+        base = os.path.expanduser(b'~/.mozilla/firefox')
 
     if not base:
         return []
 
-    ini_path = os.path.join(base, 'profiles.ini')
+    ini_path = os.path.join(base, b'profiles.ini')
     c = RawConfigParser(allow_no_value=True)
     c.read([ini_path])
 
     paths = []
 
     for section in c.sections():
-        if not c.has_option(section, 'Path'):
+        if not c.has_option(section, b'Path'):
             continue
 
-        profile_path = c.get(section, 'Path')
+        profile_path = c.get(section, b'Path')
         is_relative = True
-        if c.has_option(section, 'IsRelative'):
-            is_relative = c.getboolean(section, 'IsRelative')
+        if c.has_option(section, b'IsRelative'):
+            is_relative = c.getboolean(section, b'IsRelative')
 
         if is_relative:
             profile_path = os.path.join(base, profile_path)
 
         is_default = False
-        if c.has_option(section, 'Default'):
-            is_default = c.getboolean(section, 'Default')
+        if c.has_option(section, b'Default'):
+            is_default = c.getboolean(section, b'Default')
 
-        name = c.get(section, 'Name')
+        name = c.get(section, b'Name')
 
         newest_time = None
         if find_times:
@@ -128,9 +128,9 @@ def get_cookies(profile_path, host=None):
     """
     with sqlite_safe_open(os.path.join(profile_path, 'cookies.sqlite')) as db:
         if host:
-            host = host.lstrip('.')
+            host = host.lstrip(b'.')
             result = db.execute('SELECT * FROM moz_cookies WHERE host=? or host=?',
-                (host, '.%s' % host))
+                (host, b'.%s' % host))
         else:
             result = db.execute('SELECT * FROM moz_cookies')
 

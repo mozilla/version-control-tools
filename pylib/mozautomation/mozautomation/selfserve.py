@@ -23,9 +23,9 @@ class Branch(object):
         self.name = name
 
         if meta:
-            self.graph_branches = meta['graph_branches']
-            self.repo = meta['repo']
-            self.repo_type = meta['repo']
+            self.graph_branches = meta[b'graph_branches']
+            self.repo = meta[b'repo']
+            self.repo_type = meta[b'repo']
 
     def builds(self):
         """Returns a list of builds on this branch."""
@@ -39,15 +39,15 @@ class Branch(object):
 
     def build(self, build_id):
         """Obtain info about a build specified by its ID."""
-        return self._request('build', build_id)
+        return self._request(b'build', build_id)
 
     def builders(self):
         """Return info on builders building for this branch."""
-        return self._request('builders')
+        return self._request(b'builders')
 
     def builder(self, builder):
         """Return info on a single bingler."""
-        return self._request('builders', builder)
+        return self._request(b'builders', builder)
 
     def _request(self, *paths):
         return self._client._request(self.name, *paths)
@@ -64,16 +64,16 @@ class SelfServeClient(object):
 
     def branches(self):
         """Returns all the branches as Branch instances."""
-        for name, meta in self._request('branches').items():
+        for name, meta in self._request(b'branches').items():
             yield Branch(self, name, meta)
 
     def jobs(self):
         """Returns a list of past self-serve request."""
-        return self._request('jobs')
+        return self._request(b'jobs')
 
     def get_job(self, job_id):
         """Return information about a specific job."""
-        return self._request('jobs', job_id)
+        return self._request(b'jobs', job_id)
 
     def __getitem__(self, key):
         """Dictionary like access retrives branches."""
@@ -82,20 +82,20 @@ class SelfServeClient(object):
     def _request(self, *paths):
         uri = self._uri
         for p in paths:
-            uri += '/%s' % p
+            uri += b'/%s' % p
 
         request = urllib2.Request(uri, None,
-            {'Accept': 'application/json'})
+            {b'Accept': b'application/json'})
 
         response = self._opener.open(request)
         return json.load(response)
 
 
 def get_mozilla_self_serve(username, password):
-    uri = 'https://secure.pub.build.mozilla.org/buildapi/self-serve'
+    uri = b'https://secure.pub.build.mozilla.org/buildapi/self-serve'
 
     handler = urllib2.HTTPBasicAuthHandler()
-    handler.add_password(realm='Mozilla Contributors - LDAP Authentication',
+    handler.add_password(realm=b'Mozilla Contributors - LDAP Authentication',
         uri=uri, user=username, passwd=password)
 
     opener = urllib2.build_opener(handler)

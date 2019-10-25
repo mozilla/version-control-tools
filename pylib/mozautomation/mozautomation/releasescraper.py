@@ -19,10 +19,10 @@ import concurrent.futures as futures
 import requests
 import requests.adapters
 
-NIGHTLY_ARCHIVE_URL = 'https://archive.mozilla.org/pub/firefox/nightly'
-RELEASES_ARCHIVE_URL = 'https://archive.mozilla.org/pub/firefox/releases'
+NIGHTLY_ARCHIVE_URL = b'https://archive.mozilla.org/pub/firefox/nightly'
+RELEASES_ARCHIVE_URL = b'https://archive.mozilla.org/pub/firefox/releases'
 
-RE_NIGHTLY_MONTH_ENTRY = re.compile(r'''
+RE_NIGHTLY_MONTH_ENTRY = re.compile(br'''
     <a\shref="/pub/firefox/nightly/\d{4}/\d{2}/
     # %Y-%m-%d
     (?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})
@@ -32,73 +32,73 @@ RE_NIGHTLY_MONTH_ENTRY = re.compile(r'''
     /">(?P<path>[^<]+)</a>
 ''', re.VERBOSE)
 
-RE_ARCHIVE_FILENAMES = re.compile(r'''
+RE_ARCHIVE_FILENAMES = re.compile(br'''
     <a\shref="(?P<fullpath>[^"]+)">(?P<path>[^\.][^<]+)</a>
 ''', re.VERBOSE)
 
 NIGHTLY_JSON_FILES = {
-    'linux32': re.compile('^firefox-.*\.linux-i686\.json$'),
-    'linux64': re.compile('^firefox-.*\.linux-x86_64\.json$'),
-    'linux64-asan': re.compile('^firefox-.*\.linux-x86_64-asan\.json$'),
-    'mac': re.compile('^firefox-.*\.mac(64)?\.json$'),
-    'win32': re.compile('^firefox-.*\.win32\.json$'),
-    'win64': re.compile('^firefox-.*\.win64(-x86_64)?\.json$'),
+    b'linux32': re.compile(b'^firefox-.*\.linux-i686\.json$'),
+    b'linux64': re.compile(b'^firefox-.*\.linux-x86_64\.json$'),
+    b'linux64-asan': re.compile(b'^firefox-.*\.linux-x86_64-asan\.json$'),
+    b'mac': re.compile(b'^firefox-.*\.mac(64)?\.json$'),
+    b'win32': re.compile(b'^firefox-.*\.win32\.json$'),
+    b'win64': re.compile(b'^firefox-.*\.win64(-x86_64)?\.json$'),
 }
 
 NIGHTLY_TEXT_FILES = {
-    'linux32': re.compile('^firefox-.*\.linux-i686\.txt$'),
-    'linux64': re.compile('^firefox-.*\.linux-x86_64\.txt$'),
-    'linux64-asan': re.compile('^firefox-.*-x86_64-asan\.txt$'),
-    'mac': re.compile('^firefox-.*\.mac(64)?\.txt$'),
-    'mac-shark': re.compile('^firefox-.*\.mac-shark\.txt$'),
-    'win32': re.compile('^firefox-.*\.win32\.txt$'),
-    'win64': re.compile('^firefox-.*\.win64(-x86_64)?\.txt$'),
+    b'linux32': re.compile(b'^firefox-.*\.linux-i686\.txt$'),
+    b'linux64': re.compile(b'^firefox-.*\.linux-x86_64\.txt$'),
+    b'linux64-asan': re.compile(b'^firefox-.*-x86_64-asan\.txt$'),
+    b'mac': re.compile(b'^firefox-.*\.mac(64)?\.txt$'),
+    b'mac-shark': re.compile(b'^firefox-.*\.mac-shark\.txt$'),
+    b'win32': re.compile(b'^firefox-.*\.win32\.txt$'),
+    b'win64': re.compile(b'^firefox-.*\.win64(-x86_64)?\.txt$'),
 }
 
 # Keys from above dicts that should be filtered out.
 NIGHTLY_IGNORE_PLATFORMS = {
-    'linux64-asan',
-    'mac-shark',
+    b'linux64-asan',
+    b'mac-shark',
 }
 
-RE_APP_VERSION = re.compile('^firefox-(?P<version>.+)\.en-US\.')
+RE_APP_VERSION = re.compile(b'^firefox-(?P<version>.+)\.en-US\.')
 
 # URLs where we're unable to find builds due to valid reasons.
 INVALID_NIGHTLY_URLS = {
-    'https://archive.mozilla.org/pub/firefox/nightly/2012/01/2012-01-21-11'
-    '-34-34-mozilla-central/',
-    'https://archive.mozilla.org/pub/firefox/nightly/2012/05/2012-05-28-03'
-    '-05-18-mozilla-central/',
+    b'https://archive.mozilla.org/pub/firefox/nightly/2012/01/2012-01-21-11'
+    b'-34-34-mozilla-central/',
+    b'https://archive.mozilla.org/pub/firefox/nightly/2012/05/2012-05-28-03'
+    b'-05-18-mozilla-central/',
 }
 
 TAGS_REPOS = [
-    ('releases/mozilla-beta', 'beta'),
-    ('releases/mozilla-release', 'release'),
+    (b'releases/mozilla-beta', b'beta'),
+    (b'releases/mozilla-release', b'release'),
 ]
 
 RELEASES_PLATFORMS = {
-    'linux32': 'linux-i686',
-    'linux64': 'linux-x86_64',
-    'mac': 'mac',
-    'win32': 'win32',
-    'win64': 'win64',
+    b'linux32': b'linux-i686',
+    b'linux64': b'linux-x86_64',
+    b'mac': b'mac',
+    b'win32': b'win32',
+    b'win64': b'win64',
 }
 
 # Tags that exist but we don't have releases for.
 MISSING_RELEASES = {
-    '3.1a1',
-    '3.1a2',
-    '5.0b4',
-    '13.0.2',
-    '40.0.1',
+    b'3.1a1',
+    b'3.1a2',
+    b'5.0b4',
+    b'13.0.2',
+    b'40.0.1',
 }
 
-RE_TAG = re.compile('^FIREFOX_(?P<version>.*)_RELEASE$')
+RE_TAG = re.compile(b'^FIREFOX_(?P<version>.*)_RELEASE$')
 
 
 def get_session():
     session = requests.Session()
-    session.headers['User-Agent'] = 'mozautomation/Firefox Release Scraper'
+    session.headers[b'User-Agent'] = b'mozautomation/Firefox Release Scraper'
 
     return session
 
@@ -147,12 +147,12 @@ def find_nightly_builds(start_day, end_day=None):
         # Load monthly pages to find links to builds.
         months = set()
         while day <= end_day:
-            months.add(day.strftime('%Y/%m'))
+            months.add(day.strftime(b'%Y/%m'))
             day += datetime.timedelta(days=1)
 
         month_fs = []
         for month in sorted(months):
-            url = '%s/%s/' % (NIGHTLY_ARCHIVE_URL, month)
+            url = b'%s/%s/' % (NIGHTLY_ARCHIVE_URL, month)
             month_fs.append(e.submit(session.get, url))
             day += datetime.timedelta(days=1)
 
@@ -164,18 +164,18 @@ def find_nightly_builds(start_day, end_day=None):
 
             for m in RE_NIGHTLY_MONTH_ENTRY.finditer(r.text):
                 groups = m.groupdict()
-                day = datetime.date(int(groups['year']), int(groups['month']),
-                                    int(groups['day']))
-                builds_by_day[day].append((groups['build'], groups['path']))
+                day = datetime.date(int(groups[b'year']), int(groups[b'month']),
+                                    int(groups[b'day']))
+                builds_by_day[day].append((groups[b'build'], groups[b'path']))
 
         build_fs = []
 
         for day, builds in sorted(builds_by_day.items()):
             for build, path in builds:
-                if build != 'mozilla-central':
+                if build != b'mozilla-central':
                     continue
 
-                url = '%s/%s/%s' % (NIGHTLY_ARCHIVE_URL, day.strftime('%Y/%m'),
+                url = b'%s/%s/%s' % (NIGHTLY_ARCHIVE_URL, day.strftime(b'%Y/%m'),
                                     path)
                 build_fs.append(e.submit(session.get, url))
 
@@ -194,12 +194,12 @@ def find_nightly_builds(start_day, end_day=None):
 
                 found_build = True
 
-                if info['platform'] in NIGHTLY_IGNORE_PLATFORMS:
+                if info[b'platform'] in NIGHTLY_IGNORE_PLATFORMS:
                     continue
 
-                assert info['path'].startswith('/pub/firefox/nightly/')
-                normpath = info['path'][len('/pub/firefox/nightly/'):]
-                url = '%s/%s' % (NIGHTLY_ARCHIVE_URL, normpath)
+                assert info[b'path'].startswith(b'/pub/firefox/nightly/')
+                normpath = info[b'path'][len(b'/pub/firefox/nightly/'):]
+                url = b'%s/%s' % (NIGHTLY_ARCHIVE_URL, normpath)
 
                 release_fs.append((info['platform'],
                                    e.submit(session.get, url)))
@@ -210,17 +210,17 @@ def find_nightly_builds(start_day, end_day=None):
                 if r.url in INVALID_NIGHTLY_URLS:
                     continue
 
-                if all('_test' in m.group('path')
+                if all(b'_test' in m.group('path')
                        for m in RE_ARCHIVE_FILENAMES.finditer(r.text)):
                     continue
 
-                if all(m.group('path').endswith('.txt.gz')
+                if all(m.group('path').endswith(b'.txt.gz')
                        for m in RE_ARCHIVE_FILENAMES.finditer(r.text)):
                     continue
 
-                print('no build info for %s' % r.url)
+                print(b'no build info for %s' % r.url)
                 for m in RE_ARCHIVE_FILENAMES.finditer(r.text):
-                    print('\t%s' % m.group('path'))
+                    print(b'\t%s' % m.group('path'))
                 continue
 
         try:
@@ -228,7 +228,7 @@ def find_nightly_builds(start_day, end_day=None):
                 r = f.result()
 
                 if r.status_code != 200:
-                    print('HTTP %s from %s' % (r.status_code, r.url))
+                    print(b'HTTP %s from %s' % (r.status_code, r.url))
                     continue
 
                 build = get_build_from_archive_file(platform, r)
@@ -247,35 +247,35 @@ def match_archive_build_file(url, m):
 
     # JSON is the preferred method for finding build info. Look for it
     # first.
-    if path.endswith('.json'):
+    if path.endswith(b'.json'):
         # Ignore JSON files that aren't build metadata.
-        if path.endswith(('.mozinfo.json', '.test_packages.json')):
+        if path.endswith((b'.mozinfo.json', b'.test_packages.json')):
             return
 
-        if path == 'test_packages.json':
+        if path == b'test_packages.json':
             return
 
         for platform, expr in NIGHTLY_JSON_FILES.items():
             if expr.match(path):
                 return {
-                    'platform': platform,
-                    'path': fullpath,
+                    b'platform': platform,
+                    b'path': fullpath,
                 }
 
         #print(path)
 
-    elif path.endswith('.txt'):
+    elif path.endswith(b'.txt'):
         for platform, expr in NIGHTLY_TEXT_FILES.items():
             if expr.match(path):
                 return {
-                    'platform': platform,
-                    'path': fullpath,
+                    b'platform': platform,
+                    b'path': fullpath,
                 }
 
-        if path.startswith(('minefield', 'mozilla-nightly')):
+        if path.startswith((b'minefield', b'mozilla-nightly')):
             return
 
-        if path.endswith('_info.txt'):
+        if path.endswith(b'_info.txt'):
             return
 
         #print('%s %s' % (path, url))
@@ -286,13 +286,13 @@ def get_build_from_archive_file(platform, r):
 
     The requested URL corresponds to a JSON or text build info file.
     """
-    if r.url.endswith('.json'):
+    if r.url.endswith(b'.json'):
         release = r.json()
 
-        build_id = release['buildid']
-        app_version = release['moz_app_version']
-        revision = release['moz_source_stamp']
-    elif r.url.endswith('.txt'):
+        build_id = release[b'buildid']
+        app_version = release[b'moz_app_version']
+        revision = release[b'moz_source_stamp']
+    elif r.url.endswith(b'.txt'):
         # Format is one of the following:
         #
         #   <buildid> <revision>
@@ -307,18 +307,18 @@ def get_build_from_archive_file(platform, r):
             build_id, revision = lines[0].split()
         elif len(lines) == 2:
             build_id, url = lines
-            assert url.startswith(('http://hg.mozilla.org/',
-                                   'https://hg.mozilla.org/'))
-            revision = url[url.rindex('/') + 1:]
+            assert url.startswith((b'http://hg.mozilla.org/',
+                                   b'https://hg.mozilla.org/'))
+            revision = url[url.rindex(b'/') + 1:]
         else:
-            print('unknown text file format for %s' % r.url)
+            print(b'unknown text file format for %s' % r.url)
             print(r.text)
             return None
 
-        path = r.url[r.url.rindex('/') + 1:]
+        path = r.url[r.url.rindex(b'/') + 1:]
         m = RE_APP_VERSION.match(path)
         if not m:
-            print('could not determine app version: %s' % path)
+            print(b'could not determine app version: %s' % path)
             return None
 
         app_version = m.group('version')
@@ -328,13 +328,13 @@ def get_build_from_archive_file(platform, r):
     day = int(build_id[6:8])
 
     return {
-        'channel': 'nightly',
-        'platform': platform,
-        'build_id': build_id,
-        'app_version': app_version,
-        'revision': revision,
-        'day': datetime.date(year, month, day),
-        'archive_url': r.url[:r.url.rindex('/') + 1],
+        b'channel': b'nightly',
+        b'platform': platform,
+        b'build_id': build_id,
+        b'app_version': app_version,
+        b'revision': revision,
+        b'day': datetime.date(year, month, day),
+        b'archive_url': r.url[:r.url.rindex(b'/') + 1],
     }
 
 
@@ -352,11 +352,11 @@ def ensure_full_revision(releases, local_hg_repo):
     """
     import hglib
 
-    with hglib.open(local_hg_repo, encoding='utf-8') as repo:
+    with hglib.open(local_hg_repo, encoding=b'utf-8') as repo:
         for release in releases:
-            if len(release['revision']) != 40:
-                ctx = repo[release['revision']]
-                release['revision'] = ctx.node()
+            if len(release[b'revision']) != 40:
+                ctx = repo[release[b'revision']]
+                release[b'revision'] = ctx.node()
 
             yield release
 
@@ -370,37 +370,37 @@ def find_builds_from_tags():
 
         # Need to process in order because we only process each tag once.
         for repo, channel in TAGS_REPOS:
-            url = 'https://hg.mozilla.org/%s/json-tags' % repo
+            url = b'https://hg.mozilla.org/%s/json-tags' % repo
 
             r = session.get(url)
             if r.status_code != 200:
                 raise Exception('unexpected non-200 from %s' % url)
 
-            for entry in r.json()['tags']:
-                m = RE_TAG.match(entry['tag'])
+            for entry in r.json()[b'tags']:
+                m = RE_TAG.match(entry[b'tag'])
                 if not m:
                     continue
 
-                if entry['tag'] in seen_tags:
+                if entry[b'tag'] in seen_tags:
                     continue
-                seen_tags.add(entry['tag'])
+                seen_tags.add(entry[b'tag'])
 
                 version = m.group('version')
 
-                if 'a' in version:
-                    sep = 'a'
-                    major, sub = version.split('a')
-                elif 'b' in version:
-                    sep = 'b'
-                    major, sub = version.split('b')
+                if b'a' in version:
+                    sep = b'a'
+                    major, sub = version.split(b'a')
+                elif b'b' in version:
+                    sep = b'b'
+                    major, sub = version.split(b'b')
                 else:
                     major = version
                     sub = None
 
-                major = major.replace('_', '.')
+                major = major.replace(b'_', b'.')
                 app_version = major
                 if sub:
-                    app_version += '%s%s' % (sep, sub)
+                    app_version += b'%s%s' % (sep, sub)
 
                 # Some releases are tagged but were never released. Skip them.
                 if app_version in MISSING_RELEASES:
@@ -408,33 +408,33 @@ def find_builds_from_tags():
 
                 # There are no build ids for release builds. Construct a
                 # dummy one from the tag date.
-                td = datetime.timedelta(seconds=entry['date'][0])
+                td = datetime.timedelta(seconds=entry[b'date'][0])
                 dt = datetime.datetime(1970, 1, 1) + td
                 day = dt.date()
 
-                build_id = dt.strftime('%Y%m%d%H%M%S')
+                build_id = dt.strftime(b'%Y%m%d%H%M%S')
 
                 for platform, archive_platform in RELEASES_PLATFORMS.items():
                     # win64 not produced until release 42.
-                    if platform == 'win64':
+                    if platform == b'win64':
                         v = distutils.version.StrictVersion
-                        ours = v(major) if '.' in major else v('%s.0' % major)
+                        ours = v(major) if b'.' in major else v(b'%s.0' % major)
 
-                        if ours < v('42.0'):
+                        if ours < v(b'42.0'):
                             continue
 
-                    archive_url = '%s/%s/%s/' % (RELEASES_ARCHIVE_URL,
+                    archive_url = b'%s/%s/%s/' % (RELEASES_ARCHIVE_URL,
                                                  app_version, archive_platform)
 
                     build = {
-                        'revision': entry['node'],
-                        'tag': entry['tag'],
-                        'channel': channel,
-                        'app_version': app_version,
-                        'platform': platform,
-                        'archive_url': archive_url,
-                        'build_id': build_id,
-                        'day': day,
+                        b'revision': entry[b'node'],
+                        b'tag': entry[b'tag'],
+                        b'channel': channel,
+                        b'app_version': app_version,
+                        b'platform': platform,
+                        b'archive_url': archive_url,
+                        b'build_id': build_id,
+                        b'day': day,
                     }
 
                     archive_fs.append((build,
@@ -444,8 +444,8 @@ def find_builds_from_tags():
             r = f.result()
             if r.status_code != 200:
                 # We shouldn't hit this.
-                print('could not find release %s %s from tag %s' % (
-                    build['app_version'], build['platform'], build['tag']))
+                print(b'could not find release %s %s from tag %s' % (
+                    build[b'app_version'], build[b'platform'], build[b'tag']))
                 continue
 
             yield build

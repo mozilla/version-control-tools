@@ -11,7 +11,7 @@ import re
 # handle lists well.
 
 BUG_RE = re.compile(
-    r'''# bug followed by any sequence of numbers, or
+    br'''# bug followed by any sequence of numbers, or
         # a standalone sequence of numbers
          (
            (?:
@@ -28,71 +28,71 @@ BUG_RE = re.compile(
 # Like BUG_RE except it doesn't flag sequences of numbers, only positive
 # "bug" syntax like "bug X" or "b=".
 BUG_CONSERVATIVE_RE = re.compile(
-    r'''((?:bug|b=)(?:\s*)(\d+)(?=\b))''', re.I | re.X)
+    br'''((?:bug|b=)(?:\s*)(\d+)(?=\b))''', re.I | re.X)
 
-SPECIFIER = r'(?:r|a|sr|rs|ui-r)[=?]'
-R_SPECIFIER = r'\br[=?]'
+SPECIFIER = br'(?:r|a|sr|rs|ui-r)[=?]'
+R_SPECIFIER = br'\br[=?]'
 R_SPECIFIER_RE = re.compile(R_SPECIFIER)
-REQUAL_SPECIFIER_RE = re.compile(r'r=')
-RQUESTION_SPECIFIER_RE = re.compile(r'r\?')
+REQUAL_SPECIFIER_RE = re.compile(br'r=')
+RQUESTION_SPECIFIER_RE = re.compile(br'r\?')
 
-LIST = r'[;,\/\\]\s*'
+LIST = br'[;,\/\\]\s*'
 LIST_RE = re.compile(LIST)
 
 # Note that we only allows a subset of legal IRC-nick characters.
 # Specifically we not allow [ \ ] ^ ` { | }
-IRC_NICK = r'[a-zA-Z0-9\-\_]+'          # this needs to match irc nicks
-BMO_IRC_NICK_RE = re.compile(r':(' + IRC_NICK + r')')
+IRC_NICK = br'[a-zA-Z0-9\-\_]+'          # this needs to match irc nicks
+BMO_IRC_NICK_RE = re.compile(br':(' + IRC_NICK + br')')
 
 REVIEWERS_RE = re.compile(
-    r'([\s\(\.\[;,])' +                 # before 'r' delimiter
-    r'(' + SPECIFIER + r')' +           # flag
-    r'(' +                              # capture all reviewers
+    br'([\s\(\.\[;,])' +                 # before 'r' delimiter
+    br'(' + SPECIFIER + br')' +           # flag
+    br'(' +                              # capture all reviewers
         IRC_NICK +                      # reviewer
-        r'(?:' +                        # additional reviewers
+        br'(?:' +                        # additional reviewers
             LIST +                      # delimiter
-            r'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
+            br'(?![a-z0-9\.\-]+[=?])' +  # don't extend match into next flag
             IRC_NICK +                  # reviewer
-        r')*' +
-    r')?')                              # noqa
+        br')*' +
+    br')?')                              # noqa
 
-BACKOUT_KEYWORD = r'^(?:backed out|backout|back out)\b'
+BACKOUT_KEYWORD = br'^(?:backed out|backout|back out)\b'
 BACKOUT_KEYWORD_RE = re.compile(BACKOUT_KEYWORD, re.I)
-CHANGESET_KEYWORD = r'(?:\b(?:changeset|revision|change|cset|of)\b)'
-CHANGESETS_KEYWORD = r'(?:\b(?:changesets|revisions|changes|csets|of)\b)'
-SHORT_NODE = r'([0-9a-f]{12}\b)'
+CHANGESET_KEYWORD = br'(?:\b(?:changeset|revision|change|cset|of)\b)'
+CHANGESETS_KEYWORD = br'(?:\b(?:changesets|revisions|changes|csets|of)\b)'
+SHORT_NODE = br'([0-9a-f]{12}\b)'
 SHORT_NODE_RE = re.compile(SHORT_NODE, re.I)
 
 BACKOUT_SINGLE_RE = re.compile(
-    BACKOUT_KEYWORD + r'\s+' +
-    CHANGESET_KEYWORD + r'?\s*' +
-    r'(?P<node>' + SHORT_NODE + r')',
+    BACKOUT_KEYWORD + br'\s+' +
+    CHANGESET_KEYWORD + br'?\s*' +
+    br'(?P<node>' + SHORT_NODE + br')',
     re.I
 )
 
 BACKOUT_MULTI_SPLIT_RE = re.compile(
-    BACKOUT_KEYWORD + r'\s+' +
-    r'(?P<count>\d+)\s+' +
+    BACKOUT_KEYWORD + br'\s+' +
+    br'(?P<count>\d+)\s+' +
     CHANGESETS_KEYWORD,
     re.I
 )
 
 BACKOUT_MULTI_ONELINE_RE = re.compile(
-    BACKOUT_KEYWORD + r'\s+' +
-    CHANGESETS_KEYWORD + r'?\s*' +
-    r'(?P<nodes>(?:(?:\s+|and|,)+' + SHORT_NODE + r')+)',
+    BACKOUT_KEYWORD + br'\s+' +
+    CHANGESETS_KEYWORD + br'?\s*' +
+    br'(?P<nodes>(?:(?:\s+|and|,)+' + SHORT_NODE + br')+)',
     re.I
 )
 
-SHORT_RE = re.compile('^[0-9a-f]{12}$', re.I)
+SHORT_RE = re.compile(b'^[0-9a-f]{12}$', re.I)
 
-DIGIT_RE = re.compile('#?\d+')
+DIGIT_RE = re.compile(b'#?\d+')
 
 # Strip out a white-list of metadata prefixes.
 # Currently just MozReview-Commit-ID
-METADATA_RE = re.compile('^MozReview-Commit-ID: ')
+METADATA_RE = re.compile(b'^MozReview-Commit-ID: ')
 
-DIFFERENTIAL_REVISION_RE = re.compile(r'(?P<phaburl>https://phabricator.services.mozilla.com/D\d+)')
+DIFFERENTIAL_REVISION_RE = re.compile(br'(?P<phaburl>https://phabricator.services.mozilla.com/D\d+)')
 
 
 def parse_bugs(s):
@@ -119,15 +119,15 @@ def filter_reviewers(s):
         if not word:
             continue
 
-        word = word.strip('"[]<>.:')
+        word = word.strip(b'"[]<>.:')
 
-        if '=' in word:
+        if b'=' in word:
             continue
 
-        if word.startswith('(') or word.endswith(')'):
+        if word.startswith(b'(') or word.endswith(b')'):
             continue
 
-        if word == 'DONTBUILD':
+        if word == b'DONTBUILD':
             continue
 
         if DIGIT_RE.match(word):
@@ -166,32 +166,32 @@ def parse_rquestion_reviewers(commit_description):
 
 def replace_reviewers(commit_description, reviewers):
     if not reviewers:
-        reviewers_str = ''
+        reviewers_str = b''
     else:
-        reviewers_str = 'r=' + ','.join(reviewers)
+        reviewers_str = b'r=' + b','.join(reviewers)
 
-    if commit_description == '':
+    if commit_description == b'':
         return reviewers_str
 
     commit_description = commit_description.splitlines()
     commit_summary = commit_description.pop(0)
-    commit_description = '\n'.join(commit_description)
+    commit_description = b'\n'.join(commit_description)
 
     if not R_SPECIFIER_RE.search(commit_summary):
-        commit_summary += ' ' + reviewers_str
+        commit_summary += b' ' + reviewers_str
     else:
         # replace the first r? with the reviewer list, and all subsequent
         # occurences with a marker to mark the blocks we need to remove
         # later
-        d = {'first': True}
+        d = {b'first': True}
 
         def replace_first_reviewer(matchobj):
             if R_SPECIFIER_RE.match(matchobj.group(2)):
-                if d['first']:
-                    d['first'] = False
+                if d[b'first']:
+                    d[b'first'] = False
                     return matchobj.group(1) + reviewers_str
                 else:
-                    return '\0'
+                    return b'\0'
             else:
                 return matchobj.group(0)
 
@@ -201,13 +201,13 @@ def replace_reviewers(commit_description, reviewers):
         # remove marker values as well as leading separators.  this allows us
         # to remove runs of multiple reviewers and retain the trailing
         # separator.
-        commit_summary = re.sub(LIST + '\0', '', commit_summary)
-        commit_summary = re.sub('\0', '', commit_summary)
+        commit_summary = re.sub(LIST + b'\0', b'', commit_summary)
+        commit_summary = re.sub(b'\0', b'', commit_summary)
 
-    if commit_description == "":
+    if commit_description == b"":
         return commit_summary.strip()
     else:
-        return commit_summary.strip() + "\n" + commit_description
+        return commit_summary.strip() + b"\n" + commit_description
 
 
 def is_backout(commit_desc):
@@ -293,31 +293,31 @@ def parse_commit_id(s):
 
     Returns None if the commit ID is not found.
     """
-    m = re.search('^MozReview-Commit-ID: ([a-zA-Z0-9]+)$', s, re.MULTILINE)
+    m = re.search(b'^MozReview-Commit-ID: ([a-zA-Z0-9]+)$', s, re.MULTILINE)
     if not m:
         return None
 
     return m.group(1)
 
 
-RE_SOURCE_REPO = re.compile('^Source-Repo: (https?:\/\/.*)$',
+RE_SOURCE_REPO = re.compile(b'^Source-Repo: (https?:\/\/.*)$',
                             re.MULTILINE)
-RE_SOURCE_REVISION = re.compile('^Source-Revision: (.*)$', re.MULTILINE)
+RE_SOURCE_REVISION = re.compile(b'^Source-Revision: (.*)$', re.MULTILINE)
 
 RE_XCHANNEL_REVISION = re.compile(
-    '^X-Channel-Repo: (?P<repo>[a-zA-Z0-9/\-._]+?)\n'
-    'X-Channel-Converted-Revision: (?P<revision>[a-fA-F0-9]{12,40}?)$',
+    b'^X-Channel-Repo: (?P<repo>[a-zA-Z0-9/\-._]+?)\n'
+    b'X-Channel-Converted-Revision: (?P<revision>[a-fA-F0-9]{12,40}?)$',
     re.MULTILINE)
 
 
 def xchannel_link(m):
-    s = m.group()[:(m.start('revision') - m.start())]
-    l = '<a href="https://hg.mozilla.org/{repo}/rev/{revision}">{revision}</a>'
+    s = m.group()[:(m.start(b'revision') - m.start())]
+    l = b'<a href="https://hg.mozilla.org/{repo}/rev/{revision}">{revision}</a>'
     s += l.format(
         repo=m.group('repo'),
         revision=m.group('revision'),
     )
-    s += m.group()[(m.end('revision') - m.start()):]
+    s += m.group()[(m.end(b'revision') - m.start()):]
     return s
 
 
@@ -325,11 +325,11 @@ def differential_revision_repl(match):
     """Replacement function to linkify Phabricator Differential
     Revision URLs in commit messages."""
     phaburl = match.group('phaburl')
-    return '<a href="{link}">{link}</a>'.format(link=phaburl)
+    return b'<a href="{link}">{link}</a>'.format(link=phaburl)
 
 
 def add_hyperlinks(s,
-                   bugzilla_url='https://bugzilla.mozilla.org/show_bug.cgi?id='):
+                   bugzilla_url=b'https://bugzilla.mozilla.org/show_bug.cgi?id='):
     """Add hyperlinks to a commit message.
 
     This is useful to be used as a Mercurial template filter for converting
@@ -345,12 +345,12 @@ def add_hyperlinks(s,
     if m:
         source_repo = m.group(1)
 
-        if source_repo.startswith('https://github.com/'):
-            github_repo = source_repo[len('https://github.com/'):]
+        if source_repo.startswith(b'https://github.com/'):
+            github_repo = source_repo[len(b'https://github.com/'):]
 
         start, end = m.span(1)
 
-        s = '%s<a href="%s">%s</a>%s' % (
+        s = b'%s<a href="%s">%s</a>%s' % (
             s[0:start],
             cgi.escape(source_repo),
             cgi.escape(source_repo),
@@ -364,7 +364,7 @@ def add_hyperlinks(s,
 
         # Hyperlink to GitHub commits.
         if github_repo:
-            s = '%s<a href="https://github.com/%s/commit/%s">%s</a>%s' % (
+            s = b'%s<a href="https://github.com/%s/commit/%s">%s</a>%s' % (
                 s[0:start],
                 cgi.escape(github_repo),
                 cgi.escape(source_revision),
@@ -373,12 +373,12 @@ def add_hyperlinks(s,
 
     # We replace #\d+ with links to the GitHub issue.
     if github_repo:
-        repl = r'<a href="https://github.com/%s/issues/\1">#\1</a>' % github_repo
-        s = re.sub(r'#(\d+)', repl, s)
+        repl = br'<a href="https://github.com/%s/issues/\1">#\1</a>' % github_repo
+        s = re.sub(br'#(\d+)', repl, s)
 
     # Bugzilla linking.
     bugzilla_re = BUG_CONSERVATIVE_RE if github_repo else BUG_RE
-    bugzilla_link = r'<a href="%s\2">\1</a>' % bugzilla_url
+    bugzilla_link = br'<a href="%s\2">\1</a>' % bugzilla_url
     s = bugzilla_re.sub(bugzilla_link, s)
 
     # l10n cross channel linking

@@ -26,13 +26,13 @@ Build = collections.namedtuple('Build', (
 
 def _dict_to_build(build):
     return Build(
-        build['build_id'].encode('ascii'),
-        build['channel'].encode('ascii'),
-        build['platform'].encode('ascii'),
-        build['app_version'].encode('ascii'),
-        build['revision'].encode('ascii'),
-        build['day'],
-        build['archive_url'].encode('ascii'))
+        build[b'build_id'],
+        build[b'channel'],
+        build[b'platform'],
+        build[b'app_version'],
+        build[b'revision'],
+        build[b'day'],
+        build[b'archive_url'])
 
 
 def _ts_to_day(ts):
@@ -150,10 +150,10 @@ class FirefoxReleaseDatabase(object):
 
             state = self.get_all_state()
 
-            insertion_key = int(state['insertion_key']) + 1
+            insertion_key = int(state[b'insertion_key']) + 1
 
-            if 'last_nightly_day' in state:
-                y, m, d = map(int, state['last_nightly_day'].split('-'))
+            if b'last_nightly_day' in state:
+                y, m, d = map(int, state[b'last_nightly_day'].split(b'-'))
                 last_day = datetime.date(y, m, d)
             else:
                 last_day = datetime.date(1900, 1, 1)
@@ -169,9 +169,9 @@ class FirefoxReleaseDatabase(object):
                 count += 1
 
             if count:
-                self._set_state('last_nightly_day',
-                                last_day.strftime('%Y-%m-%d'))
-                self._set_state('insertion_key', insertion_key)
+                self._set_state(b'last_nightly_day',
+                                last_day.strftime(b'%Y-%m-%d'))
+                self._set_state(b'insertion_key', insertion_key)
 
         return count
 
@@ -231,15 +231,15 @@ class FirefoxReleaseDatabase(object):
             day, artifacts_url = row
 
             yield json.dumps({
-                '_format': 1,
-                'insertion_key': insertion_key,
-                'channel': channel,
-                'platform': platform,
-                'build_id': build_id,
-                'app_version': app_version,
-                'revision': revision,
-                'day': day,
-                'artifacts_url': artifacts_url,
+                b'_format': 1,
+                b'insertion_key': insertion_key,
+                b'channel': channel,
+                b'platform': platform,
+                b'build_id': build_id,
+                b'app_version': app_version,
+                b'revision': revision,
+                b'day': day,
+                b'artifacts_url': artifacts_url,
             }, sort_keys=True)
 
     def import_serialized(self, data):
@@ -249,8 +249,8 @@ class FirefoxReleaseDatabase(object):
         Therefore, old data belonging to an incoming insertion key will be
         dropped and replaced by the incoming data.
         """
-        params = ('insertion_key', 'channel', 'platform', 'build_id',
-                  'app_version', 'revision', 'day', 'artifacts_url')
+        params = (b'insertion_key', b'channel', b'platform', b'build_id',
+                  b'app_version', b'revision', b'day', b'artifacts_url')
 
         insertion_keys = set()
 
@@ -258,11 +258,11 @@ class FirefoxReleaseDatabase(object):
         for entry in data:
             build = json.loads(entry)
 
-            if build['_format'] != 1:
+            if build[b'_format'] != 1:
                 raise Exception('unknown data format %s' %
-                                build['_format'])
+                                build[b'_format'])
 
-            insertion_keys.add(build['insertion_key'])
+            insertion_keys.add(build[b'insertion_key'])
             builds.append(tuple(build[k] for k in params))
 
         with self._db:
@@ -297,7 +297,7 @@ class FirefoxReleaseDatabase(object):
         """Caches data when the context manager is active."""
         monkey_patched = False
 
-        if 'builds' not in self.__dict__:
+        if b'builds' not in self.__dict__:
             builds = list(self.builds())
 
             # Monkeypatch self.builds() with a function that returns a cached copy.
@@ -310,4 +310,4 @@ class FirefoxReleaseDatabase(object):
             yield
         finally:
             if monkey_patched:
-                del self.__dict__['builds']
+                del self.__dict__[b'builds']
