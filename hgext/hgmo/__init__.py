@@ -233,8 +233,11 @@ def changesetentry(orig, web, ctx):
     """Wraps webutil.changesetentry to provide extra metadata."""
     d = orig(web, ctx)
 
+    d = pycompat.byteskwargs(d)
+
     addmetadata(web.repo, ctx, d)
-    return d
+
+    return pycompat.strkwargs(d)
 
 
 def changelistentry(orig, web, ctx):
@@ -450,7 +453,7 @@ def automationrelevancewebcommand(web):
         b'visible': visible,
     }
 
-    return web.sendtemplate(b'automationrelevance', **data)
+    return web.sendtemplate(b'automationrelevance', **pycompat.strkwargs(data))
 
 
 def isancestorwebcommand(web):

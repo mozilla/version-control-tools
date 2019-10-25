@@ -338,7 +338,7 @@ def pushlog_feed(web):
     }
 
     web.res.headers[b'Content-Type'] = ATOM_MIMETYPE
-    return web.sendtemplate(b'pushlog', **data)
+    return web.sendtemplate(b'pushlog', **pycompat.strkwargs(data))
 
 
 def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushcount=None):
@@ -529,7 +529,7 @@ def pushlog_html(web):
         b'archives': web.archivelist(b"tip"),
     }
 
-    return web.sendtemplate(b'pushlog', **data)
+    return web.sendtemplate(b'pushlog', **pycompat.strkwargs(data))
 
 
 def pushes_worker(query, repo, full):
@@ -600,7 +600,7 @@ def pushes(web):
     else:
         raise ErrorResponse(500, b'unexpected formatversion')
 
-    return web.sendtemplate(template, **data)
+    return web.sendtemplate(template, **pycompat.strkwargs(data))
 
 
 addwebcommand(pushlog_feed, 'pushlog')
