@@ -14,6 +14,7 @@ from mercurial import (
     encoding,
     error,
     extensions,
+    pycompat,
     registrar,
 )
 
@@ -26,18 +27,18 @@ with demandimport.deactivated():
     import requests  # noqa
 
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0'
 
 cmdtable = {}
 
 command = registrar.command(cmdtable)
 
-REVISION_KEY = 'subtree_revision'
-SOURCE_KEY = 'subtree_source'
-LINEAR_REPO_URL = 'https://hg.mozilla.org/projects/converted-servo-linear'
+REVISION_KEY = b'subtree_revision'
+SOURCE_KEY = b'subtree_source'
+LINEAR_REPO_URL = b'https://hg.mozilla.org/projects/converted-servo-linear'
 GITHUB_PR_URL = re.compile(
-    r'https://github\.com/servo/servo/pull/(?P<pr>[1-9][0-9]*)/?')
-COMMIT_MSG_PR = re.compile(r'servo: Merge #(?P<pr>[1-9][0-9]*) - .*')
+    br'https://github\.com/servo/servo/pull/(?P<pr>[1-9][0-9]*)/?')
+COMMIT_MSG_PR = re.compile(br'servo: Merge #(?P<pr>[1-9][0-9]*) - .*')
 
 
 def commitcommand(orig, ui, repo, *args, **kwargs):
@@ -48,27 +49,27 @@ def commitcommand(orig, ui, repo, *args, **kwargs):
     m = GITHUB_PR_URL.match(pr_url)
     if m is None:
         raise error.Abort(
-            _('--manualservosync was not a proper github pull request url'),
-            hint=_('url must be to a servo/servo pull request of the form '
-                   'https://github.com/servo/servo/pull/<pr-number>'))
+            _(b'--manualservosync was not a proper github pull request url'),
+            hint=_(b'url must be to a servo/servo pull request of the form '
+                   b'https://github.com/servo/servo/pull/<pr-number>'))
 
     pr = m.group('pr')
 
-    revset = urllib.quote('keyword("servo: Merge #%s")' % pr)
-    url = '%s/json-log?rev=%s' % (LINEAR_REPO_URL, revset)
+    revset = urllib.quote(b'keyword("servo: Merge #%s")' % pr)
+    url = b'%s/json-log?rev=%s' % (LINEAR_REPO_URL, revset)
     r = requests.get(url)
-    commits = r.json()['entries']
+    commits = r.json()[b'entries']
 
     if not commits:
         raise error.Abort(
-            _('could not find linearized commit corresponding to %s' % pr_url),
-            hint=_('If this pull requests has recently been merged it '
-                   'may not be linearized yet, please try again soon'))
+            _(b'could not find linearized commit corresponding to %s' % pr_url),
+            hint=_(b'If this pull requests has recently been merged it '
+                   b'may not be linearized yet, please try again soon'))
 
     repo.manualsync_commit = {
-        'desc': encoding.tolocal(commits[0]['desc'].encode('utf-8')),
-        'node': encoding.tolocal(commits[0]['node'].encode('utf-8')),
-        'user': encoding.tolocal(commits[0]['user'].encode('utf-8')),
+        b'desc': encoding.tolocal(commits[0][b'desc'].encode('utf-8')),
+        b'node': encoding.tolocal(commits[0][b'node'].encode('utf-8')),
+        b'user': encoding.tolocal(commits[0][b'user'].encode('utf-8')),
     }
     repo.manualsync_pr = pr
     repo.manualsync = True
@@ -84,9 +85,11 @@ def reposetup(ui, repo):
             if not self.manualsync:
                 return super(servosyncrepo, self).commit(*args, **kwargs)
 
+            kwargs = pycompat.byteskwargs(kwargs)
+
             # Override some of the commit meta data.
-            msg = self.manualsync_commit['desc']
-            user = self.manualsync_commit['user']
+            msg = self.manualsync_commit[b'desc']
+            user = self.manualsync_commit[b'user']
 
             # This method has many keyword arguments that mercurial
             # ocassionally passes positionally, meanig they end up
@@ -95,28 +98,28 @@ def reposetup(ui, repo):
             # the argument being passed twice, which is an error.
             # Protect against this by stripping the values out of
             # *args and **kwargs, passing them positionally ourselves.
-            for key in ('text', 'user'):
+            for key in (b'text', b'user'):
                 if args:
                     args = args[1:]
 
                 if key in kwargs:
                     del kwargs[key]
 
-            kwargs['extra'] = kwargs['extra'] if 'extra' in kwargs else {}
-            kwargs['extra'][SOURCE_KEY] = encoding.tolocal(LINEAR_REPO_URL)
-            kwargs['extra'][REVISION_KEY] = self.manualsync_commit['node']
+            kwargs[b'extra'] = kwargs[b'extra'] if b'extra' in kwargs else {}
+            kwargs[b'extra'][SOURCE_KEY] = encoding.tolocal(LINEAR_REPO_URL)
+            kwargs[b'extra'][REVISION_KEY] = self.manualsync_commit[b'node']
 
             # TODO: Verify that the file changes being committed are only
             # under the servo/ directory.
             ret = super(servosyncrepo, self).commit(
-                msg, user, *args, **kwargs)
+                msg, user, *args, **pycompat.strkwargs(kwargs))
 
             ctx = repo[ret]
 
-            if any(not f.startswith('servo/') for f in ctx.files()):
+            if any(not f.startswith(b'servo/') for f in ctx.files()):
                 self.ui.warn(
-                    _('warning: this commit touches files outside the servo '
-                      'directory and would be rejected by the server\n'))
+                    _(b'warning: this commit touches files outside the servo '
+                      b'directory and would be rejected by the server\n'))
 
             return ctx
 
@@ -125,8 +128,8 @@ def reposetup(ui, repo):
 
 
 def extsetup(ui):
-    entry = extensions.wrapcommand(commands.table, 'commit', commitcommand)
+    entry = extensions.wrapcommand(commands.table, b'commit', commitcommand)
     options = entry[1]
     options.append(
-        ('', 'manualservosync', '',
-         'manually overlay and sync a servo pull request', _("GH_PR_URL")))
+        (b'', b'manualservosync', b'',
+         b'manually overlay and sync a servo pull request', _(b"GH_PR_URL")))
