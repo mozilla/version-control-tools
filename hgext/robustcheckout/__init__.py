@@ -513,9 +513,10 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 # Will raise if failure limit reached.
                 handlenetworkfailure()
                 return True
+        # TODO test this branch
         elif isinstance(e, error.ResponseError):
-            if e.args[0].startswith(_('unexpected response from remote server:')):
-                ui.warn('(unexpected response from remote server; retrying)\n')
+            if e.args[0].startswith(_(b'unexpected response from remote server:')):
+                ui.warn(b'(unexpected response from remote server; retrying)\n')
                 destvfs.rmtree(forcibly=True)
                 # Will raise if failure limit reached.
                 handlenetworkfailure()
