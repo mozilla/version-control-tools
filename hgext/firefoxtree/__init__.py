@@ -553,6 +553,8 @@ def fxheads(ui, repo, **opts):
     if not isfirefoxrepo(repo):
         raise error.Abort(_(b'fxheads is only available on Firefox repos'))
 
+    opts = pycompat.byteskwargs(opts)
+
     if logcmdutil:
         displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
     else:
