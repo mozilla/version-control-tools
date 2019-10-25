@@ -37,8 +37,8 @@ with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
 
 from mozhg.util import import_module
 
-testedwith = '4.7 4.8 4.9 5.0'
-minimumhgversion = '4.7'
+testedwith = b'4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.7'
 
 cmdtable = {}
 
@@ -47,7 +47,7 @@ command = registrar.command(cmdtable)
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('overlay', 'sourceurl',
+configitem(b'overlay', b'sourceurl',
            default=configitems.dynamicdefault)
 
 # TRACKING hg48
@@ -58,17 +58,17 @@ if util.safehasattr(storageutil, 'parsemeta'):
 else:
     parsemeta = revlog.parsemeta
 
-REVISION_KEY = 'subtree_revision'
-SOURCE_KEY = 'subtree_source'
+REVISION_KEY = b'subtree_revision'
+SOURCE_KEY = b'subtree_source'
 
 
 def _ctx_summary(ctx):
     return [
-        '',
-        _('changeset: %s') % ctx.hex(),
-        _('user:      %s') % ctx.user(),
-        _('date:      %s') % dateutil.datestr(ctx.date()),
-        _('summary:   %s') % ctx.description().splitlines()[0],
+        b'',
+        _(b'changeset: %s') % ctx.hex(),
+        _(b'user:      %s') % ctx.user(),
+        _(b'date:      %s') % dateutil.datestr(ctx.date()),
+        _(b'summary:   %s') % ctx.description().splitlines()[0],
     ]
 
 
@@ -79,7 +79,7 @@ def _summarise_changed(summary, repo_name, repo, last_ctx, prefix, files):
 
     # Find revisions newer than the last overlaid.
     dest_revs = scmutil.revrange(
-        repo, ['%s:: and file("path:%s")' % (last_ctx.hex(), prefix)])
+        repo, [b'%s:: and file("path:%s")' % (last_ctx.hex(), prefix)])
     for rev in dest_revs:
         ctx = repo[rev]
 
@@ -97,10 +97,10 @@ def _summarise_changed(summary, repo_name, repo, last_ctx, prefix, files):
     if not all_ctxs:
         return
 
-    summary.extend(['', _('%s Repository:') % repo_name,
-                    '', _('Last overlaid revision:')])
+    summary.extend([b'', _(b'%s Repository:') % repo_name,
+                    b'', _(b'Last overlaid revision:')])
     summary.extend(_ctx_summary(overlaid_ctx))
-    summary.extend(['', _('Revisions that require investigation:')])
+    summary.extend([b'', _(b'Revisions that require investigation:')])
 
     # If we didn't find any revisions that match the problematic files report
     # on all revisions instead.
@@ -112,31 +112,32 @@ def _report_mismatch(ui, sourcerepo, lastsourcectx, destrepo, lastdestctx,
                      prefix, files, error_message, hint=None, notify=None):
     if notify:
         if files:
-            prefixed_file_set = set('%s%s' % (prefix, f) for f in files)
+            prefixed_file_set = set(b'%s%s' % (prefix, f) for f in files)
         else:
             prefixed_file_set = set()
 
         summary = [error_message.rstrip()]
-        _summarise_changed(summary, _('Source'), sourcerepo, lastsourcectx,
+        _summarise_changed(summary, _(b'Source'), sourcerepo, lastsourcectx,
                            prefix, prefixed_file_set)
-        _summarise_changed(summary, _('Destination'), destrepo, lastdestctx,
+        _summarise_changed(summary, _(b'Destination'), destrepo, lastdestctx,
                            prefix, prefixed_file_set)
-        summary_str = ('%s\n' % '\n'.join(summary))
+        summary_str = (b'%s\n' % b'\n'.join(summary))
 
-        cmd = shlex.split(notify)
+        cmd = shlex.split(notify.decode('ascii'))
         cmd[0] = os.path.expanduser(os.path.expandvars(cmd[0]))
         try:
             proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
             proc.communicate(summary_str)
         except OSError as ex:
-            ui.write('notify command "%s" failed: %s\n' % (cmd[0], ex))
+            ui.write(b'notify command "%s" failed: %s\n' %
+                     (cmd[0].encode('utf-8'), str(ex).encode('utf-8')))
 
     raise error.Abort(error_message, hint=hint)
 
 
 def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
                           prefix, lastsourcectx, lastdestctx, notify=None):
-    assert prefix.endswith('/')
+    assert prefix.endswith(b'/')
 
     sourceman = sourcectx.manifest()
     destman = destctx.manifest()
@@ -148,25 +149,25 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
         _report_mismatch(
             ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
             destfiles ^ sourcefiles,
-            (_('files mismatch between source and destination: %s')
-             % ', '.join(sorted(destfiles ^ sourcefiles))),
-            'destination must match previously imported changeset (%s) exactly'
+            (_(b'files mismatch between source and destination: %s')
+             % b', '.join(sorted(destfiles ^ sourcefiles))),
+            b'destination must match previously imported changeset (%s) exactly'
             % short(sourcectx.node()),
             notify=notify
         )
 
     # The set of paths is the same. Now verify the contents are identical.
     for sourcepath, sourcenode, sourceflags in sourceman.iterentries():
-        destpath = '%s%s' % (prefix, sourcepath)
+        destpath = b'%s%s' % (prefix, sourcepath)
         destnode, destflags = destman.find(destpath)
 
         if sourceflags != destflags:
             _report_mismatch(
                 ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
                 [sourcepath],
-                (_('file flags mismatch between source and destination for '
-                   '%s: %s != %s') % (sourcepath, sourceflags or _('(none)'),
-                                      destflags or _('(none)'))),
+                (_(b'file flags mismatch between source and destination for '
+                   b'%s: %s != %s') % (sourcepath, sourceflags or _(b'(none)'),
+                                      destflags or _(b'(none)'))),
                 notify=notify)
 
         # We can't just compare the nodes because they are derived from
@@ -180,8 +181,8 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
             _report_mismatch(
                 ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
                 [sourcepath],
-                _('content mismatch between source (%s) and destination (%s) '
-                  'in %s') % (short(sourcectx.node()), short(destctx.node()),
+                _(b'content mismatch between source (%s) and destination (%s) '
+                  b'in %s') % (short(sourcectx.node()), short(destctx.node()),
                               destpath),
                 notify=notify)
 
@@ -191,30 +192,30 @@ def _verifymanifestsequal(ui, sourcerepo, sourcectx, destrepo, destctx,
         destmeta = parsemeta(desttext)[0]
 
         # Copy path needs to be normalized before comparison.
-        if destmeta is not None and destmeta.get('copy', '').startswith(prefix):
-            destmeta['copy'] = destmeta['copy'][len(prefix):]
+        if destmeta is not None and destmeta.get(b'copy', b'').startswith(prefix):
+            destmeta[b'copy'] = destmeta[b'copy'][len(prefix):]
 
         # Copy revision may not be consistent across repositories because it
         # can be influenced by the path in a parent revision's copy metadata.
         # So ignore it.
-        if sourcemeta and 'copyrev' in sourcemeta:
-            del sourcemeta['copyrev']
-        if destmeta and 'copyrev' in destmeta:
-            del destmeta['copyrev']
+        if sourcemeta and b'copyrev' in sourcemeta:
+            del sourcemeta[b'copyrev']
+        if destmeta and b'copyrev' in destmeta:
+            del destmeta[b'copyrev']
 
         if sourcemeta != destmeta:
             _report_mismatch(
                 ui, sourcerepo, lastsourcectx, destrepo, lastdestctx, prefix,
                 [sourcepath],
-                (_('metadata mismatch for file %s between source and dest: '
-                   '%s != %s') % (destpath, sourcemeta, destmeta)),
+                (_(b'metadata mismatch for file %s between source and dest: '
+                   b'%s != %s') % (destpath, str(sourcemeta).encode('utf-8'), str(destmeta).encode('utf-8'))),
                 notify=notify)
 
 
 def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
                 prefix):
     """Overlay a single commit into another repo."""
-    assert prefix.endswith('/')
+    assert prefix.endswith(b'/')
     assert len(sourcectx.parents()) < 2
 
     sourceman = sourcectx.manifest()
@@ -228,13 +229,13 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
         sourcefl = sourcerepo.file(sourcepath)
         data = sourcefl.read(node)
 
-        islink = 'l' in flags
-        isexec = 'x' in flags
+        islink = b'l' in flags
+        isexec = b'x' in flags
 
         copied = None
         renamed = sourcefl.renamed(node)
         if renamed:
-            copied = '%s%s' % (prefix, renamed[0])
+            copied = b'%s%s' % (prefix, renamed[0])
 
         # TRACKING hg50 - `copied` renamed to `copysource`
         if util.versiontuple(n=2) >= (5, 0):
@@ -249,7 +250,7 @@ def _overlayrev(sourcerepo, sourceurl, sourcectx, destrepo, destctx,
                                       copied=copied)
 
     parents = [destctx.node(), None]
-    files = ['%s%s' % (prefix, f) for f in sourcectx.files()]
+    files = [b'%s%s' % (prefix, f) for f in sourcectx.files()]
     extra = dict(sourcectx.extra())
     extra[REVISION_KEY] = sourcectx.hex()
     extra[SOURCE_KEY] = sourceurl
@@ -276,7 +277,7 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
     contiguous DAG.
     """
     assert prefix
-    prefix = prefix.rstrip('/') + '/'
+    prefix = prefix.rstrip(b'/') + b'/'
 
     ui = destrepo.ui
 
@@ -294,10 +295,10 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
         except KeyError:
             if not noncontiguous:
                 raise error.Abort(
-                    _('source revisions must be part of contiguous DAG range'))
+                    _(b'source revisions must be part of contiguous DAG range'))
 
     if left:
-        raise error.Abort(_('source revisions must be part of same DAG head'))
+        raise error.Abort(_(b'source revisions must be part of same DAG head'))
 
     sourcerevs = list(sourcerevs)
 
@@ -329,8 +330,8 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
         try:
             lastdestctx = ctx
             idx = sourcerevs.index(lastsourcectx.rev()) + 1
-            ui.write(_('%s already processed as %s; '
-                       'skipping %d/%d revisions\n' %
+            ui.write(_(b'%s already processed as %s; '
+                       b'skipping %d/%d revisions\n' %
                        (short(lastsourcectx.node()), short(ctx.node()),
                         idx, len(sourcerevs))))
             sourcerevs = sourcerevs[idx:]
@@ -344,19 +345,19 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
             if firstsourcectx.p1().hex() == overlayed:
                 break
 
-            raise error.Abort(_('first source changeset (%s) is not a child '
-                                'of last overlayed changeset (%s)') % (
+            raise error.Abort(_(b'first source changeset (%s) is not a child '
+                                b'of last overlayed changeset (%s)') % (
                 short(firstsourcectx.node()), short(bin(overlayed))))
 
     if not sourcerevs:
-        ui.write(_('no source revisions left to process\n'))
+        ui.write(_(b'no source revisions left to process\n'))
         return
 
     # We don't (yet) support overlaying merge commits.
     for rev in sourcerevs:
         ctx = sourcerepo[rev]
         if len(ctx.parents()) > 1:
-            raise error.Abort(_('do not support overlaying merges: %s') %
+            raise error.Abort(_(b'do not support overlaying merges: %s') %
                               short(ctx.node()))
 
     # If we previously performed an overlay, verify that changeset
@@ -377,8 +378,8 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
     if lastsourcectx:
         if not noncontiguous:
             if sourcerepo[sourcerevs[0]].p1() != lastsourcectx:
-                raise error.Abort(_('parent of initial source changeset does '
-                                    'not match last overlayed changeset (%s)') %
+                raise error.Abort(_(b'parent of initial source changeset does '
+                                    b'not match last overlayed changeset (%s)') %
                                   short(lastsourcectx.node()))
 
             comparectx = lastsourcectx
@@ -390,28 +391,28 @@ def _dooverlay(sourcerepo, sourceurl, sourcerevs, destrepo, destctx, prefix,
 
     # All the validation is done. Proceed with the data conversion.
     with destrepo.lock():
-        with destrepo.transaction('overlay'):
+        with destrepo.transaction(b'overlay'):
             for i, rev in enumerate(sourcerevs):
-                ui.makeprogress(_('revisions'), i + 1, total=len(sourcerevs))
+                ui.makeprogress(_(b'revisions'), i + 1, total=len(sourcerevs))
                 sourcectx = sourcerepo[rev]
                 node = _overlayrev(sourcerepo, sourceurl, sourcectx,
                                    destrepo, destctx, prefix)
                 summary = sourcectx.description().splitlines()[0]
-                ui.write('%s -> %s: %s\n' % (short(sourcectx.node()),
+                ui.write(b'%s -> %s: %s\n' % (short(sourcectx.node()),
                                              short(node), summary))
                 destctx = destrepo[node]
 
-            ui.makeprogress(_('revisions'), None)
+            ui.makeprogress(_(b'revisions'), None)
 
 
 def _mirrorrepo(ui, repo, url):
     """Mirror a source repository into the .hg directory of another."""
     u = util.url(url)
     if u.islocal():
-        raise error.Abort(_('source repo cannot be local'))
+        raise error.Abort(_(b'source repo cannot be local'))
 
     # Remove scheme from path and normalize reserved characters.
-    path = url.replace('%s://' % u.scheme, '').replace('/', '_')
+    path = url.replace(b'%s://' % u.scheme, b'').replace(b'/', b'_')
     mirrorpath = repo.vfs.join(store.encodefilename(path))
 
     peer = hg.peer(ui, {}, url)
@@ -420,19 +421,19 @@ def _mirrorrepo(ui, repo, url):
 
     missingheads = [head for head in peer.heads() if head not in mirrorrepo]
     if missingheads:
-        ui.write(_('pulling %s into %s\n' % (url, mirrorpath)))
+        ui.write(_(b'pulling %s into %s\n' % (url, mirrorpath)))
         exchange.pull(mirrorrepo, peer)
 
     return mirrorrepo
 
 
-@command('overlay', [
-    ('d', 'dest', '', _('destination changeset on top of which to overlay '
-                        'changesets')),
-    ('', 'into', '', _('directory in destination in which to add files')),
-    ('', 'noncontiguous', False, _('allow non continuous dag heads')),
-    ('', 'notify', '', _('application to handle error notifications'))
-], _('[-d REV] SOURCEURL [REVS]'))
+@command(b'overlay', [
+    (b'd', b'dest', b'', _(b'destination changeset on top of which to overlay '
+                        b'changesets')),
+    (b'', b'into', b'', _(b'directory in destination in which to add files')),
+    (b'', b'noncontiguous', False, _(b'allow non continuous dag heads')),
+    (b'', b'notify', b'', _(b'application to handle error notifications'))
+], _(b'[-d REV] SOURCEURL [REVS]'))
 def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
             noncontiguous=False, notify=None):
     """Integrate contents of another repository.
@@ -472,24 +473,24 @@ def overlay(ui, repo, sourceurl, revs=None, dest=None, into=None,
     """
     # We could potentially support this later.
     if not into:
-        raise error.Abort(_('--into must be specified'))
+        raise error.Abort(_(b'--into must be specified'))
 
     if not revs:
-        revs = 'all()'
+        revs = b'all()'
 
     sourcerepo = _mirrorrepo(ui, repo, sourceurl)
     sourcerevs = scmutil.revrange(sourcerepo, [revs])
 
     if not sourcerevs:
-        raise error.Abort(_('unable to determine source revisions'))
+        raise error.Abort(_(b'unable to determine source revisions'))
 
     if dest:
         destctx = scmutil.revsymbol(repo, dest)
     else:
-        destctx = scmutil.revsymbol(repo, 'tip')
+        destctx = scmutil.revsymbol(repo, b'tip')
 
     # Backdoor for testing to force static URL.
-    sourceurl = ui.config('overlay', 'sourceurl', sourceurl)
+    sourceurl = ui.config(b'overlay', b'sourceurl', sourceurl)
 
     _dooverlay(sourcerepo, sourceurl, sourcerevs, repo, destctx, into,
                noncontiguous, notify)

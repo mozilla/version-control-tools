@@ -104,7 +104,8 @@ No copy metadata in dest fails precondition testing
   $ hg -q commit -A -m 'create foop-copy2 without copy metadata'
   $ hg overlay http://localhost:$HGPORT --into subdir
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
-  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None (no-py3 !)
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {b'copy': b'foo-copy'} != None (py3 !)
   [255]
 
   $ hg -q strip -r .
@@ -120,13 +121,15 @@ Metadata mismatch between source and dest fails precondition testing
 
   $ hg overlay http://localhost:$HGPORT --into subdir
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
-  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None (no-py3 !)
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {b'copy': b'foo-copy'} != None (py3 !)
   [255]
 
 Notification
 
   $ hg overlay http://localhost:$HGPORT --into subdir --notify 'sed "s/^/notify: /"'
-  notify: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  notify: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None (no-py3 !)
+  notify: metadata mismatch for file subdir/foo-copy2 between source and dest: {b'copy': b'foo-copy'} != None (py3 !)
   notify: 
   notify: Destination Repository:
   notify: 
@@ -149,7 +152,8 @@ Notification
   notify: date:      Thu Jan 01 00:00:00 1970 +0000
   notify: summary:   create foo-copy2 from different source
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
-  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None (no-py3 !)
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {b'copy': b'foo-copy'} != None (py3 !)
   [255]
 
 Bad notification switch shouldn't prevent normal errors
@@ -157,5 +161,6 @@ Bad notification switch shouldn't prevent normal errors
   $ hg overlay http://localhost:$HGPORT --into subdir --notify this-command-is-bad
   0f7e081c425c already processed as 4930b59d9987; skipping 4/5 revisions
   notify command "this-command-is-bad" failed: [Errno 2] No such file or directory
-  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != {'copy': 'root'}
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {'copy': 'foo-copy'} != None (no-py3 !)
+  abort: metadata mismatch for file subdir/foo-copy2 between source and dest: {b'copy': b'foo-copy'} != None (py3 !)
   [255]
