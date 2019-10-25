@@ -7,7 +7,7 @@
   $ echo initial > foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests

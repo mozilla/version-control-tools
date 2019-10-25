@@ -17,7 +17,7 @@ Create a unified repository with tags
   > EOF
 
   $ hg pull http://localhost:$HGPORT/mozilla-central
-  pulling from http://localhost:$HGPORT/mozilla-central
+  pulling from http://$LOCALHOST:$HGPORT/mozilla-central
   requesting all changes
   adding changesets
   adding manifests
@@ -26,7 +26,7 @@ Create a unified repository with tags
   new changesets b772b099dda6:994ec05999da (?)
   (run 'hg update' to get a working copy)
   $ hg pull http://localhost:$HGPORT/integration/mozilla-inbound
-  pulling from http://localhost:$HGPORT/integration/mozilla-inbound
+  pulling from http://$LOCALHOST:$HGPORT/integration/mozilla-inbound
   searching for changes
   adding changesets
   adding manifests
@@ -35,7 +35,7 @@ Create a unified repository with tags
   new changesets 01d6e2d31f88:1b348279b0e9 (?)
   (run 'hg update' to get a working copy)
   $ hg pull http://localhost:$HGPORT/integration/fx-team
-  pulling from http://localhost:$HGPORT/integration/fx-team
+  pulling from http://$LOCALHOST:$HGPORT/integration/fx-team
   searching for changes
   adding changesets
   adding manifests
@@ -52,7 +52,7 @@ Pulling from the unified repo will pull the Firefox tree tags
   $ cd repo
   $ touch .hg/IS_FIREFOX_REPO
   $ hg pull http://localhost:$HGPORT/unified
-  pulling from http://localhost:$HGPORT/unified
+  pulling from http://$LOCALHOST:$HGPORT/unified
   requesting all changes
   adding changesets
   adding manifests
@@ -85,7 +85,7 @@ Doing an incremental pull will print commit count change
 
   $ cd ../../repo
   $ hg pull http://localhost:$HGPORT/unified
-  pulling from http://localhost:$HGPORT/unified
+  pulling from http://$LOCALHOST:$HGPORT/unified
   searching for changes
   adding changesets
   adding manifests
@@ -144,7 +144,7 @@ Serve firefoxtree tags from bookmarks
   $ cd repo2
   $ touch .hg/IS_FIREFOX_REPO
   $ hg pull http://localhost:$HGPORT/unified
-  pulling from http://localhost:$HGPORT/unified
+  pulling from http://$LOCALHOST:$HGPORT/unified
   requesting all changes
   adding changesets
   adding manifests
@@ -179,7 +179,7 @@ Local bookmarks matching incoming firefox tree tags should be deleted
   (activating bookmark central)
 
   $ hg pull http://localhost:$HGPORT/unified
-  pulling from http://localhost:$HGPORT/unified
+  pulling from http://$LOCALHOST:$HGPORT/unified
   searching for changes
   no changes found
   (removing bookmark on 994ec05999da matching firefoxtree central)

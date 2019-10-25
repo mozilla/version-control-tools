@@ -16,7 +16,7 @@ Simple setup
   $ echo 1 > file3
   $ hg -q commit -A -m file3
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests

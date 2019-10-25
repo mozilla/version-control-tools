@@ -58,7 +58,7 @@ We can still push multiple heads to non-Firefox repos
 
   $ rm .hg/IS_FIREFOX_REPO
   $ hg push --force -r 0:tip http://localhost:$HGPORT1/mozilla-central
-  pushing to http://localhost:$HGPORT1/mozilla-central
+  pushing to http://$LOCALHOST:$HGPORT1/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

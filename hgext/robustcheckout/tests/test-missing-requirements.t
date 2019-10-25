@@ -2,7 +2,7 @@
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 local --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at local
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at local
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
 Blow out content of .hg directory to simulate a rolled back repo or something
@@ -11,7 +11,7 @@ Blow out content of .hg directory to simulate a rolled back repo or something
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 local --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at local
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at local
   (shared store missing requires file; this is a really odd failure; deleting store and destination)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -41,7 +41,7 @@ Test a variation where the local repo still exists
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 local --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at local
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at local
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (shared store missing requires file; this is a really odd failure; deleting store and destination)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
@@ -70,7 +70,7 @@ Test behavior when fncache is missing
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 requires-existing --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
   dotencode
@@ -88,7 +88,7 @@ Test behavior when fncache is missing
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 requires-existing --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
@@ -109,7 +109,7 @@ Test behavior when fncache is missing
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 requires-missing --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at requires-missing
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at requires-missing
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 

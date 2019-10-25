@@ -7,7 +7,7 @@ Checking out to an existing repo that isn't shared will blow it away
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest0 --revision aada1b3e573f
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at dest0
+  ensuring http://$LOCALHOST:$HGPORT/repo0@aada1b3e573f is available at dest0
   (destination is not shared; deleting)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
@@ -34,7 +34,7 @@ If shared path points nowhere, repo is "corrupt"; should be blown away
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 missingsharepath --revision aada1b3e573f
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at missingsharepath
+  ensuring http://$LOCALHOST:$HGPORT/repo0@aada1b3e573f is available at missingsharepath
   (existing repository shared store: does_not_exist)
   (shared store does not exist; deleting destination)
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
@@ -61,7 +61,7 @@ we require pooled storage
   $ touch nopoolshare/file0
   $ hg robustcheckout http://localhost:$HGPORT/repo0 nopoolshare --revision aada1b3e573f
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at nopoolshare
+  ensuring http://$LOCALHOST:$HGPORT/repo0@aada1b3e573f is available at nopoolshare
   (existing repository shared store: $TESTTMP/fakeshare/.hg)
   (shared store does not belong to pooled storage; deleting destination to improve efficiency)
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)

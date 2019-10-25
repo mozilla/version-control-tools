@@ -15,7 +15,7 @@
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -37,7 +37,7 @@ Create some obsolete changesets
   $ echo file1_2 > file1
   $ hg commit -m 'file1 2'
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -49,7 +49,7 @@ Create some obsolete changesets
   rebasing 3:11743f808184 "file1 1"
   rebasing 4:3208166ea109 "file1 2" (tip)
   $ hg push -f
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests

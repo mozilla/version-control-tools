@@ -27,7 +27,7 @@
   adding branch
 
   $ hg push -f
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests

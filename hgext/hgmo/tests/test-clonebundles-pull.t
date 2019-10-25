@@ -18,7 +18,7 @@
 clonebundles.manifest should not be transferred by default
 
   $ hg pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   $ ls .hg
@@ -39,7 +39,7 @@ clonebundles.manifest should not be transferred by default
 Even if enabled and the server doesn't have a clonebundles.manifest
 
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   $ ls .hg
@@ -80,7 +80,7 @@ Sanity check that clone bundles manifest is served properly
 clonebundles.manifest should not be transferred by default
 
   $ hg pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
 
@@ -104,7 +104,7 @@ clonebundles.manifest should not be transferred by default
 enabling config option pulls the manifest
 
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   pulling clonebundles manifest
@@ -120,7 +120,7 @@ A missing manifest results in the local file being deleted
 
   $ rm -f ../server/.hg/clonebundles.manifest
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   deleting local clonebundles.manifest

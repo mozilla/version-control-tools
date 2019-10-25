@@ -14,7 +14,7 @@ check_zookeeper without any arguments will error
 Should error connecting to non-listening port
 
   $ check_zk -H localhost:2182
-  socket error connecting to localhost: [Errno 111] Connection refused
+  socket error connecting to $LOCALHOST: [Errno 111] Connection refused
   
   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.
@@ -49,7 +49,7 @@ Stopping us should result in failure
   $ hgmo exec hgssh /usr/bin/supervisorctl stop zookeeper
   zookeeper: stopped
   $ check_zk -H localhost:2181
-  socket error connecting to localhost: [Errno 111] Connection refused
+  socket error connecting to $LOCALHOST: [Errno 111] Connection refused
   
   See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmo/ops.html
   for more info on monitor and alerts.

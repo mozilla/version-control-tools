@@ -381,7 +381,7 @@ Failure to connect to LDAP master server is not fatal
   $ hgmo exec hgssh /set-ldap-property write_url ldap://localhost:6000
 
   $ ssh -T -F ssh_config -i key1 -l user1@example.com -p $HGPORT $SSH_SERVER
-  Could not connect to the LDAP server at ldap://localhost:6000
+  Could not connect to the LDAP server at ldap://$LOCALHOST:6000
   A SSH connection has been successfully established.
   
   Your account (user1@example.com) has privileges to access Mercurial over
@@ -415,7 +415,7 @@ Can pull when LDAP master is not available
   > EOF
 
   $ hg clone ssh://${SSH_SERVER}:${HGPORT}/mozilla-central
-  remote: Could not connect to the LDAP server at ldap://localhost:6000
+  remote: Could not connect to the LDAP server at ldap://$LOCALHOST:6000
   destination directory: mozilla-central
   no changes found
   updating to branch default

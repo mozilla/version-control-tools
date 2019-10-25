@@ -34,7 +34,7 @@ Specifying branch argument will checkout branch
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@default is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@default is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
   adding changesets
@@ -54,7 +54,7 @@ Specifying branch argument will always attempt to pull because branch revisions 
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@default is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)
   (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)
@@ -66,7 +66,7 @@ Updating to another branch works
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch branch1
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@branch1 is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@branch1 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain branch1)
   (remote resolved branch1 to aada1b3e573f7272bb2ef93b34acbf0f77c69d44; result is not deterministic)
@@ -78,7 +78,7 @@ Specifying revision will switch away from branch
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
@@ -95,7 +95,7 @@ updating to it
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision abcdef0123456
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@abcdef0123456 is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@abcdef0123456 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   abort: --revision argument is ambiguous
   (must be the first 12+ characters of a SHA-1 fragment)
@@ -117,7 +117,7 @@ revision
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --branch default
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@default is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@default is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (pulling to obtain default)
   (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)

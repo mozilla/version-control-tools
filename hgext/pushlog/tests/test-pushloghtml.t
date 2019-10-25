@@ -15,7 +15,7 @@ Populate the repo with some data
   $ hg commit -A -m 'initial commit'
   adding foo
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests

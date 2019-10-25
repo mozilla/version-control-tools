@@ -27,7 +27,7 @@
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 wdirlock --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
 Simulate a held lock on the working directory for a no-op pull but working
@@ -39,7 +39,7 @@ directory update.
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 wdirlock --revision aada1b3e573f
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@aada1b3e573f is available at wdirlock
+  ensuring http://$LOCALHOST:$HGPORT/repo0@aada1b3e573f is available at wdirlock
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (dest has an active working directory lock; assuming it is left over from a previous process and that the destination is corrupt; deleting it just to be sure)
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
@@ -53,7 +53,7 @@ directory update.
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo0 wdirlock-pull --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock-pull
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at wdirlock-pull
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
   $ cd server/repo0
@@ -67,7 +67,7 @@ directory update.
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 wdirlock-pull --revision a7c4155bc8eb
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@a7c4155bc8eb is available at wdirlock-pull
+  ensuring http://$LOCALHOST:$HGPORT/repo0@a7c4155bc8eb is available at wdirlock-pull
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (dest has an active working directory lock; assuming it is left over from a previous process and that the destination is corrupt; deleting it just to be sure)
   (sharing from existing pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
@@ -86,7 +86,7 @@ to be acquired.
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo1 storelock --revision 7d5b54cb09e1
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock
+  ensuring http://$LOCALHOST:$HGPORT/repo1@7d5b54cb09e1 is available at storelock
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
   $ hg -R storelock acquirestorelock
   $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
@@ -94,7 +94,7 @@ to be acquired.
 
   $ hg robustcheckout http://localhost:$HGPORT/repo1 storelock --revision 65cd4e3b46a3
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo1@65cd4e3b46a3 is available at storelock
+  ensuring http://$LOCALHOST:$HGPORT/repo1@65cd4e3b46a3 is available at storelock
   (existing repository shared store: $TESTTMP/share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg)
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
@@ -117,7 +117,7 @@ Simulate a held lock on the store for a pull plus working directory update.
 
   $ hg -q robustcheckout http://localhost:$HGPORT/repo1 storelock-pull --revision 7d5b54cb09e1
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-pull
+  ensuring http://$LOCALHOST:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-pull
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
   $ hg -R storelock-pull acquirestorelock
   $ readlink share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg/store/lock
@@ -130,7 +130,7 @@ Simulate a held lock on the store for a pull plus working directory update.
 
   $ hg robustcheckout http://localhost:$HGPORT/repo1 storelock-pull --revision fca136d824da
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo1@fca136d824da is available at storelock-pull
+  ensuring http://$LOCALHOST:$HGPORT/repo1@fca136d824da is available at storelock-pull
   (existing repository shared store: $TESTTMP/share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg)
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
@@ -153,7 +153,7 @@ Simulate a held lock on the store without a working directory
 
   $ hg robustcheckout http://localhost:$HGPORT/repo1 storelock-nowdir --revision 7d5b54cb09e1
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-nowdir
+  ensuring http://$LOCALHOST:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-nowdir
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
   requesting all changes

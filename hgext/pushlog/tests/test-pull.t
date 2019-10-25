@@ -37,7 +37,7 @@ Pulling from a remote that has pushlog will fetch pushlog data
   > pushlog = $TESTDIR/hgext/pushlog
   > EOF
   $ hg pull http://localhost:$HGPORT
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   added 1 pushes
@@ -62,7 +62,7 @@ Pulling from a remote that has pushlog will fetch pushlog data
 
   $ cd client
   $ hg pull http://localhost:$HGPORT
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   adding changesets
   adding manifests

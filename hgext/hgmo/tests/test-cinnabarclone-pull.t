@@ -19,7 +19,7 @@
 cinnabar.manifest should not be transferred by default
 
   $ hg pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   $ ls .hg
@@ -40,7 +40,7 @@ cinnabar.manifest should not be transferred by default
 Even if enabled and the server doesn't have a cinnabar.manifest
 
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   $ ls .hg
@@ -73,7 +73,7 @@ Sanity check that clone bundles manifest is served properly
 cinnabar.manifest should not be transferred by default
 
   $ hg pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
 
@@ -97,7 +97,7 @@ cinnabar.manifest should not be transferred by default
 enabling config option pulls the manifest
 
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   pulling cinnabarclone manifest
@@ -109,7 +109,7 @@ A missing manifest results in the local file being deleted
 
   $ rm -f ../server/.hg/cinnabar.manifest
   $ hg --config hgmo.pullclonebundlesmanifest=true pull
-  pulling from http://localhost:$HGPORT/
+  pulling from http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   deleting local cinnabar.manifest

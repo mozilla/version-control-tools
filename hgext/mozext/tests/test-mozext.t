@@ -57,7 +57,7 @@ Set up a repository
   adding bar
   $ hg bookmark -r tip central
   $ hg push http://localhost:$HGPORT/mozilla-central -B central
-  pushing to http://localhost:$HGPORT/mozilla-central
+  pushing to http://$LOCALHOST:$HGPORT/mozilla-central
   searching for changes
   remote: adding changesets
   remote: adding manifests

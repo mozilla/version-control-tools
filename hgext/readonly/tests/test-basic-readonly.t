@@ -26,7 +26,7 @@ Push to repository without any readonly reason files will work
   $ touch foo
   $ hg -q commit -A -m initial
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: adding changesets
   remote: adding manifests
@@ -39,7 +39,7 @@ Empty local reason file prints generic message
   $ echo readonly > foo
   $ hg commit -m readonly
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: repository is read only
   remote: refusing to add changesets
@@ -51,7 +51,7 @@ Pushing a bookmark fails
 
   $ hg bookmark -r 0 bm0
   $ hg push -B bm0
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   no changes found
   remote: repository is read only
@@ -69,7 +69,7 @@ Local reason file with content prints message
   > EOF
 
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: repository is read only
   remote: repository is no longer active
@@ -82,7 +82,7 @@ Global and local reason file should print local reason
 
   $ touch $TESTTMP/globalreason
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: repository is read only
   remote: repository is no longer active
@@ -95,7 +95,7 @@ Global reason file in isolation works
 
   $ rm -f ../server/.hg/readonlyreason
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: all repositories currently read only
   remote: refusing to add changesets
@@ -110,7 +110,7 @@ Global reason file reason is printed
   > EOF
 
   $ hg push
-  pushing to http://localhost:$HGPORT/
+  pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
   remote: all repositories currently read only
   remote: this is the global reason

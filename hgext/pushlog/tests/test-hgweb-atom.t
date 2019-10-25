@@ -326,23 +326,6 @@ Get the second page of 10 pushes via pushlog/2
      </div>
     </content>
    </entry>
-  
-  </feed>
-
-
-Get the second page of 10 pushes via pushlog/2
-  $ http "http://localhost:$HGPORT/hg-test/pushlog/2" --header content-type --body-file body
-  200
-  content-type: application/atom+xml
-
-  $ cat body
-  <?xml version="1.0" encoding="ascii"?>
-  <feed xmlns="http://www.w3.org/2005/Atom">
-   <id>http://$LOCALHOST:$HGPORT/hg-test/pushlog</id>
-   <link rel="self" href="http://$LOCALHOST:$HGPORT/hg-test/pushlog"/>
-   <link rel="alternate" href="http://$LOCALHOST:$HGPORT/hg-test/pushloghtml"/>
-   <title>hg-test Pushlog</title>
-   <updated>*</updated> (glob)
    <entry>
     <title>Changeset 5af266358ee895496337d0c6f9646954c607d189</title>
     <id>http://www.selenic.com/mercurial/#changeset-5af266358ee895496337d0c6f9646954c607d189</id>

@@ -2,7 +2,7 @@
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   requesting all changes
   adding changesets
@@ -26,7 +26,7 @@ Modifications to a tracked file should get lost during update
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
@@ -42,7 +42,7 @@ Modifications should also get lost when updating to new revision
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision b8b78f0253d8
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@b8b78f0253d8 is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@b8b78f0253d8 is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to b8b78f0253d822e33ba652fd3d80a5c0837cfdf3
@@ -59,7 +59,7 @@ Added and copied files will be lost during update
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
@@ -70,7 +70,7 @@ Added and copied files will be lost during update
 
   $ hg robustcheckout http://localhost:$HGPORT/repo0 dest --revision 5d6cdc75a09b --purge
   (using Mercurial *) (glob)
-  ensuring http://localhost:$HGPORT/repo0@5d6cdc75a09b is available at dest
+  ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (existing repository shared store: $TESTTMP/share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg)
   (purging working directory)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
