@@ -13,16 +13,16 @@ from mercurial import (
     registrar,
 )
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0'
-minimumhgversion = '4.4'
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.4'
 
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('obshacks', 'obsolescenceexchangeusers',
+configitem(b'obshacks', b'obsolescenceexchangeusers',
            default=configitems.dynamicdefault)
-configitem('obshacks', 'userfromenv',
+configitem(b'obshacks', b'userfromenv',
            default=configitems.dynamicdefault)
 
 
@@ -35,33 +35,33 @@ def enableevolutionexchange(repo):
     if not any(obsolete.isenabled(repo, opt) for opt in opts):
         return
 
-    features = set(ui.configlist('experimental', 'evolution'))
+    features = set(ui.configlist(b'experimental', b'evolution'))
     # Nothing to do if already enabled.
-    if 'all' in features or obsolete.exchangeopt in features:
+    if b'all' in features or obsolete.exchangeopt in features:
         return
 
     # Enable exchange if the current user is in the allow list.
-    exchangeusers = ui.configlist('obshacks', 'obsolescenceexchangeusers', [])
+    exchangeusers = ui.configlist(b'obshacks', b'obsolescenceexchangeusers', [])
     if not exchangeusers:
         return
 
     # Some tests can't change the uid, so allow a test mode where the user
     # comes from USER.
-    if ui.configbool('obshacks', 'userfromenv', False):
-        user = os.environ.get('USER')
+    if ui.configbool(b'obshacks', b'userfromenv', False):
+        user = ui.environ.get(b'USER')
     else:
         try:
             user = pwd.getpwuid(os.getuid()).pw_name
         except KeyError:
-            raise error.Abort('unable to resolve process user name')
+            raise error.Abort(b'unable to resolve process user name')
 
     if user not in exchangeusers:
         return
 
-    evolution = ui.config('experimental', 'evolution')
-    evolution += ' %s' % obsolete.exchangeopt
-    ui.setconfig('experimental', 'evolution', evolution.strip(),
-                 source='obshacksext')
+    evolution = ui.config(b'experimental', b'evolution')
+    evolution += b' %s' % obsolete.exchangeopt
+    ui.setconfig(b'experimental', b'evolution', evolution.strip(),
+                 source=b'obshacksext')
 
 
 def reposetup(ui, repo):
