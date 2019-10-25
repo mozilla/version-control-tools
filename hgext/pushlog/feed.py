@@ -16,6 +16,7 @@ from mercurial.node import hex, nullid
 from mercurial import (
     demandimport,
     error,
+    pycompat,
     scmutil,
     templatefilters,
     templateutil,
@@ -28,8 +29,8 @@ with demandimport.deactivated():
 
 xmlescape = templatefilters.xmlescape
 
-testedwith = '4.8 4.9 5.0'
-minimumhgversion = '4.8'
+testedwith = b'4.8 4.9 5.0'
+minimumhgversion = b'4.8'
 
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
@@ -38,10 +39,10 @@ PUSHES_PER_PAGE = 10
 def addwebcommand(f, name):
     '''Adds `f` as a webcommand named `name`.'''
     setattr(hgwebcommands, name, f)
-    hgwebcommands.__all__.append(name)
+    hgwebcommands.__all__.append(pycompat.bytestr(name))
 
 
-ATOM_MIMETYPE = 'application/atom+xml'
+ATOM_MIMETYPE = b'application/atom+xml'
 
 
 class QueryType:
@@ -51,7 +52,7 @@ class QueryType:
 
 class PushlogQuery(object):
     '''Represents the internal state of a query to Pushlog'''
-    def __init__(self, repo, urlbase='', tipsonly=False):
+    def __init__(self, repo, urlbase=b'', tipsonly=False):
         self.repo = repo
         self.urlbase = urlbase
         self.tipsonly = tipsonly
@@ -160,30 +161,30 @@ class PushlogQuery(object):
 
     def description(self):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
-            return ''
+            return b''
         bits = []
         isotime = lambda x: datetime.fromtimestamp(x).isoformat(' ')
         if self.querystart == QueryType.DATE:
-            bits.append('after %s' % isotime(self.querystart_value))
+            bits.append(b'after %s' % isotime(self.querystart_value))
         elif self.querystart == QueryType.CHANGESET:
-            bits.append('after changeset %s' % self.querystart_value)
+            bits.append(b'after changeset %s' % self.querystart_value)
         elif self.querystart == QueryType.PUSHID:
-            bits.append('after push ID %s' % self.querystart_value)
+            bits.append(b'after push ID %s' % self.querystart_value)
 
         if self.queryend == QueryType.DATE:
-            bits.append('before %s' % isotime(self.queryend_value))
+            bits.append(b'before %s' % isotime(self.queryend_value))
         elif self.queryend == QueryType.CHANGESET:
-            bits.append('up to and including changeset %s' % self.queryend_value)
+            bits.append(b'up to and including changeset %s' % self.queryend_value)
         elif self.queryend == QueryType.PUSHID:
-            bits.append('up to and including push ID %s' % self.queryend_value)
+            bits.append(b'up to and including push ID %s' % self.queryend_value)
 
         if self.userquery:
-            bits.append('by user %s' % ' or '.join(self.userquery))
+            bits.append(b'by user %s' % b' or '.join(self.userquery))
 
         if self.changesetquery:
-            bits.append('with changeset %s' % ' and '.join(self.changesetquery))
+            bits.append(b'with changeset %s' % b' and '.join(self.changesetquery))
 
-        return 'Changes pushed ' + ', '.join(bits)
+        return b'Changes pushed ' + b', '.join(bits)
 
 
 def localdate(ts):
@@ -203,7 +204,7 @@ def do_parse_date(datestring):
     which can handle relative dates in natural language."""
     datestring = datestring.strip()
     # This is sort of awful. Match YYYY-MM-DD hh:mm:ss, with the time parts all being optional
-    m = re.match("^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)(?: (?P<hour>\d\d)(?::(?P<minute>\d\d)(?::(?P<second>\d\d))?)?)?$", datestring)
+    m = re.match(br"^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)(?: (?P<hour>\d\d)(?::(?P<minute>\d\d)(?::(?P<second>\d\d))?)?)?$", datestring)
     if m:
         date = (int(m.group("year")), int(m.group("month")), int(m.group("day")),
                 m.group("hour") and int(m.group("hour")) or 0,
@@ -223,9 +224,9 @@ def pushlog_setup(repo, req):
     build a PushlogQuery object and populate it with data from the request.
     The returned query object will have its query already run, and
     its entries member can be read."""
-    page = int(req.qsparams.get('node', '1'))
+    page = int(req.qsparams.get(b'node', b'1'))
 
-    tipsonly = req.qsparams.get('tipsonly', None) == '1'
+    tipsonly = req.qsparams.get(b'tipsonly', None) == b'1'
 
     urlbase = req.advertisedbaseurl
 
@@ -235,43 +236,43 @@ def pushlog_setup(repo, req):
     query.page = page
 
     # find start component
-    if 'startdate' in req.qsparams:
-        startdate = do_parse_date(req.qsparams.get('startdate', None))
+    if b'startdate' in req.qsparams:
+        startdate = do_parse_date(req.qsparams.get(b'startdate', None))
         query.querystart = QueryType.DATE
         query.querystart_value = startdate
-    elif 'fromchange' in req.qsparams:
+    elif b'fromchange' in req.qsparams:
         query.querystart = QueryType.CHANGESET
-        query.querystart_value = req.qsparams.get('fromchange', None)
-    elif 'startID' in req.qsparams:
+        query.querystart_value = req.qsparams.get(b'fromchange', None)
+    elif b'startID' in req.qsparams:
         query.querystart = QueryType.PUSHID
-        query.querystart_value = req.qsparams.get('startID', None)
+        query.querystart_value = req.qsparams.get(b'startID', None)
     else:
         # default is last 10 pushes
         query.querystart = QueryType.COUNT
         query.querystart_value = PUSHES_PER_PAGE
 
-    if 'enddate' in req.qsparams:
-        enddate = do_parse_date(req.qsparams.get('enddate', None))
+    if b'enddate' in req.qsparams:
+        enddate = do_parse_date(req.qsparams.get(b'enddate', None))
         query.queryend = QueryType.DATE
         query.queryend_value = enddate
-    elif 'tochange' in req.qsparams:
+    elif b'tochange' in req.qsparams:
         query.queryend = QueryType.CHANGESET
-        query.queryend_value = req.qsparams.get('tochange', None)
-    elif 'endID' in req.qsparams:
+        query.queryend_value = req.qsparams.get(b'tochange', None)
+    elif b'endID' in req.qsparams:
         query.queryend = QueryType.PUSHID
-        query.queryend_value = req.qsparams.get('endID', None)
+        query.queryend_value = req.qsparams.get(b'endID', None)
 
-    query.userquery = req.qsparams.getall('user')
+    query.userquery = req.qsparams.getall(b'user')
 
     #TODO: use rev here, switch page to ?page=foo ?
-    query.changesetquery = req.qsparams.getall('changeset')
+    query.changesetquery = req.qsparams.getall(b'changeset')
 
     try:
-        query.formatversion = int(req.qsparams.get('version', '1'))
+        query.formatversion = int(req.qsparams.get(b'version', b'1'))
     except ValueError:
-        raise ErrorResponse(500, 'version parameter must be an integer')
+        raise ErrorResponse(500, b'version parameter must be an integer')
     if query.formatversion < 1 or query.formatversion > 2:
-        raise ErrorResponse(500, 'version parameter must be 1 or 2')
+        raise ErrorResponse(500, b'version parameter must be 1 or 2')
 
     query.do_query()
 
@@ -280,7 +281,9 @@ def pushlog_setup(repo, req):
 
 def isotime(timestamp):
     '''Returns the ISO format of the given timestamp'''
-    return datetime.utcfromtimestamp(timestamp).isoformat() + 'Z'
+    dt = datetime.utcfromtimestamp(timestamp).isoformat()
+    dt = pycompat.bytestr(dt)
+    return dt + b'Z'
 
 
 def feedentrygenerator(_context, entries, repo, url, urlbase):
@@ -288,14 +291,14 @@ def feedentrygenerator(_context, entries, repo, url, urlbase):
     """
     for pushid, user, date, node in entries:
         ctx = scmutil.revsingle(repo, node)
-        filesgen = [{'name': fn} for fn in ctx.files()]
+        filesgen = [{b'name': fn} for fn in ctx.files()]
         yield {
-            'node': node,
-            'date': isotime(date),
-            'user': xmlescape(user),
-            'urlbase': urlbase,
-            'url': url,
-            'files': templateutil.mappinglist(filesgen),
+            b'node': pycompat.bytestr(node),
+            b'date': isotime(date),
+            b'user': xmlescape(pycompat.bytestr(user)),
+            b'urlbase': pycompat.bytestr(urlbase),
+            b'url': pycompat.bytestr(url),
+            b'files': templateutil.mappinglist(filesgen),
         }
 
 
@@ -303,20 +306,22 @@ def pushlog_feed(web):
     """WebCommand for producing the ATOM feed of the pushlog."""
     req = web.req
 
-    req.qsparams['style'] = 'atom'
+    req.qsparams[b'style'] = b'atom'
     # Need to reset the templater instance to use the new style.
     web.tmpl = web.templater(req)
 
     query = pushlog_setup(web.repo, req)
 
     if query.entries:
-        dt = isotime(query.entries[0][2])
+        dt = pycompat.bytestr(isotime(query.entries[0][2]))
     else:
-        dt = datetime.utcnow().isoformat().split('.', 1)[0] + 'Z'
+        dt = datetime.utcnow().isoformat().split('.', 1)[0]
+        dt = pycompat.bytestr(dt)
+        dt += b'Z'
 
-    url = req.apppath or '/'
-    if not url.endswith('/'):
-        url += '/'
+    url = req.apppath or b'/'
+    if not url.endswith(b'/'):
+        url += b'/'
 
     queryentries = (
         (pushid, user, date, node)
@@ -325,15 +330,15 @@ def pushlog_feed(web):
     )
 
     data = {
-        'urlbase': query.urlbase,
-        'url': url,
-        'repo': query.reponame,
-        'date': dt,
-        'entries': templateutil.mappinggenerator(feedentrygenerator, args=(queryentries, web.repo, url, query.urlbase)),
+        b'urlbase': query.urlbase,
+        b'url': url,
+        b'repo': query.reponame,
+        b'date': dt,
+        b'entries': templateutil.mappinggenerator(feedentrygenerator, args=(queryentries, web.repo, url, query.urlbase)),
     }
 
-    web.res.headers['Content-Type'] = ATOM_MIMETYPE
-    return web.sendtemplate('pushlog', **data)
+    web.res.headers[b'Content-Type'] = ATOM_MIMETYPE
+    return web.sendtemplate(b'pushlog', **data)
 
 
 def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushcount=None):
@@ -348,13 +353,13 @@ def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushco
     firstchange = pushcount is not None
 
     mergerollupval = templateutil.mappinglist(
-        [{'count': pushcount}]
-        if firstchange and mergehidden == 'hidden'
+        [{b'count': pushcount}]
+        if firstchange and mergehidden == b'hidden'
         else []
     )
 
     pushval = templateutil.mappinglist(
-        [{"date": localdate(date), "user": user}]
+        [{b"date": localdate(date), b"user": user}]
         if firstchange
         else []
     )
@@ -362,20 +367,20 @@ def create_entry(ctx, web, pushid, user, date, node, mergehidden, parity, pushco
     filediffs = webutil.listfilediffs(ctxfiles, node, len(ctxfiles))
 
     return {
-        "author": ctx.user(),
-        "desc": ctx.description(),
-        "files": filediffs,
-        "rev": ctx.rev(),
-        "node": hex(n),
-        "parents": [c.hex() for c in ctx.parents()],
-        "tags": webutil.nodetagsdict(repo, n),
-        "branches": webutil.nodebranchdict(repo, ctx),
-        "inbranch": webutil.nodeinbranch(repo, ctx),
-        "hidden": mergehidden,
-        "mergerollup": mergerollupval,
-        "id": pushid,
-        "parity": parity,
-        "push": pushval,
+        b"author": ctx.user(),
+        b"desc": ctx.description(),
+        b"files": filediffs,
+        b"rev": ctx.rev(),
+        b"node": hex(n),
+        b"parents": [c.hex() for c in ctx.parents()],
+        b"tags": webutil.nodetagsdict(repo, n),
+        b"branches": webutil.nodebranchdict(repo, ctx),
+        b"inbranch": webutil.nodeinbranch(repo, ctx),
+        b"hidden": mergehidden,
+        b"mergerollup": mergerollupval,
+        b"id": pushid,
+        b"parity": parity,
+        b"push": pushval,
     }
 
 
@@ -395,7 +400,7 @@ def handle_entries_for_push(web, samepush, p):
     pushid, user, date, node = samepush.popleft()
     ctx = scmutil.revsingle(web.repo, node)
     multiple_parents = len([c for c in ctx.parents() if c.node() != nullid]) > 1
-    mergehidden = "hidden" if multiple_parents else ""
+    mergehidden = b"hidden" if multiple_parents else b""
 
     # Yield the initial entry, which contains special information such as
     # the number of changesets merged in this push
@@ -417,15 +422,15 @@ def pushlog_changenav(_context, query):
     end = min(numpages + 1, query.page + PUSHES_PER_PAGE/2)
 
     if query.page != 1:
-        yield {'page': 1, 'label': "First"}
-        yield {'page': query.page - 1, 'label': "Prev"}
+        yield {b'page': 1, b'label': b"First"}
+        yield {b'page': query.page - 1, b'label': b"Prev"}
 
     for i in range(start, end):
-        yield {'page': i, 'label': str(i)}
+        yield {b'page': i, b'label': pycompat.bytestr(i)}
 
     if query.page != numpages:
-        yield {'page': query.page + 1, 'label': "Next"}
-        yield {'page': numpages, 'label': "Last"}
+        yield {b'page': query.page + 1, b'label': b"Next"}
+        yield {b'page': numpages, b'label': b"Last"}
 
 
 def pushlog_changelist(_context, web, query, tiponly):
@@ -514,17 +519,17 @@ def pushlog_html(web):
     query = pushlog_setup(web.repo, req)
 
     data = {
-        'changenav': templateutil.mappinggenerator(pushlog_changenav, args=(query,)),
-        'rev': 0,
-        'entries': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, False)),
-        'latestentry': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, True)),
-        'startdate': req.qsparams.get('startdate', '1 week ago'),
-        'enddate': req.qsparams.get('enddate', 'now'),
-        'querydescription': query.description(),
-        'archives': web.archivelist("tip"),
+        b'changenav': templateutil.mappinggenerator(pushlog_changenav, args=(query,)),
+        b'rev': 0,
+        b'entries': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, False)),
+        b'latestentry': templateutil.mappinggenerator(pushlog_changelist, args=(web, query, True)),
+        b'startdate': req.qsparams.get(b'startdate', b'1 week ago'),
+        b'enddate': req.qsparams.get(b'enddate', b'now'),
+        b'querydescription': query.description(),
+        b'archives': web.archivelist(b"tip"),
     }
 
-    return web.sendtemplate('pushlog', **data)
+    return web.sendtemplate(b'pushlog', **data)
 
 
 def pushes_worker(query, repo, full):
@@ -533,20 +538,20 @@ def pushes_worker(query, repo, full):
     haveobs = bool(repo.obsstore)
     pushes = {}
     for pushid, user, date, node in query.entries:
-        pushid = str(pushid)
+        pushid = pycompat.bytestr(pushid)
 
         # Create the pushes entry first. It is OK to have empty
         # pushes if nodes from the pushlog no longer exist.
         if pushid not in pushes:
             pushes[pushid] = {
-                'user': user,
-                'date': date,
-                'changesets': [],
+                b'user': user,
+                b'date': date,
+                b'changesets': [],
             }
 
         try:
             ctx = repo[node]
-            nodekey = 'changesets'
+            nodekey = b'changesets'
         # Changeset is hidden
         except error.FilteredRepoLookupError:
             # Try to find the hidden changeset so its metadata can be used.
@@ -555,17 +560,17 @@ def pushes_worker(query, repo, full):
             except error.LookupError:
                 continue
 
-            nodekey = 'obsoletechangesets'
+            nodekey = b'obsoletechangesets'
 
         if full:
             node = {
-                'node': ctx.hex(),
-                'author': ctx.user(),
-                'desc': ctx.description(),
-                'branch': ctx.branch(),
-                'parents': [c.hex() for c in ctx.parents()],
-                'tags': ctx.tags(),
-                'files': ctx.files(),
+                b'node': ctx.hex(),
+                b'author': ctx.user(),
+                b'desc': ctx.description(),
+                b'branch': ctx.branch(),
+                b'parents': [c.hex() for c in ctx.parents()],
+                b'tags': ctx.tags(),
+                b'files': ctx.files(),
             }
 
             # Only expose obsolescence metadata if the repo has some.
@@ -574,11 +579,11 @@ def pushes_worker(query, repo, full):
 
                 precursors = [hex(m[0]) for m in precursors]
                 if precursors:
-                    node['precursors'] = precursors
+                    node[b'precursors'] = precursors
 
         pushes[pushid].setdefault(nodekey, []).insert(0, node)
 
-    return {'pushes': pushes, 'lastpushid': query.lastpushid}
+    return {b'pushes': pushes, b'lastpushid': query.lastpushid}
 
 
 def pushes(web):
@@ -586,14 +591,14 @@ def pushes(web):
     req = web.req
 
     query = pushlog_setup(web.repo, req)
-    data = pushes_worker(query, web.repo, 'full' in req.qsparams)
+    data = pushes_worker(query, web.repo, b'full' in req.qsparams)
 
     if query.formatversion == 1:
-        template = 'pushes1'
+        template = b'pushes1'
     elif query.formatversion == 2:
-        template = 'pushes2'
+        template = b'pushes2'
     else:
-        raise ErrorResponse(500, 'unexpected formatversion')
+        raise ErrorResponse(500, b'unexpected formatversion')
 
     return web.sendtemplate(template, **data)
 
