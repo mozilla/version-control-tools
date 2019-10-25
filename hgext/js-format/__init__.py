@@ -17,6 +17,7 @@ from mercurial import (
     extensions,
     localrepo,
     match,
+    pycompat,
     scmutil,
 )
 
@@ -27,14 +28,14 @@ with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
 from mozhg.util import is_firefox_repo
 
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
-minimumhgversion = '4.4'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.4'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
 
 
 def call_js_format(repo, changed_files):
     '''Call `./mach eslint --fix` on the changed files'''
-    extensions = (".js", ".jsx", ".jsm")
+    extensions = (b".js", b".jsx", b".jsm")
     path_list = []
     for filename in sorted(changed_files):
         # Ignore files unsupported in eslint and prettier
@@ -45,10 +46,10 @@ def call_js_format(repo, changed_files):
         # No files have been touched
         return
 
-    mach_path = os.path.join(repo.root, 'mach')
-    arguments = ['eslint', '--fix'] + path_list
+    mach_path = os.path.join(repo.root, b'mach')
+    arguments = [b'eslint', b'--fix'] + path_list
     if os.name == 'nt':
-        js_format_cmd = ['sh', 'mach'] + arguments
+        js_format_cmd = [b'sh', b'mach'] + arguments
     else:
         js_format_cmd = [mach_path] + arguments
     subprocess.call(js_format_cmd)
@@ -74,7 +75,7 @@ def wrappedcommit(orig, repo, *args, **kwargs):
             call_js_format(repo, changed_files)
 
     except Exception as e:
-        repo.ui.warn('Exception %s\n' % str(e))
+        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
 
     finally:
         lock.release()
@@ -95,7 +96,7 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
             call_js_format(repo, filestoamend)
 
     except Exception as e:
-        repo.ui.warn('Exception %s\n' % str(e))
+        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
 
     return orig(ui, repo, old, extra, pats, opts)
 
@@ -107,5 +108,5 @@ def reposetup(ui, repo):
     if not repo.local() or 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
         return
 
-    extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
-    extensions.wrapfunction(cmdutil, 'amend', wrappedamend)
+    extensions.wrapfunction(localrepo.localrepository, b'commit', wrappedcommit)
+    extensions.wrapfunction(cmdutil, b'amend', wrappedamend)
