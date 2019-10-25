@@ -513,6 +513,13 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 # Will raise if failure limit reached.
                 handlenetworkfailure()
                 return True
+        elif isinstance(e, error.ResponseError):
+            if e.args[0].startswith(_('unexpected response from remote server:')):
+                ui.warn('(unexpected response from remote server; retrying)\n')
+                destvfs.rmtree(forcibly=True)
+                # Will raise if failure limit reached.
+                handlenetworkfailure()
+                return True
         elif isinstance(e, ssl.SSLError):
             # Assume all SSL errors are due to the network, as Mercurial
             # should convert non-transport errors like cert validation failures
