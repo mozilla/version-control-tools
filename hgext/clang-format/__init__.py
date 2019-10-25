@@ -17,6 +17,7 @@ from mercurial import (
     extensions,
     localrepo,
     match,
+    pycompat,
     scmutil,
 )
 
@@ -27,9 +28,9 @@ with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
 from mozhg.util import is_firefox_repo
 
 
-testedwith = '4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
-minimumhgversion = '4.4'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.4'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
 
 
 def call_clang_format(repo, changed_files):
@@ -39,7 +40,7 @@ def call_clang_format(repo, changed_files):
     # tools/lint/hooks_clang_format.py
     # release-services/src/staticanalysis/bot/static_analysis_bot/config.py
     # Too heavy to import the full class just for this variable
-    extensions = (".cpp", ".c", ".cc", ".h", ".m", ".mm")
+    extensions = (b".cpp", b".c", b".cc", b".h", b".m", b".mm")
     path_list = []
     for filename in sorted(changed_files):
         # Ignore files unsupported in clang-format
@@ -50,10 +51,10 @@ def call_clang_format(repo, changed_files):
         # No files have been touched
         return
 
-    mach_path = os.path.join(repo.root, 'mach')
-    arguments = ['clang-format', '-p'] + path_list
+    mach_path = os.path.join(repo.root, b'mach')
+    arguments = [b'clang-format', b'-p'] + path_list
     if os.name == 'nt':
-        clang_format_cmd = ['sh', 'mach'] + arguments
+        clang_format_cmd = [b'sh', b'mach'] + arguments
     else:
         clang_format_cmd = [mach_path] + arguments
     subprocess.call(clang_format_cmd)
@@ -79,7 +80,7 @@ def wrappedcommit(orig, repo, *args, **kwargs):
             call_clang_format(repo, changed_files)
 
     except Exception as e:
-        repo.ui.warn('Exception %s\n' % str(e))
+        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
 
     finally:
         lock.release()
@@ -100,7 +101,7 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
             call_clang_format(repo, filestoamend)
 
     except Exception as e:
-        repo.ui.warn('Exception %s\n' % str(e))
+        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
 
     return orig(ui, repo, old, extra, pats, opts)
 
@@ -112,5 +113,5 @@ def reposetup(ui, repo):
     if not repo.local() or 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
         return
 
-    extensions.wrapfunction(localrepo.localrepository, 'commit', wrappedcommit)
-    extensions.wrapfunction(cmdutil, 'amend', wrappedamend)
+    extensions.wrapfunction(localrepo.localrepository, b'commit', wrappedcommit)
+    extensions.wrapfunction(cmdutil, b'amend', wrappedamend)
