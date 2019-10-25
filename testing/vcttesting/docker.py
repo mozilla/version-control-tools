@@ -802,6 +802,8 @@ class Docker(object):
         return images
 
     def build_bmo(self, images=None, verbose=False):
+        raise Exception("BMO docker container is no longer supported.")
+
         bmo_images = self.ensure_images_built([
             'bmoweb',
         ], existing=images, verbose=verbose)
@@ -967,7 +969,7 @@ class Docker(object):
         )
 
     def build_all_images(self, verbose=False, use_last=False,
-                         hgmo=True, bmo=True, max_workers=None):
+                         hgmo=True, bmo=False, max_workers=None):
         docker_images = set()
         ansible_images = {}
 
