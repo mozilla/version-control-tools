@@ -640,14 +640,6 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     return
 
 
-def wsgisendresponse(orig, self):
-    for chunk in orig(self):
-        if isinstance(chunk, bytearray):
-            chunk = bytes(chunk)
-
-        yield chunk
-
-
 def pull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to fetch the remote clonebundles.manifest."""
     res = orig(repo, remote, *args, **kwargs)
@@ -859,10 +851,6 @@ def hgwebfastannotate(orig, req, fctx, ui):
 
 
 def extsetup(ui):
-    # TRACKING hg49 4.8 would emit bytearray instances against PEP-3333.
-    extensions.wrapfunction(requestmod.wsgiresponse, b'sendresponse',
-                            wsgisendresponse)
-
     extensions.wrapfunction(exchange, b'pull', pull)
     extensions.wrapfunction(webutil, b'changesetentry', changesetentry)
     extensions.wrapfunction(webutil, b'changelistentry', changelistentry)
