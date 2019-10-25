@@ -32,27 +32,27 @@ from mozhg.util import (
 )
 
 
-minimumhgversion = '4.8'
-testedwith = '4.8 4.9 5.0'
+minimumhgversion = b'4.8'
+testedwith = b'4.8 4.9 5.0'
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('mozilla', 'enablefirefoxreleases',  # deprecated, use firefox_releasing
+configitem(b'mozilla', b'enablefirefoxreleases',  # deprecated, use firefox_releasing
            default=configitems.dynamicdefault)
-configitem('mozilla', 'firefox_releasing',
+configitem(b'mozilla', b'firefox_releasing',
            default=configitems.dynamicdefault)
-configitem('mozilla', 'firefoxreleasesdb',
+configitem(b'mozilla', b'firefoxreleasesdb',
            default=configitems.dynamicdefault)
 
 revsetpredicate = registrar.revsetpredicate()
 
 
 def extsetup(ui):
-    extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
+    extensions.wrapfunction(webutil, b'changesetentry', changesetentry)
 
     setattr(webcommands, 'firefoxreleases', firefox_releases_web_command)
-    webcommands.__all__.append('firefoxreleases')
+    webcommands.__all__.append(b'firefoxreleases')
 
 
 def db_for_repo(repo):
@@ -60,15 +60,15 @@ def db_for_repo(repo):
     if not repo.local():
         return None
 
-    if (not repo.ui.configbool('mozilla', 'enablefirefoxreleases', False)  # deprecated
-            and not repo.ui.configbool('mozilla', 'firefox_releasing', False)):
+    if (not repo.ui.configbool(b'mozilla', b'enablefirefoxreleases', False)  # deprecated
+            and not repo.ui.configbool(b'mozilla', b'firefox_releasing', False)):
         return None
 
     if not is_firefox_repo(repo):
         return None
 
-    default = repo.vfs.join('firefoxreleases.db')
-    path = repo.ui.config('mozilla', 'firefoxreleasesdb', default)
+    default = repo.vfs.join(b'firefoxreleases.db')
+    path = repo.ui.config(b'mozilla', b'firefoxreleasesdb', default)
 
     if not os.path.exists(path):
         return None
@@ -131,10 +131,10 @@ def firefox_releases_web_command(web):
 
     db = db_for_repo(repo)
     if not db:
-        error_message = 'Firefox release info not available'
-        return web.sendtemplate('error', error=error_message)
+        error_message = b'Firefox release info not available'
+        return web.sendtemplate(b'error', error=error_message)
 
-    platform = req.qsparams['platform'] if 'platform' in req.qsparams else None
+    platform = req.qsparams[b'platform'] if b'platform' in req.qsparams else None
     builds = []
 
     for build in release_builds(db, repo):
@@ -145,7 +145,7 @@ def firefox_releases_web_command(web):
 
     releases_mapping_generator = templateutil.mappinggenerator(_releases_mapped_generator, args=(builds,))
 
-    return web.sendtemplate('firefoxreleases', releases=releases_mapping_generator)
+    return web.sendtemplate(b'firefoxreleases', releases=releases_mapping_generator)
 
 
 def release_config(build):
@@ -169,9 +169,9 @@ def changesetentry(orig, web, ctx):
 
     releases = release_info_for_changeset(db, repo, ctx)
 
-    if releases['this']:
-        d['firefox_releases_here'] = []
-        d['firefox_releases_first'] = []
+    if releases[b'this']:
+        d[b'firefox_releases_here'] = []
+        d[b'firefox_releases_first'] = []
 
         for config, build in sorted(releases[b'this'].items()):
             build[b'anchor'] = build_anchor(build)
@@ -203,19 +203,19 @@ def changesetentry(orig, web, ctx):
     # Used so we don't display "first release with" and "last release without".
     # We omit displaying in this scenario because we're not confident in the
     # data and don't want to take chances with inaccurate data.
-    if 'firefox_releases_first' in d and 'firefox_releases_last' in d:
-        d['have_first_and_last_firefox_releases'] = True
+    if b'firefox_releases_first' in d and b'firefox_releases_last' in d:
+        d[b'have_first_and_last_firefox_releases'] = True
 
     # Do some template fixes
     # TODO build via a generator
-    if 'firefox_releases_first' in d:
-        d['firefox_releases_first'] = templateutil.mappinglist(d['firefox_releases_first'])
+    if b'firefox_releases_first' in d:
+        d[b'firefox_releases_first'] = templateutil.mappinglist(d[b'firefox_releases_first'])
 
-    if 'firefox_releases_last' in d:
-        d['firefox_releases_last'] = templateutil.mappinglist(d['firefox_releases_last'])
+    if b'firefox_releases_last' in d:
+        d[b'firefox_releases_last'] = templateutil.mappinglist(d[b'firefox_releases_last'])
 
-    if 'firefox_releases_here' in d:
-        d['firefox_releases_here'] = templateutil.mappinglist(d['firefox_releases_here'])
+    if b'firefox_releases_here' in d:
+        d[b'firefox_releases_here'] = templateutil.mappinglist(d[b'firefox_releases_here'])
 
     return d
 
@@ -287,14 +287,14 @@ def release_info_for_changeset(db, repo, ctx):
                        if k not in this_releases}
 
     return {
-        'previous': previous_releases,
-        'this': this_releases,
-        'first': first_releases,
-        'future': future_releases,
+        b'previous': previous_releases,
+        b'this': this_releases,
+        b'first': first_releases,
+        b'future': future_releases,
     }
 
 
-@revsetpredicate('firefoxrelease')
+@revsetpredicate(b'firefoxrelease')
 def revset_firefoxrelease(repo, subset, x):
     """``firefoxrelease([channel=], [platform=])
 
@@ -314,24 +314,24 @@ def revset_firefoxrelease(repo, subset, x):
     If no filters are specified, all revisions having a Firefox release are
     matched.
     """
-    args = revset.getargsdict(x, 'firefoxrelease', 'channel platform')
+    args = revset.getargsdict(x, b'firefoxrelease', b'channel platform')
 
     channels = set()
 
-    if 'channel' in args:
-        channels = set(revset.getstring(args['channel'],
-                                        _('channel requires a string')).split())
+    if b'channel' in args:
+        channels = set(revset.getstring(args[b'channel'],
+                                        _(b'channel requires a string')).split())
 
     platforms = set()
 
-    if 'platform' in args:
-        platforms = set(revset.getstring(args['platform'],
-                                         _('platform requires a '
-                                           'string')).split())
+    if b'platform' in args:
+        platforms = set(revset.getstring(args[b'platform'],
+                                         _(b'platform requires a '
+                                           b'string')).split())
 
     db = db_for_repo(repo)
     if not db:
-        repo.ui.warn(_('(warning: firefoxrelease() revset not available)\n'))
+        repo.ui.warn(_(b'(warning: firefoxrelease() revset not available)\n'))
         return revset.baseset()
 
     def get_revs():
