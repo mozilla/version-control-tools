@@ -37,12 +37,12 @@ def have_docker_images(images):
     # d0cker will build images automatically if needed. This slows down tests
     # drastically. So it is better to catch the issue sooner so the slowdown
     # can be identified.
-    keys = [b'DOCKER_%s_IMAGE' % i.upper() for i in images]
+    keys = ['DOCKER_%s_IMAGE' % i.upper() for i in images]
     return all(k in os.environ for k in keys)
 
 
 # Define custom checks for our environment.
-@check('docker', 'We can talk to Docker')
+@check(b'docker', b'We can talk to Docker')
 def has_docker():
     if 'SKIP_DOCKER_TESTS' in os.environ:
         return False
@@ -57,7 +57,7 @@ def has_docker():
     return d.is_alive()
 
 
-@check('hgmodocker', 'Require hgmo Docker pieces')
+@check(b'hgmodocker', b'Require hgmo Docker pieces')
 def has_hgmodocker():
     images = (
         'ldap',
@@ -67,12 +67,12 @@ def has_hgmodocker():
     )
     return has_docker() and have_docker_images(images)
 
-@check('eslint', 'Require eslint')
+@check(b'eslint', b'Require eslint')
 def has_eslint():
     from distutils.spawn import find_executable
     return find_executable('eslint') is not None
 
-@check('vcsreplicator', 'vcsreplicator Python modules')
+@check(b'vcsreplicator', b'vcsreplicator Python modules')
 def has_vcsreplicator():
     try:
         from vcsreplicator.config import Config
@@ -80,18 +80,18 @@ def has_vcsreplicator():
     except ImportError:
         return False
 
-@check('watchman', 'Require watchman')
+@check(b'watchman', b'Require watchman')
 def has_watchman():
     from distutils.spawn import find_executable
     return find_executable('watchman') is not None
 
 
-@check('bmodocker', 'Require BMO Docker pieces')
+@check(b'bmodocker', b'Require BMO Docker pieces')
 def has_bmodocker():
     return has_docker() and have_docker_images(['bmoweb'])
 
 
-@check('internet', 'Require internet connectivity')
+@check(b'internet', b'Require internet connectivity')
 def has_internet():
     try:
         import socket
@@ -103,7 +103,7 @@ def has_internet():
         return False
 
 
-@check('motoserver', 'moto AWS mock server')
+@check(b'motoserver', b'moto AWS mock server')
 def has_s3():
     '''Assert the boto3 mock library `moto` is available,
     as well as the `Flask` dependency which enables running
