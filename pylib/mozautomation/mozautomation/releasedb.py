@@ -39,17 +39,17 @@ class FirefoxReleaseDatabase(object):
     importing and therefore no races to update the insertion key.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, bytestype=bytes):
         self.path = path
 
         self.created = False
         if not os.path.exists(path):
             self.created = True
 
-        self._db = sqlite3.connect(path)
+        self._db = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)
 
         # Preserve TEXT data as bytes.
-        self._db.text_factory = bytes
+        self._db.text_factory = bytestype
 
         # Sacrifice robustness for speed. If we lose the db, we can always
         # rebuild it by doing a full scan.

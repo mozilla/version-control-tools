@@ -11,6 +11,7 @@ from mercurial import (
     configitems,
     error,
     extensions,
+    pycompat,
     registrar,
     revset,
     templateutil,
@@ -72,7 +73,7 @@ def db_for_repo(repo):
     if not os.path.exists(path):
         return None
 
-    return releasedb.FirefoxReleaseDatabase(path)
+    return releasedb.FirefoxReleaseDatabase(path, bytestype=pycompat.bytestr)
 
 
 def release_builds(db, repo, filter_unknown_revision=True):
