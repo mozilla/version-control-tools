@@ -3006,11 +3006,15 @@ class TestRunner(object):
 
         refpath = os.path.join(getcwdb(), path)
         tmpdir = os.path.join(self._hgtmp, b'child%d' % count)
+
+        # TRACKING MOZ
         errdir = os.path.dirname(refpath)
 
         # extra keyword parameters. 'case' is used by .t tests
         kwds = dict((k, testdesc[k]) for k in ['case'] if k in testdesc)
 
+        # TRACKING MOZ
+        # self._outputdir -> errdir
         t = testcls(refpath, errdir, tmpdir,
                     keeptmpdir=self.options.keep_tmpdir,
                     debug=self.options.debug,
