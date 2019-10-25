@@ -20,11 +20,9 @@ hgmo.convertsource
    ``/mozilla-central``.
 """
 
-import collections
-import hashlib
+import copy
 import json
 import os
-import subprocess
 import types
 
 from mercurial.i18n import _
@@ -414,7 +412,8 @@ def automationrelevancewebcommand(web):
 
             # Some items in changelistentry are generators, which json.dumps()
             # can't handle. So we expand them.
-            for k, v in entry.items():
+            entrycopy = copy.copy(entry)
+            for k, v in entrycopy.items():
                 # "files" is a generator that attempts to call a template.
                 # Don't even bother and just repopulate it.
                 if k == b'files':
