@@ -297,7 +297,7 @@ def firefoxtrees(repo, proto):
             if not uri:
                 continue
 
-            lines.append(b'%s %s' % (tree.encode('utf-8'), hnode))
+            lines.append(b'%s %s' % (tree, hnode))
     else:
         for tag, node, tree, uri in get_firefoxtrees(repo):
             lines.append(b'%s %s' % (tag, hex(node)))
@@ -340,7 +340,7 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # We can ignore result of the push because updateremoterefs() doesn't care:
     # it merely synchronizes state with the remote. Worst case it is a no-op.
     if tree:
-        updateremoterefs(repo, remote, tree.encode('utf-8'))
+        updateremoterefs(repo, remote, tree)
 
     return res
 
@@ -428,7 +428,6 @@ def wrappedpullobsolete(orig, pullop):
 
     tree = resolve_uri_to_tree(remote.url())
     if tree:
-        tree = tree.encode('utf-8')
         updateremoterefs(repo, remote, tree)
 
     return res
