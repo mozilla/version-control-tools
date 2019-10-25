@@ -194,9 +194,7 @@ def share(orig, ui, source, *args, **kwargs):
     """
     res = orig(ui, source, *args, **kwargs)
 
-    # TODO Mercurial 3.7 introduces a standalone function that receives the
-    # proper arguments so we can avoid this boilerplate.
-    if isinstance(source, str):
+    if not util.safehasattr(source, 'local'):
         origsource = ui.expandpath(source)
         source, branches = hg.parseurl(origsource)
         srcrepo = hg.repository(ui, source)
