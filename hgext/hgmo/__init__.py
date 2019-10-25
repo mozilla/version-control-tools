@@ -77,8 +77,8 @@ from mozhg.util import (
 
 from mercurial.wireprotoserver import httpv1protocolhandler as webproto
 
-minimumhgversion = '4.8'
-testedwith = '4.8 4.9 5.0'
+minimumhgversion = b'4.8'
+testedwith = b'4.8 4.9 5.0'
 
 cmdtable = {}
 
@@ -87,33 +87,33 @@ command = registrar.command(cmdtable)
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('mozilla', 'treeherder_repo',
+configitem(b'mozilla', b'treeherder_repo',
            default=configitems.dynamicdefault)
-configitem('hgmo', 'automationrelevantdraftancestors',
+configitem(b'hgmo', b'automationrelevantdraftancestors',
            default=configitems.dynamicdefault)
-configitem('hgmo', 'backoutsearchlimit',
+configitem(b'hgmo', b'backoutsearchlimit',
            default=configitems.dynamicdefault)
-configitem('hgmo', 'convertsource',
+configitem(b'hgmo', b'convertsource',
            default=None)
-configitem('hgmo', 'headdivergencemaxnodes',
+configitem(b'hgmo', b'headdivergencemaxnodes',
            default=configitems.dynamicdefault)
-configitem('hgmo', 'mozippath',
+configitem(b'hgmo', b'mozippath',
            default=None)
-configitem('hgmo', 'awsippath',
+configitem(b'hgmo', b'awsippath',
            default=None)
 configitem(b'hgmo', b'gcpippath',
            default=None)
-configitem('hgmo', 'pullclonebundlesmanifest',
+configitem(b'hgmo', b'pullclonebundlesmanifest',
            default=configitems.dynamicdefault)
-configitem('hgmo', 'replacebookmarks',
+configitem(b'hgmo', b'replacebookmarks',
            default=configitems.dynamicdefault)
 
 # TODO update this to /run/cloud-init/instance_data.json once
 # we can upgrade cloud-init to 18.4+ on CentOS7
-INSTANCE_DATA_PATH = '/var/hg/instance_data.json'
+INSTANCE_DATA_PATH = b'/var/hg/instance_data.json'
 
 
-@templatefilters.templatefilter('mozlink')
+@templatefilters.templatefilter(b'mozlink')
 def mozlink(text):
     """Any text. Hyperlink to Bugzilla and other detected things."""
     return commitparser.add_hyperlinks(text)
@@ -136,17 +136,18 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     def bugsgen(_context):
         '''Generator for bugs list'''
         for bug in commitparser.parse_bugs(description):
+            bug = pycompat.bytestr(bug)
             yield {
-                'no': str(bug),
-                'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug,
+                b'no': bug,
+                b'url': b'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug,
             }
 
     def reviewersgen(_context):
         '''Generator for reviewers list'''
         for reviewer in commitparser.parse_reviewers(description):
             yield {
-                'name': reviewer,
-                'revset': 'reviewer(%s)' % reviewer,
+                b'name': reviewer,
+                b'revset': b'reviewer(%s)' % reviewer,
             }
 
     def backoutsgen(_context):
@@ -156,20 +157,20 @@ def addmetadata(repo, ctx, d, onlycheap=False):
             for node in backouts[0]:
                 try:
                     bctx = scmutil.revsymbol(repo, node)
-                    yield {'node': bctx.hex()}
+                    yield {b'node': bctx.hex()}
                 except error.RepoLookupError:
                     pass
 
-    d['reviewers'] = templateutil.mappinggenerator(reviewersgen)
-    d['bugs'] = templateutil.mappinggenerator(bugsgen)
-    d['backsoutnodes'] = templateutil.mappinggenerator(backoutsgen)
+    d[b'reviewers'] = templateutil.mappinggenerator(reviewersgen)
+    d[b'bugs'] = templateutil.mappinggenerator(bugsgen)
+    d[b'backsoutnodes'] = templateutil.mappinggenerator(backoutsgen)
 
     # Repositories can define which TreeHerder repository they are associated
     # with.
-    treeherder = repo.ui.config('mozilla', 'treeherder_repo')
+    treeherder = repo.ui.config(b'mozilla', b'treeherder_repo')
     if treeherder:
-        d['treeherderrepourl'] = 'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
-        d['treeherderrepo'] = treeherder
+        d[b'treeherderrepourl'] = b'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
+        d[b'treeherderrepo'] = treeherder
 
         push = repo.pushlog.pushfromchangeset(ctx)
         # Don't print Perfherder link on non-publishing repos (like Try)
@@ -177,33 +178,33 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         # push.
         # Changeset on autoland are in the phase 'draft' until they get merged
         # to mozilla-central.
-        if push and push.nodes and (repo.ui.configbool('phases', 'publish', True) or treeherder == 'autoland'):
+        if push and push.nodes and (repo.ui.configbool(b'phases', b'publish', True) or treeherder == b'autoland'):
             lastpushhead = repo[push.nodes[0]].hex()
-            d['perfherderurl'] = (
-                'https://treeherder.mozilla.org/perf.html#/compare?'
-                'originalProject=%s&'
-                'originalRevision=%s&'
-                'newProject=%s&'
-                'newRevision=%s') % (treeherder, push.nodes[-1],
-                                     treeherder, lastpushhead)
+            d[b'perfherderurl'] = (
+                b'https://treeherder.mozilla.org/perf.html#/compare?'
+                b'originalProject=%s&'
+                b'originalRevision=%s&'
+                b'newProject=%s&'
+                b'newRevision=%s') % (treeherder, push.nodes[-1],
+                                      treeherder, lastpushhead)
 
     # If this changeset was converted from another one and we know which repo
     # it came from, add that metadata.
-    convertrevision = ctx.extra().get('convert_revision')
+    convertrevision = ctx.extra().get(b'convert_revision')
     if convertrevision:
-        sourcerepo = repo.ui.config('hgmo', 'convertsource')
+        sourcerepo = repo.ui.config(b'hgmo', b'convertsource')
         if sourcerepo:
-            d['convertsourcepath'] = sourcerepo
-            d['convertsourcenode'] = convertrevision
+            d[b'convertsourcepath'] = sourcerepo
+            d[b'convertsourcenode'] = convertrevision
 
     # Did the push to this repo included extra data about the automated landing
     # system used?
     # We omit the key if it has no value so that the 'json' filter function in
     # the map file will return null for the key's value.  Otherwise the filter
     # will return a JSON empty string, even for False-y values like None.
-    landingsystem = ctx.extra().get('moz-landing-system')
+    landingsystem = ctx.extra().get(b'moz-landing-system')
     if landingsystem:
-        d['landingsystem'] = landingsystem
+        d[b'landingsystem'] = landingsystem
 
     if onlycheap:
         return
@@ -216,18 +217,18 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     # section because resolving manifests is relatively slow and resolving
     # several on changelist pages may add seconds to page load times.
     try:
-        fctx = repo.filectx('config/milestone.txt', changeid=ctx.node())
+        fctx = repo.filectx(b'config/milestone.txt', changeid=ctx.node())
         lines = fctx.data().splitlines()
-        lines = [l for l in lines if not l.startswith('#') and l.strip()]
+        lines = [l for l in lines if not l.startswith(b'#') and l.strip()]
 
         if lines:
-            d['milestone'] = lines[0].strip()
+            d[b'milestone'] = lines[0].strip()
     except error.LookupError:
         pass
 
-    backout_node = get_backoutbynode('hgmo', repo, ctx)
+    backout_node = get_backoutbynode(b'hgmo', repo, ctx)
     if backout_node is not None:
-        d['backedoutbynode'] = backout_node
+        d[b'backedoutbynode'] = backout_node
 
 
 def changesetentry(orig, web, ctx):
@@ -255,32 +256,32 @@ def infowebcommand(web):
     """
     req = web.req
 
-    if 'node' not in req.qsparams:
+    if b'node' not in req.qsparams:
         # TRACKING hg48
         if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate('error', error="missing parameter 'node'")
+            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
         else:
-            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
 
-    nodes = req.qsparams.getall('node')
+    nodes = req.qsparams.getall(b'node')
 
     csets = []
     for node in nodes:
         ctx = scmutil.revsymbol(web.repo, node)
         csets.append({
-            'rev': ctx.rev(),
-            'node': ctx.hex(),
-            'user': ctx.user(),
-            'date': ctx.date(),
-            'description': ctx.description(),
-            'branch': ctx.branch(),
-            'tags': ctx.tags(),
-            'parents': [p.hex() for p in ctx.parents()],
-            'children': [c.hex() for c in ctx.children()],
-            'files': ctx.files(),
+            b'rev': ctx.rev(),
+            b'node': ctx.hex(),
+            b'user': ctx.user(),
+            b'date': ctx.date(),
+            b'description': ctx.description(),
+            b'branch': ctx.branch(),
+            b'tags': ctx.tags(),
+            b'parents': [p.hex() for p in ctx.parents()],
+            b'children': [c.hex() for c in ctx.children()],
+            b'files': ctx.files(),
         })
 
-    return web.sendtemplate('info', csets=templateutil.mappinglist(csets))
+    return web.sendtemplate(b'info', csets=templateutil.mappinglist(csets))
 
 
 def headdivergencewebcommand(web):
@@ -296,17 +297,17 @@ def headdivergencewebcommand(web):
     """
     req = web.req
 
-    if 'node' not in req.qsparams:
+    if b'node' not in req.qsparams:
         # TRACKING hg48
         if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate('error', error="missing parameter 'node'")
+            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
         else:
-            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
 
     repo = web.repo
 
-    paths = set(req.qsparams.getall('p'))
-    basectx = scmutil.revsymbol(repo, req.qsparams['node'])
+    paths = set(req.qsparams.getall(b'p'))
+    basectx = scmutil.revsymbol(repo, req.qsparams[b'node'])
 
     # Find how much this repo has changed since the requested changeset.
     # Our heuristic is to find the descendant head with the highest revision
@@ -337,7 +338,7 @@ def headdivergencewebcommand(web):
     # If rev 0 or a really old revision is passed in, we could DoS the server
     # by having to iterate nearly all changesets. Establish a cap for number
     # of changesets to examine.
-    maxnodes = repo.ui.configint('hgmo', 'headdivergencemaxnodes', 1000)
+    maxnodes = repo.ui.configint(b'hgmo', b'headdivergencemaxnodes', 1000)
     filemergesignored = False
     if len(betweennodes) > maxnodes:
         betweennodes = []
@@ -351,36 +352,36 @@ def headdivergencewebcommand(web):
         for p in files & paths:
             filemerges.setdefault(p, []).append(ctx.hex())
 
-    return web.sendtemplate('headdivergence', commitsbehind=commitsbehind,
+    return web.sendtemplate(b'headdivergence', commitsbehind=commitsbehind,
                 filemerges=filemerges, filemergesignored=filemergesignored)
 
 
 def automationrelevancewebcommand(web):
     req = web.req
 
-    if 'node' not in req.qsparams:
+    if b'node' not in req.qsparams:
         # TRACKING hg48
         if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate('error', error="missing parameter 'node'")
+            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
         else:
-            return web.sendtemplate('error', error={'error': "missing parameter 'node'"})
+            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
 
     repo = web.repo
     deletefields = {
-        'bookmarks',
-        'branch',
-        'branches',
-        'changelogtag',
-        'child',
-        'ctx',
-        'inbranch',
-        'instabilities',
-        'obsolete',
-        'parent',
-        'phase',
-        'succsandmarkers',
-        'tags',
-        'whyunstable',
+        b'bookmarks',
+        b'branch',
+        b'branches',
+        b'changelogtag',
+        b'child',
+        b'ctx',
+        b'inbranch',
+        b'instabilities',
+        b'obsolete',
+        b'parent',
+        b'phase',
+        b'succsandmarkers',
+        b'tags',
+        b'whyunstable',
     }
 
     csets = []
@@ -390,7 +391,7 @@ def automationrelevancewebcommand(web):
     # about what to do if the changeset isn't visible.
     urepo = repo.unfiltered()
 
-    revs = list(urepo.revs('automationrelevant(%r)', req.qsparams['node']))
+    revs = list(urepo.revs(b'automationrelevant(%r)', req.qsparams[b'node']))
 
     # The pushlog extensions wraps webutil.commonentry and the way it is called
     # means pushlog opens a SQLite connection on every call. This is inefficient.
@@ -407,7 +408,7 @@ def automationrelevancewebcommand(web):
             # The amount of redundant data for pushes containing N>100
             # changesets can add up to megabytes in size.
             try:
-                del entry['pushnodes']
+                del entry[b'pushnodes']
             except KeyError:
                 pass
 
@@ -416,9 +417,9 @@ def automationrelevancewebcommand(web):
             for k, v in entry.items():
                 # "files" is a generator that attempts to call a template.
                 # Don't even bother and just repopulate it.
-                if k == 'files':
-                    entry['files'] = sorted(ctx.files())
-                elif k == 'allparents':
+                if k == b'files':
+                    entry[b'files'] = sorted(ctx.files())
+                elif k == b'allparents':
                     # TRACKING hg48
                     # generic template keyword args needed (context, mapping)
                     # they are not actually used, so `None, None` is sufficient
@@ -427,8 +428,8 @@ def automationrelevancewebcommand(web):
                     else:
                         iterator = v().itermaps(ctx)
 
-                    entry['parents'] = [p['node'] for p in iterator]
-                    del entry['allparents']
+                    entry[b'parents'] = [p[b'node'] for p in iterator]
+                    del entry[b'allparents']
                 # These aren't interesting to us, so prune them. The
                 # original impetus for this was because "changelogtag"
                 # isn't part of the json template and adding it is non-trivial.
@@ -441,37 +442,37 @@ def automationrelevancewebcommand(web):
 
     # Advertise whether the requested revision is visible (non-obsolete).
     if csets:
-        visible = csets[-1]['node'] in repo
+        visible = csets[-1][b'node'] in repo
     else:
         visible = None
 
     data = {
-        'changesets': templateutil.mappinglist(csets),
-        'visible': visible,
+        b'changesets': templateutil.mappinglist(csets),
+        b'visible': visible,
     }
 
-    return web.sendtemplate('automationrelevance', **data)
+    return web.sendtemplate(b'automationrelevance', **data)
 
 
 def isancestorwebcommand(web):
     """Determine whether a changeset is an ancestor of another."""
     req = web.req
-    for k in ('head', 'node'):
+    for k in (b'head', b'node'):
         if k not in req.qsparams:
-            raise ErrorResponse(HTTP_NOT_FOUND, "missing parameter '%s'" % k)
+            raise ErrorResponse(HTTP_NOT_FOUND, b"missing parameter '%s'" % k)
 
-    head = req.qsparams['head']
-    node = req.qsparams['node']
+    head = req.qsparams[b'head']
+    node = req.qsparams[b'node']
 
     try:
         headctx = scmutil.revsingle(web.repo, head)
     except error.RepoLookupError:
-        raise ErrorResponse(HTTP_NOT_FOUND, 'unknown head revision %s' % head)
+        raise ErrorResponse(HTTP_NOT_FOUND, b'unknown head revision %s' % head)
 
     try:
         testctx = scmutil.revsingle(web.repo, node)
     except error.RepoLookupError:
-        raise ErrorResponse(HTTP_NOT_FOUND, 'unknown node revision %s' % node)
+        raise ErrorResponse(HTTP_NOT_FOUND, b'unknown node revision %s' % node)
 
     testrev = testctx.rev()
     isancestor = False
@@ -481,7 +482,7 @@ def isancestorwebcommand(web):
             isancestor = True
             break
 
-    return web.sendtemplate('isancestor',
+    return web.sendtemplate(b'isancestor',
                             headnode=headctx.hex(),
                             testnode=testctx.hex(),
                             isancestor=isancestor)
@@ -489,8 +490,8 @@ def isancestorwebcommand(web):
 
 def repoinfowebcommand(web):
     group_owner = repo_owner(web.repo)
-    return web.sendtemplate('repoinfo',
-                            archives=web.archivelist('tip'),
+    return web.sendtemplate(b'repoinfo',
+                            archives=web.archivelist(b'tip'),
                             groupowner=group_owner)
 
 
@@ -499,8 +500,8 @@ def revset_reviewer(repo, subset, x):
 
     Changesets reviewed by a specific person.
     """
-    l = revset.getargs(x, 1, 1, 'reviewer requires one argument')
-    n = encoding.lower(revset.getstring(l[0], 'reviewer requires a string'))
+    l = revset.getargs(x, 1, 1, b'reviewer requires one argument')
+    n = encoding.lower(revset.getstring(l[0], b'reviewer requires a string'))
 
     # Do not use a matcher here because regular expressions are not safe
     # for remote execution and may DoS the server.
@@ -525,7 +526,7 @@ def revset_automationrelevant(repo, subset, x):
     """
     s = revset.getset(repo, revset.fullreposet(repo), x)
     if len(s) > 1:
-        raise error.Abort('can only evaluate single changeset')
+        raise error.Abort(b'can only evaluate single changeset')
 
     ctx = repo[s.first()]
     revs = {ctx.rev()}
@@ -544,8 +545,8 @@ def revset_automationrelevant(repo, subset, x):
     # consider changesets from the push. However, on special repositories
     # (namely Try), we want changesets from previous pushes to come into
     # play too.
-    if repo.ui.configbool('hgmo', 'automationrelevantdraftancestors', False):
-        for rev in repo.revs('::%d & not public()', ctx.rev()):
+    if repo.ui.configbool(b'hgmo', b'automationrelevantdraftancestors', False):
+        for rev in repo.revs(b'::%d & not public()', ctx.rev()):
             revs.add(rev)
 
     return subset & revset.baseset(revs)
@@ -559,7 +560,7 @@ def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
     mirror during `hg pull` operations. We install our own code that replaces
     the complicated merging algorithm with a simple "remote wins" version.
     """
-    if not ui.configbool('hgmo', 'replacebookmarks', False):
+    if not ui.configbool(b'hgmo', b'replacebookmarks', False):
         return orig(ui, repo, remotemarks, path, trfunc, explicit=explicit)
 
     localmarks = repo._bookmarks
@@ -567,7 +568,7 @@ def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
     if localmarks == remotemarks:
         return
 
-    ui.status('remote bookmarks changed; overwriting\n')
+    ui.status(b'remote bookmarks changed; overwriting\n')
     localmarks.clear()
     for bm, node in remotemarks.items():
         localmarks[bm] = bin(node)
@@ -578,22 +579,22 @@ def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
 def servehgmo(orig, ui, repo, *args, **kwargs):
     """Wraps commands.serve to provide --hgmo flag."""
     if kwargs.get('hgmo', False):
-        kwargs['style'] = 'gitweb_mozilla'
-        kwargs['templates'] = os.path.join(ROOT, 'hgtemplates')
+        kwargs['style'] = b'gitweb_mozilla'
+        kwargs['templates'] = os.path.join(pycompat.bytestr(ROOT), b'hgtemplates')
 
         # ui.copy() is funky. Unless we do this, extension settings get
         # lost when calling hg.repository().
         ui = ui.copy()
 
         def setconfig(name, paths):
-            ui.setconfig('extensions', name,
-                         os.path.join(ROOT, 'hgext', *paths))
+            ui.setconfig(b'extensions', name,
+                         os.path.join(pycompat.bytestr(ROOT), b'hgext', *paths))
 
-        setconfig('firefoxreleases', ['firefoxreleases'])
-        setconfig('pushlog', ['pushlog'])
-        setconfig('pushlog-feed', ['pushlog', 'feed.py'])
+        setconfig(b'firefoxreleases', [b'firefoxreleases'])
+        setconfig(b'pushlog', [b'pushlog'])
+        setconfig(b'pushlog-feed', [b'pushlog', b'feed.py'])
 
-        ui.setconfig('web', 'logoimg', 'moz-logo-bw-rgb.svg')
+        ui.setconfig(b'web', b'logoimg', b'moz-logo-bw-rgb.svg')
 
         # Since new extensions may have been flagged for loading, we need
         # to obtain a new repo instance to a) trigger loading of these
@@ -603,10 +604,10 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
     return orig(ui, repo, *args, **kwargs)
 
 
-@command('mozbuildinfo', [
-    ('r', 'rev', '.', _('revision to query'), _('REV')),
-    ('', 'pipemode', False, _('accept arguments from stdin')),
-    ], _('show files info from moz.build files'),
+@command(b'mozbuildinfo', [
+    (b'r', b'rev', b'.', _(b'revision to query'), _(b'REV')),
+    (b'', b'pipemode', False, _(b'accept arguments from stdin')),
+    ], _(b'show files info from moz.build files'),
     optionalrepo=True)
 def mozbuildinfocommand(ui, repo, *paths, **opts):
     # This module imports modules not available to the hgweb virtualenv.
@@ -614,28 +615,28 @@ def mozbuildinfocommand(ui, repo, *paths, **opts):
     # moz.build evaluation context.
     import mozhg.mozbuildinfo as mozbuildinfo
 
-    if opts['pipemode']:
+    if opts[b'pipemode']:
         data = json.loads(ui.fin.read())
 
-        repo = hg.repository(ui, path=bytes(data['repo']))
-        ctx = scmutil.revsingle(repo, bytes(data['node']))
+        repo = hg.repository(ui, path=bytes(data[b'repo']))
+        ctx = scmutil.revsingle(repo, bytes(data[b'node']))
 
-        paths = data['paths']
+        paths = data[b'paths']
     else:
-        ctx = scmutil.revsingle(repo, bytes(opts['rev']))
+        ctx = scmutil.revsingle(repo, bytes(opts[b'rev']))
 
     try:
         d = mozbuildinfo.filesinfo(repo, ctx, paths=paths)
     except Exception as e:
-        d = {'error': 'Exception reading moz.build info: %s' % str(e)}
+        d = {b'error': b'Exception reading moz.build info: %s' % str(e)}
 
     if not d:
-        d = {'error': 'no moz.build info available'}
+        d = {b'error': b'no moz.build info available'}
 
     # TODO send data to templater.
     # Use stable output and indentation to make testing easier.
-    ui.write(json.dumps(d, indent=2, sort_keys=True))
-    ui.write('\n')
+    ui.write(bytes(json.dumps(d, indent=2, sort_keys=True)))
+    ui.write(b'\n')
     return
 
 
@@ -651,38 +652,38 @@ def pull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to fetch the remote clonebundles.manifest."""
     res = orig(repo, remote, *args, **kwargs)
 
-    if not repo.ui.configbool('hgmo', 'pullclonebundlesmanifest', False):
+    if not repo.ui.configbool(b'hgmo', b'pullclonebundlesmanifest', False):
         return res
 
-    has_clonebundles = remote.capable('clonebundles')
+    has_clonebundles = remote.capable(b'clonebundles')
     if not has_clonebundles:
-        if repo.vfs.exists('clonebundles.manifest'):
-            repo.ui.status(_('deleting local clonebundles.manifest\n'))
-            repo.vfs.unlink('clonebundles.manifest')
+        if repo.vfs.exists(b'clonebundles.manifest'):
+            repo.ui.status(_(b'deleting local clonebundles.manifest\n'))
+            repo.vfs.unlink(b'clonebundles.manifest')
 
-    has_cinnabarclone = remote.capable('cinnabarclone')
+    has_cinnabarclone = remote.capable(b'cinnabarclone')
     if not has_cinnabarclone:
-        if repo.vfs.exists('cinnabar.manifest'):
-            repo.ui.status(_('deleting local cinnabar.manifest\n'))
-            repo.vfs.unlink('cinnabar.manifest')
+        if repo.vfs.exists(b'cinnabar.manifest'):
+            repo.ui.status(_(b'deleting local cinnabar.manifest\n'))
+            repo.vfs.unlink(b'cinnabar.manifest')
 
     if has_clonebundles or has_cinnabarclone:
         with repo.wlock():
             if has_clonebundles:
-                repo.ui.status(_('pulling clonebundles manifest\n'))
-                manifest = remote._call('clonebundles')
-                repo.vfs.write('clonebundles.manifest', manifest)
+                repo.ui.status(_(b'pulling clonebundles manifest\n'))
+                manifest = remote._call(b'clonebundles')
+                repo.vfs.write(b'clonebundles.manifest', manifest)
             if has_cinnabarclone:
-                repo.ui.status(_('pulling cinnabarclone manifest\n'))
-                manifest = remote._call('cinnabarclone')
-                repo.vfs.write('cinnabar.manifest', manifest)
+                repo.ui.status(_(b'pulling cinnabarclone manifest\n'))
+                manifest = remote._call(b'cinnabarclone')
+                repo.vfs.write(b'cinnabar.manifest', manifest)
 
     return res
 
 
 def stream_clone_cmp(a, b):
     """Comparison function to prioritize stream bundles"""
-    packed = 'BUNDLESPEC=none-packed1'
+    packed = b'BUNDLESPEC=none-packed1'
 
     if packed in a and packed not in b:
         return -1
@@ -708,8 +709,8 @@ def filter_manifest_for_region(manifest, region):
     filtered = sorted(filtered, cmp=stream_clone_cmp)
 
     # We got a match. Write out the filtered manifest (with a trailing newline).
-    filtered.append('')
-    return '\n'.join(filtered)
+    filtered.append(b'')
+    return b'\n'.join(filtered)
 
 
 def processbundlesmanifest(orig, repo, proto):
@@ -729,22 +730,21 @@ def processbundlesmanifest(orig, repo, proto):
         return manifest
 
     # Get path for Mozilla, AWS, GCP network prefixes. Return if missing
-    mozpath = repo.ui.config('hgmo', 'mozippath')
-    awspath = repo.ui.config('hgmo', 'awsippath')
+    mozpath = repo.ui.config(b'hgmo', b'mozippath')
+    awspath = repo.ui.config(b'hgmo', b'awsippath')
     gcppath = repo.ui.config(b'hgmo', b'gcpippath')
     if not awspath and not mozpath and not gcppath:
         return manifest
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
     # actual source IP, so prefer it.
-    sourceip = proto._req.headers.get('X-CLUSTER-CLIENT-IP',
-                                      proto._req.rawenv.get('REMOTE_ADDR'))
-
+    sourceip = proto._req.headers.get(b'X-CLUSTER-CLIENT-IP',
+                                      proto._req.rawenv.get(b'REMOTE_ADDR'))
 
     if not sourceip:
         return manifest
     else:
-        sourceip = ipaddress.IPv4Address(sourceip.decode('ascii'))
+        sourceip = ipaddress.IPv4Address(pycompat.unicode(pycompat.sysstr(sourceip)))
 
     # If the request originates from a private IP address, and we are running on
     # a cloud instance, we should be serving traffic to private instances in CI.
@@ -760,7 +760,7 @@ def processbundlesmanifest(orig, repo, proto):
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
-    if awspath and 'ec2region=' in manifest.data:
+    if awspath and b'ec2region=' in manifest.data:
         try:
             with open(awspath, 'rb') as fh:
                 awsdata = json.load(fh)
@@ -776,7 +776,7 @@ def processbundlesmanifest(orig, repo, proto):
                 return filter_manifest_for_region(manifest, b'ec2region=%s' % region)
 
         except Exception as e:
-            repo.ui.log('hgmo', 'exception filtering AWS bundle source IPs: %s\n', e)
+            repo.ui.log(b'hgmo', b'exception filtering AWS bundle source IPs: %s\n', e)
 
     # If the GCP IP file path is set and some line in the manifest includes a GCE region,
     # we will check if the request came from GCP to serve optimized bundles
@@ -799,20 +799,20 @@ def processbundlesmanifest(orig, repo, proto):
     # Determine if source IP is in a Mozilla network, as we stream results to those addresses
     if mozpath:
         try:
-            with open(mozpath, 'rb') as fh:
+            with open(mozpath, 'r') as fh:
                 mozdata = fh.read().splitlines()
 
             for ipentry in mozdata:
-                network = ipaddress.IPv4Network(ipentry.decode('ascii'))
+                network = ipaddress.IPv4Network(pycompat.unicode(pycompat.sysstr(ipentry)))
 
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
                     origlines = sorted(manifest.data.splitlines(), cmp=stream_clone_cmp)
-                    origlines.append('')
-                    return '\n'.join(origlines)
+                    origlines.append(b'')
+                    return b'\n'.join(origlines)
 
         except Exception as e:
-            repo.ui.log('hgmo', 'exception filtering bundle source IPs: %s\n', e)
+            repo.ui.log(b'hgmo', b'exception filtering bundle source IPs: %s\n', e)
             return manifest
 
     return manifest
@@ -828,13 +828,13 @@ def filelog(orig, web):
     class tmplwrapper(tmpl.__class__):
         def __call__(self, *args, **kwargs):
             for entry in kwargs.get('entries', []):
-                push = web.repo.pushlog.pushfromnode(bin(entry['node']))
+                push = web.repo.pushlog.pushfromnode(bin(entry[b'node']))
                 if push:
-                    entry['pushid'] = push.pushid
-                    entry['pushdate'] = dateutil.makedate(push.when)
+                    entry[b'pushid'] = push.pushid
+                    entry[b'pushdate'] = dateutil.makedate(push.when)
                 else:
-                    entry['pushid'] = None
-                    entry['pushdate'] = None
+                    entry[b'pushid'] = None
+                    entry[b'pushdate'] = None
 
             return super(tmplwrapper, self).__call__(*args, **kwargs)
 
@@ -860,44 +860,44 @@ def hgwebfastannotate(orig, req, fctx, ui):
 
 def extsetup(ui):
     # TRACKING hg49 4.8 would emit bytearray instances against PEP-3333.
-    extensions.wrapfunction(requestmod.wsgiresponse, 'sendresponse',
+    extensions.wrapfunction(requestmod.wsgiresponse, b'sendresponse',
                             wsgisendresponse)
 
-    extensions.wrapfunction(exchange, 'pull', pull)
-    extensions.wrapfunction(webutil, 'changesetentry', changesetentry)
-    extensions.wrapfunction(webutil, 'changelistentry', changelistentry)
-    extensions.wrapfunction(bookmarks, 'updatefromremote', bmupdatefromremote)
-    extensions.wrapfunction(webcommands, 'filelog', filelog)
+    extensions.wrapfunction(exchange, b'pull', pull)
+    extensions.wrapfunction(webutil, b'changesetentry', changesetentry)
+    extensions.wrapfunction(webutil, b'changelistentry', changelistentry)
+    extensions.wrapfunction(bookmarks, b'updatefromremote', bmupdatefromremote)
+    extensions.wrapfunction(webcommands, b'filelog', filelog)
 
-    revset.symbols['reviewer'] = revset_reviewer
-    revset.safesymbols.add('reviewer')
+    revset.symbols[b'reviewer'] = revset_reviewer
+    revset.safesymbols.add(b'reviewer')
 
-    revset.symbols['automationrelevant'] = revset_automationrelevant
-    revset.safesymbols.add('automationrelevant')
+    revset.symbols[b'automationrelevant'] = revset_automationrelevant
+    revset.safesymbols.add(b'automationrelevant')
 
     # Install IP filtering for bundle URLs.
 
     # Build-in command from core Mercurial.
-    extensions.wrapcommand(wireprotov1server.commands, 'clonebundles', processbundlesmanifest)
+    extensions.wrapcommand(wireprotov1server.commands, b'clonebundles', processbundlesmanifest)
 
-    entry = extensions.wrapcommand(commands.table, 'serve', servehgmo)
-    entry[1].append(('', 'hgmo', False,
-                     'Run a server configured like hg.mozilla.org'))
+    entry = extensions.wrapcommand(commands.table, b'serve', servehgmo)
+    entry[1].append((b'', b'hgmo', False,
+                     b'Run a server configured like hg.mozilla.org'))
 
     setattr(webcommands, 'info', infowebcommand)
-    webcommands.__all__.append('info')
+    webcommands.__all__.append(b'info')
 
     setattr(webcommands, 'headdivergence', headdivergencewebcommand)
-    webcommands.__all__.append('headdivergence')
+    webcommands.__all__.append(b'headdivergence')
 
     setattr(webcommands, 'automationrelevance', automationrelevancewebcommand)
-    webcommands.__all__.append('automationrelevance')
+    webcommands.__all__.append(b'automationrelevance')
 
     setattr(webcommands, 'isancestor', isancestorwebcommand)
-    webcommands.__all__.append('isancestor')
+    webcommands.__all__.append(b'isancestor')
 
     setattr(webcommands, 'repoinfo', repoinfowebcommand)
-    webcommands.__all__.append('repoinfo')
+    webcommands.__all__.append(b'repoinfo')
 
 
 def reposetup(ui, repo):
@@ -909,24 +909,24 @@ def reposetup(ui, repo):
     # fastannotate in Mercurial 4.8 has buggy hgweb support. We always remove
     # its monkeypatch if present.
     try:
-        extensions.unwrapfunction(webutil, 'annotate',
+        extensions.unwrapfunction(webutil, b'annotate',
                                   fasupport._hgwebannotate)
     except ValueError:
         pass
 
     # And we install our own if fastannotate is enabled.
     try:
-        fastannotate = extensions.find('fastannotate')
+        fastannotate = extensions.find(b'fastannotate')
     except KeyError:
         fastannotate = None
 
-    if fastannotate and 'hgweb' in ui.configlist('fastannotate', 'modes'):
+    if fastannotate and b'hgweb' in ui.configlist(b'fastannotate', b'modes'):
         # Guard against recursive chaining, since we're in reposetup().
         try:
-            extensions.unwrapfunction(webutil, 'annotate',
+            extensions.unwrapfunction(webutil, b'annotate',
                                       hgwebfastannotate)
         except ValueError:
             pass
 
-        extensions.wrapfunction(webutil, 'annotate',
+        extensions.wrapfunction(webutil, b'annotate',
                                 hgwebfastannotate)
