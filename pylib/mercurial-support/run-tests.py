@@ -1019,7 +1019,7 @@ class Test(unittest.TestCase):
         output. This function defines how some of that normalization will
         occur.
         """
-        # TRACKING MOZ - 9 ports
+        # TRACKING MOZ - 9 ports, LOCALHOST
         r = [
             # This list should be parallel to defineport in _getenv
             self._portmap(0),
@@ -1031,6 +1031,7 @@ class Test(unittest.TestCase):
             self._portmap(6),
             self._portmap(7),
             self._portmap(8),
+            (br'\b%s\b' % re.escape(self._localhostname()), br'$LOCALHOST'),
             (br'([^0-9])%s' % re.escape(self._localip()), br'\1$LOCALIP'),
             (br'\bHG_TXNID=TXN:[a-f0-9]{40}\b', br'HG_TXNID=TXN:$ID$'),
             ]
@@ -1072,6 +1073,10 @@ class Test(unittest.TestCase):
             return b'::1'
         else:
             return b'127.0.0.1'
+
+    # Tracking MOZ - add _localhostname for cross-platform compat
+    def _localhostname(self):
+        return b'%s' % socket.getfqdn(self._localip())
 
     def _genrestoreenv(self, testenv):
         """Generate a script that can be used by tests to restore the original
@@ -1149,6 +1154,9 @@ class Test(unittest.TestCase):
         # LOCALIP could be ::1 or 127.0.0.1. Useful for tests that require raw
         # IP addresses.
         env['LOCALIP'] = _strpath(self._localip())
+
+        # TRACKING MOZ - set LOCALHOST for cross-platform localhost naming
+        env['LOCALHOST'] = _strpath(self._localhostname())
 
         # This has the same effect as Py_LegacyWindowsStdioFlag in exewrapper.c,
         # but this is needed for testing python instances like dummyssh,
