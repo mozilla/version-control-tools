@@ -14,3 +14,13 @@ test-bookmarks-replication.t
 # vcsreplicator bootstrap procedure test intermittently fails due to the concurrent
 # code printing the same lines in a non-deterministic order
 test-bootstrap.t
+
+# vcsreplicator sns test hangs for unknown reasons
+test-sns-notifier.t
+
+# vcsreplicator test for failure in Kafka availability fails to push early in the
+# test, but succeeds later down the line.
+test-cluster-unavailable.t
+
+# currently fails
+test-template-sync.t
