@@ -12,7 +12,7 @@ Install a custom commit command to simulate extra changeset data getting added b
   >     class extrarepo(repo.__class__):
   >         def commit(self, *args, **kwargs):
   >             extra = kwargs.setdefault('extra', {})
-  >             extra['moz-landing-system'] = 'wobble'
+  >             extra[b'moz-landing-system'] = b'wobble'
   >             return super(extrarepo, self).commit(*args, **kwargs)
   > 
   >     repo.__class__ = extrarepo
