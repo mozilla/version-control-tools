@@ -334,7 +334,7 @@ def get_build_from_archive_file(platform, r):
         b'app_version': app_version,
         b'revision': revision,
         b'day': datetime.date(year, month, day),
-        b'archive_url': r.url[:r.url.rindex(b'/') + 1],
+        b'artifacts_url': r.url[:r.url.rindex(b'/') + 1],
     }
 
 
@@ -432,7 +432,7 @@ def find_builds_from_tags():
                         b'channel': channel,
                         b'app_version': app_version,
                         b'platform': platform,
-                        b'archive_url': archive_url,
+                        b'artifacts_url': archive_url,
                         b'build_id': build_id,
                         b'day': day,
                     }

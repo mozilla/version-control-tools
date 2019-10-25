@@ -6,33 +6,11 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import collections
 import contextlib
 import datetime
 import json
 import os
 import sqlite3
-
-
-Build = collections.namedtuple('Build', (
-    'build_id',
-    'channel',
-    'platform',
-    'app_version',
-    'revision',
-    'day',
-    'artifacts_url',
-))
-
-def _dict_to_build(build):
-    return Build(
-        build[b'build_id'],
-        build[b'channel'],
-        build[b'platform'],
-        build[b'app_version'],
-        build[b'revision'],
-        build[b'day'],
-        build[b'archive_url'])
 
 
 def _ts_to_day(ts):
@@ -133,9 +111,9 @@ class FirefoxReleaseDatabase(object):
         self._db.execute(
             'INSERT OR REPLACE INTO builds '
                 'VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
-            (insertion_key, build.channel, build.platform,
-             build.build_id, build.app_version,
-             build.revision, ts, build.artifacts_url))
+            (insertion_key, build[b'channel'], build[b'platform'],
+             build[b'build_id'], build[b'app_version'],
+             build[b'revision'], ts, build[b'artifacts_url']))
 
     def import_nightly_builds(self, builds):
         """Import an iterable of Nightly builds into the database.
@@ -159,8 +137,6 @@ class FirefoxReleaseDatabase(object):
                 last_day = datetime.date(1900, 1, 1)
 
             for build in builds:
-                build = _dict_to_build(build)
-
                 if build in previous_builds:
                     continue
 
@@ -203,8 +179,15 @@ class FirefoxReleaseDatabase(object):
 
             day = _ts_to_day(ts)
 
-            build = Build(build_id, channel, platform, app_version,
-                          revision, day, archive_url)
+            build = {
+                b'app_version': app_version,
+                b'artifacts_url': archive_url,
+                b'build_id': build_id,
+                b'channel': channel,
+                b'day': day,
+                b'platform': platform,
+                b'revision': revision,
+            }
 
             yield build
 
@@ -228,7 +211,7 @@ class FirefoxReleaseDatabase(object):
 
         for row in self._db.execute(q, params):
             insertion_key, channel, platform, build_id, app_version, revision, \
-            day, artifacts_url = row
+            day, archives_url = row
 
             yield json.dumps({
                 b'_format': 1,
@@ -239,7 +222,7 @@ class FirefoxReleaseDatabase(object):
                 b'app_version': app_version,
                 b'revision': revision,
                 b'day': day,
-                b'artifacts_url': artifacts_url,
+                b'archives_url': archives_url,
             }, sort_keys=True)
 
     def import_serialized(self, data):

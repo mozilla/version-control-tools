@@ -81,7 +81,7 @@ def release_builds(db, repo, filter_unknown_revision=True):
     By default, only builds associated with revisions in this repo are returned.
     """
     for build in db.builds():
-        if filter_unknown_revision and build.revision not in repo:
+        if filter_unknown_revision and build[b'revision'] not in repo:
             continue
 
         yield build
@@ -93,7 +93,7 @@ def release_builds_by_revision(db, repo):
 
     for build in db.builds():
         try:
-            ctx = repo[build.revision]
+            ctx = repo[build[b'revision']]
         except error.RepoLookupError:
             continue
 
@@ -109,17 +109,16 @@ def release_configurations(db, repo):
     in this repo.
     """
     return db.unique_release_configurations(
-        fltr=lambda build: build.revision in repo)
+        fltr=lambda build: build[b'revision'] in repo)
 
 
 def _releases_mapped_generator(context, builds):
     """Generates build object mappings for use in the template layer
     """
     for i, build in enumerate(builds):
-        entry = build._asdict()
-        entry['parity'] = str(i % 2)
-        entry['anchor'] = build_anchor(build)
-        yield entry
+        build[b'parity'] = pycompat.bytestr(i % 2)
+        build[b'anchor'] = build_anchor(build)
+        yield build
 
 
 def firefox_releases_web_command(web):
@@ -138,7 +137,7 @@ def firefox_releases_web_command(web):
     builds = []
 
     for build in release_builds(db, repo):
-        if platform and build.platform != platform:
+        if platform and build[b'platform'] != platform:
             continue
 
         builds.append(build)
@@ -149,12 +148,12 @@ def firefox_releases_web_command(web):
 
 
 def release_config(build):
-    return build.channel, build.platform
+    return build[b'channel'], build[b'platform']
 
 
 def build_anchor(build):
-    return '%s%s%s%s' % (build.revision[0:12], build.channel, build.platform,
-                         build.build_id)
+    return b'%s%s%s%s' % (build[b'revision'][0:12], build[b'channel'], build[b'platform'],
+                         build[b'build_id'])
 
 
 def changesetentry(orig, web, ctx):
@@ -173,38 +172,32 @@ def changesetentry(orig, web, ctx):
         d['firefox_releases_here'] = []
         d['firefox_releases_first'] = []
 
-        for config, build in sorted(releases['this'].items()):
-            entry = build._asdict()
-
-            entry['anchor'] = build_anchor(build)
+        for config, build in sorted(releases[b'this'].items()):
+            build[b'anchor'] = build_anchor(build)
 
             # Set links to previous and future releases.
-            if config in releases['previous']:
-                entry['previousnode'] = releases['previous'][config].revision
+            if config in releases[b'previous']:
+                build[b'previousnode'] = releases[b'previous'][config].revision
 
-            d['firefox_releases_here'].append(entry)
-            d['firefox_releases_first'].append(entry)
+            d[b'firefox_releases_here'].append(build)
+            d[b'firefox_releases_first'].append(build)
 
     if releases['future']:
         d.setdefault('firefox_releases_first', [])
 
-        for config, build in sorted(releases['future'].items()):
-            entry = build._asdict()
+        for config, build in sorted(releases[b'future'].items()):
+            build[b'anchor'] = build_anchor(build)
 
-            entry['anchor'] = build_anchor(build)
+            if build not in d[b'firefox_releases_first']:
+                d[b'firefox_releases_first'].append(build)
 
-            if entry not in d['firefox_releases_first']:
-                d['firefox_releases_first'].append(entry)
+    if releases[b'previous']:
+        d[b'firefox_releases_last'] = []
 
-    if releases['previous']:
-        d['firefox_releases_last'] = []
+        for config, build in sorted(releases[b'previous'].items()):
+            build[b'anchor'] = build_anchor(build)
 
-        for config, build in sorted(releases['previous'].items()):
-            entry = build._asdict()
-
-            entry['anchor'] = build_anchor(build)
-
-            d['firefox_releases_last'].append(entry)
+            d[b'firefox_releases_last'].append(build)
 
     # Used so we don't display "first release with" and "last release without".
     # We omit displaying in this scenario because we're not confident in the
@@ -343,10 +336,10 @@ def revset_firefoxrelease(repo, subset, x):
     def get_revs():
         for rev, builds in release_builds_by_revision(db, repo).items():
             for build in builds:
-                if channels and build.channel not in channels:
+                if channels and build[b'channel'] not in channels:
                     continue
 
-                if platforms and build.platform not in platforms:
+                if platforms and build[b'platform'] not in platforms:
                     continue
 
                 yield rev
