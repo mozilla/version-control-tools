@@ -178,7 +178,7 @@ def changesetentry(orig, web, ctx):
 
             # Set links to previous and future releases.
             if config in releases[b'previous']:
-                build[b'previousnode'] = releases[b'previous'][config].revision
+                build[b'previousnode'] = releases[b'previous'][config][b'revision']
 
             d[b'firefox_releases_here'].append(build)
             d[b'firefox_releases_first'].append(build)
