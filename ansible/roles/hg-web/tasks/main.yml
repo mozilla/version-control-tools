@@ -229,7 +229,7 @@
 # Various extensions and hooks reference Python packages provided by
 # version-control-tools. Register links so all packages are available in
 # virtualenvs.
-- name: add packages to virtualens
+- name: add packages to virtualenvs
   copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
         content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
