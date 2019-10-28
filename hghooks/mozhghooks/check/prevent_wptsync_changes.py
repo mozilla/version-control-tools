@@ -33,7 +33,7 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
     """
     Prevents changes to files outside of testing/web-platform
     subdirectories for account wptsync@mozilla.com, and only allows
-    pushes to mozilla-inbound from among production repos.
+    pushes to autoland from among production repos.
 
     This account is used by a two-way repository sync between
     mozilla-central and w3c/web-platform-tests on GitHub.
@@ -52,7 +52,7 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
         success = False
         if self.repo_metadata['path'] == 'try':
             success = True
-        elif self.repo_metadata['path'] == 'integration/mozilla-inbound':
+        elif self.repo_metadata['path'] == 'integration/autoland':
             invalid_paths = [path for path in ctx.files() if not allowed_paths.match(path)]
             if not invalid_paths:
                 success = True

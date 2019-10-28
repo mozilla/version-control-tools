@@ -1,8 +1,8 @@
   $ . $TESTDIR/hghooks/tests/common.sh
-  $ hg init integration/mozilla-inbound
-  $ configurehooks integration/mozilla-inbound
-  $ touch integration/mozilla-inbound/.hg/IS_FIREFOX_REPO
-  $ hg -q clone integration/mozilla-inbound client
+  $ hg init integration/autoland
+  $ configurehooks integration/autoland
+  $ touch integration/autoland/.hg/IS_FIREFOX_REPO
+  $ hg -q clone integration/autoland client
   $ cd client
   $ mkdir -p testing/web-platform/tests
   $ mkdir testing/web-platform/meta
@@ -17,7 +17,7 @@ Regular user can push changes both in and beyond testing/web-platform
   $ touch testing/web-platform/tests/file4
   $ hg -q commit -A -m initial
   $ USER=someone@example.com hg push
-  pushing to $TESTTMP/integration/mozilla-inbound
+  pushing to $TESTTMP/integration/autoland
   searching for changes
   adding changesets
   adding manifests
@@ -33,7 +33,7 @@ wptsync user cannot push changes beyond testing/web-platform/tests or meta
   $ touch testing/web-platform/tests/file4a
   $ hg -q commit -A -m mix-of-legal-illegal-changes
   $ USER=wptsync@mozilla.com hg push
-  pushing to $TESTTMP/integration/mozilla-inbound
+  pushing to $TESTTMP/integration/autoland
   searching for changes
   adding changesets
   adding manifests
@@ -42,7 +42,7 @@ wptsync user cannot push changes beyond testing/web-platform/tests or meta
   
   ********************** ERROR **********************
   wptsync@mozilla.com can only make changes to
-  the following paths on integration/mozilla-inbound:
+  the following paths on integration/autoland:
   testing/web-platform/moz.build
   testing/web-platform/meta
   testing/web-platform/tests
@@ -63,7 +63,7 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   $ touch file1a
   $ hg -q commit -A -m illegal-changes  
   $ USER=wptsync@mozilla.com hg push
-  pushing to $TESTTMP/integration/mozilla-inbound
+  pushing to $TESTTMP/integration/autoland
   searching for changes
   adding changesets
   adding manifests
@@ -72,7 +72,7 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   
   ********************** ERROR **********************
   wptsync@mozilla.com can only make changes to
-  the following paths on integration/mozilla-inbound:
+  the following paths on integration/autoland:
   testing/web-platform/moz.build
   testing/web-platform/meta
   testing/web-platform/tests
@@ -88,11 +88,11 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
-Test legal changes for wptsync user on mozilla-inbound
+Test legal changes for wptsync user on autoland
 
   $ cd ..
   $ rm -rf client
-  $ hg -q clone integration/mozilla-inbound client
+  $ hg -q clone integration/autoland client
   $ cd client
 
 wptsync user can push changes to testing/web-platform/moz.build
@@ -100,7 +100,7 @@ wptsync user can push changes to testing/web-platform/moz.build
   $ touch testing/web-platform/moz.build
   $ hg -q commit -A -m initial
   $ USER=wptsync@mozilla.com hg push
-  pushing to $TESTTMP/integration/mozilla-inbound
+  pushing to $TESTTMP/integration/autoland
   searching for changes
   adding changesets
   adding manifests
@@ -113,7 +113,7 @@ wptsync user can push changes to testing/web-platform/tests and meta
   $ touch testing/web-platform/meta/meta1
   $ hg -q commit -A -m initial
   $ USER=wptsync@mozilla.com hg push
-  pushing to $TESTTMP/integration/mozilla-inbound
+  pushing to $TESTTMP/integration/autoland
   searching for changes
   adding changesets
   adding manifests
@@ -181,7 +181,7 @@ wptsync user can push changes to testing/web-platform/tests and meta on try
   adding file changes
   added 1 changesets with 2 changes to 2 files
 
-Test pushes outside of integration/mozilla-inbound or try
+Test pushes outside of integration/autoland or try
 
   $ cd ..
   $ rm -rf client
@@ -191,7 +191,7 @@ Test pushes outside of integration/mozilla-inbound or try
   $ hg -q clone server client
   $ cd client
 
-Regular user can push changes to a repo other than mozilla-inbound or try
+Regular user can push changes to a repo other than autoland or try
 
   $ touch file0
   $ hg -q commit -A -m initial
@@ -203,7 +203,7 @@ Regular user can push changes to a repo other than mozilla-inbound or try
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
-wptsync user cannot push changes to a repo other than mozilla-inbound or try
+wptsync user cannot push changes to a repo other than autoland or try
 
   $ touch file1
   $ hg -q commit -A -m add-a-file 
