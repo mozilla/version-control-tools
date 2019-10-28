@@ -513,12 +513,6 @@ def upload_index(html):
             CacheControl='max-age=60',
         )
 
-    for bucket, region in GCP_HOSTS:
-        client = storage.Client()
-        gcp_bucket = client.get_bucket(bucket)
-        blob = gcp_bucket.blob('index.html')
-        blob.upload_from_string(html)
-
 
 def generate_json_manifest(repos):
     d = {}
@@ -550,12 +544,6 @@ def upload_json_manifest(data):
             ContentType='application/json',
             CacheControl='max-age=60',
         )
-
-    for bucket, region in GCP_HOSTS:
-        client = storage.Client()
-        gcp_bucket = client.get_bucket(bucket)
-        blob = gcp_bucket.blob('bundles.json')
-        blob.upload_from_string(data)
 
 
 def main():
