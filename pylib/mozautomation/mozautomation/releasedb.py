@@ -100,10 +100,10 @@ class FirefoxReleaseDatabase(object):
             self._db.execute('PRAGMA user_version=1')
 
     def _insert_build(self, build, insertion_key):
-        if len(build.revision) != 40:
+        if len(build[b'revision']) != 40:
             raise ValueError('expected 40 character revision')
 
-        day = build.day
+        day = build[b'day']
         ts = (datetime.datetime(day.year, day.month, day.day) -
               datetime.datetime(1970, 1, 1))
         ts = ts.total_seconds()
@@ -141,7 +141,7 @@ class FirefoxReleaseDatabase(object):
                     continue
 
                 self._insert_build(build, insertion_key)
-                last_day = max(last_day, build.day)
+                last_day = max(last_day, build[b'day'])
                 count += 1
 
             if count:
@@ -271,7 +271,7 @@ class FirefoxReleaseDatabase(object):
             if fltr and not fltr(build):
                 continue
 
-            configs.add((build.channel, build.platform))
+            configs.add((build[b'channel'], build[b'platform']))
 
         return configs
 
