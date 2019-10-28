@@ -910,11 +910,23 @@ def _checkcurses(ui, cw):
     cw.c['ui']['interface'] = 'curses'
 
 
+def _activate_inmemory_rebase(cw):
+    '''Activates in-memory rebase.
+    '''
+    if 'rebase' not in cw.c:
+        cw.c['rebase'] = {}
+
+    cw.c['rebase']['experimental.inmemory'] = 'yes'
+
 def _checkhistoryediting(ui, cw, hg_version):
     extensions = {'histedit', 'rebase'}
 
     if hg_version >= (4, 8, 0):
         extensions.add('absorb')
+
+    # Turn on in-memory rebase for those who have rebase on already
+    if ui.hasconfig(b'extensions', b'rebase'):
+        _activate_inmemory_rebase(cw)
 
     if all(ui.hasconfig('extensions', e) for e in extensions):
         return
@@ -927,6 +939,9 @@ def _checkhistoryediting(ui, cw, hg_version):
 
     for ext in sorted(extensions):
         cw.c['extensions'][ext] = ''
+
+    # Turn on in-memory rebase if a user wants rebase
+    _activate_inmemory_rebase(cw)
 
 
 def _checkevolve(ui, cw, hg_version):
