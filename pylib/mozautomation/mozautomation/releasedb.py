@@ -124,7 +124,7 @@ class FirefoxReleaseDatabase(object):
         count = 0
         with self._db:
             # Find current builds so we can perform duplicate detection.
-            previous_builds = set(self.builds())
+            previous_builds = {build[b'build_id'] for build in self.builds()}
 
             state = self.get_all_state()
 
@@ -137,7 +137,7 @@ class FirefoxReleaseDatabase(object):
                 last_day = datetime.date(1900, 1, 1)
 
             for build in builds:
-                if build in previous_builds:
+                if build[b'build_id'] in previous_builds:
                     continue
 
                 self._insert_build(build, insertion_key)
