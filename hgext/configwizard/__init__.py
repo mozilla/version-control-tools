@@ -561,9 +561,9 @@ def configwizard(ui, repo, statedir=None, **opts):
                                'Enable logging of commands to help diagnose bugs '
                                'and performance problems')
 
-    if 'shelve' in runsteps:
-        _promptnativeextension(ui, cw, 'shelve',
-                               'Enable the shelve feature. Equivalent to git stash')
+    if b'shelve' in runsteps:
+        _promptnativeextension(ui, cw, b'shelve',
+                               b'Enable the shelve feature. Equivalent to git stash')
 
     if 'security' in runsteps:
         _checksecurity(ui, cw, hgversion)
