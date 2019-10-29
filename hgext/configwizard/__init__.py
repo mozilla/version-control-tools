@@ -483,6 +483,7 @@ wizardsteps = set([
     'permissions',
     'clang-format',
     'js-format',
+    'shelve',
 ])
 
 
@@ -559,6 +560,10 @@ def configwizard(ui, repo, statedir=None, **opts):
         _promptnativeextension(ui, cw, 'blackbox',
                                'Enable logging of commands to help diagnose bugs '
                                'and performance problems')
+
+    if 'shelve' in runsteps:
+        _promptnativeextension(ui, cw, 'shelve',
+                               'Enable the shelve feature. Equivalent to git stash')
 
     if 'security' in runsteps:
         _checksecurity(ui, cw, hgversion)
