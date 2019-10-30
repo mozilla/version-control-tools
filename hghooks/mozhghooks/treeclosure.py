@@ -16,7 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from urllib2 import urlopen
+from mercurial import (
+    urllibcompat,
+)
 import os.path
 import re
 import json
@@ -38,7 +40,7 @@ def printError(ui, message):
 def isPushAllowed(ui, repo, name):
     url = treestatus_base_url % (name,)
     try:
-        u = urlopen(url)
+        u = urllibcompat.urlreq.urlopen(url)
         data = json.load(u)
         if data['result']['status'] == 'closed':
             closure_text = b"%s is CLOSED! Reason: %s" % (name, pycompat.bytestr(data['result']['reason']))
