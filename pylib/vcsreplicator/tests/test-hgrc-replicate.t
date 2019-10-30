@@ -68,7 +68,7 @@ Replicating hgrc without hgrc file will delete file
 
 Unicode in hgrc is preserved
 
-  $ docker exec ${SSH_CID} /set-hgrc-option mozilla-central hooks dummy 'こんにちは'
+  $ hgmo exec hgssh mv /unicode.hgrc /repo/hg/mozilla/mozilla-central/.hg/hgrc
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
