@@ -4,6 +4,10 @@
 
 import hashlib
 
+from mercurial import (
+    pycompat,
+)
+
 
 def mozrepohash(ui, repo, no_raw=False, **opts):
     """obtain a hash of the repo contents.
@@ -80,24 +84,24 @@ def mozrepohash(ui, repo, no_raw=False, **opts):
     h_obsstore.update(repo.svfs.tryread(b'obsstore'))
 
     # Output with formatting
-    fm = ui.formatter('mozrepohash', opts)
+    fm = ui.formatter('mozrepohash', pycompat.byteskwargs(opts))
     fm.startitem()
     fm.write(b'revisions_visible', b'visible revisions: %d\n', len(repo))
     fm.write(b'revisions_total', b'total revisions: %d\n', len(urepo))
     fm.write(b'heads_visible', b'visible heads: %d\n', len(repo.heads()))
     fm.write(b'heads_total', b'total heads: %d\n', len(urepo.heads()))
-    fm.write(b'normal', b'normal repo hash: %s\n', h_default.hexdigest())
-    fm.write(b'unfiltered', b'unfiltered repo hash: %s\n', h_unfiltered.hexdigest())
-    fm.write(b'phases', b'phases hash: %s\n', h_phases.hexdigest())
-    fm.write(b'heads', b'heads hash: %s\n', h_heads.hexdigest())
-    fm.write(b'unfiltered_heads', b'unfiltered heads hash: %s\n', h_heads_unfiltered.hexdigest())
-    fm.write(b'pushlog', b'pushlog hash: %s\n', h_pushlog.hexdigest())
+    fm.write(b'normal', b'normal repo hash: %s\n', pycompat.bytestr(h_default.hexdigest()))
+    fm.write(b'unfiltered', b'unfiltered repo hash: %s\n', pycompat.bytestr(h_unfiltered.hexdigest()))
+    fm.write(b'phases', b'phases hash: %s\n', pycompat.bytestr(h_phases.hexdigest()))
+    fm.write(b'heads', b'heads hash: %s\n', pycompat.bytestr(h_heads.hexdigest()))
+    fm.write(b'unfiltered_heads', b'unfiltered heads hash: %s\n', pycompat.bytestr(h_heads_unfiltered.hexdigest()))
+    fm.write(b'pushlog', b'pushlog hash: %s\n', pycompat.bytestr(h_pushlog.hexdigest()))
 
     if repo.svfs.exists(b'obsstore'):
         fm.write(b'obsolete_records_count', b'obsolete records count: %d\n', len(repo.obsstore))
-        fm.write(b'obsolete_records', b'obsolete records hash: %s\n', h_obsrecords.hexdigest())
+        fm.write(b'obsolete_records', b'obsolete records hash: %s\n', pycompat.bytestr(h_obsrecords.hexdigest()))
 
         if not no_raw:
-            fm.write(b'obsstore', b'obsstore hash: %s\n', h_obsstore.hexdigest())
+            fm.write(b'obsstore', b'obsstore hash: %s\n', pycompat.bytestr(h_obsstore.hexdigest()))
 
     fm.end()

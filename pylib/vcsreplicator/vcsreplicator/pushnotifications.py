@@ -10,6 +10,9 @@ import os
 import sys
 
 import hglib
+from mercurial import (
+    pycompat,
+)
 
 from .config import (
     Config,
@@ -204,7 +207,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
 
         def node_payload(node):
             assert len(node) == 40
-            if isinstance(node, unicode):
+            if isinstance(node, pycompat.unicode):
                 node = node.encode('latin1')
 
             rev = rev_info(node)

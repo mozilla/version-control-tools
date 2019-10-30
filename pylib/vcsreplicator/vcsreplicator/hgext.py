@@ -12,6 +12,7 @@ import logging
 import os
 import re
 import shutil
+import sys
 import syslog
 import time
 import traceback
@@ -166,7 +167,7 @@ def pushkeyhook(ui, repo, namespace=None, key=None, old=None, new=None,
         return
 
     repo._replicationinfo['pushkey'].append(
-        (namespace, key, old, new, ret))
+        (pycompat.sysstr(namespace), pycompat.sysstr(key), pycompat.sysstr(old), pycompat.sysstr(new), ret))
 
 
 # This is a handler for the bundle2 phase-heads part. The prepushkey/pushkey
@@ -216,7 +217,8 @@ def phase_heads_handler(op, inpart):
     for phase, nodes in sorted(moves.items()):
         for node in nodes:
             op.repo._replicationinfo['pushkey'].append(
-                (b'phases', hex(node), b'%d' % phases.draft, b'%d' % phase, 0))
+                ('phases', pycompat.sysstr(hex(node)),
+                 '%d' % phases.draft, '%d' % phase, 0))
 
 
 def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
@@ -277,7 +279,8 @@ def txnclosehook(ui, repo, **kwargs):
         # We send these markers during the changegroup hook if it fires,
         # which should be after this hook.
         for key, value in sorted(repo._replicationinfo['obsolescence'].items()):
-            sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
+            sendpushkeymessage(ui, repo, 'obsolete', pycompat.sysstr(key), '',
+                               pycompat.sysstr(value), 0)
 
 
 def changegrouphook(ui, repo, node=None, source=None, **kwargs):
@@ -291,16 +294,16 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
     for rev in range(repo[node].rev(), len(repo)):
         ctx = repo[rev]
 
-        pushnodes.append(ctx.hex())
+        pushnodes.append(pycompat.sysstr(ctx.hex()))
 
         if ctx.node() in heads:
-            pushheads.append(ctx.hex())
+            pushheads.append(pycompat.sysstr(ctx.hex()))
 
     with ui.kafkainteraction():
         repo.producerlog('CHANGEGROUPHOOK_SENDING')
         vcsrproducer.record_hg_changegroup(ui.replicationproducer,
                                            repo.replicationwireprotopath,
-                                           source,
+                                           pycompat.sysstr(source),
                                            pushnodes,
                                            pushheads,
                                            partition=repo.replicationpartition)
@@ -310,7 +313,7 @@ def changegrouphook(ui, repo, node=None, source=None, **kwargs):
                     duration)
 
         for key, value in sorted(repo._replicationinfo['obsolescence'].items()):
-            sendpushkeymessage(ui, repo, 'obsolete', key, '', value, 0)
+            sendpushkeymessage(ui, repo, 'obsolete', pycompat.sysstr(key), '', pycompat.sysstr(value), 0)
 
 
 def sendpushkeymessages(ui, repo):
@@ -335,30 +338,45 @@ def sendpushkeymessage(ui, repo, namespace, key, old, new, ret):
         duration = time.time() - start
         repo.producerlog('PUSHKEY_SENT')
         ui.status(_(b'recorded updates to %s in replication log in %.3fs\n') % (
-            namespace, duration))
+            pycompat.bytestr(namespace), duration))
+
+
+def yield_encoded_requirements(requirements):
+    for r in requirements:
+        yield pycompat.sysstr(r)
 
 
 def sendreposyncmessage(ui, repo, bootstrap=False):
     """Send a message to perform a full repository sync."""
     if repo.vfs.exists(b'hgrc'):
-        hgrc = repo.vfs.read(b'hgrc')
+        hgrc = repo.vfs.read(b'hgrc').decode('utf-8', 'surrogatepass')
     else:
         hgrc = None
 
-    heads = [repo[h].hex() for h in repo.heads()]
+    heads = [pycompat.sysstr(repo[h].hex()) for h in repo.heads()]
 
     with ui.kafkainteraction():
         repo.producerlog('SYNC_SENDING')
         producer = ui.replicationproducer
+
+        # TRACKING py3
+        if pycompat.ispy3:
+            requirements = yield_encoded_requirements(repo.requirements)
+        else:
+            requirements = repo.requirements
+
         vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
-                                         hgrc, heads, repo.requirements,
+                                         hgrc, heads, requirements,
                                          partition=repo.replicationpartition,
                                          bootstrap=bootstrap)
         repo.producerlog('SYNC_SENT')
 
 
 def sendheadsmessage(ui, repo):
-    heads = [hex(n) for n in repo.filtered(b'served').heads()]
+    heads = [
+        pycompat.sysstr(hex(n))
+        for n in repo.filtered(b'served').heads()
+    ]
 
     # Pull numeric push ID from the pushlog extensions, if available.
     if util.safehasattr(repo, 'pushlog'):
@@ -431,7 +449,7 @@ def replicatehgrc(ui, repo):
     This command should be called when the hgrc of the repository changes.
     """
     if repo.vfs.exists(b'hgrc'):
-        content = repo.vfs.read(b'hgrc')
+        content = repo.vfs.read(b'hgrc').decode('utf-8', 'surrogatepass')
     else:
         content = None
 
@@ -569,7 +587,7 @@ def wireprotodispatch(orig, repo, proto, command):
 def wrapped_getdispatchrepo(orig, repo, proto, command):
     '''Wraps `wireproto.getdispatchrepo` to serve the unfiltered repository'''
     unfiltereduser = repo.ui.config(b'replication', b'unfiltereduser')
-    if not unfiltereduser or unfiltereduser != repo.ui.environ.get('USER'):
+    if not unfiltereduser or unfiltereduser != repo.ui.environ.get(b'USER'):
         return orig(repo, proto, command)
 
     permission = wireproto.commands[command].permission
@@ -631,6 +649,11 @@ def uisetup(ui):
         raise error.Abort(b'replicationproducer.acktimeout config option not '
                           b'set')
 
+    # TRACKING py3
+    hosts = list(map(lambda x: pycompat.sysstr(x), hosts))
+    clientid = pycompat.sysstr(clientid)
+    topic = pycompat.sysstr(topic)
+
     class replicatingui(ui.__class__):
         """Custom ui class that provides access to replication primitives."""
 
@@ -639,7 +662,7 @@ def uisetup(ui):
             """Obtain a ``Producer`` instance to write to the replication log."""
             if not getattr(self, '_replicationproducer', None):
                 client = SimpleClient(hosts, client_id=clientid,
-                                                 timeout=timeout)
+                                             timeout=timeout)
                 self._replicationproducer = vcsrproducer.Producer(
                     client, topic, batch_send=False,
                     req_acks=reqacks, ack_timeout=acktimeout)
@@ -649,7 +672,11 @@ def uisetup(ui):
         @property
         def replicationpartitionmap(self):
             pm = {}
-            for k, v in self.configitems(b'replicationproducer'):
+            replicationproduceritems = (
+                (pycompat.sysstr(k), pycompat.sysstr(v),)
+                for k, v in self.configitems(b'replicationproducer')
+            )
+            for k, v in replicationproduceritems:
                 # Ignore unrelated options in this section.
                 if not k.startswith('partitionmap.'):
                     continue
@@ -688,10 +715,18 @@ def uisetup(ui):
             """Write to the producer syslog facility."""
             ident = self.config(b'replicationproducer', b'syslogident', b'vcsreplicator')
             facility = self.config(b'replicationproducer', b'syslogfacility', b'LOG_LOCAL2')
+
+            if not ident or not facility:
+                raise error.Abort(b'syslog identity or facility missing from '
+                                  b'replicationproducer config')
+
+            ident = pycompat.sysstr(ident)
+            facility = pycompat.sysstr(facility)
+
             facility = getattr(syslog, facility)
             syslog.openlog(ident, 0, facility)
 
-            if not isinstance(repo, str):
+            if not isinstance(repo, (bytes, str)):
                 repo = repo.replicationwireprotopath
 
             pre = '%s %s %s' % (os.environ.get('USER', '<unknown>'), repo, action)
@@ -750,10 +785,10 @@ def reposetup(ui, repo):
 
             Matches are case insensitive but rewrites are case preserving.
             """
-            lower = self.root.lower()
+            lower = pycompat.sysstr(self.root.lower())
             for source, dest in self.ui.configitems(b'replicationpathrewrites'):
-                if lower.startswith(source):
-                    return dest + self.root[len(source):]
+                if lower.startswith(pycompat.sysstr(source)):
+                    return pycompat.sysstr(dest) + pycompat.sysstr(self.root[len(source):])
 
             raise error.Abort(b'repository path not configured for replication',
                               hint=b'add entry to [replicationpathrewrites]')
@@ -775,7 +810,7 @@ def reposetup(ui, repo):
                 # Hash path to determine bucket/partition.
                 # This isn't used for cryptography, so MD5 is sufficient.
                 h = hashlib.md5()
-                h.update(path)
+                h.update(pycompat.bytestr(path))
                 i = int(h.hexdigest(), 16)
                 offset = i % len(parts)
                 return parts[offset]

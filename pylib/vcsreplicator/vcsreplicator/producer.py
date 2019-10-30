@@ -8,6 +8,10 @@ import json
 import logging
 import time
 
+from mercurial import (
+    pycompat,
+)
+
 from kafka.producer.base import Producer as KafkaProducer
 from kafka.common import KafkaError
 
@@ -43,7 +47,7 @@ class Producer(KafkaProducer):
         # We currently only support 1 message format. It is
         # "1\n" followed by a JSON payload. No length is encoded,
         # as Kafka does this for us.
-        j = json.dumps(o, sort_keys=True)
+        j = pycompat.bytestr(json.dumps(o, sort_keys=True))
         msg = b''.join([MESSAGE_HEADER_V1, j])
 
         try:
@@ -133,7 +137,7 @@ def record_hg_repo_sync(producer, path, hgrc, heads, requirements, partition, bo
     return producer.send_message({
         'name': 'hg-repo-sync-2',
         'path': path,
-        'requirements': sorted(list(requirements)),
+        'requirements': sorted(i for i in list(requirements)),
         'hgrc': hgrc,
         'heads': heads,
         'bootstrap': bootstrap,

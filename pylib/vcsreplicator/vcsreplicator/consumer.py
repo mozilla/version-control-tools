@@ -21,6 +21,10 @@ import cbor2
 import hglib
 from kafka.consumer import SimpleConsumer
 
+from mercurial import (
+    pycompat,
+)
+
 from .config import Config
 from .util import (
     consumer_offsets,
@@ -459,7 +463,7 @@ def run_command(client, args):
 
         lines = v.splitlines()
         for line in lines:
-            logger.warn(b'  > %s' % line)
+            logger.warn('  > %s' % pycompat.sysstr(line))
 
         # Truncate the stream.
         combined.seek(0)
@@ -484,9 +488,20 @@ def run_command(client, args):
         b'e': write_err,
     }
 
+    quoteable_args = [
+        pycompat.sysstr(arg)
+        for arg in [hglib.HGPATH] + args
+    ]
+
     logger.warn('  $ %s' % ' '.join(
-        map(pipes.quote, [hglib.HGPATH] + args)))
-    ret = client.runcommand(args, {}, channels)
+        map(pipes.quote, quoteable_args)))
+
+    unquotable_args = [
+        pycompat.bytestr(arg)
+        for arg in quoteable_args
+    ]
+
+    ret = client.runcommand(unquotable_args[1:], {}, channels)
     logger.warn('  [%d]' % ret)
 
     return ret, out.getvalue(), err.getvalue()
@@ -505,7 +520,7 @@ def update_hgrc(repo_path, content):
 
         return
 
-    assert isinstance(content, unicode)
+    assert isinstance(content, pycompat.unicode)
     logger.warn('writing hgrc: %s' % p)
     with open(p, 'wb') as fh:
         fh.write(content.encode('utf-8'))

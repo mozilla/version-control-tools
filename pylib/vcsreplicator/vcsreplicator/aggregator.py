@@ -9,6 +9,10 @@ import os
 import sys
 import time
 
+from mercurial import (
+    pycompat,
+)
+
 from .config import Config
 from .consumer import Consumer
 from .daemon import (
@@ -27,7 +31,9 @@ def read_consumer_groups(path):
         for line in fh:
             line = line.strip()
             if line:
-                consumer_groups.append(line)
+                consumer_groups.append(
+                    pycompat.sysstr(line)
+                )
 
     return consumer_groups
 
@@ -92,6 +98,8 @@ def get_aggregation_counts(client, consumer_topic, consumer_groups,
     return fully_consumed_offsets, acked_offsets, unacked_partition_counts
 
 
+int_to_sysstr = lambda i: pycompat.sysstr(str(i))
+
 def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
                                         ack_group, producer_topic, alive):
     """Replay messages of a monitored topic when all consumers have acked them.
@@ -119,7 +127,7 @@ def synchronize_fully_consumed_messages(client, consumer_topic, consumer_groups,
     unacked_count = sum(unacked_partition_counts.values())
     logger.warn('%d unacked messages in %d partition: [%s]' % (
                 unacked_count, len(unacked_partition_counts),
-                ', '.join(map(str, sorted(unacked_partition_counts.keys())))))
+                ', '.join(map(int_to_sysstr, sorted(unacked_partition_counts.keys())))))
 
     copy_messages(client=client,
                   consumer_topic=consumer_topic,
