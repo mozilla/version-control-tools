@@ -136,7 +136,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
     tip = repo[b'tip'].rev()
     rejecting = False
 
-    for i in reversed(xrange(rev, tip + 1)):
+    for i in reversed(range(rev, tip + 1)):
         c = repo[i]
 
         if b"IGNORE BAD COMMIT MESSAGES" in c.description():

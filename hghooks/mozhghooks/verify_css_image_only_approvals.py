@@ -30,7 +30,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
 
     errors = []
     # Loop through each changeset being added to the repository
-    for change_id in xrange(repo[node].rev(), len(repo)):
+    for change_id in range(repo[node].rev(), len(repo)):
         # Loop through each file for the current changeset
         for changed_file in repo[change_id].files():
             # Check they have an expected extension:

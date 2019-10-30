@@ -34,7 +34,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         # Accept the entire push for code uplifts
         return 0
     # Loop through each changeset being added to the repository
-    for change_id in xrange(repo[node].rev(), len(repo)):
+    for change_id in range(repo[node].rev(), len(repo)):
         # Loop through each file for the current changeset
         for file in repo[change_id].files():
             # Interested only in files potentially used for l10n

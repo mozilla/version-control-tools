@@ -26,7 +26,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         plural = b's' if num_changes > 1 else b''
         ui.write(b'\nView your change%s here:\n' % plural)
 
-        for i in xrange(rev, tip + 1):
+        for i in range(rev, tip + 1):
             node = repo[i].hex()
             ui.write(b'  %srev/%s\n' % (url, node))
     else:

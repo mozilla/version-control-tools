@@ -18,7 +18,7 @@ def hook(ui, repo, node, source=None, **kwargs):
 
     havebad = False
 
-    for rev in xrange(repo[node].rev(), len(repo)):
+    for rev in range(repo[node].rev(), len(repo)):
         ctx = repo[rev]
         user = ctx.user()
 
