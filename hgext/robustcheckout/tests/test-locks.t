@@ -7,14 +7,14 @@
   >     command = registrar.command(cmdtable)
   > else:
   >     command = cmdutil.command(cmdtable)
-  > @command('acquirewlock')
+  > @command(b'acquirewlock')
   > def acquirewlock(ui, repo):
-  >     lockmod.lock._host = 'dummyhost'
+  >     lockmod.lock._host = b'dummyhost'
   >     wlock = repo.wlock()
   >     setattr(wlock, 'release', lambda: None)
-  > @command('acquirestorelock')
+  > @command(b'acquirestorelock')
   > def acquirestorelock(ui, repo):
-  >     lockmod.lock._host = 'dummyhost'
+  >     lockmod.lock._host = b'dummyhost'
   >     wlock = repo.wlock()
   >     lock = repo.lock()
   >     setattr(lock, 'release', lambda: None)
