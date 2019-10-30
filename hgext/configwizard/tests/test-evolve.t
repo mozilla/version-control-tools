@@ -5,7 +5,7 @@
 
   $ cat > fakeversion.py << EOF
   > from mercurial import util
-  > util.version = lambda: '4.2.3'
+  > util.version = lambda: b'4.2.3'
   > EOF
 
 Warning printed if Mercurial < 4.3

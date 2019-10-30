@@ -2,7 +2,7 @@
 
   $ cat > fakeversion.py << EOF
   > from mercurial import util
-  > util.version = lambda: '4.1.2'
+  > util.version = lambda: b'4.1.2'
   > EOF
 
 Rejecting color doesn't enable it

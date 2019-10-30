@@ -4,7 +4,7 @@
 
   $ cat > fakeversion.py << EOF
   > from mercurial import util
-  > util.version = lambda: '3.8.1'
+  > util.version = lambda: b'3.8.1'
   > EOF
 
 Rejecting fsmonitor doesn't enable it

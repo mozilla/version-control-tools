@@ -216,7 +216,7 @@ Check that when on 4.6 with the old wip enabled, the alias is updated with a mes
 
   $ cat > fakeversion3.py << EOF
   > from mercurial import util
-  > util.version = lambda: '4.6'
+  > util.version = lambda: b'4.6'
   > EOF
 
   $ cat > .hgrc << EOF

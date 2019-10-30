@@ -4,7 +4,7 @@ Should not get legacy version message when running on supported version
 
   $ cat > fakeversion.py << EOF
   > from mercurial import util
-  > util.version = lambda: '4.3.3'
+  > util.version = lambda: b'4.3.3'
   > EOF
 
   $ FAKEVERSION='--config extensions.fakeversion=fakeversion.py'
@@ -23,7 +23,7 @@ Old version will print legacy message and prompt
 
   $ rm fakeversion.pyc
   $ cat >> fakeversion.py << EOF
-  > util.version = lambda: '4.3.2'
+  > util.version = lambda: b'4.3.2'
   > EOF
 
   $ hg $FAKEVERSION --config configwizard.steps=hgversion configwizard
@@ -77,7 +77,7 @@ Too old version will fail outright
 
   $ rm fakeversion.pyc
   $ cat >> fakeversion.py << EOF
-  > util.version = lambda: '3.4.2'
+  > util.version = lambda: b'3.4.2'
   > EOF
 
   $ hg $FAKEVERSION --config configwizard.steps=hgversion configwizard
