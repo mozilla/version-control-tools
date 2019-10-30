@@ -588,7 +588,7 @@ def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
 
 def wrappedpull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to add remote tracking refs."""
-    if not hasattr(repo, 'changetracker'):
+    if not util.safehasattr(repo, 'changetracker'):
         return orig(repo, remote, *args, **kwargs)
 
     old_rev = len(repo)
@@ -614,7 +614,7 @@ def wrappedpull(orig, repo, remote, *args, **kwargs):
     return res
 
 def wrappedpush(orig, repo, remote, *args, **kwargs):
-    if not hasattr(repo, 'changetracker'):
+    if not util.safehasattr(repo, 'changetracker'):
         return orig(repo, remote, *args, **kwargs)
 
     res = orig(repo, remote, *args, **kwargs)
