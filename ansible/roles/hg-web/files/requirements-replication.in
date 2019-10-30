@@ -8,7 +8,7 @@ cbor2
 boto3
 
 futures
-kafka-python==1.4.2
+kafka-python==1.4.6
 mercurial==5.0.1
 python-hglib
 PyYAML

@@ -6,22 +6,24 @@
 #
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
-certifi==2019.3.9 \
-    --hash=sha256:59b7658e26ca9c7339e00f8f4636cdfe59d34fa37b9b04f6f9e9926b3cece1a5 \
-    --hash=sha256:b26104d6835d1f5e49452a26eb2ff87fe7090b89dfcaee5ea2212697e1e1d7ae \
+certifi==2019.6.16 \
+    --hash=sha256:046832c04d4e752f37383b628bc601a7ea7211496b4638f6514d0e5b9acc4939 \
+    --hash=sha256:945e3ba63a0b9f577b1395204e13c3a231f9bc0223888be653286534e5873695 \
     # via sentry-sdk
-kafka-python==1.4.2 \
-    --hash=sha256:6a5c516f540f4b13b78c64a85dd42dc38fe29257e2fae6393fc5daff9106389b \
-    --hash=sha256:b5df584e200da5f814228a308a655c27d9c740ca83442910360c704679640a5f
+kafka-python==1.4.6 \
+    --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
+    --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b
 mercurial==5.0.1 \
-    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce
-pyasn1-modules==0.2.5 \
-    --hash=sha256:ef721f68f7951fab9b0404d42590f479e30d9005daccb1699b0a51bb4177db96 \
-    --hash=sha256:f309b6c94724aeaf7ca583feb1cc70430e10d7551de5e36edfc1ae6909bcfb3c \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce \
+    --hash=sha256:8726d864bbf6ea0688a768e1701c270763bda92465925bbc06022845206c3ca8 \
+    --hash=sha256:b05cd66c92981998e6cc5a8853ae21a1a2d8704511246e22c7d0a6d421474458
+pyasn1-modules==0.2.6 \
+    --hash=sha256:43c17a83c155229839cc5c6b868e8d0c6041dba149789b6d6e28801c64821722 \
+    --hash=sha256:e30199a9d221f1b26c885ff3d87fd08694dbbe18ed0e8e405a2a7126d30ce4c0 \
     # via python-ldap
-pyasn1==0.4.5 \
-    --hash=sha256:da2420fe13a9452d8ae97a0e478adde1dee153b11ba832a95b223a2ba01c10f7 \
-    --hash=sha256:da6b43a8c9ae93bc80e2739efb38cc776ba74a886e3e9318d65fe81a8b8a2c6e \
+pyasn1==0.4.6 \
+    --hash=sha256:3bb81821d47b17146049e7574ab4bf1e315eb7aead30efe5d6a9ca422c9710be \
+    --hash=sha256:b773d5c9196ffbc3a1e13bdf909d446cad80a039aa3340bcad72f395b76ebc86 \
     # via pyasn1-modules, python-ldap
 python-ldap==3.2.0 \
     --hash=sha256:7d1c4b15375a533564aad3d3deade789221e450052b21ebb9720fb822eccdb8e
@@ -31,7 +33,7 @@ sentry-sdk==0.7.14 \
 six==1.12.0 \
     --hash=sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c \
     --hash=sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73
-urllib3==1.25.2 \
-    --hash=sha256:a53063d8b9210a7bdec15e7b272776b9d42b2fd6816401a0d43006ad2f9902db \
-    --hash=sha256:d363e3607d8de0c220d31950a8f38b18d5ba7c0830facd71a1c6b1036b7ce06c \
+urllib3==1.25.3 \
+    --hash=sha256:b246607a25ac80bedac05c6f282e3cdaf3afb65420fd024ac94435cabe6e18d1 \
+    --hash=sha256:dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232 \
     # via sentry-sdk

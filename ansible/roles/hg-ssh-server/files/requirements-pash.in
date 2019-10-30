@@ -4,7 +4,7 @@
 # Kafka is in this virtualenv to support replication on the hg leader server.
 # It isn't needed on a standalone hg server. But installing it doesn't really
 # hurt.
-kafka-python==1.4.2
+kafka-python==1.4.6
 mercurial==5.0.1
 python-ldap
 sentry-sdk==0.7.14
