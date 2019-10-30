@@ -25,15 +25,15 @@ from mercurial import (
 
 from vcsreplicator import commoncommands
 
-testedwith = '4.5 4.6 4.7 4.8 4.9'
-minimumhgversion = '4.5'
+testedwith = b'4.5 4.6 4.7 4.8 4.9'
+minimumhgversion = b'4.5'
 
 cmdtable = {}
 command = registrar.command(cmdtable)
 
 # Register `hg mozrepohash` with the command registrar
-command('mozrepohash', [
-    ('', 'no-raw', False, 'skip hashing raw files'),
+command(b'mozrepohash', [
+    (b'', b'no-raw', False, b'skip hashing raw files'),
 ] + cmdutil.formatteropts)(commoncommands.mozrepohash)
 
 
@@ -73,8 +73,8 @@ def computeunreplicated(repo, visibilityexceptions=None):
         # unfiltered repo is really weird. But it could conceivably happen
         # in weird conditions. Let's log it and treat it as non-fatal.
         except error.LookupError:
-            repo.ui.log('vcsreplicator',
-                        _('node in replicated data file does not exist: %s\n') %
+            repo.ui.log(b'vcsreplicator',
+                        _(b'node in replicated data file does not exist: %s\n') %
                         hex(node))
 
     # Find the set of revisions between the changelog's heads and the replicated
@@ -97,14 +97,14 @@ def computeunreplicated(repo, visibilityexceptions=None):
         unreplicated_revs = set()
 
     else:
-        unreplicated_revs = urepo.revs('::%ld - ::%ld', cl_heads,
+        unreplicated_revs = urepo.revs(b'::%ld - ::%ld', cl_heads,
                                        replicated_head_revs)
 
     return frozenset(unserved | set(unreplicated_revs))
 
 
 def extsetup(ui):
-    repoview.filtertable['replicatedserved'] = computeunreplicated
+    repoview.filtertable[b'replicatedserved'] = computeunreplicated
 
     # This tells the branchmap code that the branchmap cache for our custom
     # repoview is derived from the served repoview. It makes branchmap
@@ -118,7 +118,7 @@ def extsetup(ui):
     # request time. We add ``.hg/replicated-data`` to this list to ensure
     # that changes to the file are reflected on the next request and that
     # old cached state of this file/attribute aren't used.
-    REFRESH_ENTRY = ('path', 'replicated-data')
+    REFRESH_ENTRY = (b'path', b'replicated-data')
 
     if REFRESH_ENTRY not in hg.foi:
         hg.foi.append(REFRESH_ENTRY)
@@ -134,7 +134,7 @@ def reposetup(ui, repo):
         # This typically only occurs if the repository mutates itself. If
         # another process mutates the file, it will not be reflected on this
         # repository instance.
-        @localrepo.repofilecache('replicated-data')
+        @localrepo.repofilecache(b'replicated-data')
         def replicated_data(self):
             """Obtain the data structure holding fully replicated data.
 
@@ -155,7 +155,7 @@ def reposetup(ui, repo):
             try:
                 data = cbor2.loads(raw_data)
             except cbor2.CBORDecodeError as e:
-                raise error.Abort('malformed CBOR data: %s' % e)
+                raise error.Abort(b'malformed CBOR data: %s' % e)
 
             return data
 

@@ -118,7 +118,7 @@ def _get_pushlog_info(hgclient, public_url, revs):
         if not line:
             continue
 
-        node, pushid, pushuser, pushtime = line.split('\0')
+        node, pushid, pushuser, pushtime = line.split(b'\0')
         # Not all changegroup events have corresponding pushlog entries.
         # This should be rare.
         if not pushid:
@@ -134,7 +134,7 @@ def _get_pushlog_info(hgclient, public_url, revs):
 
         pushes.setdefault(pushid, {
             'pushid': pushid,
-            'user': pushuser,
+            'user': pycompat.sysstr(pushuser),
             'time': pushtime,
             'push_json_url': '%s/json-pushes?version=2&%s' % (public_url, q),
             'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q),
@@ -234,7 +234,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
                 push = None
 
             return {
-                'node': node,
+                'node': pycompat.sysstr(node),
                 'known': bool(rev),
                 'visible': visible,
                 'desc': rev[1] if rev else None,

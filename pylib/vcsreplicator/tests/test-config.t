@@ -17,6 +17,8 @@ No config with extension installed should cause immediate abort
     File "* (glob) (?)
       raise *.Abort('replicationproducer.hosts config option not set') (glob) (?)
   Abort: replicationproducer.hosts config option not set (?)
+      raise error.Abort(b'replicationproducer.hosts config option not set')
+  Abort: replicationproducer.hosts config option not set
   *** failed to set up extension vcsreplicator: replicationproducer.hosts config option not set
 #else
   $ hg st
@@ -39,6 +41,8 @@ Missing clientid
     File "* (glob) (?)
       raise *.Abort('replicationproducer.clientid config option not set') (glob) (?)
   Abort: replicationproducer.clientid config option not set (?)
+      raise error.Abort(b'replicationproducer.clientid config option not set')
+  Abort: replicationproducer.clientid config option not set
   *** failed to set up extension vcsreplicator: replicationproducer.clientid config option not set
 #else
   $ hg st
@@ -60,6 +64,8 @@ Missing topic
     File "* (glob) (?)
       raise *.Abort('replicationproducer.topic config option not set') (glob) (?)
   Abort: replicationproducer.topic config option not set (?)
+      raise error.Abort(b'replicationproducer.topic config option not set')
+  Abort: replicationproducer.topic config option not set
   *** failed to set up extension vcsreplicator: replicationproducer.topic config option not set
 #else
   $ hg st
@@ -81,6 +87,8 @@ No partition map
     File "* (glob) (?)
       raise *.Abort('replicationproducer.partitionmap.* (glob) (?)
   Abort: replicationproducer.partitionmap.* config options not set (?)
+      raise error.Abort(b'replicationproducer.partitionmap.* config options '
+  Abort: replicationproducer.partitionmap.* config options not set
   *** failed to set up extension vcsreplicator: replicationproducer.partitionmap.* config options not set
 #else
   $ hg st
@@ -102,6 +110,8 @@ No reqacks
     File "* (glob) (?)
       raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
   Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
+      raise error.Abort(b'replicationproducer.reqacks must be set to -1, 0, '
+  Abort: replicationproducer.reqacks must be set to -1, 0, or 1
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
   $ hg st
@@ -123,6 +133,8 @@ Bad reqacks value
     File "* (glob) (?)
       raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
   Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (?)
+      raise error.Abort(b'replicationproducer.reqacks must be set to -1, 0, '
+  Abort: replicationproducer.reqacks must be set to -1, 0, or 1
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
 #else
   $ hg st
@@ -144,6 +156,8 @@ No acktimeout
     File "* (glob) (?)
       raise *.Abort('replicationproducer.acktimeout config option* (glob) (?)
   Abort: replicationproducer.acktimeout config option not set (?)
+      raise error.Abort(b'replicationproducer.acktimeout config option not '
+  Abort: replicationproducer.acktimeout config option not set
   *** failed to set up extension vcsreplicator: replicationproducer.acktimeout config option not set
 #else
   $ hg st
