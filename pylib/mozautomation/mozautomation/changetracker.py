@@ -7,6 +7,11 @@ from __future__ import unicode_literals
 import binascii
 import os
 import sqlite3
+import sys
+
+# TRACKING py3
+if sys.version_info[0] >= 3:
+    buffer = memoryview
 
 from .repository import (
     MercurialRepository,
