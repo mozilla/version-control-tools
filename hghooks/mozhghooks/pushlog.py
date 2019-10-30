@@ -18,12 +18,12 @@
 
 def log(ui, repo, node, **kwargs):
     if not hasattr(repo, 'pushlog'):
-        ui.write('repository not properly configured; missing pushlog extension.\n')
+        ui.write(b'repository not properly configured; missing pushlog extension.\n')
         return 1
 
     # As long as the pushlog extension is installed, we should never get
     # here because the extension installs its own hook which overwrites
     # us.
-    ui.write('Assertion failure: the pushlog hook code should not run any more. '
-        'Please file a bug.\n')
+    ui.write(b'Assertion failure: the pushlog hook code should not run any more. '
+             b'Please file a bug.\n')
     return 1

@@ -26,41 +26,41 @@
 import os
 
 ALLOWED_USERS = set([
-    'Callek@gmail.com',
-    'asasaki@mozilla.com',
-    'arich@mozilla.com',
-    'bhearsum@mozilla.com',
-    'catlee@mozilla.com',
-    'dcrisan@mozilla.com',
-    'dhouse@mozilla.com',
-    'jlorenzo@mozilla.com',
-    'jlund@mozilla.com',
-    'jwatkins@mozilla.com',
-    'jwood@mozilla.com',
-    'klibby@mozilla.com',
-    'kmoir@mozilla.com',
-    'mcornmesser@mozilla.com',
-    'nthomas@mozilla.com',
-    'qfortier@mozilla.com',
-    'raliiev@mozilla.com',
-    'rthijssen@mozilla.com',
-    'aselagea@mozilla.com',
-    'mtabara@mozilla.com',
-    'sfraser@mozilla.com',
-    'aobreja@mozilla.com',
-    'mozilla@hocat.ca',  # Tom Prince
+    b'Callek@gmail.com',
+    b'asasaki@mozilla.com',
+    b'arich@mozilla.com',
+    b'bhearsum@mozilla.com',
+    b'catlee@mozilla.com',
+    b'dcrisan@mozilla.com',
+    b'dhouse@mozilla.com',
+    b'jlorenzo@mozilla.com',
+    b'jlund@mozilla.com',
+    b'jwatkins@mozilla.com',
+    b'jwood@mozilla.com',
+    b'klibby@mozilla.com',
+    b'kmoir@mozilla.com',
+    b'mcornmesser@mozilla.com',
+    b'nthomas@mozilla.com',
+    b'qfortier@mozilla.com',
+    b'raliiev@mozilla.com',
+    b'rthijssen@mozilla.com',
+    b'aselagea@mozilla.com',
+    b'mtabara@mozilla.com',
+    b'sfraser@mozilla.com',
+    b'aobreja@mozilla.com',
+    b'mozilla@hocat.ca',  # Tom Prince
 ])
 
 
 def hook(ui, repo, node=None, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     rev = repo[node].rev()
     tip = repo[b'tip'].rev()
     branches = set(repo[i].branch() for i in range(rev, tip + 1))
-    if 'production' in branches and os.environ['USER'] not in ALLOWED_USERS:
-        print "** you (%s) are not allowed to push to the production branch" \
-            % (os.environ['USER'],)
+    if b'production' in branches and os.environ[b'USER'] not in ALLOWED_USERS:
+        print b"** you (%s) are not allowed to push to the production branch" \
+            % (os.environ[b'USER'],)
         return 1
     return 0

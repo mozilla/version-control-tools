@@ -17,23 +17,26 @@
 
 import re
 from mercurial.node import short
+from mercurial import (
+    pycompat,
+)
 from mozautomation import commitparser
 
-INVALID_REVIEW_FLAG_RE = re.compile(r'[\s.;]r\?(?:\w|$)')
+INVALID_REVIEW_FLAG_RE = re.compile(br'[\s.;]r\?(?:\w|$)')
 
 goodMessage = [re.compile(x, re.I) for x in [
-    r'bug [0-9]+',
-    r'no bug',
+    br'bug [0-9]+',
+    br'no bug',
 
-    r'^(back(ing|ed)?\s+out|backout).*(\s+|\:)[0-9a-f]{12}',
-    r'^(revert(ed|ing)?).*(\s+|\:)[0-9a-f]{12}',
-    r'^add(ed|ing)? tag'
+    br'^(back(ing|ed)?\s+out|backout).*(\s+|\:)[0-9a-f]{12}',
+    br'^(revert(ed|ing)?).*(\s+|\:)[0-9a-f]{12}',
+    br'^add(ed|ing)? tag'
 ]]
 
-trySyntax = re.compile(r'\btry:')
+trySyntax = re.compile(br'\btry:')
 
 VENDORED_PATHS = (
-    'servo/',
+    b'servo/',
 )
 
 
@@ -48,13 +51,14 @@ def is_vendor_ctx(ctx):
 
 def is_good_message(ui, c):
     def message(fmt):
+        formatted_fmt = fmt % {b'rev': c.hex()[:12]}
         ui.write(
-            '\n\n'
-            '************************** ERROR ****************************\n'
-            '%s\n%s\n%s\n'
-            '*************************************************************\n'
-            '\n\n'
-            % (fmt.format(rev=c.hex()[:12]), c.user(), c.description())
+            b'\n\n'
+            b'************************** ERROR ****************************\n'
+            b'%s\n%s\n%s\n'
+            b'*************************************************************\n'
+            b'\n\n'
+            % (formatted_fmt, c.user(), c.description())
         )
 
     desc = c.description()
@@ -64,40 +68,40 @@ def is_good_message(ui, c):
     if commitparser.is_backout(desc):
         try:
             if not commitparser.parse_backouts(desc, strict=True):
-                raise ValueError('Rev {rev} has malformed backout message.')
+                raise ValueError('Rev %(rev)s has malformed backout message.')
             nodes, bugs = commitparser.parse_backouts(desc, strict=True)
             if not nodes:
-                raise ValueError('Rev {rev} is missing backed out revisions.')
+                raise ValueError('Rev %(rev)s is missing backed out revisions.')
         except ValueError as e:
             # Reject invalid backout messages on vendored paths, warn otherwise.
             if is_vendor_ctx(c):
-                message(str(e))
+                message(pycompat.bytestr(e))
                 return False
-            ui.write('Warning: %s\n' % str(e).format(rev=c.hex()[:12]))
+            ui.write(b'Warning: %s\n' % (pycompat.bytestr(e) % {b'rev': c.hex()[:12]}))
 
     # Vendored merges must reference source revisions.
-    if 'Source-Revision: ' in desc and is_vendor_ctx(c):
-        ui.write('(%s looks like a vendoring change; ignoring commit message '
-                 'hook)\n' % short(c.node()))
+    if b'Source-Revision: ' in desc and is_vendor_ctx(c):
+        ui.write(b'(%s looks like a vendoring change; ignoring commit message '
+                 b'hook)\n' % short(c.node()))
         return True
 
-    if c.user() in ["ffxbld", "seabld", "tbirdbld", "cltbld"]:
+    if c.user() in [b"ffxbld", b"seabld", b"tbirdbld", b"cltbld"]:
         return True
 
     if trySyntax.search(desc):
-        message("Rev {rev} uses try syntax. (Did you mean to push to Try "
-                "instead?)")
+        message(b"Rev %(rev)s uses try syntax. (Did you mean to push to Try "
+                b"instead?)")
         return False
 
     # Match against [PATCH] and [PATCH n/m]
-    if "[PATCH" in desc:
-        message('Rev {rev} contains git-format-patch "[PATCH]" cruft. Use '
-                'git-format-patch -k to avoid this.')
+    if b"[PATCH" in desc:
+        message(b'Rev %(rev)s contains git-format-patch "[PATCH]" cruft. Use '
+                b'git-format-patch -k to avoid this.')
         return False
 
     if INVALID_REVIEW_FLAG_RE.search(firstline):
-        message("Rev {rev} contains 'r?' in the commit message. Please use "
-                "'r=' instead.")
+        message(b"Rev %(rev)s contains 'r?' in the commit message. Please use "
+                b"'r=' instead.")
         return False
 
     for r in goodMessage:
@@ -105,26 +109,26 @@ def is_good_message(ui, c):
             return True
 
     desc_lower = desc.lower()
-    if desc_lower.startswith(('merge', 'merging', 'automated merge')):
+    if desc_lower.startswith((b'merge', b'merging', b'automated merge')):
         if len(c.parents()) == 2:
             return True
         else:
-            message("Rev {rev} claims to be a merge, but it has only one "
-                    "parent.")
+            message(b"Rev %(rev)s claims to be a merge, but it has only one "
+                    b"parent.")
             return False
 
-    if desc_lower.startswith(('back', 'revert')):
+    if desc_lower.startswith((b'back', b'revert')):
         # Purposely ambiguous: it's ok to say "backed out rev N" or
         # "reverted to rev N-1"
-        message("Backout rev {rev} needs a bug number or a rev id.")
+        message(b"Backout rev %(rev)s needs a bug number or a rev id.")
     else:
-        message('Rev {rev} needs "Bug N" or "No bug" in the commit message.')
+        message(b'Rev %(rev)s needs "Bug N" or "No bug" in the commit message.')
 
     return False
 
 
 def hook(ui, repo, node, hooktype, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     # All changesets from node to "tip" inclusive are part of this push.
@@ -135,7 +139,7 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
     for i in reversed(xrange(rev, tip + 1)):
         c = repo[i]
 
-        if "IGNORE BAD COMMIT MESSAGES" in c.description():
+        if b"IGNORE BAD COMMIT MESSAGES" in c.description():
             # Ignore commit messages for all earlier revs in this push.
             break
 
@@ -147,8 +151,8 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
         return 0
 
     # We want to allow using this hook locally
-    if hooktype == "pretxnchangegroup":
+    if hooktype == b"pretxnchangegroup":
         return 1
 
-    ui.write('This changeset would have been rejected!\n')
+    ui.write(b'This changeset would have been rejected!\n')
     return 0  # to fail not warn change to 1

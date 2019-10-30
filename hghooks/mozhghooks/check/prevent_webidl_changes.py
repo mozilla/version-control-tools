@@ -26,40 +26,40 @@ from ..checks import (
 )
 
 DOM_PEERS = [
-    dict(name='Andrea Marchesini', nick=['baku'], email=['amarchesini@mozilla.com']),
-    dict(name='Andreas Farre', nick=['farre'], email=['afarre@mozilla.com']),
-    dict(name='Andrew McCreight', nick=['mccr8'], email=['continuation@gmail.com']),
-    dict(name='Bobby Holley', nick=['bholley'], email=['bholley@mozilla.com']),
-    dict(name='Boris Zbarsky', nick=['bz', 'bzbarsky'], email=['bzbarsky@mit.edu']),
-    dict(name='Ehsan Akhgari', nick=['ehsan'], email=['ehsan@mozilla.com', 'ehsan.akhgari@gmail.com']),
-    dict(name='Henri Sivonen', nick=['hsivonen'], email=['hsivonen@hsivonen.fi']),
-    dict(name='Nika Layzell', nick=['mystor', 'nika'], email=['nika@thelayzells.com']),
-    dict(name='Olli Pettay', nick=['smaug'], email=['olli.pettay@helsinki.fi', 'bugs@pettay.fi']),
-    dict(name='Peter Van der Beken', nick=['peterv'], email=['peterv@propagandism.org']),
+    {'name': b'Andrea Marchesini', 'nick': [b'baku'], 'email': [b'amarchesini@mozilla.com']},
+    {'name': b'Andreas Farre', 'nick': [b'farre'], 'email': [b'afarre@mozilla.com']},
+    {'name': b'Andrew McCreight', 'nick': [b'mccr8'], 'email': [b'continuation@gmail.com']},
+    {'name': b'Bobby Holley', 'nick': [b'bholley'], 'email': [b'bholley@mozilla.com']},
+    {'name': b'Boris Zbarsky', 'nick': [b'bz', b'bzbarsky'], 'email': [b'bzbarsky@mit.edu']},
+    {'name': b'Ehsan Akhgari', 'nick': [b'ehsan'], 'email': [b'ehsan@mozilla.com', b'ehsan.akhgari@gmail.com']},
+    {'name': b'Henri Sivonen', 'nick': [b'hsivonen'], 'email': [b'hsivonen@hsivonen.fi']},
+    {'name': b'Nika Layzell', 'nick': [b'mystor', b'nika'], 'email': [b'nika@thelayzells.com']},
+    {'name': b'Olli Pettay', 'nick': [b'smaug'], 'email': [b'olli.pettay@helsinki.fi', b'bugs@pettay.fi']},
+    {'name': b'Peter Van der Beken', 'nick': [b'peterv'], 'email': [b'peterv@propagandism.org']},
 ]
 
 # The root directory for WebIDL files which contain only ChromeOnly
 # interfaces, and do not require DOM peer review.
-CHROME_WEBIDL_ROOT = 'dom/chrome-webidl/'
+CHROME_WEBIDL_ROOT = b'dom/chrome-webidl/'
 
 # Servo WebIDL files do not need DOM Peer review.
-SERVO_ROOT = 'servo/'
+SERVO_ROOT = b'servo/'
 
-MISSING_REVIEW = """
+MISSING_REVIEW = b"""
 Changeset %s alters WebIDL file(s) without DOM peer review:
 %s
 
 Please, request review from either:
 """
 for p in DOM_PEERS:
-    MISSING_REVIEW += "  - {} (:{})\n".format(p['name'], p['nick'][0])
+    MISSING_REVIEW += b"  - %s (:%s)\n" % (p['name'], p['nick'][0])
 
-CHROME_ONLY = """
+CHROME_ONLY = b"""
 Not enforcing DOM peer review for WebIDL files within the chrome WebIDL root.
 Please make sure changes do not contain any web-visible binding definitions.
 """
 
-SERVO_ONLY = """
+SERVO_ONLY = b"""
 Not enforcing DOM peer review for WebIDL files within Servo.
 Please make sure changes do not contain any web-visible binding definitions.
 """
@@ -69,14 +69,14 @@ class WebIDLCheck(PreTxnChangegroupCheck):
     """Prevents WebIDL file modifications without appropriate review."""
     @property
     def name(self):
-        return 'webidl_check'
+        return b'webidl_check'
 
     def relevant(self):
-        return self.repo_metadata['firefox_releasing']
+        return self.repo_metadata[b'firefox_releasing']
 
     def pre(self, node):
         # Accept the entire push for code uplifts
-        self.is_uplift = 'a=release' in self.repo[b'tip'].description().lower()
+        self.is_uplift = b'a=release' in self.repo[b'tip'].description().lower()
 
     def check(self, ctx):
         if self.is_uplift:
@@ -91,7 +91,7 @@ class WebIDLCheck(PreTxnChangegroupCheck):
             return True
 
         # Ignore changes that don't touch .webidl files
-        webidl_files = [f for f in ctx.files() if f.endswith('.webidl')]
+        webidl_files = [f for f in ctx.files() if f.endswith(b'.webidl')]
         if not webidl_files:
             return True
 
@@ -125,9 +125,9 @@ class WebIDLCheck(PreTxnChangegroupCheck):
             return True
 
         # Reject
-        print_banner(self.ui, 'error',
+        print_banner(self.ui, b'error',
                      MISSING_REVIEW % (short(ctx.node()),
-                                       '\n'.join(review_required_files)))
+                                       b'\n'.join(review_required_files)))
         return False
 
     def post_check(self):

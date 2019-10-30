@@ -22,6 +22,18 @@ rewrote history, we would want to fix this issue as part of the conversion.
 But we can prevent more such broken changesets from entering history.
 """
 
+LEGACY_REBASE_WARNING = b'''
+You apparently used `hg rebase` before pushing, and your mercurial
+version stores inconsistent metadata when doing so. Please upgrade
+mercurial or avoid `hg rebase`.
+Following is the list of changesets from your push with
+inconsistent metadata:
+   %s
+
+See http://wiki.mozilla.org/Troubleshooting_Mercurial#Fix_rebase
+for possible instructions how to fix your push.
+'''
+
 def get_changed_files(repo, cs1, cs2):
     """
     Return the list of changed files between changeset cs1 and changeset
@@ -84,7 +96,7 @@ def get_changed_files(repo, cs1, cs2):
 
 
 def hook(ui, repo, node, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     broken = []
@@ -103,7 +115,7 @@ def hook(ui, repo, node, source=None, **kwargs):
         # Running this check thoroughly on all changesets reveals that all the
         # detected ones have a 'rebase_source' marker. As the test is rather
         # slow, skip changesets without such a marker.
-        if 'rebase_source' not in ctx.extra():
+        if b'rebase_source' not in ctx.extra():
             continue
         changed_files = get_changed_files(repo, parents[0], ctx)
 
@@ -111,19 +123,7 @@ def hook(ui, repo, node, source=None, **kwargs):
             broken.append(short(ctx.node()))
 
     if broken:
-        ui.write(textwrap.dedent('''
-            You apparently used `hg rebase` before pushing, and your mercurial
-            version stores inconsistent metadata when doing so. Please upgrade
-            mercurial or avoid `hg rebase`.
-            Following is the list of changesets from your push with
-            inconsistent metadata:
-        '''))
-        for c in broken:
-            ui.write('   %s\n' % c)
-        ui.write(textwrap.dedent('''
-            See http://wiki.mozilla.org/Troubleshooting_Mercurial#Fix_rebase
-            for possible instructions how to fix your push.
-        '''))
+        ui.write(LEGACY_REBASE_WARNING % b'\n   '.join(broken))
         return 1
 
     return 0

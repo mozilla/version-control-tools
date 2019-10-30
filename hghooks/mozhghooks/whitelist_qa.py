@@ -26,20 +26,20 @@
 import os
 
 ALLOWED_USERS = set([
-    'dmitchell@mozilla.com',
-    'hskupin@mozilla.com',
+    b'dmitchell@mozilla.com',
+    b'hskupin@mozilla.com',
 ])
 
 
 def hook(ui, repo, node=None, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     rev = repo[node].rev()
     tip = repo[b'tip'].rev()
     branches = set(repo[i].branch() for i in range(rev, tip + 1))
-    if 'production' in branches and os.environ['USER'] not in ALLOWED_USERS:
-        print "** you (%s) are not allowed to push to the production branch" \
-            % (os.environ['USER'],)
+    if b'production' in branches and os.environ[b'USER'] not in ALLOWED_USERS:
+        print b"** you (%s) are not allowed to push to the production branch" \
+            % (os.environ[b'USER'],)
         return 1
     return 0

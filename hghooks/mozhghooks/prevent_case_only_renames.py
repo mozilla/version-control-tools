@@ -20,7 +20,7 @@ This hook is designed to prevent renames that only change the case of a file.
 from mercurial.node import hex, short
 
 def hook(ui, repo, node, hooktype, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     # All changesets from node to "tip" inclusive are part of this push.
@@ -38,7 +38,8 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
                 continue
             if f.lower() == r[0].lower():
                 rejecting = True
-                print "\n\n************************** ERROR ****************************"
-                print "File rename in changeset %s only changes file case! (%s to %s)" % (short(hex(ctx.node())), r[0], f)
-                print "*************************************************************\n\n"
+                ui.write(b"\n\n************************** ERROR ****************************\n")
+                ui.write(b"File rename in changeset %s only changes file case! (%s to %s)\n" %
+                         (short(hex(ctx.node())), r[0], f))
+                ui.write(b"*************************************************************\n\n\n")
     return 1 if rejecting else 0

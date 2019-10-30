@@ -10,10 +10,10 @@ from mercurial import (
     encoding,
 )
 
-RE_PROPER_AUTHOR = re.compile('^[^<]+\s\<[^<>]+@[^<>]+\>$')
+RE_PROPER_AUTHOR = re.compile(br'^[^<]+\s\<[^<>]+@[^<>]+\>$')
 
 def hook(ui, repo, node, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     havebad = False
@@ -23,11 +23,11 @@ def hook(ui, repo, node, source=None, **kwargs):
         user = ctx.user()
 
         # These are frequently used in automation. Ignore them for now.
-        if user in ('ffxbld', 'tbirdbld', 'seabld'):
+        if user in (b'ffxbld', b'tbirdbld', b'seabld'):
             continue
 
         if not RE_PROPER_AUTHOR.match(user):
-            ui.write('malformed user field in changeset %s: %s\n' % (
+            ui.write(b'malformed user field in changeset %s: %s\n' % (
                 short(ctx.node()), user))
             havebad = True
 
@@ -35,18 +35,18 @@ def hook(ui, repo, node, source=None, **kwargs):
         return 0
 
     ui.write(
-        'user fields must be of the format "author <email>"\n'
-        'e.g. "Mozilla Contributor <someone@example.com>"\n'
-        'set "ui.username" in your hgrc to a well-formed value\n'
-        '\n'
-        '"graft" can be used to rewrite multiple changesets to have a different user value\n'
-        'use the "--currentuser" or "--user" arguments to "graft" to specify an explicit user\n'
-        '\n'
-        '`hg up {parent} && hg graft --currentuser -r {first}::`\n'
-        'will rewrite all pushed changesets and their descendants to the current user value\n'
-        '\n'
-        "`hg up {parent} && hg graft --user 'Some User <someone@example.com>' -r {first}::{tip}`\n"
-        'will rewrite just the pushed changesets to an explicit username\n'
+        b'user fields must be of the format "author <email>"\n'
+        b'e.g. "Mozilla Contributor <someone@example.com>"\n'
+        b'set "ui.username" in your hgrc to a well-formed value\n'
+        b'\n'
+        b'"graft" can be used to rewrite multiple changesets to have a different user value\n'
+        b'use the "--currentuser" or "--user" arguments to "graft" to specify an explicit user\n'
+        b'\n'
+        b'`hg up {parent} && hg graft --currentuser -r {first}::`\n'
+        b'will rewrite all pushed changesets and their descendants to the current user value\n'
+        b'\n'
+        b"`hg up {parent} && hg graft --user 'Some User <someone@example.com>' -r {first}::{tip}`\n"
+        b'will rewrite just the pushed changesets to an explicit username\n'
         .format(
             parent=short(repo[node].p1().node()),
             first=short(repo[node].node()),
@@ -55,7 +55,7 @@ def hook(ui, repo, node, source=None, **kwargs):
 
     # Make non-fatal on l10n repos for now because their tools are known to not
     # use proper values.
-    if 'l10n' in repo.path:
+    if b'l10n' in repo.path:
         havebad = False
 
     return 1 if havebad else 0

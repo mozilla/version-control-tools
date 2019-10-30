@@ -21,50 +21,58 @@ import os.path
 import re
 import json
 
-magicwords = "CLOSED TREE"
-treestatus_base_url = "https://treestatus.mozilla-releng.net/trees/%s"
+from mercurial import (
+    pycompat,
+)
+
+magicwords = b"CLOSED TREE"
+treestatus_base_url = b"https://treestatus.mozilla-releng.net/trees/%s"
 
 
-def printError(message):
-    print "\n\n************************** ERROR ****************************"
-    print message
-    print "*************************************************************\n\n"
+def printError(ui, message):
+    ui.write(b"\n\n************************** ERROR ****************************\n")
+    ui.write(message)
+    ui.write(b"*************************************************************\n\n\n")
 
 
-def isPushAllowed(repo, name):
+def isPushAllowed(ui, repo, name):
     url = treestatus_base_url % (name,)
     try:
         u = urlopen(url)
         data = json.load(u)
         if data['result']['status'] == 'closed':
-            closure_text = "%s is CLOSED! Reason: %s" % (name, data['result']['reason'])
+            closure_text = b"%s is CLOSED! Reason: %s" % (name, pycompat.bytestr(data['result']['reason']))
             # Block the push unless they know the magic words
             if repo[b'tip'].description().find(magicwords) == -1:
-                printError("%s\nTo push despite the closed tree, include \"%s\" in your push comment" % (closure_text, magicwords))
+                printError(ui, b"%s\nTo push despite the closed tree, include \"%s\" in your push comment\n" %
+                           (closure_text, magicwords))
                 return False
 
-            print "%s\nBut you included the magic words.  Hope you had permission!" % closure_text
+            ui.write(b"%s\nBut you included the magic words.  Hope you had permission!\n" % closure_text)
         elif data['result']['status'] == 'approval required':
             # Block the push unless they have approval or are backing out
             dlower = repo[b'tip'].description().lower()
-            if not (re.search('a\S*=', dlower) or dlower.startswith('back') or dlower.startswith('revert')):
-                printError("Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: a=... (or, more accurately, a\\S*=...)")
+            if not (re.search(br'a\S*=', dlower) or dlower.startswith(b'back') or dlower.startswith(b'revert')):
+                printError(ui,
+                           b"Pushing to an APPROVAL REQUIRED tree requires your top changeset comment to include: "
+                           b"a=... (or, more accurately, a\\S*=...)\n")
                 return False
 
     except (ValueError, IOError), (err):
         # fail closed if treestatus is down, unless the magic words have been used
-        printError("Error accessing %s :\n"
-                   "%s\n"
-                   "Unable to check if the tree is open - treating as if CLOSED.\n"
-                   "To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
+        printError(ui,
+                    b"Error accessing %s :\n"
+                    b"%s\n"
+                    b"Unable to check if the tree is open - treating as if CLOSED.\n"
+                    b"To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
         if repo[b'tip'].description().find(magicwords) == -1:
             return False
     return True
 
 
 def hook(ui, repo, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
     treestatus_name = os.path.basename(repo.root)
-    return 0 if isPushAllowed(repo, treestatus_name) else 1
+    return 0 if isPushAllowed(ui, repo, treestatus_name) else 1

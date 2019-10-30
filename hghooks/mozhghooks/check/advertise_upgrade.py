@@ -8,7 +8,7 @@ from ..checks import (
     print_banner,
 )
 
-OUT_OF_DATE_CLIENT = """
+OUT_OF_DATE_CLIENT = b"""
 YOU ARE PUSHING WITH AN OUT OF DATE MERCURIAL CLIENT!
 
 Newer versions are faster and have numerous bug fixes.
@@ -21,12 +21,12 @@ class AdvertiseUpgradeCheck(ChangeGroupCheck):
 
     @property
     def name(self):
-        return 'advertise_upgrade'
+        return b'advertise_upgrade'
 
     def relevant(self):
         return True
 
     def check(self, **kwargs):
         if 'bundle2' not in kwargs:
-            print_banner(self.ui, 'warning', OUT_OF_DATE_CLIENT)
+            print_banner(self.ui, b'warning', OUT_OF_DATE_CLIENT)
         return True

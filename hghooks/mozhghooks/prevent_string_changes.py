@@ -25,12 +25,12 @@ import re
 
 
 def hook(ui, repo, hooktype, node, source=None, **kwargs):
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return 0
 
-    error = ""
+    error = b""
     changed_strings = False
-    if 'a=release' in repo[b'tip'].description().lower():
+    if b'a=release' in repo[b'tip'].description().lower():
         # Accept the entire push for code uplifts
         return 0
     # Loop through each changeset being added to the repository
@@ -38,23 +38,23 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         # Loop through each file for the current changeset
         for file in repo[change_id].files():
             # Interested only in files potentially used for l10n
-            if (re.search('locales/en-US/', file) and file.endswith(('.dtd', '.ini', '.properties'))):
+            if (re.search(b'locales/en-US/', file) and file.endswith((b'.dtd', b'.ini', b'.properties'))):
                 changed_strings = True
-                if not re.search('l10n=', repo[b'tip'].description().lower()):
-                    error += "* File used for localization (%s) altered in this changeset *\n" % file
+                if not re.search(b'l10n=', repo[b'tip'].description().lower()):
+                    error += b"* File used for localization (%s) altered in this changeset *\n" % file
     # Check if an error occurred
-    if error != "":
-        print "\n************************** ERROR ****************************\n"
-        print error
-        print "This repository is string frozen. Please request explicit permission from"
-        print "release managers to break string freeze in your bug."
-        print "If you have that explicit permission, denote that by including in"
-        print "your commit message l10n=..."
-        print "*************************************************************\n"
+    if error != b"":
+        ui.write(b"\n************************** ERROR ****************************\n\n")
+        ui.write(error)
+        ui.write(b"\nThis repository is string frozen. Please request explicit permission from\n")
+        ui.write(b"release managers to break string freeze in your bug.\n")
+        ui.write(b"If you have that explicit permission, denote that by including in\n")
+        ui.write(b"your commit message l10n=...\n")
+        ui.write(b"*************************************************************\n\n")
         # Reject the changesets
         return 1
     else:
         if changed_strings:
-            print "You've signaled approval for changes to strings in your push, thanks."
+            ui.write(b"You've signaled approval for changes to strings in your push, thanks.\n")
     # Accept the changesets
     return 0

@@ -7,22 +7,22 @@ import abc
 import re
 
 
-RE_VALID_NAME = re.compile('^[a-zA-Z0-9_]+$')
+RE_VALID_NAME = re.compile(br'^[a-zA-Z0-9_]+$')
 
 
 def print_banner(ui, level, message):
     width = max(len(l) for l in message.splitlines())
     banner = [
-        ' {} '.format(level.upper()).center(width, '*'),
+        (b' %s ' % level.upper()).center(width, b'*'),
         message.strip(),
-        '*' * width,
+        b'*' * width,
     ]
-    ui.write('\n' + '\n'.join(banner) + '\n\n')
+    ui.write(b'\n' + b'\n'.join(banner) + b'\n\n')
 
 
 def print_notice(ui, message):
     for l in message.strip().splitlines():
-        ui.write('-- %s\n' % l)
+        ui.write(b'-- %s\n' % l)
 
 
 class PreTxnChangegroupCheck(object):
@@ -39,7 +39,7 @@ class PreTxnChangegroupCheck(object):
 
     def __init__(self, ui, repo, info):
         if not RE_VALID_NAME.match(self.name):
-            raise Exception('check name is invalid: %s' % self.name)
+            raise Exception(b'check name is invalid: %s' % self.name)
 
         self.ui = ui
         self.repo = repo
@@ -107,7 +107,7 @@ class ChangeGroupCheck(object):
 
     def __init__(self, ui, repo, info):
         if not RE_VALID_NAME.match(self.name):
-            raise Exception('check name is invalid: %s' % self.name)
+            raise Exception(b'check name is invalid: %s' % self.name)
 
         self.ui = ui
         self.repo = repo

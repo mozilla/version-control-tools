@@ -10,8 +10,8 @@ from ..checks import (
 )
 
 
-SUBREPO_NOT_ALLOWED = """
-{node} contains subrepositories.
+SUBREPO_NOT_ALLOWED = b"""
+%(node)s contains subrepositories.
 
 Subrepositories are not allowed on this repository.
 
@@ -33,7 +33,7 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
     """
     @property
     def name(self):
-        return 'prevent_subrepos'
+        return b'prevent_subrepos'
 
     def relevant(self):
         return True
@@ -47,7 +47,7 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
         # whether there is *any* versioned data for these tracked files. If not,
         # we can short circuit the check and avoid manifest lookups.
         seen = False
-        for p in ('.hgsub', '.hgsubstate'):
+        for p in (b'.hgsub', b'.hgsubstate'):
             fl = self.repo.file(p)
             if len(fl):
                 seen = True
@@ -62,13 +62,14 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
         if self.done:
             return True
 
-        if '.hgsub' not in ctx and '.hgsubstate' not in ctx:
+        if b'.hgsub' not in ctx and b'.hgsubstate' not in ctx:
             return True
 
         self.done = True
 
-        print_banner(self.ui, 'error', SUBREPO_NOT_ALLOWED.format(
-            node=ctx.hex()[0:12]))
+        print_banner(self.ui, b'error', SUBREPO_NOT_ALLOWED % {
+            b'node': ctx.hex()[0:12],
+        })
         return False
 
     def post_check(self):

@@ -13,38 +13,39 @@ from ..checks import (
     print_banner
 )
 
-BANNER = """
+BANNER = b"""
 Merge day push contains unexpected changes.
 """
 
 
 ALLOWED_FILES = (
-    '.hgtags',
-    'CLOBBER',
-    'browser/config/mozconfigs/',
-    'browser/config/version.txt',
-    'browser/config/version_display.txt',
-    'browser/confvars.sh',
-    'build/mozconfig.common',
-    'config/milestone.txt',
-    'mobile/android/config/mozconfigs/',
-    'services/sync/modules/constants.js',
-    'xpcom/components/Module.h',
-    'mobile/android/config/version-files/beta/version.txt',
-    'mobile/android/config/version-files/beta/version_display.txt',
-    'mobile/android/config/version-files/nightly/version.txt',
-    'mobile/android/config/version-files/nightly/version_display.txt',
-    'mobile/android/config/version-files/release/version.txt',
-    'mobile/android/config/version-files/release/version_display.txt',
+    b'.hgtags',
+    b'CLOBBER',
+    b'browser/config/mozconfigs/',
+    b'browser/config/version.txt',
+    b'browser/config/version_display.txt',
+    b'browser/confvars.sh',
+    b'build/mozconfig.common',
+    b'config/milestone.txt',
+    b'mobile/android/config/mozconfigs/',
+    b'services/sync/modules/constants.js',
+    b'xpcom/components/Module.h',
+    b'mobile/android/config/version-files/beta/version.txt',
+    b'mobile/android/config/version-files/beta/version_display.txt',
+    b'mobile/android/config/version-files/nightly/version.txt',
+    b'mobile/android/config/version-files/nightly/version_display.txt',
+    b'mobile/android/config/version-files/release/version.txt',
+    b'mobile/android/config/version-files/release/version_display.txt',
+
 )
 
-INVALID_PATH_FOUND = """
+INVALID_PATH_FOUND = b"""
 ffxbld-merge can only push changes to
 the following paths:
-{}
+%s
 
 Illegal paths found:
-{}{}
+%s%s
 """
 
 
@@ -52,20 +53,20 @@ class MergeDayCheck(PreTxnChangegroupCheck):
     """ffxbld-merge user should only be able to push merges"""
     @property
     def name(self):
-        return 'merge_day'
+        return b'merge_day'
 
     def relevant(self):
-        return os.environ['USER'] in ('stage-ffxbld-merge', 'ffxbld-merge')
+        return self.ui.environ[b'USER'] in {b'stage-ffxbld-merge', b'ffxbld-merge'}
 
     def pre(self, node):
         self._unified = _get_unified_repo(self.ui)
 
     def check(self, ctx):
-        if not self.repo_metadata['firefox']:
+        if not self.repo_metadata[b'firefox']:
             print_banner(
-                self.ui, 'error',
-                'ffxbld-merge cannot push to non-firefox repository {}'.format(
-                    self.repo_metadata['path']),
+                self.ui, b'error',
+                b'ffxbld-merge cannot push to non-firefox repository %s' %
+                    self.repo_metadata[b'path'],
             )
             return False
 
@@ -82,16 +83,16 @@ class MergeDayCheck(PreTxnChangegroupCheck):
                 pass
             else:
                 print_banner(
-                    self.ui, 'error',
-                    'ffxbld-merge cannot push non-trivial merges.',
+                    self.ui, b'error',
+                    b'ffxbld-merge cannot push non-trivial merges.',
                 )
                 return False
 
         # For commits that haven't landed in another tree, and aren't merges
         # they can only touch files in the allow list.
         matcher = match(
-            ctx.repo().root, '',
-            ['path:{}'.format(path) for path in ALLOWED_FILES],
+            ctx.repo().root, b'',
+            [b'path:%s' % path for path in ALLOWED_FILES],
         )
         invalid_paths = {
             path for path in ctx.files()
@@ -99,11 +100,11 @@ class MergeDayCheck(PreTxnChangegroupCheck):
         }
         if invalid_paths:
             print_banner(
-                self.ui, 'error',
-                INVALID_PATH_FOUND.format(
-                    "\n".join(item for item in sorted(ALLOWED_FILES)),
-                    "\n".join(item for item in sorted(invalid_paths)[:20]),
-                    "\n..." if len(invalid_paths) > 20 else "",
+                self.ui, b'error',
+                INVALID_PATH_FOUND % (
+                    b"\n".join(item for item in sorted(ALLOWED_FILES)),
+                    b"\n".join(item for item in sorted(invalid_paths)[:20]),
+                    b"\n..." if len(invalid_paths) > 20 else b"",
                 ),
             )
             return False
@@ -116,8 +117,8 @@ class MergeDayCheck(PreTxnChangegroupCheck):
 
 
 def _get_unified_repo(ui):
-    repo_root = ui.config('mozilla', 'repo_root', '/repo/hg/mozilla')
-    if not repo_root.endswith('/'):
-        repo_root += '/'
+    repo_root = ui.config(b'mozilla', b'repo_root', b'/repo/hg/mozilla')
+    if not repo_root.endswith(b'/'):
+        repo_root += b'/'
 
-    return repository(ui, os.path.join(repo_root, 'mozilla-unified'))
+    return repository(ui, os.path.join(repo_root, b'mozilla-unified'))

@@ -24,33 +24,33 @@ from ..checks import (
 )
 
 IPC_PEERS = [
-    dict(name='Andrew McCreight', nick=['mccr8'], email=['continuation@gmail.com']),
-    dict(name='Jed Davis', nick=['jld'], email=['jld@mozilla.com']),
-    dict(name='Nathan Froyd', nick=['froydnj'], email=['nfroyd@mozilla.com']),
-    dict(name='Nika Layzell', nick=['nika'], email=['nika@thelayzells.com']),
+    {'name': b'Andrew McCreight', 'nick': [b'mccr8'], 'email': [b'continuation@gmail.com']},
+    {'name': b'Jed Davis', 'nick': [b'jld'], 'email': [b'jld@mozilla.com']},
+    {'name': b'Nathan Froyd', 'nick': [b'froydnj'], 'email': [b'nfroyd@mozilla.com']},
+    {'name': b'Nika Layzell', 'nick': [b'nika'], 'email': [b'nika@thelayzells.com']},
 ]
 
-MISSING_REVIEW = """
+MISSING_REVIEW = b"""
 Changeset %s alters sync-messages.ini without IPC peer review.
 
 Please, request review from either:
 """
 for p in IPC_PEERS:
-    MISSING_REVIEW += "  - {} (:{})\n".format(p['name'], p['nick'][0])
+    MISSING_REVIEW += b"  - %s (:%s)\n" % (p['name'], p['nick'][0])
 
 
 class SyncIPCCheck(PreTxnChangegroupCheck):
     """Changes to ipc/ipdl/sync-messages.ini requires IPC peer review."""
     @property
     def name(self):
-        return 'ipcsync_check'
+        return b'ipcsync_check'
 
     def relevant(self):
-        return self.repo_metadata['firefox_releasing']
+        return self.repo_metadata[b'firefox_releasing']
 
     def pre(self, node):
         # Accept the entire push for code uplifts
-        self.is_uplift = 'a=release' in self.repo[b'tip'].description().lower()
+        self.is_uplift = b'a=release' in self.repo[b'tip'].description().lower()
 
     def check(self, ctx):
         if self.is_uplift:
@@ -66,7 +66,7 @@ class SyncIPCCheck(PreTxnChangegroupCheck):
 
         # Ignore changes that don't touch sync-messages.ini
         ipc_files = [f for f in ctx.files()
-                     if f == 'ipc/ipdl/sync-messages.ini']
+                     if f == b'ipc/ipdl/sync-messages.ini']
         if not ipc_files:
             return True
 
@@ -80,7 +80,7 @@ class SyncIPCCheck(PreTxnChangegroupCheck):
             return True
 
         # Reject
-        print_banner(self.ui, 'error', MISSING_REVIEW % short(ctx.node()))
+        print_banner(self.ui, b'error', MISSING_REVIEW % short(ctx.node()))
         return False
 
     def post_check(self):

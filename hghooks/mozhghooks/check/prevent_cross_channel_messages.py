@@ -10,7 +10,7 @@ from ..checks import (
 )
 
 
-X_CHANNEL_COMMIT_FOUND = """
+X_CHANNEL_COMMIT_FOUND = b"""
 You are trying to commit with a message that conflicts with
 cross-channel localization.
 Please adjust your commit messages to avoid lines starting with
@@ -28,22 +28,22 @@ class XChannelMessageCheck(PreTxnChangegroupCheck):
     """
     @property
     def name(self):
-        return 'x_channel_message'
+        return b'x_channel_message'
 
     def relevant(self):
         return (
-            self.repo_metadata['firefox']
-            or self.repo_metadata['thunderbird'])
+            self.repo_metadata[b'firefox']
+            or self.repo_metadata[b'thunderbird'])
 
     def pre(self, node):
         pass
 
     def check(self, ctx):
-        if not any(line.startswith('X-Channel-')
+        if not any(line.startswith(b'X-Channel-')
                    for line in ctx.description().splitlines()):
             return True
 
-        print_banner(self.ui, 'error', X_CHANNEL_COMMIT_FOUND)
+        print_banner(self.ui, b'error', X_CHANNEL_COMMIT_FOUND)
         return False
 
     def post_check(self):

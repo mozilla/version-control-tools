@@ -13,7 +13,7 @@ from ..checks import (
     PreTxnChangegroupCheck,
 )
 
-UNRELATED_REPO_MESSAGE = '''
+UNRELATED_REPO_MESSAGE = b'''
 *** pushing unrelated repository ***
 
 Changeset %s introduces a new root changeset into this repository. This
@@ -38,10 +38,10 @@ class SingleRootCheck(PreTxnChangegroupCheck):
     """
     @property
     def name(self):
-        return 'single_root'
+        return b'single_root'
 
     def relevant(self):
-        return not self.repo_metadata['user_repo']
+        return not self.repo_metadata[b'user_repo']
 
     def pre(self, node):
         self.new_roots = set()
@@ -71,19 +71,19 @@ class SingleRootCheck(PreTxnChangegroupCheck):
         # We also don't support magic syntax in commit messages to allow new
         # roots because we don't trust users to not abuse this.
 
-        allowed_roots = self.ui.configlist('allowedroots', self.repo[0].hex())
+        allowed_roots = self.ui.configlist(b'allowedroots', self.repo[0].hex())
         allowed_roots = set(map(bin, allowed_roots))
 
         bad_roots = self.new_roots - allowed_roots
         good_roots = self.new_roots & allowed_roots
 
         for root in sorted(good_roots):
-            self.ui.write('(allowing new root %s because it is in the '
-                          'whitelist)\n' % short(root))
+            self.ui.write(b'(allowing new root %s because it is in the '
+                          b'whitelist)\n' % short(root))
 
         if not bad_roots:
             return True
 
         self.ui.write(UNRELATED_REPO_MESSAGE %
-                      ', '.join(sorted(map(short, bad_roots))))
+                      b', '.join(sorted(map(short, bad_roots))))
         return False

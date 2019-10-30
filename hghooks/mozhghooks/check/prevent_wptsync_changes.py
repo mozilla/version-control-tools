@@ -11,21 +11,21 @@ from ..checks import (
     print_banner,
 )
 
-allowed_paths = re.compile("testing/web-platform/(?:moz\.build|meta/.*|tests/.*)$")
+allowed_paths = re.compile(b"testing/web-platform/(?:moz\.build|meta/.*|tests/.*)$")
 
-INVALID_PATH_FOUND = """
+INVALID_PATH_FOUND = b"""
 wptsync@mozilla.com can only make changes to
-the following paths on {}:
+the following paths on %s:
 testing/web-platform/moz.build
 testing/web-platform/meta
 testing/web-platform/tests
 
 Illegal paths found:
-{}{}
+%s%s
 """
 
-ILLEGAL_REPO = """
-wptsync@mozilla.com cannot push to {}
+ILLEGAL_REPO = b"""
+wptsync@mozilla.com cannot push to %s
 """
 
 
@@ -40,32 +40,32 @@ class WPTSyncCheck(PreTxnChangegroupCheck):
     """
     @property
     def name(self):
-        return 'wptsync_check'
+        return b'wptsync_check'
 
     def relevant(self):
-        return os.environ['USER'] == 'wptsync@mozilla.com'
+        return self.ui.environ[b'USER'] == b'wptsync@mozilla.com'
 
     def pre(self, node):
         pass
 
     def check(self, ctx):
         success = False
-        if self.repo_metadata['path'] == 'try':
+        if self.repo_metadata[b'path'] == b'try':
             success = True
-        elif self.repo_metadata['path'] == 'integration/autoland':
+        elif self.repo_metadata[b'path'] == b'integration/autoland':
             invalid_paths = [path for path in ctx.files() if not allowed_paths.match(path)]
             if not invalid_paths:
                 success = True
             else:
                 invalid_paths = set(invalid_paths)
-                print_banner(self.ui, 'error', INVALID_PATH_FOUND.format(
-                    self.repo_metadata['path'],
-                    "\n".join(item for item in sorted(invalid_paths)[:20]),
-                    "\n..." if len(invalid_paths) > 20 else ""
+                print_banner(self.ui, b'error', INVALID_PATH_FOUND % (
+                    self.repo_metadata[b'path'],
+                    b"\n".join(item for item in sorted(invalid_paths)[:20]),
+                    b"\n..." if len(invalid_paths) > 20 else b""
                 ))
         else:
-            print_banner(self.ui, 'error',
-                         ILLEGAL_REPO.format(self.repo_metadata['path']))
+            print_banner(self.ui, b'error',
+                         ILLEGAL_REPO % self.repo_metadata[b'path'])
         return success
 
     def post_check(self):

@@ -10,7 +10,7 @@ from ..checks import (
 )
 
 
-TRY_CONFIG_FOUND = """
+TRY_CONFIG_FOUND = b"""
 You are trying to commit the temporary 'try_task_config.json' file
 on a non-try branch. Either make sure you are pushing to try or
 remove the file and push again.
@@ -26,19 +26,19 @@ class TryConfigCheck(PreTxnChangegroupCheck):
     """
     @property
     def name(self):
-        return 'try_task_config'
+        return b'try_task_config'
 
     def relevant(self):
-        return self.repo_metadata['firefox_releasing']
+        return self.repo_metadata[b'firefox_releasing']
 
     def pre(self, node):
         pass
 
     def check(self, ctx):
-        if 'try_task_config.json' not in ctx.files():
+        if b'try_task_config.json' not in ctx.files():
             return True
 
-        print_banner(self.ui, 'error', TRY_CONFIG_FOUND)
+        print_banner(self.ui, b'error', TRY_CONFIG_FOUND)
         return False
 
     def post_check(self):

@@ -14,25 +14,25 @@ from mozhg.util import (
     timers,
 )
 
-testedwith = '4.8 4.9 5.0'
-minimumhgversion = '4.8'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
+testedwith = b'4.8 4.9 5.0'
+minimumhgversion = b'4.8'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('allowedroots', '.*',
+configitem(b'allowedroots', b'.*',
            generic=True)
-configitem('mozilla', 'check.*',
+configitem(b'mozilla', b'check.*',
            generic=True)
-configitem('mozilla', 'repo_root',
+configitem(b'mozilla', b'repo_root',
            default=configitems.dynamicdefault)
-configitem('mozilla', 'treeherder_repo',
+configitem(b'mozilla', b'treeherder_repo',
            default=None)
-configitem('mozilla', 'lando_required_repo_list',
-           default='')
-configitem('mozilla', 'sentry_dsn',
-           default="")
+configitem(b'mozilla', b'lando_required_repo_list',
+           default=b'')
+configitem(b'mozilla', b'sentry_dsn',
+           default=b"")
 
 
 def get_check_classes(hook):
@@ -53,7 +53,7 @@ def get_check_classes(hook):
     )
 
     # TODO check to hook mapping should also be automatically discovered.
-    if hook == 'pretxnchangegroup':
+    if hook == b'pretxnchangegroup':
         return (
             merge_day.MergeDayCheck,
             prevent_cross_channel_messages.XChannelMessageCheck,
@@ -67,7 +67,7 @@ def get_check_classes(hook):
             try_task_config_file.TryConfigCheck,
         )
 
-    elif hook == 'changegroup':
+    elif hook == b'changegroup':
         return (
             advertise_upgrade.AdvertiseUpgradeCheck,
         )
@@ -80,14 +80,14 @@ def get_checks(ui, repo, source, classes):
     """
 
     # Never apply hooks at pull time or when re-applying from strips.
-    if source in ('pull', 'strip'):
+    if source in (b'pull', b'strip'):
         return []
 
     info = identify_repo(repo)
 
     # Don't apply to non-hosted repos.
-    if not info['hosted']:
-        ui.write('(not running mozilla hooks on non-hosted repo)\n')
+    if not info[b'hosted']:
+        ui.write(b'(not running mozilla hooks on non-hosted repo)\n')
         return []
 
     checks = []
@@ -98,22 +98,22 @@ def get_checks(ui, repo, source, classes):
 
         force_enable = False
         force_disable = False
-        override = ui.config('mozilla', 'check.%s' % name)
-        if override in ('enable', 'true'):
+        override = ui.config(b'mozilla', b'check.%s' % name)
+        if override in (b'enable', b'true'):
             force_enable = True
-        elif override in ('disable', 'false'):
+        elif override in (b'disable', b'false'):
             force_disable = True
 
         enabled = check.relevant()
         if not isinstance(enabled, bool):
-            raise Exception('relevant() must return a bool; got %s' % enabled)
+            raise Exception(b'relevant() must return a bool; got %s' % enabled)
 
         if enabled and force_disable:
-            ui.warn('(%s check disabled per config override)\n' %
+            ui.warn(b'(%s check disabled per config override)\n' %
                     name)
             continue
         elif not enabled and force_enable:
-            ui.warn('(%s check enabled per config override)\n' %
+            ui.warn(b'(%s check enabled per config override)\n' %
                     name)
             enabled = True
 
@@ -125,9 +125,9 @@ def get_checks(ui, repo, source, classes):
 
 def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
     checks = get_checks(ui, repo, source,
-                        get_check_classes('pretxnchangegroup'))
+                        get_check_classes(b'pretxnchangegroup'))
 
-    with timers(ui, 'mozhooks', 'mozhooks.pretxnchangegroup.') as times:
+    with timers(ui, b'mozhooks', b'mozhooks.pretxnchangegroup.') as times:
         for check in checks:
             with times.timeit(check.name):
                 check.pre(node)
@@ -149,9 +149,9 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
 
 
 def changegroup(ui, repo, source=None, **kwargs):
-    checks = get_checks(ui, repo, source, get_check_classes('changegroup'))
+    checks = get_checks(ui, repo, source, get_check_classes(b'changegroup'))
 
-    with timers(ui, 'mozhooks', 'mozhooks.changegroup.') as times:
+    with timers(ui, b'mozhooks', b'mozhooks.changegroup.') as times:
         for check in checks:
             with times.timeit(check.name):
                 if not check.check(**kwargs):
@@ -161,5 +161,5 @@ def changegroup(ui, repo, source=None, **kwargs):
 
 
 def reposetup(ui, repo):
-    ui.setconfig('hooks', 'pretxnchangegroup.mozhooks', pretxnchangegroup)
-    ui.setconfig('hooks', 'changegroup.mozhooks', changegroup)
+    ui.setconfig(b'hooks', b'pretxnchangegroup.mozhooks', pretxnchangegroup)
+    ui.setconfig(b'hooks', b'changegroup.mozhooks', changegroup)
