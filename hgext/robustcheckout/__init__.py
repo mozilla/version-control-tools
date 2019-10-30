@@ -21,8 +21,6 @@ import re
 import socket
 import ssl
 import time
-import urllib2
-import urlparse
 
 from mercurial.i18n import _
 from mercurial.node import hex, nullid
@@ -37,6 +35,7 @@ from mercurial import (
     pycompat,
     registrar,
     scmutil,
+    urllibcompat,
     util,
 )
 
@@ -336,7 +335,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
             else:
                 record_op('overall_nopull_populatedwdir')
 
-        server_url = urlparse.urlparse(url).netloc
+        server_url = urllibcompat.urlreq.urlparse(url).netloc
 
         if 'TASKCLUSTER_INSTANCE_TYPE' in os.environ:
             perfherder = {
@@ -527,7 +526,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             ui.warn(b'ssl error: %s\n' % e)
             handlenetworkfailure()
             return True
-        elif isinstance(e, urllib2.URLError):
+        elif isinstance(e, urllibcompat.urlerr.urlerror):
             if isinstance(e.reason, socket.error):
                 ui.warn(b'socket error: %s\n' % str(e.reason).encode('ascii'))
                 handlenetworkfailure()
@@ -553,7 +552,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     except error.RepoLookupError:
         raise error.Abort(b'unable to resolve root revision from clone '
                           b'source')
-    except (error.Abort, ssl.SSLError, urllib2.URLError) as e:
+    except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
         if handlepullerror(e):
             return callself()
         raise
@@ -628,7 +627,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 shareopts = {b'pool': sharebase, b'mode': b'identity'}
                 res = hg.clone(ui, {}, clonepeer, dest=dest, update=False,
                                shareopts=shareopts)
-        except (error.Abort, ssl.SSLError, urllib2.URLError) as e:
+        except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
             if handlepullerror(e):
                 return callself()
             raise
@@ -694,7 +693,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                     pullop = exchange.pull(repo, remote, heads=pullrevs)
                     if not pullop.rheads:
                         raise error.Abort(b'unable to pull requested revision')
-        except (error.Abort, ssl.SSLError, urllib2.URLError) as e:
+        except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
             if handlepullerror(e):
                 return callself()
             raise
