@@ -16,6 +16,7 @@ from mercurial import (
     demandimport,
     error,
     hg,
+    pycompat,
     ui as uimod,
     util,
 )
@@ -44,7 +45,7 @@ MODERN_FINGERPRINTS = {
     'hg.mozilla.org': 'sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48',
 }
 
-INITIAL_MESSAGE = '''
+INITIAL_MESSAGE = b'''
 This wizard will guide you through configuring Mercurial for an optimal
 experience contributing to Mozilla projects.
 
@@ -60,7 +61,7 @@ MINIMUM_SUPPORTED_VERSION = (3, 5, 0)
 # mozilla-central/python/mozboot/mozboot/base.py
 OLDEST_NON_LEGACY_VERSION = (4, 3, 3)
 
-VERSION_TOO_OLD = '''
+VERSION_TOO_OLD = b'''
 Your version of Mercurial (%d.%d) is too old to run `hg configwizard`.
 
 Mozilla's Mercurial support policy is to support at most the past
@@ -72,7 +73,7 @@ See https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/ins
 for Mozilla-tailored instructions for install Mercurial.
 '''.lstrip()
 
-LEGACY_MERCURIAL_MESSAGE = '''
+LEGACY_MERCURIAL_MESSAGE = b'''
 You are running an out of date Mercurial client (%s).
 
 For a faster and better Mercurial experience, we HIGHLY recommend you
@@ -83,7 +84,7 @@ to upgrade may leave you exposed. You are highly encouraged to upgrade in
 case you aren't running a patched version.
 '''.lstrip()
 
-MISSING_USERNAME = '''
+MISSING_USERNAME = b'''
 You don't have a username defined in your Mercurial config file. In order
 to author commits, you'll need to define a name and e-mail address.
 
@@ -94,19 +95,19 @@ acceptable.
 (Relevant config option: ui.username)
 '''.lstrip()
 
-MISSING_IRCNICK = '''
+MISSING_IRCNICK = b'''
 You don't have a Mozilla IRC nickname defined in your Mercurial config file.
 
 (Relevant config option: mozilla.ircnick)
 '''
 
-BAD_DIFF_SETTINGS = '''
+BAD_DIFF_SETTINGS = b'''
 Mercurial is not configured to produce diffs in a more readable format.
 
 Would you like to change this (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-TWEAKDEFAULTS_INFO = '''
+TWEAKDEFAULTS_INFO = b'''
 Mercurial has implemented some functionality behind ui.tweakdefaults config,
 that most users would like by default, but would break some workflows due to
 backwards compatibility issues.
@@ -119,7 +120,7 @@ and checking the "tweakdefaults" section.
 Would you like to enable these features (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-PAGER_INFO = '''
+PAGER_INFO = b'''
 The "pager" extension transparently redirects command output to a pager
 program (like "less") so command output can be more easily consumed
 (e.g. output longer than the terminal can be scrolled).
@@ -133,20 +134,20 @@ Please select one of the following for configuring pager:
 Which option would you like? $$ &1 $$ &2 $$ &3
 '''.strip()
 
-CURSES_INFO = '''
+CURSES_INFO = b'''
 Mercurial can provide richer terminal interactions for some operations
 by using the popular "curses" library.
 
 Would you like to enable "curses" interfaces (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-EVOLVE_INCOMPATIBLE = '''
+EVOLVE_INCOMPATIBLE = b'''
 Evolve requires Mercurial 4.3+. Your Mercurial is too old to run evolve.
 
 Please upgrade Mercurial to use evolve.
 '''.lstrip()
 
-WATCHMAN_NOT_FOUND = '''
+WATCHMAN_NOT_FOUND = b'''
 The "watchman" filesystem watching tool could not be found or isn't
 working.
 
@@ -161,7 +162,7 @@ is available on PATH (you should be able to run `watchman` from
 your shell).
 '''.lstrip()
 
-FSMONITOR_INFO = '''
+FSMONITOR_INFO = b'''
 The fsmonitor extension integrates the watchman filesystem watching tool
 with Mercurial. Commands like `hg status`, `hg diff`, and `hg commit`
 (which need to examine filesystem state) can query watchman to obtain
@@ -174,7 +175,7 @@ should "just work."
 Would you like to enable fsmonitor (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-FSMONITOR_NOT_AVAILABLE = '''
+FSMONITOR_NOT_AVAILABLE = b'''
 Newer versions of Mercurial have built-in support for integrating with
 filesystem watching services to make common operations faster.
 
@@ -184,7 +185,7 @@ repository.
 Please upgrade to Mercurial 3.8+ so this feature is available.
 '''.lstrip()
 
-WIP_INFO = '''
+WIP_INFO = b'''
 It is common to want a quick view of changesets that are in progress.
 
 The ``hg wip`` command provides such a view.
@@ -211,14 +212,14 @@ is in.)
 Would you like to install the `hg wip` alias (Yn)? $$ &Yes $$ &No
 '''.lstrip()
 
-WIP_UPDATED_EXPRESSION = '''
+WIP_UPDATED_EXPRESSION = b'''
 It appears you are on a new version of Mercurial (4.6+) but you are using the old `hg wip` alias.
 In new versions of Mercurial, the revset expression `unstable` has been renamed to `orphan`.
 
 We will update the alias for you so it uses the new keyword.
 '''.lstrip()
 
-SMARTANNOTATE_INFO = '''
+SMARTANNOTATE_INFO = b'''
 The ``hg smart-annotate`` command provides experimental support for
 viewing the annotate information while skipping certain changesets,
 such as code-formatting changes.
@@ -226,7 +227,7 @@ such as code-formatting changes.
 Would you like to install the `hg smart-annotate` alias (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-FIREFOXTREE_INFO = '''
+FIREFOXTREE_INFO = b'''
 The firefoxtree extension makes interacting with the multiple Firefox
 repositories easier:
 
@@ -250,19 +251,19 @@ b) perform head/bookmark-based development (as opposed to mq)
 Would you like to activate firefoxtree (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-CLANG_FORMAT_INFO = '''
+CLANG_FORMAT_INFO = b'''
 The "clang-format" extension provides execution of clang-format at the commit steps.
 It relies on ./mach clang-format directly.
 Would you like to activate clang-format (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-JS_FORMAT_INFO = '''
+JS_FORMAT_INFO = b'''
 The "js-format" extension provides execution of eslint+prettier at the commit steps.
 It relies on ./mach eslint --fix directly.
 Would you like to activate js-format (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-FORMATSOURCE_INFO = '''
+FORMATSOURCE_INFO = b'''
 The "format-source" extension provides a way to run code-formatting tools in a way that
 avoids conflicts related to this formatting when merging/rebasing code across the
 reformatting.
@@ -282,13 +283,13 @@ can be used in most cases.
 Would you like to activate format-source (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-FORMATSOURCE_DISABLE_INFO = '''
+FORMATSOURCE_DISABLE_INFO = b'''
 Removing extensions.format-source since it\'s no longer needed. For the moment we
 want to disable format-source since the big format of Gecko has been performed.
 We will re-enable this when we will need it again.\n
 '''
 
-CODEREVIEW_INFO = '''
+CODEREVIEW_INFO = b'''
 Commits to Mozilla projects are typically sent to Phabricator. This is the
 preferred code review tool at Mozilla.
 Phabricator installation instructions are here
@@ -296,7 +297,7 @@ http://moz-conduit.readthedocs.io/en/latest/phabricator-user.html
 
 '''.lstrip()
 
-PUSHTOTRY_INFO = '''
+PUSHTOTRY_INFO = b'''
 The push-to-try extension generates a temporary commit with a given
 try syntax and pushes it to the try server. The extension is intended
 to be used in concert with other tools generating try syntax so that
@@ -307,7 +308,7 @@ they can push to try without depending on mq or other workarounds.
 Would you like to activate push-to-try (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-HISTORY_EDITING_INFO = '''
+HISTORY_EDITING_INFO = b'''
 Various extensions provide functionality to rewrite repository history. These
 enable more powerful - and often more productive - workflows.
 
@@ -334,7 +335,7 @@ Would you like to enable these history editing extensions (Yn)? $$ &Yes $$ &No
 '''.strip()
 
 
-EVOLVE_INFO_WARNING = '''
+EVOLVE_INFO_WARNING = b'''
 The evolve extension is a Mercurial extension for faster and
 safer mutable history. It implements the changeset evolution concept
 for Mercurial, allowing for safe and simple history re-writing. It
@@ -357,7 +358,7 @@ once the `evolve` extension is enabled.
 Would you like to enable the evolve extension? (Yn) $$ &Yes $$ &No
 '''
 
-EVOLVE_UPDATE_PROMPT = '''
+EVOLVE_UPDATE_PROMPT = b'''
 It looks like the setup wizard has already installed a copy of the
 evolve extension on your machine, at {evolve_dir}.
 
@@ -366,7 +367,7 @@ evolve extension on your machine, at {evolve_dir}.
 Would you like to update evolve to the latest version?  (Yn) $$ &Yes $$ &No
 '''
 
-EVOLVE_CLONE_ERROR = '''
+EVOLVE_CLONE_ERROR = b'''
 Could not clone the evolve extension for installation.
 You can install evolve yourself with
 
@@ -377,7 +378,7 @@ and then enable the extension via
   $ hg config -e
 '''
 
-MULTIPLE_VCT = '''
+MULTIPLE_VCT = b'''
 *** WARNING ***
 
 Multiple version-control-tools repositories are referenced in your
@@ -391,7 +392,7 @@ version-control-tools repository:
 
 '''.lstrip()
 
-FILE_PERMISSIONS_WARNING = '''
+FILE_PERMISSIONS_WARNING = b'''
 Your hgrc file is currently readable by others.
 
 Sensitive information such as your Bugzilla credentials could be
@@ -401,8 +402,8 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
 
-testedwith = '4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
-buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
+testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}
 
@@ -436,54 +437,54 @@ def _vcthome():  # Returns the directory where the vct clone is located
     vct_dir = os.path.normpath(os.path.join(ext_dir, '..'))
     vcthome_dir = os.path.normpath(os.path.join(vct_dir, '..'))
 
-    return vcthome_dir
+    return pycompat.bytestr(vcthome_dir)
 
 
-if registrar and util.safehasattr(registrar, 'configitem'):
+if registrar and util.safehasattr(registrar, b'configitem'):
     configtable = {}
     configitem = registrar.configitem(configtable)
 
     # TODO some of these are registered elsewhere. This can produce a warning
     # for duplicate registration. We should ideally call a shared function
     # that only registers once.
-    configitem('configwizard', 'steps',
+    configitem(b'configwizard', b'steps',
                default=[])
-    configitem('bugzilla', 'username',
+    configitem(b'bugzilla', b'username',
                default=None)
-    configitem('bugzilla', 'apikey',
+    configitem(b'bugzilla', b'apikey',
                default=None)
-    configitem('mozilla', 'ircnick',
+    configitem(b'mozilla', b'ircnick',
                default=None)
-    configitem('mozilla', 'mozbuild_state_path',
+    configitem(b'mozilla', b'mozbuild_state_path',
                default=_vcthome())
-    configitem('revsetalias', 'wip',
+    configitem(b'revsetalias', b'wip',
                default=None)
 
 wizardsteps = set([
-    'hgversion',
-    'username',
-    'tweakdefaults',
-    'diff',
-    'color',
-    'pager',
-    'curses',
-    'historyediting',
-    'evolve',
-    'fsmonitor',
-    'blackbox',
-    'security',
-    'firefoxtree',
-    'format-source',
-    'wip',
-    'smartannotate',
-    'codereview',
-    'pushtotry',
-    'multiplevct',
-    'configchange',
-    'permissions',
-    'clang-format',
-    'js-format',
-    'shelve',
+    b'hgversion',
+    b'username',
+    b'tweakdefaults',
+    b'diff',
+    b'color',
+    b'pager',
+    b'curses',
+    b'historyediting',
+    b'evolve',
+    b'fsmonitor',
+    b'blackbox',
+    b'security',
+    b'firefoxtree',
+    b'format-source',
+    b'wip',
+    b'smartannotate',
+    b'codereview',
+    b'pushtotry',
+    b'multiplevct',
+    b'configchange',
+    b'permissions',
+    b'clang-format',
+    b'js-format',
+    b'shelve',
 ])
 
 
@@ -495,8 +496,8 @@ def configwizard(ui, repo, statedir=None, **opts):
     # during uisetup() doesn't work. So we do our own ui.hasconfig()
     # here. Other uses of ui.hasconfig() are allowed, as they will
     # have a properly monkeypatched ui.__class__.
-    if 'steps' in ui._data(False)._data.get('configwizard', {}):
-        runsteps = set(ui.configlist('configwizard', 'steps'))
+    if b'steps' in ui._data(False)._data.get(b'configwizard', {}):
+        runsteps = set(ui.configlist(b'configwizard', b'steps'))
 
     hgversion = util.versiontuple(n=3)
 
@@ -510,9 +511,9 @@ def configwizard(ui, repo, statedir=None, **opts):
             hgversion[0], hgversion[1],
             MINIMUM_SUPPORTED_VERSION[0], MINIMUM_SUPPORTED_VERSION[1],
         ))
-        raise error.Abort('upgrade Mercurial then run again')
+        raise error.Abort(b'upgrade Mercurial then run again')
 
-    uiprompt(ui, INITIAL_MESSAGE, default='<RETURN>')
+    uiprompt(ui, INITIAL_MESSAGE, default=b'<RETURN>')
 
     with demandimport.deactivated():
         # Mercurial 4.2 moved function from scmutil to rcutil.
@@ -525,80 +526,81 @@ def configwizard(ui, repo, statedir=None, **opts):
     path = configpaths[0] if configpaths else userrcpath()[0]
     cw = configobjwrapper(path)
 
-    if 'hgversion' in runsteps:
+    if b'hgversion' in runsteps:
         if _checkhgversion(ui, hgversion):
             return 1
 
-    if 'username' in runsteps:
+    if b'username' in runsteps:
         _checkusername(ui, cw)
 
-    if 'tweakdefaults' in runsteps:
+    if b'tweakdefaults' in runsteps:
         _checktweakdefaults(ui, cw)
 
-    if 'diff' in runsteps:
+    if b'diff' in runsteps:
         _checkdiffsettings(ui, cw)
 
-    if 'color' in runsteps:
+    if b'color' in runsteps:
         _checkcolor(ui, cw, hgversion)
 
-    if 'pager' in runsteps:
+    if b'pager' in runsteps:
         _checkpager(ui, cw, hgversion)
 
-    if 'curses' in runsteps:
+    if b'curses' in runsteps:
         _checkcurses(ui, cw)
 
-    if 'historyediting' in runsteps:
+    if b'historyediting' in runsteps:
         _checkhistoryediting(ui, cw, hgversion)
 
-    if 'evolve' in runsteps:
+    if b'evolve' in runsteps:
         _checkevolve(ui, cw, hgversion)
 
-    if 'fsmonitor' in runsteps:
+    if b'fsmonitor' in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
 
-    if 'blackbox' in runsteps:
-        _promptnativeextension(ui, cw, 'blackbox',
-                               'Enable logging of commands to help diagnose bugs '
-                               'and performance problems')
+    if b'blackbox' in runsteps:
+        _promptnativeextension(ui, cw, b'blackbox',
+                               b'Enable logging of commands to help diagnose bugs '
+                               b'and performance problems')
 
     if b'shelve' in runsteps:
         _promptnativeextension(ui, cw, b'shelve',
                                b'Enable the shelve feature. Equivalent to git stash')
 
-    if 'security' in runsteps:
+    if b'security' in runsteps:
         _checksecurity(ui, cw, hgversion)
 
-    if 'firefoxtree' in runsteps:
-        _promptvctextension(ui, cw, 'firefoxtree', FIREFOXTREE_INFO)
+    if b'firefoxtree' in runsteps:
+        _promptvctextension(ui, cw, b'firefoxtree', FIREFOXTREE_INFO)
 
-    if 'clang-format' in runsteps:
-        _promptvctextension(ui, cw, 'clang-format', CLANG_FORMAT_INFO)
+    if b'clang-format' in runsteps:
+        _promptvctextension(ui, cw, b'clang-format', CLANG_FORMAT_INFO)
 
-    if 'js-format' in runsteps:
-        _promptvctextension(ui, cw, 'js-format', JS_FORMAT_INFO)
+    if b'js-format' in runsteps:
+        _promptvctextension(ui, cw, b'js-format', JS_FORMAT_INFO)
 
-    if 'format-source' in runsteps:
+
+    if b'format-source' in runsteps:
         _checkformatsource(ui, cw)
 
-    if 'wip' in runsteps:
+    if b'wip' in runsteps:
         _checkwip(ui, cw)
 
-    if 'smartannotate' in runsteps:
+    if b'smartannotate' in runsteps:
         _checksmartannotate(ui, cw)
 
-    if 'codereview' in runsteps:
+    if b'codereview' in runsteps:
         _checkcodereview(ui, cw)
 
-    if 'pushtotry' in runsteps:
-        _promptvctextension(ui, cw, 'push-to-try', PUSHTOTRY_INFO)
+    if b'pushtotry' in runsteps:
+        _promptvctextension(ui, cw, b'push-to-try', PUSHTOTRY_INFO)
 
-    if 'multiplevct' in runsteps:
+    if b'multiplevct' in runsteps:
         _checkmultiplevct(ui, cw)
 
-    if 'configchange' in runsteps:
+    if b'configchange' in runsteps:
         _handleconfigchange(ui, cw)
 
-    if 'permissions' in runsteps:
+    if b'permissions' in runsteps:
         _checkpermissions(ui, cw)
 
     return 0
@@ -610,10 +612,10 @@ def configwizard(ui, repo, statedir=None, **opts):
 # So we handle the error to enable the extension to load and the command
 # to run.
 cwargs = [
-    ('s', 'statedir', '', _('directory to store state')),
+    (b's', b'statedir', b'', _(b'directory to store state')),
 ]
 try:
-    configwizard = command('configwizard', cwargs, _('hg configwizard'),
+    configwizard = command(b'configwizard', cwargs, _(b'hg configwizard'),
                            optionalrepo=True)(configwizard)
 except TypeError:
     from mercurial import commands
@@ -624,13 +626,13 @@ except TypeError:
     # 2. command is None
 
     if command:
-        configwizard = command('configwizard', cwargs, _('hg configwizard'))(configwizard)
-        commands.optionalrepo += ' configwizard'
+        configwizard = command(b'configwizard', cwargs, _(b'hg configwizard'))(configwizard)
+        commands.optionalrepo += b' configwizard'
     else:
-        commands.table['configwizard'] = (
-            configwizard, cwargs, _('hg configwizard')
+        commands.table[b'configwizard'] = (
+            configwizard, cwargs, _(b'hg configwizard')
         )
-        commands.optionalrepo += ' configwizard'
+        commands.optionalrepo += b' configwizard'
 
 
 def _checkhgversion(ui, hgversion):
@@ -638,16 +640,16 @@ def _checkhgversion(ui, hgversion):
         return
 
     ui.warn(LEGACY_MERCURIAL_MESSAGE % util.version())
-    ui.warn('\n')
+    ui.warn(b'\n')
 
     if os.name == 'nt':
-        ui.warn('Please upgrade to the latest MozillaBuild to upgrade '
-                'your Mercurial install.\n\n')
+        ui.warn(b'Please upgrade to the latest MozillaBuild to upgrade '
+                b'your Mercurial install.\n\n')
     else:
-        ui.warn('Please run `mach bootstrap` to upgrade your Mercurial '
-                'install.\n\n')
+        ui.warn(b'Please run `mach bootstrap` to upgrade your Mercurial '
+                b'install.\n\n')
 
-    if uipromptchoice(ui, 'Would you like to continue using an old Mercurial version (Yn)? $$ &Yes $$ &No'):
+    if uipromptchoice(ui, b'Would you like to continue using an old Mercurial version (Yn)? $$ &Yes $$ &No'):
         return 1
 
 
@@ -658,43 +660,43 @@ def uiprompt(ui, msg, default=None):
     may be hard to read.
     """
     lines = msg.splitlines(True)
-    ui.write(''.join(lines[0:-1]))
+    ui.write(b''.join(lines[0:-1]))
     return ui.prompt(lines[-1], default=default)
 
 
 def uipromptchoice(ui, msg, default=0):
     lines = msg.splitlines(True)
-    ui.write(''.join(lines[0:-1]))
+    ui.write(b''.join(lines[0:-1]))
     return ui.promptchoice(lines[-1], default=default)
 
 
 def _checkusername(ui, cw):
-    if ui.config('ui', 'username'):
+    if ui.config(b'ui', b'username'):
         return
 
     ui.write(MISSING_USERNAME)
 
     name, email = None, None
 
-    name = ui.prompt('What is your name?', '')
+    name = ui.prompt(b'What is your name?', b'')
     if name:
-        email = ui.prompt('What is your e-mail address?', '')
+        email = ui.prompt(b'What is your e-mail address?', b'')
 
     if name and email:
-        username = '%s <%s>' % (name, email)
+        username = b'%s <%s>' % (name, email)
         if 'ui' not in cw.c:
             cw.c['ui'] = {}
-        cw.c['ui']['username'] = username.strip()
+        cw.c['ui']['username'] = pycompat.sysstr(username.strip())
 
-        ui.write('setting ui.username=%s\n\n' % username)
+        ui.write(b'setting ui.username=%s\n\n' % username)
     else:
-        ui.warn('Unable to set username; You will be unable to author '
-                'commits\n\n')
+        ui.warn(b'Unable to set username; You will be unable to author '
+                b'commits\n\n')
 
 
 def _checkdiffsettings(ui, cw):
-    git = ui.configbool('diff', 'git')
-    showfunc = ui.configbool('diff', 'showfunc')
+    git = ui.configbool(b'diff', b'git')
+    showfunc = ui.configbool(b'diff', b'showfunc')
 
     if git and showfunc:
         return
@@ -708,7 +710,7 @@ def _checkdiffsettings(ui, cw):
 
 
 def _checktweakdefaults(ui, cw):
-    if ui.configbool('ui', 'tweakdefaults'):
+    if ui.configbool(b'ui', b'tweakdefaults'):
         return
 
     if not uipromptchoice(ui, TWEAKDEFAULTS_INFO):
@@ -724,14 +726,14 @@ def _checktweakdefaults(ui, cw):
 
 
 def _promptnativeextension(ui, cw, ext, msg):
-    if ui.hasconfig('extensions', ext):
+    if ui.hasconfig(b'extensions', ext):
         return
 
-    if not uipromptchoice(ui, '%s (Yn) $$ &Yes $$ &No' % msg):
-        if 'extensions' not in cw.c:
+    if not uipromptchoice(ui, b'%s (Yn) $$ &Yes $$ &No' % msg):
+        if b'extensions' not in cw.c:
             cw.c['extensions'] = {}
 
-        cw.c['extensions'][ext] = ''
+        cw.c['extensions'][pycompat.sysstr(ext)] = ''
 
 
 def _vctextpath(ext, path=None):
@@ -752,10 +754,10 @@ def _enableext(cw, name, value):
 
 
 def _promptvctextension(ui, cw, ext, msg):
-    if ui.hasconfig('extensions', ext):
+    if ui.hasconfig(b'extensions', ext):
         return
 
-    ext_path = _vctextpath(ext)
+    ext_path = _vctextpath(pycompat.sysstr(ext))
 
     # Verify the extension loads before prompting to enable it. This is
     # done out of paranoia.
@@ -771,13 +773,13 @@ def _promptvctextension(ui, cw, ext, msg):
                                       '--config', 'extensions.testmodule=%s' % ext_path,
                                       '--config', 'ui.traceback=true'],
                                      stderr=subprocess.STDOUT)
-    if 'Traceback' in result:
+    if b'Traceback' in result:
         return
 
-    if uipromptchoice(ui, '%s (Yn) $$ &Yes $$ &No' % msg):
+    if uipromptchoice(ui, b'%s (Yn) $$ &Yes $$ &No' % msg):
         return
 
-    _enableext(cw, ext, ext_path)
+    _enableext(cw, pycompat.sysstr(ext), ext_path)
 
 
 def _checkcolor(ui, cw, hg_version):
@@ -789,12 +791,12 @@ def _checkcolor(ui, cw, hg_version):
     if color_builtin:
         ext = cw.c.get('extensions', {})
         if 'color' in ext:
-            ui.write('Removing extensions.color because color is enabled '
-                     'by default in Mercurial 4.2+\n')
+            ui.write(b'Removing extensions.color because color is enabled '
+                     b'by default in Mercurial 4.2+\n')
             del ext['color']
     else:
-        _promptnativeextension(ui, cw, 'color',
-                               'Enable color output to your terminal')
+        _promptnativeextension(ui, cw, b'color',
+                               b'Enable color output to your terminal')
 
 
 def _checkformatsource(ui, cw):
@@ -806,7 +808,7 @@ def _checkformatsource(ui, cw):
             ui.write(FORMATSOURCE_DISABLE_INFO)
             del ext['format-source']
     else:
-        _promptvctextension(ui, cw, 'format-source', FORMATSOURCE_INFO)
+        _promptvctextension(ui, cw, b'format-source', FORMATSOURCE_INFO)
 
 
 def _checkpager(ui, cw, hg_version):
@@ -824,28 +826,28 @@ def _checkpager(ui, cw, hg_version):
     if pager_builtin:
         ext = cw.c.get('extensions', {})
         if 'pager' in ext:
-            ui.write('Removing extensions.pager because pager is built-in in '
-                     'Mercurial 4.2+\n')
+            ui.write(b'Removing extensions.pager because pager is built-in in '
+                     b'Mercurial 4.2+\n')
             del ext['pager']
 
         for k in list(cw.c.get('pager', {})):
             if not k.startswith('attend'):
                 continue
 
-            ui.write('Removing pager.%s because it is no longer necessary in '
-                     'Mercurial 4.2+\n' % k)
+            ui.write(b'Removing pager.%s because it is no longer necessary in '
+                     b'Mercurial 4.2+\n' % pycompat.bytestr(k))
             del cw.c['pager'][k]
     else:
-        haveext = ui.hasconfig('extensions', 'pager')
+        haveext = ui.hasconfig(b'extensions', b'pager')
         attends = set([
-            'help',
-            'incoming',
-            'outgoing',
-            'status',
+            b'help',
+            b'incoming',
+            b'outgoing',
+            b'status',
         ])
 
-        haveattends = all(ui.hasconfig('pager', 'attend-%s' % a) for a in attends)
-        haveconfig = ui.hasconfig('pager', 'pager')
+        haveattends = all(ui.hasconfig(b'pager', b'attend-%s' % a) for a in attends)
+        haveconfig = ui.hasconfig(b'pager', b'pager')
 
         if haveext and haveattends and haveconfig:
             return
@@ -883,8 +885,8 @@ def _checkpager(ui, cw, hg_version):
             cw.c['pager']['pager'] = value
 
         for a in sorted(attends):
-            if not ui.hasconfig('pager', 'attend-%s' % a):
-                cw.c['pager']['attend-%s' % a] = 'true'
+            if not ui.hasconfig(b'pager', b'attend-%s' % a):
+                cw.c['pager']['attend-%s' % pycompat.sysstr(a)] = 'true'
 
 
 def _try_curses_import():
@@ -903,7 +905,7 @@ def _try_curses_import():
 
 
 def _checkcurses(ui, cw):
-    if ui.hasconfig('ui', 'interface'):
+    if ui.hasconfig(b'ui', b'interface'):
         return
 
     # curses isn't available on all platforms. Don't prompt if not
@@ -924,16 +926,16 @@ def _activate_inmemory_rebase(cw):
     cw.c['rebase']['experimental.inmemory'] = 'yes'
 
 def _checkhistoryediting(ui, cw, hg_version):
-    extensions = {'histedit', 'rebase'}
+    extensions = {b'histedit', b'rebase'}
 
     if hg_version >= (4, 8, 0):
-        extensions.add('absorb')
+        extensions.add(b'absorb')
 
     # Turn on in-memory rebase for those who have rebase on already
     if ui.hasconfig(b'extensions', b'rebase'):
         _activate_inmemory_rebase(cw)
 
-    if all(ui.hasconfig('extensions', e) for e in extensions):
+    if all(ui.hasconfig(b'extensions', e) for e in extensions):
         return
 
     if uipromptchoice(ui, HISTORY_EDITING_INFO):
@@ -943,7 +945,7 @@ def _checkhistoryediting(ui, cw, hg_version):
         cw.c['extensions'] = {}
 
     for ext in sorted(extensions):
-        cw.c['extensions'][ext] = ''
+        cw.c['extensions'][pycompat.sysstr(ext)] = ''
 
     # Turn on in-memory rebase if a user wants rebase
     _activate_inmemory_rebase(cw)
@@ -954,24 +956,25 @@ def _checkevolve(ui, cw, hg_version):
         ui.warn(EVOLVE_INCOMPATIBLE)
         return
 
-    remote_evolve_path = 'https://www.mercurial-scm.org/repo/evolve/'
+    remote_evolve_path = b'https://www.mercurial-scm.org/repo/evolve/'
     # Install to the same dir as v-c-t, unless the mozbuild directory path is passed (testing)
-    evolve_clone_dir = ui.config('mozilla', 'mozbuild_state_path', _vcthome())
+    evolve_clone_dir = ui.config(b'mozilla', b'mozbuild_state_path', _vcthome())
 
-    local_evolve_path = '{evolve_clone_dir}/evolve'.format(evolve_clone_dir=evolve_clone_dir)
-    evolve_config_value = '{evolve_path}/hgext3rd/evolve'.format(evolve_path=local_evolve_path)
+    local_evolve_path = b'%(evolve_clone_dir)s/evolve' % {b'evolve_clone_dir': evolve_clone_dir}
+    evolve_config_value = '%(evolve_path)s/hgext3rd/evolve' % \
+                          {'evolve_path': pycompat.sysstr(local_evolve_path)}
 
     # If evolve is not installed, install it
-    if not ui.hasconfig('extensions', 'evolve'):
+    if not ui.hasconfig(b'extensions', b'evolve'):
         if uipromptchoice(ui, EVOLVE_INFO_WARNING):
             return
 
         try:
             # Clone the evolve extension and enable
-            hg.clone(ui, {}, remote_evolve_path, branch=('stable',), dest=local_evolve_path)
+            hg.clone(ui, {}, remote_evolve_path, branch=(b'stable',), dest=local_evolve_path)
             _enableext(cw, 'evolve', evolve_config_value)
 
-            ui.write('Evolve was downloaded successfully.\n')
+            ui.write(b'Evolve was downloaded successfully.\n')
 
         except error.Abort as hg_err:
             ui.write(str(hg_err))
@@ -979,18 +982,18 @@ def _checkevolve(ui, cw, hg_version):
 
     # If evolve is installed and managed by this wizard,
     # update it via pull/update
-    elif ui.config('extensions', 'evolve') == evolve_config_value:
-        if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT.format(evolve_dir=local_evolve_path)):
+    elif ui.config(b'extensions', b'evolve') == evolve_config_value:
+        if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT % {b'evolve_dir': local_evolve_path}):
             return
 
         try:
             local_evolve_repo = hg.repository(ui, local_evolve_path)
 
             # Pull the latest stable, update to tip
-            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=('stable',))
-            hgupdate(ui, local_evolve_repo, rev='stable')
+            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
+            hgupdate(ui, local_evolve_repo, rev=b'stable')
 
-            ui.write('Evolve was updated successfully.\n')
+            ui.write(b'Evolve was updated successfully.\n')
 
         except error.Abort as hg_err:
             ui.write(EVOLVE_CLONE_ERROR)
@@ -1015,32 +1018,32 @@ def _checkfsmonitor(ui, cw, hgversion):
                                 stderr=subprocess.STDOUT)
     except Exception:
         ui.write(WATCHMAN_NOT_FOUND)
-        ui.write('\n')
+        ui.write(b'\n')
         return
 
-    if ui.hasconfig('extensions', 'fsmonitor'):
+    if ui.hasconfig(b'extensions', 'fsmonitor'):
         ext = cw.c.get('extensions', {})
         if any([ext.pop('hgwatchman', False), ext.pop('watchman', False)]):
-            ui.write('Removing extensions.hgwatchman because fsmonitor is installed\n')
+            ui.write(b'Removing extensions.hgwatchman because fsmonitor is installed\n')
 
         return
 
     # Mercurial 3.8+ has fsmonitor built-in.
     if hgversion >= (3, 8, 0):
-        _promptnativeextension(ui, cw, 'fsmonitor', FSMONITOR_INFO)
+        _promptnativeextension(ui, cw, b'fsmonitor', FSMONITOR_INFO)
     else:
         ui.write(FSMONITOR_NOT_AVAILABLE)
 
 
 def _checkwip(ui, cw):
-    havewip_alias = ui.hasconfig('alias', 'wip')
-    havewip_revset = ui.hasconfig('revsetalias', 'wip')
+    havewip_alias = ui.hasconfig(b'alias', b'wip')
+    havewip_revset = ui.hasconfig(b'revsetalias', b'wip')
 
     hg_version = util.versiontuple(n=2)
 
     # If the user has the `wip` revset alias, they are on hg46+ and have the old alias
     # (ie with `orphan` expression instead of `unstable`), we upgrade with a notice
-    if havewip_revset and hg_version >= (4, 6) and 'unstable' in ui.config('revsetalias', 'wip'):
+    if havewip_revset and hg_version >= (4, 6) and b'unstable' in ui.config(b'revsetalias', b'wip'):
         ui.write(WIP_UPDATED_EXPRESSION)
     elif not havewip_alias and uipromptchoice(ui, WIP_INFO):
         return
@@ -1065,7 +1068,7 @@ def _checkwip(ui, cw):
             ') and (not obsolete() or %s()^) '
             'and not closed()') % unstable
 
-    if ui.hasconfig('extensions', 'firefoxtree') or 'firefoxtree' in cw.c.get('extensions', {}):
+    if ui.hasconfig(b'extensions', b'firefoxtree') or 'firefoxtree' in cw.c.get('extensions', {}):
         wiprevset += ' and not (fxheads() - date(-90))'
 
     cw.c['revsetalias']['wip'] = wiprevset
@@ -1121,7 +1124,7 @@ def _set_color(cw, name, value):
 
 
 def _checksmartannotate(ui, cw):
-    havesmartannotate_alias = ui.hasconfig('alias', 'smart-annotate')
+    havesmartannotate_alias = ui.hasconfig(b'alias', b'smart-annotate')
 
     if not havesmartannotate_alias and uipromptchoice(ui, SMARTANNOTATE_INFO):
         return
@@ -1206,7 +1209,7 @@ def _checksecurity(ui, cw, hgversion):
 
 
 def _checkcodereview(ui, cw):
-    if ui.promptchoice('Will you be submitting commits to Mozilla (Yn)? $$ &Yes $$ &No'):
+    if ui.promptchoice(b'Will you be submitting commits to Mozilla (Yn)? $$ &Yes $$ &No'):
         return
 
     ui.write(CODEREVIEW_INFO)
@@ -1218,15 +1221,15 @@ def _checkmultiplevct(ui, cw):
     # dependencies via __file__. Files from different revisions could lead
     # to unexpected environments and break things.
     seenvct = set()
-    for k, v in ui.configitems('extensions'):
+    for k, v in ui.configitems(b'extensions'):
         # mercurial.extensions.loadpath() does variable and user expansion.
         # We need to match behavior.
         v = os.path.realpath(util.normpath(util.expandpath(v)))
 
-        if 'version-control-tools' not in v:
+        if b'version-control-tools' not in v:
             continue
-        i = v.index('version-control-tools')
-        vct = v[0:i + len('version-control-tools')]
+        i = v.index(b'version-control-tools')
+        vct = v[0:i + len(b'version-control-tools')]
         seenvct.add(vct)
 
     if len(seenvct) > 1:
@@ -1235,31 +1238,31 @@ def _checkmultiplevct(ui, cw):
 
 def _handleconfigchange(ui, cw):
     # Obtain the old and new content so we can show a diff.
-    newbuf = io.BytesIO()
+    newbuf = pycompat.bytesio()
     cw.write(newbuf)
     newbuf.seek(0)
-    newlines = [l.rstrip() for l in newbuf.readlines()]
+    newlines = [pycompat.sysstr(l.rstrip()) for l in newbuf.readlines()]
     oldlines = []
     if os.path.exists(cw.path):
         with open(cw.path, 'rb') as fh:
-            oldlines = [l.rstrip() for l in fh.readlines()]
+            oldlines = [pycompat.sysstr(l.rstrip()) for l in fh.readlines()]
 
     diff = list(difflib.unified_diff(oldlines, newlines,
                                      'hgrc.old', 'hgrc.new',
                                      lineterm=''))
 
     if len(diff):
-        ui.write('Your config file needs updating.\n')
-        if not ui.promptchoice('Would you like to see a diff of the changes first (Yn)? $$ &Yes $$ &No'):
+        ui.write(b'Your config file needs updating.\n')
+        if not ui.promptchoice(b'Would you like to see a diff of the changes first (Yn)? $$ &Yes $$ &No'):
             for line in diff:
-                ui.write('%s\n' % line)
-            ui.write('\n')
+                ui.write(b'%s\n' % pycompat.bytestr(line))
+            ui.write(b'\n')
 
-        if not ui.promptchoice('Write changes to hgrc file (Yn)? $$ &Yes $$ &No'):
+        if not ui.promptchoice(b'Write changes to hgrc file (Yn)? $$ &Yes $$ &No'):
             with open(cw.path, 'wb') as fh:
                 fh.write(newbuf.getvalue())
         else:
-            ui.write('config changes not written; we would have written the following:\n')
+            ui.write(b'config changes not written; we would have written the following:\n')
             ui.write(newbuf.getvalue())
             return 1
 
@@ -1278,7 +1281,7 @@ def _checkpermissions(ui, cw):
         # We don't care about sticky and set UID bits because
         # this is a regular file.
         mode = mode & stat.S_IRWXU
-        ui.write('Changing permissions of %s\n' % cw.path)
+        ui.write(b'Changing permissions of %s\n' % cw.path)
         os.chmod(cw.path, mode)
 
 
@@ -1293,7 +1296,7 @@ class configobjwrapper(object):
     """
     def __init__(self, path):
         self.path = path
-        self._random = str(uuid.uuid4())
+        self._random = pycompat.bytestr(uuid.uuid4())
 
         lines = []
 
@@ -1303,13 +1306,13 @@ class configobjwrapper(object):
                     # Mercurial has special syntax to include other files.
                     # ConfigObj doesn't recognize it. Normalize on read and
                     # restore on write to preserve it.
-                    if line.startswith('%include'):
-                        line = '#%s %s' % (self._random, line)
+                    if line.startswith(b'%include'):
+                        line = b'#%s %s' % (self._random, line)
 
-                    if line.startswith(';'):
-                        raise error.Abort('semicolon (;) comments in config '
-                                          'files not supported',
-                                          hint='use # for comments')
+                    if line.startswith(b';'):
+                        raise error.Abort(b'semicolon (;) comments in config '
+                                          b'files not supported',
+                                          hint=b'use # for comments')
 
                     lines.append(line)
 
@@ -1319,10 +1322,10 @@ class configobjwrapper(object):
     def write(self, fh):
         lines = self.c.write()
         for line in lines:
-            if line.startswith('#%s ' % self._random):
+            if line.startswith(b'#%s ' % self._random):
                 line = line[2 + len(self._random):]
 
-            fh.write('%s\n' % line)
+            fh.write(b'%s\n' % line)
 
 
 # Ancient versions of Mercurial lack util.safehasattr(). So implement it here.
@@ -1333,7 +1336,7 @@ def safehasattr(thing, attr):
 
 def uisetup(ui):
     # hasconfig() was added in 3.7. Backport until we require 3.7.
-    if safehasattr(ui, 'hasconfig'):
+    if safehasattr(ui, b'hasconfig'):
         return
 
     class configui(ui.__class__):
@@ -1349,14 +1352,14 @@ def extsetup(ui):
     def versiontuple(v=None, n=4):
         if not v:
             v = util.version()
-        parts = v.split('+', 1)
+        parts = v.split(b'+', 1)
         if len(parts) == 1:
             vparts, extra = parts[0], None
         else:
             vparts, extra = parts
 
         vints = []
-        for i in vparts.split('.'):
+        for i in vparts.split(b'.'):
             try:
                 vints.append(int(i))
             except ValueError:
@@ -1372,5 +1375,5 @@ def extsetup(ui):
         if n == 4:
             return (vints[0], vints[1], vints[2], extra)
 
-    if not safehasattr(util, 'versiontuple'):
+    if not safehasattr(util, b'versiontuple'):
         util.versiontuple = versiontuple
