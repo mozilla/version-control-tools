@@ -63,7 +63,7 @@ def get_changed_files(repo, cs1, cs2):
 
     def get_next(lines):
         try:
-            return lines.next()
+            return next(lines)
         except StopIteration:
             return None
 
