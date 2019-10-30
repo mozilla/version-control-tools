@@ -42,16 +42,17 @@ def hook(ui, repo, node, source=None, **kwargs):
         b'"graft" can be used to rewrite multiple changesets to have a different user value\n'
         b'use the "--currentuser" or "--user" arguments to "graft" to specify an explicit user\n'
         b'\n'
-        b'`hg up {parent} && hg graft --currentuser -r {first}::`\n'
+        b'`hg up %(parent)s && hg graft --currentuser -r %(first)s::`\n'
         b'will rewrite all pushed changesets and their descendants to the current user value\n'
         b'\n'
-        b"`hg up {parent} && hg graft --user 'Some User <someone@example.com>' -r {first}::{tip}`\n"
+        b"`hg up %(parent)s && hg graft --user 'Some User <someone@example.com>' -r %(first)s::%(tip)s`\n"
         b'will rewrite just the pushed changesets to an explicit username\n'
-        .format(
-            parent=short(repo[node].p1().node()),
-            first=short(repo[node].node()),
-            tip=short(repo[b'tip'].node())
-        ))
+        % {
+            b'parent': short(repo[node].p1().node()),
+            b'first': short(repo[node].node()),
+            b'tip': short(repo[b'tip'].node()),
+        }
+    )
 
     # Make non-fatal on l10n repos for now because their tools are known to not
     # use proper values.
