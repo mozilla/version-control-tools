@@ -1,4 +1,16 @@
+import sys
 from setuptools import setup, find_packages
+
+install_requires = [
+    'cbor2',
+    'kafka-python',
+    'Mercurial',
+    'python-hglib',
+]
+
+# Only install `futures` backport on Python 2
+if sys.version_info[0] == 2:
+    install_requires.append('futures')
 
 setup(
     name='vcsreplicator',
@@ -28,11 +40,5 @@ setup(
             'vcsreplicator-bootstrap-hgweb=vcsreplicator.bootstrap:hgweb',
         ],
     },
-    install_requires=[
-        'cbor2',
-        'futures',
-        'kafka-python',
-        'Mercurial',
-        'python-hglib',
-    ],
+    install_requires=install_requires,
 )
