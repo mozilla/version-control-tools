@@ -100,7 +100,7 @@ Well formed servo fixup commit
   $ cat >> .hg/hgrc << EOF
   > [extensions]
   > mq=
-  > commitextras=$TESTDIR/hghooks/tests/commitextras.py
+  > commitextras=
   > EOF
 
   $ hg strip 'roots(outgoing())' >/dev/null
