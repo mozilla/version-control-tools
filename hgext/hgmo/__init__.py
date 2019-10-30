@@ -651,8 +651,20 @@ def stream_clone_cmp(a, b):
     return 0
 
 
+# TRACKING py3 - `cmp` sorting function deprecated, use `key`
+if pycompat.ispy3:
+    import functools
+    sorted_kwargs = {
+        'key': functools.cmp_to_key(stream_clone_cmp),
+    }
+else:
+    sorted_kwargs = {
+        'cmp': stream_clone_cmp,
+    }
+
+
 def filter_manifest_for_region(manifest, region):
-    """Filter a clonebundles manifest by cloud region
+    """Filter a clonebundles manifest by region
 
     The returned manifest will be sorted to prioritize clone bundles
     for the specified AWS region.
@@ -664,7 +676,7 @@ def filter_manifest_for_region(manifest, region):
 
     # We prioritize stream clone bundles to AWS clients because they are
     # the fastest way to clone and we want our automation to be fast.
-    filtered = sorted(filtered, cmp=stream_clone_cmp)
+    filtered = sorted(filtered, **sorted_kwargs)
 
     # We got a match. Write out the filtered manifest (with a trailing newline).
     filtered.append(b'')
@@ -765,7 +777,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
-                    origlines = sorted(manifest.data.splitlines(), cmp=stream_clone_cmp)
+                    origlines = sorted(manifest.data.splitlines(), **sorted_kwargs)
                     origlines.append(b'')
                     return b'\n'.join(origlines)
 
