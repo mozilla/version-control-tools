@@ -159,11 +159,13 @@ class Config(object):
         # Repo passes through filter if matching an include rule
         # and not matching an exclude rule
         if includematch and not excludematch:
-            return RepoFilterResult(True, includematch.groupdict().keys()[0])
+            matchkeys = iter(includematch.groupdict().keys())
+            return RepoFilterResult(True, next(matchkeys))
 
         # Return specific exclude rule if there was a match
         if excludematch:
-            return RepoFilterResult(False, excludematch.groupdict().keys()[0])
+            matchkeys = iter(excludematch.groupdict().keys())
+            return RepoFilterResult(False, next(matchkeys))
 
         # Use "noinclude" if we didn't get a match for an include rule
         return RepoFilterResult(False, 'noinclude')
