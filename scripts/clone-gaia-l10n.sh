@@ -58,8 +58,7 @@ EOF
     /var/hg/version-control-tools/scripts/repo-permissions $loc hg scm_l10n wwr || ec=$?
     pushd ${loc} >/dev/null
     echo "Doing initial push to webheads for ${loc}"
-    /var/hg/version-control-tools/scripts/push-repo.sh || ec=$?
-    sudo -u hg /usr/local/bin/repo-push.sh ${loc} --hgrc
+    sudo -u hg $venv/bin/hg replicatesync
     popd >/dev/null
     test ${ec} -eq 0 ||
         die "Can't do basic setup '${loc}' (${ec})"

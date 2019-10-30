@@ -193,9 +193,6 @@
         group=root
         mode=0644
 
-- name: sudoers policy for repo-push is in place
-  copy: src=repo-push.sudoers dest=/etc/sudoers.d/repo-push
-
 - name: global Mercurial configs are in place
   template: src={{ item }}.j2
             dest=/etc/mercurial/{{ item }}
@@ -215,13 +212,6 @@
     owner: root
     group: root
     mode: 0644
-
-- name: install repo-push script
-  copy: src={{ vct }}/scripts/repo-push.sh
-        dest=/usr/local/bin/repo-push.sh
-        owner=root
-        group=root
-        mode=0755
 
 - name: ensure bundles directory exists
   file: path=/repo/hg/bundles

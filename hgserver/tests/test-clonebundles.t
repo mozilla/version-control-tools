@@ -241,6 +241,7 @@ The copyfrom=x field copies bundles from another repo
   $ cd ..
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload 'try copyfrom=mozilla-central'
+  wrote synchronization message into replication log
   copying /repo/hg/mozilla/mozilla-central/.hg/clonebundles.manifest -> /repo/hg/mozilla/try/.hg/clonebundles.manifest
   ignoring repo try in index because no gzip bundle
 

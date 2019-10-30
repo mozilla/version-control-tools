@@ -22,7 +22,6 @@ from google.cloud import storage
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
 HG = '/var/hg/venv_bundles/bin/hg'
-PUSH_REPO = '/var/hg/version-control-tools/scripts/push-repo.sh'
 
 # The types of bundles to generate.
 #
@@ -260,6 +259,8 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     ``zstd_max`` denotes whether to generate zstd bundles with maximum
     compression.
     """
+    assert not os.path.isabs(repo)
+
     # Copy manifest files from the source repository listed. Don't return
     # anything because we don't need to list bundles since this repo isn't
     # canonical.
@@ -283,11 +284,10 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         shutil.copy2(source, dest)
 
         # Replicate manifest to mirrors.
-        subprocess.check_call([PUSH_REPO], cwd=dest_repo)
+        subprocess.check_call([HG, 'replicatesync'], cwd=dest_repo)
 
         return {}
 
-    assert not os.path.isabs(repo)
     repo_full = os.path.join('/repo/hg/mozilla', repo)
 
     hg_stat = os.stat(os.path.join(repo_full, '.hg'))

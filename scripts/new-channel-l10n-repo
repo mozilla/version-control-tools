@@ -34,8 +34,7 @@ EOF
     log " + Setting up ownership"
     /var/hg/version-control-tools/scripts/repo-permissions $repo $repo_owner $repo_group wwr
     log " + Updating web heads"
-    (cd $repo && /var/hg/version-control-tools/scripts/push-repo.sh)
-    (cd $repo && sudo -u hg /usr/local/bin/repo-push.sh $repo --hgrc)
+    (cd $repo && $venv/bin/hg replicatesync)
 }
 
 # Clone the given repository to the given destination

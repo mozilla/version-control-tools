@@ -514,10 +514,8 @@ def set_repo_obsolescence(repo_name, enabled):
 
 
 def do_delete(repo_dir, repo_name):
-    run_command('rm -rf %s/users/%s/%s' % (DOC_ROOT, repo_dir, repo_name))
-    # TODO implement vcsreplicator support for deleting repos
-    run_command('/usr/bin/sudo -u hg /usr/local/bin/repo-push.sh -d -e users/%s/%s' %
-                (repo_dir, repo_name))
+    repo_path = '%s/users/%s/%s' % (DOC_ROOT, repo_dir, repo_name)
+    run_command('nohup %s -R %s replicatedelete' % (HG, repo_path))
     purge_log = open('/tmp/pushlog_purge.%s' % os.getpid(), "a")
     purge_log.write('echo users/%s/%s\n' % (repo_dir, repo_name))
     purge_log.close()
