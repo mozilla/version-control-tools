@@ -1,6 +1,10 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+from mercurial import (
+    pycompat,
+)
+
 from mercurial.hgweb import (
     hgweb_mod,
 )
@@ -14,9 +18,9 @@ def extsetup(ui):
             else:
                 req, repo = args
 
-            bytelimit = repo.ui.configint('badserver', 'bytelimit')
+            bytelimit = repo.ui.configint(b'badserver', b'bytelimit')
 
-            untilgoodcount = repo.vfs.tryread('badserveruntilgood')
+            untilgoodcount = repo.vfs.tryread(b'badserveruntilgood')
             if untilgoodcount:
                 untilgoodcount = int(untilgoodcount)
 
@@ -24,7 +28,7 @@ def extsetup(ui):
             # comparing an int type instead of a string. The first check could
             # be true for "0" but this check would be false for int(0).
             if untilgoodcount:
-                repo.vfs.write('badserveruntilgood', str(untilgoodcount - 1))
+                repo.vfs.write(b'badserveruntilgood', pycompat.bytestr(untilgoodcount - 1))
 
             bytecount = 0
             for r in super(droppinghgweb, self)._runwsgi(*args):
