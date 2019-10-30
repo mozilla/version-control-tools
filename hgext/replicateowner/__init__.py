@@ -22,11 +22,11 @@ from mozhg.util import (
     repo_owner,
 )
 
-minimumhgversion = '4.6'
-testedwith = '4.6 4.7 4.8 4.9 5.0'
+minimumhgversion = b'4.6'
+testedwith = b'4.6 4.7 4.8 4.9 5.0'
 
 
-@wireprotov1server.wireprotocommand('mozowner', '', permission='pull')
+@wireprotov1server.wireprotocommand(b'mozowner', b'', permission=b'pull')
 def moz_owner_command(repo, proto):
     """Obtain the group owner of the repository."""
     return repo_owner(repo)
@@ -34,36 +34,36 @@ def moz_owner_command(repo, proto):
 
 def _capabilities(orig, *args, **kwargs):
     caps = orig(*args, **kwargs)
-    caps.append('moz-owner')
+    caps.append(b'moz-owner')
     return caps
 
 
 class sshv1peer(sshpeer.sshv1peer):
     def mozowner(self):
-        self.requirecap('moz-owner', _('moz-owner'))
-        return self._call('mozowner')
+        self.requirecap(b'moz-owner', _('moz-owner'))
+        return self._call(b'mozowner')
 
 
 def exchange_pull_owner(orig, pullop):
     res = orig(pullop)
 
-    if ('moz-owner' in pullop.stepsdone
-        or not pullop.remote.capable('moz-owner')):
+    if (b'moz-owner' in pullop.stepsdone
+        or not pullop.remote.capable(b'moz-owner')):
         return res
 
-    pullop.stepsdone.add('moz-owner')
+    pullop.stepsdone.add(b'moz-owner')
 
     group = pullop.remote.mozowner()
 
-    existing = pullop.repo.vfs.tryread('moz-owner')
-    if existing != group + '\n':
-        pullop.repo.ui.write('updating moz-owner file\n')
-        with pullop.repo.vfs('moz-owner', 'wb', atomictemp=True) as fh:
-            fh.write(group + '\n')
+    existing = pullop.repo.vfs.tryread(b'moz-owner')
+    if existing != group + b'\n':
+        pullop.repo.ui.write(b'updating moz-owner file\n')
+        with pullop.repo.vfs(b'moz-owner', b'wb', atomictemp=True) as fh:
+            fh.write(group + b'\n')
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireprotov1server, '_capabilities', _capabilities)
-    extensions.wrapfunction(exchange, '_pullobsolete', exchange_pull_owner)
+    extensions.wrapfunction(wireprotov1server, b'_capabilities', _capabilities)
+    extensions.wrapfunction(exchange, b'_pullobsolete', exchange_pull_owner)
 
     sshpeer.sshv1peer = sshv1peer
