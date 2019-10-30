@@ -22,13 +22,16 @@ from .repository import (
 class ChangeTracker(object):
     """Data store for tracking changes and bugs and repository events."""
 
-    def __init__(self, path):
+    def __init__(self, path, bytestype=bytes):
         self.path = path
         self.created = False
         if not os.path.exists(path):
             self.created = True
 
-        self._db = sqlite3.connect(path)
+        self._db = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES)
+
+        # Preserve TEXT data as bytes.
+        self._db.text_factory = bytestype
 
         # We don't care about data loss because all data can be reconstructed
         # relatively easily.
