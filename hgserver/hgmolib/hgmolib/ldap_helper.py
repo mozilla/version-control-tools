@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from __future__ import print_function
+
 import json
 import sys
 import datetime
@@ -26,7 +28,8 @@ def ldap_connect(ldap_url):
         ldap_conn.simple_bind_s(settings['username'], settings['password'])
         return ldap_conn
     except Exception:
-        print >>sys.stderr, "Could not connect to the LDAP server at %s" % ldap_url
+        print("Could not connect to the LDAP server at %s" % ldap_url,
+              file=sys.stderr)
         return None
 
 
@@ -39,18 +42,18 @@ def get_ldap_attribute(mail, attr, conn_string):
 
     result = ldap_conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE, '(mail=' + mail + ')', [attr])
     if len(result) > 1:
-        print >>sys.stderr, 'More than one match found'
+        print('More than one match found', file=sys.stderr)
         ldap_conn.unbind_s()
         return False
     elif len(result) == 0:
-        print >>sys.stderr, 'No matches found'
+        print('No matches found', file=sys.stderr)
         ldap_conn.unbind_s()
         return False
     else:
         if attr in result[0][1]:
             attr_val = result[0][1][attr][0]
             ldap_conn.unbind_s()
-            return attr_val
+            return attr_val.decode('ascii')
         else:
             ldap_conn.unbind_s()
             return False
@@ -71,22 +74,21 @@ def update_access_date(mail, attr, value, conn_string_ro,
         return
 
     dn, old_entry = results[0]
-
     # Only update attribute for accounts belonging to the hgAccount object
     # class.
-    if 'hgAccount' not in old_entry['objectClass']:
+    if b'hgAccount' not in old_entry['objectClass']:
         return
 
     now = datetime.datetime.utcnow()
     yesterday = now - datetime.timedelta(days=1)
 
     try:
-        last_access = datetime.datetime.strptime(old_entry[attr][0],
+        last_access = datetime.datetime.strptime(old_entry[attr.encode('ascii')][0],
                                                  '%Y%m%d%H%M%S.%fZ')
 
     # Old values don't have partial second time.
     except ValueError:
-        last_access = datetime.datetime.strptime(old_entry[attr][0],
+        last_access = datetime.datetime.strptime(old_entry[attr.encode('ascii')][0],
                                                  '%Y%m%d%H%M%SZ')
     # Attribute not yet set.
     except KeyError:
@@ -94,7 +96,7 @@ def update_access_date(mail, attr, value, conn_string_ro,
         last_access = now - datetime.timedelta(days=7300)
 
     if last_access < yesterday:
-        ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value)])
+        ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value.encode('ascii'))])
 
 
 def get_user_dn_by_mail(conn, ldap_basedn, email):
@@ -124,7 +126,7 @@ def get_scm_groups(mail):
     groups = set()
     for dn, attrs in result:
         for group in attrs['cn']:
-            groups.add(group)
+            groups.add(group.decode('ascii'))
 
     return groups
 
@@ -145,6 +147,6 @@ def get_active_scm_groups(mail):
     groups = set()
     for dn, attrs in result:
         for group in attrs['cn']:
-            groups.add(group)
+            groups.add(group.decode('ascii'))
 
     return groups

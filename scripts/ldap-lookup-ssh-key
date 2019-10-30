@@ -15,8 +15,8 @@ import ldap
 
 
 SETTINGS_PATH = '/etc/mercurial/ldap.json'
-UID_ATTRIBUTE = b'mail'
-SSH_KEY_ATTRIBUTE = b'sshPublicKey'
+UID_ATTRIBUTE = 'mail'
+SSH_KEY_ATTRIBUTE = 'sshPublicKey'
 
 def main(user):
     with open(SETTINGS_PATH, 'rb') as fh:
@@ -27,10 +27,11 @@ def main(user):
     if settings.get('starttls', True):
         conn.start_tls_s()
 
-    conn.simple_bind_s(settings['username'], settings['password'])
+    conn.simple_bind_s(settings['username'],
+                       settings['password'])
 
-    result = conn.search_s(b'dc=mozilla', ldap.SCOPE_SUBTREE,
-                           b'(%s=%s)' % (UID_ATTRIBUTE, user),
+    result = conn.search_s('dc=mozilla', ldap.SCOPE_SUBTREE,
+                           '(%s=%s)' % (UID_ATTRIBUTE, user),
                            [SSH_KEY_ATTRIBUTE])
 
     if not result:
@@ -50,14 +51,14 @@ def main(user):
 
     # Ignore DSA keys. The server shouldn't support these anyway. Defense
     # in depth.
-    keys = [k for k in keys if not k.startswith('ssh-dss')]
+    keys = [k for k in keys if not k.startswith(b'ssh-dss')]
 
     if not keys:
         print('no valid SSH keys found for user', file=sys.stderr)
         return 1
 
     for key in keys:
-        print(key)
+        print(key.decode('ascii'))
 
     return 0
 
@@ -69,6 +70,6 @@ if __name__ == '__main__':
 
     try:
         sys.exit(main(sys.argv[1]))
-    except Exception:
-        print('error', file=sys.stderr)
+    except Exception as e:
+        print('%s' % e, file=sys.stderr)
         sys.exit(1)
