@@ -12,14 +12,15 @@ import subprocess
 import sys
 
 
-def process_input_file(source: pathlib.Path, dest: pathlib.Path):
+def process_input_file(source: pathlib.Path, dest: pathlib.Path, pip_compile: pathlib.Path):
     print('processing %s' % dest)
 
     env = dict(os.environ)
     env['CUSTOM_COMPILE_COMMAND'] = sys.argv[0]
+    env['HGPYTHON3'] = '1'
 
     subprocess.run([
-        'pip-compile',
+        pip_compile,
         '--generate-hashes',
         '--emit-trusted-host',
         '--annotate',
@@ -59,6 +60,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('path', nargs='*', default=[],
                         help='Explicit requirements file to operate on')
+    parser.add_argument('--pip-compile', default='pip-compile',
+                        help='Path to `pip-compile` executable for desired interpreter')
 
     args = parser.parse_args()
 
@@ -90,8 +93,9 @@ def main():
 
         source = pathlib.Path('%s.in' % base)
         dest = pathlib.Path(p)
+        pip_compile = pathlib.Path(args.pip_compile).expanduser()
 
-        process_input_file(source, dest)
+        process_input_file(source, dest, pip_compile)
 
 
 if __name__ == '__main__':
