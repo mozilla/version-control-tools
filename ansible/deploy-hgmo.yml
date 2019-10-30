@@ -34,10 +34,6 @@
       local_action: command hg --cwd {{ vct }} log -r {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
-    - name: check if mozbuild chroot is available
-      stat: path={{ vct }}/chroot_mozbuild/chroot.tar.gz
-      register: chroot_mozbuild
-
     - block:
       - name: notify IRC of deployment
         irc: server=irc.mozilla.org

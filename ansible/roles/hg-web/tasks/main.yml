@@ -417,32 +417,33 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-- name: mount point for repos
-  file: path={{ item }} state=directory owner=hg group=hg mode=0755
-  with_items:
-    - /repo/hg/chroot_mozbuild/repo/hg/mozilla
+# TODO remove once a deploy has deleted these units
+- block:
+  - name: mozbuild chroot bind mount unit is disabled (server only)
+    service:
+      name: "{{ item }}"
+      enabled: no
+      state: stopped
+    with_items:
+     - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
+     - hg-bind-mount.service
+    when: vct_dir.stat.exists
+  rescue:
+    - debug:
+        msg: "mozbuild chroot bind mount unit already deleted, please remove from config"
 
-# In order to get a read-only bind mount, we have to first do a regular
-# bind mount then do a remount. This is managed by multiple systemd units.
-- name: systemd unit files for repo bind bound (servers only)
-  copy: src={{ item }}
-        dest=/etc/systemd/system/{{ item }}
-        owner=root
-        group=root
-        mode=0644
+- name: remove mozbuildinfo related systemd unit files
+  file:
+    follow: yes
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  with_items:
+   - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
+   - repo_local-mozilla-chroot_mozbuild-dev.mount
+   - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
+   - hg-bind-mount.service
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
-  with_items:
-    - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
-    - repo_local-mozilla-chroot_mozbuild-dev.mount
-    - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
-    - hg-bind-mount.service
-
-- name: main bind mount unit is enabled (server only)
-  service: name=hg-bind-mount.service
-           enabled=yes
-           state=started
-  when: vct_dir.stat.exists == False
+  when: vct_dir.stat.exists
 
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl

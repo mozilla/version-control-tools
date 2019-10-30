@@ -1,4 +1,3 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 
 Mercurial==4.8
-mozbuild==0.2

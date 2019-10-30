@@ -606,42 +606,6 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
     return orig(ui, repo, *args, **kwargs)
 
 
-@command(b'mozbuildinfo', [
-    (b'r', b'rev', b'.', _(b'revision to query'), _(b'REV')),
-    (b'', b'pipemode', False, _(b'accept arguments from stdin')),
-    ], _(b'show files info from moz.build files'),
-    optionalrepo=True)
-def mozbuildinfocommand(ui, repo, *paths, **opts):
-    # This module imports modules not available to the hgweb virtualenv.
-    # Delay importing it so it doesn't interfere with operation outside the
-    # moz.build evaluation context.
-    import mozhg.mozbuildinfo as mozbuildinfo
-
-    if opts[b'pipemode']:
-        data = json.loads(ui.fin.read())
-
-        repo = hg.repository(ui, path=bytes(data[b'repo']))
-        ctx = scmutil.revsingle(repo, bytes(data[b'node']))
-
-        paths = data[b'paths']
-    else:
-        ctx = scmutil.revsingle(repo, bytes(opts[b'rev']))
-
-    try:
-        d = mozbuildinfo.filesinfo(repo, ctx, paths=paths)
-    except Exception as e:
-        d = {b'error': b'Exception reading moz.build info: %s' % str(e)}
-
-    if not d:
-        d = {b'error': b'no moz.build info available'}
-
-    # TODO send data to templater.
-    # Use stable output and indentation to make testing easier.
-    ui.write(bytes(json.dumps(d, indent=2, sort_keys=True)))
-    ui.write(b'\n')
-    return
-
-
 def pull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to fetch the remote clonebundles.manifest."""
     res = orig(repo, remote, *args, **kwargs)

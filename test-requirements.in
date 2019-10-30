@@ -19,9 +19,6 @@ lockfile
 # Used by docker.py.
 mechanize
 
-# Used by hgweb.
-mozbuild==0.2
-
 # Used for testing.
 nose
 

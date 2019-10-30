@@ -16,9 +16,6 @@ mach==0.5.1
 mercurial==5.0.1
 mock
 
-# For moz.build reading in hgmo extension.
-mozbuild==0.2
-
 nose
 pytest
 redo

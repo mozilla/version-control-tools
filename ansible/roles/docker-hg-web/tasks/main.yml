@@ -49,16 +49,3 @@
     # Rename this file to just `instance_data.json` to test
     # behaviour on cloud instances
     - test_instance_data.json
-
-# We have an additional virtualenv in Docker to run moz.build info
-# directly from hgweb without the secure execution environment we
-# run in production. We do this because we can't execute the secure
-# wrapper inside Docker because of limited privileges of Docker
-# containers. This is unfortunate. But it's what we have to do for
-# now.
-
-- name: create virtualenv for moz.build info
-  include: ../../../tasks/virtualenv.yml
-           venv=/var/hg/venv_mozbuild
-           requirements=../roles/docker-hg-web/files/requirements-mozbuild.txt
-
