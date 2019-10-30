@@ -16,9 +16,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+from __future__ import absolute_import
+
 import os.path
 
-from treeclosure import isPushAllowed
+from mozhghooks.treeclosure import isPushAllowed
 
 # Array of which directories SeaMonkey exclusively controls in comm-central
 seamonkeyOwns = [
