@@ -12,12 +12,11 @@ Currently, some defaults are assumed. Functionality can be expanded as
 needed.
 """
 
-import urllib2
-from StringIO import StringIO
-
 from mercurial import (
     error,
+    pycompat,
     registrar,
+    url,
     util,
 )
 
@@ -28,30 +27,29 @@ if util.safehasattr(registrar, 'configitem'):
     configtable = {}
     configitem = registrar.configitem(configtable)
 
-    configitem('urlintercept', 'path',
+    configitem(b'urlintercept', b'path',
                default=None)
-
 
 class URLInterceptor(object):
     def __init__(self, ui):
         self.ui = ui
 
     def open(self, url, data=None, timeout=None):
-        path = self.ui.config('urlintercept', 'path')
+        path = self.ui.config(b'urlintercept', b'path')
         if not path:
-            raise error.Abort('no urlintercept path defined!')
+            raise error.Abort(b'no urlintercept path defined!')
 
         with open(path, 'rb') as fh:
             expected = fh.readline().rstrip()
             response = fh.read()
 
         if url != expected:
-            raise error.Abort('Incorrect URL. Got %s; expected %s' % (
+            raise error.Abort(b'Incorrect URL. Got %s; expected %s' % (
                 url, expected))
 
-        self.ui.write('intercepting url\n')
-        return StringIO(response)
+        self.ui.write(b'intercepting url\n')
+        return pycompat.bytesio(response)
 
 def extsetup(ui):
     interceptor = URLInterceptor(ui)
-    urllib2.install_opener(interceptor)
+    url.urlreq.installopener(interceptor)
