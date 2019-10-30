@@ -76,6 +76,9 @@ if __name__ == '__main__':
         help='Only run tests that do not require Docker')
     parser.add_argument('--run-flaky', action='store_true',
         help='Run tests marked as intermittent failures')
+    parser.add_argument('--run-py3-failing', action='store_true',
+        help='Run tests marked as failures under Python 3 when a '
+             'Python 3 Mercurial is detected')
 
     options, extra = parser.parse_known_args(sys.argv)
 
@@ -96,6 +99,7 @@ if __name__ == '__main__':
         '--headless',
         '--no-docker',
         '--run-flaky',
+        '--run-py3-failing',
     }
     hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
@@ -171,10 +175,27 @@ if __name__ == '__main__':
 
             continue
 
+    # Our custom HGHAVE introduces a check for running Mercurial version.
+    # This is done by consulting a HGVERSION environment variable.
+    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
+    if options.with_hg:
+        hg = options.with_hg
+    hgversion, pyversion = get_hg_version(hg)
+    if hgversion is None:
+        print('Unable to determine Mercurial version')
+        sys.exit(1)
+
+    pyversion = tuple(int(digit) for digit in pyversion.split('.'))
+
     # Add `--blacklist=testing/flaky-tests.txt` to the command line
     if not options.run_flaky:
         flaky_tests_path = os.path.join(HERE, 'testing', 'flaky-tests.txt')
         hg_harness_args.extend(['--blacklist', flaky_tests_path])
+
+    # Add `--blacklist=testing/py3-failing.txt` to the command line
+    if pyversion >= (3, 0) and not options.run_py3_failing:
+        py3_failing_path = os.path.join(HERE, 'testing', 'py3-failing.txt')
+        hg_harness_args.extend(['--blacklist', py3_failing_path])
 
     run_hg_tests = []
     run_unit_tests = []
@@ -237,16 +258,6 @@ if __name__ == '__main__':
     print('Will run %d non-Docker tests concurrently' % no_docker_jobs)
     if have_docker:
         print('Will run %d Docker tests concurrently' % docker_jobs)
-
-    # Our custom HGHAVE introduces a check for running Mercurial version.
-    # This is done by consulting a HGVERSION environment variable.
-    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
-    if options.with_hg:
-        hg = options.with_hg
-    hgversion = get_hg_version(hg)
-    if hgversion is None:
-        print('Unable to determine Mercurial version')
-        sys.exit(1)
 
     os.environ['HGVERSION'] = hgversion
 
@@ -356,7 +367,7 @@ if __name__ == '__main__':
             tests_docker = sorted(t for t in tests if t in docker_tests)
             tests_no_docker = sorted(t for t in tests if t not in docker_tests)
 
-            real_version = get_hg_version(hg_path)
+            real_version, _pyversion = get_hg_version(hg_path)
 
             print('Testing with Mercurial %s (resolved to %s)' % (
                 version, real_version))

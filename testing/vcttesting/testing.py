@@ -368,12 +368,16 @@ def get_hg_version(hg):
     env = dict(os.environ)
     env[b'HGPLAIN'] = b'1'
     env[b'HGRCPATH'] = b'/dev/null'
-    out = subprocess.check_output('%s version -T json' % hg,
-                                  env=env, shell=True)
+    try:
+        out = subprocess.check_output('%s debuginstall -T json' % hg,
+                                      env=env, shell=True)
+    except subprocess.CalledProcessError as e:
+        out = e.output
 
     # index 0 because Mercurial's JSON templates always emit
     # a list, with a single element in our case
-    return json.loads(out)[0]['ver']
+    debuginstall_info = json.loads(out)[0]
+    return debuginstall_info['hgver'], debuginstall_info['pythonver']
 
 
 def remove_err_files(tests):
