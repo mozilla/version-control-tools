@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import contextlib
 import functools
 import hashlib
-import json
 import logging
 import os
 import re
@@ -505,28 +504,31 @@ def replicatedelete(ui, repo):
         raise error.Abort(_('could not delete repo %s: %s\n' % (repo_dir, e)))
 
 
-@command('debugbase85obsmarkers', [], 'MARKERS', norepo=True)
-def debugbase85obsmarkers(ui, markers):
+@command(b'debugbase85obsmarkers', [
+    (b'T', b'template', b'json', _(b'display with template'), _(b'TEMPLATE'))
+], b'MARKERS', norepo=True)
+def debugbase85obsmarkers(ui, markers, **opts):
     """Print information about base85 obsolescence markers."""
     data = base85.b85decode(markers)
     version, markers = obsolete._readmarkers(data)
 
-    out = []
-    for precursor, successors, flags, metadata, date, parents in markers:
-        if parents:
-            parents = [hex(n) for n in parents]
+    with ui.formatter(b'debugbase85obsmarkers', pycompat.byteskwargs(opts)) as fm:
+        for precursor, successors, flags, metadata, date, parents in markers:
+            fm.startitem()
 
-        out.append({
-            'precursor': hex(precursor),
-            'successors': [hex(n) for n in successors],
-            'flags': flags,
-            'metadata': metadata,
-            'date': date,
-            'parents': parents,
-        })
+            if parents:
+                parents = [hex(n) for n in parents]
 
-    # Ideally we'd use the templater. But we only need machine readable output.
-    ui.write(json.dumps(out, indent=4, sort_keys=True, separators=(',', ': ')))
+            successors = [hex(n) for n in successors]
+
+            fm.write(b'precursor', b'precursor: %s\n', hex(precursor))
+            fm.write(b'successors', b'successors: %s\n',
+                     fm.formatlist(successors, b'successor'))
+            fm.write(b'flags', b'flags: %d\n', flags)
+            fm.write(b'metadata', b'metadata: %s\n',
+                     fm.formatlist(metadata, b'metadata'))
+            fm.write(b'date', b'date: %s\n', fm.formatdate(date))
+            fm.condwrite(parents, b'parents', b'parents: %s\n', parents)
 
 
 def wireprotodispatch(orig, repo, proto, command):

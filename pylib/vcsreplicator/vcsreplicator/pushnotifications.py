@@ -259,7 +259,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
                 'precursor': precursor,
                 'successors': successors,
                 'user': user,
-                'time': marker['date'][0],
+                'time': float(marker['date'][0]),
             })
 
     return 'obsolete.1', {
