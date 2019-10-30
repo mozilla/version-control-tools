@@ -137,6 +137,17 @@ clean shutdown (which there was).
 
   $ sleep 3
 
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
+  sending heartbeat to partition 0
+  sending heartbeat to partition 1
+  sending heartbeat to partition 2
+  sending heartbeat to partition 3
+  sending heartbeat to partition 4
+  sending heartbeat to partition 5
+  sending heartbeat to partition 6
+  sending heartbeat to partition 7
+  wrote heartbeat message into 8 partitions
+
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes

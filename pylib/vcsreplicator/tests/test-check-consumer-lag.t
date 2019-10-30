@@ -150,6 +150,8 @@ Resuming consumers clears check
   vcsreplicator:\d: started (re)
   vcsreplicator:\d: started (re)
 
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
   $ check --warning-lag-count 0 --warning-lag-time 1.0
   OK - 8/8 consumers completely in sync
   
