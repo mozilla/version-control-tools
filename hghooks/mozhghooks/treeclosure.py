@@ -60,7 +60,7 @@ def isPushAllowed(ui, repo, name):
                            b"a=... (or, more accurately, a\\S*=...)\n")
                 return False
 
-    except (ValueError, IOError), (err):
+    except (ValueError, IOError) as err:
         # fail closed if treestatus is down, unless the magic words have been used
         printError(ui,
                     b"Error accessing %s :\n"
