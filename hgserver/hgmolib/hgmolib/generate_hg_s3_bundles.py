@@ -297,11 +297,13 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     # Bundle files are named after the tip revision in the repository at
     # the time the bundle was created. This is the easiest way to name
     # bundle files.
-    tip = subprocess.check_output([HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}'])
+    tip = subprocess.check_output(
+        [HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}']
+    ).decode('latin-1')
     print('tip is %s' % tip)
 
     with open(os.path.join(repo_full, '.hg', 'requires'), 'rb') as fh:
-        generaldelta = 'generaldelta\n' in fh.readlines()
+        generaldelta = b'generaldelta\n' in fh.readlines()
 
     if not generaldelta:
         raise Exception('non-generaldelta repo not supported: %s' % repo_full)
@@ -445,7 +447,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         print('Copying %s -> %s' % (clonebundles_path, backup_path))
         shutil.copy2(clonebundles_path, backup_path)
 
-    with open(clonebundles_path, 'wb') as fh:
+    with open(clonebundles_path, 'w') as fh:
         fh.write('\n'.join(clonebundles_manifest))
 
     # Ensure manifest is owned by same user who owns repo and has sane
@@ -493,7 +495,7 @@ def generate_index(repos):
 
     # We rely on the mtime of this file for monitoring to ensure
     # bundle generation is working.
-    with open(os.path.join(BUNDLE_ROOT, 'index.html'), 'wb') as fh:
+    with open(os.path.join(BUNDLE_ROOT, 'index.html'), 'w') as fh:
         fh.write(html)
 
     return html
@@ -528,7 +530,7 @@ def generate_json_manifest(repos):
             }
 
     data = json.dumps(d, sort_keys=True, indent=4)
-    with open(os.path.join(BUNDLE_ROOT, 'bundles.json'), 'wb') as fh:
+    with open(os.path.join(BUNDLE_ROOT, 'bundles.json'), 'w') as fh:
         fh.write(data)
 
     return data
@@ -556,7 +558,7 @@ def main():
 
     args, remaining = parser.parse_known_args()
     if args.f:
-        with open(args.f, 'rb') as fh:
+        with open(args.f, 'r') as fh:
             items = [l.rstrip() for l in fh]
     else:
         items = remaining
