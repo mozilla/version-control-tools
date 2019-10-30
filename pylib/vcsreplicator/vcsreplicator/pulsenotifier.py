@@ -29,24 +29,24 @@ def send_pulse_message(config, exchange, repo_url, payload):
     """
     c = config.c
 
-    routing_key_strip_prefix = c.get('pulse', 'routing_key_strip_prefix')
+    routing_key_strip_prefix = config.get('pulse', 'routing_key_strip_prefix')
     if not repo_url.startswith(routing_key_strip_prefix):
         raise Exception('repo URL does not begin with %s: %s' % (
             routing_key_strip_prefix, repo_url))
 
     routing_key = repo_url[len(routing_key_strip_prefix):]
 
-    hostname = c.get('pulse', 'hostname')
+    hostname = config.get('pulse', 'hostname')
     port = c.getint('pulse', 'port')
-    userid = c.get('pulse', 'userid')
+    userid = config.get('pulse', 'userid')
 
     logger.warn('connecting to pulse at %s:%d as %s' % (hostname, port, userid))
 
     conn = kombu.Connection(hostname=hostname,
                             port=port,
                             userid=userid,
-                            password=c.get('pulse', 'password'),
-                            virtual_host=c.get('pulse', 'virtual_host'),
+                            password=config.get('pulse', 'password'),
+                            virtual_host=config.get('pulse', 'virtual_host'),
                             ssl=c.getboolean('pulse', 'ssl'),
                             connect_timeout=c.getint('pulse', 'connect_timeout'))
     conn.connect()
@@ -82,7 +82,7 @@ def on_event(config, message_type, partition, message, created, data):
         # Lock the old message type and prevent new keys from being added.
         sanitized = {k: v for k, v in data.items()
                      if k in ('repo_url', 'heads', 'pushlog_pushes')}
-        exchange = config.c.get('pulse', 'exchange')
+        exchange = config.get('pulse', 'exchange')
         send_pulse_message(config, exchange, repo_url, sanitized)
 
     # It's worth noting that we don't ack the message until sent to all
@@ -100,7 +100,7 @@ def on_event(config, message_type, partition, message, created, data):
 
     # Version 2 of the exchange adds the message type to the payload so
     # multiple message types can be published.
-    exchange2 = config.c.get('pulse', 'exchange2')
+    exchange2 = config.get('pulse', 'exchange2')
     send_pulse_message(config, exchange2, repo_url, {
         'type': message_type,
         'data': data,

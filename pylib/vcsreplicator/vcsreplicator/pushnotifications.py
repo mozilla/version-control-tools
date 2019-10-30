@@ -298,8 +298,8 @@ def run_cli(config_section, cb, validate_config=None):
     if validate_config:
         validate_config(config)
 
-    group = config.c.get(config_section, 'group')
-    topic = config.c.get(config_section, 'topic')
+    group = config.get(config_section, 'group')
+    topic = config.get(config_section, 'topic')
 
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)

@@ -79,13 +79,13 @@ def hgssh():
 
     config = Config(filename=args.config)
 
-    topic = config.c.get('replicationproducer', 'topic')
+    topic = config.get('replicationproducer', 'topic')
 
     # Create consumer to gather partition offsets
     consumer_config = {
         # set this so offsets are committed to Zookeeper
         'api_version': (0, 8, 1),
-        'bootstrap_servers': config.c.get('replicationproducer', 'hosts'),
+        'bootstrap_servers': config.get('replicationproducer', 'hosts'),
         'enable_auto_commit': False,  # We don't actually commit but this is just for good measure
     }
     consumer = KafkaConsumer(**consumer_config)
@@ -190,15 +190,15 @@ def hgweb():
     consumer_config = {
         # set this so offsets are committed to Zookeeper
         'api_version': (0, 8, 1),
-        'bootstrap_servers': config.c.get('consumer', 'hosts'),
-        'client_id': config.c.get('consumer', 'client_id'),
+        'bootstrap_servers': config.get('consumer', 'hosts'),
+        'client_id': config.get('consumer', 'client_id'),
         'enable_auto_commit': False,
-        'group_id': config.c.get('consumer', 'group'),
+        'group_id': config.get('consumer', 'group'),
         'max_partition_fetch_bytes': MAX_BUFFER_SIZE,
         'value_deserializer': value_deserializer,
     }
 
-    topic = config.c.get('consumer', 'topic')
+    topic = config.get('consumer', 'topic')
 
     topicpartitions = [
         TopicPartition(topic, partition)
@@ -230,7 +230,7 @@ def hgweb():
 
     # Overwrite default hglib path so handle_message_main and it's derivatives
     # use the correct virtualenv
-    hglib.HGPATH = config.c.get('programs', 'hg')
+    hglib.HGPATH = config.get('programs', 'hg')
 
     # Maps partitions to the list of messages within the bootstrap range
     aggregate_messages_by_topicpartition = {
@@ -370,7 +370,7 @@ def hgweb():
             total_message_batches -= 1
             logger.info('%s batches remaining' % total_message_batches)
 
-    logger.info('%s bootstrap process complete' % config.c.get('consumer', 'group'))
+    logger.info('%s bootstrap process complete' % config.get('consumer', 'group'))
 
     # If anything broke, dump the errors and set exit code 1
     if outputdata:

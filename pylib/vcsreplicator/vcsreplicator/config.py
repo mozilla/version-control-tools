@@ -13,6 +13,10 @@ import time
 from kafka import SimpleClient
 from kafka.common import KafkaUnavailableError
 
+from mercurial import (
+    pycompat,
+)
+
 # Holds a boolean indicating if a repo was filtered and the
 # name of the rule that allowed/disallowed the filtering
 RepoFilterResult = collections.namedtuple('RepoFilterResult', ('passes_filter', 'rule'))
@@ -96,11 +100,14 @@ class Config(object):
         else:
             self.has_filters = False
 
+    def get(self, section, option):
+        return pycompat.sysstr(self.c.get(section, option))
+
     @property
     def hg_path(self):
         """Path to a hg executable."""
         if self.c.has_section('programs') and self.c.has_option('programs', 'hg'):
-            return self.c.get('programs', 'hg')
+            return self.get('programs', 'hg')
 
         return 'hg'
 
@@ -181,8 +188,8 @@ class Config(object):
         retry. This is useful when attempting to connect to a cluster that may
         still be coming online, for example.
         """
-        hosts = self.c.get(section, 'hosts')
-        client_id = self.c.get(section, 'client_id')
+        hosts = self.get(section, 'hosts')
+        client_id = self.get(section, 'client_id')
         connect_timeout = 60
         if self.c.has_option(section, 'connect_timeout'):
             connect_timeout = self.c.getint(section, 'connect_timeout')

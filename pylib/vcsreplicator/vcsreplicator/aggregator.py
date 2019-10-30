@@ -201,10 +201,10 @@ def cli():
 
     config = Config(filename=args.config)
     client = config.get_client_from_section('aggregator', timeout=5)
-    topic = config.c.get('aggregator', 'monitor_topic')
-    groups_path = config.c.get('aggregator', 'monitor_groups_file')
-    ack_group = config.c.get('aggregator', 'ack_group')
-    aggregate_topic = config.c.get('aggregator', 'aggregate_topic')
+    topic = config.get('aggregator', 'monitor_topic')
+    groups_path = config.get('aggregator', 'monitor_groups_file')
+    ack_group = config.get('aggregator', 'ack_group')
+    aggregate_topic = config.get('aggregator', 'aggregate_topic')
 
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)

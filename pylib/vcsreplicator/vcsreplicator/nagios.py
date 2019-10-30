@@ -77,8 +77,8 @@ def check_consumer_lag():
 
     config = Config(filename=args.config)
     client = config.get_client_from_section(consumer_section, timeout=5)
-    topic = config.c.get(consumer_section, 'topic')
-    group = config.c.get(consumer_section, 'group')
+    topic = config.get(consumer_section, 'topic')
+    group = config.get(consumer_section, 'group')
 
     try:
         offsets = consumer_offsets_and_lag(client, topic, [group])[group]
@@ -185,9 +185,9 @@ def check_aggregator_lag():
 
     config = Config(filename=args.config)
     client = config.get_client_from_section('aggregator', timeout=5)
-    monitor_topic = config.c.get('aggregator', 'monitor_topic')
-    groups_path = config.c.get('aggregator', 'monitor_groups_file')
-    ack_group = config.c.get('aggregator', 'ack_group')
+    monitor_topic = config.get('aggregator', 'monitor_topic')
+    groups_path = config.get('aggregator', 'monitor_groups_file')
+    ack_group = config.get('aggregator', 'ack_group')
 
     try:
         groups = read_consumer_groups(groups_path)

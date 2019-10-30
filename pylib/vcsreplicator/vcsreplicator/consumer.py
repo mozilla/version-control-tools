@@ -349,7 +349,7 @@ def process_hg_delete(config, wire_path):
 
     # Use configured `todelete_path` if available
     if config.c.has_section('consumer') and config.c.has_option('consumer', 'todelete_path'):
-        todelete_path = config.c.get('consumer', 'todelete_path')
+        todelete_path = config.get('consumer', 'todelete_path')
     else:
         todelete_path = '/repo/hg/todelete'
 
@@ -574,12 +574,12 @@ def print_offsets():
 
     config = Config(filename=args.config)
     client = config.get_client_from_section('consumer', timeout=5)
-    topic = config.c.get('consumer', 'topic')
+    topic = config.get('consumer', 'topic')
 
     if args.group:
         groups = [s.strip() for s in args.group.split(',')]
     else:
-        groups = [config.c.get('consumer', 'group')]
+        groups = [config.get('consumer', 'group')]
 
     d = consumer_offsets_and_lag(client, topic, groups)
 
@@ -643,8 +643,8 @@ def run_cli(message_handler):
     hglib.HGPATH = config.hg_path
 
     client = config.get_client_from_section('consumer', timeout=30)
-    topic = config.c.get('consumer', 'topic')
-    group = config.c.get('consumer', 'group')
+    topic = config.get('consumer', 'topic')
+    group = config.get('consumer', 'group')
     poll_timeout = config.c.getfloat('consumer', 'poll_timeout')
     wait_for_topic(client, topic, 30)
 
