@@ -455,7 +455,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             destvfs.rmtree(forcibly=True)
 
     def handlerepoerror(e):
-        if e.message == _(b'abandoned transaction found'):
+        if pycompat.bytestr(e) == _(b'abandoned transaction found'):
             ui.warn(b'(abandoned transaction found; trying to recover)\n')
             repo = hg.repository(ui, dest)
             if not repo.recover():
@@ -528,7 +528,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             return True
         elif isinstance(e, urllibcompat.urlerr.urlerror):
             if isinstance(e.reason, socket.error):
-                ui.warn(b'socket error: %s\n' % str(e.reason).encode('ascii'))
+                ui.warn(b'socket error: %s\n' % pycompat.bytestr(e.reason))
                 handlenetworkfailure()
                 return True
             else:
@@ -634,7 +634,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         except error.RepoError as e:
             return handlerepoerror(e)
         except error.RevlogError as e:
-            ui.warn(b'(repo corruption: %s; deleting shared store)\n' % e.message)
+            ui.warn(b'(repo corruption: %s; deleting shared store)\n' % e)
             with timeit('remove_shared_store_revlogerror', 'remote-store'):
                 deletesharedstore()
             return callself()
@@ -700,7 +700,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         except error.RepoError as e:
             return handlerepoerror(e)
         except error.RevlogError as e:
-            ui.warn(b'(repo corruption: %s; deleting shared store)\n' % e.message)
+            ui.warn(b'(repo corruption: %s; deleting shared store)\n' % e)
             deletesharedstore()
             return callself()
         finally:
