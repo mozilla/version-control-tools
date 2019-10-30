@@ -201,30 +201,30 @@ OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
     exec(f.read())
 
-testedwith = '4.8 4.9 5.0'
-minimumhgversion = '4.8'
+testedwith = b'4.8 4.9 5.0'
+minimumhgversion = b'4.8'
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem('serverlog', 'blackbox',
+configitem(b'serverlog', b'blackbox',
            default=True)
-configitem('serverlog', 'blackbox.service',
-           default='hgweb')
-configitem('serverlog', 'reporoot',
+configitem(b'serverlog', b'blackbox.service',
+           default=b'hgweb')
+configitem(b'serverlog', b'reporoot',
            default='')
-configitem('serverlog', 'hgweb',
-           default=False)
-configitem('serverlog', 'ssh',
-           default=False)
-configitem('serverlog', 'datalogsizeinterval',
-           default=10000000)
-configitem('serverlog', 'syslog',
+configitem(b'serverlog', b'hgweb',
            default=True)
-configitem('serverlog', 'syslog.ident',
-           default='hgweb')
-configitem('serverlog', 'syslog.facility',
-           'LOG_LOCAL2')
+configitem(b'serverlog', b'ssh',
+           default=True)
+configitem(b'serverlog', b'datalogsizeinterval',
+           default=10000000)
+configitem(b'serverlog', b'syslog',
+           default=True)
+configitem(b'serverlog', b'syslog.ident',
+           default=b'hgweb')
+configitem(b'serverlog', b'syslog.facility',
+           b'LOG_LOCAL2')
 
 
 class fileobjectproxy(object):
@@ -267,13 +267,13 @@ def wrappeddispatch(orig, repo, proto, command):
         startusage = resource.getrusage(resource.RUSAGE_SELF)
 
         repo._serverlog.update({
-            'requestid': str(uuid.uuid1()),
+            'requestid': pycompat.bytestr(uuid.uuid1()),
             'startcpu': startusage.ru_utime + startusage.ru_stime,
             'starttime': time.time(),
             'ui': weakref.ref(repo.ui),
         })
     else:
-        raise error.ProgrammingError('unhandled protocol handler: %r' % proto)
+        raise error.ProgrammingError(b'unhandled protocol handler: %r' % proto)
 
     # If the return type is a `pushres`, `_sshv1respondbytes` will be called twice.
     # We only want to log a completed SSH event on the second call, so flip the
@@ -336,24 +336,24 @@ def record_completed_ssh_command(fout):
     deltacpu = endcpu - serverlog['startcpu']
 
     logevent(ui, serverlog, 'END_SSH_COMMAND',
-             '%.3f' % deltatime,
-             '%.3f' % deltacpu)
+             b'%.3f' % deltatime,
+             b'%.3f' % deltacpu)
 
     del serverlog['ui']
     del serverlog['starttime']
     del serverlog['startcpu']
-    serverlog['requestid'] = ''
+    serverlog['requestid'] = b''
 
 
 def repopath(repo):
-    root = repo.ui.config('serverlog', 'reporoot')
-    if root and not root.endswith('/'):
-        root += '/'
+    root = repo.ui.config(b'serverlog', b'reporoot')
+    if root and not root.endswith(b'/'):
+        root += b'/'
 
     path = repo.path
     if root and path.startswith(root):
         path = path[len(root):]
-    path = path.rstrip('/').rstrip('/.hg')
+    path = path.rstrip(b'/').rstrip(b'/.hg')
 
     return path
 
@@ -366,27 +366,28 @@ def logevent(ui, context, action, *args):
     ``action`` is the event name and ``args`` are arguments specific to the
     ``action``.
     """
-    fmt = '%s %s %s'
-    formatters = (context['requestid'], action, ' '.join(args))
+    fmt = b'%s %s %s'
+    formatters = (context['requestid'], pycompat.bytestr(action), b' '.join(args))
     if context.get('sessionid'):
-        fmt = '%s:' + fmt
+        fmt = b'%s:' + fmt
         formatters = tuple([context['sessionid']] + list(formatters))
 
-    if ui.configbool('serverlog', 'blackbox'):
-        ui.log(ui.config('serverlog', 'blackbox.service'),
-               fmt + '\n', *formatters)
+    if ui.configbool(b'serverlog', b'blackbox'):
+        ui.log(ui.config(b'serverlog', b'blackbox.service'),
+               fmt + b'\n', *formatters)
 
-    if ui.configbool('serverlog', 'syslog'):
+    if ui.configbool(b'serverlog', b'syslog'):
         logsyslog(ui, fmt % formatters)
 
 
 def logsyslog(ui, message):
     """Log a formatted message to syslog."""
-    ident = ui.config('serverlog', 'syslog.ident')
-    facility = getattr(syslog, ui.config('serverlog', 'syslog.facility'))
+    ident = pycompat.sysstr(ui.config(b'serverlog', b'syslog.ident'))
+    facility_config = pycompat.sysstr(ui.config(b'serverlog', b'syslog.facility'))
+    facility = getattr(syslog, facility_config)
 
     syslog.openlog(ident, 0, facility)
-    syslog.syslog(syslog.LOG_NOTICE, message)
+    syslog.syslog(syslog.LOG_NOTICE, pycompat.sysstr(message))
     syslog.closelog()
 
 
@@ -463,8 +464,8 @@ class sshserverwrapped(wireprotoserver.sshserver):
         repo = self._repo
 
         serverlog = {
-            'sessionid': str(uuid.uuid1()),
-            'requestid': '',
+            'sessionid': pycompat.bytestr(uuid.uuid1()),
+            'requestid': b'',
             'path': repopath(repo),
         }
 
@@ -476,7 +477,7 @@ class sshserverwrapped(wireprotoserver.sshserver):
 
         logevent(repo.ui, serverlog, 'BEGIN_SSH_SESSION',
                  serverlog['path'],
-                 os.environ['USER'])
+                 repo.ui.environ[b'USER'])
 
         self._serverlog = serverlog
 
@@ -495,8 +496,8 @@ class sshserverwrapped(wireprotoserver.sshserver):
             deltacpu = endcpu - startcpu
 
             logevent(repo.ui, serverlog, 'END_SSH_SESSION',
-                     '%.3f' % deltatime,
-                     '%.3f' % deltacpu)
+                     b'%.3f' % deltatime,
+                     b'%.3f' % deltacpu)
 
             self._serverlog = None
 
