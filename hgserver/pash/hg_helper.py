@@ -2,9 +2,19 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from cgi import escape
-import ConfigParser
-import json
+from __future__ import print_function
+
+# TRACKING py3
+# ConfigParser -> configparser, raw_input -> input,
+# cgi.escape -> html.escape
+try:
+    from configparser import RawConfigParser
+    from html import escape
+    raw_input = input
+except ImportError:
+    from ConfigParser import RawConfigParser
+    from cgi import escape
+
 import os
 import sys
 import re
@@ -245,13 +255,13 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
 
     if not os.path.exists(userdir):
         run_command('mkdir %s' % userdir)
-    print 'Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url)
+    print('Please wait.  Cloning /%s to %s' % (source_repo_path, dest_url))
     run_command('nohup %s --config format.usegeneraldelta=true init %s' % (HG, dest_dir))
     run_command('nohup %s -R %s pull %s/%s' % (HG, dest_dir, DOC_ROOT, source_repo_path))
     run_command('nohup %s -R %s replicatesync' % (HG, dest_dir))
     # TODO ensure user WSGI files are in place on hgweb machine.
     # (even better don't rely on per-use WSGI files)
-    print "Clone complete."
+    print("Clone complete.")
 
 
 def make_wsgi_dir(cname, user_repo_dir):
@@ -260,7 +270,7 @@ def make_wsgi_dir(cname, user_repo_dir):
     if not os.path.isdir(wsgi_dir):
         os.mkdir(wsgi_dir)
 
-    print "Creating hgweb.config file"
+    print("Creating hgweb.config file")
     # Create hgweb.config file if it doesn't already exist
     if not os.path.isfile("%s/hgweb.config" % wsgi_dir):
         hgconfig = open("%s/hgweb.config" % wsgi_dir, "w")
@@ -291,12 +301,12 @@ def make_wsgi_dir(cname, user_repo_dir):
 def fix_user_repo_perms(repo_name):
     user = os.getenv('USER')
     user_repo_dir = user.replace('@', '_')
-    print "Fixing permissions, don't interrupt."
+    print("Fixing permissions, don't interrupt.")
     try:
         run_command('/var/hg/version-control-tools/scripts/repo-permissions %s/users/%s/%s %s scm_level_1 wwr' %
                     (DOC_ROOT, user_repo_dir, repo_name, user))
-    except Exception, e:
-        print "Exception %s" % (e)
+    except Exception as e:
+        print("Exception %s" % (e))
 
 
 def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
@@ -317,26 +327,26 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
     if selection != 'yes':
         return
 
-    print 'You can clone an existing public repo or a users private repo.'
-    print 'You can also create an empty repository.'
+    print('You can clone an existing public repo or a users private repo.')
+    print('You can also create an empty repository.')
     selection = prompt_user('Source repository:', [
                             'Clone a public repository',
                             'Clone a private repository',
                             'Create an empty repository'])
-    if (selection == 'Clone a public repository'):
+    if selection == 'Clone a public repository':
         exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
         args = shlex.split(exec_command)
         with open(os.devnull, 'wb') as devnull:
             p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=devnull)
-            repo_list = p.communicate()[0].split("\n")
+            repo_list = p.communicate()[0].decode('utf-8').split("\n")
         if repo_list:
-            print "We have the repo_list"
+            print("We have the repo_list")
             repo_list = map(lambda x: x.replace(DOC_ROOT + '/', ''), repo_list)
             repo_list = map(lambda x: x.replace('/.hg', ''), repo_list)
             repo_list = [x.strip() for x in sorted(repo_list) if x.strip()]
-            print 'List of available public repos'
+            print('List of available public repos')
             source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
-    elif (selection == 'Clone a private repository'):
+    elif selection == 'Clone a private repository':
         source_user = raw_input('Please enter the e-mail address of the user '
                                 'owning the repo: ')
         valid_user = is_valid_user(source_user)
@@ -350,8 +360,8 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
             sys.exit(1)
         source_user_path = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 1 -mindepth 1 -type d')
         if not source_user_path:
-            print 'That user does not have any private repositories.'
-            print 'Check https://' + cname + '/users for a list of valid users.'
+            print('That user does not have any private repositories.')
+            print('Check https://' + cname + '/users for a list of valid users.')
             sys.exit(1)
         else:
             user_repo_list = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 3 -mindepth 2 -type d -name .hg')
@@ -359,30 +369,30 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
             user_repo_list = map(lambda x: x.replace('/.hg', ''), user_repo_list)
             user_repo_list = map(lambda x: x.strip('/'), user_repo_list)
             user_repo_list = sorted(user_repo_list)
-            print 'Select the users repo you wish to clone.'
+            print('Select the users repo you wish to clone.')
             source_repo = prompt_user('Pick a source repo:', user_repo_list, period=False)
         source_repo = 'users/' + source_user + '/' + source_repo
-    elif (selection == 'Create an empty repository'):
+    elif selection == 'Create an empty repository':
         source_repo = ''
     else:
         # We should not get here
         source_repo = ''
     if source_repo != '':
-        print 'About to clone /%s to /users/%s/%s' % (source_repo, user_repo_dir, repo_name)
+        print('About to clone /%s to /users/%s/%s' % (source_repo, user_repo_dir, repo_name))
         response = prompt_user('Proceed?', ['yes', 'no'])
-        if (response == 'yes'):
-            print 'Please do not interrupt this operation.'
+        if response == 'yes':
+            print('Please do not interrupt this operation.')
             run_hg_clone(user_repo_dir, repo_name, source_repo)
     else:
-        print "About to create an empty repository at /users/%s/%s" % (user_repo_dir, repo_name)
+        print("About to create an empty repository at /users/%s/%s" % (user_repo_dir, repo_name))
         response = prompt_user('Proceed?', ['yes', 'no'])
-        if (response == 'yes'):
+        if response == 'yes':
             if not os.path.exists('%s/users/%s' % (DOC_ROOT, user_repo_dir)):
                 try:
                     exec_command = '/bin/mkdir %s/users/%s' % (DOC_ROOT, user_repo_dir)
                     run_command(exec_command)
-                except Exception, e:
-                    print "Exception %s" % (e)
+                except Exception as e:
+                    print("Exception %s" % (e))
 
             run_command('/usr/bin/nohup %s --config format.usegeneraldelta=true init %s/users/%s/%s' % (HG, DOC_ROOT, user_repo_dir, repo_name))
     fix_user_repo_perms(repo_name)
@@ -415,7 +425,7 @@ def get_user_repo_config(repo_dir):
         run_command('touch %s' % path)
         run_command('chown %s:scm_level_1 %s' % (user, path))
 
-    config = ConfigParser.RawConfigParser()
+    config = RawConfigParser()
     if not config.read(path):
         sys.stderr.write('Could not read the hgrc file for this repo\n')
         sys.stderr.write('Please file a Developer Services :: hg.mozilla.org bug\n')
@@ -528,10 +538,10 @@ def delete_repo(cname, repo_name, do_quick_delete):
         if do_quick_delete:
             do_delete(user_repo_dir, repo_name)
         else:
-            print '\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name)
-            print '\nThis action is IRREVERSIBLE.'
+            print('\nAre you sure you want to delete /users/%s/%s?' % (user_repo_dir, repo_name))
+            print('\nThis action is IRREVERSIBLE.')
             selection = prompt_user('Proceed?', ['yes', 'no'])
-            if (selection == 'yes'):
+            if selection == 'yes':
                 do_delete(user_repo_dir, repo_name)
     else:
         sys.stderr.write('Could not find the repository at /users/%s/%s.\n' %

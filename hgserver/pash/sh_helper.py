@@ -2,9 +2,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from __future__ import print_function
+
 import shlex
 import subprocess
 import sys
+
+# TRACKING py3 raw_input -> input
+if sys.version_info[0] >= 3:
+    raw_input = input
 
 
 def run_command(command_string, input=None, verbose=False):
@@ -12,10 +18,10 @@ def run_command(command_string, input=None, verbose=False):
     output_lines = []
     fixed_command_string = command_string.lstrip().rstrip()
     line_cnt = 0
-    if(verbose):
+    if verbose:
         # Don't do any redirection of stdout/stderr
         out_fd = None
-        print "EXEC [%s]" % fixed_command_string
+        print("EXEC [%s]" % fixed_command_string)
     else:
         # all output goes to /dev/null
         out_fd = open('/dev/null', 'w')
@@ -32,10 +38,10 @@ def run_command(command_string, input=None, verbose=False):
         l = subcommand.stdout.readline()
         if not l:
             if verbose:
-                print "Breaking after reading %i lines from subprocess" % line_cnt
+                print("Breaking after reading %i lines from subprocess" % line_cnt)
             break
         if verbose:
-            print l,
+            print(l)
             output_lines.append(l.rstrip())
     if not verbose:
         out_fd.close()
@@ -44,15 +50,15 @@ def run_command(command_string, input=None, verbose=False):
 
 def prompt_user(prompt_string, options, period=True):
     index = 0
-    print
-    print '0) Exit.'
+    print('')
+    print('0) Exit.')
     for option in options:
         index += 1
         s = '%s) %s' % (index, option)
         if period:
             s += '.'
-        print s
-    print
+        print(s)
+    print('')
     selection = raw_input(prompt_string + ' ')
     if selection.isdigit():
         selection = int(selection)
