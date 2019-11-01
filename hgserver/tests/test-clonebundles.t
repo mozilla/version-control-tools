@@ -161,8 +161,13 @@ Fetching with a GCE IP will limit to GCE URL
 
 
 Fetching with a private IP and a cloud metadata file indicating host region is us-west-2 will limit to same region URLs
+Reload apache after setting config, so processes pick up the new config
 
-  $ test_cloud_instance hgweb0 on
+  $ hgmo exec hgweb0 /set-config-option /etc/mercurial/hgrc hgmo "instance-data-path" "/var/hg/test_instance_data.json"
+  $ hgmo exec hgweb0 supervisorctl restart httpd
+  httpd: stopped
+  httpd: started
+  
   $ http --no-headers --request-header "Remote-Addr: 10.144.1.1" ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
@@ -171,7 +176,10 @@ Fetching with a private IP and a cloud metadata file indicating host region is u
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
   
 
-  $ test_cloud_instance hgweb0 off
+  $ hgmo exec hgweb0 /set-config-option /etc/mercurial/hgrc hgmo "instance-data-path" ""
+  $ hgmo exec hgweb0 supervisorctl restart httpd
+  httpd: stopped
+  httpd: started
 
 Fetching with an AWS IP from "other" region returns full list
 
@@ -306,5 +314,9 @@ zstd-max bundles created when requested
   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-central/6ed7c1ea69ee8362d21174681a219d1a9e7aad52.packed1.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=eu-central-1
   https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-central/6ed7c1ea69ee8362d21174681a219d1a9e7aad52.packed1.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 gceregion=us-central1
 
+
+Print some logs
+
+  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/error_log
 
   $ hgmo clean

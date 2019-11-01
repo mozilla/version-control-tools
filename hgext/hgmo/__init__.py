@@ -106,10 +106,8 @@ configitem(b'hgmo', b'pullclonebundlesmanifest',
            default=configitems.dynamicdefault)
 configitem(b'hgmo', b'replacebookmarks',
            default=configitems.dynamicdefault)
-
-# TODO update this to /run/cloud-init/instance_data.json once
-# we can upgrade cloud-init to 18.4+ on CentOS7
-INSTANCE_DATA_PATH = b'/var/hg/instance_data.json'
+configitem(b'hgmo', b'instance-data-path',
+           default=None)
 
 
 @templatefilters.templatefilter(b'mozlink')
@@ -723,8 +721,9 @@ def processbundlesmanifest(orig, repo, proto):
     # a cloud instance, we should be serving traffic to private instances in CI.
     # Grab the region from the instance_data.json object and serve the correct
     # manifest accordingly
-    if sourceip.is_private and os.path.exists(INSTANCE_DATA_PATH):
-        with open(INSTANCE_DATA_PATH, 'rb') as fh:
+    instance_data_path = repo.ui.config(b'hgmo', b'instance-data-path')
+    if instance_data_path and sourceip.is_private and os.path.exists(instance_data_path):
+        with open(instance_data_path, 'rb') as fh:
             instance_data = json.load(fh)
 
         region = instance_data['v1']['region']

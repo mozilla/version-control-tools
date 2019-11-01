@@ -108,5 +108,10 @@ gcpippath = /var/hg/gcp-ip-ranges.txt
 mozippath = /var/hg/moz-ip-ranges.txt
 pullclonebundlesmanifest = true
 
+{% if replication_filters == True %}
+# Set the instance data path only on mirrors
+instance-data-path = /var/hg/instance_data.json
+{% endif %}
+
 [mozilla]
 firefoxreleasesdb = /var/hg/fxreleases/db.db
