@@ -81,6 +81,7 @@ testedwith = b'4.8 4.9 5.0 5.1'
 cmdtable = {}
 
 command = registrar.command(cmdtable)
+revsetpredicate = registrar.revsetpredicate()
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -497,6 +498,7 @@ def repoinfowebcommand(web):
                             groupowner=group_owner)
 
 
+@revsetpredicate(b'reviewer(REVIEWER)', safe=True)
 def revset_reviewer(repo, subset, x):
     """``reviewer(REVIEWER)``
 
@@ -517,6 +519,7 @@ def revset_reviewer(repo, subset, x):
     return subset.filter(hasreviewer)
 
 
+@revsetpredicate(b'automationrelevant(set)', safe=True)
 def revset_automationrelevant(repo, subset, x):
     """``automationrelevant(set)``
 
@@ -834,12 +837,6 @@ def extsetup(ui):
     extensions.wrapfunction(webutil, b'changelistentry', changelistentry)
     extensions.wrapfunction(bookmarks, b'updatefromremote', bmupdatefromremote)
     extensions.wrapfunction(webcommands, b'filelog', filelog)
-
-    revset.symbols[b'reviewer'] = revset_reviewer
-    revset.safesymbols.add(b'reviewer')
-
-    revset.symbols[b'automationrelevant'] = revset_automationrelevant
-    revset.safesymbols.add(b'automationrelevant')
 
     # Install IP filtering for bundle URLs.
 
