@@ -24,7 +24,7 @@ from mercurial import (
     util,
 )
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0'
+testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
 minimumhgversion = b'4.3'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
