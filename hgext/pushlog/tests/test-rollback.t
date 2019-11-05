@@ -17,8 +17,9 @@
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
 A failure during the transaction should cause the pushlog to not
 record
@@ -37,7 +38,7 @@ record
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   recorded push in pushlog
   fake hook failure
   transaction abort!
@@ -60,9 +61,10 @@ Remove the abort hook and ensure pushing again works as expected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   recorded push in pushlog
   fake hook success
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (re)

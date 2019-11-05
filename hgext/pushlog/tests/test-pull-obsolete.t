@@ -30,8 +30,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
 
   $ touch file0
   $ hg -q commit -A -m file0
@@ -48,8 +49,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 0 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets (?)
 
@@ -227,10 +229,12 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 3 files
-  1 new obsolescence markers
+  added 3 changesets with 3 changes to 3 files (no-hg52 !)
+  1 new obsolescence markers (no-hg52 !)
   received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
+  added 3 changesets with 3 changes to 3 files (hg52 !)
+  1 new obsolescence markers (hg52 !)
   new changesets 96ee1d7354c4:a129f82339bb (no-hg48 !)
   new changesets 96ee1d7354c4:a129f82339bb (3 drafts) (hg48 !)
   (run 'hg update' to get a working copy)
@@ -271,9 +275,10 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   adding changesets
   adding manifests
   adding file changes
+  added 4 pushes (hg52 !)
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
-  added 4 pushes
+  added 4 pushes (no-hg52 !)
   obsoleted 1 changesets (?)
   new changesets a129f82339bb (?)
   new changesets a129f82339bb (1 drafts) (hg48 !)

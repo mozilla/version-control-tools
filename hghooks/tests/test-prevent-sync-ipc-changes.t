@@ -32,7 +32,7 @@ Editing the sync-messages.ini file without any review should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ******************************** ERROR *********************************
   Changeset 8fb3e82ba334 alters sync-messages.ini without IPC peer review.
@@ -58,7 +58,7 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ******************************** ERROR *********************************
   Changeset d970a5c85d15 alters sync-messages.ini without IPC peer review.

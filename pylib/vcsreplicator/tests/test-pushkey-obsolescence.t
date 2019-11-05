@@ -47,8 +47,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -86,8 +87,9 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 2 changes to 2 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/obs/rev/442ce5a124e001862e8bd6a8871d8b85e09bebd7
@@ -130,8 +132,9 @@ Pruning a changeset locally and pushing should result in obsolescence marker on 
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -214,6 +217,7 @@ Creating obsolescence marker directly on server will result in replication
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete 67b45555a21f4d9d470adc4f1ed3af63918f6414
   no username found, using 'root@*' instead (glob)
+  1 new obsolescence markers (hg52 !)
   obsoleted 1 changesets
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -243,6 +247,7 @@ Creating obsolescence marker directly on server will result in replication
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 17
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 1 changesets
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
@@ -262,8 +267,9 @@ Pushing obsolescence marker without bundle2 works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/obs/rev/de9a6dc9203d34261c1e2bea219bdd6053d74dda
@@ -318,8 +324,9 @@ Pushing obsolescence marker without bundle2 works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 0 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -408,8 +415,9 @@ Now let's check what happens when replication is lagging
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 0 changes to 3 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: obsoleted 2 changesets
   remote: 
@@ -428,8 +436,9 @@ Now let's check what happens when replication is lagging
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 0 changes to 3 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: obsoleted 2 changesets
   remote: 

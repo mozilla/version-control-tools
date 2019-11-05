@@ -84,7 +84,7 @@ Add file (tracked extension, inside expected path), wrong commit message, should
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files
+  added 1 changesets with 2 changes to 2 files (no-hg52 !)
   
   ************************** ERROR ****************************
   
@@ -111,8 +111,9 @@ Amend commit message to use correct keyword, should work
   adding changesets
   adding manifests
   adding file changes
+  You've signaled approval for changes to strings in your push, thanks. (hg52 !)
   added 1 changesets with 2 changes to 2 files
-  You've signaled approval for changes to strings in your push, thanks.
+  You've signaled approval for changes to strings in your push, thanks. (no-hg52 !)
 
 Edit existing file and commit with correct keyword, should work
 
@@ -124,8 +125,9 @@ Edit existing file and commit with correct keyword, should work
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   You've signaled approval for changes to strings in your push, thanks.
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Delete a file and commit without the correct keyword, should fail
 
@@ -137,7 +139,7 @@ Delete a file and commit without the correct keyword, should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 0 changes to 0 files
+  added 1 changesets with 0 changes to 0 files (no-hg52 !)
   
   ************************** ERROR ****************************
   
@@ -161,8 +163,9 @@ Delete a file and commit without the correct keyword, should fail
   adding changesets
   adding manifests
   adding file changes
+  You've signaled approval for changes to strings in your push, thanks. (hg52 !)
   added 1 changesets with 0 changes to 0 files
-  You've signaled approval for changes to strings in your push, thanks.
+  You've signaled approval for changes to strings in your push, thanks. (no-hg52 !)
 
 Edit a file (tracked extension, inside expected path), as part of code uplift, should work
 
@@ -192,7 +195,7 @@ Same edit of a tracked file after release uplift, should fail
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files
+  added 2 changesets with 2 changes to 2 files (no-hg52 !)
   
   ************************** ERROR ****************************
   
@@ -220,8 +223,9 @@ Message check should be case insensitive
   adding changesets
   adding manifests
   adding file changes
+  You've signaled approval for changes to strings in your push, thanks. (hg52 !)
   added 3 changesets with 3 changes to 2 files
-  You've signaled approval for changes to strings in your push, thanks.
+  You've signaled approval for changes to strings in your push, thanks. (no-hg52 !)
 
   $ cd ..
 

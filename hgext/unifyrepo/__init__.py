@@ -82,7 +82,7 @@ from mercurial import (
 )
 
 minimumhgversion = b'4.8'
-testedwith = b'4.8 4.9 5.0 5.1'
+testedwith = b'4.8 4.9 5.0 5.1 5.2'
 
 cmdtable = {}
 

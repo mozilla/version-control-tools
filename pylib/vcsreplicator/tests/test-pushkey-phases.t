@@ -40,8 +40,9 @@ Create the repository and push a change
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -148,8 +149,9 @@ processing on the mirror.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 2 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/7dea706c17247788835d1987dc7103ffc365c338

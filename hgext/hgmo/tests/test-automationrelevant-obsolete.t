@@ -20,8 +20,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
 
   $ echo p1_1 > file0
   $ hg -q commit -A -m 'push 1 commit 1'
@@ -42,8 +43,9 @@ Create some obsolete changesets
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 2 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
 
   $ hg rebase -s 11743f808184 -d 96ee1d7354c4
   rebasing 3:11743f808184 "file1 1"
@@ -54,8 +56,9 @@ Create some obsolete changesets
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 0 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: obsoleted 2 changesets (?)
 

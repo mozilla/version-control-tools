@@ -50,8 +50,9 @@
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 2 changesets with 2 changes to 2 files (+1 heads)
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ hg rebase -s ae13d9da6966 -d 62eebb2f0f00
   rebasing 1:ae13d9da6966 "file0"
@@ -62,8 +63,9 @@
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 2 changesets with 0 changes to 2 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
   2 new obsolescence markers
   obsoleted 2 changesets (?)
 

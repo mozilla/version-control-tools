@@ -57,10 +57,11 @@ Pulling from the unified repo will pull the Firefox tree tags
   adding changesets
   adding manifests
   adding file changes
-  added 5 changesets with 5 changes to 2 files (+1 heads)
+  added 5 changesets with 5 changes to 2 files (+1 heads) (no-hg52 !)
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  added 5 changesets with 5 changes to 2 files (+1 heads) (hg52 !)
   new changesets b772b099dda6:3057abf99ee2 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ cat .hg/firefoxtrees
@@ -90,9 +91,10 @@ Doing an incremental pull will print commit count change
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files
+  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   updated firefox tree tag fx-team (+1 commits)
   updated firefox tree tag inbound (+2 commits)
+  added 3 changesets with 3 changes to 1 files (hg52 !)
   new changesets 3c626f0c790e:a4521c375045 (?)
   (run 'hg update' to get a working copy)
 
@@ -113,10 +115,11 @@ Local filesystem pull should retrieve tree tags
   adding changesets
   adding manifests
   adding file changes
-  added 8 changesets with 8 changes to 2 files (+1 heads)
+  added 8 changesets with 8 changes to 2 files (+1 heads) (no-hg52 !)
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  added 8 changesets with 8 changes to 2 files (+1 heads) (hg52 !)
   new changesets b772b099dda6:a4521c375045 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 
@@ -149,11 +152,12 @@ Serve firefoxtree tags from bookmarks
   adding changesets
   adding manifests
   adding file changes
-  added 8 changesets with 8 changes to 2 files (+1 heads)
+  added 8 changesets with 8 changes to 2 files (+1 heads) (no-hg52 !)
   adding remote bookmark foobar
   updated firefox tree tag central
   updated firefox tree tag fx-team
   updated firefox tree tag inbound
+  added 8 changesets with 8 changes to 2 files (+1 heads) (hg52 !)
   new changesets b772b099dda6:a4521c375045 (?)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 

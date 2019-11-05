@@ -43,13 +43,14 @@ Push a single changeset to a non-try repo print the URL
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   View your change here:
     https://hg.mozilla.org/integration/mozilla-inbound/rev/3d7d3272d708dbf56dab75764495a40032014e3c
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=3d7d3272d708dbf56dab75764495a40032014e3c
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Pushing a changeset to Try prints Treeherder URLs
 
@@ -59,13 +60,15 @@ Pushing a changeset to Try prints Treeherder URLs
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   View your change here:
     https://hg.mozilla.org/try/rev/3d7d3272d708dbf56dab75764495a40032014e3c
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=try&revision=3d7d3272d708dbf56dab75764495a40032014e3c
+  added 1 changesets with 1 changes to 1 files (hg52 !)
+
 
 Pushing a changeset to Try with talos jobs prints a link to perfherder...
 
@@ -77,7 +80,7 @@ Pushing a changeset to Try with talos jobs prints a link to perfherder...
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   View your change here:
     https://hg.mozilla.org/try/rev/083142255559ec6a2b4f78157c1ea522e6fd9722
@@ -87,6 +90,8 @@ Pushing a changeset to Try with talos jobs prints a link to perfherder...
   
   It looks like this try push has talos jobs. Compare performance against a baseline revision:
     https://treeherder.mozilla.org/perf.html#/comparechooser?newProject=try&newRevision=083142255559ec6a2b4f78157c1ea522e6fd9722
+  added 1 changesets with 1 changes to 1 files (hg52 !)
+
 
 and doesn't when it doesn't
 
@@ -98,13 +103,15 @@ and doesn't when it doesn't
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   View your change here:
     https://hg.mozilla.org/try/rev/7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=try&revision=7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
+  added 1 changesets with 1 changes to 1 files (hg52 !)
+
 
 try-comm-central is also special
 
@@ -114,7 +121,7 @@ try-comm-central is also special
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files
+  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   
   View your changes here:
     https://hg.mozilla.org/try-comm-central/rev/3d7d3272d708dbf56dab75764495a40032014e3c
@@ -123,6 +130,7 @@ try-comm-central is also special
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=try-comm-central&revision=7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
+  added 3 changesets with 3 changes to 1 files (hg52 !)
 
 Push multiple changesets to a non-try repo
 
@@ -136,7 +144,7 @@ Push multiple changesets to a non-try repo
   adding changesets
   adding manifests
   adding file changes
-  added 4 changesets with 4 changes to 1 files
+  added 4 changesets with 4 changes to 1 files (no-hg52 !)
   
   View your changes here:
     https://hg.mozilla.org/integration/mozilla-inbound/rev/083142255559ec6a2b4f78157c1ea522e6fd9722
@@ -146,6 +154,7 @@ Push multiple changesets to a non-try repo
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=b404b501615bd72a0bfbb905e636c2f1fcf110da
+  added 4 changesets with 4 changes to 1 files (hg52 !)
 
 Push a lot of changesets to a non-try repo
 
@@ -156,11 +165,12 @@ Push a lot of changesets to a non-try repo
   adding changesets
   adding manifests
   adding file changes
-  added 21 changesets with 21 changes to 1 files
+  added 21 changesets with 21 changes to 1 files (no-hg52 !)
   
   View the pushlog for these changes here:
     https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=78d884a7fbe7948375d29b261a92a948dea508db
   
   Follow the progress of your build on Treeherder:
     https://treeherder.mozilla.org/#/jobs?repo=mozilla-inbound&revision=78d884a7fbe7948375d29b261a92a948dea508db
+  added 21 changesets with 21 changes to 1 files (hg52 !)
 

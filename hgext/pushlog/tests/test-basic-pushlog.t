@@ -27,8 +27,9 @@ Pushing single changesets at a time works
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -41,8 +42,9 @@ Pushing single changesets at a time works
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -66,8 +68,9 @@ Pushing multiple changesets at a time works
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 2 changesets with 2 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog server
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -100,8 +103,9 @@ Pushing to an empty db file works (bug 466149)
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 4 changesets with 4 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog empty
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)
@@ -131,7 +135,7 @@ Pushing to a locked DB errors out (bug 508863)
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files
+  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   error recording into pushlog (database is locked); please retry your push
   transaction abort!
   rolling back pushlog
@@ -146,8 +150,9 @@ Pushing to a locked DB errors out (bug 508863)
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog locked
   ID: 1; user: hguser; Date: \d+; Rev: 0; Node: 12cb2e907074dd3f8a985a0bb3713836bae731d8 (re)

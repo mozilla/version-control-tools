@@ -15,8 +15,9 @@
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
   $ echo foo2 > foo
   $ hg commit -m 'second'
   $ hg push ../server
@@ -25,8 +26,9 @@
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
 Stripping changesets should result in pushlog getting stripped
 
@@ -71,8 +73,9 @@ being stripped. This tests rev reordering in pushlog database
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 2 changesets with 2 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ hg -q up -r 0
   $ echo c3 > foo
@@ -86,8 +89,10 @@ being stripped. This tests rev reordering in pushlog database
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 1 files (+1 heads)
-  recorded push in pushlog
+  recorded push in pushlog (hg52 !)
+  added 2 changesets with 2 changes to 1 files (no-hg52 !)
+  added 2 changesets with 2 changes to 1 files (+1 heads) (hg52 !)
+  recorded push in pushlog (no-hg52 !)
 
   $ cd ../server
 

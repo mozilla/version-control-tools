@@ -59,7 +59,7 @@ Pushing is not allowed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   illegal change to repository
   changes to repositories on HTTP replicas can only be made through the replication system; a change via push is not allowed
   transaction abort!

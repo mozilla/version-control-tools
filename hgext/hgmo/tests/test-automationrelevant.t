@@ -12,8 +12,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
 
   $ echo p1_1 > foo
   $ hg commit -m 'push 1 commit 1'

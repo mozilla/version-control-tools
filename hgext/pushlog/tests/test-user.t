@@ -24,7 +24,7 @@ No user environment variables result in error
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   authenticated user not found; refusing to write into pushlog
   transaction abort!
   rollback completed
@@ -39,7 +39,7 @@ Empty user environment variables result in error
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   authenticated user not found; refusing to write into pushlog
   transaction abort!
   rollback completed
@@ -52,7 +52,7 @@ Empty user environment variables result in error
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   authenticated user not found; refusing to write into pushlog
   transaction abort!
   rollback completed
@@ -67,8 +67,9 @@ REMOTE_USER is preferred over USER
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog server
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
@@ -84,9 +85,10 @@ autoland user
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   autoland push detected
   recorded push in pushlog
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
   $ dumppushlog server
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
@@ -109,8 +111,9 @@ User prefixing works
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ echo local1 > foo
   $ hg commit -m 'local prefix'
@@ -121,8 +124,9 @@ User prefixing works
   adding changesets
   adding manifests
   adding file changes
+  recorded push in pushlog (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog
+  recorded push in pushlog (no-hg52 !)
 
   $ dumppushlog server
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)

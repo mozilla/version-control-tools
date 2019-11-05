@@ -19,10 +19,10 @@
 Blackbox log should contain times for each of our hooks
 
   $ grep mozhooks $TESTTMP/server/.hg/blackbox.log
-  *>   - running reposetup for mozhooks (glob) (hg49 !)
-  *> reposetup for mozhooks took * (glob) (hg49 !)
-  *>   - running reposetup for mozhooks (glob) (hg49 !)
-  *> reposetup for mozhooks took * (glob) (hg49 !)
+  *>   - running reposetup for mozhooks (glob) (no-hg52 !)
+  *> reposetup for mozhooks took * (glob) (no-hg52 !)
+  *>   - running reposetup for mozhooks (glob) (no-hg52 !)
+  *> reposetup for mozhooks took * (glob) (no-hg52 !)
   *> mozhooks.pretxnchangegroup.prevent_subrepos took * seconds (glob)
   *> mozhooks.pretxnchangegroup.prevent_symlinks took * seconds (glob)
   *> mozhooks.pretxnchangegroup.single_root took * seconds (glob)

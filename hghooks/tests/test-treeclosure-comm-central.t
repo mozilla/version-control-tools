@@ -35,8 +35,9 @@ Pushing to an open Thunderbird tree should succeed
   adding changesets
   adding manifests
   adding file changes
+  intercepting url (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  intercepting url
+  intercepting url (no-hg52 !)
 
 Pushing to an open SeaMonkey tree should succeed
 Note that paths under suite/ are treated as seamonkey
@@ -56,8 +57,9 @@ Note that paths under suite/ are treated as seamonkey
   adding changesets
   adding manifests
   adding file changes
+  intercepting url (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  intercepting url
+  intercepting url (no-hg52 !)
 
 Pushing to an open calendar tree should succeed
 Note that paths under calendar/ query thunderbird
@@ -77,8 +79,9 @@ Note that paths under calendar/ query thunderbird
   adding changesets
   adding manifests
   adding file changes
+  intercepting url (hg52 !)
   added 1 changesets with 1 changes to 1 files
-  intercepting url
+  intercepting url (no-hg52 !)
 
 Pushing to a closed Thunderbird tree should fail
 
@@ -95,7 +98,7 @@ Pushing to a closed Thunderbird tree should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -127,7 +130,7 @@ Test pushing when SeaMonkey is closed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -159,7 +162,7 @@ Test pushing when calendar is closed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -183,10 +186,11 @@ Adding CLOSED TREE allows the push to go through
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   comm-central-thunderbird is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 And the same for SeaMonkey
 
@@ -203,10 +207,11 @@ And the same for SeaMonkey
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   comm-central-seamonkey is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 CLOSED TREE only needed on tip commit
 
@@ -222,10 +227,11 @@ CLOSED TREE only needed on tip commit
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files
+  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   intercepting url
   comm-central-seamonkey is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
+  added 3 changesets with 3 changes to 1 files (hg52 !)
 
 Approval required is enforced
 
@@ -242,7 +248,7 @@ Approval required is enforced
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -266,8 +272,9 @@ Use the magic words to bypass approval
   adding changesets
   adding manifests
   adding file changes
+  intercepting url (hg52 !)
   added 2 changesets with 2 changes to 1 files
-  intercepting url
+  intercepting url (no-hg52 !)
 
 Also check a1.2=foo approval syntax works
 
@@ -279,8 +286,9 @@ Also check a1.2=foo approval syntax works
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Approval on multiple changesets only requires tip
 
@@ -296,5 +304,6 @@ Approval on multiple changesets only requires tip
   adding changesets
   adding manifests
   adding file changes
+  intercepting url (hg52 !)
   added 3 changesets with 3 changes to 1 files
-  intercepting url
+  intercepting url (no-hg52 !)

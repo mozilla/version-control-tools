@@ -37,7 +37,7 @@ ffxbld-merge user cannot push non-merge day changes
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 4 changes to 4 files
+  added 1 changesets with 4 changes to 4 files (no-hg52 !)
   
   **************************** ERROR ****************************
   ffxbld-merge can only push changes to
@@ -80,7 +80,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 5 changes to 5 files
+  added 2 changesets with 5 changes to 5 files (no-hg52 !)
   
   **************************** ERROR ****************************
   ffxbld-merge can only push changes to
@@ -182,7 +182,7 @@ ffxbld-merge user can't push merges that don't match the first parent
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ****************** ERROR *******************
   ffxbld-merge cannot push non-trivial merges.
@@ -228,7 +228,7 @@ ffxbld-merge user cannot push merge day changes to any non-Firefox repo
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files
+  added 1 changesets with 2 changes to 2 files (no-hg52 !)
   
   ****************************** ERROR ******************************
   ffxbld-merge cannot push to non-firefox repository non-firefox-repo
@@ -249,7 +249,7 @@ ffxbld-merge user cannot push changes to any non-Firefox repo
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 3 changes to 3 files
+  added 2 changesets with 3 changes to 3 files (no-hg52 !)
   
   ****************************** ERROR ******************************
   ffxbld-merge cannot push to non-firefox repository non-firefox-repo

@@ -21,8 +21,9 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/hgcustom/version-control-tools/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -330,8 +331,9 @@ We are able to push to the new user repo
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/72a8548a894aea3fd307e2b253e34df2b019da34

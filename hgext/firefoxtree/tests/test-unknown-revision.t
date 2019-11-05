@@ -46,6 +46,7 @@ Prune the changeset associated with inbound
 
   $ hg phase --draft --force -r 0:tip
   $ hg debugobsolete 1b348279b0e9b3c29568b6abc8a1776a68d39261
+  1 new obsolescence markers (hg52 !)
   obsoleted 1 changesets (?)
 
   $ hg log -r 'fxheads()' -T '{node}\n'

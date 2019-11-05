@@ -47,15 +47,16 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 2 changes to 1 files
-  remote: recorded push in pushlog
-  exporting bookmark bm1 (hg47 !)
+  remote: recorded push in pushlog (no-hg52 !)
+  exporting bookmark bm1 (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   remote:   https://hg.mozilla.org/mozilla-central/rev/04da6c25817b564b37238ee5144e5adf2af0cb5b
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
-  exporting bookmark bm1 (no-hg47 !)
+  exporting bookmark bm1 (hg52 !)
 
   $ hg push -B bm2
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -63,14 +64,15 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog
-  exporting bookmark bm2 (hg47 !)
+  remote: recorded push in pushlog (no-hg52 !)
+  exporting bookmark bm2 (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e7d8e0aefcf6bcc137a21978e9a431c5b0dafd86
   remote: recorded changegroup in replication log in \d\.\d+s (re)
-  exporting bookmark bm2 (no-hg47 !)
+  exporting bookmark bm2 (hg52 !)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
@@ -111,14 +113,15 @@ Push a bookmark update
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
-  updating bookmark bm2 (hg47 !)
+  remote: recorded push in pushlog (no-hg52 !)
+  updating bookmark bm2 (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/b222465a31a101470b94a950392809801a91d3da
   remote: recorded changegroup in replication log in \d\.\d+s (re)
-  updating bookmark bm2 (no-hg47 !)
+  updating bookmark bm2 (hg52 !)
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
@@ -148,9 +151,9 @@ Push a non-forward bookmark update
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
-  updating bookmark bm2 (hg47 !)
+  updating bookmark bm2 (no-hg52 !)
   remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
-  updating bookmark bm2 (no-hg47 !)
+  updating bookmark bm2 (hg52 !)
   [1]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini

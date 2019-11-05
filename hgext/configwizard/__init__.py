@@ -402,7 +402,7 @@ Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
+testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
 
 cmdtable = {}

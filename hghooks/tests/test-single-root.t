@@ -58,7 +58,7 @@ Pushing new root should be rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (+1 heads)
+  added 1 changesets with 1 changes to 1 files (+1 heads) (no-hg52 !)
   *** pushing unrelated repository ***
   
   Changeset 884385885a43 introduces a new root changeset into this repository. This
@@ -83,7 +83,7 @@ Can force disable check via config
   adding changesets
   adding manifests
   adding file changes
-  added 4 changesets with 4 changes to 2 files (+1 heads)
+  added 4 changesets with 4 changes to 2 files (+1 heads) (no-hg52 !)
   *** pushing unrelated repository ***
   
   Changeset 884385885a43 introduces a new root changeset into this repository. This
@@ -108,8 +108,9 @@ Can force disable check via config
   adding changesets
   adding manifests
   adding file changes
+  (single_root check disabled per config override) (hg52 !)
   added 4 changesets with 4 changes to 2 files (+1 heads)
-  (single_root check disabled per config override)
+  (single_root check disabled per config override) (no-hg52 !)
 
 
 But it works on repos in users/
@@ -147,7 +148,7 @@ List an unknown root
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (+1 heads)
+  added 1 changesets with 1 changes to 1 files (+1 heads) (no-hg52 !)
   *** pushing unrelated repository ***
   
   Changeset 884385885a43 introduces a new root changeset into this repository. This
@@ -173,8 +174,9 @@ Whitelist the new root
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (+1 heads)
+  added 1 changesets with 1 changes to 1 files (+1 heads) (no-hg52 !)
   (allowing new root 884385885a43 because it is in the whitelist)
+  added 1 changesets with 1 changes to 1 files (+1 heads) (hg52 !)
 
   $ cd client
 
@@ -217,7 +219,7 @@ Pushing new root as part of multiple commits will be rejected
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files (+1 heads)
+  added 2 changesets with 2 changes to 2 files (+1 heads) (no-hg52 !)
   *** pushing unrelated repository ***
   
   Changeset 4101f99f849b introduces a new root changeset into this repository. This

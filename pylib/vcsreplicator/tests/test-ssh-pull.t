@@ -35,8 +35,9 @@ This test demonstrates the pull behaviour on hgssh servers
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -52,8 +53,9 @@ This test demonstrates the pull behaviour on hgssh servers
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 2 changes to 2 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/442ce5a124e001862e8bd6a8871d8b85e09bebd7
@@ -75,8 +77,9 @@ This test demonstrates the pull behaviour on hgssh servers
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 2 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 

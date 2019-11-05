@@ -21,8 +21,9 @@ Create the repository
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -103,8 +104,9 @@ Pushing multiple heads results in appropriate behavior
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 7 changesets with 7 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb7cb9e7f231851436db4de63e0a26
@@ -157,8 +159,9 @@ Shutting off a consumer should prevent heads from being aggregated and written o
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/36638cc83b4d9084a2a38f41f345da73390ad05b

@@ -50,8 +50,9 @@ them. So disable the pulse consumer until all repo changes have been made.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -85,6 +86,7 @@ Create an obsolescence marker on the server
 
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs debugobsolete 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
   no username found, using 'root@*' instead (glob)
+  1 new obsolescence markers (hg52 !)
   obsoleted 1 changesets
   recorded updates to obsolete in replication log in \d+\.\d+s (re)
 
@@ -105,8 +107,9 @@ Send a precursor marker referencing a node unknown to the server
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: 
   remote: View your change here:
@@ -134,8 +137,9 @@ Commit message with multiple lines works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:

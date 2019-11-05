@@ -37,7 +37,7 @@ Without magic word, can't change nsprpub/
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected nsprpub/ directory: 89dbe12f8b46)
   ************************************************************************
   You do not have permissions to modify files under nsprpub/ or security/nss/
@@ -79,7 +79,7 @@ Without magic word, can't change security/nss/
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected security/nss/ directory: 0792e81e881c)
   ************************************************************************
   You do not have permissions to modify files under nsprpub/ or security/nss/
@@ -124,7 +124,7 @@ files must contain the correct corresponding keyword
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 3 files
+  added 3 changesets with 3 changes to 3 files (no-hg52 !)
   (1 changesets contain changes to protected security/nss/ directory: b0b7d814f51e)
   ************************************************************************
   You do not have permissions to modify files under nsprpub/ or security/nss/

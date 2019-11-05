@@ -13,7 +13,7 @@ from mercurial import (
     registrar,
 )
 
-testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1'
+testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
 minimumhgversion = b'4.4'
 
 

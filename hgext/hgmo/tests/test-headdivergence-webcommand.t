@@ -21,8 +21,9 @@ Simple setup
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: recorded push in pushlog (hg52 !)
   remote: added 4 changesets with 5 changes to 4 files
-  remote: recorded push in pushlog
+  remote: recorded push in pushlog (no-hg52 !)
 
   $ hg log -G -T '{node} {desc}\n'
   @  3c042dabdc9c32e8018d3ee6fc1893023ae82722 file3

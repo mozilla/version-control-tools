@@ -27,7 +27,7 @@ No bug is rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -110,8 +110,9 @@ Including the local numeric ID is silly and deprecated, but allowed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   Warning: Rev 8b918b1082f8 has malformed backout message.
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Checking "revert to" syntax
 
@@ -193,7 +194,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -217,7 +218,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -241,7 +242,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -271,7 +272,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -297,7 +298,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -321,7 +322,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -345,7 +346,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   Warning: Rev 0c2851fbf7ba has malformed backout message.
   
   
@@ -370,7 +371,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -394,7 +395,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -422,7 +423,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -448,7 +449,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -472,7 +473,7 @@ Test some bad commit messages
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -572,7 +573,7 @@ Messages without "Source-Revision: " aren't excluded
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -603,8 +604,9 @@ Messages without "Source-Revision: " aren't excluded
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (768c84b471a9 looks like a vendoring change; ignoring commit message hook)
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Malformed backout message in vendored path
 
@@ -616,7 +618,7 @@ Malformed backout message in vendored path
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -654,8 +656,9 @@ a warning.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   Warning: Rev 018e10233c06 has malformed backout message.
+  added 1 changesets with 1 changes to 1 files (hg52 !)
 
 Change a random file and make sure someone isn't cheating the hook
 
@@ -675,7 +678,7 @@ Change a random file and make sure someone isn't cheating the hook
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
