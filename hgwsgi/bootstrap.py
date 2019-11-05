@@ -11,7 +11,8 @@ import os
 os.environ['HGENCODING'] = 'UTF-8'
 
 
-from mercurial.hgweb import hgweb
+from mercurial.hgweb import hgwebdir
+from mercurial import pycompat
 
 
 # Set HTTPS_PROXY from /etc/environment value, if present. We don't
@@ -26,7 +27,7 @@ def set_env():
                     continue
 
                 value = line.strip().split(b'=', 1)[1]
-                value = value.strip('"')
+                value = value.strip(b'"')
 
                 os.environ['HTTPS_PROXY'] = value
                 break
@@ -41,4 +42,4 @@ def make_application(wsgi_dir):
 
     config = os.path.join(wsgi_dir, 'hgweb.config')
 
-    return hgweb(config)
+    return hgwebdir(pycompat.bytestr(config))
