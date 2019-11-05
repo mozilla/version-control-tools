@@ -3,14 +3,19 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import ConfigParser
+# TRACKING py3
+# configparser module renamed
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
+
 import os
 import sys
 
 configpath, section, key, value = sys.argv[1:]
 
-
-c = ConfigParser.ConfigParser()
+c = ConfigParser()
 
 if os.path.exists(configpath):
     c.read(configpath)
@@ -20,5 +25,5 @@ if not c.has_section(section):
 
 c.set(section, key, value)
 
-with open(configpath, 'wb') as fh:
+with open(configpath, 'w') as fh:
     c.write(fh)
