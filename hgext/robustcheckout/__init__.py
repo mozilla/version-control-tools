@@ -532,11 +532,11 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 handlenetworkfailure()
                 return True
             else:
-                ui.warn(b'unhandled URLError; reason type: %s; value: %s' % (
+                ui.warn(b'unhandled URLError; reason type: %s; value: %s\n' % (
                     e.reason.__class__.__name__, e.reason))
         else:
             ui.warn(b'unhandled exception during network operation; type: %s; '
-                    b'value: %s' % (e.__class__.__name__, e))
+                    b'value: %s\n' % (e.__class__.__name__, e))
 
         return False
 
