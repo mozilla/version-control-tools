@@ -6,18 +6,30 @@
 # Runs a simple HTTP server that records POSTed SNS subscription data
 # to a local file so tests can read it and verify content.
 
-import BaseHTTPServer
+# TRACKING py3
+try:
+    from http.server import (
+        BaseHTTPRequestHandler,
+        HTTPServer,
+    )
+    from cgi import parse_qs
+except ImportError:
+    from BaseHTTPServer import (
+        BaseHTTPRequestHandler,
+        HTTPServer,
+    )
+    from urlparse import parse_qs
+
 import json
 import sys
-import urlparse
 
 
-class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         cl = int(self.headers['content-length'])
         body = self.rfile.read(cl)
 
-        data = urlparse.parse_qs(body)
+        data = parse_qs(body)
 
         with open('/sns-messages', 'ab') as fh:
             fh.write('POST %s ' % self.path)
@@ -29,5 +41,5 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
 
 
-httpd = BaseHTTPServer.HTTPServer(('', int(sys.argv[1])), RequestHandler)
+httpd = HTTPServer(('', int(sys.argv[1])), RequestHandler)
 httpd.serve_forever()
