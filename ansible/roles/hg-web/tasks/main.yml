@@ -417,34 +417,6 @@
   notify: systemd daemon reload
   when: vct_dir.stat.exists == False
 
-# TODO remove once a deploy has deleted these units
-- block:
-  - name: mozbuild chroot bind mount unit is disabled (server only)
-    service:
-      name: "{{ item }}"
-      enabled: no
-      state: stopped
-    with_items:
-     - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
-     - hg-bind-mount.service
-    when: vct_dir.stat.exists
-  rescue:
-    - debug:
-        msg: "mozbuild chroot bind mount unit already deleted, please remove from config"
-
-- name: remove mozbuildinfo related systemd unit files
-  file:
-    follow: yes
-    path: "/etc/systemd/system/{{ item }}"
-    state: absent
-  with_items:
-   - repo_local-mozilla-chroot_mozbuild-repo-hg-mozilla.mount
-   - repo_local-mozilla-chroot_mozbuild-dev.mount
-   - repo_local-mozilla-chroot_mozbuild-dev-urandom.service
-   - hg-bind-mount.service
-  notify: systemd daemon reload
-  when: vct_dir.stat.exists
-
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
            regexp={{ item.search }}
