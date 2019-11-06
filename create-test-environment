@@ -16,79 +16,92 @@ if [ "$sslcheck" -ne 0 ]; then
 fi
 
 ROOT=`pwd`
+
+for PYTHON_VERSION_NUMBER in 2 3
+do
+    echo "Installing virtualenv for Python ${PYTHON_VERSION_NUMBER}"
+
+    # Set environment variables according to Python version being installed
+    if [[ ${PYTHON_VERSION_NUMBER} -eq 2 ]]
+    then
+        VENV=${ROOT}/venv
+        PYTHON_VERSION=python2.7
+    else
+        VENV=${ROOT}/venv/py3
+        PYTHON_VERSION=python3.6
+    fi
+
+    if [ ! -d ${VENV}/lib ]; then
+      # There is a bug in pycrypto where it tries to invoke `configure` instead
+      # of a path qualified configure. So if there is a "configure" on $PATH
+      # it will invoke the wrong one.
+      configure=which configure &>/dev/null || true
+      if [ "x" != "x${configure}" ]; then
+        echo "configure in PATH; pycrypto install will fail!"
+        echo "Remove the path containing ${configure} from PATH"
+        exit 1
+      fi
+
+      . ${ROOT}/testing/create-virtualenv
+    fi
+
+    cd ${ROOT}
+    source ${VENV}/bin/activate
+
+    # Install different test requirements into each venv
+    if [[ ${PYTHON_VERSION_NUMBER} -eq 2 ]]
+    then
+        pip install --upgrade --require-hashes -r test-requirements.txt
+    else
+        HGPYTHON3=1 pip install --upgrade --require-hashes -r test-requirements-3.txt
+    fi
+
+
+    cd hgserver/hgmolib
+    python setup.py develop
+    cd ../..
+
+    cd pylib/Bugsy
+    python setup.py develop
+    cd ../..
+
+    cd pylib/mozansible
+    python setup.py develop
+    cd ../..
+
+    cd pylib/mozhg
+    python setup.py develop
+    cd ../..
+
+    cd pylib/mozhginfo
+    python setup.py develop
+    cd ../..
+
+    cd pylib/mozautomation
+    python setup.py develop
+    cd ../..
+
+    cd pylib/vcsreplicator
+    python setup.py develop
+    cd ../..
+
+    cd hghooks
+    python setup.py develop
+    cd ..
+
+    cd testing
+    python setup.py develop
+    cd ..
+
+done
+
+
+python -m vcttesting.environment install-mercurials
+
+# Set venv back to Python 2 for test runner code
 VENV=${ROOT}/venv
-
-if [ ! -d ${VENV}/lib ]; then
-  # There is a bug in pycrypto where it tries to invoke `configure` instead
-  # of a path qualified configure. So if there is a "configure" on $PATH
-  # it will invoke the wrong one.
-  configure=which configure &>/dev/null || true
-  if [ "x" != "x${configure}" ]; then
-    echo "configure in PATH; pycrypto install will fail!"
-    echo "Remove the path containing ${configure} from PATH"
-    exit 1
-  fi
-
-  . ${ROOT}/testing/create-virtualenv
-fi
-
-cd ${ROOT}
 source ${VENV}/bin/activate
 
-pip install --upgrade --require-hashes -r test-requirements.txt
-
-cd hgserver/hgmolib
-python setup.py develop
-cd ../..
-
-cd pylib/Bugsy
-python setup.py develop
-cd ../..
-
-cd pylib/mozansible
-python setup.py develop
-cd ../..
-
-cd pylib/mozhg
-python setup.py develop
-cd ../..
-
-cd pylib/mozhginfo
-python setup.py develop
-cd ../..
-
-cd pylib/mozautomation
-python setup.py develop
-cd ../..
-
-cd pylib/vcsreplicator
-python setup.py develop
-cd ../..
-
-cd hghooks
-python setup.py develop
-cd ..
-
-cd testing
-python setup.py develop
-cd ..
-
-# Collect code coverage from all Python processes if environment variable
-# is set.
-cat > venv/bin/sitecustomize.py << EOF
-import os
-
-if os.environ.get('CODE_COVERAGE', False):
-    import uuid
-    import coverage
-
-    covpath = os.path.join(os.environ['COVERAGE_DIR'],
-        'coverage.%s' % uuid.uuid1())
-    cov = coverage.coverage(data_file=covpath, auto_data=True)
-    cov._warn_no_data = False
-    cov._warn_unimported_source = False
-    cov.start()
-EOF
 
 python -m vcttesting.environment install-mercurials
 

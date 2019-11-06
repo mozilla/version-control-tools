@@ -275,3 +275,11 @@ if __name__ == '__main__':
         }
         # PATH has global virtualenv activated.
         install_mercurials(venv, hg='hg')
+
+        # Install Python 3 Mercurials
+        venv = {
+            'path': os.path.join(ROOT, 'venv', 'py3'),
+            'python': os.path.join(ROOT, 'venv', 'py3', 'bin', 'python'),
+        }
+        # PATH has global virtualenv activated.
+        install_mercurials(venv, hg='hg')

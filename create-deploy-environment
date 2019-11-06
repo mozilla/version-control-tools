@@ -4,6 +4,7 @@ set -eu
 
 ROOT=`pwd`
 VENV=${ROOT}/venv
+PYTHON_VERSION=python2.7
 
 if [ ! -d ${VENV}/lib ]; then
   . ${ROOT}/testing/create-virtualenv
