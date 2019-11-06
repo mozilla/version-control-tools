@@ -46,6 +46,7 @@ def HGEXT_BOOTSTRAP():
         'third_party/python/chardet',
         'third_party/python/idna',
         'third_party/python/requests',
+        'third_party/python/six',
         'third_party/python/urllib3',
     ]
     for p in lib_paths:
