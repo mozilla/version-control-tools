@@ -11,10 +11,10 @@ from mercurial import (
 changelog_add = changelog.changelog.add
 
 def add(self, manifest, files, desc, transaction, p1, p2,
-        user, date=None, extra=None, p1copies=None, p2copies=None):
+        user, date=None, extra=None, p1copies=None, p2copies=None, *args, **kwargs):
     files = ['foo', 'bar']
     return changelog_add(self, manifest, files, desc, transaction, p1, p2,
-        user, date=date, extra=extra)
+        user, date=date, extra=extra, *args, **kwargs)
 
 changelog.changelog.add = add
 

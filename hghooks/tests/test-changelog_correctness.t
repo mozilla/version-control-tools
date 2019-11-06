@@ -40,7 +40,7 @@ Create a broken changeset
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 0 changes to 0 files
+  added 1 changesets with 0 changes to 0 files (no-hg52 !)
   
   You apparently used `hg rebase` before pushing, and your mercurial
   version stores inconsistent metadata when doing so. Please upgrade
