@@ -17,6 +17,13 @@ def _ts_to_day(ts):
     return datetime.datetime.utcfromtimestamp(ts).date()
 
 
+def build_anchor(build):
+    '''Create an identifier unique to each release build
+    '''
+    return b'%s%s%s%s' % (build[b'revision'][0:12], build[b'channel'], build[b'platform'],
+                         build[b'build_id'])
+
+
 class FirefoxReleaseDatabase(object):
     """Persistently store Firefox release information in a database.
 
@@ -124,7 +131,7 @@ class FirefoxReleaseDatabase(object):
         count = 0
         with self._db:
             # Find current builds so we can perform duplicate detection.
-            previous_builds = {build[b'build_id'] for build in self.builds()}
+            previous_builds = {build_anchor(build) for build in self.builds()}
 
             state = self.get_all_state()
 
@@ -137,7 +144,7 @@ class FirefoxReleaseDatabase(object):
                 last_day = datetime.date(1900, 1, 1)
 
             for build in builds:
-                if build[b'build_id'] in previous_builds:
+                if build_anchor(build) in previous_builds:
                     continue
 
                 self._insert_build(build, insertion_key)

@@ -118,7 +118,7 @@ def _releases_mapped_generator(context, builds):
     """
     for i, build in enumerate(builds):
         build[b'parity'] = pycompat.bytestr(i % 2)
-        build[b'anchor'] = build_anchor(build)
+        build[b'anchor'] = releasedb.build_anchor(build)
         yield build
 
 
@@ -152,11 +152,6 @@ def release_config(build):
     return build[b'channel'], build[b'platform']
 
 
-def build_anchor(build):
-    return b'%s%s%s%s' % (build[b'revision'][0:12], build[b'channel'], build[b'platform'],
-                         build[b'build_id'])
-
-
 def changesetentry(orig, web, ctx):
     """Add metadata for an individual changeset in hgweb."""
     d = orig(web, ctx)
@@ -174,7 +169,7 @@ def changesetentry(orig, web, ctx):
         d[b'firefox_releases_first'] = []
 
         for config, build in sorted(releases[b'this'].items()):
-            build[b'anchor'] = build_anchor(build)
+            build[b'anchor'] = releasedb.build_anchor(build)
 
             # Set links to previous and future releases.
             if config in releases[b'previous']:
@@ -187,7 +182,7 @@ def changesetentry(orig, web, ctx):
         d.setdefault(b'firefox_releases_first', [])
 
         for config, build in sorted(releases[b'future'].items()):
-            build[b'anchor'] = build_anchor(build)
+            build[b'anchor'] = releasedb.build_anchor(build)
 
             if build not in d[b'firefox_releases_first']:
                 d[b'firefox_releases_first'].append(build)
@@ -196,7 +191,7 @@ def changesetentry(orig, web, ctx):
         d[b'firefox_releases_last'] = []
 
         for config, build in sorted(releases[b'previous'].items()):
-            build[b'anchor'] = build_anchor(build)
+            build[b'anchor'] = releasedb.build_anchor(build)
 
             d[b'firefox_releases_last'].append(build)
 
