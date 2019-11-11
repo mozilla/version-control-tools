@@ -184,7 +184,7 @@ def changesetentry(orig, web, ctx):
             d[b'firefox_releases_first'].append(build)
 
     if releases['future']:
-        d.setdefault('firefox_releases_first', [])
+        d.setdefault(b'firefox_releases_first', [])
 
         for config, build in sorted(releases[b'future'].items()):
             build[b'anchor'] = build_anchor(build)
