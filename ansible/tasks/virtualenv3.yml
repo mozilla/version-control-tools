@@ -1,3 +1,14 @@
+- name: check if Python 2 virtualenv exists
+  stat:
+    path: "{{ venv }}/bin/python2.7"
+  register: py2_venv
+
+- name: delete Python 2 virtualenv
+  file:
+    path: "{{ venv }}"
+    state: absent
+  when: py2_venv.stat.exists
+
 - name: create Python 3 virtualenv in {{ venv }}
   command: "{{ python }} -m venv {{ venv }} creates={{ venv }}"
 
