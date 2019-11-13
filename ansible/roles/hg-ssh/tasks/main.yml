@@ -112,7 +112,8 @@
            requirements=../roles/hg-ssh/files/requirements-tools.txt
 
 - name: create virtualenv for bundle generation
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_bundles
            requirements=../roles/hg-ssh/files/requirements-bundles.txt
 
@@ -123,7 +124,7 @@
 #
 # The vcsreplicator Python package contains support code for managing
 # replication. Also add it to the virtualenv.
-- name: add packages to virtualenvs
+- name: add packages to Python 2 virtualenvs
   copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
         content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
@@ -132,18 +133,26 @@
   with_items:
     - { venv: venv_pash, path: hghooks, pth: mozhghooks }
     - { venv: venv_tools, path: hghooks, pth: mozhghooks }
-    - { venv: venv_bundles, path: hghooks, pth: mozhghooks }
     - { venv: venv_pash, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
-    - { venv: venv_bundles, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_pash, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_tools, path: pylib/vcsreplicator, pth: vcsreplicator }
-    - { venv: venv_bundles, path: pylib/vcsreplicator, pth: vcsreplicator }
     - { venv: venv_pash, path: pylib/mozautomation, pth: mozautomation }
     - { venv: venv_tools, path: pylib/mozautomation, pth: mozautomation }
-    - { venv: venv_bundles, path: pylib/mozautomation, pth: mozautomation }
     - { venv: venv_pash, path: hgserver/hgmolib, pth: hgmolib }
     - { venv: venv_tools, path: hgserver/hgmolib, pth: hgmolib }
+
+- name: add packages to Python 3 virtualenvs
+  copy: dest=/var/hg/{{ item.venv }}/lib64/python3.6/site-packages/{{ item.pth }}.pth
+        content=/var/hg/version-control-tools/{{ item.path }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - { venv: venv_bundles, path: hghooks, pth: mozhghooks }
+    - { venv: venv_bundles, path: pylib/mozhg, pth: mozhg }
+    - { venv: venv_bundles, path: pylib/vcsreplicator, pth: vcsreplicator }
+    - { venv: venv_bundles, path: pylib/mozautomation, pth: mozautomation }
 
 - name: determine if v-c-t clone is present
   stat: path=/var/hg/version-control-tools/.hg
