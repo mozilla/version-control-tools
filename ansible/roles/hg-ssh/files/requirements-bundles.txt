@@ -4,12 +4,12 @@
 #
 #    ./upgrade-python-packages
 #
-boto3==1.10.12 \
-    --hash=sha256:4f231c746d2acba8b458897f7a0a2f4b9d75656eeeba9c78d17f60fa0cc2cb68 \
-    --hash=sha256:e3c67a3b0140b903cc2d64ee9e68a392961a205dc54290000baf928e6a65e25c
-botocore==1.13.12 \
-    --hash=sha256:0095818b1f1e2698c3fe0ccc6bd4ed8c735fce37d9a99d7f304047bfd8272ec8 \
-    --hash=sha256:9303675e019b4a7389bfbec264068435d2111739b46baa7ebd08391e64dddfb4 \
+boto3==1.9.248 \
+    --hash=sha256:34b4d76b37fa671854ff45f143d6f8a53017873d186fa751730363c9f7cecb34 \
+    --hash=sha256:7ac03fc57f8d3e795e06ccc02018ba33be54005342230dba3d06e933c0e79fee
+botocore==1.12.248 \
+    --hash=sha256:20ad9c248a999b80ae82280170570483c95dfe5135778f2c22ae17cb2d618267 \
+    --hash=sha256:6e5b997b8087a29611916e58a28ad3d62d07fe7ac12ef552179e7f11c607d61a \
     # via boto3, s3transfer
 cachetools==3.1.1 \
     --hash=sha256:428266a1c0d36dc5aca63a2d7c5942e88c2c898d72139fca0e97fdd2380517ae \
@@ -28,13 +28,17 @@ docutils==0.15.2 \
     --hash=sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827 \
     --hash=sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99 \
     # via botocore
+futures==3.3.0 \
+    --hash=sha256:49b3f5b064b6e3afc3316421a3f25f66c137ae88f068abbf72830170033c5e16 \
+    --hash=sha256:7e033af76a5e35f58e56da7a91e687706faf4e7bdfb2cbc3f2cca6b9bcda9794 \
+    # via google-api-core, s3transfer
 google-api-core==1.14.3 \
     --hash=sha256:b95895a9398026bc0500cf9b4a3f82c3f72c3f9150b26ff53af40c74e91c264a \
     --hash=sha256:df8adc4b97f5ab4328a0e745bee77877cf4a7d4601cb1cd5959d2bbf8fba57aa \
     # via google-cloud-core
-google-auth==1.7.0 \
-    --hash=sha256:8b67e34a07055b9785948ff9d3e044f93be9019f4f69711b04450087ae150817 \
-    --hash=sha256:cf60c71698f90177e044c8df1e2915a6da372a99d2af0e236d76c426aaf4f114 \
+google-auth==1.6.3 \
+    --hash=sha256:0f7c6a64927d34c1a474da92cfc59e552a5d3b940d3266606c6a28b72888b9e4 \
+    --hash=sha256:20705f6803fd2c4d1cc2dcb0df09d4dfcb9a7d51fd59e94a3a28231fd93119ed \
     # via google-api-core, google-cloud-storage
 google-cloud-core==1.0.3 \
     --hash=sha256:0ee17abc74ff02176bee221d4896a00a3c202f3fb07125a7d814ccabd20d7eb5 \
@@ -61,10 +65,10 @@ jmespath==0.9.4 \
 kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b
-mercurial==5.2 \
-    --hash=sha256:34d4676826628e23f12dc381a500cd416f44053f6ae217a9d89d7f3d199ada1c \
-    --hash=sha256:ff030e923f03ee15c91191996fcb099bfcfa60c7df263be227f67b6a65d36194 \
-    --hash=sha256:ffe0105cd872a8c199ce2ee2ff18f594bc717820b0dcfbe1ce714e2d39cf7c2d
+mercurial==5.0.1 \
+    --hash=sha256:4c98a8e4cd5595feaa5ef7385ee2ac6b78bb4599353d3851c0823bd5543e62ce \
+    --hash=sha256:8726d864bbf6ea0688a768e1701c270763bda92465925bbc06022845206c3ca8 \
+    --hash=sha256:b05cd66c92981998e6cc5a8853ae21a1a2d8704511246e22c7d0a6d421474458
 protobuf==3.10.0 \
     --hash=sha256:125713564d8cfed7610e52444c9769b8dcb0b55e25cc7841f2290ee7bc86636f \
     --hash=sha256:1accdb7a47e51503be64d9a57543964ba674edac103215576399d2d0e34eac77 \
@@ -113,9 +117,9 @@ s3transfer==0.2.1 \
     --hash=sha256:6efc926738a3cd576c2a79725fed9afde92378aa5c6a957e3af010cb019fac9d \
     --hash=sha256:b780f2411b824cb541dbcd2c713d0cb61c7d1bcadae204cdddda2b35cef493ba \
     # via boto3
-six==1.13.0 \
-    --hash=sha256:1f1b7d42e254082a9db6279deae68afb421ceba6158efa6131de7b3003ee93fd \
-    --hash=sha256:30f610279e8b2578cab6db20741130331735c781b56053c59c4076da27f06b66 \
+six==1.12.0 \
+    --hash=sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c \
+    --hash=sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73 \
     # via google-api-core, google-auth, google-resumable-media, protobuf, python-dateutil
 urllib3==1.25.6 \
     --hash=sha256:3de946ffbed6e6746608990594d08faac602528ac7015ac28d33cee6a45b7398 \
@@ -123,7 +127,7 @@ urllib3==1.25.6 \
     # via botocore, requests
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==41.6.0 \
-    --hash=sha256:3e8e8505e563631e7cb110d9ad82d135ee866b8146d5efe06e42be07a72db20a \
-    --hash=sha256:6afa61b391dcd16cb8890ec9f66cc4015a8a31a6e1c2b4e0c464514be1a3d722 \
-    # via google-api-core, google-auth, protobuf
+setuptools==41.5.1 \
+    --hash=sha256:998a90a43ad3c696e1ffad1b23783e1bd2e6a92e6066959de7c6f0669c154458 \
+    --hash=sha256:9f1b3c6a6b862cf994c47c5b5a212a75cf0a11912d1cd11abfdfe03a4f49f5b2 \
+    # via google-api-core, protobuf
