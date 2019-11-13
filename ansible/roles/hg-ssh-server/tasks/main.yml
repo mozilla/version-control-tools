@@ -36,9 +36,11 @@
     # Needed to build python-ldap package for virtualenv.
     - openldap-devel
     - python-devel
+    - python
     - python36u
     - python36u-pip
     - rsyslog
+    - python36u-devel
 
 - name: mercurial config directory is present
   file: path=/etc/mercurial state=directory mode=0755
