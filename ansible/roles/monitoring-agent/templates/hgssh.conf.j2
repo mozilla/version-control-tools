@@ -45,8 +45,8 @@ pattern = "vcsreplicator-pulse-notifier"
 [[inputs.procstat]]
 pattern = "vcsreplicator-sns-notifier"
 
+# Monitor hg bundle generate `lastrun` file
 [[inputs.filestat]]
 files = [
-    # Monitor hg bundle generate `lastrun` file
     "/repo/hg/bundles/lastrun",
 ]
