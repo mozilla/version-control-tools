@@ -115,7 +115,7 @@ SCM LDAP group membership is printed with no-op login.
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos (mozilla-central via Lando, releases/*), Firefox Repos (mozilla-central via direct push), Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -199,7 +199,7 @@ ssh as autoland, tagging user2 as the originator of the request
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos (mozilla-central via Lando, releases/*), Firefox Repos (mozilla-central via direct push), Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -292,7 +292,7 @@ Do another login to verify no pash errors are present
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos (mozilla-central via Lando, releases/*), Firefox Repos (mozilla-central via direct push), Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -398,7 +398,7 @@ Failure to connect to LDAP master server is not fatal
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos (mozilla-central via Lando, releases/*), Firefox Repos (mozilla-central via direct push), Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
