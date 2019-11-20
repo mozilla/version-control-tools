@@ -30,7 +30,6 @@
     - sudo
     - tar
     - yum-plugin-versionlock
-    - python36u-devel
 
 - name: install system packages
   yum: name={{ item }} state=present
