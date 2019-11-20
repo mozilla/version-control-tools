@@ -37,10 +37,10 @@
     - openldap-devel
     - python-devel
     - python
-    - python36u
-    - python36u-pip
-    - rsyslog
+    - python3
+    - python3-pip
     - python3-devel
+    - rsyslog
 
 - name: mercurial config directory is present
   file: path=/etc/mercurial state=directory mode=0755
