@@ -40,7 +40,7 @@
     - python36u
     - python36u-pip
     - rsyslog
-    - python36u-devel
+    - python3-devel
 
 - name: mercurial config directory is present
   file: path=/etc/mercurial state=directory mode=0755
