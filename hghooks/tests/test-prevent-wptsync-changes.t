@@ -40,7 +40,7 @@ wptsync user cannot push changes beyond testing/web-platform/tests or meta
   adding file changes
   added 1 changesets with 5 changes to 5 files (no-hg52 !)
   
-  ********************** ERROR **********************
+  ****************** ERROR *******************
   wptsync@mozilla.com can only make changes to
   the following paths on integration/autoland:
   testing/web-platform/moz.build
@@ -51,7 +51,7 @@ wptsync user cannot push changes beyond testing/web-platform/tests or meta
   file0a
   other/file1a
   testing/web-platform/moz_build
-  ***************************************************
+  ********************************************
   
   transaction abort!
   rollback completed
@@ -70,7 +70,7 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   adding file changes
   added 2 changesets with 6 changes to 6 files (no-hg52 !)
   
-  ********************** ERROR **********************
+  ****************** ERROR *******************
   wptsync@mozilla.com can only make changes to
   the following paths on integration/autoland:
   testing/web-platform/moz.build
@@ -81,7 +81,7 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   file0a
   other/file1a
   testing/web-platform/moz_build
-  ***************************************************
+  ********************************************
   
   transaction abort!
   rollback completed
