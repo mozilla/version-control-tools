@@ -90,8 +90,7 @@ being stripped. This tests rev reordering in pushlog database
   adding manifests
   adding file changes
   recorded push in pushlog (hg52 !)
-  added 2 changesets with 2 changes to 1 files (no-hg52 !)
-  added 2 changesets with 2 changes to 1 files (+1 heads) (hg52 !)
+  added 2 changesets with 2 changes to 1 files (+1 heads)
   recorded push in pushlog (no-hg52 !)
 
   $ cd ../server
