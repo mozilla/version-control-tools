@@ -5,7 +5,9 @@ testing/bmoserver/.vagrant
 testing/puppet/files/Mozilla-Bugzilla-Public*
 testing/unifiedserver/.vagrant
 venv/
+\.bash_history$
 \.egg-info/
+\.env$
 \.pyc$
 \.pyo$
 \.swp$

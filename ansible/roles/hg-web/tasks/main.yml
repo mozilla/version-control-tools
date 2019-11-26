@@ -171,7 +171,7 @@
 
 - name: create virtualenv for Python 3 tools
   include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/python3.6
+           python=/usr/bin/python3
            venv=/var/hg/venv_tools_py3
            requirements=../roles/hg-web/files/requirements-tools-py3.txt
 

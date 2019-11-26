@@ -1,0 +1,61 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# To use docker-compose for running the test environment you must
+# create a `.env` file with the following contents:
+#     UID=<uid-of-your-host-machine-user>
+#     GID=<gid-of-your-host-machine-user>
+#     DOCKER_GID=<gid-of-the-host-machine-docker-group>
+#
+# The values for UID, GID, and DOCKER_GID can be found using the
+# following respectively.
+#     $ id -u <username>
+#     $ id -g <username>
+#     $ echo "Group docker with GID="$(cut -d: -f3 < <(getent group docker))""
+#
+# Here is an example of my `.env` file at time of writing:
+#     UID=1000
+#     GID=1000
+#     DOCKER_GID=975
+#
+# The environment may be built by running:
+# `$ docker-compose build`
+#
+# Non-docker tests may be run with:
+# `$ docker-compose run --rm test-runner`
+#
+# The test-runner docker image runs ./create-test-environment
+# with NO_DOCKER=1, since that relys on the host docker daemon.
+# The containers for docker tests can be built by running:
+# `$ docker-compose run --rm test-runner ./d0cker build-all`
+#
+# The full test-suite with docker tests can be run with:
+# `$ docker-compose run --rm test-runner /vct/run-tests`
+
+version: '3'
+services:
+  test-runner:
+    build:
+      context: ./
+      dockerfile: ./testing/docker/test-runner/Dockerfile
+      args:
+        USER_ID: ${UID}
+        GROUP_ID: ${GID}
+        DOCKER_GID: ${DOCKER_GID}
+    image: vct-test-runner:built
+    command: ["/vct/run-tests", "--no-docker"]
+    network_mode: "host"
+    user: vct
+    environment:
+      - NO_DOCKER=1
+      - USER=vct
+    volumes:
+      - ./:/vct
+      - test_runner_venv:/vct/venv
+      - test_runner_cache:/vct/.cache
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  test_runner_venv:
+  test_runner_cache:

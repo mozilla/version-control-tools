@@ -1031,10 +1031,15 @@ class Test(unittest.TestCase):
             self._portmap(6),
             self._portmap(7),
             self._portmap(8),
-            (br'\b%s\b' % re.escape(self._localhostname()), br'$LOCALHOST'),
             (br'([^0-9])%s' % re.escape(self._localip()), br'\1$LOCALIP'),
             (br'\bHG_TXNID=TXN:[a-f0-9]{40}\b', br'HG_TXNID=TXN:$ID$'),
-            ]
+        ] + [
+            (br'\b%s\b' % re.escape(hostname), br'$LOCALHOST')
+            for hostname in
+            # Sort by most '.' characters first so that we properly handle
+            # aliases that are substrings.
+            sorted(self._localhostnames(), key=lambda x: x.count(b'.'), reverse=True)
+        ]
         r.append((self._escapepath(self._testtmp), b'$TESTTMP'))
 
         # TRACKING MOZ - docker stuff
@@ -1076,7 +1081,12 @@ class Test(unittest.TestCase):
 
     # Tracking MOZ - add _localhostname for cross-platform compat
     def _localhostname(self):
-        return b'%s' % socket.getfqdn(self._localip())
+        return self._localhostnames()[0]
+
+    # Tracking MOZ - add _localhostnames for cross-platform compat
+    def _localhostnames(self):
+        hostname, aliaslist, _ = socket.gethostbyaddr(self._localip())
+        return [b'%s' % hostname] + [b'%s' % alias for alias in aliaslist]
 
     def _genrestoreenv(self, testenv):
         """Generate a script that can be used by tests to restore the original

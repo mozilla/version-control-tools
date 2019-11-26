@@ -28,7 +28,7 @@ do
         PYTHON_VERSION=python2.7
     else
         VENV=${ROOT}/venv/py3
-        PYTHON_VERSION=python3.6
+        PYTHON_VERSION=python3
     fi
 
     if [ ! -d ${VENV}/lib ]; then
