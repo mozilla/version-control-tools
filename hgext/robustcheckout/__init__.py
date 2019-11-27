@@ -26,6 +26,7 @@ from mercurial.i18n import _
 from mercurial.node import hex, nullid
 from mercurial import (
     commands,
+    configitems,
     error,
     exchange,
     extensions,
@@ -37,14 +38,8 @@ from mercurial import (
     scmutil,
     urllibcompat,
     util,
+    vfs,
 )
-
-# TRACKING hg43
-try:
-    from mercurial import configitems
-    configitems.dynamicdefault
-except ImportError:
-    configitems = None
 
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
@@ -53,32 +48,13 @@ testedwith = b'4.8 4.9 5.0 5.1 5.2'
 minimumhgversion = b'4.8'
 
 cmdtable = {}
+command = registrar.command(cmdtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    configitem(b'robustcheckout', b'retryjittermin', default=configitems.dynamicdefault)
-    configitem(b'robustcheckout', b'retryjittermax', default=configitems.dynamicdefault)
-
-
-# Mercurial 4.2 introduced the vfs module and deprecated the symbol in
-# scmutil.
-def getvfs():
-    try:
-        from mercurial.vfs import vfs
-        return vfs
-    except ImportError:
-        return scmutil.vfs
+configitem(b'robustcheckout', b'retryjittermin', default=configitems.dynamicdefault)
+configitem(b'robustcheckout', b'retryjittermax', default=configitems.dynamicdefault)
 
 
 def getsparse():
@@ -171,12 +147,8 @@ def purgewrapper(orig, ui, *args, **kwargs):
 
 
 def peerlookup(remote, v):
-    # TRACKING hg46 4.6 added commandexecutor API.
-    if util.safehasattr(remote, 'commandexecutor'):
-        with remote.commandexecutor() as e:
-            return e.callcommand(b'lookup', {b'key': v}).result()
-    else:
-        return remote.lookup(v)
+    with remote.commandexecutor() as e:
+        return e.callcommand(b'lookup', {b'key': v}).result()
 
 
 @command(b'robustcheckout', [
@@ -402,14 +374,14 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
     # potential repo corruption), it is probably faster, since verifying
     # repos can take a while.
 
-    destvfs = getvfs()(dest, audit=False, realpath=True)
+    destvfs = vfs.vfs(dest, audit=False, realpath=True)
 
     def deletesharedstore(path=None):
         storepath = path or destvfs.read(b'.hg/sharedpath').strip()
         if storepath.endswith(b'.hg'):
             storepath = os.path.dirname(storepath)
 
-        storevfs = getvfs()(storepath, audit=False)
+        storevfs = vfs.vfs(storepath, audit=False)
         storevfs.rmtree(forcibly=True)
 
     if destvfs.exists() and not destvfs.exists(b'.hg'):
@@ -565,7 +537,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         raise error.Abort(b'source repo appears to be empty')
 
     storepath = os.path.join(sharebase, hex(rootnode))
-    storevfs = getvfs()(storepath, audit=False)
+    storevfs = vfs.vfs(storepath, audit=False)
 
     if storevfs.isfileorlink(b'.hg/store/lock'):
         ui.warn(b'(shared store has an active lock; assuming it is left '
@@ -765,11 +737,7 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             raise error.Abort(b'sparse profile %s does not exist at revision '
                               b'%s' % (sparse_profile, checkoutrevision))
 
-        # TRACKING hg48 - parseconfig takes `action` param
-        if util.versiontuple(n=2) >= (4, 8):
-            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'), b'sparse')
-        else:
-            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'))
+        old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'), b'sparse')
 
         old_includes, old_excludes, old_profiles = old_config
 
