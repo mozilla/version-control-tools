@@ -249,18 +249,6 @@ else:
     matchdate = util.matchdate
 
 
-# TRACKING hg47
-# ui.progress -> ui.makeprogress
-def makeprogress(ui, *args, **kwargs):
-    """In HG47, the call to `ui.progress` was replaced with `ui.makeprogress`.
-    This method ensures the correct version of the method is called by inspecting
-    the ui object for the existance of the new `ui.makeprogress method`"""
-    if util.safehasattr(ui, "makeprogress"):
-        return ui.makeprogress(*args, **kwargs)
-    else:
-        return ui.progress(*args, **kwargs)
-
-
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
 with demandimport.deactivated():
@@ -1573,14 +1561,14 @@ def reposetup(ui, repo):
                 return
 
             for rev in self:
-                makeprogress(ui, b'changeset', rev, total=len(self))
+                ui.makeprogress(b'changeset', rev, total=len(self))
                 ctx = self[rev]
                 bugs = parse_bugs(ctx.description())
                 if bugs:
                     self.changetracker.associate_bugs_with_changeset(bugs,
                         ctx.node())
 
-            makeprogress(ui, b'changeset', None)
+            ui.makeprogress(b'changeset', None)
 
 
     repo.__class__ = remotestrackingrepo
