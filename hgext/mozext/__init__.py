@@ -223,6 +223,9 @@ from mercurial import (
     templatekw,
     util,
 )
+from mercurial.utils import (
+    dateutil,
+)
 
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
@@ -236,17 +239,6 @@ from mozhg.util import (
 
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
-
-# TRACKING hg47
-# util.makedate -> utils.dateutils.makedate
-# util.matchdate -> utils.dateutils.matchdate
-dateutil = import_module('mercurial.utils.dateutil')
-if dateutil:
-    makedate = dateutil.makedate
-    matchdate = dateutil.matchdate
-else:
-    makedate = util.makedate
-    matchdate = util.matchdate
 
 
 # Disable demand importing for mozautomation because "requests" doesn't
@@ -731,7 +723,7 @@ def revset_firstpushdate(repo, subset, x):
     Changesets that were initially pushed according to the date spec provided.
     """
     ds = revset.getstring(x, _(b'firstpushdate() requires a string'))
-    dm = matchdate(ds)
+    dm = dateutil.matchdate(ds)
 
     def fltr(x):
         pushes = list(repo.changetracker.pushes_for_changeset(repo[x].node()))
@@ -775,7 +767,7 @@ def revset_pushdate(repo, subset, x):
     All pushes are examined.
     """
     ds = revset.getstring(x, _(b'pushdate() requires a string'))
-    dm = matchdate(ds)
+    dm = dateutil.matchdate(ds)
 
     def fltr(x):
         for push in repo.changetracker.pushes_for_changeset(repo[x].node()):
@@ -1104,7 +1096,7 @@ def template_firstpushdate(context, mapping):
     if not pushes:
         return None
 
-    return makedate(pushes[0][2])
+    return dateutil.makedate(pushes[0][2])
 
 
 def template_pushdates(context, mapping):
@@ -1114,7 +1106,7 @@ def template_pushdates(context, mapping):
     repo = context.resource(mapping, b'repo')
 
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushdates = [makedate(p[2]) for p in pushes]
+    pushdates = [dateutil.makedate(p[2]) for p in pushes]
 
     # TRACKING hg47
     if templateutil:
@@ -1131,7 +1123,7 @@ def template_pushheaddates(context, mapping):
 
     node = ctx.node()
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushheaddates = [makedate(p[2]) for p in pushes if pycompat.bytestr(p[4]) == node]
+    pushheaddates = [dateutil.makedate(p[2]) for p in pushes if pycompat.bytestr(p[4]) == node]
 
     # TRACKING hg47
     if templateutil:
