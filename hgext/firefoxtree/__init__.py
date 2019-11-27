@@ -92,6 +92,7 @@ from mercurial import (
     scmutil,
     templatekw,
     util,
+    wireprotov1server,
 )
 from mercurial.error import RepoError
 from mercurial.i18n import _
@@ -119,10 +120,6 @@ logcmdutil = import_module('mercurial.logcmdutil')
 
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
-
-wireproto = import_module('mercurial.wireprotov1server')
-if not wireproto:
-    wireproto = import_module('mercurial.wireproto')
 
 testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2'
 minimumhgversion = b'4.6'
@@ -288,6 +285,7 @@ def get_firefoxtrees(repo):
         yield tag, node, tree, uri
 
 
+@wireprotov1server.wireprotocommand(b'firefoxtrees', b'', permission=b'pull')
 def firefoxtrees(repo, proto):
     lines = []
 
@@ -304,19 +302,6 @@ def firefoxtrees(repo, proto):
 
     return b'\n'.join(lines)
 
-# Mercurial 4.5.2 added a "permissions" dict. 4.6 moved this into the
-# @wireprotocommand decorator.
-
-# TRACKING hg46
-if 'permission' in pycompat.getargspec(wireproto.wireprotocommand).args:
-    firefoxtrees = wireproto.wireprotocommand(b'firefoxtrees', b'',
-                                              permission=b'pull')(firefoxtrees)
-else:
-    firefoxtrees = wireproto.wireprotocommand(b'firefoxtrees', b'')(firefoxtrees)
-
-    # TRACKING hg45
-    if util.safehasattr(wireproto, b'permissions'):
-        wireproto.permissions[b'firefoxtrees'] = b'pull'
 
 def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
@@ -631,7 +616,7 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, b'push', push)
     extensions.wrapfunction(exchange, b'_pullobsolete', wrappedpullobsolete)
     extensions.wrapfunction(exchange, b'_pullbookmarks', wrappedpullbookmarks)
-    extensions.wrapfunction(wireproto, b'_capabilities', capabilities)
+    extensions.wrapfunction(wireprotov1server, b'_capabilities', capabilities)
     extensions.wrapcommand(commands.table, b'outgoing', outgoingcommand)
     extensions.wrapcommand(commands.table, b'pull', pullcommand)
     extensions.wrapcommand(commands.table, b'push', pushcommand)
