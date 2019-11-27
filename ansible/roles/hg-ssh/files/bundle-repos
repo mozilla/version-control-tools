@@ -1,4 +1,5 @@
 mozilla-central zstd_max
+integration/autoland
 integration/mozilla-inbound
 releases/mozilla-release
 releases/mozilla-aurora
