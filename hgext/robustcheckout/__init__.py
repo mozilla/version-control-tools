@@ -103,13 +103,13 @@ def unlinkwrapper(unlinkorig, fn, ui):
     except OSError as e:
         # Assert the error is in fact Windows related
         if not util.safehasattr(e, 'winerror'):
-            raise e
+            raise
 
         # Windows error 3 corresponds to ERROR_PATH_NOT_FOUND
         # only handle this case; re-raise the exception for other kinds of
         # failures.
         if e.winerror != 3:
-            raise e
+            raise
         ui.debug(b'caught WindowsError ERROR_PATH_NOT_FOUND; '
                  b'calling unlink_long %s\n' % fn)
         return unlinklong(fn)
