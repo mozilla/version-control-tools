@@ -49,8 +49,8 @@ except ImportError:
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
-minimumhgversion = b'4.3'
+testedwith = b'4.8 4.9 5.0 5.1 5.2'
+minimumhgversion = b'4.8'
 
 cmdtable = {}
 
@@ -124,12 +124,16 @@ def unlinkwrapper(unlinkorig, fn, ui):
     try:
         ui.debug(b'calling unlink_orig %s\n' % fn)
         return unlinkorig(fn)
-    except WindowsError as e:
+    except OSError as e:
+        # Assert the error is in fact Windows related
+        if not util.safehasattr(e, 'winerror'):
+            raise e
+
         # Windows error 3 corresponds to ERROR_PATH_NOT_FOUND
         # only handle this case; re-raise the exception for other kinds of
         # failures.
         if e.winerror != 3:
-            raise
+            raise e
         ui.debug(b'caught WindowsError ERROR_PATH_NOT_FOUND; '
                  b'calling unlink_long %s\n' % fn)
         return unlinklong(fn)
@@ -138,8 +142,8 @@ def unlinkwrapper(unlinkorig, fn, ui):
 @contextlib.contextmanager
 def wrapunlink(ui):
     '''Context manager that temporarily monkeypatches unlink functions.'''
-    purgemod = extensions.find(b'purge')
-    to_wrap = [(purgemod.util, b'unlink')]
+    from mercurial import win32
+    to_wrap = [(win32, b'unlink')]
 
     # Pass along the ui object to the unlink_wrapper so we can get logging out
     # of it.
