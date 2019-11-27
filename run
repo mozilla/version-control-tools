@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This script is designed to alias common docker-compose commands used for
+# running tests, development, etc. Any complicated processing should
+# be done inside the container in a proper command line application
+# rather than this script.
+
+import os
+import sys
+
+
+COMMANDS = {
+    "tests": ("docker-compose", "run", "--rm", "test-runner", "/vct/run-tests"),
+    "shell": ("docker-compose", "run", "--rm", "test-runner", "/bin/bash"),
+}
+
+def main(args):
+    if not args or args[0] not in COMMANDS:
+        print("./run [command]\n")
+        print("Possible Commands:")
+        for cmd in COMMANDS:
+            print(f"\t{cmd}")
+
+        return 1
+
+    cmd = COMMANDS[args[0]]
+    cmd = list(cmd) + args[1:]
+
+    print("$ {}".format(" ".join(cmd)))
+    os.execvp(cmd[0], cmd)
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
