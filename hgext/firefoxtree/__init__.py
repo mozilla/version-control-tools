@@ -85,6 +85,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    logcmdutil,
     namespaces,
     pycompat,
     registrar,
@@ -114,9 +115,6 @@ from mozautomation.repository import (
     TRY_TREES,
 )
 from mozhg.util import import_module
-
-# TRACKING hg46
-logcmdutil = import_module('mercurial.logcmdutil')
 
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
@@ -539,10 +537,7 @@ def fxheads(ui, repo, **opts):
 
     opts = pycompat.byteskwargs(opts)
 
-    if logcmdutil:
-        displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
-    else:
-        displayer = cmdutil.show_changeset(ui, repo, opts)
+    displayer = logcmdutil.changesetdisplayer(ui, repo, opts)
 
     seen = set()
     for tag, node, tree, uri in get_firefoxtrees(repo):
