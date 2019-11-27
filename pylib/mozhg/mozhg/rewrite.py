@@ -75,38 +75,18 @@ def preservefilectx(oldctx):
             islink = b'l' in fctx.flags()
             isexec = b'x' in fctx.flags()
 
-            # TRACKING hg45 memctx argument was renamed to changectx and
-            # converted from a named argument to positional argument in 4.5.
-            spec = pycompat.getargspec(context.memfilectx.__init__)
-
-            if 'changectx' in spec.args:
-                # TRACKING hg50
-                # `copied` renamed to `copysource`
-                if util.versiontuple(n=2) >= (5, 0):
-                    return context.memfilectx(repo, memctx, path, fctx.data(),
-                                              islink=islink,
-                                              isexec=isexec,
-                                              copysource=copied)
-                else:
-                    return context.memfilectx(repo, memctx, path, fctx.data(),
-                                              islink=islink,
-                                              isexec=isexec,
-                                              copied=copied)
+            # TRACKING hg50
+            # `copied` renamed to `copysource`
+            if util.versiontuple(n=2) >= (5, 0):
+                return context.memfilectx(repo, memctx, path, fctx.data(),
+                                          islink=islink,
+                                          isexec=isexec,
+                                          copysource=copied)
             else:
-                # TRACKING hg50
-                # `copied` renamed to `copysource`
-                if util.versiontuple(n=2) >= (5, 0):
-                    return context.memfilectx(repo, path, fctx.data(),
-                                              islink=islink,
-                                              isexec=isexec,
-                                              copysource=copied,
-                                              memctx=memctx)
-                else:
-                    return context.memfilectx(repo, path, fctx.data(),
-                                              islink=islink,
-                                              isexec=isexec,
-                                              copied=copied,
-                                              memctx=memctx)
+                return context.memfilectx(repo, memctx, path, fctx.data(),
+                                          islink=islink,
+                                          isexec=isexec,
+                                          copied=copied)
         except KeyError:
             return None
 
