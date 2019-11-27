@@ -266,8 +266,8 @@ with demandimport.deactivated():
         TREE_ALIASES,
     )
 
-testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2'
-minimumhgversion = b'4.6'
+testedwith = b'4.7 4.8 4.9 5.0 5.1 5.2'
+minimumhgversion = b'4.7'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
 
 cmdtable = {}
