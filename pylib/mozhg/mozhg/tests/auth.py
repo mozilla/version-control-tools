@@ -22,21 +22,12 @@ from mozhg.auth import (
 )
 
 cmdtable = {}
+command = registrar.command(cmdtable)
 
-# Mercurial 4.3 introduced registrar.command as a replacement for
-# cmdutil.command.
-if util.safehasattr(registrar, 'command'):
-    command = registrar.command(cmdtable)
-else:
-    command = cmdutil.command(cmdtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    register_config_items(configitem)
+register_config_items(configitem)
 
 
 @command('bzauth', [

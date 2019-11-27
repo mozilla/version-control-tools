@@ -17,18 +17,13 @@ from mercurial import (
     pycompat,
     registrar,
     url,
-    util,
 )
 
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4
-# requires config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    configitem(b'urlintercept', b'path',
-               default=None)
+configitem(b'urlintercept', b'path',
+           default=None)
 
 class URLInterceptor(object):
     def __init__(self, ui):

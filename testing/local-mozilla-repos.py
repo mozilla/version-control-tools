@@ -16,7 +16,6 @@ import sys
 
 from mercurial import (
     registrar,
-    util,
 )
 
 try:
@@ -27,15 +26,11 @@ except ImportError:
 
     from mozautomation import repository
 
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-# TRACKING hg43 Mercurial 4.3 introduced the config registrar. 4.4 requires
-# config items to be registered to avoid a devel warning.
-if util.safehasattr(registrar, b'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
-
-    configitem(b'localmozrepo', b'readuri', default=None)
-    configitem(b'localmozrepo', b'writeuri', default=None)
+configitem(b'localmozrepo', b'readuri', default=None)
+configitem(b'localmozrepo', b'writeuri', default=None)
 
 
 def extsetup(ui):

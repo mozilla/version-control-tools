@@ -37,9 +37,6 @@ def import_module(name):
         return None
 
 
-# TRACKING hg43
-configitems = import_module('mercurial.configitems')
-
 FIREFOX_ROOT_NODE = b'8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
 THUNDERBIRD_ROOT_NODE = b'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
 
@@ -93,11 +90,7 @@ def identify_repo(repo):
     if not repo_root.endswith(b'/'):
         repo_root += b'/'
 
-    # TRACKING hg43
-    if configitems:
-        publishing = repo.ui.configbool(b'phases', b'publish')
-    else:
-        publishing = repo.ui.configbool(b'phases', b'publish', True)
+    publishing = repo.ui.configbool(b'phases', b'publish')
 
     d = {
         b'firefox': is_firefox_repo(repo),

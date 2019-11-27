@@ -80,13 +80,11 @@ from mozhg.auth import getbugzillaauth
 testedwith = '4.2 4.3 4.4 4.5 4.6'
 buglink = 'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20bzpost'
 
-# TRACKING hg44 - must register config items
-if util.safehasattr(registrar, 'configitem'):
-    configtable = {}
-    configitem = registrar.configitem(configtable)
+configtable = {}
+configitem = registrar.configitem(configtable)
 
-    configitem('bzpost', 'excludetrees', default=[])
-    configitem('bzpost', 'updateuserrepo', default=False)
+configitem('bzpost', 'excludetrees', default=[])
+configitem('bzpost', 'updateuserrepo', default=False)
 
 
 def wrappedpushbookmark(orig, pushop):

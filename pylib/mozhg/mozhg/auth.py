@@ -9,10 +9,12 @@ import shutil
 import tempfile
 import urlparse
 
-from mercurial import config, error
+from mercurial import (
+    config,
+    configitems,
+    error,
+)
 from mercurial.i18n import _
-
-from util import import_module
 
 
 def register_config_items(configitem):
@@ -20,9 +22,6 @@ def register_config_items(configitem):
 
     The argument is a ``registrar.configitem`` instance.
     """
-    # TRACKING hg43
-    configitems = import_module('mercurial.configitems')
-
     configitem(b'bugzilla', b'username',
                default=configitems.dynamicdefault)
     configitem(b'bugzilla', b'apikey',
