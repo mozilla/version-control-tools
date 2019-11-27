@@ -571,25 +571,13 @@ def _getcachedlabels(repo, ctx, cache):
 
     return labels
 
-# TRACKING hg46
-if util.versiontuple(n=2) >= (4, 6):
-    fxheadsdec = templatekeyword(b'fxheads', requires={b'repo', b'ctx', b'cache'})
-else:
-    fxheadsdec = templatekeyword(b'fxheads')
 
-@fxheadsdec
-def template_fxheads(*args, **kwargs):
+@templatekeyword(b'fxheads', requires={b'repo', b'ctx', b'cache'})
+def template_fxheads(context, mapping):
     """:fxheads: List of strings. Firefox trees with heads on this commit."""
-    # TRACKING hg46
-    if util.versiontuple(n=2) >= (4, 6):
-        context, mapping = args
-        repo = context.resource(mapping, b'repo')
-        ctx = context.resource(mapping, b'ctx')
-        cache = context.resource(mapping, b'cache')
-    else:
-        repo = kwargs[b'repo']
-        ctx = kwargs[b'ctx']
-        cache = kwargs[b'cache']
+    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b'ctx')
+    cache = context.resource(mapping, b'cache')
 
     labels = _getcachedlabels(repo, ctx, cache)
     if not labels:
