@@ -39,17 +39,9 @@ from mercurial import (
     pycompat,
     registrar,
     util,
+    wireprotov1server,
 )
 
-from mozhg.util import (
-    import_module,
-)
-
-# TRACKING hg46
-# wireproto -> wireprotov1server
-wireproto = import_module('mercurial.wireprotov1server')
-if not wireproto:
-    wireproto = import_module('mercurial.wireproto')
 
 with demandimport.deactivated():
     from kafka import SimpleClient
@@ -551,10 +543,10 @@ def debugbase85obsmarkers(ui, markers, **opts):
 
 
 def wireprotodispatch(orig, repo, proto, command):
-    """Wraps wireproto.dispatch() to allow operations on unfiltered repo.
+    """Wraps wireprotov1server.dispatch() to allow operations on unfiltered repo.
 
     Replication consumers need full access to the source repo. The
-    default implementation of ``wireproto.dispatch`` always operated on
+    default implementation of ``wireprotov1server.dispatch`` always operated on
     the ``served`` repo filter, which doesn't expose hidden changesets.
     This could cause replication mirrors referencing hidden changesets
     to encounter errors.
@@ -585,21 +577,21 @@ def wireprotodispatch(orig, repo, proto, command):
 
 
 def wrapped_getdispatchrepo(orig, repo, proto, command):
-    '''Wraps `wireproto.getdispatchrepo` to serve the unfiltered repository'''
+    '''Wraps `wireprotov1server.getdispatchrepo` to serve the unfiltered repository'''
     unfiltereduser = repo.ui.config(b'replication', b'unfiltereduser')
     if not unfiltereduser or unfiltereduser != repo.ui.environ.get(b'USER'):
         return orig(repo, proto, command)
 
-    permission = wireproto.commands[command].permission
+    permission = wireprotov1server.commands[command].permission
     if permission == b'pull':
         return repo.unfiltered()
     return orig(repo, proto, command)
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireproto, b'dispatch', wireprotodispatch)
+    extensions.wrapfunction(wireprotov1server, b'dispatch', wireprotodispatch)
     extensions.wrapcommand(commands.table, b'init', initcommand)
-    extensions.wrapfunction(wireproto, b'getdispatchrepo', wrapped_getdispatchrepo)
+    extensions.wrapfunction(wireprotov1server, b'getdispatchrepo', wrapped_getdispatchrepo)
 
     if _ORIG_PHASE_HEADS_HANDLER:
         bundle2.parthandlermapping[b'phase-heads'] = phase_heads_handler
