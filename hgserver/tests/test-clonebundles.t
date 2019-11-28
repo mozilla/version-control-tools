@@ -167,7 +167,6 @@ Reload apache after setting config, so processes pick up the new config
   $ hgmo exec hgweb0 supervisorctl restart httpd
   httpd: stopped
   httpd: started
-  
   $ http --no-headers --request-header "Remote-Addr: 10.144.1.1" ${HGWEB_0_URL}mozilla-central?cmd=clonebundles
   200
   
