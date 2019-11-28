@@ -185,6 +185,7 @@ import gc
 import os
 import re
 import sys
+from collections import namedtuple, Counter, defaultdict
 
 from operator import methodcaller
 
@@ -222,6 +223,8 @@ from mercurial import (
     templatefilters,
     templatekw,
     util,
+    pathutil,
+    url
 )
 from mercurial.utils import (
     dateutil,
@@ -237,9 +240,12 @@ from mozhg.util import (
     get_backoutbynode,
 )
 
+
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
 
+logcmdutil = import_module('mercurial.logcmdutil')
+getlogrevs = logcmdutil.getrevs
 
 # Disable demand importing for mozautomation because "requests" doesn't
 # play nice with the demand importer.
@@ -291,6 +297,10 @@ configitem(b'mozext', b'reject_pushes_with_repo_names',
            default=False)
 configitem(b'mozext', b'backoutsearchlimit',
            default=configitems.dynamicdefault)
+configitem(b'reviewers', b'.*',
+           generic=True,
+           default=configitems.dynamicdefault)
+
 
 colortable = {
     b'buildstatus.success': b'green',
@@ -1568,3 +1578,238 @@ def reposetup(ui, repo):
     if ui.configbool(b'mozext', b'reject_pushes_with_repo_names'):
         ui.setconfig(b'hooks', b'prepushkey.reject_repo_names',
             reject_repo_names_hook)
+
+
+class DropoffCounter(object):
+    '''Maintain a mapping from values to counts and weights, where the weight
+    drops off exponentially as "time" passes. This is useful when more recent
+contributions should be weighted higher than older ones.'''
+
+    Item = namedtuple('Item', ['name', 'count', 'weight'])
+
+    def __init__(self, factor):
+        self.factor = factor
+        self.counts = Counter()
+        self.weights = defaultdict(float)
+        self.age = 0
+
+    def add(self, value):
+        self.counts[value] += 1
+        self.weights[value] += pow(self.factor, self.age)
+
+    def advance(self):
+        self.age += 1
+
+    def most_weighted(self, n):
+        top = sorted(self.weights, key=lambda k: self.weights[k], reverse=True)
+        if len(top) > n:
+            top = top[:n]
+        return [self[key] for key in top]
+
+    def countValues(self):
+        '''Return number of distinct values stored.'''
+        return len(self.counts)
+
+    def weight(self, value):
+        return self.weights[value]
+
+    def __getitem__(self, key):
+        if key in self.counts:
+            return DropoffCounter.Item(key, self.counts[key], self.weights[key])
+
+
+def fullpaths(ui, repo, paths):
+    cwd = os.getcwd()
+    return [pathutil.canonpath(repo.root, cwd, path) for path in paths]
+
+
+def get_logrevs_for_files(repo, files, opts):
+    limit = opts['limit'] or 1000000
+    revs = getlogrevs(repo, files, {b'follow': True, b'limit': limit})[0]
+    for rev in revs:
+        yield rev
+
+
+def choose_changes(ui, repo, patchfile, opts):
+    if opts.get('file'):
+        changedFiles = fullpaths(ui, repo, opts['file'])
+        return (changedFiles, 'file', opts['file'])
+
+    if opts.get('dir'):
+        changedFiles = opts['dir']  # For --debug printout only
+        return (changedFiles, 'dir', opts['dir'])
+
+    if opts.get('rev'):
+        revs = scmutil.revrange(repo, opts['rev'])
+        if not revs:
+            raise error.Abort(b"no changes found")
+        files_in_revs = set()
+        for rev in revs:
+            for f in repo[rev].files():
+                files_in_revs.add(f)
+        changedFiles = sorted(filesInRevs)
+        return (changedFiles, 'rev', opts['rev'])
+
+    diff = None
+    changedFiles = None
+    if patchfile is not None:
+        source = None
+        if util.safehasattr(patchfile, 'getvalue'):
+            diff = patchfile.getvalue()
+            source = (b'patchdata', None)
+        else:
+            try:
+                diff = url.open(ui, patchfile).read()
+                source = (b'patch', patchfile)
+            except IOError:
+                if hasattr(repo, 'mq'):
+                    q = repo.mq
+                    if q:
+                        diff = url.open(ui, q.lookup(patchfile)).read()
+                        source = ('mqpatch', patchfile)
+    else:
+        # try using:
+        #  1. current diff (if nonempty)
+        #  2. top applied patch in mq patch queue (if mq enabled)
+        #  3. parent of working directory
+        ui.pushbuffer()
+        commands.diff(ui, repo, git=True)
+        diff = ui.popbuffer()
+        changedFiles = fileRe.findall(diff)
+        if len(changedFiles) > 0:
+            source = (b'current diff', None)
+        else:
+            changedFiles = None
+            diff = None
+
+        if hasattr(repo, 'mq') and repo.mq:
+            ui.pushbuffer()
+            try:
+                commands.diff(ui, repo, change="qtip", git=True)
+            except error.RepoLookupError:
+                pass
+            diff = ui.popbuffer()
+            if diff == '':
+                diff = None
+            else:
+                source = ('qtip', None)
+
+        if diff is None:
+            changedFiles = sorted(repo[b'.'].files())
+            source = (b'rev', b'.')
+
+    if changedFiles is None:
+        changedFiles = fileRe.findall(diff)
+
+    return (changedFiles, source[0], source[1])
+
+
+def patch_changes(ui, repo, patchfile=None, **opts):
+    '''Given a patch, look at what files it changes, and map a function over
+    the changesets that touch overlapping files.
+
+    Scan through the last LIMIT commits to find the relevant changesets
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used directly.
+    '''
+    (changedFiles, source, source_info) = choose_changes(ui, repo, patchfile, opts)
+    if ui.verbose:
+        ui.write(b"Patch source: %s" % source)
+        if source_info is not None:
+            ui.write(b" %r" % (source_info,))
+        ui.write(b"\n")
+
+    if len(changedFiles) == 0:
+        ui.write(b"Warning: no modified files found in patch. Did you mean to use the -f option?\n")
+
+    if ui.verbose:
+        ui.write(b"Using files:\n")
+        if len(changedFiles) == 0:
+            ui.write(b"  (none)\n")
+        else:
+            for changedFile in changedFiles:
+                ui.write(b"  %s\n" % changedFile)
+
+    # Expand files out to their current full paths
+    if opts.get('dir'):
+        exact_files = [b'glob:' + opts['dir'] + b'/**']
+    else:
+        paths = [p + b'/**' if os.path.isdir(p) else p for p in changedFiles]
+        matchfn = scmutil.match(repo[b'.'], paths, default=b'relglob')
+        exact_files = [b'path:' + path for path in repo[b'.'].walk(matchfn)]
+        if len(exact_files) == 0:
+            return
+
+    for rev in get_logrevs_for_files(repo, exact_files, opts):
+        yield repo[rev]
+
+
+fileRe = re.compile(br"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
+suckerRe = re.compile(br"[^s-]r=(\w+)")
+
+
+@command(b'reviewers', [
+    (b'f', b'file', [], b'see reviewers for FILE', b'FILE'),
+    (b'r', b'rev', [], b'see reviewers for revisions', b'REVS'),
+    (b'l', b'limit', 200, b'how many revisions back to scan', b'LIMIT'),
+    (b'', b'brief', False, b'shorter output')],
+    _(b'hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
+def reviewers(ui, repo, patchfile=None, **opts):
+    '''Suggest a reviewer for a patch
+
+    Scan through the last LIMIT commits to find candidate reviewers for a
+    patch (or set of files).
+
+    The patch may be given as a file or a URL. If no patch is specified,
+    the changes in the working directory will be used. If there are no
+    changes, the topmost applied patch in your mq repository will be used.
+
+    Alternatively, the -f option may be used to pass in one or more files
+    that will be used to infer the reviewers instead.
+
+    The [reviewers] section of your .hgrc may be used to specify reviewer
+    aliases in case reviewers are specified multiple ways.
+
+    Written by Blake Winton http://weblog.latte.ca/blake/
+    '''
+
+    def canon(reviewer):
+        reviewer = reviewer.lower()
+        return ui.config(b'reviewers', reviewer, reviewer)
+
+    suckers = DropoffCounter(0.95)
+    totalSuckers = 0
+    enoughSuckers = 100
+    for change in patch_changes(ui, repo, patchfile, **opts):
+        for raw in suckerRe.findall(change.description()):
+            suckers.add(canon(raw))
+        if suckers.countValues() >= enoughSuckers:
+            break
+        suckers.advance()
+
+    if suckers.age == 0:
+        ui.write(b"no matching files found\n")
+        return
+
+    if opts.get('brief'):
+        if len(suckers) == 0:
+            ui.write(b"no reviewers found in range\n")
+        else:
+            r = [ b"%s x %d" % (s.name, s.count) for s in suckers.most_weighted(3) ]
+            ui.write(b", ".join(r) + b"\n")
+        return
+
+    ui.write(b"Potential reviewers:\n")
+    if (suckers.countValues() == 0):
+        ui.write(b"  none found in range (try higher --limit?)\n")
+    else:
+        top_weight = 0
+        for s in suckers.most_weighted(5):
+            top_weight = top_weight or s.weight
+            ui.write(b"  %s: %d (score = %d)\n" % (s.name, s.count, 10 * s.weight / top_weight))
+    ui.write(b"\n")
