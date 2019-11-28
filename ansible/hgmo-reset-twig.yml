@@ -45,7 +45,7 @@
       when: old_st.stat.exists == True
       tags: check
 
-- hosts: hgssh-prod-master:hgweb-prod
+- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors
   gather_facts: no
   tasks:
     - name: Rename twig to twig-old
@@ -100,7 +100,7 @@
     - name: Show revision
       debug: var=hg_log.stdout.split('\n')
 
-- hosts: hgssh-prod-master:hgweb-prod
+- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors
   gather_facts: no
   tasks:
     - name: Stat twig-old
