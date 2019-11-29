@@ -59,7 +59,7 @@ MINIMUM_SUPPORTED_VERSION = (3, 5, 0)
 # Upgrade Mercurial older than this.
 # This should match MODERN_MERCURIAL_VERSION from
 # mozilla-central/python/mozboot/mozboot/base.py
-OLDEST_NON_LEGACY_VERSION = (4, 3, 3)
+OLDEST_NON_LEGACY_VERSION = (4, 9)
 
 VERSION_TOO_OLD = b'''
 Your version of Mercurial (%d.%d) is too old to run `hg configwizard`.
