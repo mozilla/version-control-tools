@@ -244,6 +244,7 @@ from mozhg.util import (
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
 
+
 logcmdutil = import_module('mercurial.logcmdutil')
 getlogrevs = logcmdutil.getrevs
 
@@ -1581,20 +1582,18 @@ def reposetup(ui, repo):
 
 
 class DropoffCounter(object):
-    '''Maintain a mapping from values to counts and weights, where the weight
+    """Maintain a mapping from values to counts and weights, where the weight
     drops off exponentially as "time" passes. This is useful when more recent
-contributions should be weighted higher than older ones.'''
+    contributions should be weighted higher than older ones."""
 
-    Item = namedtuple('Item', ['name', 'count', 'weight'])
+    Item = namedtuple('Item', ['name', 'weight'])
 
     def __init__(self, factor):
         self.factor = factor
-        self.counts = Counter()
         self.weights = defaultdict(float)
         self.age = 0
 
     def add(self, value):
-        self.counts[value] += 1
         self.weights[value] += pow(self.factor, self.age)
 
     def advance(self):
@@ -1606,19 +1605,18 @@ contributions should be weighted higher than older ones.'''
             top = top[:n]
         return [self[key] for key in top]
 
-    def countValues(self):
-        '''Return number of distinct values stored.'''
-        return len(self.counts)
+    def count_values(self):
+        """Return number of distinct values stored."""
+        return len(self.weights)
 
     def weight(self, value):
         return self.weights[value]
 
     def __getitem__(self, key):
-        if key in self.counts:
-            return DropoffCounter.Item(key, self.counts[key], self.weights[key])
+        return DropoffCounter.Item(key, self.weights[key])
 
 
-def fullpaths(ui, repo, paths):
+def fullpaths(repo, paths):
     cwd = os.getcwd()
     return [pathutil.canonpath(repo.root, cwd, path) for path in paths]
 
@@ -1632,12 +1630,12 @@ def get_logrevs_for_files(repo, files, opts):
 
 def choose_changes(ui, repo, patchfile, opts):
     if opts.get('file'):
-        changedFiles = fullpaths(ui, repo, opts['file'])
-        return (changedFiles, 'file', opts['file'])
+        changed_files = fullpaths(repo, opts['file'])
+        return (changed_files, b'file', opts['file'])
 
     if opts.get('dir'):
-        changedFiles = opts['dir']  # For --debug printout only
-        return (changedFiles, 'dir', opts['dir'])
+        changed_files = opts['dir']  # For --debug printout only
+        return (changed_files, b'dir', opts['dir'])
 
     if opts.get('rev'):
         revs = scmutil.revrange(repo, opts['rev'])
@@ -1647,11 +1645,10 @@ def choose_changes(ui, repo, patchfile, opts):
         for rev in revs:
             for f in repo[rev].files():
                 files_in_revs.add(f)
-        changedFiles = sorted(filesInRevs)
-        return (changedFiles, 'rev', opts['rev'])
+        changed_files = sorted(files_in_revs)
+        return (changed_files, b'rev', opts['rev'])
 
-    diff = None
-    changedFiles = None
+    changed_files = None
     if patchfile is not None:
         source = None
         if util.safehasattr(patchfile, 'getvalue'):
@@ -1662,46 +1659,30 @@ def choose_changes(ui, repo, patchfile, opts):
                 diff = url.open(ui, patchfile).read()
                 source = (b'patch', patchfile)
             except IOError:
-                if hasattr(repo, 'mq'):
-                    q = repo.mq
-                    if q:
-                        diff = url.open(ui, q.lookup(patchfile)).read()
-                        source = ('mqpatch', patchfile)
+                raise error.Abort(b'Could not find patchfile called "%s"' % patchfile)
+
     else:
         # try using:
         #  1. current diff (if nonempty)
-        #  2. top applied patch in mq patch queue (if mq enabled)
-        #  3. parent of working directory
+        #  2. parent of working directory
         ui.pushbuffer()
         commands.diff(ui, repo, git=True)
         diff = ui.popbuffer()
-        changedFiles = fileRe.findall(diff)
-        if len(changedFiles) > 0:
+        changed_files = fileRe.findall(diff)
+        if len(changed_files) > 0:
             source = (b'current diff', None)
         else:
-            changedFiles = None
+            changed_files = None
             diff = None
 
-        if hasattr(repo, 'mq') and repo.mq:
-            ui.pushbuffer()
-            try:
-                commands.diff(ui, repo, change="qtip", git=True)
-            except error.RepoLookupError:
-                pass
-            diff = ui.popbuffer()
-            if diff == '':
-                diff = None
-            else:
-                source = ('qtip', None)
-
         if diff is None:
-            changedFiles = sorted(repo[b'.'].files())
+            changed_files = sorted(repo[b'.'].files())
             source = (b'rev', b'.')
 
-    if changedFiles is None:
-        changedFiles = fileRe.findall(diff)
+    if changed_files is None:
+        changed_files = fileRe.findall(diff)
 
-    return (changedFiles, source[0], source[1])
+    return (changed_files, source[0], source[1])
 
 
 def patch_changes(ui, repo, patchfile=None, **opts):
@@ -1711,8 +1692,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
     Scan through the last LIMIT commits to find the relevant changesets
 
     The patch may be given as a file or a URL. If no patch is specified,
-    the changes in the working directory will be used. If there are no
-    changes, the topmost applied patch in your mq repository will be used.
+    the changes in the working directory will be used.
 
     Alternatively, the -f option may be used to pass in one or more files
     that will be used directly.
@@ -1756,18 +1736,16 @@ suckerRe = re.compile(br"[^s-]r=(\w+)")
 @command(b'reviewers', [
     (b'f', b'file', [], b'see reviewers for FILE', b'FILE'),
     (b'r', b'rev', [], b'see reviewers for revisions', b'REVS'),
-    (b'l', b'limit', 200, b'how many revisions back to scan', b'LIMIT'),
-    (b'', b'brief', False, b'shorter output')],
+    (b'l', b'limit', 200, b'how many revisions back to scan', b'LIMIT')],
     _(b'hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
 def reviewers(ui, repo, patchfile=None, **opts):
-    '''Suggest a reviewer for a patch
+    """Suggest a reviewer for a patch
 
     Scan through the last LIMIT commits to find candidate reviewers for a
     patch (or set of files).
 
     The patch may be given as a file or a URL. If no patch is specified,
-    the changes in the working directory will be used. If there are no
-    changes, the topmost applied patch in your mq repository will be used.
+    the changes in the working directory will be used.
 
     Alternatively, the -f option may be used to pass in one or more files
     that will be used to infer the reviewers instead.
@@ -1776,19 +1754,18 @@ def reviewers(ui, repo, patchfile=None, **opts):
     aliases in case reviewers are specified multiple ways.
 
     Written by Blake Winton http://weblog.latte.ca/blake/
-    '''
+    """
 
     def canon(reviewer):
         reviewer = reviewer.lower()
         return ui.config(b'reviewers', reviewer, reviewer)
 
     suckers = DropoffCounter(0.95)
-    totalSuckers = 0
-    enoughSuckers = 100
+    enough_suckers = 100
     for change in patch_changes(ui, repo, patchfile, **opts):
         for raw in suckerRe.findall(change.description()):
             suckers.add(canon(raw))
-        if suckers.countValues() >= enoughSuckers:
+        if suckers.count_values() >= enough_suckers:
             break
         suckers.advance()
 
@@ -1796,20 +1773,10 @@ def reviewers(ui, repo, patchfile=None, **opts):
         ui.write(b"no matching files found\n")
         return
 
-    if opts.get('brief'):
-        if len(suckers) == 0:
-            ui.write(b"no reviewers found in range\n")
-        else:
-            r = [ b"%s x %d" % (s.name, s.count) for s in suckers.most_weighted(3) ]
-            ui.write(b", ".join(r) + b"\n")
-        return
-
     ui.write(b"Potential reviewers:\n")
-    if (suckers.countValues() == 0):
+    if suckers.count_values() == 0:
         ui.write(b"  none found in range (try higher --limit?)\n")
     else:
-        top_weight = 0
-        for s in suckers.most_weighted(5):
-            top_weight = top_weight or s.weight
-            ui.write(b"  %s: %d (score = %d)\n" % (s.name, s.count, 10 * s.weight / top_weight))
+        for i, s in enumerate(suckers.most_weighted(5)):
+            ui.write(b"  %d. %s\n" % (i + 1, s.name))
     ui.write(b"\n")

@@ -17,7 +17,7 @@ Check reviewer using uncommitted diff
   $ echo "other line" > file1.txt
   $ hg reviewers
   Potential reviewers:
-    user1: 1 (score = 10)
+    1. user1
   
   $ hg up --clean -q
 
@@ -27,6 +27,6 @@ Check reviewer using last revision
   $ hg commit -m "no bug: r=user3"
   $ hg reviewers
   Potential reviewers:
-    user3: 1 (score = 10)
-    user2: 1 (score = 9)
+    1. user3
+    2. user2
   
