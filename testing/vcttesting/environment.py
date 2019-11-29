@@ -207,14 +207,10 @@ def create_docs():
     return venv
 
 
-def create_hgdev(docker_bmo=False):
+def create_hgdev():
     """Create an environment used for hacking on Mercurial extensions."""
     venv = create_virtualenv('hgdev')
-
-    if docker_bmo:
-        reqs = 'testing/requirements-hgdev-docker.txt'
-    else:
-        reqs = 'testing/requirements-hgdev.txt'
+    reqs = 'testing/requirements-hgdev.txt'
 
     process_pip_requirements(venv, reqs)
     install_editable(venv, 'hghooks')
@@ -225,17 +221,6 @@ def create_hgdev(docker_bmo=False):
     install_editable(venv, 'testing')
 
     install_mercurials(venv, hg=os.path.join(venv['bin_dir'], 'hg'))
-
-    if docker_bmo:
-        activate_virtualenv(venv)
-        docker = docker_client()
-
-        if docker:
-            docker.build_bmo(verbose=True)
-        else:
-            print('Docker not available; cannot build BMO Docker image')
-
-        print('attempting to builder bugzilla.mozilla.org Docker image')
 
     return venv
 

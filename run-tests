@@ -245,7 +245,7 @@ if __name__ == '__main__':
             have_docker = True
             os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
-            # We build the base BMO images in the test runner because doing it
+            # We build the base docker images in the test runner because doing it
             # from tests would be racey. It is easier to do it here instead of
             # complicating code with locks.
             #

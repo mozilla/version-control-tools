@@ -149,18 +149,14 @@ class Docker(object):
         self._ddir = DOCKER_DIR
         self._state_path = state_path
         self.state = {
-            'clobber-bmobootstrap': None,
-            'clobber-bmofetch': None,
             'clobber-hgweb': None,
             'clobber-hgmaster': None,
             'clobber-hgrb': None,
             'clobber-rbweb': None,
             'images': {},
             'containers': {},
-            'last-bmoweb-id': None,
             'last-pulse-id': None,
             'last-rbweb-id': None,
-            'last-bmoweb-bootstrap-id': None,
             'last-rbweb-bootstrap-id': None,
             'last-hgrb-id': None,
             'last-hgmaster-id': None,
@@ -176,16 +172,12 @@ class Docker(object):
                 self.state = json.load(fh)
 
         keys = (
-            'clobber-bmobootstrap',
-            'clobber-bmofetch',
             'clobber-hgweb',
             'clobber-hgmaster',
             'clobber-hgrb',
             'clobber-rbweb',
-            'last-bmoweb-id',
             'last-pulse-id',
             'last-rbweb-id',
-            'last-bmoweb-bootstrap-id',
             'last-rbweb-bootstrap-id',
             'last-hgmaster-id',
             'last-hgrb-id',
@@ -801,163 +793,6 @@ class Docker(object):
 
         return images
 
-    def build_bmo(self, images=None, verbose=False):
-        raise Exception("BMO docker container is no longer supported.")
-
-        bmo_images = self.ensure_images_built([
-            'bmoweb',
-        ], existing=images, verbose=verbose)
-
-        self.state['last-bmoweb-id'] = bmo_images['bmoweb']
-        self.save_state()
-
-        state_images = self.state['images']
-
-        # The keys for the bootstrapped images are derived from the base
-        # images they depend on. This means that if we regenerate a new
-        # base image, the bootstrapped images will be regenerated.
-        bmoweb_bootstrapped_key = 'bmoweb-bootstrapped:%s' % \
-            bmo_images['bmoweb']
-
-        bmoweb_bootstrap = state_images.get(bmoweb_bootstrapped_key)
-
-        known_images = self.all_docker_images()
-        if bmoweb_bootstrap and bmoweb_bootstrap not in known_images:
-            bmoweb_bootstrap = None
-
-        if not bmoweb_bootstrap or self.clobber_needed('bmobootstrap'):
-            bmoweb_bootstrap = self._bootstrap_bmo(bmo_images['bmoweb'])
-
-        state_images[bmoweb_bootstrapped_key] = bmoweb_bootstrap
-        self.state['last-bmoweb-bootstrap-id'] = bmoweb_bootstrap
-        self.save_state()
-
-        return {
-            'bmoweb': bmoweb_bootstrap,
-        }
-
-    def _bootstrap_bmo(self, web_image):
-        """Build bootstrapped BMO images.
-
-        BMO's first run time takes several seconds. It isn't practical to wait
-        for this every time the containers start. So, we do the first run code
-        once and commit the result to a new image.
-        """
-        web_environ = {}
-
-        if 'FETCH_BMO' in os.environ or self.clobber_needed('bmofetch'):
-            web_environ['FETCH_BMO'] = '1'
-
-        host_config = self.api_client.create_host_config(
-            port_bindings={80: None})
-
-        web_id = self.api_client.create_container(
-            web_image,
-            environment=web_environ,
-            host_config=host_config,
-            labels=['bmoweb-bootstrapping'])['Id']
-
-        with self.start_container(web_id) as web_state:
-            web_hostname, web_port = self._get_host_hostname_port(
-                web_state, '80/tcp')
-            wait_for_http(
-                web_hostname,
-                web_port,
-                path='xmlrpc.cgi',
-                extra_check_fn=self._get_assert_container_running_fn(web_id))
-
-        web_unique_id = str(uuid.uuid1())
-
-        # Save an image of the stopped containers.
-        # We tag with a unique ID so we can identify all bootrapped images
-        # easily from Docker's own metadata. We have to give a tag becaue
-        # Docker will forget the repository name if a name image has only a
-        # repository name as well.
-
-        web_bootstrap = self.api_client.commit(
-            web_id, repository='bmoweb-bootstrapped', tag=web_unique_id)['Id']
-
-        self.api_client.remove_container(web_id, v=True)
-
-        return web_bootstrap
-
-    def start_bmo(self, cluster, http_port=80,
-                  web_image=None, verbose=False):
-        """Start a bugzilla.mozilla.org cluster.
-
-        Code in this function is pretty much inlined in self.start_mozreview
-        for performance reasons because we don't want start_mozreview to have
-        to wait for complete initialization before it is unblocked. We could
-        probably factor functionality into smaller pieces.
-        """
-        if not web_image:
-            images = self.build_bmo(verbose=verbose)
-            web_image = images['bmoweb']
-
-        containers = self.state['containers'].setdefault(cluster, [])
-
-        network_name = 'bmo-%s' % uuid.uuid4()
-        self.api_client.create_network(network_name, driver='bridge')
-
-        bmo_url = 'http://%s:%s/' % (self.docker_hostname, http_port)
-        bmo_host_config = self.api_client.create_host_config(
-            port_bindings={80: http_port})
-        web_id = self.api_client.create_container(
-            web_image,
-            environment={'BMO_URL': bmo_url},
-            host_config=bmo_host_config,
-            networking_config=self.network_config(network_name, 'web'),
-            labels=['bmoweb'])['Id']
-        containers.append(web_id)
-        self.api_client.start(web_id)
-        web_state = self.api_client.inspect_container(web_id)
-
-        self.save_state()
-
-        hostname, hostport = self._get_host_hostname_port(web_state, '80/tcp')
-        bmo_url = 'http://%s:%d/' % (hostname, hostport)
-
-        print('waiting for Bugzilla to start')
-        wait_for_http(
-            hostname, hostport,
-            extra_check_fn=self._get_assert_container_running_fn(web_id))
-        print('Bugzilla accessible on %s' % bmo_url)
-
-        return {
-            'bugzilla_url': bmo_url,
-            'web_id': web_id,
-        }
-
-    def stop_bmo(self, cluster):
-        count = 0
-
-        ids = self.state['containers'].get(cluster, [])
-        networks = set()
-
-        with futures.ThreadPoolExecutor(max(1, len(ids))) as e:
-            for container in reversed(ids):
-                if count == 0:
-                    state = self.api_client.inspect_container(container)
-                    for network in state['NetworkSettings']['Networks'].values():
-                        networks.add(network['NetworkID'])
-
-                count += 1
-                e.submit(self.api_client.remove_container, container,
-                         force=True,
-                         v=True)
-
-        # There should only be 1, so don't use a ThreadPoolExecutor.
-        for network in networks:
-            self.api_client.remove_network(network)
-
-        print('stopped %d containers' % count)
-
-        try:
-            del self.state['containers'][cluster]
-            self.save_state()
-        except KeyError:
-            pass
-
     def network_config(self, network_name, alias):
         """Obtain a networking config object."""
         return self.api_client.create_networking_config(
@@ -969,7 +804,7 @@ class Docker(object):
         )
 
     def build_all_images(self, verbose=False, use_last=False,
-                         hgmo=True, bmo=False, max_workers=None):
+                         hgmo=True, max_workers=None):
         docker_images = set()
         ansible_images = {}
 
@@ -979,11 +814,6 @@ class Docker(object):
             }
             ansible_images['hgmaster'] = ('docker-hgmaster', 'centos7')
             ansible_images['hgweb'] = ('docker-hgweb', 'centos7')
-
-        if bmo:
-            docker_images |= {
-                'bmoweb',
-            }
 
         images = self.ensure_images_built(docker_images,
                                           ansibles=ansible_images,
@@ -998,18 +828,11 @@ class Docker(object):
                     verbose=verbose,
                     use_last=use_last)
 
-            if bmo:
-                f_bmo = e.submit(
-                    self.build_bmo,
-                    images=images,
-                    verbose=verbose)
-
         hgmo_result = f_hgmo.result() if hgmo else None
-        bmo_result = f_bmo.result() if bmo else None
 
         self.prune_images()
 
-        return None, hgmo_result, bmo_result
+        return None, hgmo_result
 
     def get_full_image(self, image):
         for i in self.api_client.images():
@@ -1028,11 +851,9 @@ class Docker(object):
                       for c in self.api_client.containers())
 
         ignore_images = set([
-            self.state['last-bmoweb-id'],
             self.state['last-hgrb-id'],
             self.state['last-pulse-id'],
             self.state['last-rbweb-id'],
-            self.state['last-bmoweb-bootstrap-id'],
             self.state['last-hgmaster-id'],
             self.state['last-hgweb-id'],
             self.state['last-ldap-id'],
@@ -1041,8 +862,6 @@ class Docker(object):
         ])
 
         relevant_repos = set([
-            'bmoweb',
-            'bmoweb-bootstrapped',
             'pulse',
             'rbweb',
             'hgmaster',

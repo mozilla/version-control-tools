@@ -7,14 +7,6 @@
 with Files('**'):
     BUG_COMPONENT = ('Developer Services', 'General')
 
-with Files('hgext/bzexport/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: bzexport')
-    FINAL = True
-
-with Files('hgext/bzpost/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: bzpost')
-    FINAL = True
-
 with Files('hgext/firefoxtree/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: firefoxtree')
     FINAL = True

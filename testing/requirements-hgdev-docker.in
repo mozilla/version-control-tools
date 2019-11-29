@@ -1,5 +1,0 @@
--r requirements-hgdev.in
-
-backports.lzma
-docker
-mechanize

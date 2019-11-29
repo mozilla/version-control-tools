@@ -82,14 +82,6 @@ COVERAGE_OMIT = (
     'pylib/requests/*',
 )
 
-# Maps virtualenv name to allowed Docker requirements.
-# If key not present, all Docker requirements are allowed. A
-# test will be skipped if Docker isn't available or if test
-# requires Docker component not enabled by the virtualenv.
-VIRTUALENV_DOCKER_REQUIREMENTS = {
-    'hgdev': {'bmo',},
-}
-
 
 def is_test_filename(f):
     """Is a path a test file."""
@@ -232,8 +224,6 @@ def docker_requirements_for_test(path):
     Returns a set of strings describing which Docker features are
     needed. String values are:
 
-    bmo
-       Requires images to run Bugzilla
     hgmo
        Requires images to run hg.mozilla.org
     """
@@ -246,9 +236,6 @@ def docker_requirements_for_test(path):
 
         if b'#require hgmodocker' in content:
             res.add('hgmo')
-
-        if b'#require bmodocker' in content:
-            res.add('bmo')
 
         for keyword in docker_keywords:
             if keyword in content:
@@ -282,24 +269,19 @@ def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
     Only Docker images "allowed" by the specified virtualenv will be built.
     Not all virtualenvs support all Docker images.
     """
-    requirements = docker_requirements(tests)
 
-    # Filter out requirements not specified by the virtualenv.
-    allowed_requirements = VIRTUALENV_DOCKER_REQUIREMENTS.get(venv_name,
-                                                              set(requirements))
-    requirements = requirements & allowed_requirements
-
-    if not requirements:
+    if venv_name == 'hgdev':
         return {}
+
+    requirements = docker_requirements(tests)
 
     env = {}
     print('generating Docker images needed for tests')
     t_start = time.time()
-    mr_images, hgmo_images, bmo_images = docker.build_all_images(
+    mr_images, hgmo_images = docker.build_all_images(
             verbose=verbose,
             use_last=use_last,
-            hgmo='hgmo' in requirements,
-            bmo='bmo' in requirements)
+            hgmo='hgmo' in requirements)
 
     t_end = time.time()
     print('got Docker images in %.2fs' % (t_end - t_start))
@@ -309,9 +291,6 @@ def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
         env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
         env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
         env['DOCKER_PULSE_IMAGE'] = hgmo_images['pulse']
-
-    if 'bmo' in requirements:
-        env['DOCKER_BMOWEB_IMAGE'] = bmo_images['bmoweb']
 
     return env
 

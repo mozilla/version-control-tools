@@ -49,30 +49,6 @@ class DockerCommands(object):
     def build_hgmo(self):
         self.d.build_hgmo(verbose=True)
 
-    @Command('start-bmo', category='docker',
-        description='Start a bugzilla.mozilla.org instance')
-    @CommandArgument('cluster', help='Name to give to this instance')
-    @CommandArgument('http_port',
-        help='HTTP port the server should be exposed on')
-    @CommandArgument('--web-id-file',
-        help='File to store the bmoweb container ID in')
-    def start_bmo(self, cluster, http_port, web_id_file=None):
-        web_image = os.environ.get('DOCKER_BMOWEB_IMAGE')
-
-        res = self.d.start_bmo(cluster=cluster,
-                http_port=http_port,
-                web_image=web_image)
-
-        if web_id_file:
-            with open(web_id_file, 'wb') as fh:
-                fh.write(res['web_id'])
-
-    @Command('stop-bmo', category='docker',
-        description='Stop a bugzilla.mozilla.org instance')
-    @CommandArgument('cluster', help='Name of instance to stop')
-    def stop_bmo(self, cluster):
-        self.d.stop_bmo(cluster)
-
     @Command('build', category='docker',
              description='Build a single image')
     @CommandArgument('name', help='Name of image to build')
@@ -106,15 +82,3 @@ class DockerCommands(object):
         description='Prune old Docker images')
     def prune_images(self):
         self.d.prune_images()
-
-    # This should ideally be elsewhere. This was introduced at a time when
-    # start-bmo didn't track the bmoweb container ID explicitly.
-    @Command('create-bugzilla-api-key', category='docker',
-             description='Create and print an API key for a user')
-    @CommandArgument('cid', help='bmoweb container ID')
-    @CommandArgument('user', help='User to create key for')
-    def create_api_key(self, cid, user):
-        print(self.d.execute(cid, [
-            '/var/lib/bugzilla/bugzilla/scripts/issue-api-key.pl',
-            user,
-        ], stdout=True).strip())

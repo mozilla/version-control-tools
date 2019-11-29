@@ -9,24 +9,6 @@ described in the sections below.
 
 All extensions are located under the ``hgext/`` subdirectory.
 
-bzexport
-========
-
-The bzexport extension provides commands for interacting with Bugzilla.
-It's known for its namesake ``hg bzexport`` command, which exports/uploads
-patches to Bugzilla. It also offers an ``hg newbug`` command to create
-new bugs from the command line.
-
-This extension lives under ``hgext/bzexport``.
-
-bzpost
-======
-
-The bzpost extension will automatically update Bugzilla with comments
-containing the URL to pushed changesets after pushing changesets that
-reference bugs. The implementation is highly tailored towards the
-Firefox workflow.
-
 firefoxtree
 ===========
 

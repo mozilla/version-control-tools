@@ -29,9 +29,6 @@ def main():
     sp = subparsers.add_parser('hgdev',
                                help='Mercurial hooks and extensions')
 
-    sp.add_argument('--docker-bmo', action='store_true',
-                    help='Enable Docker support for bugzilla.mozilla.org')
-
     sp = subparsers.add_parser('vcssync',
                                help='Version control synchronization')
 
@@ -46,7 +43,7 @@ def main():
     if env == 'docs':
         info = create_docs()
     elif env == 'hgdev':
-        info = create_hgdev(docker_bmo=args.docker_bmo)
+        info = create_hgdev()
     elif env == 'vcssync':
         info = create_vcssync()
     elif env == 'xchannel':

@@ -86,11 +86,6 @@ def has_watchman():
     return find_executable('watchman') is not None
 
 
-@check(b'bmodocker', b'Require BMO Docker pieces')
-def has_bmodocker():
-    return has_docker() and have_docker_images(['bmoweb'])
-
-
 @check(b'internet', b'Require internet connectivity')
 def has_internet():
     try:

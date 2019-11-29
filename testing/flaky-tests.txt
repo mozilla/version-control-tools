@@ -1,6 +1,4 @@
 # List of "flaky" tests in version-control-tools
-# Everything in bzexport
-# Everything in bzpost
 
 # robustcheckout test fails on post-4.7 Mercurial due to changes in hgweb
 test-server-failure.t
