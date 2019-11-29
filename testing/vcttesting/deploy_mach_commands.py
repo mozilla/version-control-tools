@@ -30,12 +30,16 @@ class DeployCommands(object):
                      help='Skip hgweb deployment if present')
     @CommandArgument('--skip-mirrors', action='store_true',
                      help='Skip mirrors deployment if present')
+    @CommandArgument('--clean-wdir', action='store_true',
+                     help='Clean working directory of encrypted secrets '
+                          'after deploy')
     @CommandArgument('--verbosity', type=int,
                      help='How verbose to be with output')
     def hgmo(self, skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
-             verbosity=None):
+             clean_wdir=False, verbosity=None):
         from vcttesting.deploy import deploy_hgmo as deploy
         return deploy(
+            clean_wdir=clean_wdir,
             skip_mirrors=skip_mirrors,
             skip_hgssh=skip_hgssh,
             skip_hgweb=skip_hgweb,

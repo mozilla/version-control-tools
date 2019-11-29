@@ -48,7 +48,7 @@ def run_playbook(name, extra_vars=None, verbosity=0):
 
 
 def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
-                verbosity=0):
+                clean_wdir=False, verbosity=0):
     """Deploy to hg.mozilla.org."""
     decrypt_sops_files()
 
@@ -62,10 +62,11 @@ def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
     res = run_playbook('deploy-hgmo', extra_vars=extra,
                         verbosity=verbosity)
 
-    # Wipe away encrypted secrets
-    subprocess.check_output(
-        ['hg', '-R', ROOT, 'update', '--clean', '-r', '.']
-    )
+    if clean_wdir:
+        # Wipe away encrypted secrets
+        subprocess.check_output(
+            ['hg', '-R', ROOT, 'update', '--clean', '-r', '.']
+        )
 
     return res
 
