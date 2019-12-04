@@ -964,8 +964,12 @@ def _checkevolve(ui, cw, hg_version):
     evolve_config_value = '%(evolve_path)s/hgext3rd/evolve' % \
                           {'evolve_path': pycompat.sysstr(local_evolve_path)}
 
+    users_evolve_path = ui.config(b'extensions', b'evolve')
+    if users_evolve_path:
+        users_evolve_path = pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path)))
+
     # If evolve is not installed, install it
-    if not ui.hasconfig(b'extensions', b'evolve'):
+    if users_evolve_path == None:
         if uipromptchoice(ui, EVOLVE_INFO_WARNING):
             return
 
@@ -980,9 +984,11 @@ def _checkevolve(ui, cw, hg_version):
             ui.write(str(hg_err))
             ui.write(EVOLVE_CLONE_ERROR)
 
+        return
+
     # If evolve is installed and managed by this wizard,
     # update it via pull/update
-    elif ui.config(b'extensions', b'evolve') == evolve_config_value:
+    if users_evolve_path == evolve_config_value:
         if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT % {b'evolve_dir': local_evolve_path}):
             return
 
@@ -999,8 +1005,6 @@ def _checkevolve(ui, cw, hg_version):
             ui.write(EVOLVE_CLONE_ERROR)
 
     # If evolve is not managed by this wizard, do nothing
-    else:
-        return
 
 
 def _checkfsmonitor(ui, cw, hgversion):
