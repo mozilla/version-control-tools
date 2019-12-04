@@ -754,10 +754,15 @@ def _enableext(cw, name, value):
 
 
 def _promptvctextension(ui, cw, ext, msg):
-    if ui.hasconfig(b'extensions', ext):
-        return
-
     ext_path = _vctextpath(pycompat.sysstr(ext))
+
+    # Do nothing (return) if the user has configured this extension, unless it
+    # points to the directory that we manage and that directory is missing.
+    users_ext_path = ui.config(b'extensions', ext)
+    if users_ext_path != None:
+        users_ext_path = pycompat.fsdecode(util.normpath(util.expandpath(users_ext_path)))
+        if users_ext_path != ext_path or os.path.exists(ext_path):
+            return
 
     # Verify the extension loads before prompting to enable it. This is
     # done out of paranoia.
