@@ -968,8 +968,11 @@ def _checkevolve(ui, cw, hg_version):
     if users_evolve_path:
         users_evolve_path = pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path)))
 
-    # If evolve is not installed, install it
-    if users_evolve_path == None:
+    # If evolve is not installed, install it. (If the user's path to evolve is
+    # the path that we manage, but it doesn't exist yet, assume that their
+    # config file has been copied to a new machine and we need to clone evolve.
+    if users_evolve_path == None or \
+            (users_evolve_path == evolve_config_value and not os.path.exists(evolve_config_value)):
         if uipromptchoice(ui, EVOLVE_INFO_WARNING):
             return
 
