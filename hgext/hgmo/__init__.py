@@ -116,16 +116,6 @@ def mozlink(text):
     return commitparser.add_hyperlinks(text)
 
 
-def stream_json(data):
-    """Convert a data structure to a generator of chunks representing JSON."""
-    # We use latin1 as the encoding because all data should be treated as
-    # byte strings. ensure_ascii will escape non-ascii values using \uxxxx.
-    # Also, use stable output and indentation to make testing easier.
-    encoder = json.JSONEncoder(indent=2, sort_keys=True, encoding='latin1',
-                               separators=(',', ': '))
-    return encoder.iterencode(data)
-
-
 def addmetadata(repo, ctx, d, onlycheap=False):
     """Add changeset metadata for hgweb templates."""
     description = encoding.fromlocal(ctx.description())
