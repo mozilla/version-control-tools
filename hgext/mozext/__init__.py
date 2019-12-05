@@ -1586,14 +1586,16 @@ class DropoffCounter(object):
     drops off exponentially as "time" passes. This is useful when more recent
     contributions should be weighted higher than older ones."""
 
-    Item = namedtuple('Item', ['name', 'weight'])
+    Item = namedtuple('Item', ['name', 'count', 'weight'])
 
     def __init__(self, factor):
         self.factor = factor
+        self.counts = defaultdict(int)
         self.weights = defaultdict(float)
         self.age = 0
 
     def add(self, value):
+        self.counts[value] += 1
         self.weights[value] += pow(self.factor, self.age)
 
     def advance(self):
@@ -1609,11 +1611,8 @@ class DropoffCounter(object):
         """Return number of distinct values stored."""
         return len(self.weights)
 
-    def weight(self, value):
-        return self.weights[value]
-
     def __getitem__(self, key):
-        return DropoffCounter.Item(key, self.weights[key])
+        return DropoffCounter.Item(key, self.counts[key], self.weights[key])
 
 
 def fullpaths(repo, paths):
@@ -1773,10 +1772,14 @@ def reviewers(ui, repo, patchfile=None, **opts):
         ui.write(b"no matching files found\n")
         return
 
-    ui.write(b"Potential reviewers:\n")
     if suckers.count_values() == 0:
-        ui.write(b"  none found in range (try higher --limit?)\n")
-    else:
-        for i, s in enumerate(suckers.most_weighted(5)):
-            ui.write(b"  %d. %s\n" % (i + 1, s.name))
+        ui.write(b"No reviewers found in range (try higher --limit?)\n")
+        return
+
+    reviewers = suckers.most_weighted(5)
+    ui.write(b'Ranking reviewers by "frecency"...\n')
+    name_column_length = max([len(reviewer.name) for reviewer in reviewers] + [len(b"Reviewer:")])
+    ui.write(b"%-*s    Recently reviewed commits:\n" % (name_column_length, b"Reviewer:"))
+    for reviewer in reviewers:
+        ui.write(b" %-*s    %d\n" % (name_column_length, reviewer.name, reviewer.count))
     ui.write(b"\n")
