@@ -10,7 +10,7 @@
   $ cd client
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > mq=
+  > strip=
   > EOF
 
 Normal commits must have a bug number. The following tests look for the

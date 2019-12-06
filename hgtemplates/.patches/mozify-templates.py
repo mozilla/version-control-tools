@@ -165,7 +165,7 @@ def main(source_templates, vct_templates_path, new_templates_path, hg='hg'):
                    check=True)
 
     # Apply all our patches. The order of patches is defined by a series
-    # file. Kinda like how MQ works.
+    # file.
     patch_dir = vct_templates_path / '.patches'
     series = patch_dir / 'series'
 

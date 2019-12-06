@@ -12,7 +12,7 @@
   $ cd client
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > mq=
+  > strip=
   > EOF
 
 Regular renames should work

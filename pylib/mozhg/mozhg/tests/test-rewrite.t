@@ -1,6 +1,5 @@
   $ cat >> $HGRCPATH << EOF
   > [extensions]
-  > mq =
   > testrewrite = $TESTDIR/pylib/mozhg/mozhg/tests/testrewrite.py
   > EOF
 
@@ -516,69 +515,3 @@ Bookmarks on rewritten changesets should be moved
   $ hg up 8b138ced889d
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (leaving bookmark bm2)
-
-Rewritten MQ patches should retain metadata
-
-  $ echo mq1 > foo
-  $ hg qnew -d '0 0' -m 'patch 1' patch-1
-  $ echo mq2 > foo
-  $ hg qnew -d '0 0' -m 'patch 2' patch-2
-
-  $ cat .hg/patches/status
-  ff479019e00d7341d67611e8998f7290a1407e23:patch-1
-  cc52d46d2da72567eb42b898206f4cd46a0cd483:patch-2
-
-  $ hg log -G -r 8b138ced889d::
-  @  changeset:   22:cc52d46d2da7
-  |  tag:         patch-2
-  |  tag:         qtip
-  |  tag:         tip
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     patch 2
-  |
-  o  changeset:   21:ff479019e00d
-  |  tag:         patch-1
-  |  tag:         qbase
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     patch 1
-  |
-  o  changeset:   20:8b138ced889d
-  |  bookmark:    bm2
-  ~  tag:         qparent
-     user:        test
-     date:        Thu Jan 01 00:00:00 1970 +0000
-     summary:     bm2 commit 2
-  
-
-  $ hg rewritemessage ff479019e00d
-  saved backup bundle to $TESTTMP/repo/.hg/strip-backup/cc52d46d2da7*-replacing.hg (glob)
-
-  $ hg log -G -r 8b138ced889d::
-  @  changeset:   22:265e95091ab1
-  |  tag:         patch-2
-  |  tag:         qtip
-  |  tag:         tip
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     patch 2
-  |
-  o  changeset:   21:40a869e5c384
-  |  tag:         patch-1
-  |  tag:         qbase
-  |  user:        test
-  |  date:        Thu Jan 01 00:00:00 1970 +0000
-  |  summary:     patch 1
-  |
-  o  changeset:   20:8b138ced889d
-  |  bookmark:    bm2
-  ~  tag:         qparent
-     user:        test
-     date:        Thu Jan 01 00:00:00 1970 +0000
-     summary:     bm2 commit 2
-  
-
-  $ cat .hg/patches/status
-  40a869e5c384a7ca5fe8113e2fb47c80adf45a4c:patch-1
-  265e95091ab1bdbf56d78e6afab8cf5d115e27be:patch-2

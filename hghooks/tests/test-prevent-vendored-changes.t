@@ -100,7 +100,7 @@ Well formed servo fixup commit
 
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > mq=
+  > strip=
   > commitextras=
   > EOF
 

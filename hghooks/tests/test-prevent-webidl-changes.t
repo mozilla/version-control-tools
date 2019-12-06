@@ -16,11 +16,9 @@
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd client
-mq provides `hg strip` for older Mercurial versions and supplies it even
-in modern versions
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > mq=
+  > strip=
   > EOF
 
 Editing a .webidl file without any review should fail

@@ -305,11 +305,10 @@ def push(orig, repo, remote, force=False, revs=None, newbranch=False, **kwargs):
     # If no arguments are specified to `hg push`, Mercurial's default
     # behavior is to try to push all non-remote changesets. The Firefox
     # trees all have hooks that prevent new heads from being created.
-    # This default Mercurial behavior can really cause problems when people
-    # are doing multi-headed development (e.g. bookmark-based development
-    # instead of mq). So, we silently change the default behavior of
-    # `hg push` to only push the current changeset when pushing to a Firefox
-    # repo.
+    # This default Mercurial behavior causes problems with our recommended
+    # development model (bookmark-based development). So, we silently
+    # change the default behavior of `hg push` to only push the current
+    # changeset when pushing to a Firefox repo.
     tree = resolve_uri_to_tree(remote.url())
     if tree and not revs:
         repo.ui.status(_(b'no revisions specified to push; '

@@ -16,7 +16,7 @@
   $ cd client
   $ cat >> .hg/hgrc << EOF
   > [extensions]
-  > mq=
+  > strip=
   > EOF
 
 Pushing to an open Thunderbird tree should succeed

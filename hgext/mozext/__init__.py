@@ -1200,7 +1200,7 @@ def template_dates(context, mapping, args):
     return sep.join(util.datestr(d, fmt) for d in args[0][0](context, mapping,
         args[0][1]))
 
-def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, reverse_order=False, **opts):
+def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False, **opts):
     if not opts.get('force'):
         ui.status(b'checking for uncommitted changes\n')
         cmdutil.bailifchanged(repo)
@@ -1263,7 +1263,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, use_mq=False, revers
             saved_stdin = sys.stdin
             sys.stdin = rpatch
 
-        handle_change(desc, node, qimport=(use_mq and new_opts.get('nopush')))
+        handle_change()
 
         if saved_stdin is None:
             ui.fin = save_fin
@@ -1373,7 +1373,7 @@ def oops(ui, repo, rev, **opts):
     See "hg help revisions" and "hg help revsets" for more about specifying
     revisions.
     """
-    def handle_change(desc, node, **kwargs):
+    def handle_change():
         commands.import_(ui, repo, b'-',
                          force=True,
                          no_commit=True,

@@ -286,17 +286,6 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b'replacing'):
 
                 repo._bookmarks.recordchange(tr)
 
-        # Update references to rewritten MQ patches.
-        if hasattr(repo, 'mq'):
-            q = repo.mq
-            for e in q.applied:
-                if e.node in nodemap:
-                    e.node = nodemap[e.node]
-                    q.applieddirty = True
-
-            # This no-ops if nothing is dirty.
-            q.savedirty()
-
         # If obsolescence is enabled, obsolete the old changesets.
         if obsenabled:
             markers = []
