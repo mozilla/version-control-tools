@@ -19,20 +19,25 @@ def process_input_file(source: pathlib.Path, dest: pathlib.Path, pip_compile: pa
     env['CUSTOM_COMPILE_COMMAND'] = sys.argv[0]
     env['HGPYTHON3'] = '1'
 
-    subprocess.run([
-        pip_compile,
-        '--generate-hashes',
-        '--emit-trusted-host',
-        '--annotate',
-        '--header',
-        '--index',
-        '--output-file', '%s' % dest,
-        # We have a transitive dependency on setuptools, which requires this flag to be pinned
-        '--allow-unsafe',
-        '-U',
-        '%s' % source
-    ],
-    check=True, capture_output=True, env=env)
+    try:
+        subprocess.run([
+            pip_compile,
+            '--generate-hashes',
+            '--emit-trusted-host',
+            '--annotate',
+            '--header',
+            '--index',
+            '--output-file', '%s' % dest,
+            # We have a transitive dependency on setuptools, which requires this flag to be pinned
+            '--allow-unsafe',
+            '-U',
+            '%s' % source
+        ],
+        check=True, capture_output=True, env=env)
+    except subprocess.CalledProcessError as err:
+        print('`pip-compile` errored attempting to upgrade %s' % source)
+        print(err.stderr.decode('utf-8'))
+        sys.exit(err.returncode)
 
     # pip-compile doesn't preserve --find-links from input file. So do
     # that manually.
