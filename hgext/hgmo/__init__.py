@@ -718,7 +718,7 @@ def processbundlesmanifest(orig, repo, proto):
 
         region = instance_data['v1']['region']
 
-        return filter_manifest_for_region(manifest, b'ec2region=%s' % region)
+        return filter_manifest_for_region(manifest, b'ec2region=%s' % pycompat.bytestr(region))
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
@@ -735,7 +735,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 region = ipentry['region']
 
-                return filter_manifest_for_region(manifest, b'ec2region=%s' % region)
+                return filter_manifest_for_region(manifest, b'ec2region=%s' % pycompat.bytestr(region))
 
         except Exception as e:
             repo.ui.log(b'hgmo', b'exception filtering AWS bundle source IPs: %s\n', e)
@@ -748,7 +748,7 @@ def processbundlesmanifest(orig, repo, proto):
                 gcpdata = f.read().splitlines()
 
             for entry in gcpdata:
-                network = ipaddress.IPv4Network(pycompat.unicode(entry))
+                network = ipaddress.IPv4Network(pycompat.unicode(pycompat.sysstr(entry)))
 
                 if sourceip not in network:
                     continue
