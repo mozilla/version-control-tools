@@ -91,6 +91,9 @@ def hgssh():
     consumer = KafkaConsumer(**consumer_config)
 
     partitions = consumer.partitions_for_topic(topic)
+    if not partitions:
+        logger.critical('could not get partitions for %s' % topic)
+        sys.exit(1)
 
     # Gather the initial offsets
     topicpartitions = [
