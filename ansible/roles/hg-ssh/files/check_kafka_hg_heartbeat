@@ -24,7 +24,7 @@ if not kafkalogger.handlers:
 config = {}
 
 try:
-    out = subprocess.check_output([HG, 'config'])
+    out = subprocess.check_output([HG, 'config']).decode('utf-8')
 
     for line in out.splitlines():
         k, v = line.split('=', 1)
@@ -55,7 +55,7 @@ try:
 except KafkaError as e:
     print('CRITICAL - cannot establish connection to Kafka')
     print('')
-    print(e)
+    print(str(e))
     print('')
     print('This error should only occur if the Kafka cluster is down or')
     print('if the server configuration is invalid. Please report this error')
