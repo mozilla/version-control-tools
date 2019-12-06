@@ -32,10 +32,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         data = parse_qs(body)
 
         with open('/sns-messages', 'ab') as fh:
-            fh.write('POST %s ' % self.path)
+            fh.write(b'POST %s ' % self.path.encode('utf-8'))
             fh.write(json.dumps(data, indent=4, sort_keys=True,
                                 separators=(',', ': ')))
-            fh.write('\n')
+            fh.write(b'\n')
 
         self.send_response(200)
         self.end_headers()

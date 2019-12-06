@@ -15,7 +15,7 @@ topic = 'hgmo-events'
 
 session = boto3.Session(aws_access_key_id='irrelevant_key',
                         aws_secret_access_key='irrelevant_secret',
-                        region_name='us-east-1')
+                        region_name='us-west-2')
 
 s3 = session.client('s3', endpoint_url='http://localhost:5001')
 s3.create_bucket(Bucket=bucket,
@@ -35,8 +35,8 @@ with open('/etc/mercurial/notifications.ini', 'rb') as fh:
 
 with open('/etc/mercurial/notifications.ini', 'wb') as fh:
     for line in lines:
-        if line.startswith('topic_arn ='):
-            line = 'topic_arn = %s\n' % arn
+        if line.startswith(b'topic_arn ='):
+            line = b'topic_arn = %s\n' % arn.encode('utf-8')
 
         fh.write(line)
 
