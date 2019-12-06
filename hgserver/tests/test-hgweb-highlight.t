@@ -53,6 +53,14 @@ Create a repository
   <a href="#l3"></a><span id="l3">  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span></span>
   <a href="#l4"></a><span id="l4"><span class="p">}</span></span>
 
+
+Check logs for errors
+
+  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/access_log
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.js HTTP/1.1" 200 4876 "-" "-" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.jsm HTTP/1.1" 200 4886 "-" "-" (glob)
+  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/error_log
+
 Cleanup
 
   $ hgmo clean

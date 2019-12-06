@@ -241,6 +241,21 @@ Upgrade notice is advertised to clients not running bundle2
   remote: 
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
+Check logs for errors
+
+  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/access_log
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central?cmd=capabilities HTTP/1.1" 200 516 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=batch HTTP/1.1" 200 42 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=getbundle HTTP/1.1" 200 82 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central?cmd=capabilities HTTP/1.1" 200 516 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=batch HTTP/1.1" 200 43 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=listkeys HTTP/1.1" 200 15 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=listkeys HTTP/1.1" 200 - "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "POST /mozilla-central?cmd=unbundle HTTP/1.1" 401 22 "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/json-rev/77538e1ce4be HTTP/1.1" 200 350 "-" "-" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/json-pushes HTTP/1.1" 200 116 "-" "-" (glob)
+  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/error_log
+
 Cleanup
 
   $ hgmo clean
