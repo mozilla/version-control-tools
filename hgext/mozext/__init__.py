@@ -523,7 +523,7 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
     This command prints pushlog entries for a given changeset. It is used to
     answer the question: how did a changeset propagate to all the trees.
     """
-    print_changeset_pushes(ui, repo, rev, all=all)
+    print_changeset_pushes(ui, repo, scmutil.revsingle(repo, rev), all=all)
 
 
 @command(b'buginfo', [
