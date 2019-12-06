@@ -30,20 +30,20 @@ def on_event(config, message_type, partition, message, created, data):
     c = config.c
 
     if c.has_option('awsevents', 's3_endpoint_url'):
-        s3_endpoint_url = c.get('awsevents', 's3_endpoint_url')
+        s3_endpoint_url = config.get('awsevents', 's3_endpoint_url')
     else:
         s3_endpoint_url = None
 
     if c.has_option('awsevents', 'sns_endpoint_url'):
-        sns_endpoint_url = c.get('awsevents', 'sns_endpoint_url')
+        sns_endpoint_url = config.get('awsevents', 'sns_endpoint_url')
     else:
         sns_endpoint_url = None
 
-    access_key_id = c.get('awsevents', 'access_key_id')
-    secret_access_key = c.get('awsevents', 'secret_access_key')
-    region = c.get('awsevents', 'region')
-    topic_arn = c.get('awsevents', 'topic_arn')
-    bucket = c.get('awsevents', 'bucket')
+    access_key_id = config.get('awsevents', 'access_key_id')
+    secret_access_key = config.get('awsevents', 'secret_access_key')
+    region = config.get('awsevents', 'region')
+    topic_arn = config.get('awsevents', 'topic_arn')
+    bucket = config.get('awsevents', 'bucket')
 
     session = boto3.Session(aws_access_key_id=access_key_id,
                             aws_secret_access_key=secret_access_key,

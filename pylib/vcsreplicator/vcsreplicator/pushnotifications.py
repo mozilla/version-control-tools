@@ -186,7 +186,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
 
     # ASSERTION: vcsreplicator extension loaded in system/user config.
     with hglib.open(local_path, encoding='utf-8') as hgclient:
-        out = hgclient.rawcommand([b'debugbase85obsmarkers', rawdata])
+        out = hgclient.rawcommand([b'debugbase85obsmarkers', pycompat.bytestr(rawdata)])
         markers = json.loads(out)
         logger.warn('processing %d obsolete markers' % len(markers))
 
@@ -240,7 +240,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
                 'node': pycompat.sysstr(node),
                 'known': bool(rev),
                 'visible': visible,
-                'desc': rev[1] if rev else None,
+                'desc': pycompat.sysstr(rev[1]) if rev else None,
                 'push': push,
             }
 
@@ -256,7 +256,7 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
             user = None
             for m in marker['metadata']:
                 if m[0] == u'user':
-                    user = m[1].encode('utf-8')
+                    user = pycompat.sysstr(m[1])
 
             data.append({
                 'precursor': precursor,
