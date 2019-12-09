@@ -74,6 +74,10 @@ Ignored files are also purged when requested
   $ ls dest
   foo
 
+Try running `hg purge` outside of robustcheckout
+
+  $ hg -R dest/ purge
+
 Confirm no errors in log
 
   $ cat ./server/error.log

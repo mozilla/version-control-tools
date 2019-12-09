@@ -141,7 +141,10 @@ def wrapunlink(ui):
 
 
 def purgewrapper(orig, ui, *args, **kwargs):
-    '''Runs original purge() command with unlink monkeypatched.'''
+    '''Runs original purge() command with unlink monkeypatched.
+
+    For Windows only, originally written for Bug 1157704.
+    '''
     with wrapunlink(ui):
         return orig(ui, *args, **kwargs)
 
@@ -787,5 +790,6 @@ def extsetup(ui):
         except KeyError:
             extensions.load(ui, ext, None)
 
-    purgemod = extensions.find(b'purge')
-    extensions.wrapcommand(purgemod.cmdtable, b'purge', purgewrapper)
+    if os.name == 'nt':
+        purgemod = extensions.find(b'purge')
+        extensions.wrapcommand(purgemod.cmdtable, b'purge', purgewrapper)
