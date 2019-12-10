@@ -382,14 +382,14 @@ def exchangepullpushlog(orig, pullop):
         pushid, who, when, nodes = line.split(b' ', 3)
         nodes = [bin(n) for n in nodes.split()]
 
-        # Verify incoming changesets are known and stop processing when we see
-        # an unknown changeset. This can happen when we're pulling a former
-        # head instead of all changesets.
-        try:
-            [repo[n] for n in nodes]
-        except error.RepoLookupError:
-            repo.ui.warn(b'received pushlog entry for unknown changeset; ignoring\n')
-            break
+        # Warn when incoming changesets are unknown. This can happen when we're
+        # pulling a former head instead of all changesets, when there are obsolete
+        # changesets that are not being pulled, or when relbranches are used.
+        for node in nodes:
+            try:
+                repo[node]
+            except error.RepoLookupError:
+                repo.ui.warn(b'received pushlog entry for unknown changeset %s; ignoring\n' % (hex(node),))
 
         pushes.append((int(pushid), who, int(when), nodes))
 
