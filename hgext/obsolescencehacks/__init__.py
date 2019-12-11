@@ -10,6 +10,7 @@ from mercurial import (
     configitems,
     error,
     obsolete,
+    pycompat,
     registrar,
 )
 
@@ -51,7 +52,7 @@ def enableevolutionexchange(repo):
         user = ui.environ.get(b'USER')
     else:
         try:
-            user = pwd.getpwuid(os.getuid()).pw_name
+            user = pycompat.bytestr(pwd.getpwuid(os.getuid()).pw_name)
         except KeyError:
             raise error.Abort(b'unable to resolve process user name')
 
