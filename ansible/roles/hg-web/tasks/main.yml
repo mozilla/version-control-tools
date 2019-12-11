@@ -24,6 +24,7 @@
     - python-devel
     - python36u
     - python36u-pip
+    - python3-devel
     - rsync
     # Needed for hg user to execute mozbuild-eval as root.
     - rsyslog
