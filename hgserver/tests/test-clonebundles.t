@@ -9,11 +9,11 @@ Create and seed repository
   $ hgmo create-repo mozilla-central scm_level_1
   (recorded repository creation in replication log)
 
-  $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central > /dev/null
+  $ hg -q clone ssh://${SSH_SERVER}:${SSH_PORT}/mozilla-central
   $ cd mozilla-central
   $ touch foo
   $ hg -q commit -A -m initial
-  $ hg push > /dev/null
+  $ hg -q push
   $ cd ..
 
 Ensure bundle creation script raises during bundle generation
@@ -80,7 +80,7 @@ The clonebundles.manifest file should exist though
 
 Now do a fully working run
 
-  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload mozilla-central >/dev/null
+  $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload mozilla-central > /dev/null
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
 A subsequent bundle generation should produce a backup clonebundles.manifest.old file
@@ -244,7 +244,7 @@ The copyfrom=x field copies bundles from another repo
   $ cd try
   $ touch foo
   $ hg -q commit -A -m initial
-  $ hg push > /dev/null
+  $ hg -q push
   $ cd ..
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles --no-upload 'try copyfrom=mozilla-central'
@@ -283,7 +283,7 @@ zstd-max bundles created when requested
   $ cd mozilla-central
   $ echo ztd-max > foo
   $ hg commit -m zstd-max
-  $ hg push >/dev/null
+  $ hg -q push
   $ cd ..
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles 'mozilla-central zstd_max' --no-upload > /dev/null
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
