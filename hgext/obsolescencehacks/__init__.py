@@ -59,9 +59,7 @@ def enableevolutionexchange(repo):
     if user not in exchangeusers:
         return
 
-    evolution = ui.config(b'experimental', b'evolution')
-    evolution += b' %s' % obsolete.exchangeopt
-    ui.setconfig(b'experimental', b'evolution', evolution.strip(),
+    ui.setconfig(b'experimental', b'evolution.%s' % obsolete.exchangeopt, True,
                  source=b'obshacksext')
 
 

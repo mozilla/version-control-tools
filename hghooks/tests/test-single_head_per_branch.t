@@ -114,7 +114,7 @@ Hidden changesets should not impact head detection.
   $ cd ../mozilla-central
   $ cat >> .hg/hgrc << EOF
   > [experimental]
-  > evolution=createmarkers
+  > evolution.createmarkers = true
   > EOF
 
   $ hg up default

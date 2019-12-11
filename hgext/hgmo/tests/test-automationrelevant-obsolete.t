@@ -2,7 +2,7 @@
   $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
   $ cat >> $HGRCPATH << EOF
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [phases]
   > publish = false
   > [extensions]

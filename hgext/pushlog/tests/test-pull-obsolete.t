@@ -4,7 +4,7 @@
   > [ui]
   > ssh = python "$TESTDIR/pylib/mercurial-support/dummyssh"
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [extensions]
   > rebase =
   > EOF

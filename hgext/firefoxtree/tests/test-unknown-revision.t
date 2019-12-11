@@ -36,7 +36,7 @@ The same test but for a repository that uses obsolescence
 
   $ cat >> .hg/hgrc << EOF
   > [experimental]
-  > evolution = createmarkers
+  > evolution.createmarkers = true
   > EOF
 
   $ hg -q pull central

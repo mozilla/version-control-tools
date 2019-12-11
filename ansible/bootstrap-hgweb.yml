@@ -100,11 +100,11 @@
     # Work around this using a stream clone for the try repos, and then regex
     # replace the rule in the replication rules filter
     - name: clone try repo
-      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=all clone -U --stream https://hg.mozilla.org/try /repo/hg/mozilla/try
+      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=true clone -U --stream https://hg.mozilla.org/try /repo/hg/mozilla/try
       become_user: hg
 
     - name: clone try-comm repo
-      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=all clone -U --stream https://hg.mozilla.org/try-comm-central /repo/hg/mozilla/try-comm-central
+      command: /var/hg/venv_replication/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config ui.clonebundles=false --config experimental.evolution=true clone -U --stream https://hg.mozilla.org/try-comm-central /repo/hg/mozilla/try-comm-central
       become_user: hg
 
     - name: enable try repo in replication rules

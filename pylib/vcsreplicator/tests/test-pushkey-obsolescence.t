@@ -7,7 +7,7 @@
   $ hgmo create-repo obs scm_level_1
   (recorded repository creation in replication log)
   $ hgmo exec hgssh /set-hgrc-option obs phases publish false
-  $ hgmo exec hgssh /set-hgrc-option obs experimental evolution all
+  $ hgmo exec hgssh /set-hgrc-option obs experimental evolution true
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/obs replicatehgrc
   recorded hgrc in replication log
 
@@ -26,7 +26,7 @@
   > [extensions]
   > rebase =
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [ui]
   > ssh = ssh -F $TESTTMP/ssh_config -i $TESTTMP/testuser -l user@example.com
   > EOF

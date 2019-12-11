@@ -9,7 +9,7 @@ This test demonstrates the pull behaviour on hgssh servers
   $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
   $ hgmo exec hgssh /set-hgrc-option mozilla-central phases publish false
-  $ hgmo exec hgssh /set-hgrc-option mozilla-central experimental evolution all
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central experimental evolution true
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
@@ -21,7 +21,7 @@ This test demonstrates the pull behaviour on hgssh servers
   > [extensions]
   > rebase =
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [ui]
   > ssh = ssh -F $TESTTMP/ssh_config -i $TESTTMP/l3user -l l3user@example.com
   > EOF

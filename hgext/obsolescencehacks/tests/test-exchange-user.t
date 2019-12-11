@@ -17,7 +17,7 @@
   > [phases]
   > publish = false
   > [experimental]
-  > evolution = createmarkers
+  > evolution.createmarkers = true
   > EOF
 
   $ cd repo0
@@ -59,7 +59,7 @@ Enabling obsolescence won't enable marker exchange since the user doesn't match
   $ export USER=noexchange
   $ cat >> .hg/hgrc << EOF
   > [experimental]
-  > evolution = createmarkers
+  > evolution.createmarkers = true
   > EOF
   $ hg rebase -s tip -d 0
   rebasing 2:f63449cbe54b "commit0" (tip)

@@ -28,7 +28,7 @@ Create some repositories
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ hgmo exec hgssh /set-hgrc-option mozilla-central phases publish false
-  $ hgmo exec hgssh /set-hgrc-option mozilla-central experimental evolution all
+  $ hgmo exec hgssh /set-hgrc-option mozilla-central experimental evolution true
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central replicatehgrc
   recorded hgrc in replication log
 
@@ -47,7 +47,7 @@ Create an obsolete changeset with a large commit message to test SNS message siz
   > [extensions]
   > rebase =
   > [experimental]
-  > evolution = all
+  > evolution = true
   > EOF
 
   $ echo orig > foo

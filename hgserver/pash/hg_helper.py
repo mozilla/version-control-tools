@@ -508,7 +508,7 @@ def set_repo_obsolescence(repo_name, enabled):
         config.add_section('experimental')
 
     if enabled:
-        config.set('experimental', 'evolution', 'all')
+        config.set('experimental', 'evolution', 'true')
     else:
         config.remove_option('experimental', 'evolution')
 

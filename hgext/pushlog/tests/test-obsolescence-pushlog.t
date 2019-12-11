@@ -2,7 +2,7 @@
 
   $ cat >> $HGRCPATH << EOF
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [extensions]
   > rebase =
   > EOF

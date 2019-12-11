@@ -51,7 +51,7 @@ Enable obsolescence on the repo
   publish = False
   
   [experimental]
-  evolution = all
+  evolution = true
   
 
 Create initial repo content
@@ -62,7 +62,7 @@ Create initial repo content
   > rebase=
   > 
   > [experimental]
-  > evolution=all
+  > evolution=true
   > EOF
 
   $ touch foo
@@ -104,7 +104,7 @@ Create another clone
   $ hg -q clone ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1 repo-1-clone
   $ cat >> repo-1-clone/.hg/hgrc << EOF
   > [experimental]
-  > evolution=all
+  > evolution=true
   > EOF
 
 Create some obsolescence markers
@@ -267,7 +267,7 @@ Create a repo that only has the createmarkers feature enabled
 
   $ hgmo create-repo integration/autoland scm_level_1
   (recorded repository creation in replication log)
-  $ hgmo exec hgssh /set-hgrc-option integration/autoland experimental evolution createmarkers
+  $ hgmo exec hgssh /set-hgrc-option integration/autoland experimental evolution.createmarkers true
   $ hgmo exec hgssh /set-hgrc-option integration/autoland phases publish false
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/integration/autoland replicatehgrc
   recorded hgrc in replication log
@@ -276,7 +276,7 @@ Create a repo that only has the createmarkers feature enabled
   $ cd autoland
   $ cat >> .hg/hgrc << EOF
   > [experimental]
-  > evolution = all
+  > evolution = true
   > [extensions]
   > rebase =
   > EOF
