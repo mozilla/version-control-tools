@@ -25,6 +25,7 @@ configitem = registrar.configitem(configtable)
 configitem(b'urlintercept', b'path',
            default=None)
 
+
 class URLInterceptor(object):
     def __init__(self, ui):
         self.ui = ui
@@ -44,6 +45,7 @@ class URLInterceptor(object):
 
         self.ui.write(b'intercepting url\n')
         return pycompat.bytesio(response)
+
 
 def extsetup(ui):
     interceptor = URLInterceptor(ui)

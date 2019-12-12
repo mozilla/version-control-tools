@@ -33,6 +33,8 @@ configitem(b'mozilla', b'lando_required_repo_list',
            default=b'')
 configitem(b'mozilla', b'sentry_dsn',
            default=b"")
+configitem(b'mozilla', b'check_bug_references_repos',
+           default=None)
 
 
 def get_check_classes(hook):
@@ -42,6 +44,7 @@ def get_check_classes(hook):
         advertise_upgrade,
         merge_day,
         prevent_cross_channel_messages,
+        check_bug_references,
         prevent_subrepos,
         prevent_symlinks,
         prevent_sync_ipc_changes,
@@ -57,6 +60,7 @@ def get_check_classes(hook):
         return (
             merge_day.MergeDayCheck,
             prevent_cross_channel_messages.XChannelMessageCheck,
+            check_bug_references.CheckBugReferencesCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
             prevent_sync_ipc_changes.SyncIPCCheck,
