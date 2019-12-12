@@ -649,7 +649,7 @@ def _checkhgversion(ui, hgversion):
         ui.warn(b'Please run `mach bootstrap` to upgrade your Mercurial '
                 b'install.\n\n')
 
-    if uipromptchoice(ui, b'Would you like to continue using an old Mercurial version (Yn)? $$ &Yes $$ &No'):
+    if not uipromptchoice(ui, b'Would you like to exit to upgrade your Mercurial version (Yn)? $$ &Yes $$ &No'):
         return 1
 
 

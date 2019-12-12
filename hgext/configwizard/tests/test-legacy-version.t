@@ -45,7 +45,8 @@ Old version will print legacy message and prompt
   
   Please run `mach bootstrap` to upgrade your Mercurial install.
   
-  Would you like to continue using an old Mercurial version (Yn)?  y
+  Would you like to exit to upgrade your Mercurial version (Yn)?  y
+  [1]
 
   $ hg --config ui.interactive=true --config configwizard.steps=hgversion $FAKEVERSION configwizard << EOF
   > 
@@ -69,8 +70,7 @@ Old version will print legacy message and prompt
   
   Please run `mach bootstrap` to upgrade your Mercurial install.
   
-  Would you like to continue using an old Mercurial version (Yn)?  n
-  [1]
+  Would you like to exit to upgrade your Mercurial version (Yn)?  n
 
 
 Too old version will fail outright
