@@ -47,3 +47,10 @@
     - aws-ip-ranges.json
     - gcp-ip-ranges.txt
     - test_instance_data.json
+
+- name: set moz-ip-path for tests
+  ini_file:
+    dest: /etc/mercurial/hgrc
+    section: hgmo
+    option: mozippath
+    value: /var/hg/moz-ip-ranges.txt
