@@ -1,4 +1,14 @@
 ---
+- name: check if Python 3 virtualenv exists
+  stat:
+    path: "{{ venv }}/bin/python3"
+  register: py3_venv
+
+- name: delete Python 3 virtualenv
+  file:
+    path: "{{ venv }}"
+    state: absent
+  when: py3_venv.stat.exists
 
 - name: download python packaging tools
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
