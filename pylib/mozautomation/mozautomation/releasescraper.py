@@ -162,7 +162,7 @@ def find_nightly_builds(start_day, end_day=None):
             if r.status_code != 200:
                 continue
 
-            for m in RE_NIGHTLY_MONTH_ENTRY.finditer(r.text):
+            for m in RE_NIGHTLY_MONTH_ENTRY.finditer(r.content):
                 groups = m.groupdict()
                 day = datetime.date(int(groups[b'year']), int(groups[b'month']),
                                     int(groups[b'day']))
@@ -188,7 +188,7 @@ def find_nightly_builds(start_day, end_day=None):
             assert r.status_code == 200
 
             found_build = False
-            for m in RE_ARCHIVE_FILENAMES.finditer(r.text):
+            for m in RE_ARCHIVE_FILENAMES.finditer(r.content):
                 info = match_archive_build_file(r.url, m)
                 if not info:
                     continue
@@ -212,15 +212,15 @@ def find_nightly_builds(start_day, end_day=None):
                     continue
 
                 if all(b'_test' in m.group('path')
-                       for m in RE_ARCHIVE_FILENAMES.finditer(r.text)):
+                       for m in RE_ARCHIVE_FILENAMES.finditer(r.content)):
                     continue
 
                 if all(m.group('path').endswith(b'.txt.gz')
-                       for m in RE_ARCHIVE_FILENAMES.finditer(r.text)):
+                       for m in RE_ARCHIVE_FILENAMES.finditer(r.content)):
                     continue
 
                 print(b'no build info for %s' % r.url)
-                for m in RE_ARCHIVE_FILENAMES.finditer(r.text):
+                for m in RE_ARCHIVE_FILENAMES.finditer(r.content):
                     print(b'\t%s' % m.group('path'))
                 continue
 
