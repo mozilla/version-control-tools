@@ -153,7 +153,7 @@ class FirefoxReleaseDatabase(object):
 
             if count:
                 self._set_state(b'last_nightly_day',
-                                last_day.strftime(b'%Y-%m-%d'))
+                                last_day.strftime('%Y-%m-%d').encode('utf-8'))
                 self._set_state(b'insertion_key', insertion_key)
 
         return count

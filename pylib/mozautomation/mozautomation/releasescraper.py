@@ -147,7 +147,7 @@ def find_nightly_builds(start_day, end_day=None):
         # Load monthly pages to find links to builds.
         months = set()
         while day <= end_day:
-            months.add(day.strftime(b'%Y/%m'))
+            months.add(day.strftime('%Y/%m').encode('utf-8'))
             day += datetime.timedelta(days=1)
 
         month_fs = []
@@ -175,7 +175,8 @@ def find_nightly_builds(start_day, end_day=None):
                 if build != b'mozilla-central':
                     continue
 
-                url = b'%s/%s/%s' % (NIGHTLY_ARCHIVE_URL, day.strftime(b'%Y/%m'),
+                url = b'%s/%s/%s' % (NIGHTLY_ARCHIVE_URL,
+                                     day.strftime('%Y/%m').encode('utf-8'),
                                     path)
                 build_fs.append(e.submit(session.get, url))
 
@@ -412,7 +413,7 @@ def find_builds_from_tags():
                 dt = datetime.datetime(1970, 1, 1) + td
                 day = dt.date()
 
-                build_id = dt.strftime(b'%Y%m%d%H%M%S')
+                build_id = dt.strftime('%Y%m%d%H%M%S').encode('utf-8')
 
                 for platform, archive_platform in RELEASES_PLATFORMS.items():
                     # win64 not produced until release 42.
