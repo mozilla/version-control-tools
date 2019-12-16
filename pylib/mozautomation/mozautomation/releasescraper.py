@@ -61,7 +61,7 @@ NIGHTLY_IGNORE_PLATFORMS = {
     b'mac-shark',
 }
 
-RE_APP_VERSION = re.compile(b'^firefox-(?P<version>.+)\.en-US\.')
+RE_APP_VERSION = re.compile('^firefox-(?P<version>.+)\.en-US\.')
 
 # URLs where we're unable to find builds due to valid reasons.
 INVALID_NIGHTLY_URLS = {
@@ -287,13 +287,13 @@ def get_build_from_archive_file(platform, r):
 
     The requested URL corresponds to a JSON or text build info file.
     """
-    if r.url.endswith(b'.json'):
+    if r.url.endswith('.json'):
         release = r.json()
 
-        build_id = release[b'buildid']
-        app_version = release[b'moz_app_version']
-        revision = release[b'moz_source_stamp']
-    elif r.url.endswith(b'.txt'):
+        build_id = release['buildid']
+        app_version = release['moz_app_version']
+        revision = release['moz_source_stamp']
+    elif r.url.endswith('.txt'):
         # Format is one of the following:
         #
         #   <buildid> <revision>
@@ -312,14 +312,14 @@ def get_build_from_archive_file(platform, r):
                                    b'https://hg.mozilla.org/'))
             revision = url[url.rindex(b'/') + 1:]
         else:
-            print(b'unknown text file format for %s' % r.url)
+            print('unknown text file format for %s' % r.url)
             print(r.text)
             return None
 
-        path = r.url[r.url.rindex(b'/') + 1:]
+        path = r.url[r.url.rindex('/') + 1:]
         m = RE_APP_VERSION.match(path)
         if not m:
-            print(b'could not determine app version: %s' % path)
+            print('could not determine app version: %s' % path)
             return None
 
         app_version = m.group('version')
@@ -330,12 +330,12 @@ def get_build_from_archive_file(platform, r):
 
     return {
         b'channel': b'nightly',
-        b'platform': platform,
-        b'build_id': build_id,
-        b'app_version': app_version,
-        b'revision': revision,
+        b'platform': platform.encode('utf-8'),
+        b'build_id': build_id.encode('utf-8'),
+        b'app_version': app_version.encode('utf-8'),
+        b'revision': revision.encode('utf-8'),
         b'day': datetime.date(year, month, day),
-        b'artifacts_url': r.url[:r.url.rindex(b'/') + 1],
+        b'artifacts_url': r.url[:r.url.rindex(b'/') + 1].encode('utf-8'),
     }
 
 
