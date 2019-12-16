@@ -179,12 +179,12 @@
 # mod_wsgi is a Python package. But pip-compile doesn't like it for some reason.
 # We install it into the virtualenv as a one-off.
 - name: download mod_wsgi
-  get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/mod_wsgi-4.5.24.tar.gz
-           dest=/var/tmp/mod_wsgi-4.5.24.tar.gz
-           sha256sum=47843bbb4a1c77a594519e176fb53be817b34673c26397dea66bc11cdd2a3595
+  get_url: url=https://github.com/GrahamDumpleton/mod_wsgi/archive/4.6.5.tar.gz
+           dest=/var/tmp/mod_wsgi-4.6.5.tar.gz
+           sha256sum=5cbe05f8b9b21a9e40d5d7226f4976643b1ee5e23a2d114bceae34d9948be5e0
 
 - name: install mod_wsgi
-  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/tmp/mod_wsgi-4.5.24.tar.gz
+  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/tmp/mod_wsgi-4.6.5.tar.gz
 
 # We have a chicken and egg problem with the prevent_hgweb_changes hook, which
 # is globally installed. If the hook isn't present, Mercurial won't allow
