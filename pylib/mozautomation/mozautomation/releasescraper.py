@@ -330,7 +330,7 @@ def get_build_from_archive_file(platform, r):
 
     return {
         b'channel': b'nightly',
-        b'platform': platform.encode('utf-8'),
+        b'platform': platform,
         b'build_id': build_id.encode('utf-8'),
         b'app_version': app_version.encode('utf-8'),
         b'revision': revision.encode('utf-8'),
