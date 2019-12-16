@@ -7,9 +7,9 @@ cbor2
 # Needed because wireproto caching extension is enabled globally.
 boto3
 
-futures
 kafka-python==1.4.6
-mercurial==5.0.1
+mercurial==5.2.1
+pygments
 python-hglib
 PyYAML
 six

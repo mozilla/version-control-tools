@@ -156,23 +156,26 @@
 # We run a lot of our Python out of our virtualenvs because that is how you
 # are supposed to do Python.
 - name: create virtualenv for hgweb
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_hgweb
            requirements=../roles/hg-web/files/requirements-hgweb.txt
 
 - name: create virtualenv for replication
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_replication
            requirements=../roles/hg-web/files/requirements-replication.txt
 
 - name: create virtualenv for tools
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_tools
            requirements=../roles/hg-web/files/requirements-tools.txt
 
 - name: create virtualenv for Python 3 tools
   include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/python3
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_tools_py3
            requirements=../roles/hg-web/files/requirements-tools-py3.txt
 
@@ -231,7 +234,7 @@
 # version-control-tools. Register links so all packages are available in
 # virtualenvs.
 - name: add packages to virtualenvs
-  copy: dest=/var/hg/{{ item.venv }}/lib/python2.7/site-packages/{{ item.pth }}.pth
+  copy: dest=/var/hg/{{ item.venv }}/lib64/python3.6/site-packages/{{ item.pth }}.pth
         content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
         group=root

@@ -10,7 +10,7 @@ Run script to apply our templates changes.
 Always test against the version of Mercurial we have deployed to hg.mo
 
   $ HG=`which hg` $TESTDIR/hgtemplates/.patches/mozify-templates.py \
-  >   $TESTDIR/venv/mercurials/5.0.1/lib/python2.7/site-packages/mercurial/templates \
+  >   $TESTDIR/venv/py3/mercurials/5.2/lib/python3.6/site-packages/mercurial/templates \
   >   $TESTDIR/hgtemplates \
   >   `pwd`/hgtemplates
   adding atom/bookmarkentry.tmpl

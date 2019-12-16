@@ -4,10 +4,8 @@
 # Needed because wireproto caching extension is enabled globally.
 boto3
 
-bloxtool==0.33
 cbor2
-futures
-mercurial==5.0.1
+mercurial==5.2.1
 python-hglib
 requests
 tabulate
