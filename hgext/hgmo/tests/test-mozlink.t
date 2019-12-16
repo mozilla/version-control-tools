@@ -22,6 +22,8 @@
   > 12345 is a bug
   > 
   > foo 123456 whitespace!
+  > 
+  > Differential Revision: https://phabricator.services.mozilla.com/D123
   > EOF
 
   $ hg log -T '{desc|mozlink}\n'
@@ -40,6 +42,8 @@
   <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=12345">12345</a> is a bug
   
   foo <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=123456">123456</a> whitespace!
+  
+  Differential Revision: <a href="https://phabricator.services.mozilla.com/D123">https://phabricator.services.mozilla.com/D123</a>
 
   $ echo 1 > foo
   $ hg commit -A -l - << EOF

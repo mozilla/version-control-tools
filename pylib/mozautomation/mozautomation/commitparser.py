@@ -312,11 +312,11 @@ RE_XCHANNEL_REVISION = re.compile(
 
 def xchannel_link(m):
     s = m.group()[:(m.start(b'revision') - m.start())]
-    l = b'<a href="https://hg.mozilla.org/{repo}/rev/{revision}">{revision}</a>'
-    s += l.format(
-        repo=m.group('repo'),
-        revision=m.group('revision'),
-    )
+    l = b'<a href="https://hg.mozilla.org/%(repo)s/rev/%(revision)s">%(revision)s</a>'
+    s += l % {
+        b'repo': m.group('repo'),
+        b'revision': m.group('revision'),
+    }
     s += m.group()[(m.end(b'revision') - m.start()):]
     return s
 
@@ -325,7 +325,7 @@ def differential_revision_repl(match):
     """Replacement function to linkify Phabricator Differential
     Revision URLs in commit messages."""
     phaburl = match.group('phaburl')
-    return b'<a href="{link}">{link}</a>'.format(link=phaburl)
+    return b'<a href="%(link)s">%(link)s</a>' % {b'link': phaburl}
 
 
 def htmlescape(s, quote=None):
