@@ -202,7 +202,7 @@ def find_nightly_builds(start_day, end_day=None):
                 normpath = info[b'path'][len(b'/pub/firefox/nightly/'):]
                 url = b'%s/%s' % (NIGHTLY_ARCHIVE_URL, normpath)
 
-                release_fs.append((info['platform'],
+                release_fs.append((info[b'platform'],
                                    e.submit(session.get, url)))
 
             if not found_build:
