@@ -164,9 +164,9 @@ def find_nightly_builds(start_day, end_day=None):
 
             for m in RE_NIGHTLY_MONTH_ENTRY.finditer(r.content):
                 groups = m.groupdict()
-                day = datetime.date(int(groups[b'year']), int(groups[b'month']),
-                                    int(groups[b'day']))
-                builds_by_day[day].append((groups[b'build'], groups[b'path']))
+                day = datetime.date(int(groups['year']), int(groups['month']),
+                                    int(groups['day']))
+                builds_by_day[day].append((groups['build'], groups['path']))
 
         build_fs = []
 
