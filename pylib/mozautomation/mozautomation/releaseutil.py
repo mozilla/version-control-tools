@@ -23,12 +23,12 @@ def import_nightly_builds(database_path, repo, start_day=None):
             year, month, day = map(int, state[b'last_nightly_day'].split(b'-'))
             last_day = datetime.date(year, month, day)
             start_day = last_day - datetime.timedelta(days=2)
-            print(b'using %s as start day calculated from last seen day %s' % (
+            print('using %s as start day calculated from last seen day %s' % (
                 start_day, last_day))
         else:
             # This is the earliest day we can import Nightly releases for.
             start_day = datetime.date(2010, 4, 1)
-            print(b'using %s as Nightly start day because no state seen' %
+            print('using %s as Nightly start day because no state seen' %
                   start_day)
 
     nightly_builds = releasescraper.find_nightly_builds(start_day)
