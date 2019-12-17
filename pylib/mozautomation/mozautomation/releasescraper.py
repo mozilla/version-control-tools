@@ -219,7 +219,7 @@ def find_nightly_builds(start_day, end_day=None):
                        for m in RE_ARCHIVE_FILENAMES.finditer(r.content)):
                     continue
 
-                print(b'no build info for %s' % r.url)
+                print('no build info for %s' % r.url)
                 for m in RE_ARCHIVE_FILENAMES.finditer(r.content):
                     print(b'\t%s' % m.group('path'))
                 continue
@@ -229,7 +229,7 @@ def find_nightly_builds(start_day, end_day=None):
                 r = f.result()
 
                 if r.status_code != 200:
-                    print(b'HTTP %s from %s' % (r.status_code, r.url))
+                    print('HTTP %s from %s' % (r.status_code, r.url))
                     continue
 
                 build = get_build_from_archive_file(platform, r)
@@ -308,8 +308,8 @@ def get_build_from_archive_file(platform, r):
             build_id, revision = lines[0].split()
         elif len(lines) == 2:
             build_id, url = lines
-            assert url.startswith((b'http://hg.mozilla.org/',
-                                   b'https://hg.mozilla.org/'))
+            assert url.startswith(('http://hg.mozilla.org/',
+                                   'https://hg.mozilla.org/'))
             revision = url[url.rindex('/') + 1:]
         else:
             print('unknown text file format for %s' % r.url)
