@@ -1457,7 +1457,7 @@ def reposetup(ui, repo):
                 # Don't store RELBRANCH refs for non-release trees, as they are
                 # meaningless and cruft from yesteryear.
                 if branch.endswith(b'RELBRANCH'):
-                    if tree not in TREE_ALIASES['releases']:
+                    if tree not in TREE_ALIASES[b'releases']:
                         continue
 
                 ref = b'%s/%s' % (tree, branch)
