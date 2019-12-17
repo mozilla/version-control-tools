@@ -310,7 +310,7 @@ def get_build_from_archive_file(platform, r):
             build_id, url = lines
             assert url.startswith((b'http://hg.mozilla.org/',
                                    b'https://hg.mozilla.org/'))
-            revision = url[url.rindex(b'/') + 1:]
+            revision = url[url.rindex('/') + 1:]
         else:
             print('unknown text file format for %s' % r.url)
             print(r.text)
@@ -335,7 +335,7 @@ def get_build_from_archive_file(platform, r):
         b'app_version': app_version.encode('utf-8'),
         b'revision': revision.encode('utf-8'),
         b'day': datetime.date(year, month, day),
-        b'artifacts_url': r.url[:r.url.rindex(b'/') + 1].encode('utf-8'),
+        b'artifacts_url': r.url[:r.url.rindex('/') + 1].encode('utf-8'),
     }
 
 
