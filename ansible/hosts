@@ -1,5 +1,5 @@
 [hgweb-prod]
-hgweb4.dmz.mdc1.mozilla.com ansible_become=yes
+hgweb3.dmz.mdc1.mozilla.com ansible_become=yes
 
 [hgssh-prod]
 hgssh[1:3].dmz.mdc1.mozilla.com ansible_become=yes
