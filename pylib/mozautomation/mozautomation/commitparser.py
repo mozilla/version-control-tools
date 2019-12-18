@@ -310,13 +310,13 @@ RE_XCHANNEL_REVISION = re.compile(
 
 
 def xchannel_link(m):
-    s = m.group()[:(m.start(b'revision') - m.start())]
+    s = m.group()[:(m.start('revision') - m.start())]
     l = b'<a href="https://hg.mozilla.org/%(repo)s/rev/%(revision)s">%(revision)s</a>'
     s += l % {
         b'repo': m.group('repo'),
         b'revision': m.group('revision'),
     }
-    s += m.group()[(m.end(b'revision') - m.start()):]
+    s += m.group()[(m.end('revision') - m.start()):]
     return s
 
 
