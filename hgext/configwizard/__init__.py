@@ -730,7 +730,7 @@ def _promptnativeextension(ui, cw, ext, msg):
         return
 
     if not uipromptchoice(ui, b'%s (Yn) $$ &Yes $$ &No' % msg):
-        if b'extensions' not in cw.c:
+        if 'extensions' not in cw.c:
             cw.c['extensions'] = {}
 
         cw.c['extensions'][pycompat.sysstr(ext)] = ''
@@ -989,7 +989,7 @@ def _checkevolve(ui, cw, hg_version):
             ui.write(b'Evolve was downloaded successfully.\n')
 
         except error.Abort as hg_err:
-            ui.write(str(hg_err))
+            ui.write(pycompat.bytestr(hg_err))
             ui.write(EVOLVE_CLONE_ERROR)
 
         return
