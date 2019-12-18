@@ -4,7 +4,6 @@
 
 # This module contains utilities for parsing commit messages.
 
-import cgi
 import re
 
 # These regular expressions are not very robust. Specifically, they fail to
@@ -382,9 +381,9 @@ def add_hyperlinks(s,
         if github_repo:
             s = b'%s<a href="https://github.com/%s/commit/%s">%s</a>%s' % (
                 s[0:start],
-                cgi.escape(github_repo),
-                cgi.escape(source_revision),
-                cgi.escape(source_revision),
+                htmlescape(github_repo),
+                htmlescape(source_revision),
+                htmlescape(source_revision),
                 s[end:])
 
     # We replace #\d+ with links to the GitHub issue.
