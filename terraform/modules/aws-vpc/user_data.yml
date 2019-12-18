@@ -8,13 +8,6 @@ users:
     sudo:  ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDF1QPKh9Qe7uLewUXKJj66zwYngDJM3UbmyO/6jhdFSbsSB1528THQjZYjemj1JyWmvuKk7lCEJD06alGMN54jEm0qccjZEQc1jQ3ZIa6YZpEjHyFuqgIrTVj3N6LXBBbENOdSFt+V3WGRNw9cXq30rr8vD6tmk4+IjXgTHuTqyGCfTBIx48qvbC7CszF8CkoQYFGOHMpP9R/VN3BjTnOSf9ULIqyxZ0BNJ+SMtMYn+DKefOiNNtYsDz5GcjbJFnGidAw3/Zqpz19wrfKwIDfIBgAgrrYAMzYOawCFWINevhGbQUuUJNXk78ZC6ouiaenvtsPgC1hnxth3neazS0sX69wKIYP1ECZLK86dm4fSKVqkazjI2TyQ7T9NHAEbO0i6XUQhAaXC6hbTCa7uLknJY4/NkAL0s9G70lTlw/uRFhhlK44/fW5c7tURbgw5N3mGO5dYWL0xzFECSfQkiSWZBSBviD9rUh6FVRxFVpPE+HpDhEtVd0HoybXnFXr7Zrayfv6K4Xsls5JSrf149YVKr/mrXYbIY8MzaFRDO9Q9yoiNZcbIVe8wVhq+1afUA7ME/xbDzBxlaXmwflhs8lfeOgG8d9rgsgrXsRZFuIi2KLM420iaWk+/yhzjhg/ZrJ/2DFRKCbMdO3SYkBFwPr+QDQYs83nliGhuNqS4KTZMsw==
-  - name: lars
-    lock_passwd: true
-    groups: sudo
-    shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
-    ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCc1Upfn2I5on/g2ncR3mNv3XWZlWwXX8kGD+1hqb5io08/LcKOZSVci4LVa5oSLFKX+ZrwgVgg8oBrAqbaE1VDiHEj8WQdvWOjheQo5qV8RzhWxmuSSlshvfHEQUlJtD20mScvY9IgAZJon4KxInQbfux8OtS20N6pLLcoGNY5fqSIj70BHTzURtd8eP1PLzcWP+YcBbdZmTNBCN/bANPW8330rBqvBJ7+GptcvSGUxE4NwgCcegnNJHkudYPouIRH8vY7at0OWP7KjSw61oJSo7wlm9KhS/EKiwceX68ZzyUuReieR4ydmonBapHj5VDMKTFIE1QAj/Z/sWwG6jeIHFCvFR48ffsOrKKF2g2274glStnSEbkpU+hA0tUIvNzYHNTS0fmm56pWHjAbbBBj0amDG5Mh9WN+BsOoqLpNS2InMJG53ywNXmXfnyKjPR33IRvSQ6BTjb3HiGqbF4r3C5p3XV/cOR5DjKk/j5fRq/rJa/ksMR8yRgvBsosPfXNjRCpruH8DdLIFd2SRauwaNzshBgoT0cgL2JW3YQ4EQ4jfduVpbmH7Cdtl9uO8aaJATwVtOprM90zVM+mNgRdToRAlVjWZb27hpMBNIYSR5/ki/j2mlPu5suF0N2zle5bj17gykiR/jBclkvLyF9ol0OAUMI6ONW/uXzfQQFmkDQ==
   # Other users
   - name: hg
     lock_passwd: true
