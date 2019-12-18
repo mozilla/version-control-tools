@@ -29,7 +29,7 @@ def set_env():
                 value = line.strip().split(b'=', 1)[1]
                 value = value.strip(b'"')
 
-                os.environ['HTTPS_PROXY'] = value
+                os.environ['HTTPS_PROXY'] = pycompat.strurl(value)
                 break
 
     except IOError as e:
