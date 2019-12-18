@@ -34,21 +34,6 @@
       local_action: command hg --cwd {{ vct }} log -r {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
-    - block:
-      - name: notify IRC of deployment
-        irc: server=irc.mozilla.org
-             port=6697
-             use_ssl=true
-             channel="#vcs"
-             nick=hg-deploy-bot
-             color=red
-             msg="Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}"
-             passwd="{{ hostvars[groups['hgssh-prod-master'][0]].hg_deploy_bot_pw.content | b64decode }}"
-        run_once: true
-      rescue:
-        - debug:
-            msg: "Started deploy of revision {{ lookup('file', '../.vctnode') }} to hg.mozilla.org; previous {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}"
-
 - import_playbook: deploy-hgweb.yml
   when: skip_hgweb == False
 
