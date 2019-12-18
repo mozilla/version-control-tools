@@ -100,7 +100,7 @@ def parse_bugs(s):
     if m:
         source_repo = m.group(1)
 
-        if source_repo.startswith('https://github.com/'):
+        if source_repo.startswith(b'https://github.com/'):
             is_github_repo = True
 
     bugzilla_re = BUG_CONSERVATIVE_RE if is_github_repo else BUG_RE
