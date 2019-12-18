@@ -1,0 +1,36 @@
+---
+# Usage:
+#   $ ansible-playbook -i ansible/hosts add-user-to-mirror.yml -e name=<username> key=<ssh pubkey>
+#
+# example, noting the use of quotes for the key variable:
+#    $ ansible-playbook -i hosts add-user-to-mirror.yml -e name=mhentges -e "key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...'"
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: verify username specified
+      fail:
+        msg: "required value `name` is unset"
+      when: name is not defined
+
+    - name: verify key specified
+      fail:
+        msg: "required value `key` is unset"
+      when: key is not defined
+
+- hosts: hgweb-mirrors
+  gather_facts: no
+  tasks:
+    - name: add user to mirror
+      user:
+        append: yes
+        groups: sudo
+        name: "{{ name }}"
+        password_lock: yes
+        shell: /bin/bash
+
+    - name: add ssh key for user
+      authorized_key:
+        key: "{{ key }}"
+        state: present
+        user: "{{ name }}"
