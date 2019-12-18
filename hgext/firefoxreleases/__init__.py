@@ -158,11 +158,13 @@ def changesetentry(orig, web, ctx):
     """Add metadata for an individual changeset in hgweb."""
     d = orig(web, ctx)
 
+    d = pycompat.byteskwargs(d)
+
     repo = web.repo
 
     db = db_for_repo(repo)
     if not db:
-        return d
+        return pycompat.strkwargs(d)
 
     releases = release_info_for_changeset(db, repo, ctx)
 
@@ -214,7 +216,7 @@ def changesetentry(orig, web, ctx):
     if b'firefox_releases_here' in d:
         d[b'firefox_releases_here'] = templateutil.mappinglist(d[b'firefox_releases_here'])
 
-    return d
+    return pycompat.strkwargs(d)
 
 
 def release_info_for_changeset(db, repo, ctx):
