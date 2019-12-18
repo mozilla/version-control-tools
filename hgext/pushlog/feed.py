@@ -163,7 +163,7 @@ class PushlogQuery(object):
         if self.querystart == QueryType.COUNT and not self.userquery and not self.changesetquery:
             return b''
         bits = []
-        isotime = lambda x: datetime.fromtimestamp(x).isoformat(' ')
+        isotime = lambda x: pycompat.bytestr(datetime.fromtimestamp(x).isoformat(' '))
         if self.querystart == QueryType.DATE:
             bits.append(b'after %s' % isotime(self.querystart_value))
         elif self.querystart == QueryType.CHANGESET:
