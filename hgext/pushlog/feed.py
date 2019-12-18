@@ -215,7 +215,7 @@ def do_parse_date(datestring):
                 -1) # isdst
     else:
         # fall back to parsedatetime
-        date, x = cal.parse(datestring)
+        date, x = cal.parse(pycompat.sysstr(datestring))
     return time.mktime(date)
 
 
