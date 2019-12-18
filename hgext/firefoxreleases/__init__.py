@@ -180,7 +180,7 @@ def changesetentry(orig, web, ctx):
             d[b'firefox_releases_here'].append(build)
             d[b'firefox_releases_first'].append(build)
 
-    if releases['future']:
+    if releases[b'future']:
         d.setdefault(b'firefox_releases_first', [])
 
         for config, build in sorted(releases[b'future'].items()):
