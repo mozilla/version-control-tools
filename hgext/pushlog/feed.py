@@ -421,6 +421,10 @@ def pushlog_changenav(_context, query):
     start = max(1, query.page - PUSHES_PER_PAGE/2)
     end = min(numpages + 1, query.page + PUSHES_PER_PAGE/2)
 
+    # Ensure `start` and `end` are int since they need to be passed to `range`
+    start = int(ceil(start))
+    end = int(ceil(end))
+
     if query.page != 1:
         yield {b'page': 1, b'label': b"First"}
         yield {b'page': query.page - 1, b'label': b"Prev"}
