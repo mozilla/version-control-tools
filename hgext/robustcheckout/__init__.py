@@ -254,7 +254,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
                     'lowerIsBetter': True,
                     'shouldAlert': False,
                     'serverUrl': server_url.decode('utf-8'),
-                    'hgVersion': util.version(),
+                    'hgVersion': util.version().decode('utf-8'),
                     'extraOptions': [os.environ['TASKCLUSTER_INSTANCE_TYPE']],
                     'subtests': [],
                 })
