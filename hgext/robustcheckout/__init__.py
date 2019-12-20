@@ -44,8 +44,8 @@ from mercurial import (
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
-minimumhgversion = b'4.3'
+testedwith = b'4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
+minimumhgversion = b'4.5'
 
 cmdtable = {}
 command = registrar.command(cmdtable)
@@ -70,8 +70,12 @@ def supported_hg():
 
 
 def peerlookup(remote, v):
-    with remote.commandexecutor() as e:
-        return e.callcommand(b'lookup', {b'key': v}).result()
+    # TRACKING hg46 4.6 added commandexecutor API.
+    if util.safehasattr(remote, 'commandexecutor'):
+        with remote.commandexecutor() as e:
+            return e.callcommand(b'lookup', {b'key': v}).result()
+    else:
+        return remote.lookup(v)
 
 
 @command(b'robustcheckout', [
@@ -661,7 +665,11 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             raise error.Abort(b'sparse profile %s does not exist at revision '
                               b'%s' % (sparse_profile, checkoutrevision))
 
-        old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'), b'sparse')
+        # TRACKING hg48 - parseconfig takes `action` param
+        if util.versiontuple(n=2) >= (4, 8):
+            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'), b'sparse')
+        else:
+            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b'sparse'))
 
         old_includes, old_excludes, old_profiles = old_config
 
