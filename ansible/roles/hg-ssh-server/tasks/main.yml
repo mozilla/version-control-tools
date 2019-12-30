@@ -117,7 +117,8 @@
 #        group=root
 
 - name: create virtualenv for pash
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_pash
            requirements=../roles/hg-ssh-server/files/requirements-pash.txt
 
