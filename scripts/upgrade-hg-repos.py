@@ -14,8 +14,8 @@ current directory.
 
 import argparse
 import collections
-import datetime
 import concurrent.futures
+import datetime
 import os
 import pathlib
 import stat
