@@ -200,8 +200,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    valid = True
-
     repos = []
     for line in sys.stdin:
         line = line.strip()
@@ -210,12 +208,10 @@ if __name__ == '__main__':
 
         repo = pathlib.Path(line)
         if not validate_repo(repo):
-            valid = False
+            print('repo %s is not valid' % repo)
+            sys.exit(1)
 
         repos.append(repo)
-
-    if not valid:
-        sys.exit(1)
 
     res = 0
 
