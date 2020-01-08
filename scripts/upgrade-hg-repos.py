@@ -25,6 +25,7 @@ import sys
 RECOGNIZED_GROUPS = {
     'hg',
     'hg_embedding',
+    'scm_allow_direct_push',
     'scm_autoland',
     'scm_conduit',
     'scm_level_1',
@@ -34,6 +35,7 @@ RECOGNIZED_GROUPS = {
     'scm_l10n_infra',
     'scm_l10n_drivers',
     'scm_nss',
+    'scm_versioncontrol',
 }
 
 HERE = pathlib.Path(os.path.normpath(os.path.abspath(os.path.dirname(
