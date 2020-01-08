@@ -137,14 +137,13 @@ def run_and_log(args, cwd, log_handle, prefix):
     return p.returncode
 
 
-def upgrade_repo(path, dry_run=False):
+def upgrade_repo(path, hg, dry_run=False):
     hg_dir = path / '.hg'
 
     group = guess_group_owner(hg_dir)
 
     args = [
-        '/usr/bin/python', '-u',
-        '/usr/bin/hg',
+        hg,
         # This makes it easier to tell which repo the process is operating on.
         '--cwd', str(path.resolve()),
         '--pager=never',
@@ -194,6 +193,8 @@ if __name__ == '__main__':
                         help='Do not perform upgrade')
     parser.add_argument('-j', type=int, default=1,
                         help='Number of workers')
+    parser.add_argument('--with-hg', type=str, required=True,
+                        help='Mercurial driver to use for upgrade')
 
     args = parser.parse_args()
 
@@ -219,7 +220,7 @@ if __name__ == '__main__':
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.j) as e:
         fs = []
         for repo in repos:
-            fs.append(e.submit(upgrade_repo, repo, dry_run=args.dry_run))
+            fs.append(e.submit(upgrade_repo, repo, args.with_hg, dry_run=args.dry_run))
 
         for f in concurrent.futures.as_completed(fs):
             try:
