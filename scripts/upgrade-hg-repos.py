@@ -67,8 +67,8 @@ def guess_group_owner(path):
 def validate_repo(path):
     hg_dir = path / '.hg'
 
-    if not os.path.isdir(path):
-        print('%s is not a directory' % path)
+    if not hg_dir.is_dir():
+        print('%s is not a directory' % hg_dir)
         return False
 
     # We require that repos have consistent ownership so we know that changing
