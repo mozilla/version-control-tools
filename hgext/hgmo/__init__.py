@@ -630,28 +630,19 @@ def pull(orig, repo, remote, *args, **kwargs):
     return res
 
 
-def stream_clone_cmp(a, b):
-    """Comparison function to prioritize stream bundles"""
-    packed = b'BUNDLESPEC=none-packed1'
+PACKED_V1 = b'BUNDLESPEC=none-packed1'
+PACKED_V2 = b'BUNDLESPEC=none-v2;stream=v2'
 
-    if packed in a and packed not in b:
-        return -1
-    if packed in b and packed not in a:
+
+def stream_clone_key(manifest_entry):
+    """Key function to prioritize stream clone bundles,
+    preferring newer stream clones over older.
+    """
+    if PACKED_V2 in manifest_entry:
+        return 0
+    if PACKED_V1 in manifest_entry:
         return 1
-
-    return 0
-
-
-# TRACKING py3 - `cmp` sorting function deprecated, use `key`
-if pycompat.ispy3:
-    import functools
-    sorted_kwargs = {
-        'key': functools.cmp_to_key(stream_clone_cmp),
-    }
-else:
-    sorted_kwargs = {
-        'cmp': stream_clone_cmp,
-    }
+    return 2
 
 
 def filter_manifest_for_region(manifest, region):
@@ -667,7 +658,7 @@ def filter_manifest_for_region(manifest, region):
 
     # We prioritize stream clone bundles to AWS clients because they are
     # the fastest way to clone and we want our automation to be fast.
-    filtered = sorted(filtered, **sorted_kwargs)
+    filtered = sorted(filtered, key=stream_clone_key)
 
     # We got a match. Write out the filtered manifest (with a trailing newline).
     filtered.append(b'')
@@ -769,7 +760,7 @@ def processbundlesmanifest(orig, repo, proto):
 
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
-                    origlines = sorted(manifest.data.splitlines(), **sorted_kwargs)
+                    origlines = sorted(manifest.data.splitlines(), key=stream_clone_key)
                     origlines.append(b'')
                     return b'\n'.join(origlines)
 
