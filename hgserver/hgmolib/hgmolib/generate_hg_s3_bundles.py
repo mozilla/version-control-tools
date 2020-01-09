@@ -36,14 +36,14 @@ CREATES = [
     ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {}),
     ('zstd-max', ['--config', 'experimental.bundlecomplevel=20',
                   'bundle', '-a', '-t', 'zstd-v2'], {}),
-    ('packed1', ['debugcreatestreamclonebundle'], {}),
+    ('stream-v2', ['bundle', '-a', '-t', 'none-v2;stream=v2'], {})
 ]
 
 CLONEBUNDLES_ORDER = [
     ('zstd-max', 'BUNDLESPEC=zstd-v2'),
     ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
-    ('packed1', 'BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1'),
+    ('stream-v2', 'BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Cstore'),
 ]
 
 # Defines S3 hostname and bucket where uploads should go.
@@ -133,7 +133,7 @@ HTML_ENTRY = '''
   <td class="numeric">{zstd_entry}</td>
   <td class="numeric">{zstd_max_entry}</td>
   <td class="numeric">{gzip_v2_entry}</td>
-  <td class="numeric">{packed1_entry}</td>
+  <td class="numeric">{stream_v2_entry}</td>
 </tr>
 '''.strip()
 
@@ -477,7 +477,7 @@ def generate_index(repos):
 
         opts = {'repo': repo}
 
-        for k in ('gzip-v2', 'packed1', 'zstd', 'zstd-max'):
+        for k in ('gzip-v2', 'stream-v2', 'zstd', 'zstd-max'):
             key = '%s_entry' % k.replace('-', '_')
             if k in p:
                 opts[key] = '<a href="{path}">{size:,}</a>'.format(
