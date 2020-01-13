@@ -75,19 +75,6 @@ want to maintain a unified repository, *mozext* is very valuable.
 
 This extension lives under ``hgext/mozext``.
 
-
-qbackout
-========
-
-The qbackout extension provides assitance to help perform code backouts
-the Mozilla way.
-
-qimportbz
-=========
-
-The qimportbz extension allows you to easily import patches from
-Bugzilla.
-
 serverlog
 =========
 

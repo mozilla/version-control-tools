@@ -23,14 +23,6 @@ with Files('hgext/pushlog/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: Pushlog')
     FINAL = True
 
-with Files('hgext/qbackout/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: qbackout')
-    FINAL = True
-
-with Files('hgext/qimportbz/**'):
-    BUG_COMPONENT = ('Developer Services', 'Mercurial: qimportbz')
-    FINAL = True
-
 with Files('hghooks/**'):
     BUG_COMPONENT = ('Developer Services', 'Mercurial: hg.mozilla.org')
     FINAL = True
