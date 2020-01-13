@@ -13,7 +13,6 @@ dependencies:
       httpd_max_spare_servers: 2,
       httpd_server_limit: 4,
       httpd_max_clients: 4,
-      is_testing: true,
       vct_node: "DOCKER",
       kafka_broker_id: 2014,
       kafka_host_name: dummyhost,

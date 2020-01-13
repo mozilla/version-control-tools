@@ -1,10 +1,6 @@
 ---
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - include: ../../../tasks/systemd-mail-unit-output.yml
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: Install packages required to run a Mercurial server
   yum: name={{ item }} state=present
@@ -52,12 +48,12 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: enable hg-master.target systemd unit
   service: name=hg-master.target
            enabled=yes
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: hg user ssh config is prepared
   file: path=/home/hg/.ssh state=directory mode=0775 owner=hg group=hg
@@ -160,23 +156,23 @@
 
 - name: create v-c-t clone (server only)
   command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! clone https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools
-  when: vct_dir.stat.exists == False and vct_clone.stat.exists == False
+  when: is_testing is not defined and vct_clone.stat.exists == False
 
 - name: pull version-control-tools repo (server only)
   command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: update version-control-tools repo (server only)
   command: /var/hg/venv_tools/bin/hg -R /var/hg/version-control-tools up -r {{ lookup('file', '../../../../.vctnode') }}
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: delete ignored files from version-control-tools repo
   command: /var/hg/venv_tools/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -rlpt --chmod=Dg+s,ugo+r --delete-after /vct/ /var/hg/version-control-tools/
-  when: vct_dir.stat.exists == True
+  when: is_testing is defined
 
 - name: install vcsreplicator into tools virtualenv
   command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
@@ -278,7 +274,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: create directory for Nagios files
   file: path={{ item }}
@@ -319,7 +315,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
   with_items:
     - hg-bundle-generate.service
     - hg-bundle-generate.timer
@@ -336,7 +332,7 @@
 - name: systemd services are enabled (server only)
   service: name={{ item }}
            enabled=yes
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
   with_items:
     - hg-bundle-generate.timer
     - hg-kafka-heartbeat.timer
@@ -350,13 +346,13 @@
 - name: ensure hg-master-monitor.timer is started (server only)
   service: name=hg-master-monitor.timer
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: restart all services specific to master server (server only)
   service: name=hg-master.target
            state=restarted
   ignore_errors: True
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: install cinnabarclone
   include: ../../../tasks/cinnabarclone.yml

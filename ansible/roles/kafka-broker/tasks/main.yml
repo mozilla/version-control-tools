@@ -1,8 +1,4 @@
 ---
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - name: install system packages
   yum: name={{ item }} state=present
   with_items:
@@ -113,7 +109,7 @@
   with_items:
     - kafka
     - zookeeper
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 # We DON'T set state=started because starting kafka and zookeeper can be
 # dangerous since it may introduce nodes into a cluster at an unwanted
@@ -124,7 +120,7 @@
   with_items:
     - kafka
     - zookeeper
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 # We can remove this is we ever install NRPE in Docker.
 - name: create directory for NRPE check configs

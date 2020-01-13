@@ -1,9 +1,5 @@
 ---
 # We assume in various places in this file that we only run on RHEL/CentOS.
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - name: install epel package repository
   yum: name=epel-release
        state=present
@@ -25,8 +21,3 @@
         owner=root
         group=root
         mode=0644
-
-- name: ensure supervisor service is started
-  service: name=supervisord
-           state=started
-  when: vct_dir.stat.exists == False

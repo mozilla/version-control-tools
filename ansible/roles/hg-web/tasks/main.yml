@@ -1,9 +1,4 @@
 ---
-
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - name: install system packages
   yum: name={{ item }} state=present
   with_items:
@@ -198,23 +193,23 @@
 # The replicateowner extension doesn't work with https:// remotes, so it is disabled.
 - name: clone version-control-tools repo (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: pull version-control-tools (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: update version-control-tools revision (server only)
   command: /var/hg/venv_hgweb/bin/hg -R /var/hg/version-control-tools up -C {{ lookup('file', '../../../../.vctnode') }}
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -rlpt --delete-after /vct/ /var/hg/version-control-tools/
-  when: vct_dir.stat.exists == True
+  when: is_testing is defined
 
 - name: delete ignored files from version-control-tools repo (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 # pip doesn't reinstall the same version unless --upgrade is passed.
 # We need to pass --no-deps to prevent dependencies from getting pulled
@@ -403,7 +398,7 @@
         hour=2
 
 - include: ../../../tasks/systemd-mail-unit-output.yml
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: create directory mail-unit-output override file
   file: path=/etc/systemd/system/mail-unit-output@.service.d
@@ -419,7 +414,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: advertise current v-c-t changeset in hgweb
   replace: dest=/repo/hg/hg_templates/gitweb_mozilla/footer.tmpl
@@ -453,13 +448,13 @@
     - firefox-release-scraper.service
     - firefox-release-scraper.timer
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: firefox release scraper service enabled (server only)
   service: name=firefox-release-scraper.timer
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: systemd service files for AWS IP scraper
   copy: src={{ item }}
@@ -471,19 +466,19 @@
     - aws-ip-scraper.service
     - aws-ip-scraper.timer
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: AWS IP scraper service enabled (server only)
   service: name=aws-ip-scraper.timer
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: Run AWS IP scrape to get latest (server only)
   service: name=aws-ip-scraper.service
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: systemd service files for GCP IP scraper
   copy: src={{ item }}
@@ -495,19 +490,19 @@
     - gcp-ip-scraper.service
     - gcp-ip-scraper.timer
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: GCP IP scraper service enabled (server only)
   service: name=gcp-ip-scraper.timer
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: Run GCP IP scrape to get latest (server only)
   service: name=gcp-ip-scraper.service
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: install vcsreplicator config
   template: src="{{ item }}.j2"
@@ -547,7 +542,7 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: vcsreplicator service is enabled (server only)
   service: name=vcsreplicator@{{ item }}.service
@@ -561,11 +556,11 @@
     - '5'
     - '6'
     - '7'
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: restart vcsreplicator daemons (server only)
   command: /usr/bin/systemctl restart vcsreplicator@*.service
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: systemd service file for vcsreplicator-heads
   copy: src=vcsreplicator-heads.service
@@ -574,16 +569,16 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: vcsreplicator-heads service is enabled (server only)
   service: name=vcsreplicator-heads.service
            enabled=yes
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: restart vcsreplicator-heads daemon (server only)
   command: /usr/bin/systemctl restart vcsreplicator-heads.service
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: create Nagios config directory
   file: path=/etc/nagios/nrpe.d
@@ -611,7 +606,7 @@
            state=started
   # Don't do this on Docker because it has its own mechanism for
   # starting.
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: install cinnabarclone
   include: ../../../tasks/cinnabarclone.yml

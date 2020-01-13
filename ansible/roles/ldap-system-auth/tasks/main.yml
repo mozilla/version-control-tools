@@ -1,8 +1,4 @@
 ---
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - name: install packages required to use LDAP for system auth
   yum: name={{ item }} state=present
   with_items:
@@ -41,7 +37,7 @@
   service: name=nslcd.service
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: configure sshd
   copy: src=sshd_config
@@ -51,4 +47,4 @@
 
 - name: generate SSH host keys (Docker only)
   command: /usr/bin/ssh-keygen -A -N ''
-  when: vct_dir.stat.exists == True
+  when: is_testing is defined

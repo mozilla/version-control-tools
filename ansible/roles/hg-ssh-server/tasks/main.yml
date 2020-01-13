@@ -1,8 +1,4 @@
 ---
-- name: determine if running in Docker
-  stat: path=/vct
-  register: vct_dir
-
 - name: Create groups for SCM ACLs
   group: name={{ item.name }} gid={{ item.gid }}
   with_items:
@@ -91,13 +87,13 @@
         group=root
         mode=0644
   notify: systemd daemon reload
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: ensure hg sshd runs on startup
   service: name=sshd_hg.service
            enabled=yes
            state=started
-  when: vct_dir.stat.exists == False
+  when: is_testing is not defined
 
 - name: Mercurial repository directories are present
   file: path={{ item }} state=directory mode=0775

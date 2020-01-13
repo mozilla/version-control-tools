@@ -35,7 +35,7 @@ guessmime = True
 # know what the hostname is. So we use "self" in that environment and a full
 # URL in production.
 
-{% if vct_dir.stat.exists == False %}
+{% if is_testing is not defined %}
 csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src https://hg.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 {% else %}
 csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
