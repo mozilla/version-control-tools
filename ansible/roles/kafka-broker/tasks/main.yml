@@ -126,14 +126,6 @@
     - zookeeper
   when: vct_dir.stat.exists == False
 
-# TODO delete this after a few weeks.
-- name: remove supervisor configs
-  file: path=/etc/supervisor.d/{{ item }}.conf
-        state=absent
-  with_items:
-    - kafka
-    - zookeeper
-
 # We can remove this is we ever install NRPE in Docker.
 - name: create directory for NRPE check configs
   file: path=/etc/nagios/nrpe.d
