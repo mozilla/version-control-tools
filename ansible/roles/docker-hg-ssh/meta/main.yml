@@ -12,6 +12,7 @@ dependencies:
       ldap_starttls: false,
       sshd_hg_port: 22,
       hgweb_hosts: [],
+      is_testing: true,
       kafka_broker_id: 1024,
       kafka_host_name: dummyhost,
       kafka_zookeeper_connect: dummyhostports,
