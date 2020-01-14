@@ -360,7 +360,7 @@ Would you like to enable the evolve extension? (Yn) $$ &Yes $$ &No
 
 EVOLVE_UPDATE_PROMPT = b'''
 It looks like the setup wizard has already installed a copy of the
-evolve extension on your machine, at {evolve_dir}.
+evolve extension on your machine, at %(evolve_dir)s.
 
 (Relevant config option: extensions.evolve)
 
