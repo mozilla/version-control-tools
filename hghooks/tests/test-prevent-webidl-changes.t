@@ -313,23 +313,6 @@ Hook should not run when stripping
 
   $ cd ..
 
-.webidl files in servo/ are immune from the hook
-
-  $ cd client
-  $ mkdir servo
-  $ echo "interface Test{};" > servo/interface.webidl
-  $ hg commit -A -m 'add interface in servo'
-  adding servo/interface.webidl
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 1 changesets with 1 changes to 1 files
-  -- Not enforcing DOM peer review for WebIDL files within Servo.
-  -- Please make sure changes do not contain any web-visible binding definitions.
-
 Editing a .webidl file that isn't in a web root should pass
 
   $ mkdir -p dom/chrome-webidl

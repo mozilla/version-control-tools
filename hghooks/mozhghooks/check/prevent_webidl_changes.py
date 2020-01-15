@@ -42,9 +42,6 @@ DOM_PEERS = [
 # interfaces, and do not require DOM peer review.
 CHROME_WEBIDL_ROOT = b'dom/chrome-webidl/'
 
-# Servo WebIDL files do not need DOM Peer review.
-SERVO_ROOT = b'servo/'
-
 MISSING_REVIEW = b"""
 Changeset %s alters WebIDL file(s) without DOM peer review:
 %s
@@ -56,11 +53,6 @@ for p in DOM_PEERS:
 
 CHROME_ONLY = b"""
 Not enforcing DOM peer review for WebIDL files within the chrome WebIDL root.
-Please make sure changes do not contain any web-visible binding definitions.
-"""
-
-SERVO_ONLY = b"""
-Not enforcing DOM peer review for WebIDL files within Servo.
 Please make sure changes do not contain any web-visible binding definitions.
 """
 
@@ -106,17 +98,13 @@ class WebIDLCheck(PreTxnChangegroupCheck):
             file_counts['total'] += 1
             if f.startswith(CHROME_WEBIDL_ROOT):
                 file_counts['chrome'] += 1
-            elif f.startswith(SERVO_ROOT):
-                file_counts['servo'] += 1
             else:
                 review_required_files.append(f)
 
-        # Allow chrome-only and servo-only changes
-        if file_counts['chrome'] + file_counts['servo'] == file_counts['total']:
+        # Allow chrome-only changes
+        if file_counts['chrome'] == file_counts['total']:
             if file_counts['chrome']:
                 print_notice(self.ui, CHROME_ONLY)
-            if file_counts['servo']:
-                print_notice(self.ui, SERVO_ONLY)
             return True
 
         # Allow if reviewed by any peer
