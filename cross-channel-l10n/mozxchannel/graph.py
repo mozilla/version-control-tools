@@ -72,8 +72,8 @@ class SparseGraph(object):
         self.heads.clear()
         del self.archived_parents[:]
         del self.merges[:]
-        range = scmutil.revrange(self.source,  self.src_revs)
-        self.graph = list(graphmod.dagwalker(self.source, range))
+        revrange = scmutil.revrange(self.source,  self.src_revs)
+        self.graph = list(graphmod.dagwalker(self.source, revrange))
         gid2rev = dict(
             ((id, ctx.rev()) for id, C, ctx, parents in self.graph))
         # graphmod returns a graph of all possible connections through
@@ -101,7 +101,7 @@ class SparseGraph(object):
             else:
                 yield parents
 
-        for depth in xrange(1, max_depth + 1):
+        for depth in range(1, max_depth + 1):
             self.archived_parents.append(self.parents)
             new_parents = {}
             for src_rev, local_parents in self.parents.items():

@@ -50,21 +50,21 @@ Create forks and merges
   >>> repo = repository(ui())
   >>> len(repo)
   10
-  >>> g = graph.SparseGraph(repo, ['filelog("red")'])
+  >>> g = graph.SparseGraph(repo, [b'filelog("red")'])
   >>> g.createGraph()
   >>> sorted(g.parents.keys())
   [0, 1, 4, 7]
-  >>> g.parents[0]
-  set([])
-  >>> g.parents[1]
-  set([0])
-  >>> g.parents[7]
-  set([4])
+  >>> sorted(g.parents[0])
+  []
+  >>> sorted(g.parents[1])
+  [0]
+  >>> sorted(g.parents[7])
+  [4]
   >>> g.roots
   [0]
-  >>> g.heads
-  set([7])
-  >>> g = graph.SparseGraph(repo, ['filelog("red") and 2::'])
+  >>> sorted(g.heads)
+  [7]
+  >>> g = graph.SparseGraph(repo, [b'filelog("red") and 2::'])
   >>> g.createGraph()
   >>> sorted(g.parents.keys())
   [4, 7]
@@ -75,17 +75,17 @@ Now let's test the unoptimized graph. Fixing the artifacts below would be nice.
   >>> from mercurial.ui import ui
   >>> from mozxchannel import graph
   >>> repo = repository(ui())
-  >>> g = graph.SparseGraph(repo, ['filelog("red")'])
+  >>> g = graph.SparseGraph(repo, [b'filelog("red")'])
   >>> g.createGraph(max_depth=0, optimize=False)
   >>> sorted(g.parents.keys())
   [0, 1, 4, 7]
-  >>> g.parents[0]
-  set([])
-  >>> g.parents[1]
-  set([0])
-  >>> g.parents[7]  # this also shows the route 1, 5, 6, 7
-  set([1, 4])
+  >>> sorted(g.parents[0])
+  []
+  >>> sorted(g.parents[1])
+  [0]
+  >>> sorted(g.parents[7])  # this also shows the route 1, 5, 6, 7
+  [1, 4]
   >>> g.roots
   [0]
-  >>> g.heads
-  set([7])
+  >>> sorted(g.heads)
+  [7]

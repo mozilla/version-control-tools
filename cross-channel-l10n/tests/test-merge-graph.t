@@ -59,7 +59,7 @@ Ensure that we merged everything, should only have a single head
   >>> repo = repository(ui())
   >>> len(repo)
   10
-  >>> g = graph.SparseGraph(repo, ['filelog("glob:red/*")'])
+  >>> g = graph.SparseGraph(repo, [b'filelog("glob:red/*")'])
   >>> g.createGraph()
   >>> sorted(g.parents.keys())
   [0, 1, 2, 3, 4, 9]
