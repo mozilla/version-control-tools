@@ -107,6 +107,35 @@ Source-Repo: https://github.com/mozilla/foo'''
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=romulus, r=remus')), ['romulus', 'remus'])
         self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=romulus, remus')), ['romulus', 'remus'])
 
+        # test that periods in names are OK
+        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=jimmy.jones, r=bill.mcneal')), ['jimmy.jones', 'bill.mcneal'])
+        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=jimmy.')), ['jimmy'])
+
+
+        # check some funky names too
+        self.assertEqual(list(parse_reviewers("stuff;r=a")), ["a"])
+        self.assertEqual(list(parse_reviewers("stuff;r=aa")), ["aa"])
+        self.assertEqual(list(parse_reviewers("stuff;r=.a")), [".a"])
+        self.assertEqual(list(parse_reviewers("stuff;r=..a")), ["..a"])
+        self.assertEqual(list(parse_reviewers("stuff;r=...a")), ["...a"])
+        self.assertEqual(list(parse_reviewers("stuff;r=a...a")), ["a...a"])
+        self.assertEqual(list(parse_reviewers("stuff;r=a.b")), ["a.b"])
+        self.assertEqual(list(parse_reviewers("stuff;r=a.b.c")), ["a.b.c"])
+        self.assertEqual(list(parse_reviewers("stuff;r=-.-.-")), ["-.-.-"])
+
+        # NOTE: a string such as "stuff;r=a.,b" will not be parsed as expected
+        # and will yield ["a"]. TODO: fix this in the future in the regex, or
+        # do some post processing in `parse_reviewers` if this is needed. The
+        # following test is testing the current behaviour only.
+
+        self.assertEqual(list(parse_reviewers("stuff;r=a.,b")), ["a"])
+
+        # altogether now with some spaces sprinkled here and there
+        self.assertEqual(
+            list(parse_reviewers("hi;r=a,aa,.a,..a,...a, a...a,a.b, a.b.c, -.-.-")),
+            [ "a", "aa", ".a", "..a", "...a", "a...a", "a.b", "a.b.c", "-.-.-"]
+        )
+
         # bare r?
         self.assertEqual(list(parse_reviewers('Bug 123 - Blah blah; r?')), [])
         self.assertEqual(list(parse_reviewers(
@@ -168,6 +197,13 @@ Source-Repo: https://github.com/mozilla/foo'''
             '-header-filter=^/.../mozilla-central/.* \\\n'
             '-fix')),
             ['ehsan'])
+
+    @unittest.skip
+    def test_first_reviewer_with_period_at_end_of_name():
+        # TODO: this is not the current behaviour, but implementing this would
+        # yield more expected results. We should probably also account for the
+        # case of users having a period at the end of their username.
+        self.assertEqual(list(parse_reviewers("stuff;r=a.,b")), ["a", "b"])
 
     def test_requal_reviewers(self):
         # empty

@@ -40,7 +40,7 @@ LIST_RE = re.compile(LIST)
 
 # Note that we only allows a subset of legal IRC-nick characters.
 # Specifically we not allow [ \ ] ^ ` { | }
-IRC_NICK = br'[a-zA-Z0-9\-\_]+'          # this needs to match irc nicks
+IRC_NICK = br'[a-zA-Z0-9\-\_.]*[a-zA-Z0-9\-\_]+'  # this needs to match irc nicks
 BMO_IRC_NICK_RE = re.compile(br':(' + IRC_NICK + br')')
 
 REVIEWERS_RE = re.compile(
