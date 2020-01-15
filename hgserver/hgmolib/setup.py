@@ -20,6 +20,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
+            'find-hg-repos=hgmolib.environment:script_find_hg_repos',
             'generate-hg-s3-bundles=hgmolib.generate_hg_s3_bundles:main',
         ]
     }
