@@ -37,7 +37,7 @@ Editing a .webidl file without any review should fail
   Changeset 743ef64f8a38 alters WebIDL file(s) without DOM peer review:
   original.webidl
   
-  Please, request review from either:
+  Please, request review from the #webidl reviewer group or either:
     - Andrea Marchesini (:baku)
     - Andreas Farre (:farre)
     - Andrew McCreight (:mccr8)
@@ -70,7 +70,7 @@ Editing a .webidl file without /DOM/ peer review should fail
   Changeset 0cfb912b8138 alters WebIDL file(s) without DOM peer review:
   original.webidl
   
-  Please, request review from either:
+  Please, request review from the #webidl reviewer group or either:
     - Andrea Marchesini (:baku)
     - Andreas Farre (:farre)
     - Andrew McCreight (:mccr8)
@@ -117,7 +117,7 @@ Editing a .webidl file without /DOM/ peer review in the same push as a commit wi
   Changeset a9b3d7778cda alters WebIDL file(s) without DOM peer review:
   original.webidl
   
-  Please, request review from either:
+  Please, request review from the #webidl reviewer group or either:
     - Andrea Marchesini (:baku)
     - Andreas Farre (:farre)
     - Andrew McCreight (:mccr8)
@@ -169,7 +169,7 @@ WebIDL change after release uplift fails
   Changeset 3043c2c5e650 alters WebIDL file(s) without DOM peer review:
   original.webidl
   
-  Please, request review from either:
+  Please, request review from the #webidl reviewer group or either:
     - Andrea Marchesini (:baku)
     - Andreas Farre (:farre)
     - Andrew McCreight (:mccr8)
@@ -347,7 +347,7 @@ Editing multiple .webidl files without review should fail
   dom/file1.webidl
   dom/file2.webidl
   
-  Please, request review from either:
+  Please, request review from the #webidl reviewer group or either:
     - Andrea Marchesini (:baku)
     - Andreas Farre (:farre)
     - Andrew McCreight (:mccr8)

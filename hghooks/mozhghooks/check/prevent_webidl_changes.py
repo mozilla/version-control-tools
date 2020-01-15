@@ -46,7 +46,7 @@ MISSING_REVIEW = b"""
 Changeset %s alters WebIDL file(s) without DOM peer review:
 %s
 
-Please, request review from either:
+Please, request review from the #webidl reviewer group or either:
 """
 for p in DOM_PEERS:
     MISSING_REVIEW += b"  - %s (:%s)\n" % (p['name'], p['nick'][0])
