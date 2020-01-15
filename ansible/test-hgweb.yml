@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
   roles:
-    - docker-hg-web
+    - test-hg-web
   vars:
     zk_listen_on_all_ips: true

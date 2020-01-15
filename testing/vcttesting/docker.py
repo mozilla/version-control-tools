@@ -781,8 +781,8 @@ class Docker(object):
             'ldap',
             'pulse',
         ], ansibles={
-            'hgmaster': ('docker-hgmaster', 'centos7'),
-            'hgweb': ('docker-hgweb', 'centos7'),
+            'hgmaster': ('test-hgmaster', 'centos7'),
+            'hgweb': ('test-hgweb', 'centos7'),
         }, existing=images, verbose=verbose, use_last=use_last)
 
         self.state['last-hgmaster-id'] = images['hgmaster']
@@ -812,8 +812,8 @@ class Docker(object):
             docker_images |= {
                 'ldap',
             }
-            ansible_images['hgmaster'] = ('docker-hgmaster', 'centos7')
-            ansible_images['hgweb'] = ('docker-hgweb', 'centos7')
+            ansible_images['hgmaster'] = ('test-hgmaster', 'centos7')
+            ansible_images['hgweb'] = ('test-hgweb', 'centos7')
 
         images = self.ensure_images_built(docker_images,
                                           ansibles=ansible_images,

@@ -62,7 +62,7 @@
 - name: virtualenv to run test-specific processes
   include: ../../../tasks/virtualenv.yml
            venv=/var/hg/venv_testing
-           requirements=../roles/docker-hg-ssh/files/requirements-testing.txt
+           requirements=../roles/test-hg-ssh/files/requirements-testing.txt
 
 - name: install unifyrepo testing config
   copy: src=unify-mozilla-unified-testing.ini dest=/etc/mercurial/unify-mozilla-unified.ini mode=0755

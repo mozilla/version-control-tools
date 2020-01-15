@@ -1,7 +1,7 @@
 ---
 dependencies:
-  - supervisor
-  - docker-kafkabroker
+  - test-supervisor
+  - test-kafkabroker
   # Docker startup routines plug in proper values for ZooKeeper and
   # Kafka settings.
   - { role: hg-web,

@@ -11,7 +11,7 @@ os.environ['DOCKER_ENTRYPOINT'] = '1'
 
 subprocess.check_call([
     '/usr/bin/python', '-u',
-    '/usr/bin/ansible-playbook', 'docker-hgmaster.yml', '-c', 'local',
+    '/usr/bin/ansible-playbook', 'test-hgmaster.yml', '-c', 'local',
     '-t', 'docker-startup'],
     cwd='/vct/ansible')
 

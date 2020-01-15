@@ -7,7 +7,7 @@
         mode=0644
   with_items:
     - docker
-    - docker-kafkabroker
+    - test-kafkabroker
 
 # Docker isn't running systemd. Remove the rsyslog config file telling
 # rsyslog to bind to /run/systemd/journal/syslog so it binds to /dev/log
