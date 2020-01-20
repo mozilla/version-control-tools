@@ -1,36 +1,35 @@
 ---
 - name: install system packages
-  yum: name={{ item }} state=present
-  with_items:
-    # This is likely already installed, but needed for Docker.
-    - cronie
-    - gcc
-    - httpd
-    # To build mod_wsgi from source so it can be placed in virtualenvs.
-    - httpd-devel
-    # Provides `setcap` utility.
-    - libcap
-    # Secures processes, especially moz.build evaluation.
-    - libcgroup
-    # We use logrotate to control log files
-    - logrotate
-    - openssh-clients
-    - openssh-server
-    - python-devel
-    - python3
-    - python3-pip
-    - python3-devel
-    - rsync
-    # Needed for hg user to execute mozbuild-eval as root.
-    - rsyslog
-    - sudo
-    - tar
-    - yum-plugin-versionlock
+  yum:
+    state: present
+    name:
+      # This is likely already installed, but needed for Docker.
+      - cronie
+      - gcc
+      - httpd
+      # To build mod_wsgi from source so it can be placed in virtualenvs.
+      - httpd-devel
+      # Provides `setcap` utility.
+      - libcap
+      # Secures processes, especially moz.build evaluation.
+      - libcgroup
+      # We use logrotate to control log files
+      - logrotate
+      - openssh-clients
+      - openssh-server
+      - python-devel
+      - python3
+      - python3-pip
+      - python3-devel
+      - rsync
+      # Needed for hg user to execute mozbuild-eval as root.
+      - rsyslog
+      - sudo
+      - tar
+      - yum-plugin-versionlock
 
 - name: install system packages
-  yum: name={{ item }} state=present
-  with_items:
-    - libcgroup-tools
+  yum: name=libcgroup-tools state=present
 
 - name: ensure critical system packages are locked so they aren't auto-upgraded
   command: /usr/bin/yum versionlock add {{ item }}

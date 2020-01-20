@@ -3,11 +3,12 @@
   when: is_testing is not defined
 
 - name: Install packages required to run a Mercurial server
-  yum: name={{ item }} state=present
-  with_items:
-    - sudo
-    - tar
-    - yum-plugin-versionlock
+  yum:
+    state: present
+    name:
+      - sudo
+      - tar
+      - yum-plugin-versionlock
 
 - name: ensure critical system packages are locked so they aren't auto-upgraded
   command: /usr/bin/yum versionlock add {{ item }}
