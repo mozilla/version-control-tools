@@ -290,7 +290,7 @@ will be an indication of a successful bootstrap
   * * vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total (glob)
   * * vcsreplicator.bootstrap exiting sync for: {moz}/deleterepo (glob)
   * * vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central (glob)
-  * * vcsreplicator.bootstrap error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\nremote: Warning: Permanently added the RSA host key for IP address * to the list of known hosts.\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!') (glob)
+  * * vcsreplicator.bootstrap error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!') (glob)
   * * vcsreplicator.bootstrap 2 repositories remaining (glob)
   * * vcsreplicator.bootstrap exiting sync for: {moz}/mozilla-central (glob)
   * * vcsreplicator.bootstrap syncing repo: {moz}/testrepo (glob)
@@ -394,7 +394,6 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   pulling 1 heads into /repo/hg/mozilla/deleterepo
     $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/deleterepo
     > pulling from ssh://hgssh/deleterepo
-    > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
     > remote: requested repo deleterepo does not exist
     > abort: no suitable response from remote hg!
     [255]
@@ -482,7 +481,7 @@ Verify bootstrap log is correct
   * * vcsreplicator.bootstrap extra messages found for {moz}/mozilla-central: 2 total (glob)
   * * vcsreplicator.bootstrap exiting sync for: {moz}/deleterepo (glob)
   * * vcsreplicator.bootstrap syncing repo: {moz}/mozilla-central (glob)
-  * * vcsreplicator.bootstrap error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\nremote: Warning: Permanently added the RSA host key for IP address * to the list of known hosts.\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!') (glob)
+  * * vcsreplicator.bootstrap error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!') (glob)
   * * vcsreplicator.bootstrap 2 repositories remaining (glob)
   * * vcsreplicator.bootstrap exiting sync for: {moz}/mozilla-central (glob)
   * * vcsreplicator.bootstrap syncing repo: {moz}/testrepo (glob)
@@ -516,7 +515,7 @@ Ensure the audit output is in the correct format
   $ hgmo exec hgweb0 cat /repo/hg/hgweb_bootstrap_out.json | python -m json.tool
   {
       "{moz}/deleterepo": [
-          "error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\\nremote: Warning: Permanently added the RSA host key for IP address '*.*.*.*' to the list of known hosts.\\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!')" (glob)
+          "error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg!')"
       ],
       "{moz}/filterrepo": [
           "filtered by rule testrule"
