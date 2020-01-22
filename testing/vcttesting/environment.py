@@ -99,17 +99,22 @@ def install_editable(venv, relpath, extra_env=None):
     subprocess.check_call(args, env=env)
 
 
-def install_mercurials(venv, hg):
+def install_mercurials(venv, hg, py3=False):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
-        '4.8.2',
-        '4.9.1',
-        '5.0.1',
-        '5.1.2',
         '5.2',
         '5.3rc0',
         '@',
     ]
+
+    # Python 2 only Mercurials
+    if not py3:
+        VERSIONS.extend([
+            '4.8.2',
+            '4.9.1',
+            '5.0.1',
+            '5.1.2',
+        ])
 
     hg_dir = os.path.join(ROOT, 'venv', 'hg')
     mercurials = os.path.join(venv['path'], 'mercurials')
@@ -266,4 +271,4 @@ if __name__ == '__main__':
             'python': os.path.join(ROOT, 'venv', 'py3', 'bin', 'python'),
         }
         # PATH has global virtualenv activated.
-        install_mercurials(venv, hg='hg')
+        install_mercurials(venv, hg='hg', py3=True)
