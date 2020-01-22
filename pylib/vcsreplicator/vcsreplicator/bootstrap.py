@@ -93,7 +93,7 @@ def hgssh():
     consumer_config = {
         # set this so offsets are committed to Zookeeper
         'api_version': (0, 8, 1),
-        'bootstrap_servers': config.get('replicationproducer', 'hosts'),
+        'bootstrap_servers': config.get('replicationproducer', 'hosts').split(', '),
         'enable_auto_commit': False,  # We don't actually commit but this is just for good measure
     }
     consumer = KafkaConsumer(**consumer_config)
@@ -201,7 +201,7 @@ def hgweb():
     consumer_config = {
         # set this so offsets are committed to Zookeeper
         'api_version': (0, 8, 1),
-        'bootstrap_servers': config.get('consumer', 'hosts'),
+        'bootstrap_servers': config.get('consumer', 'hosts').split(', '),
         'client_id': config.get('consumer', 'client_id'),
         'enable_auto_commit': False,
         'group_id': config.get('consumer', 'group'),
