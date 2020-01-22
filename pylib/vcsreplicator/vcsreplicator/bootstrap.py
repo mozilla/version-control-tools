@@ -98,6 +98,11 @@ def hgssh():
     }
     consumer = KafkaConsumer(**consumer_config)
 
+    # This call populates topic metadata for all topics in the cluster.
+    # Needed as missing topic metadata can cause the below call to retrieve
+    # partition information to fail.
+    consumer.topics()
+
     partitions = consumer.partitions_for_topic(topic)
     if not partitions:
         logger.critical('could not get partitions for %s' % topic)
@@ -221,6 +226,9 @@ def hgweb():
     ]
 
     consumer = KafkaConsumer(**consumer_config)
+
+    # This call populates topic metadata for all topics in the cluster.
+    consumer.topics()
 
     outputdata = collections.defaultdict(list)
 
