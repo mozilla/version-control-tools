@@ -65,6 +65,14 @@ def clone_repo(config, path, requirements, hgrc, heads):
         logger.info('exiting sync for: %s' % path)
 
 
+def seqmap(message_handler, events):
+    '''Process events using the message handler in the order they
+    arrived in the queue
+    '''
+    for config, payload in events:
+        message_handler(config, payload)
+
+
 def hgssh():
     '''hgssh component of the vcsreplicator bootstrap procedure.'''
     import argparse
@@ -351,8 +359,7 @@ def hgweb():
             # Schedule extra message processing if necessary
             if repo in extra_messages:
                 logger.info('scheduling extra processing for %s' % repo)
-                configs, payloads = zip(*extra_messages[repo])
-                future = e.submit(map, handle_message_main, configs, payloads)
+                future = e.submit(seqmap, handle_message_main, extra_messages[repo])
                 extra_messages_futures_repo_mapping[future] = repo
 
         # Process extra messages
