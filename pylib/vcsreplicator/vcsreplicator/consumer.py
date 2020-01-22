@@ -312,6 +312,23 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
             raise hglib.error.CommandError(args, res, out, err)
 
 
+def stream_clone_repo(canonical_path, local_path):
+    '''Stream clone the canonical repo to the local path.
+    Returns on success and raises on error.
+    '''
+    args = hglib.util.cmdbuilder('clone', canonical_path, local_path,
+                                 stream=True)
+    args.insert(0, hglib.HGPATH)
+    logger.warn('performing stream clone of %s to %s' % (canonical_path, local_path))
+
+    proc = hglib.util.popen(args)
+    out, err = proc.communicate()
+    if proc.returncode:
+        raise hglib.error.CommandError(args, proc.returncode, out, err)
+
+    logger.warn('%s cloned to %s successfully' % (canonical_path, local_path))
+
+
 def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
     local_path = config.parse_wire_repo_path(path)
     url = config.get_pull_url_from_repo_path(path)
@@ -321,7 +338,16 @@ def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
         if not create:
             return
 
-        init_repo(local_path)
+        # Attempt to stream clone the repo from a clonebundle to maximize performance,
+        # then follow up with a regular `hg pull` to ensure repo metadata
+        # is replicated. This will fail if a clonebundle is not available
+        # for download due to permissions on the master server (ie in tests)
+        # so we fall back to the pull protocol.
+        try:
+            stream_clone_repo(url, local_path)
+        except hglib.error.CommandError as e:
+            logger.warn('stream clone of %s failed - using pull instead' % url)
+            init_repo(local_path)
 
     # TODO set or warn about different requirements.
 

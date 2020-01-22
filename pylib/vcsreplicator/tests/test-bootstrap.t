@@ -388,6 +388,8 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
 
   $ hgmo exec hgweb0 cat /var/log/vcsrbootstrap/consumer.log
   repository does not exist: /repo/hg/mozilla/deleterepo
+  performing stream clone of ssh://hgssh/deleterepo to /repo/hg/mozilla/deleterepo
+  stream clone of ssh://hgssh/deleterepo failed - using pull instead
   created Mercurial repository: /repo/hg/mozilla/deleterepo
   pulling 1 heads into /repo/hg/mozilla/deleterepo
     $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/deleterepo
@@ -397,6 +399,8 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     > abort: no suitable response from remote hg!
     [255]
   repository does not exist: /repo/hg/mozilla/mozilla-central
+  performing stream clone of ssh://hgssh/mozilla-central to /repo/hg/mozilla/mozilla-central
+  stream clone of ssh://hgssh/mozilla-central failed - using pull instead
   created Mercurial repository: /repo/hg/mozilla/mozilla-central
   writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   pulling 1 heads into /repo/hg/mozilla/mozilla-central
@@ -414,6 +418,8 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     [0]
   pulled 1 changesets into /repo/hg/mozilla/mozilla-central
   repository does not exist: /repo/hg/mozilla/testrepo
+  performing stream clone of ssh://hgssh/testrepo to /repo/hg/mozilla/testrepo
+  stream clone of ssh://hgssh/testrepo failed - using pull instead
   created Mercurial repository: /repo/hg/mozilla/testrepo
   writing hgrc: /repo/hg/mozilla/testrepo/.hg/hgrc
   pulling 1 heads into /repo/hg/mozilla/testrepo
