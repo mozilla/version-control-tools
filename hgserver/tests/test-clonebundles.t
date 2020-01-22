@@ -158,7 +158,7 @@ Fetching with a GCE IP will limit to GCE URL
   
 
 
-Fetching with a private IP and a cloud metadata file indicating host region is us-west-2 will limit to same region URLs
+Fetching with a private IP and a cloud metadata file indicating host region is us-west-2 in AWS will limit to same region URLs
 Reload apache after setting config, so processes pick up the new config
 
   $ hgmo exec hgweb0 /set-config-option /etc/mercurial/hgrc hgmo "instance-data-path" "/var/hg/test_instance_data.json"

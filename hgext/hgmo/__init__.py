@@ -665,6 +665,27 @@ def filter_manifest_for_region(manifest, region):
     return b'\n'.join(filtered)
 
 
+CLOUD_REGION_MAPPING = {
+    'aws': b'ec2region',
+    'gce': b'gceregion',
+}
+
+
+def cloud_region_specifier(instance_data):
+    '''Return the cloud region specifier that corresponds to the given
+    instance data object.
+
+    Instance data object format can be found at:
+        https://cloudinit.readthedocs.io/en/latest/topics/instancedata.html
+    '''
+    cloud_data_v1 = instance_data['v1']
+
+    return b'%(cloud)s=%(region)s' % {
+        b'cloud': CLOUD_REGION_MAPPING[cloud_data_v1['cloud_name']],
+        b'region': pycompat.bytestr(cloud_data_v1['region'])
+    }
+
+
 def processbundlesmanifest(orig, repo, proto):
     """Wraps wireproto.clonebundles.
 
@@ -707,9 +728,7 @@ def processbundlesmanifest(orig, repo, proto):
         with open(instance_data_path, 'rb') as fh:
             instance_data = json.load(fh)
 
-        region = instance_data['v1']['region']
-
-        return filter_manifest_for_region(manifest, b'ec2region=%s' % pycompat.bytestr(region))
+        return filter_manifest_for_region(manifest, cloud_region_specifier(instance_data))
 
     # If the AWS IP file path is set and some line in the manifest includes an ec2 region,
     # we will check if the request came from AWS to server optimized bundles.
