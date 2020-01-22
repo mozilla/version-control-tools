@@ -405,10 +405,10 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     > adding changesets
     > adding manifests
     > adding file changes
-    > added 1 changesets with 1 changes to 1 files
     > received pushlog entry for unknown changeset 89e594ce6b790e64021edfe272c70db75e7304ab; ignoring
     > added 1 pushes
     > updating moz-owner file
+    > added 1 changesets with 1 changes to 1 files
     > new changesets 7a58fdf00b0f
     > (run 'hg update' to get a working copy)
     [0]
@@ -422,9 +422,9 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     > adding changesets
     > adding manifests
     > adding file changes
-    > added 1 changesets with 1 changes to 1 files
     > added 1 pushes
     > updating moz-owner file
+    > added 1 changesets with 1 changes to 1 files
     > new changesets 77538e1ce4be
     > (run 'hg update' to get a working copy)
     [0]
@@ -436,9 +436,9 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     > adding changesets
     > adding manifests
     > adding file changes
-    > added 1 changesets with 1 changes to 1 files
     > received pushlog entry for unknown changeset ba17b5c8e955a5e7f57c478cdd75bc999c5460a1; ignoring
     > added 1 pushes
+    > added 1 changesets with 1 changes to 1 files
     > new changesets 89e594ce6b79
     > (run 'hg update' to get a working copy)
     [0]
