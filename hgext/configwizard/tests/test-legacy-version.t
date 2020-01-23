@@ -21,7 +21,9 @@ Should not get legacy version message when running on supported version
 
 Old version will print legacy message and prompt
 
-  $ rm fakeversion.pyc
+  $ rm -f fakeversion.pyc
+  $ rm -rf __pycache__/
+
   $ cat >> fakeversion.py << EOF
   > util.version = lambda: b'4.3.2'
   > EOF
@@ -75,7 +77,9 @@ Old version will print legacy message and prompt
 
 Too old version will fail outright
 
-  $ rm fakeversion.pyc
+  $ rm -f fakeversion.pyc
+  $ rm -rf __pycache__/
+
   $ cat >> fakeversion.py << EOF
   > util.version = lambda: b'3.4.2'
   > EOF

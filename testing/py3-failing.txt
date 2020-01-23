@@ -1,10 +1,5 @@
 # List of tests failing under Python 3 for various reasons
 
-# Removing `.pyc` is different on Python 2/3, and the test suite
-# Python 2/3 `hghave` checks the value of `sys.version_info`
-# on the Python running the tests, instead of the Python running `hg`
-test-legacy-version.t
-
 # `evolve` extension is not yet compatible with Python 3,
 # resulting in the test failing when we run the help
 # command for the extension
