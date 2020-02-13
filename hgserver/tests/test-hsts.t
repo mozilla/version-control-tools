@@ -31,3 +31,7 @@ HSTS header absent if both conditions are true
 
   $ http ${HGWEB_0_URL}mozilla-central?cmd=capabilities --agent 'mercurial/proto-1.0' --no-body --header strict-transport-security
   200
+
+Cleanup
+
+  $ hgmo clean

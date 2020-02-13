@@ -57,3 +57,8 @@ No CSP if HG user-agent
 
   $ http ${HGWEB_0_URL}mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml --agent 'mercurial/proto-1.0' --no-body --header content-security-policy
   200
+
+
+Cleanup
+
+  $ hgmo clean
