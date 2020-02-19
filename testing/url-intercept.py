@@ -17,6 +17,7 @@ from mercurial import (
     pycompat,
     registrar,
     url,
+    urllibcompat,
 )
 
 configtable = {}
@@ -38,6 +39,10 @@ class URLInterceptor(object):
         with open(path, 'rb') as fh:
             expected = fh.readline().rstrip()
             response = fh.read()
+
+        # TRACKING py3 - we require a Request object
+        if isinstance(url, urllibcompat.urlreq.request):
+            url = url.get_full_url()
 
         if url != expected:
             raise error.Abort(b'Incorrect URL. Got %s; expected %s' % (

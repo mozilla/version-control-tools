@@ -40,7 +40,8 @@ def printError(ui, message):
 def isPushAllowed(ui, repo, name):
     url = treestatus_base_url % (name,)
     try:
-        u = urllibcompat.urlreq.urlopen(url)
+        request = urllibcompat.urllib2.Request(url)
+        u = urllibcompat.urlreq.urlopen(request)
         data = json.load(u)
         if data['result']['status'] == 'closed':
             closure_text = b"%s is CLOSED! Reason: %s" % (name, pycompat.bytestr(data['result']['reason']))
