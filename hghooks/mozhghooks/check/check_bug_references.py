@@ -120,7 +120,7 @@ class BMOAPIClient(object):
         url = self.base_url + path
         if params:
             url += b"?" + urllibcompat.urlreq.urlencode(params)
-        request = urllibcompat.urllib2.Request(url)
+        request = urllibcompat.urlreq.request(pycompat.sysstr(url))
         for k, v in self.headers.items():
             request.add_header(k, v)
         response = urllibcompat.urlreq.urlopen(request)
