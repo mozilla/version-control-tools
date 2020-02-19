@@ -67,7 +67,7 @@ def isPushAllowed(ui, repo, name):
                     b"Error accessing %s :\n"
                     b"%s\n"
                     b"Unable to check if the tree is open - treating as if CLOSED.\n"
-                    b"To push regardless, include \"%s\" in your push comment." % (url, pycompat.bytestr(str(err)), magicwords))
+                    b"To push regardless, include \"%s\" in your push comment.\n" % (url, pycompat.bytestr(str(err)), magicwords))
         if repo[b'tip'].description().find(magicwords) == -1:
             return False
     return True
