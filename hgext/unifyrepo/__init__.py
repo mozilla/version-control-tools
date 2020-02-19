@@ -424,7 +424,7 @@ def unifyrepo(ui, settings, **opts):
              len(pullnodes), len(unifiedpushes)))
 
     if not pullnodes:
-        ui.write('nothing to do; exiting\n')
+        ui.write(b'nothing to do; exiting\n')
         return
 
     stagepeer = hg.peer(ui, {}, conf.stagepath)
