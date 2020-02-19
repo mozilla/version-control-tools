@@ -40,7 +40,7 @@ def printError(ui, message):
 def isPushAllowed(ui, repo, name):
     url = treestatus_base_url % (name,)
     try:
-        request = urllibcompat.urllib2.Request(url)
+        request = urllibcompat.urlreq.request(pycompat.sysstr(url))
         u = urllibcompat.urlreq.urlopen(request)
         data = json.load(u)
         if data['result']['status'] == 'closed':
@@ -67,7 +67,7 @@ def isPushAllowed(ui, repo, name):
                     b"Error accessing %s :\n"
                     b"%s\n"
                     b"Unable to check if the tree is open - treating as if CLOSED.\n"
-                    b"To push regardless, include \"%s\" in your push comment." % (url, err, magicwords))
+                    b"To push regardless, include \"%s\" in your push comment." % (url, pycompat.bytestr(str(err)), magicwords))
         if repo[b'tip'].description().find(magicwords) == -1:
             return False
     return True
