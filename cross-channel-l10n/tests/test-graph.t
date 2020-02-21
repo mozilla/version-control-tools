@@ -89,3 +89,14 @@ Now let's test the unoptimized graph. Fixing the artifacts below would be nice.
   [0]
   >>> sorted(g.heads)
   [7]
+
+Test a partial graph
+
+  >>> from mercurial.hg import repository
+  >>> from mercurial.ui import ui
+  >>> from mozxchannel import graph
+  >>> repo = repository(ui())
+  >>> g = graph.SparseGraph(repo, [2, 3, 4])
+  >>> g.createGraph()
+  >>> print(sorted(g.parents[2]))
+  []

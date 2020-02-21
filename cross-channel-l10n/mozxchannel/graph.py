@@ -37,6 +37,11 @@ path in the underlying DAG that gets from 3 to 0 without going through
 """
 
 from collections import defaultdict
+try:
+    from functools import reduce
+except ImportError:
+    # python2, that's OK
+    pass
 from mercurial import graphmod, scmutil, node
 
 
@@ -47,7 +52,7 @@ class SparseGraph(object):
         #: Mapping of revision ints to list of children
         self.children = defaultdict(list)
         #: Mapping of revision ints to list of parents
-        self.parents = {}
+        self.parents = defaultdict(set)
         self.archived_parents = []
         #: list of merges, i.e. more than one parent
         self.merges = []
@@ -68,10 +73,20 @@ class SparseGraph(object):
         optimize: Find long-range loops and remove them from the
             graph. Requires at least max_depth of 1
         """
+        self.clear()
+        self.add_parents(
+            self.parents_from_source()
+        )
+        self.finalize(max_depth=max_depth, optimize=optimize)
+
+    def clear(self):
+        self.children.clear()
         self.parents.clear()
         self.heads.clear()
         del self.archived_parents[:]
         del self.merges[:]
+
+    def parents_from_source(self):
         revrange = scmutil.revrange(self.source,  self.src_revs)
         self.graph = list(graphmod.dagwalker(self.source, revrange))
         gid2rev = dict(
@@ -84,9 +99,14 @@ class SparseGraph(object):
         # we ignore missing parents, too, we collect those in self.roots
         for _id, C, src_ctx, parents in self.graph:
             local_parents = set((
-                gid2rev.get(p[1]) for p in parents if p[0] != 'M'))
-            self.parents[src_ctx.rev()] = local_parents
+                gid2rev.get(p[1]) for p in parents if p[0] != b'M'))
+            yield src_ctx.rev(), local_parents
 
+    def add_parents(self, parents_iterable):
+        for child, local_parents in parents_iterable:
+            self.parents[child].update(local_parents)
+
+    def finalize(self, max_depth=1, optimize=True):
         # eliminate leap-frog loops where the grandchild is also a child
         # we do this for grandchildren, and deeper.
         # The depth is a bit of an optimization problem.
