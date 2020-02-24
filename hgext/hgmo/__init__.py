@@ -681,7 +681,7 @@ def cloud_region_specifier(instance_data):
     cloud_data_v1 = instance_data['v1']
 
     return b'%(cloud)s=%(region)s' % {
-        b'cloud': CLOUD_REGION_MAPPING[cloud_data_v1['cloud_name']],
+        b'cloud': CLOUD_REGION_MAPPING[cloud_data_v1['cloud-name']],
         b'region': pycompat.bytestr(cloud_data_v1['region'])
     }
 
