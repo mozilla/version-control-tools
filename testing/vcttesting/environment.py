@@ -103,7 +103,7 @@ def install_mercurials(venv, hg, py3=False):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
         '5.2',
-        '5.3rc0',
+        '5.3',
         '@',
     ]
 
