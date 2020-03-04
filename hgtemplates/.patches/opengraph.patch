@@ -63,7 +63,6 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  </head>
  <body>
  
-diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/error.tmpl
 --- a/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,10 @@
@@ -169,7 +168,7 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/error.tmpl
  </style>
  <script type="text/javascript" src="{staticurl|urlescape}mercurial.js"></script>
 +
-+<meta property="og:image" content="{staticurl|urlescape}hgicon.png"/>
++<meta property="og:image" content="{staticurl|urlescape}{logoimg}"/>
 +<meta property="og:type" content="website"/>
 --- a/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
