@@ -57,8 +57,8 @@ Create a repository
 Check logs for errors
 
   $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/access_log
-  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.js HTTP/1.1" 200 4876 "-" "-" (glob)
-  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.jsm HTTP/1.1" 200 4886 "-" "-" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.js HTTP/1.1" 200 * "-" "-" (glob)
+  * - - [*/*/*:*:*:* +0000] "GET /mozilla-central/file/eefea2647aef/foo.jsm HTTP/1.1" 200 * "-" "-" (glob)
   $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/error_log
 
 Cleanup
