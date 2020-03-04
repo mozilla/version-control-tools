@@ -4,6 +4,11 @@
    href="{url|urlescape}atom-branches" title="Atom feed for {repo|escape}: branches"/>
 <link rel="alternate" type="application/rss+xml"
    href="{url|urlescape}rss-branches" title="RSS feed for {repo|escape}: branches"/>
+
+<meta property="og:title" content="{repo|escape} branches" />
+<meta property="og:url" content="{url|urlescape}bookmarks{sessionvars%urlparameter}" />
+<meta property="og:description" content="List of Mercurial branches for {repo|escape}" />
+
 </head>
 <body>
 

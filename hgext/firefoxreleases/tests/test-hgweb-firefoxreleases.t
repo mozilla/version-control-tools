@@ -35,11 +35,19 @@ Page showing table of Firefox releases is available
   </style>
   <script type="text/javascript" src="/static/mercurial.js"></script>
   
+  <meta property="og:image" content="/static/hgicon.png"/>
+  <meta property="og:type" content="website"/>
+  
   <title>$TESTTMP/server: Firefox Releases</title>
   <link rel="alternate" type="application/atom+xml"
      href="/atom-log" title="Atom feed for $TESTTMP/server"/>
   <link rel="alternate" type="application/rss+xml"
      href="/rss-log" title="RSS feed for $TESTTMP/server"/>
+  
+  <meta property="og:title" content="Firefox Releases for $TESTTMP/server" />
+  <meta property="og:url" content="/firefoxreleases" />
+  <meta property="og:description" content="List of Firefox releases for $TESTTMP/server" />
+  
   </head>
   <body>
   

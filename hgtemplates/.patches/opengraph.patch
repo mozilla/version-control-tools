@@ -1,0 +1,300 @@
+# HG changeset patch
+# User test
+# Date 0 0
+#      Thu Jan 01 00:00:00 1970 +0000
+# Node ID cfb25cfdf73b7358c733e336ffb7d219776b400c
+# Parent  72afc34799b94df7f2f55ca249b0a06559ca4624
+Add OpenGraph meta tags
+
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
+--- a/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-bookmarks" title="Atom feed for {repo|escape}: bookmarks"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-bookmarks" title="RSS feed for {repo|escape}: bookmarks"/>
++
++<meta property="og:title" content="{repo|escape} bookmarks" />
++<meta property="og:url" content="{url|urlescape}bookmarks{sessionvars%urlparameter}" />
++<meta property="og:description" content="List of Mercurial bookmarks for {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/branches.tmpl
+--- a/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-branches" title="Atom feed for {repo|escape}: branches"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-branches" title="RSS feed for {repo|escape}: branches"/>
++
++<meta property="og:title" content="{repo|escape} branches" />
++<meta property="og:url" content="{url|urlescape}bookmarks{sessionvars%urlparameter}" />
++<meta property="og:description" content="List of Mercurial branches for {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/changelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape} Changelog Feed" />
++<meta property="og:url" content="{url|urlescape}changelog/{sessionvars%urlparameter}" />
++<meta property="og:description" content="Changelog of Mercurial repo {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/changeset.tmpl
+--- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} / {desc|strip|escape|mozlink|firstline|nonempty}" />
++<meta property="og:url" content="{url|urlescape}rev/{symrev}{sessionvars%urlparameter}" />
++<meta property="og:description" content="{desc|strip|escape|mozlink|nonempty}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/error.tmpl
+--- a/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,10 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="Mercurial error" />
++<meta property="og:description" content="Error page - sorry!" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/fileannotate.tmpl
+--- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,12 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (annotated)" />
++<meta property="og:url" content="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
++<meta property="og:description" content="Line-by-line annotation (aka 'blame') of the file contents of {file|escape} in {repo|escape}@{symrev}'" />
++
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/filecomparison.tmpl
+--- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (side-by-side)" />
++<meta property="og:url" content="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
++<meta property="og:description" content="Side-by-side diff of changes to {file|escape} in {repo|escape}@{symrev}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/filediff.tmpl
+--- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (combined diff)" />
++<meta property="og:url" content="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
++<meta property="og:description" content="Combined diff of changes to {file|escape} in {repo|escape}@{symrev}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/filelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape} / {file|escape} file revisions" />
++<meta property="og:url" content="{url|urlescape}filelog/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
++<meta property="og:description" content="List of revisions to {file|escape} in {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/filerevision.tmpl
+--- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape}" />
++<meta property="og:url" content="{url|urlescape}file/{symrev}{file|urlescape}{sessionvars%urlparameter}}" />
++<meta property="og:description" content="Content of {file|escape} at revision {node} in {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/graph.tmpl
+--- a/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape} graph" />
++<meta property="og:url" content="{url|urlescape}graph{sessionvars%urlparameter}" />
++<meta property="og:description" content="Visual representation of {repo|escape} graphical topology " />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/header.tmpl
+--- a/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -23,3 +23,6 @@
+ }
+ </style>
+ <script type="text/javascript" src="{staticurl|urlescape}mercurial.js"></script>
++
++<meta property="og:image" content="{staticurl|urlescape}hgicon.png"/>
++<meta property="og:type" content="website"/>
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/help.tmpl
+--- a/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="Mercurial web help" />
++<meta property="og:url" content="{url|urlescape}help{sessionvars%urlparameter}" />
++<meta property="og:description" content="Rendered web help output for Mercurial" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/helptopics.tmpl
+--- a/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="Help topics for Mercurial" />
++<meta property="og:url" content="{url|urlescape}help{sessionvars%urlparameter}" />
++<meta property="og:description" content="Index of topics for Mercurial help" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/index.tmpl
+--- a/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -1,5 +1,10 @@
+ {header}
+ <title>Mercurial repositories index</title>
++
++<meta property="og:title" content="hg.mozilla.org index" />
++<meta property="og:url" content="{url|urlescape}" />
++<meta property="og:description" content="hg.mozilla.org repository index" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/manifest.tmpl
+--- a/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape}@{symrev} files manifest" />
++<meta property="og:url" content="{url|urlescape}help{sessionvars%urlparameter}" />
++<meta property="og:description" content="Index of topics for Mercurial help" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/notfound.tmpl
+--- a/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -1,5 +1,9 @@
+ {header}
+ <title>Mercurial repository not found</title>
++
++<meta property="og:title" content="Mercurial 404" />
++<meta property="og:description" content="Sorry, we couldn't find this page." />
++
+ </head>
+ 
+ <body>
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/search.tmpl
+--- a/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape} search results for {query|escape}" />
++<meta property="og:url" content="{url|urlescape}log{sessionvars%urlparameter}" />
++<meta property="og:description" content="Results for a search of {query|escape} in {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/summary.tmpl
+--- a/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
++
++<meta property="og:title" content="{repo|escape} summary" />
++<meta property="og:url" content="{url|urlescape}summary{sessionvars%urlparameter}" />
++<meta property="og:description" content="A summary of repository state for {repo|escape}" />
++
+ </head>
+ <body>
+ 
+diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/tags.tmpl
+--- a/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
++++ b/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -4,6 +4,11 @@
+    href="{url|urlescape}atom-tags" title="Atom feed for {repo|escape}: tags"/>
+ <link rel="alternate" type="application/rss+xml"
+    href="{url|urlescape}rss-tags" title="RSS feed for {repo|escape}: tags"/>
++
++<meta property="og:title" content="{repo|escape} tags" />
++<meta property="og:url" content="{url|urlescape}tags{sessionvars%urlparameter}" />
++<meta property="og:description" content="Show information about tags for {repo|escape}" />
++
+ </head>
+ <body>
+ 

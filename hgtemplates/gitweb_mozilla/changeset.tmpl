@@ -4,6 +4,11 @@
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
 <link rel="alternate" type="application/rss+xml"
    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
+
+<meta property="og:title" content="{repo|escape}@{symrev} / {desc|strip|escape|mozlink|firstline|nonempty}" />
+<meta property="og:url" content="{url|urlescape}rev/{symrev}{sessionvars%urlparameter}" />
+<meta property="og:description" content="{desc|strip|escape|mozlink|nonempty}" />
+
 </head>
 <body>
 

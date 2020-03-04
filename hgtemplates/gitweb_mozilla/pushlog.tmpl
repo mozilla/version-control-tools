@@ -24,7 +24,7 @@ $(document).ready(function () \{
       $(this).text("[Collapse]");
     else
       $(this).text("[Expand]");
-    
+
     var pushid = $(this).attr("class");
     pushid = '.' + pushid.match(/id\d+/);
     $(pushid).nextAll(pushid).toggle();
@@ -33,6 +33,11 @@ $(document).ready(function () \{
 });
 // ]]>
 </script>
+
+<meta property="og:title" content="{repo|escape} pushlog feed" />
+<meta property="og:url" content="{url|urlescape}pushloghtml{sessionvars%urlparameter}" />
+<meta property="og:description" content="Rendered pushlog feed for {repo|escape}" />
+
 </head>
 <body>
 

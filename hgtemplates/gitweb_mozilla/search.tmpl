@@ -4,6 +4,11 @@
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
 <link rel="alternate" type="application/rss+xml"
    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
+
+<meta property="og:title" content="{repo|escape} search results for {query|escape}" />
+<meta property="og:url" content="{url|urlescape}log{sessionvars%urlparameter}" />
+<meta property="og:description" content="Results for a search of {query|escape} in {repo|escape}" />
+
 </head>
 <body>
 

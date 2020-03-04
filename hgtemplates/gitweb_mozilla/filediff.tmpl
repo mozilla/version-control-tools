@@ -4,6 +4,11 @@
    href="{url|urlescape}atom-log" title="Atom feed for {repo|escape}"/>
 <link rel="alternate" type="application/rss+xml"
    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
+
+<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (combined diff)" />
+<meta property="og:url" content="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
+<meta property="og:description" content="Combined diff of changes to {file|escape} in {repo|escape}@{symrev}" />
+
 </head>
 <body>
 
