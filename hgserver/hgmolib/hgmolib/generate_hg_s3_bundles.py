@@ -12,7 +12,9 @@ import os
 import shutil
 import socket
 import subprocess
+import sys
 import time
+import traceback
 
 import boto3
 import botocore.exceptions
@@ -226,6 +228,8 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
 
         except socket.error as e:
             print('%s:%s failed: %s' % (bucket_name, remote_path, e))
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback)
             time.sleep(15)
     else:
         raise Exception('GCP cloud storage upload of %s:%s not successful after'
