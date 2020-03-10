@@ -23,7 +23,6 @@ import tarfile
 import tempfile
 import time
 import urlparse
-import uuid
 import warnings
 
 import backports.lzma as lzma
@@ -540,7 +539,7 @@ class Docker(object):
                         break
 
                 if not have_tag:
-                    self.api_client.tag(full_image, name, str(uuid.uuid1()))
+                    self.api_client.tag(full_image, name, name)
 
                 return full_image
 
@@ -763,7 +762,7 @@ class Docker(object):
                     raise Exception('Ansible did not run on %s successfully' %
                                     repository)
 
-                tag = str(uuid.uuid1())
+                tag = playbook.replace('test-', '', 1)
 
                 iid = self.api_client.commit(cid['Id'], repository=repository,
                                              tag=tag)['Id']
