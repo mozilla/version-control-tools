@@ -11,7 +11,9 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import socket
+import sys
 import time
+
 
 def send_zk_command(host, port, command):
     """Send a ZooKeeper 4 letter command to a host:port."""
@@ -34,78 +36,44 @@ def send_zk_command(host, port, command):
     return ''.join(result)
 
 
-with open('/kafka-servers', 'rb') as fh:
+servers_path = '/kafka-servers'
+timeout = 180.0
+def try_zookeeper_connect(host):
+    """Attempt to connect to Zookeeper on the given host.
+    """
+    try:
+        return send_zk_command(host, 2181, 'stat') is not None
+    except Exception:
+        return False
+
+# Wait for the list of servers to become available.
+# The file will be installed by the process starting this container.
+print('wait for server info file')
+t_start = time.time()
+while True:
+    if os.path.exists(servers_path):
+        break
+
+    if time.time() - t_start > timeout:
+        sys.exit('server file not available before timeout. giving up')
+    time.sleep(0.1)
+
+with open(servers_path, 'rb') as fh:
     lines = fh.read().splitlines()
 
 servers = lines[3:]
 hostnames = [s.split(':')[0] for s in servers]
 
-timeout = 20.0
-start = time.time()
+t_start = time.time()
+while not all(
+    try_zookeeper_connect(host)
+    for host in hostnames
+):
 
-# Do one pass until all sockets start listening.
-for hostname in hostnames:
-    while True:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(1.0)
-            s.connect((hostname, 2181))
-            break
-        except socket.error:
-            if time.time() - start > timeout:
-                raise Exception('timeout reached waiting for ZooKeeper socket')
+    if time.time() - t_start > timeout:
+        sys.exit('timeout reached waiting for Zookeeper')
 
-            time.sleep(0.1)
-
-# Do another pass to query cluster state.
-for hostname in hostnames:
-    while True:
-        try:
-            res = send_zk_command(hostname, 2181, 'ruok')
-            if res == 'imok':
-                break
-        except Exception:
-            if time.time() - start > timeout:
-                raise Exception('timeout')
-            time.sleep(0.1)
-
-    while True:
-        try:
-            res = send_zk_command(hostname, 2181, 'isro')
-            if res == 'rw':
-                break
-        except Exception:
-            if time.time() - start > timeout:
-                raise Exception('timeout')
-            time.sleep(0.1)
-
-# And wait until all followers are present.
-for hostname in hostnames:
-    while True:
-        try:
-            res = send_zk_command(hostname, 2181, 'mntr').rstrip()
-            attrs = {}
-            for line in res.splitlines():
-                k, v = line.split('\t')
-
-                if k not in ('zk_version', 'zk_server_state'):
-                    v = int(v)
-
-                attrs[k] = v
-
-            if attrs['zk_server_state'] != 'leader':
-                break
-
-            if attrs['zk_followers'] == len(hostnames) - 1:
-                break
-
-            raise Exception('expected followers count wrong')
-
-        except Exception:
-            if time.time() - start > timeout:
-                raise Exception('timeout')
-
-            time.sleep(0.1)
+    time.sleep(0.1)
 
 env = dict(os.environ)
 env.update({
