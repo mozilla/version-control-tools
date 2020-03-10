@@ -77,10 +77,6 @@ class HgmoCommands(object):
             print('export KAFKA_%d_HOSTPORT=%s' % (i, hostport))
         print('export ZOOKEEPER_CONNECT=%s' % self.c.zookeeper_connect)
 
-    @Command('stop', category='hgmo',
-             description='Stop a hg.mozilla.org cluster')
-    def stop(self):
-        self.c.stop()
 
     @Command('clean', category='hgmo',
              description='Clean up all references to this cluster')

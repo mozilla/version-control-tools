@@ -406,18 +406,6 @@ class HgCluster(object):
 
         return self._write_state()
 
-    def stop(self):
-        """Stop the cluster.
-
-        Containers will be shut down gracefully.
-        """
-        with futures.ThreadPoolExecutor(5) as e:
-            e.submit(self._dc.stop, self.master_id)
-            e.submit(self._dc.stop, self.ldap_id)
-            e.submit(self._dc.stop, self.pulse_id)
-            for i in self.web_ids:
-                e.submit(self._dc.stop, i)
-
     def clean(self):
         """Clean the cluster.
 
