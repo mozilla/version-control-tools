@@ -1,0 +1,63 @@
+version: '3'
+services:
+  hgssh:
+    command: /usr/bin/supervisord -n
+    entrypoint: /entrypoint.py
+    image: hgmaster:hgmaster
+    ports:
+      # Note the lack of a `:` here - it should be provided in the environment variable.
+      # This is a hack so the compose file works without specifying a master ssh port.
+      # It also allows us to use `docker-compose down` without knowing the ssh port used
+      # to start up the service.
+      - "${MASTER_SSH_PORT}22"
+      - "2181"
+      - "2888"
+      - "3888"
+      - "9092"
+    networks:
+      hgcluster_network:
+    environment:
+      - BROKER_ID=0
+
+  hgweb0:
+    command: /usr/bin/supervisord -n
+    image: hgweb:hgweb
+    entrypoint: /entrypoint.py
+    ports:
+      - "22"
+      - "80"
+      - "9092"
+    networks:
+      hgcluster_network:
+    environment:
+      - BROKER_ID=1
+  hgweb1:
+    command: /usr/bin/supervisord -n
+    image: hgweb:hgweb
+    entrypoint: /entrypoint.py
+    ports:
+      - "22"
+      - "80"
+      - "9092"
+    networks:
+      hgcluster_network:
+    environment:
+      - BROKER_ID=2
+
+  ldap:
+    image: ldap:ldap
+    ports:
+      - "389"
+    networks:
+      hgcluster_network:
+
+  pulse:
+    image: pulse:pulse
+    ports:
+      - "5672"
+    networks:
+      hgcluster_network:
+
+networks:
+  hgcluster_network:
+    driver: bridge
