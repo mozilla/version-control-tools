@@ -22,26 +22,27 @@ code, simply run::
    will be installed on servers. Be aware of any local changes you have
    performed, as they might be reflected on the server.
 
-For minor deployments, pre-announcement of changes is not necessary: just do
-the deployment. As part of the deployment, an IRC notification will be issued
-in #vcs by Ansible.
+Scheduled Outage Policy
+-----------------------
 
-For major upgrades (upgrading the Mercurial release or other major changes
-such as reconfiguring SSH settings or other changes that have a higher chance
-of fallout, pre-announcement is highly recommended.
+**For outages expected to last nor more than one hour** no advanced notice
+to Sheriffs or Developers is required; however, it is recommended that a
+notification is posted on the relevant Slack/Matrix channels at the time of
+outage commencement.
 
-Pre-announcements should be made to
-`dev-version-control <mailto:dev-version-control@lists.mozilla.org>`_.
+Should an issue occur that makes it likely for the outage to extend beyond
+the one hour mark, if possible the work should be rolled back and rescheduled
+for another date.
 
-Deployment-time announcements should be made in ``#vcs``. In addition, the
-on-duty Sheriff (they will have ``|Sheriffduty`` appended to their IRC nick)
-should be notified. Anyone in ``#ci`` with ``|buildduty`` in their IRC
-nick should also be notified. Sending an email to ``sheriffs@mozilla.org``
-can't also hurt.
+**For outages expected to last more than one hour** Sheriffs and Developers
+require notice at least one business day prior to the scheduled outage time.
+A notification must be posted on the relevant Slack/Matrix channels at the
+time of outage commencement.
 
-If extra caution is warranted, a bug should be filed against the Change Advisory
-Board. This board will help you schedule the upgrade work. Details can be found
-at https://wiki.mozilla.org/IT/ChangeControl.
+**Outage scheduling** should be mindful of peak development times, and where
+possible shuold be scheduled to occur during North American off-peak periods:
+before 9am US/Eastern, over lunch (noon US/Eastern or US/Pacific), or after
+5pm US/Pacific.
 
 Operational Secrets
 -------------------
