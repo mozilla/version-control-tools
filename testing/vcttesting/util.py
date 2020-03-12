@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import socket
+import string
 import time
 
 import concurrent.futures as futures
@@ -189,3 +190,32 @@ def limited_threadpoolexecutor(wanted_workers, max_workers=None):
         workers = min(wanted_workers, max_workers)
 
     return futures.ThreadPoolExecutor(workers)
+
+
+def normalize_testname(testname):
+    '''Normalize test name for use with `docker-compose`.
+
+    `docker-compose` normalizes project names by removing whitespace and other
+    punctuation.
+
+    >>> normalize_testname('test-push-basic.t')
+    'testpushbasict'
+    >>> normalize_testname('this is a test')
+    'thisisatest'
+    >>> normalize_testname('lolol!!!!!! haha')
+    'lololhaha'
+    >>> normalize_testname('hello/there/testname')
+    testname
+    >>> normalize_testname(None)
+    None
+    '''
+    if not testname:
+        return None
+
+    # TODO names like "/" will break this
+    testname = testname.split('/')[-1].lower()
+
+    return ''.join(
+        char for char in testname
+        if char not in (set(string.punctuation) | set(string.whitespace))
+    )
