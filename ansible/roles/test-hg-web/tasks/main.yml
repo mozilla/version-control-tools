@@ -54,3 +54,10 @@
     section: hgmo
     option: mozippath
     value: /var/hg/moz-ip-ranges.txt
+
+- name: install test ssh config for hg user
+  copy:
+    src: ssh_config
+    dest: /home/hg/.ssh/config
+    owner: hg
+    group: hg

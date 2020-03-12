@@ -1,0 +1,7 @@
+Host hgssh
+    User vcs-sync@mozilla.com
+    IdentityFile /etc/mercurial/mirror
+    ServerAliveCountMax 3
+    ServerAliveInterval 5
+    ConnectionAttempts 3
+    ConnectTimeout 15

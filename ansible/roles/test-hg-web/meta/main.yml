@@ -5,7 +5,7 @@ dependencies:
   # Docker startup routines plug in proper values for ZooKeeper and
   # Kafka settings.
   - { role: hg-web,
-      mirror_source: "@mirror_source@",
+      mirror_source: "hgssh",
       mirror_ssh_user: hg,
       wsgi_processes: 4,
       httpd_start_servers: 1,
