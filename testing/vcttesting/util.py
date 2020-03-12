@@ -7,6 +7,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import socket
 import string
+import subprocess
 import time
 
 import concurrent.futures as futures
@@ -15,6 +16,7 @@ import requests
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+HGCLUSTER_DOCKER_COMPOSE = os.path.join(ROOT, 'testing', 'hgcluster-docker-compose.yml')
 
 
 def get_available_port():
@@ -190,6 +192,29 @@ def limited_threadpoolexecutor(wanted_workers, max_workers=None):
         workers = min(wanted_workers, max_workers)
 
     return futures.ThreadPoolExecutor(workers)
+
+
+def docker_compose_down_background(project_name, show_output=False):
+    '''Run `docker-compose down` for the given project name.
+
+    Returns the `subprocess.Popen` object for use by the caller.
+    '''
+    docker_compose_down_command = [
+        'docker-compose',
+        '--file', HGCLUSTER_DOCKER_COMPOSE,
+        '--project-name', project_name,
+        'down',
+    ]
+
+    kwargs = {}
+    if not show_output:
+        # TRACKING py3 - once we have full Py3 support in the test environment
+        # we can make use of `subprocess.DEVNULL`
+        devnull = open(os.devnull, 'wb')
+        kwargs['stderr'] = devnull
+        kwargs['stdout'] = devnull
+
+    return subprocess.Popen(docker_compose_down_command, **kwargs)
 
 
 def normalize_testname(testname):
