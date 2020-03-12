@@ -10,6 +10,9 @@ coverage
 # Used by docker.py.
 docker
 
+# Used to spin up hgcluster in a manageable way
+docker-compose
+
 # For code linting.
 flake8
 
