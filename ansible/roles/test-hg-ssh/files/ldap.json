@@ -2,6 +2,6 @@
   "username": "cn=admin,dc=mozilla",
   "password": "password",
   "starttls": false,
-  "url": "%url%",
-  "write_url": "%writeurl%"
+  "url": "ldap://ldap:389/",
+  "write_url": "ldap://ldap:389/"
 }

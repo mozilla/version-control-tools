@@ -17,11 +17,6 @@ subprocess.check_call([
 
 del os.environ['DOCKER_ENTRYPOINT']
 
-ldap_uri = 'ldap://ldap:389/'
-
-pulse_hostname = 'pulse'
-pulse_port = 5672
-
 # Generate host SSH keys for hg.
 if not os.path.exists('/etc/mercurial/ssh/ssh_host_ed25519_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'ed25519',
@@ -30,23 +25,6 @@ if not os.path.exists('/etc/mercurial/ssh/ssh_host_ed25519_key'):
 if not os.path.exists('/etc/mercurial/ssh/ssh_host_rsa_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '4096',
                            '-f', '/etc/mercurial/ssh/ssh_host_rsa_key', '-N', ''])
-
-ldap_conf = open('/etc/mercurial/ldap.json', 'rb').readlines()
-with open('/etc/mercurial/ldap.json', 'wb') as fh:
-    for line in ldap_conf:
-        line = line.replace('%url%', ldap_uri)
-        line = line.replace('%writeurl%', ldap_uri)
-        fh.write(line)
-
-# Set up code coverage, if requested.
-if 'CODE_COVERAGE' in os.environ:
-    with open('/collect-coverage', 'a'):
-        pass
-else:
-    try:
-        os.unlink('/collect-coverage')
-    except OSError:
-        pass
 
 subprocess.check_call(['/entrypoint-kafkabroker'])
 
@@ -89,15 +67,6 @@ with open('/etc/mercurial/notifications.ini', 'wb') as fh:
         if section == 'pulseconsumer':
             if line.startswith('hosts ='):
                 line = 'hosts = %s\n' % ', '.join(kafka_servers)
-
-        if section == 'pulse':
-            if line.startswith('hostname ='):
-                line = 'hostname = %s\n' % pulse_hostname
-            elif line.startswith('port ='):
-                line = 'port = %d\n' % pulse_port
-            # SSL isn't enabled in Docker.
-            elif line.startswith('ssl ='):
-                line = 'ssl = false\n'
 
         fh.write(line)
 
