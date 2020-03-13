@@ -5,6 +5,13 @@
     - java-1.8.0-openjdk-headless
     - tar
 
+- name: download Jolokia
+  get_url:
+    url: https://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/1.6.1/jolokia-jvm-1.6.1-agent.jar
+    dest: /opt/jolokia-jvm-1.6.1-agent.jar
+    sha256sum: cc0883217bfd96bb542b7a27c6ea14dda99d604d91dc700f9bb980f5d2a0e359
+    mode: 0755
+
 - name: download ZooKeeper and Kafka
   get_url: url=https://s3-us-west-2.amazonaws.com/moz-packages/{{ item.path }}
            dest=/var/tmp/{{ item.path }}

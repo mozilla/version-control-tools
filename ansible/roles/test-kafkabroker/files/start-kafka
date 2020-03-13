@@ -63,6 +63,8 @@ env.update({
     'KAFKA_GC_LOG_OPTS': '-Xloggc:/var/log/kafka/server-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M',
     'KAFKA_LOG4J_OPTS': '-Dlog4j.configuration=file:/etc/kafka/log4j.properties',
     'KAFKA_HEAP_OPTS': '-Xmx512m',
+    'KAFKA_OPTS': '-javaagent:/opt/jolokia-jvm-1.6.1-agent.jar=host=localhost,port=8778',
+    'LOG_DIR': '/var/log/kafka',
 })
 
 # -daemon here causes same Java process to be executed with "nohup"
