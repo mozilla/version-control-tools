@@ -2,11 +2,11 @@
 # User test
 # Date 0 0
 #      Thu Jan 01 00:00:00 1970 +0000
-# Node ID cfb25cfdf73b7358c733e336ffb7d219776b400c
+# Node ID 44a66254954d7cc5d948e482858ef8e57407885d
 # Parent  72afc34799b94df7f2f55ca249b0a06559ca4624
 Add OpenGraph meta tags
 
-diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/bookmarks.tmpl
 --- a/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/bookmarks.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -20,7 +20,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/branches.tmpl
 --- a/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/branches.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -34,7 +35,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/changelog.tmpl
 --- a/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/changelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -48,7 +50,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/changeset.tmpl
 --- a/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/changeset.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -56,13 +59,14 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} / {desc|strip|escape|firstline|nonempty}" />
++<meta property="og:title" content="{repo|escape} @ {symrev}" />
 +<meta property="og:url" content="{url|urlescape}rev/{symrev}{sessionvars%urlparameter}" />
-+<meta property="og:description" content="{desc|strip|escape|nonempty}" />
++<meta property="og:description" content="{desc|strip|escape|firstline|nonempty}" />
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/error.tmpl
 --- a/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/error.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,10 @@
@@ -75,7 +79,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/fileannotate.tmpl
 --- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,12 @@
@@ -83,14 +88,15 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (annotated)" />
++<meta property="og:title" content="{repo|escape} @ {symrev} / {file|escape}" />
 +<meta property="og:url" content="{url|urlescape}annotate/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
-+<meta property="og:description" content="Line-by-line annotation (aka 'blame') of the file contents of {file|escape} in {repo|escape}@{symrev}'" />
++<meta property="og:description" content="Line-by-line annotation (aka 'blame') of the file contents of {file|escape} in {repo|escape} @ {symrev}'" />
 +
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/filecomparison.tmpl
 --- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -98,13 +104,14 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (side-by-side)" />
++<meta property="og:title" content="{repo|escape} @ {symrev} / {file|escape}" />
 +<meta property="og:url" content="{url|urlescape}comparison/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
-+<meta property="og:description" content="Side-by-side diff of changes to {file|escape} in {repo|escape}@{symrev}" />
++<meta property="og:description" content="Side-by-side diff of changes to {file|escape} in {repo|escape} @ {symrev}" />
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/filediff.tmpl
 --- a/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/filediff.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -112,13 +119,14 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape} (combined diff)" />
++<meta property="og:title" content="{repo|escape} @ {symrev} / {file|escape}" />
 +<meta property="og:url" content="{url|urlescape}diff/{symrev}/{file|urlescape}{sessionvars%urlparameter}" />
-+<meta property="og:description" content="Combined diff of changes to {file|escape} in {repo|escape}@{symrev}" />
++<meta property="og:description" content="Combined diff of changes to {file|escape} in {repo|escape} @ {symrev}" />
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/filelog.tmpl
 --- a/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/filelog.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -132,7 +140,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/filerevision.tmpl
 --- a/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -140,13 +149,14 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} / {file|escape}" />
++<meta property="og:title" content="{repo|escape} @ {symrev} / {file|escape}" />
 +<meta property="og:url" content="{url|urlescape}file/{symrev}{file|urlescape}{sessionvars%urlparameter}}" />
 +<meta property="og:description" content="Content of {file|escape} at revision {node} in {repo|escape}" />
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/graph.tmpl
 --- a/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -160,7 +170,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/header.tmpl
 --- a/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/header.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -23,3 +23,6 @@
@@ -170,6 +181,7 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
 +<meta property="og:image" content="{staticurl|urlescape}{logoimg}"/>
 +<meta property="og:type" content="website"/>
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/help.tmpl
 --- a/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/help.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -183,7 +195,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/helptopics.tmpl
 --- a/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/helptopics.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -197,7 +210,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/index.tmpl
 --- a/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/index.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -1,5 +1,10 @@
@@ -210,7 +224,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/manifest.tmpl
 --- a/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/manifest.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -218,13 +233,14 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
  <link rel="alternate" type="application/rss+xml"
     href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
 +
-+<meta property="og:title" content="{repo|escape}@{symrev} files manifest" />
++<meta property="og:title" content="{repo|escape} @ {symrev} files manifest" />
 +<meta property="og:url" content="{url|urlescape}help{sessionvars%urlparameter}" />
-+<meta property="og:description" content="Index of topics for Mercurial help" />
++<meta property="og:description" content="Files present in {repo|escape}" />
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/notfound.tmpl
 --- a/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/notfound.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -1,5 +1,9 @@
@@ -235,8 +251,9 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +<meta property="og:description" content="Sorry, we couldn't find this page." />
 +
  </head>
- 
+
  <body>
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/search.tmpl
 --- a/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/search.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -250,7 +267,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/summary.tmpl
 --- a/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/summary.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -264,7 +282,8 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
+diff -r 72afc34799b9 -r 44a66254954d hgtemplates/gitweb_mozilla/tags.tmpl
 --- a/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
 +++ b/hgtemplates/gitweb_mozilla/tags.tmpl	Thu Jan 01 00:00:00 1970 +0000
 @@ -4,6 +4,11 @@
@@ -278,4 +297,4 @@ diff -r 72afc34799b9 -r cfb25cfdf73b hgtemplates/gitweb_mozilla/bookmarks.tmpl
 +
  </head>
  <body>
- 
+
