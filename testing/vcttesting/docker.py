@@ -38,7 +38,9 @@ import concurrent.futures as futures
 from coverage.data import CoverageData
 
 from .util import (
+    docker_compose_down_background,
     limited_threadpoolexecutor,
+    normalize_testname,
     wait_for_http,
 )
 from .vctutil import (
@@ -1043,32 +1045,15 @@ class Docker(object):
                 self.api_client.stop(cid)
 
     @contextmanager
-    def auto_clean_orphans(self):
+    def auto_clean_orphans(self, tests):
         if not self.is_alive():
             yield
             return
 
-        containers = {c['Id'] for c in self.api_client.containers(all=True)}
-        images = {i['Id'] for i in self.api_client.images(all=True)}
-        networks = {n['Id'] for n in self.api_client.networks()}
         try:
             yield
         finally:
-            with futures.ThreadPoolExecutor(8) as e:
-                for c in self.api_client.containers(all=True):
-                    if c['Id'] not in containers:
-                        e.submit(self.api_client.remove_container, c['Id'],
-                                 force=True, v=True)
-
-            with futures.ThreadPoolExecutor(8) as e:
-                for i in self.api_client.images(all=True):
-                    if i['Id'] not in images:
-                        e.submit(self.api_client.remove_image, c['Id'])
-
-            with futures.ThreadPoolExecutor(8) as e:
-                for n in self.api_client.networks():
-                    if n['Id'] not in networks:
-                        e.submit(self.api_client.remove_network, n['Id'])
+            map(docker_compose_down_background, map(normalize_testname, tests))
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
                 detach=False):

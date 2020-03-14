@@ -12,7 +12,6 @@ alias pulse='$TESTDIR/pulse'
 
 hgmoenv() {
   export DOCKER_STATE_FILE=`pwd`/.dockerstate
-  export HGMO_STATE_FILE=`pwd`/hgmo.json
 
   hgmo start --master-ssh-port $HGPORT > /dev/null
   if [ $? -ne 0 ]; then

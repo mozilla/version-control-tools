@@ -7,21 +7,28 @@ from __future__ import absolute_import, print_function, unicode_literals
 import errno
 import json
 import os
+import subprocess
+import sys
 import uuid
 
 import concurrent.futures as futures
 
 from .ldap import LDAP
 from .util import (
+    docker_compose_down_background,
+    get_available_port,
+    normalize_testname,
     wait_for_amqp,
     wait_for_kafka,
     wait_for_kafka_topic,
     wait_for_ssh,
 )
 
+import yaml
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+HGCLUSTER_DOCKER_COMPOSE = os.path.join(ROOT, 'testing', 'hgcluster-docker-compose.yml')
 
 
 def get_hgweb_mozbuild_chroot(d):
@@ -70,204 +77,169 @@ class HgCluster(object):
         'hgserver/pash/sh_helper.py': '/usr/local/bin/sh_helper.py',
     }
 
-    def __init__(self, docker, state_path=None, ldap_image=None,
-                 master_image=None, web_image=None, pulse_image=None):
+    def __init__(self, docker):
         self._d = docker
-        self._dc = docker.api_client
-        self.state_path = state_path
+        self.testname = normalize_testname(os.getenv('TESTNAME'))
 
-        if state_path and os.path.exists(state_path):
-            with open(state_path, 'rb') as fh:
-                state = json.load(fh)
-                for k, v in state.items():
-                    setattr(self, k, v)
-        else:
-            self.ldap_image = ldap_image
-            self.master_image = master_image
-            self.web_image = web_image
-            self.pulse_image = pulse_image
-            self.ldap_id = None
-            self.master_id = None
-            self.web_ids = []
-            self.ldap_uri = None
-            self.pulse_hostname = None
-            self.pulse_hostport = None
-            self.master_ssh_hostname = None
-            self.master_ssh_port = None
-            self.master_host_rsa_key = None
-            self.master_host_ed25519_key = None
-            self.web_urls = []
-            self.kafka_hostports = []
-            self.zookeeper_connect = None
+        with open(HGCLUSTER_DOCKER_COMPOSE) as f:
+            self.docker_compose_content = yaml.safe_load(f)
 
-    def start(self, ldap_port=None, master_ssh_port=None, web_count=2,
-              pulse_port=None, coverage=False):
+        if not self.testname:
+            print('$TESTNAME environment variable not set - commands will fail without '
+                  'specifying a cluster name.')
+
+    def get_cluster_containers(self, onetime=False):
+        '''Return containers corresponding to the cluster with the specified name.
+        '''
+        import time
+
+        initial = time.time()
+        while True:
+            project_containers = self._d.client.containers.list(
+                # Use sparse to avoid inspecting each container for information. Also
+                # avoids a race condition when attempting to inspect a container that no
+                # longer exists, resulting in a stack trace.
+                sparse=True,
+                filters={
+                    'label': 'com.docker.compose.project=%s' % self.testname
+                }
+            )
+
+            if onetime:
+                break
+
+            # Wait until ports are properly exposed
+            if len(project_containers) == len(self.docker_compose_content['services']):
+                break
+
+            if time.time() - initial > 60:
+                raise Exception("timeout reached waiting for all 5 containers")
+
+        # Call `reload` to acquire data about our sparsely acquired objects
+        for container in project_containers:
+            container.reload()
+
+        return {
+            container.labels['com.docker.compose.service']: container
+            for container in project_containers
+        }
+
+    def get_state(self):
+        '''Return a dict containing variables to be exported into the test environment shell.
+        '''
+        containers = self.get_cluster_containers()
+
+        params = {}
+
+        params['pulse_hostname'], params['pulse_hostport'] = self._d._get_host_hostname_port(
+            containers['pulse'].attrs, '5672/tcp'
+        )
+        params['master_ssh_hostname'], params['master_ssh_port'] = self._d._get_host_hostname_port(
+            containers['hgssh'].attrs, '22/tcp'
+        )
+        _, _, params['master_host_ed25519_key'], params['master_host_rsa_key'] = self.get_mirror_ssh_keys(
+            containers['hgssh'].id
+        )
+        params['ldap_uri'] = 'ldap://%s:%s' % self._d._get_host_hostname_port(containers['ldap'].attrs, '389/tcp')
+        params['master_id'] = containers['hgssh'].id
+        params['hgweb_0_url'] = 'http://%s:%s/' % self._d._get_host_hostname_port(containers['hgweb0'].attrs, '80/tcp')
+        params['hgweb_1_url'] = 'http://%s:%s/' % self._d._get_host_hostname_port(containers['hgweb1'].attrs, '80/tcp')
+        params['hgweb_0_cid'] = containers['hgweb0'].id
+        params['hgweb_1_cid'] = containers['hgweb1'].id
+        params['kafka_0_hostport'] = '%s:%s' % self._d._get_host_hostname_port(containers['hgssh'].attrs, '9092/tcp')
+        params['kafka_1_hostport'] = '%s:%s' % self._d._get_host_hostname_port(containers['hgweb0'].attrs, '9092/tcp')
+        params['kafka_2_hostport'] = '%s:%s' % self._d._get_host_hostname_port(containers['hgweb1'].attrs, '9092/tcp')
+
+        return params
+
+    def start(self, master_ssh_port=None, show_output=False):
         """Start the cluster.
 
         If ``coverage`` is True, code coverage for Python executions will be
         obtained.
         """
+        if not self.testname:
+            raise Exception('cluster name is not set')
 
-        ldap_image = self.ldap_image
-        master_image = self.master_image
-        web_image = self.web_image
-        pulse_image = self.pulse_image
+        if self.get_cluster_containers(onetime=True):
+            raise Exception('pre-existing containers exist for project %s;\n'
+                            '(try running `hgmo clean` or `docker container rm`)' % self.testname)
 
-        if not ldap_image or not master_image or not web_image or not pulse_image:
-            images = self._d.build_hgmo(verbose=True)
-            master_image = images['hgmaster']
-            web_image = images['hgweb']
-            ldap_image = images['ldap']
-            pulse_image = images['pulse']
+        # docker-compose needs the arguments in this order
+        docker_compose_up_command = [
+            'docker-compose',
+            # Use the `hgcluster-docker-compose` file
+            '--file', HGCLUSTER_DOCKER_COMPOSE,
+            # Specify the project name for cluster management via container labels
+            '--project-name', self.testname,
+            'up',
+            # Always recreate containers and volumes
+            '--force-recreate',
+            '--renew-anon-volumes',
+            # Use detached mode to run containers in the background
+            '-d',
+        ]
 
-        zookeeper_id = 0
+        newenv = os.environ.copy()
 
-        network_name = 'hgmo-%s' % uuid.uuid4()
-        self._dc.create_network(network_name, driver='bridge')
+        if master_ssh_port:
+            # Use a `:` here, so that leaving the field blank will cause it to be
+            # empty in the docker-compose file, allowing us to `docker-compose down`
+            # without knowing the master ssh port of the cluster.
+            newenv['MASTER_SSH_PORT'] = '%d:' % master_ssh_port
 
-        def network_config(alias):
-            return self._dc.create_networking_config(
-                endpoints_config={
-                    network_name: self._dc.create_endpoint_config(
-                        aliases=[alias],
-                    )
-                }
-            )
+        kwargs = {'env': newenv}
+        if not show_output:
+            # TRACKING py3 - once we have full Py3 support in the test environment
+            # we can make use of `subprocess.DEVNULL`
+            devnull = open(os.devnull, 'wb')
+            kwargs['stderr'] = devnull
+            kwargs['stdout'] = devnull
 
-        with futures.ThreadPoolExecutor(5) as e:
-            ldap_host_config = self._dc.create_host_config(
-                port_bindings={389: ldap_port})
-            f_ldap_create = e.submit(self._dc.create_container, ldap_image,
-                                     labels=['ldap'],
-                                     host_config=ldap_host_config,
-                                     networking_config=network_config('ldap'))
+        compose_up_process = subprocess.Popen(docker_compose_up_command, **kwargs)
 
-            pulse_host_config = self._dc.create_host_config(
-                port_bindings={5672: pulse_port},
-                # Erlang does an iteration of all possible file
-                # descriptor numbers when running child processes during
-                # startup. Docker's file limits may be in the hundreds
-                # of thousands, causing this iteration to take many
-                # seconds. So mitigate that with lower file limits.
-                ulimits=[{
-                    'Name': 'nofile',
-                    'Soft': 128,
-                    'Hard': 128,
-                }],
-            )
-            f_pulse_create = e.submit(self._dc.create_container, pulse_image,
-                                      labels=['pulse'],
-                                      host_config=pulse_host_config,
-                                      networking_config=network_config('pulse'))
+        try:
+            cluster_containers = self.get_cluster_containers()
+        except Exception as e:
+            print(e, file=sys.stderr)
+            print('\n', file=sys.stderr)
 
-            env = {
-                'ZOOKEEPER_ID': '%d' % zookeeper_id,
-                'KAFKA_BROKER_ID': '%d' % zookeeper_id,
-            }
-            zookeeper_id += 1
+            return_code = compose_up_process.wait()
 
-            if coverage:
-                env['CODE_COVERAGE'] = '1'
+            print('docker-compose errored with exit code %d: stderr:\n%s' %
+                  (return_code, compose_up_process.stderr),
+                  file=sys.stderr)
+            sys.exit(1)
 
-            master_host_config = self._dc.create_host_config(
-                port_bindings={
-                    22: master_ssh_port,
-                    9092: None,
-                },
-            )
+        all_states = {
+            name: state
+            for name, state in cluster_containers.items()
+            if 'hg' in name
+        }
+        web_states = {
+            name: state
+            for name, state in all_states.items()
+            if 'hgweb' in name
+        }
 
-            f_master_create = e.submit(self._dc.create_container,
-                master_image,
-                environment=env,
-                entrypoint=['/entrypoint.py'],
-                command=['/usr/bin/supervisord', '-n'],
-                ports=[22, 2181, 2888, 3888, 9092],
-                host_config=master_host_config,
-                labels=['hgssh'],
-                networking_config=network_config('hgssh'))
+        # Number of hg related containers, and number of web heads
+        n_web = len(web_states)
+        n_hg = len(all_states)
 
-            f_web_creates = []
-            for i in range(web_count):
-                env = {
-                    'ZOOKEEPER_ID': '%d' % zookeeper_id,
-                    'KAFKA_BROKER_ID': '%d' % zookeeper_id,
-                }
-                zookeeper_id += 1
+        # Fail early here so we aren't surprised if `network_name` is an unexpected value
+        if not all(len(state.attrs['NetworkSettings']['Networks']) == 1 for state in all_states.values()):
+            raise Exception('Each container should only have one network attached')
 
-                web_host_config = self._dc.create_host_config(
-                    port_bindings={
-                        22: None,
-                        80: None,
-                        9092: None,
-                    },
-                )
+        network_name = cluster_containers['hgssh'].attrs['NetworkSettings']['Networks'].keys()[0]
 
-                f_web_creates.append(e.submit(self._dc.create_container,
-                                              web_image,
-                                              environment=env,
-                                              ports=[22, 80, 2181, 2888, 3888, 9092],
-                                              entrypoint=['/entrypoint.py'],
-                                              command=['/usr/bin/supervisord', '-n'],
-                                              host_config=web_host_config,
-                                              labels=['hgweb', 'hgweb%d' % i],
-                                              networking_config=network_config('hgweb%d' % i)))
-
-            ldap_id = f_ldap_create.result()['Id']
-            pulse_id = f_pulse_create.result()['Id']
-            master_id = f_master_create.result()['Id']
-
-            f_ldap_start = e.submit(self._dc.start, ldap_id)
-            f_pulse_start = e.submit(self._dc.start, pulse_id)
-
-            self._dc.start(master_id)
-            master_state = self._dc.inspect_container(master_id)
-
-            web_ids = [f.result()['Id'] for f in f_web_creates]
-            fs = []
-            for i in web_ids:
-                fs.append(e.submit(self._dc.start, i))
-            [f.result() for f in fs]
-
-            f_web_states = []
-            for i in web_ids:
-                f_web_states.append(e.submit(self._dc.inspect_container, i))
-
-            f_ldap_start.result()
-            f_ldap_state = e.submit(self._dc.inspect_container, ldap_id)
-            f_pulse_start.result()
-            f_pulse_state = e.submit(self._dc.inspect_container, pulse_id)
-
-            web_states = [f.result() for f in f_web_states]
-            ldap_state = f_ldap_state.result()
-            pulse_state = f_pulse_state.result()
-
-        all_states = [master_state] + web_states
-
-        # ZooKeeper and Kafka can't be started until the endpoints of nodes in
-        # the cluster are known. The entrypoint script waits for a file created
-        # by a process execution to come into existence before these daemons
-        # are started. So do this early after startup.
-        zk_ips = [s['NetworkSettings']['Networks'][network_name]['IPAddress']
-                  for s in [master_state] + web_states]
-        zookeeper_hostports = ['%s:2888:3888' % ip for ip in zk_ips]
-        zookeeper_connect = ','.join('%s:2181/hgmoreplication' % ip for ip in zk_ips)
-        web_hostnames = [s['Config']['Hostname'] for s in web_states]
-
-        with futures.ThreadPoolExecutor(web_count + 1) as e:
-            for s in all_states:
-                command = [
-                    '/set-kafka-servers',
-                    s['NetworkSettings']['Networks'][network_name]['IPAddress'],
-                    '9092',
-                    ','.join(web_hostnames),
-                ] + zookeeper_hostports
-                e.submit(self._d.execute, s['Id'], command)
+        master_id = cluster_containers['hgssh'].id
+        web_ids = [state.id for state in web_states.values()]
 
         # Obtain replication and host SSH keys.
         mirror_private_key, mirror_public_key, master_host_ed25519_key, master_host_rsa_key = \
             self.get_mirror_ssh_keys(master_id)
 
-        with futures.ThreadPoolExecutor(web_count + 1) as e:
+        with futures.ThreadPoolExecutor(n_web) as e:
             # Set SSH keys on hgweb instances.
             cmd = [
                 '/set-mirror-key.py',
@@ -285,22 +257,23 @@ class HgCluster(object):
         # us fetching them. We wait on a network service (Kafka) started in
         # entrypoint.py after SSH keys are generated to eliminate this race
         # condition.
-        fs = []
-        with futures.ThreadPoolExecutor(web_count) as e:
-            for s in web_states:
-                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
-                fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 60))
+        futures_list = []
+        with futures.ThreadPoolExecutor(n_web) as e:
+            for name, state in web_states.items():
+                # Wait until we can access Kafka from the host machine
+                host, port = self._d._get_host_hostname_port(state.attrs, '9092/tcp')
+                futures_list.append(e.submit(wait_for_kafka, '%s:%s' % (host, port), 180))
 
-        for f in fs:
+        for f in futures_list:
             f.result()
 
         f_mirror_host_keys = []
-        with futures.ThreadPoolExecutor(web_count) as e:
+        with futures.ThreadPoolExecutor(n_web) as e:
             # Obtain host keys from mirrors.
-            for s in web_states:
+            for state in web_states.values():
                 f_mirror_host_keys.append((
-                    s['NetworkSettings']['Networks'][network_name]['IPAddress'],
-                    e.submit(self._d.get_file_content, s['Id'],
+                    state.attrs['NetworkSettings']['Networks'][network_name]['IPAddress'],
+                    e.submit(self._d.get_file_content, state.id,
                              '/etc/ssh/ssh_host_rsa_key.pub')))
 
         # Tell the master about all the mirrors.
@@ -311,31 +284,27 @@ class HgCluster(object):
             args.extend([ip, key])
         self._d.execute(master_id, args)
 
-        ldap_hostname, ldap_hostport = \
-                self._d._get_host_hostname_port(ldap_state, '389/tcp')
         master_ssh_hostname, master_ssh_hostport = \
-                self._d._get_host_hostname_port(master_state, '22/tcp')
+                self._d._get_host_hostname_port(cluster_containers['hgssh'].attrs, '22/tcp')
         pulse_hostname, pulse_hostport = \
-                self._d._get_host_hostname_port(pulse_state, '5672/tcp')
+                self._d._get_host_hostname_port(cluster_containers['pulse'].attrs, '5672/tcp')
 
-        self.ldap_uri = 'ldap://%s:%d/' % (ldap_hostname,
-                                           ldap_hostport)
-
-        fs = []
+        futures_list = []
+        # 4 threads, one for each service we need to wait on
         with futures.ThreadPoolExecutor(4) as e:
-            fs.append(e.submit(self.ldap.create_vcs_sync_login,
+            futures_list.append(e.submit(self.ldap.create_vcs_sync_login,
                                mirror_public_key))
-            fs.append(e.submit(wait_for_amqp, pulse_hostname,
+            futures_list.append(e.submit(wait_for_amqp, pulse_hostname,
                                pulse_hostport, 'guest', 'guest'))
-            fs.append(e.submit(wait_for_ssh, master_ssh_hostname,
+            futures_list.append(e.submit(wait_for_ssh, master_ssh_hostname,
                                master_ssh_hostport))
             # We already waited on the web nodes above. So only need to
             # wait on master here.
-            h, p = self._d._get_host_hostname_port(master_state, '9092/tcp')
-            fs.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
+            h, p = self._d._get_host_hostname_port(cluster_containers['hgssh'].attrs, '9092/tcp')
+            futures_list.append(e.submit(wait_for_kafka, '%s:%s' % (h, p), 20))
 
         # Will re-raise exceptions.
-        for f in fs:
+        for f in futures_list:
             f.result()
 
         # Create Kafka topics.
@@ -344,142 +313,60 @@ class HgCluster(object):
             ('replicatedpushdatapending', '1'),
             ('replicatedpushdata', '1'),
         ]
-        fs = []
-        with futures.ThreadPoolExecutor(3) as e:
+        futures_list = []
+        with futures.ThreadPoolExecutor(len(TOPICS)) as e:
             for topic, partitions in TOPICS:
                 cmd = [
                     '/opt/kafka/bin/kafka-topics.sh',
                     '--create',
                     '--topic', topic,
                     '--partitions', partitions,
-                    '--replication-factor', '3',
+                    '--replication-factor', str(n_hg),
                     '--config', 'min.insync.replicas=2',
                     '--config', 'unclean.leader.election.enable=false',
                     '--config', 'max.message.bytes=104857600',
-                    '--zookeeper', zookeeper_connect,
+                    '--zookeeper', 'hgssh:2181/hgmoreplication,hgweb0:2181/hgmoreplication,hgweb1:2181/hgmoreplication',
                 ]
-                fs.append(e.submit(self._d.execute, master_id, cmd,
+                futures_list.append(e.submit(self._d.execute, master_id, cmd,
                                    stdout=True))
 
-        for f in futures.as_completed(fs):
-            if 'Created topic' not in f.result():
-                raise Exception('kafka topic not created')
+        for f in futures.as_completed(futures_list):
+            result = f.result()
+            if 'Created topic' not in result:
+                raise Exception('kafka topic not created: %s' % result)
 
         # There appears to be a race condition between the topic being
         # created and the topic being available. So we explicitly wait
         # for the topic to appear on all clients so processes within
         # containers don't need to wait.
         with futures.ThreadPoolExecutor(4) as e:
-            fs = []
-            for s in all_states:
-                h, p = self._d._get_host_hostname_port(s, '9092/tcp')
+            futures_list = []
+            for state in all_states.values():
+                h, p = self._d._get_host_hostname_port(state.attrs, '9092/tcp')
                 hostport = '%s:%s' % (h, p)
                 for topic in TOPICS:
-                    fs.append(e.submit(wait_for_kafka_topic, hostport,
+                    futures_list.append(e.submit(wait_for_kafka_topic, hostport,
                                        topic[0]))
 
-            [f.result() for f in fs]
+            [f.result() for f in futures_list]
 
-        self.ldap_image = ldap_image
-        self.master_image = master_image
-        self.web_image = web_image
-        self.pulse_image = pulse_image
-        self.ldap_id = ldap_id
-        self.pulse_id = pulse_id
-        self.master_id = master_id
-        self.web_ids = web_ids
-        self.pulse_hostname = pulse_hostname
-        self.pulse_hostport = pulse_hostport
-        self.master_ssh_hostname = master_ssh_hostname
-        self.master_ssh_port = master_ssh_hostport
-        self.master_host_rsa_key = master_host_rsa_key
-        self.master_host_ed25519_key = master_host_ed25519_key
-        self.web_urls = []
-        self.kafka_hostports = []
-        for s in all_states:
-            hostname, hostport = self._d._get_host_hostname_port(s, '9092/tcp')
-            self.kafka_hostports.append('%s:%d' % (hostname, hostport))
-        for s in web_states:
-            hostname, hostport = self._d._get_host_hostname_port(s, '80/tcp')
-            self.web_urls.append('http://%s:%d/' % (hostname, hostport))
-        self.zookeeper_connect = zookeeper_connect
+        return self.get_state()
 
-        return self._write_state()
-
-    def clean(self):
+    def clean(self, cluster_name=None, show_output=False):
         """Clean the cluster.
 
         Containers will be shut down and removed. The state file will
         destroyed.
         """
-        state = self._dc.inspect_container(self.master_id)
-
-        with futures.ThreadPoolExecutor(4) as e:
-            e.submit(self._dc.remove_container, self.master_id, force=True,
-                     v=True)
-            e.submit(self._dc.remove_container, self.ldap_id, force=True,
-                     v=True)
-            e.submit(self._dc.remove_container, self.pulse_id, force=True,
-                     v=True)
-            for i in self.web_ids:
-                e.submit(self._dc.remove_container, i, force=True, v=True)
-
-        for network in state['NetworkSettings']['Networks'].values():
-            self._dc.remove_network(network['NetworkID'])
-
-        try:
-            os.unlink(self.state_path)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
-
-        self.ldap_id = None
-        self.pulse_id = None
-        self.master_id = None
-        self.web_ids = []
-        self.ldap_uri = None
-        self.pulse_hostname = None
-        self.pulse_hostport = None
-        self.master_ssh_hostname = None
-        self.master_ssh_port = None
-        self.kafka_hostports = []
-        self.zookeeper_connect = None
-
-    def _write_state(self):
-        assert self.state_path
-        s = {
-                'ldap_image': self.ldap_image,
-                'master_image': self.master_image,
-                'web_image': self.web_image,
-                'pulse_image': self.pulse_image,
-                'ldap_id': self.ldap_id,
-                'pulse_id': self.pulse_id,
-                'master_id': self.master_id,
-                'web_ids': self.web_ids,
-                'ldap_uri': self.ldap_uri,
-                'pulse_hostname': self.pulse_hostname,
-                'pulse_hostport': self.pulse_hostport,
-                'master_ssh_hostname': self.master_ssh_hostname,
-                'master_ssh_port': self.master_ssh_port,
-                'master_host_rsa_key': self.master_host_rsa_key,
-                'master_host_ed25519_key': self.master_host_ed25519_key,
-                'web_urls': self.web_urls,
-                'kafka_hostports': self.kafka_hostports,
-                'zookeeper_connect': self.zookeeper_connect,
-        }
-        with open(self.state_path, 'wb') as fh:
-            json.dump(s, fh, sort_keys=True, indent=4)
-
-        return s
+        cluster_name = normalize_testname(cluster_name or self.testname)
+        docker_compose_down_background(cluster_name, show_output=show_output)
 
     @property
     def ldap(self):
-        assert self.ldap_uri
-        return LDAP(self.ldap_uri, 'cn=admin,dc=mozilla', 'password')
+        state = self.get_state()
+        return LDAP(state['ldap_uri'], 'cn=admin,dc=mozilla', 'password')
 
     def get_mirror_ssh_keys(self, master_id=None):
-        master_id = master_id or self.master_id
-
         with futures.ThreadPoolExecutor(4) as e:
             f_private_key = e.submit(self._d.get_file_content, master_id,
                                      '/etc/mercurial/mirror')
@@ -505,7 +392,9 @@ class HgCluster(object):
         """
         cmd = ['/create-repo', name, group]
 
-        return self._d.execute(self.master_id, cmd, stdout=True, stderr=True)
+        state = self.get_state()
+
+        return self._d.execute(state['master_id'], cmd, stdout=True, stderr=True)
 
     def aggregate_code_coverage(self, destdir):
         master_map = {}

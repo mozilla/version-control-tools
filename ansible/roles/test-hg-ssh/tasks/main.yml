@@ -67,6 +67,35 @@
 - name: install unifyrepo testing config
   copy: src=unify-mozilla-unified-testing.ini dest=/etc/mercurial/unify-mozilla-unified.ini mode=0755
 
+- name: setup notifications.ini testing config
+  ini_file:
+    path: /etc/mercurial/notifications.ini
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: pulseconsumer, option: hosts, value: "hgssh:9092, hgweb0:9092, hgweb1:9092" }
+    - { section: pulse, option: hostname, value: pulse }
+    - { section: pulse, option: port, value: 5672 }
+    - { section: pulse, option: ssl, value: false }
+
+- name: setup Kafka hostports
+  ini_file:
+    path: /etc/mercurial/hgrc
+    section: replicationproducer
+    option: hosts
+    value: "hgssh:9092, hgweb0:9092, hgweb1:9092"
+  with_items:
+    - { path: /etc/mercurial/hgrc, section: replicationproducer }
+    - { path: /etc/mercurial/pushdataaggregator.ini, section: aggregator }
+
+- name: install testing pushdataaggregator_groups file
+  copy:
+    dest: /repo/hg/pushdataaggregator_groups
+    src: test_pushdataaggregator_groups
+    owner: root
+    group: root
+    mode: 0644
 
 - name: set privileged push hook repos to dummy values
   ini_file:

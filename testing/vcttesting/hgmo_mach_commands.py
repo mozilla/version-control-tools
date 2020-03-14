@@ -23,11 +23,6 @@ class HgmoCommands(object):
         from vcttesting.docker import Docker, params_from_env
         from vcttesting.hgmo import HgCluster
 
-        if 'HGMO_STATE_FILE' not in os.environ:
-            print('Do not know where to store state.')
-            print('Set the HGMO_STATE_FILE environment variable and try again.')
-            sys.exit(1)
-
         if 'DOCKER_STATE_FILE' not in os.environ:
             print('Do not where to store Docker state.')
             print('Set the DOCKER_STATE_FILE environment variable and try again.')
@@ -38,11 +33,7 @@ class HgmoCommands(object):
         if not docker.is_alive():
             print('Docker not available')
             sys.exit(1)
-        self.c = HgCluster(docker, os.environ['HGMO_STATE_FILE'],
-                           ldap_image=os.environ.get('DOCKER_LDAP_IMAGE'),
-                           master_image=os.environ.get('DOCKER_HGMASTER_IMAGE'),
-                           web_image=os.environ.get('DOCKER_HGWEB_IMAGE'),
-                           pulse_image=os.environ.get('DOCKER_PULSE_IMAGE'))
+        self.c = HgCluster(docker)
 
     @Command('start', category='hgmo',
              description='Start a hg.mozilla.org cluster')
@@ -50,38 +41,41 @@ class HgmoCommands(object):
                      help='Port number on which SSH server should listen')
     def start(self, master_ssh_port=None):
         s = self.c.start(master_ssh_port=master_ssh_port,
-                         coverage='CODE_COVERAGE' in os.environ)
+                         show_output=False)
         print('SSH Hostname: %s' % s['master_ssh_hostname'])
         print('SSH Port: %s' % s['master_ssh_port'])
         print('LDAP URI: %s' % s['ldap_uri'])
-        for url in s['web_urls']:
-            print('Web URL: %s' % url)
+        print('Web URL 0: %s' % s['hgweb_0_url'])
+        print('Web URL 1: %s' % s['hgweb_1_url'])
         print('Pulse: %s:%d' % (s['pulse_hostname'], s['pulse_hostport']))
 
     @Command('shellinit', category='hgmo',
              description='Print shell commands to export variables')
     def shellinit(self):
-        print('export SSH_CID=%s' % self.c.master_id)
-        print('export PULSE_HOST=%s' % self.c.pulse_hostname)
-        print('export PULSE_PORT=%s' % self.c.pulse_hostport)
-        print('export SSH_SERVER=%s' % self.c.master_ssh_hostname)
-        print('export SSH_PORT=%d' % self.c.master_ssh_port)
-        # Don't export the full value because spaces.
-        print('export SSH_HOST_RSA_KEY=%s' % self.c.master_host_rsa_key.split()[1])
-        print('export SSH_HOST_ED25519_KEY=%s' % self.c.master_host_ed25519_key.split()[1])
-        for i, url in enumerate(self.c.web_urls):
-            print('export HGWEB_%d_URL=%s' % (i, url))
-        for i, cid in enumerate(self.c.web_ids):
-            print('export HGWEB_%d_CID=%s' % (i, cid))
-        for i, hostport in enumerate(self.c.kafka_hostports):
-            print('export KAFKA_%d_HOSTPORT=%s' % (i, hostport))
-        print('export ZOOKEEPER_CONNECT=%s' % self.c.zookeeper_connect)
+        cluster_state = self.c.get_state()
 
+        print('export SSH_CID=%s' % cluster_state['master_id'])
+        print('export PULSE_HOST=%s' % cluster_state['pulse_hostname'])
+        print('export PULSE_PORT=%s' % cluster_state['pulse_hostport'])
+        print('export SSH_SERVER=%s' % cluster_state['master_ssh_hostname'])
+        print('export SSH_PORT=%d' % cluster_state['master_ssh_port'])
+        # Don't export the full value because spaces.
+        print('export SSH_HOST_RSA_KEY=%s' % cluster_state['master_host_rsa_key'].split()[1])
+        print('export SSH_HOST_ED25519_KEY=%s' % cluster_state['master_host_ed25519_key'].split()[1])
+        print('export HGWEB_0_URL=%s' % cluster_state['hgweb_0_url'])
+        print('export HGWEB_1_URL=%s' % cluster_state['hgweb_1_url'])
+        print('export HGWEB_0_CID=%s' % cluster_state['hgweb_0_cid'])
+        print('export HGWEB_1_CID=%s' % cluster_state['hgweb_1_cid'])
+        print('export KAFKA_0_HOSTPORT=%s' % cluster_state['kafka_0_hostport'])
+        print('export KAFKA_1_HOSTPORT=%s' % cluster_state['kafka_1_hostport'])
+        print('export KAFKA_2_HOSTPORT=%s' % cluster_state['kafka_2_hostport'])
 
     @Command('clean', category='hgmo',
              description='Clean up all references to this cluster')
-    def clean(self):
-        self.c.clean()
+    @CommandArgument('--show-output', action='store_true',
+                     help='Display output of shutdown process')
+    def clean(self, show_output=False):
+        self.c.clean(show_output=show_output)
 
     @Command('create-ldap-user', category='hgmo',
              description='Create a new user in LDAP')
@@ -154,13 +148,15 @@ class HgmoCommands(object):
     @CommandArgument('command', help='Command to execute',
                      nargs=argparse.REMAINDER)
     def execute(self, name, command, detach=False):
+        state = self.c.get_state()
+
         if name == 'hgssh':
-            cid = self.c.master_id
+            cid = state['master_id']
         elif name == 'pulse':
-            cid = self.c.pulse_id
+            cid = state['pulse_id']
         elif name.startswith('hgweb'):
             i = int(name[5:])
-            cid = self.c.web_ids[i]
+            cid = state['hgweb_%d_cid' % i]
         else:
             print('invalid name. must be "hgssh" or "hgwebN"')
             return 1
@@ -180,7 +176,8 @@ class HgmoCommands(object):
              description='Downloads SSH keys used by mirrors')
     @CommandArgument('out_dir', help='Directory in which to write the keys')
     def download_mirror_ssh_keys(self, out_dir):
-        priv, pub = self.c.get_mirror_ssh_keys()[0:2]
+        state = self.c.get_state()
+        priv, pub = self.c.get_mirror_ssh_keys(master_id=state['master_id'])[0:2]
 
         with open(os.path.join(out_dir, 'mirror'), 'wb') as fh:
             fh.write(priv)

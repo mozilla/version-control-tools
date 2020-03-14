@@ -3,45 +3,27 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from __future__ import print_function
+
 import os
+import socket
 import sys
-import time
 
-if 'ZOOKEEPER_ID' not in os.environ:
-    print('error: ZOOKEEPER_ID not in environment')
+if 'BROKER_ID' not in os.environ:
+    print('error: BROKER_ID not in environment', file=sys.stderr)
     sys.exit(1)
 
-if 'KAFKA_BROKER_ID' not in os.environ:
-    print('error: KAFKA_BROKER_ID not in environment')
-    sys.exit(1)
-
-zk_id = os.environ['ZOOKEEPER_ID']
-broker_id = os.environ['KAFKA_BROKER_ID']
+broker_id = os.environ['BROKER_ID']
 server_properties = '/etc/kafka/server.properties'
 zoo_cfg = '/etc/zookeeper/zoo.cfg'
-servers_path = '/kafka-servers'
 
-# Wait for the list of servers to become available.
-# The file will be installed by the process starting this container.
-print('wait for server info file')
-t_start = time.time()
-while True:
-    if os.path.exists(servers_path):
-        break
-
-    if time.time() - t_start > 60:
-        sys.exit('server file not available before timeout. giving up')
-    time.sleep(0.1)
-
-with open(servers_path, 'r') as fh:
-    lines = fh.read().splitlines()
-print('read server info file')
-
-advertise_host = lines[0]
-advertise_port = lines[1]
-consumer_hostnames = lines[2]
-servers = lines[3:]
-hostnames = [s.split(':')[0] for s in servers]
+advertise_host = socket.gethostbyaddr(socket.gethostname())[2][0]
+advertise_port = '9092'
+hostnames = ('hgssh', 'hgweb0', 'hgweb1')
+servers = [
+    '%s:2888:3888' % s
+    for s in hostnames
+]
 
 # Tell ZooKeeper what the servers are.
 lines = []
@@ -62,7 +44,7 @@ print('wrote zookeeper server list')
 
 # Set the ZooKeeper current server ID.
 with open('/var/lib/zookeeper/myid', 'w') as fh:
-    fh.write(zk_id)
+    fh.write(broker_id)
 
 print('wrote zookeeper id')
 

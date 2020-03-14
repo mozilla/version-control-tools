@@ -285,7 +285,7 @@ if __name__ == '__main__':
             # the Mercurial test harness allows tests to register cleanup
             # actions, there is only so much we can do.
             print('Running Docker Mercurial tests')
-            with docker.auto_clean_orphans():
+            with docker.auto_clean_orphans(run_hg_tests_docker):
                 args = hg_harness_args + ['-j', str(docker_jobs)] + run_hg_tests_docker
                 res2 = subprocess.call(args, cwd=HERE)
                 if res2:
