@@ -247,6 +247,7 @@ Creating obsolescence marker directly on server will result in replication
   vcsreplicator.consumer processing hg-pushkey-1 from partition 2 offset 17
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
   vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   > 1 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 1 changesets
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]

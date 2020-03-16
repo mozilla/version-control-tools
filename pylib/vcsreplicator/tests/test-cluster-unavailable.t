@@ -62,8 +62,8 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
   $ hgmo exec hgweb1 /usr/bin/supervisorctl stop kafka
   kafka: stopped
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
-  abort: error sending heartbeat: NOT_ENOUGH_REPLICAS (hg52 !)
   sending heartbeat to partition 0
+  abort: error sending heartbeat: NOT_ENOUGH_REPLICAS
   abort: error sending heartbeat: NOT_ENOUGH_REPLICAS (no-hg52 !)
   [255]
 
