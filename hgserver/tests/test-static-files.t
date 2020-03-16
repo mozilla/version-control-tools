@@ -53,7 +53,7 @@ Repositories reference /static/ for static URLs
   <link rel="icon" href="/static/DOCKER/hgicon.png" type="image/png" />
   <link rel="stylesheet" href="/static/DOCKER/style-gitweb.css" type="text/css" />
   <script type="text/javascript" src="/static/DOCKER/mercurial.js"></script>
-  <meta property="og:image" content="/static/DOCKER/hgicon.png"/>
+  <meta property="og:image" content="/static/DOCKER/moz-logo-bw-rgb.svg"/>
               <img src="/static/DOCKER/moz-logo-bw-rgb.svg" alt="mercurial" />
 
   $ hgmo clean
