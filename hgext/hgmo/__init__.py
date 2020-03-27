@@ -680,8 +680,15 @@ def cloud_region_specifier(instance_data):
     '''
     cloud_data_v1 = instance_data['v1']
 
+    # Some of the mirrors were spun up using an ancient version of
+    # cloud-init. In case `cloud_name` isn't available, we should look
+    # for `cloud-name`.
+    cloud_name = cloud_data_v1.get('cloud_name')
+    if not cloud_name:
+        cloud_name = cloud_data_v1['cloud-name']
+
     return b'%(cloud)s=%(region)s' % {
-        b'cloud': CLOUD_REGION_MAPPING[cloud_data_v1['cloud-name']],
+        b'cloud': CLOUD_REGION_MAPPING[cloud_name],
         b'region': pycompat.bytestr(cloud_data_v1['region'])
     }
 
