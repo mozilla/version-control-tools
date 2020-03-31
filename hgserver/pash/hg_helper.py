@@ -666,7 +666,7 @@ def serve(cname, enable_repo_config=False, enable_repo_group=False,
         assert_valid_repo_name(repo)
         hgrc = '/repo/hg/mozilla/%s/.hg/hgrc' % repo
         if os.path.exists(hgrc):
-            with open(hgrc, 'rb') as fh:
+            with open(hgrc, 'r', encoding="utf-8") as fh:
                 sys.stdout.write(fh.read())
     else:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
