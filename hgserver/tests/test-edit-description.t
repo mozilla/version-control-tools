@@ -44,4 +44,15 @@
   description = This is my repo!
   
 
+Check the repo-config and repo-group commands work as intended.
+
+  $ standarduserssh $SSH_SERVER repo-config users/user_example.com/repo-1
+  [web]
+  description = This is my repo!
+  
+
+  $ standarduserssh $SSH_SERVER repo-group users/user_example.com/repo-1
+  scm_level_1
+
+
   $ hgmo clean
