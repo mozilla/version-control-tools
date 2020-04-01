@@ -29,8 +29,14 @@ if os.environ.get('CODE_COVERAGE', False):
 '''
 
 
-def create_virtualenv(name):
-    path = os.path.join(ROOT, 'venv', name)
+def create_virtualenv(name=None, python='python'):
+    path = os.path.join(ROOT, 'venv')
+
+    env = dict(os.environ)
+    env['PYTHON_VERSION'] = python
+
+    if name:
+        path = os.path.join(path, name)
 
     try:
         os.makedirs(os.path.dirname(path))
@@ -41,12 +47,12 @@ def create_virtualenv(name):
     if os.name == 'nt':
         bin_dir = os.path.join(path, 'Scripts')
         pip = os.path.join(bin_dir, 'pip.exe')
-        python = os.path.join(bin_dir, 'python.exe')
+        python = os.path.join(bin_dir, python + '.exe')
         activate = os.path.join(bin_dir, 'activate')
     else:
         bin_dir = os.path.join(path, 'bin')
         pip = os.path.join(bin_dir, 'pip')
-        python = os.path.join(bin_dir, 'python')
+        python = os.path.join(bin_dir, python)
         activate = os.path.join(bin_dir, 'activate')
 
     res = {
@@ -58,7 +64,6 @@ def create_virtualenv(name):
         'activate_this': os.path.join(bin_dir, 'activate_this.py'),
     }
 
-    env = dict(os.environ)
     env['ROOT'] = ROOT
     env['VENV'] = path
 
@@ -84,7 +89,11 @@ def process_pip_requirements(venv, requirements):
         venv['pip'], 'install', '--upgrade', '--require-hashes',
         '-r', os.path.join(ROOT, requirements),
     ]
-    subprocess.check_call(args)
+
+    hg_env = os.environ.copy()
+    hg_env['HGPYTHON3'] = '1'
+
+    subprocess.check_call(args, env=hg_env)
 
 
 def install_editable(venv, relpath, extra_env=None):
@@ -124,6 +133,7 @@ def install_mercurials(venv, hg, py3=False):
     # vanilla Mercurial.
     hg_env = dict(os.environ)
     hg_env['HGRCPATH'] = ''
+    hg_env['HGPYTHON3'] = '1'
 
     # Ensure a Mercurial clone is present and up to date.
     if not os.path.isdir(hg_dir):
