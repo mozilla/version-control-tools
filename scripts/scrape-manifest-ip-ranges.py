@@ -165,6 +165,7 @@ def get_aws_ips():
                     'ip_prefix': is_ip_address_network,
                     'region': str,
                     'service': str,
+                    'network_border_group': str,
                 },
             ]),
         }, extra=False, required=True)
