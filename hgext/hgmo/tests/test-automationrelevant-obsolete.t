@@ -121,6 +121,7 @@ Unless --hidden is used
               "parents": [
                   "d406a5ad38f255efb8657338e56a2bd6b8149cca"
               ],
+              "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0
@@ -150,6 +151,7 @@ Unless --hidden is used
               "parents": [
                   "11743f8081842eb047711e85120177ed46be343e"
               ],
+              "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0

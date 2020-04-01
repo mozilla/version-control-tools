@@ -368,7 +368,6 @@ def automationrelevancewebcommand(web):
         b'instabilities',
         b'obsolete',
         b'parent',
-        b'phase',
         b'succsandmarkers',
         b'tags',
         b'whyunstable',

@@ -151,6 +151,7 @@ web command for exposing automation relevance works
               "parents": [
                   "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
               ],
+              "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0
@@ -180,6 +181,7 @@ web command for exposing automation relevance works
               "parents": [
                   "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
               ],
+              "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0
@@ -209,6 +211,7 @@ web command for exposing automation relevance works
               "parents": [
                   "66a66c6c6ae312ec88240754300468a6cea8f71d"
               ],
+              "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0
