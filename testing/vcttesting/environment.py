@@ -263,6 +263,26 @@ def create_xchannel():
     return venv
 
 
+def install_cinnabar(dest=None):
+    """Install git-cinnabar"""
+    if not dest:
+        dest = os.path.join(ROOT, 'venv', 'git-cinnabar')
+
+    if not os.path.exists(dest):
+        subprocess.check_call([
+            'git', 'clone', '--branch', 'release', 'https://github.com/glandium/git-cinnabar.git',
+            dest,
+        ])
+
+    subprocess.check_call([
+        'git', 'pull'
+    ], cwd=dest)
+
+    subprocess.check_call([
+        'make', '-j4', 'helper', 'NO_OPENSSL=1', 'NO_GETTEXT=1',
+    ], cwd=dest)
+
+
 if __name__ == '__main__':
     import sys
 
