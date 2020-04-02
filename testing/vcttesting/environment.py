@@ -108,7 +108,7 @@ def install_editable(venv, relpath, extra_env=None):
     subprocess.check_call(args, env=env)
 
 
-def install_mercurials(venv, hg, py3=False):
+def install_mercurials(venv, hg='hg', py3=False):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
         '5.2',
@@ -281,6 +281,66 @@ def install_cinnabar(dest=None):
     subprocess.check_call([
         'make', '-j4', 'helper', 'NO_OPENSSL=1', 'NO_GETTEXT=1',
     ], cwd=dest)
+
+
+def create_global():
+    """Create the global test environment virtualenv
+
+    This functions the same as ./create-test-environment
+    """
+    # No `name` parameter since this will be the top-level venv
+    venv_py2 = create_virtualenv(python='python2')
+    venv_py3 = create_virtualenv(name='py3', python='python3')
+
+    venvs = (venv_py2, venv_py3,)
+
+    # Install third-party dependencies
+    process_pip_requirements(venv_py2, 'test-requirements.txt')
+    process_pip_requirements(venv_py3, 'test-requirements-3.txt')
+
+    # Install editable packages
+    editables = {
+        'hgserver/hgmolib',
+        'pylib/Bugsy',
+        'pylib/mozansible',
+        'pylib/mozhg',
+        'pylib/mozhginfo',
+        'pylib/mozautomation',
+        'pylib/vcsreplicator',
+        'hghooks',
+        'testing',
+    }
+    for venv in venvs:
+        for package in editables:
+            install_editable(venv, package)
+
+    install_mercurials(venv_py2)
+    install_mercurials(venv_py3, py3=True)
+
+    cinnabar_dest = os.path.join(venv_py2['path'], 'git-cinnabar')
+    install_cinnabar(dest=cinnabar_dest)
+
+    if os.getenv('NO_DOCKER'):
+        print('Not building Docker images because NO_DOCKER is set')
+    else:
+        print("Building Docker images.")
+        print("This could take a while and may consume a lot of internet bandwidth.")
+        print("If you don't want Docker images, it is safe to hit CTRL+c to abort this.")
+
+        try:
+            subprocess.check_call([
+                os.path.join(ROOT, 'd0cker'), 'build-all'
+            ])
+        except subprocess.CalledProcessError:
+            print("You will not be able to run tests that require Docker.")
+            print("Please see https://docs.docker.com/installation/ for how to install Docker.")
+            print("When Docker is installed, re-run this script")
+            print("To avoid re-building the Docker images next time, set the `NO_DOCKER` "
+                  "environment variable to any value.")
+            sys.exit(1)
+
+    # Return info about Py2 venv since we still require that to run tests
+    return venv_py2
 
 
 if __name__ == '__main__':
