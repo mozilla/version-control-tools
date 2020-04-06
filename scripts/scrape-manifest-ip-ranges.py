@@ -18,7 +18,13 @@ from pathlib import Path
 import dns.resolver
 import requests
 from datadiff import diff
-from voluptuous import All, Schema, Invalid as VoluptuousInvalid, truth
+from voluptuous import (
+    All,
+    Optional,
+    Schema,
+    Invalid as VoluptuousInvalid,
+    truth,
+)
 from voluptuous.humanize import validate_with_humanized_errors
 
 
@@ -165,7 +171,7 @@ def get_aws_ips():
                     'ip_prefix': is_ip_address_network,
                     'region': str,
                     'service': str,
-                    'network_border_group': str,
+                    'network_border_group': Optional(str),
                 },
             ]),
         }, extra=False, required=True)
