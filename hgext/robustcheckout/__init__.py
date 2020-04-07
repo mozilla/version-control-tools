@@ -77,12 +77,14 @@ def peerlookup(remote, v):
     (b'', b'networkattempts', 3, b'Maximum number of attempts for network '
                                  b'operations'),
     (b'', b'sparseprofile', b'', b'Sparse checkout profile to use (path in repo)'),
+    (b'U', b'noupdate', False, b'the clone will include an empty working directory\n'
+                               b'(only a repository)'),
     ],
     b'[OPTION]... URL DEST',
     norepo=True)
 def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
                    purge=False, sharebase=None, networkattempts=None,
-                   sparseprofile=None):
+                   sparseprofile=None, noupdate=False):
     """Ensure a working copy has the specified revision checked out.
 
     Repository data is automatically pooled into the common directory
@@ -168,7 +170,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
     try:
         return _docheckout(ui, url, dest, upstream, revision, branch, purge,
                            sharebase, optimes, behaviors, networkattempts,
-                           sparse_profile=sparseprofile)
+                           sparse_profile=sparseprofile, noupdate=noupdate)
     finally:
         overall = time.time() - start
 
@@ -249,7 +251,7 @@ def robustcheckout(ui, url, dest, upstream=None, revision=None, branch=None,
 
 def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
                 optimes, behaviors, networkattemptlimit, networkattempts=None,
-                sparse_profile=None):
+                sparse_profile=None, noupdate=False):
     if not networkattempts:
         networkattempts = [1]
 
@@ -257,7 +259,8 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
         return _docheckout(ui, url, dest, upstream, revision, branch, purge,
                            sharebase, optimes, behaviors, networkattemptlimit,
                            networkattempts=networkattempts,
-                           sparse_profile=sparse_profile)
+                           sparse_profile=sparse_profile,
+                           noupdate=noupdate)
 
     @contextlib.contextmanager
     def timeit(op, behavior):
@@ -599,6 +602,11 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
 
     # Now we should have the wanted revision in the store. Perform
     # working directory manipulation.
+
+    # Avoid any working directory manipulations if `-U`/`--noupdate` was passed
+    if noupdate:
+        ui.write(b'(skipping update since `-U` was passed)\n')
+        return None
 
     # Purge if requested. We purge before update because this way we're
     # guaranteed to not have conflicts on `hg update`.
