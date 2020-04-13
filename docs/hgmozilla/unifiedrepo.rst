@@ -5,7 +5,7 @@ Working With a Unified Firefox Repository
 =========================================
 
 Traditionally, the various Firefox repositories (``mozilla-central``,
-``mozilla-inbound``, ``mozilla-aurora``, etc) have been separate
+``autoland``, ``mozilla-beta``, etc) have been separate
 repositories. They all share the same root commit
 (``8ba995b74e18334ab3707f27e9eb8f4e37ba3d29``), so it is possible to combine
 them locally. This has several benefits:
@@ -22,7 +22,7 @@ Unified Repository on hg.mozilla.org
 
 ``https://hg.mozilla.org/mozilla-unified`` is a *read-only* unified
 repository containing all of the commits on the ``default`` branch of
-the various Firefox repositories (mozilla-central, inbound, aurora,
+the various Firefox repositories (mozilla-central, autoland, aurora,
 beta, release, esr, etc) in chronological order by push time.
 
 Advantages of the Unified Repo
@@ -145,8 +145,6 @@ to each repo since last pull.::
    adding file changes
    added 39 changesets with 309 changes to 235 files
    updated firefox tree tag beta (+2 commits)
-   updated firefox tree tag esr52 (+2 commits)
-   updated firefox tree tag inbound (+34 commits)
    updated firefox tree tag release (+1 commits)
    (run 'hg update' to get a working copy)
 

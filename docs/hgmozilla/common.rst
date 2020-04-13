@@ -184,7 +184,6 @@ To enable ``mozext``, add the following to your hgrc::
 Then, in a Firefox clone, run an ``hg pull`` to grab pushlog data::
 
    $ hg pull central
-   $ hg pull inbound
    $ hg pull autoland
 
 Now, you can run revsets to query pushlog data::

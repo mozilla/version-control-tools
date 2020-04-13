@@ -191,7 +191,7 @@ Pulse messages are written to the following exchanges:
 * (experimental) `exchange/hgpushes/v2 <https://tools.taskcluster.net/pulse-inspector/#!((exchange:exchange/hgpushes/v2,routingKeyPattern:%23))>`_
 
 The routing key for each message is the relative path of the repository
-on hg.mozilla.org (e.g. ``mozilla-central`` or ``integration/mozilla-inbound``).
+on hg.mozilla.org (e.g. ``mozilla-central`` or ``integration/autoland``).
 
 The ``payload`` of the JSON messages published to Pulse depend on the exchange.
 

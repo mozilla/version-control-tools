@@ -12,15 +12,13 @@ Background on Multiple Repositories
 
 Firefox developers typically interact with multiple repositories. There
 is the canonical head of Firefox development,
-`mozilla-central <https://hg.mozilla.org/mozilla-central>`_. There are
-landing repositories such as
-`mozilla-inbound <https://hg.mozilla.org/integration/mozilla-inbound>`_
-and
-`fx-team <https://hg.mozilla.org/integration/fx-team>`_.
+`mozilla-central <https://hg.mozilla.org/mozilla-central>`_. There is
+one landing repositories called autoland
+`autoland <https://hg.mozilla.org/integration/autoland>`_.
 Then there are release repositories like
-`mozilla-aurora <https://hg.mozilla.org/releases/mozilla-aurora>`_,
-`mozilla-beta <https://hg.mozilla.org/releases/mozilla-beta>`_, and
-`mozilla-release <https://hg.mozilla.org/releases/mozilla-release>`_.
+`mozilla-beta <https://hg.mozilla.org/releases/mozilla-beta>`_,
+`mozilla-release <https://hg.mozilla.org/releases/mozilla-release>`_
+and mozilla-esr*,
 
 **All of these repositories share the same initial commit and thus are
 one logical repository.** However, for historical and continuity
@@ -34,11 +32,11 @@ Consolidating the Repositories Locally
 Traditionally, Mozilla developers maintain separate clones of each
 repository. There is thus a one to one mapping between local and remote
 repositories. For example, you may have separate ``mozilla-central`` and
-``mozilla-inbound`` directories/clones to track the different *upstream*
+``autoland`` directories/clones to track the different *upstream*
 repositories. This practice is grossly inefficient. The shared repository
 data is fetched and stored multiple times. This creates more load for
 the server, occupies more space on disk, and adds overhead to common
-tasks such as rebasing from central to inbound.
+tasks such as rebasing from central to autoland.
 
 The *firefoxtree* extension allows you to easily combine the separate
 remote repositories into a local, single, unified repository.
@@ -71,22 +69,13 @@ The following example demonstrates how to pull various Firefox
 repositories into a single local repository and then how to navigate
 between commits.::
 
-  $ hg pull https://hg.mozilla.org/integration/mozilla-inbound
-  pulling from https://hg.mozilla.org/integration/mozilla-inbound
+  $ hg pull https://hg.mozilla.org/integration/autoland
+  pulling from https://hg.mozilla.org/integration/autoland
   searching for changes
   adding changesets
   adding manifests
   adding file changes
   added 34 changesets with 140 changes to 113 files (+1 heads)
-  (run 'hg heads .' to see heads, 'hg merge' to merge)
-
-  $ hg pull https://hg.mozilla.org/integration/b2g-inbound
-  pulling from https://hg.mozilla.org/integration/b2g-inbound
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 21 changesets with 119 changes to 13 files (+1 heads)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
 
   $ hg up central
@@ -100,12 +89,12 @@ between commits.::
   date:        Sat Nov 08 03:20:23 2014 -0800
   summary:     No bug, Automated blocklist update from host bld-linux64-spot-144 - a=blocklist-update
 
-  $ hg up inbound
+  $ hg up autoland
   118 files updated, 0 files merged, 2 files removed, 0 files unresolved
 
   $ hg log -r .
   changeset:   248586:e021487d1297
-  tag:         inbound
+  tag:         autoland
   user:        Connor <cojojennings@gmail.com>
   date:        Wed Oct 29 23:58:03 2014 -0400
   summary:     Bug 575094 - Modify how prefservice is accessed so that it's from the parent process and not from the child process. Also re-enable test_bug528292_wrap.js. r=jdm
@@ -119,10 +108,8 @@ To view a summary of which repositories are on which changesets, run
 ``hg fxheads``::
 
   $ hg fxheads
-  248607:a7a2bacecce7 b2ginbound tip Bumping manifests a=b2g-bump
   248552:d380166816dd central No bug, Automated blocklist update from host bld-linux64-spot-144 - a=blocklist-update
-  246125:c742dcb56135 fx-team Bug 1088729 - Only allow http(s) directory links and https/data images [r=adw]
-  248586:e021487d1297 inbound Bug 575094 - Modify how prefservice is accessed so that it's from the parent process and not from the child process. Also re-enable test_bug528292_wrap.js. r=jdm
+  248586:e021487d1297 autoland Bug 575094 - Modify how prefservice is accessed so that it's from the parent process and not from the child process. Also re-enable test_bug528292_wrap.js. r=jdm
 
 .. tip::
 
@@ -143,12 +130,11 @@ Simply type ``hg pull <tree>`` to pull from a known Firefox repository.
 For example::
 
   $ hg pull central
-  $ hg pull inbound
+  $ hg pull autoland
 
-Or type ``hg push <tree>`` to push to a Firefox repository.::
+Or type ``hg push <tree>`` to push to a Firefox repository (need permissions).::
 
-  $ hg push inbound
-  $ hg push aurora
+  $ hg push autoland
 
 .. tip::
 
@@ -178,11 +164,10 @@ through each of these repositories and pull from all of them. These
 special paths include:
 
 integration
-   Pull from all integration/landing repositories (inbound, fx-team,
-   b2g-inbound)
+   Pull from all integration/landing repositories (autoland)
 releases
    Pull from all repositories that Firefox is released from (central,
-   aurora, beta, release, esr, etc)
+   beta, release, esr, etc)
 
 Safer Push Defaults
 ===================

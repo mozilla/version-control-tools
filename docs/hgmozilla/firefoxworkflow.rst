@@ -200,7 +200,7 @@ Before landing, we need to rebase our unlanded changesets on top of
 the latest changeset from an integration branch::
 
    $ hg pull
-   $ hg rebase -d inbound
+   $ hg rebase -d autoland
 
 If you need to add ``r=`` reviewer attribution to the commit message,
 do that now::
@@ -212,4 +212,4 @@ update commit messages accordingly.
 
 And finally we land::
 
-   $ hg push -r . inbound
+   $ hg push -r . autoland
