@@ -67,6 +67,20 @@ This fixes #9000 and bug 324521
 Source-Repo: https://github.com/mozilla/foo'''
         self.assertEqual(parse_bugs(msg), [324521])
 
+    def test_bug_conservatively(self):
+        self.assertEqual(parse_bugs(b'bug 1', conservative=True), [1])
+        self.assertEqual(parse_bugs(b'bug 123456', conservative=True), [123456])
+        self.assertEqual(parse_bugs(b'Bug 123456', conservative=True), [123456])
+        self.assertEqual(parse_bugs(b'debug 123456', conservative=True), [])
+        self.assertEqual(parse_bugs(b'testb=1234x', conservative=True), [])
+        self.assertEqual(parse_bugs(b'ab4665521e2f', conservative=True), [])
+        self.assertEqual(parse_bugs(b'Aug 2008', conservative=True), [])
+        self.assertEqual(parse_bugs(b'b=#12345', conservative=True), [])
+        self.assertEqual(parse_bugs(b'b=12345', conservative=True), [12345])
+        self.assertEqual(parse_bugs(b'GECKO_191a2_20080815_RELBRANCH', conservative=True), [])
+        self.assertEqual(parse_bugs(b'12345 is a bug', conservative=True), [])
+        self.assertEqual(parse_bugs(b' 123456 whitespace!', conservative=True), [])
+
     def test_reviewers(self):
 
         # first with r? reviewer request syntax

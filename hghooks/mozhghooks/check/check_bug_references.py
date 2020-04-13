@@ -89,7 +89,9 @@ def parse_bug_ids(string):
     Returns:
         set of bytes: a set of strings representing bug IDs
     """
-    return {pycompat.bytestr(b) for b in commitparser.parse_bugs(string)}
+    return {
+        pycompat.bytestr(b) for b in commitparser.parse_bugs(string, conservative=True)
+    }
 
 
 class BMOAPIClient(object):

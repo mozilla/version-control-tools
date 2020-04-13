@@ -27,7 +27,7 @@ BUG_RE = re.compile(
 # Like BUG_RE except it doesn't flag sequences of numbers, only positive
 # "bug" syntax like "bug X" or "b=".
 BUG_CONSERVATIVE_RE = re.compile(
-    br'''((?:bug|b=)(?:\s*)(\d+)(?=\b))''', re.I | re.X)
+    br'''(\b(?:bug|b=)\b(?:\s*)(\d+)(?=\b))''', re.I | re.X)
 
 SPECIFIER = br'(?:r|a|sr|rs|ui-r)[=?]'
 R_SPECIFIER = br'\br[=?]'
@@ -94,16 +94,15 @@ METADATA_RE = re.compile(b'^MozReview-Commit-ID: ')
 DIFFERENTIAL_REVISION_RE = re.compile(br'(?P<phaburl>https://phabricator.services.mozilla.com/D\d+)')
 
 
-def parse_bugs(s):
-    is_github_repo = False
+def parse_bugs(s, conservative=False):
     m = RE_SOURCE_REPO.search(s)
     if m:
         source_repo = m.group(1)
 
         if source_repo.startswith(b'https://github.com/'):
-            is_github_repo = True
+            conservative = True
 
-    bugzilla_re = BUG_CONSERVATIVE_RE if is_github_repo else BUG_RE
+    bugzilla_re = BUG_CONSERVATIVE_RE if conservative else BUG_RE
 
     bugs_with_duplicates = [int(m[1]) for m in bugzilla_re.findall(s)]
     bugs_seen = set()
