@@ -22,7 +22,7 @@ ci-ue1-b ansible_host=10.191.12.152
 [hgweb-mirrors:children]
 ci-uw1
 ci-uw2
-ci-ue1
+#ci-ue1
 
 [hgweb-mirrors:vars]
 ansible_sudo=yes
