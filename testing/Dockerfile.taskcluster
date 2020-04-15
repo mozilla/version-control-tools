@@ -39,7 +39,7 @@ RUN apt-get update && \
 
 RUN hg clone https://hg.mozilla.org/hgcustom/version-control-tools /vct-cache && \
   cd /vct-cache && \
-  NO_DOCKER=1 ./create-test-environment && \
+  NO_DOCKER=1 ./create-environment test && \
   chown -R worker:worker /vct-cache
 
 # Install Watchman for fsmonitor tests

@@ -11,7 +11,7 @@ cd /work/vct
 
 cp -a /vct-cache/venv .
 chown -R `whoami` .
-./create-test-environment
+./create-environment test
 ./run-tests \
   --verbose \
   --with-hg=venv/mercurials/${HG_VERSION}/bin/hg \

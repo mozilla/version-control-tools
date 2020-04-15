@@ -39,6 +39,6 @@ WORKDIR /vct/
 RUN chown -R vct:vct /vct
 
 USER vct
-RUN NO_DOCKER=1 /vct/create-test-environment
+RUN NO_DOCKER=1 /vct/create-environment test
 
 CMD ["sh"]
