@@ -32,6 +32,7 @@ URLError to be raised.
 
 from mercurial import (
     error,
+    pycompat,
     registrar,
     url,
     urllibcompat,
@@ -39,7 +40,7 @@ from mercurial import (
 
 
 import json
-import StringIO
+
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -57,7 +58,8 @@ class AdvancedURLInterceptor(object):
             req (Request)
 
         Returns:
-            StringIO.StringIO: a file-like object representing the response
+            pycompat.bytesio (Python version dependent) object with
+            extra `getcode` attribute.
 
         Raises:
             HTTPError, URLError
@@ -71,17 +73,25 @@ class AdvancedURLInterceptor(object):
 
         response = data[req.get_full_url()]
 
-        if response[b"code"] != 200:
-            if response[b"code"] is None:
-                # No response, i.e. raise URLError
-                error_to_raise = urllibcompat.urlerr.urlerror(b"fake error")
-            else:
-                error_to_raise = urllibcompat.urlerr.httperror(
-                    url,
-                    response[b"code"],
-                    b"", None, None)
-            raise error_to_raise
-        return StringIO.StringIO(json.dumps(data[req.get_full_url()][b"data"]))
+        if response["code"] is None:
+            # No response, i.e. raise URLError
+            raise urllibcompat.urlerr.urlerror(b"fake error")
+
+        if response["code"] != 200:
+            raise urllibcompat.urlerr.httperror(
+                url,
+                response["code"],
+                b"", None, None)
+
+        return_obj = pycompat.bytesio(
+            pycompat.bytestr(json.dumps(response["data"]))
+        )
+
+        # Urllib "openers" expect a file-like object with some
+        # extra helper parameters. Add them here.
+        return_obj.getcode = lambda: 200
+
+        return return_obj
 
 
 def extsetup(ui):

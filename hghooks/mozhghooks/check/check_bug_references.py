@@ -145,7 +145,7 @@ class BMOAPIClient(object):
             (b"include_fields", b"id"),
         )
         data = json.load(self._get(url, params))
-        bugs = data.get(b"bugs", [])
+        bugs = data.get("bugs", [])
         return {pycompat.bytestr(b["id"]) for b in bugs}
 
     def get_status_code_for_bug(self, bug_id):
