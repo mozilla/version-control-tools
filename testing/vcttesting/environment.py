@@ -6,6 +6,7 @@ import errno
 import os
 import shutil
 import subprocess
+import sys
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -341,24 +342,3 @@ def create_global():
 
     # Return info about Py2 venv since we still require that to run tests
     return venv_py2
-
-
-if __name__ == '__main__':
-    import sys
-
-    # This is a hack to support create-test-environment.
-    if sys.argv[1] == 'install-mercurials':
-        venv = {
-            'path': os.path.join(ROOT, 'venv'),
-            'python': os.path.join(ROOT, 'venv', 'bin', 'python'),
-        }
-        # PATH has global virtualenv activated.
-        install_mercurials(venv, hg='hg')
-
-        # Install Python 3 Mercurials
-        venv = {
-            'path': os.path.join(ROOT, 'venv', 'py3'),
-            'python': os.path.join(ROOT, 'venv', 'py3', 'bin', 'python'),
-        }
-        # PATH has global virtualenv activated.
-        install_mercurials(venv, hg='hg', py3=True)
