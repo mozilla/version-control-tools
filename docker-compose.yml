@@ -25,7 +25,7 @@
 # Non-docker tests may be run with:
 # `$ docker-compose run --rm test-runner`
 #
-# The test-runner docker image runs ./create-test-environment
+# The test-runner docker image runs `./create-environment test`
 # with NO_DOCKER=1, since that relys on the host docker daemon.
 # The containers for docker tests can be built by running:
 # `$ docker-compose run --rm test-runner ./d0cker build-all`

@@ -70,18 +70,18 @@ Development and testing requires the creation of a special environment
 containing all the prerequisites necessary to develop and test. This
 is accomplished by running the following command::
 
-   $ ./create-test-environment
+   $ ./create-environment test
 
 .. tip::
 
-   You should periodically run ``create-test-environment`` to ensure
+   You should periodically run ``create-environment test`` to ensure
    everything is up to date. (Yes, the tools should do this
    automatically.)
 
 Activating an Environment
 =========================
 
-Once you've executed ``create-test-environment``, you'll need to
+Once you've executed ``create-environment test``, you'll need to
 *activate* it so your current shell has access to all its wonders::
 
    $ source venv/bin/activate
