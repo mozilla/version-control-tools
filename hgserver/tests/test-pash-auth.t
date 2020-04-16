@@ -360,9 +360,9 @@ hgAccountEnabled=FALSE shows account disabled message
   This commonly occurs due to account inactivity (you need to SSH
   into hg.mozilla.org every few months to keep your account active).
   
-  To restore Mercurial access, please file a LDAP
-  bug (https://tinyurl.com/yxufmrro) and request hg access be restored
-  for hgdisabled@example.com.
+  To restore Mercurial access, please file a bug on Bugzilla under
+  the `mozilla.org :: Repository Account Requests` component and
+  request access be restored for hgdisabled@example.com.
 
 Failure to connect to LDAP mirror locks us out
 What happens here is nscd caches the valid passwd entry lookup for the user.
