@@ -133,7 +133,6 @@ Test that the hook reject commits when bug IDs could not be verified.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ************************************ ERROR ************************************
   While checking if a bug referenced in your commit message is a security bug, an
@@ -160,7 +159,6 @@ Test that the hook rejects references to bugs that do not have public permission
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ************************************ ERROR ************************************
   Your commit message references bugs that are currently private. To avoid
@@ -190,7 +188,6 @@ Test that the hook rejects references to bugs that do not have public permission
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ************************************ ERROR ************************************
   Your commit message references bugs that are currently private. To avoid
@@ -221,7 +218,6 @@ Test that the hook rejects references to bugs that do not exist.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ********************************** ERROR **********************************
   Your commit message references a bug that does not exist. Please check your
@@ -248,7 +244,6 @@ Test that the hook rejects commits when BMO returns a server error.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ************************************ ERROR ************************************
   While checking if a bug referenced in your commit message is a security bug, an
@@ -275,13 +270,13 @@ Test that the hook allows push when override flag is included in commit message.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ********************************** WARNING **********************************
   You have chosen to ignore or skip checking bugs IDs referenced in your commit
   message. Security bugs or invalid bugs referenced will not block your push.
   *****************************************************************************
   
+  added 1 changesets with 1 changes to 1 files
 
 Test that the hook does not reject commits that have a valid bug ID.
   $ touch some_other_file
