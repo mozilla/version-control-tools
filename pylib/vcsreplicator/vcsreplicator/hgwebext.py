@@ -25,7 +25,7 @@ from mercurial import (
 
 from vcsreplicator import commoncommands
 
-testedwith = b'4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
+testedwith = b'4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 minimumhgversion = b'4.5'
 
 cmdtable = {}

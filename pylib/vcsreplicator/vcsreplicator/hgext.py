@@ -52,7 +52,7 @@ with demandimport.deactivated():
 
 base85 = policy.importmod('base85')
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2'
+testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 
 cmdtable = {}
 
@@ -364,7 +364,16 @@ def sendreposyncmessage(ui, repo, bootstrap=False):
         repo.producerlog('SYNC_SENT')
 
 
-def sendheadsmessage(ui, repo):
+def sendheadsmessage(ui, repo, success=True):
+    """Repo-unlock callback function to send a message
+    notifying callers about the new heads
+
+    TRACKING hg53: make `success` default to `False`
+    """
+    # Don't send the heads message if the unlock was not a success
+    if not success:
+        return
+
     heads = [
         pycompat.sysstr(hex(n))
         for n in repo.filtered(b'served').heads()
