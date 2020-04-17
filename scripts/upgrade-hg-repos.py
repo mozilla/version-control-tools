@@ -36,6 +36,7 @@ RECOGNIZED_GROUPS = {
     'scm_l10n_drivers',
     'scm_nss',
     'scm_versioncontrol',
+    'scm_kaios',
 }
 
 HERE = pathlib.Path(os.path.normpath(os.path.abspath(os.path.dirname(
