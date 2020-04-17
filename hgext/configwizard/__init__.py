@@ -915,7 +915,7 @@ def _checkcurses(ui, cw):
 
     # curses isn't available on all platforms. Don't prompt if not
     # available.
-    if _try_curses_import() and uipromptchoice(ui, CURSES_INFO):
+    if not _try_curses_import() or uipromptchoice(ui, CURSES_INFO):
         return
 
     cw.c.setdefault('ui', {})
