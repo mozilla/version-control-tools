@@ -45,7 +45,7 @@ CLONEBUNDLES_ORDER = [
     ('zstd-max', 'BUNDLESPEC=zstd-v2'),
     ('zstd', 'BUNDLESPEC=zstd-v2'),
     ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
-    ('stream-v2', 'BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Cstore'),
+    ('stream-v2', 'BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore'),
 ]
 
 # Defines S3 hostname and bucket where uploads should go.
@@ -106,8 +106,8 @@ HTML_INDEX = '''
     </p>
     <p>
       <strong>
-        Mercurial 4.1 or newer is required to unbundle zstd.
-        Please use gzip or stream for older versions.
+        Mercurial 4.7 or newer is required for stream clone bundles
+        due to the sparserevlog requirement.
       </strong>
     </p>
     <p>
