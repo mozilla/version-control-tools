@@ -23,7 +23,7 @@ from mozhg.util import (
 )
 
 minimumhgversion = b'4.6'
-testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2'
+testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 
 
 @wireprotov1server.wireprotocommand(b'mozowner', b'', permission=b'pull')

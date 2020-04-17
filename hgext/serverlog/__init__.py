@@ -201,7 +201,7 @@ OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
     exec(f.read())
 
-testedwith = b'4.8 4.9 5.0 5.1 5.2'
+testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3'
 minimumhgversion = b'4.8'
 
 configtable = {}

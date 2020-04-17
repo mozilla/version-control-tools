@@ -28,7 +28,7 @@ configitem = registrar.configitem(configtable)
 configitem(b'push-to-try', b'nodate',
            default=False)
 
-testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2'
+testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 minimumhgversion = b'4.6'
 
 @command(b'push-to-try', [
