@@ -5,7 +5,7 @@
 boto3
 
 cbor2
-mercurial==5.2.1
+mercurial==5.3.2
 python-hglib
 requests
 tabulate

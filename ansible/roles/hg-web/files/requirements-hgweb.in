@@ -2,7 +2,8 @@
 --find-links /var/tmp/pip
 
 boto3
-cbor2
+# TODO determine why this can't be upgraded to 5.1.0
+cbor2==4.1.2
 ipaddress
-mercurial==5.2.1
+mercurial==5.3.2
 Pygments==2.1.3
