@@ -6,10 +6,6 @@ releases/mozilla-aurora
 releases/mozilla-beta
 releases/mozilla-esr68
 releases/mozilla-esr60
-releases/mozilla-esr52
-releases/mozilla-esr45
-releases/mozilla-esr38
-releases/mozilla-esr31
 mozilla-unified zstd_max
 build/tools
 build/mozharness
