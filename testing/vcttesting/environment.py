@@ -112,8 +112,9 @@ def install_editable(venv, relpath, extra_env=None):
 def install_mercurials(venv, hg='hg', py3=False):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
-        '5.2',
-        '5.3',
+        '5.2.2',
+        '5.3.2',
+        '5.4rc0',
         '@',
     ]
 
