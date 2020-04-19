@@ -2,7 +2,6 @@ mozilla-central zstd_max
 integration/autoland
 integration/mozilla-inbound
 releases/mozilla-release
-releases/mozilla-aurora
 releases/mozilla-beta
 releases/mozilla-esr68
 releases/mozilla-esr60
