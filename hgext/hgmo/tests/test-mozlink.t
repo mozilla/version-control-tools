@@ -23,6 +23,8 @@
   > 
   > foo 123456 whitespace!
   > 
+  > Bug 1630574 [wpt PR 22998]
+  > 
   > Differential Revision: https://phabricator.services.mozilla.com/D123
   > EOF
 
@@ -35,13 +37,15 @@
   
   Aug 2008
   
-  <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=12345">b=#12345</a>
+  b=#12345
   
   GECKO_191a2_20080815_RELBRANCH
   
-  <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=12345">12345</a> is a bug
+  12345 is a bug
   
-  foo <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=123456">123456</a> whitespace!
+  foo 123456 whitespace!
+  
+  <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1630574">Bug 1630574</a> [wpt PR 22998]
   
   Differential Revision: <a href="https://phabricator.services.mozilla.com/D123">https://phabricator.services.mozilla.com/D123</a>
 

@@ -352,7 +352,6 @@ def add_hyperlinks(s,
     # Look for annotations saying this commit originally came from elsewhere.
     # If these are present, we are less aggressive about e.g. linking numbers
     # to Bugzilla bugs.
-    source_repo = None
     github_repo = None
 
     m = RE_SOURCE_REPO.search(s)
@@ -391,9 +390,8 @@ def add_hyperlinks(s,
         s = re.sub(br'#(\d+)', repl, s)
 
     # Bugzilla linking.
-    bugzilla_re = BUG_CONSERVATIVE_RE if github_repo else BUG_RE
     bugzilla_link = br'<a href="%s\2">\1</a>' % bugzilla_url
-    s = bugzilla_re.sub(bugzilla_link, s)
+    s = BUG_CONSERVATIVE_RE.sub(bugzilla_link, s)
 
     # l10n cross channel linking
     s = RE_XCHANNEL_REVISION.sub(xchannel_link, s)
