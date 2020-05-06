@@ -156,7 +156,7 @@ Mercurial can leverage "watchman" to make many operations
 recommends installing "watchman" when working with the Firefox
 repository.
 
-Please see https://facebook.github.io/watchman/docs/install.html
+Please see https://facebook.github.io/watchman/docs/install/
 for instructions on installing watchman. Please ensure `watchman`
 is available on PATH (you should be able to run `watchman` from
 your shell).
