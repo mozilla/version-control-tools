@@ -14,9 +14,6 @@ hgmoenv() {
   export DOCKER_STATE_FILE=`pwd`/.dockerstate
 
   hgmo start --master-ssh-port $HGPORT > /dev/null
-  if [ $? -ne 0 ]; then
-    exit 80
-  fi
   $(hgmo shellinit)
 
   cat > ssh-known-hosts << EOF
