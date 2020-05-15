@@ -26,9 +26,6 @@ HGHAVE_PY = os.path.join(REPO_ROOT, 'pylib', 'mercurial-support', 'hghave.py')
 with open(HGHAVE_PY) as f:
     exec(f.read())
 
-# Need to supplement sys.path because PYTHONPATH isn't set properly
-# from the context of run-tests.py. This is very hacky.
-sys.path.insert(0, os.path.join(REPO_ROOT, 'testing'))
 
 def have_docker_images(images):
     # These environment variables are exported by run-tests. If they aren't
@@ -42,7 +39,7 @@ def have_docker_images(images):
 
 
 # Define custom checks for our environment.
-@check(b'docker', b'We can talk to Docker')
+@check('docker', 'We can talk to Docker')
 def has_docker():
     if 'SKIP_DOCKER_TESTS' in os.environ:
         return False
@@ -57,7 +54,7 @@ def has_docker():
     return d.is_alive()
 
 
-@check(b'hgmodocker', b'Require hgmo Docker pieces')
+@check('hgmodocker', 'Require hgmo Docker pieces')
 def has_hgmodocker():
     images = (
         'ldap',
@@ -67,12 +64,12 @@ def has_hgmodocker():
     )
     return has_docker() and have_docker_images(images)
 
-@check(b'eslint', b'Require eslint')
+@check('eslint', 'Require eslint')
 def has_eslint():
     from distutils.spawn import find_executable
     return find_executable('eslint') is not None
 
-@check(b'vcsreplicator', b'vcsreplicator Python modules')
+@check('vcsreplicator', 'vcsreplicator Python modules')
 def has_vcsreplicator():
     try:
         from vcsreplicator.config import Config
@@ -80,13 +77,13 @@ def has_vcsreplicator():
     except ImportError:
         return False
 
-@check(b'watchman', b'Require watchman')
+@check('watchman', 'Require watchman')
 def has_watchman():
     from distutils.spawn import find_executable
     return find_executable('watchman') is not None
 
 
-@check(b'internet', b'Require internet connectivity')
+@check('internet', 'Require internet connectivity')
 def has_internet():
     try:
         import socket
@@ -98,7 +95,7 @@ def has_internet():
         return False
 
 
-@check(b'motoserver', b'moto AWS mock server')
+@check('motoserver', 'moto AWS mock server')
 def has_s3():
     '''Assert the boto3 mock library `moto` is available,
     as well as the `Flask` dependency which enables running

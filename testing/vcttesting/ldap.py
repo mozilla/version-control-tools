@@ -33,8 +33,12 @@ class LDAP(object):
 
         dn = 'mail=%s,o=com,dc=mozilla' % email
 
+        username = username.encode('utf-8')
+        fullname = fullname.encode('utf-8')
+        bugzilla_email = bugzilla_email.encode('utf-8')
+
         r = [
-            (b'objectClass', [
+            ('objectClass', [
                 b'inetOrgPerson',
                 b'organizationalPerson',
                 b'person',
@@ -42,23 +46,23 @@ class LDAP(object):
                 b'bugzillaAccount',
                 b'top',
             ]),
-            (b'cn', [fullname]),
-            (b'gidNumber', [b'100']),
-            (b'homeDirectory', [b'/home/%s' % username]),
-            (b'sn', [fullname.split()[-1]]),
-            (b'uid', [username]),
-            (b'uidNumber', [str(uid)]),
-            (b'bugzillaEmail', [bugzilla_email]),
+            ('cn', [fullname]),
+            ('gidNumber', [b'100']),
+            ('homeDirectory', [b'/home/%s' % username]),
+            ('sn', [fullname.split()[-1]]),
+            ('uid', [username]),
+            ('uidNumber', [str(uid).encode('utf-8')]),
+            ('bugzillaEmail', [bugzilla_email]),
         ]
 
         if hg_access:
             r[0][1].append(b'hgAccount')
             value = b'TRUE' if hg_enabled else b'FALSE'
             r.extend([
-                (b'fakeHome', [b'/tmp']),
-                (b'hgAccountEnabled', [value]),
-                (b'hgHome', [b'/tmp']),
-                (b'hgShell', [b'/bin/sh']),
+                ('fakeHome', [b'/tmp']),
+                ('hgAccountEnabled', [value]),
+                ('hgHome', [b'/tmp']),
+                ('hgShell', [b'/bin/sh']),
             ])
 
         self.c.add_s(dn, r)
@@ -130,7 +134,7 @@ class LDAP(object):
         dn = 'uid=vcs-sync,ou=logins,dc=mozilla'
 
         r = [
-            (b'objectClass', [
+            ('objectClass', [
                 b'account',
                 b'top',
                 b'uidObject',
@@ -139,16 +143,16 @@ class LDAP(object):
                 b'posixAccount',
                 b'ldapPublicKey',
             ]),
-            (b'cn', [b'VCS Sync']),
-            (b'fakeHome', [b'/tmp']),
-            (b'gidNumber', [b'100']),
-            (b'hgAccountEnabled', [b'TRUE']),
-            (b'hgHome', [b'/tmp']),
-            (b'hgShell', [b'/bin/sh']),
-            (b'homeDirectory', [b'/home/vcs-sync']),
-            (b'mail', [b'vcs-sync@mozilla.com']),
-            (b'uidNumber', [b'1500']),
-            (b'sshPublicKey', [pubkey]),
+            ('cn', [b'VCS Sync']),
+            ('fakeHome', [b'/tmp']),
+            ('gidNumber', [b'100']),
+            ('hgAccountEnabled', [b'TRUE']),
+            ('hgHome', [b'/tmp']),
+            ('hgShell', [b'/bin/sh']),
+            ('homeDirectory', [b'/home/vcs-sync']),
+            ('mail', [b'vcs-sync@mozilla.com']),
+            ('uidNumber', [b'1500']),
+            ('sshPublicKey', [pubkey.encode('utf-8')]),
         ]
 
         self.c.add_s(dn, r)
@@ -161,12 +165,12 @@ class LDAP(object):
 
         try:
             existing = self.c.search_s(dn, ldap.SCOPE_BASE)[0][1]
-            if b'ldapPublicKey' not in existing[b'objectClass']:
-                modlist.append((ldap.MOD_ADD, b'objectClass', b'ldapPublicKey'))
+            if b'ldapPublicKey' not in existing['objectClass']:
+                modlist.append((ldap.MOD_ADD, 'objectClass', b'ldapPublicKey'))
         except ldap.NO_SUCH_OBJECT:
             pass
 
-        modlist.append((ldap.MOD_ADD, b'sshPublicKey', key))
+        modlist.append((ldap.MOD_ADD, 'sshPublicKey', key))
 
         self.c.modify_s(dn, modlist)
 
@@ -178,13 +182,13 @@ class LDAP(object):
         """
         dn = 'mail=%s,o=com,dc=mozilla' % email
 
-        group_dn = 'cn=%s,ou=groups,dc=mozilla' % group
-        modlist = [(ldap.MOD_ADD, b'memberUid', email)]
+        group_dn = 'cn=%s,ou=groups,dc=mozilla' % group.decode('utf-8')
+        modlist = [(ldap.MOD_ADD, 'memberUid', email.encode('utf-8'))]
         self.c.modify_s(group_dn, modlist)
 
         # MoCo LDAP has an active_* for each scm_level_* group, which we need
         # to emulate here.
-        if group.startswith('scm_level_') or group == "scm_allow_direct_push":
-            group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group
-            modlist = [(ldap.MOD_ADD, b'member', str(dn))]
+        if group.startswith(b'scm_level_') or group == b"scm_allow_direct_push":
+            group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group.decode('utf-8')
+            modlist = [(ldap.MOD_ADD, 'member', dn.encode('utf-8'))]
             self.c.modify_s(group_dn, modlist)

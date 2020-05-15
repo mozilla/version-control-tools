@@ -213,7 +213,6 @@ def docker_compose_down_background(project_name, show_output=False):
         devnull = open(os.devnull, 'wb')
         kwargs['stderr'] = devnull
         kwargs['stdout'] = devnull
-
     return subprocess.Popen(docker_compose_down_command, **kwargs)
 
 

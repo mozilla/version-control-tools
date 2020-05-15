@@ -5,7 +5,7 @@
 # This script is used to manage Docker containers in the context of running
 # Mercurial tests.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 from collections import deque
 import docker
@@ -22,8 +22,13 @@ import sys
 import tarfile
 import tempfile
 import time
-import urlparse
 import warnings
+
+# TRACKING py3
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 import backports.lzma as lzma
 
@@ -169,8 +174,12 @@ class Docker(object):
         }
 
         if os.path.exists(state_path):
-            with open(state_path, 'rb') as fh:
-                self.state = json.load(fh)
+            try:
+                with open(state_path, 'r') as fh:
+                    self.state = json.load(fh)
+            except json.JSONDecodeError:
+                print("Couldn't load Docker state file at %s, ignoring;" % state_path,
+                      file=sys.stderr)
 
         keys = (
             'clobber-hgweb',
@@ -264,8 +273,12 @@ class Docker(object):
         env['HGRCPATH'] = '/dev/null'
         args = [hg_executable(), '-R', '.', 'locate']
         with open(os.devnull, 'wb') as null:
-            files = subprocess.check_output(
-                args, env=env, cwd=ROOT, stderr=null).splitlines()
+            files = (
+                subprocess.check_output(
+                    args, env=env, cwd=ROOT, stderr=null)
+                .decode('utf-8')
+                .splitlines()
+            )
 
         # Add untracked files from extra-files directory. This can be used
         # as a means to add files that aren't tracked by version control for
@@ -344,8 +357,10 @@ class Docker(object):
         instantly. Of course, this assumes: a) the Docker daemon and its stored
         images can be trusted b) content of URLs is constant.
         """
-        tag = '%s-%s' % (tagprefix,
-                         hashlib.sha256('%s%s' % (url, digest)).hexdigest())
+        hexdigest = hashlib.sha256(
+            b'%s%s' % (url.encode('ascii'), digest.encode('ascii'))
+        ).hexdigest()
+        tag = '%s-%s' % (tagprefix, hexdigest)
         for image in self._get_sorted_images():
             repotags = image['RepoTags'] or []
             for repotag in repotags:
@@ -423,7 +438,7 @@ class Docker(object):
 
         dockerfile_lines = []
         vct_paths = []
-        with open(os.path.join(p, 'Dockerfile'), 'rb') as fh:
+        with open(os.path.join(p, 'Dockerfile'), 'r') as fh:
             for line in fh:
                 line = line.rstrip()
                 if line.startswith('# %include'):
@@ -440,7 +455,7 @@ class Docker(object):
 
                     base_image = self.import_base_image(repository, tagprefix,
                                                         url, digest)
-                    line = b'FROM %s' % base_image.encode('ascii')
+                    line = 'FROM %s' % base_image
 
                 dockerfile_lines.append(line)
 
@@ -470,7 +485,7 @@ class Docker(object):
                 # We may modify the content of the Dockerfile. Grab it from
                 # memory.
                 if rel == 'Dockerfile':
-                    df = b'\n'.join(dockerfile_lines)
+                    df = '\n'.join(dockerfile_lines).encode('utf-8')
                     ti.size = len(df)
                     fh = BytesIO(df)
                     fh.seek(0)
@@ -908,7 +923,7 @@ class Docker(object):
         self.save_state()
 
     def save_state(self):
-        with open(self._state_path, 'wb') as fh:
+        with open(self._state_path, 'w') as fh:
             json.dump(self.state, fh, indent=4, sort_keys=True)
 
     def all_docker_images(self):
@@ -1021,7 +1036,7 @@ class Docker(object):
 
                 get_and_write_vct_node()
                 vct_paths = self._get_vct_files()
-                with tempfile.NamedTemporaryFile() as fh:
+                with tempfile.NamedTemporaryFile(mode='w+') as fh:
                     for f in sorted(vct_paths.keys()):
                         fh.write('%s\n' % f)
                     fh.write('.vctnode\n')
@@ -1053,7 +1068,9 @@ class Docker(object):
         try:
             yield
         finally:
-            map(docker_compose_down_background, map(normalize_testname, tests))
+            # Attempt to shut down any lingering clusters
+            for norm_test in map(normalize_testname, tests):
+                docker_compose_down_background(norm_test)
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
                 detach=False):
@@ -1065,7 +1082,11 @@ class Docker(object):
         docker-py 1.3.0.
         """
         r = self.api_client.exec_create(cid, cmd, stdout=stdout, stderr=stderr)
-        return self.api_client.exec_start(r['Id'], stream=stream, detach=detach)
+        return (
+            self.api_client
+            .exec_start(r['Id'], stream=stream, detach=detach)
+            .decode('utf-8')
+        )
 
     def get_file_content(self, cid, path):
         """Get the contents of a file from a container."""

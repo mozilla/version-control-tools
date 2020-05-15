@@ -120,7 +120,7 @@ class HgmoCommands(object):
     @CommandArgument('group',
                      help='Name of LDAP group to add user to')
     def add_user_to_group(self, email, group):
-        self.c.ldap.add_user_to_group(email, group)
+        self.c.ldap.add_user_to_group(email, group.encode('utf-8'))
 
     @Command('create-repo', category='hgmo',
              description='Create a repository in the cluster')
@@ -179,10 +179,10 @@ class HgmoCommands(object):
         state = self.c.get_state()
         priv, pub = self.c.get_mirror_ssh_keys(master_id=state['master_id'])[0:2]
 
-        with open(os.path.join(out_dir, 'mirror'), 'wb') as fh:
+        with open(os.path.join(out_dir, 'mirror'), 'w') as fh:
             fh.write(priv)
         os.chmod(os.path.join(out_dir, 'mirror'), stat.S_IRUSR | stat.S_IWUSR)
 
-        with open(os.path.join(out_dir, 'mirror.pub'), 'wb') as fh:
+        with open(os.path.join(out_dir, 'mirror.pub'), 'w') as fh:
             fh.write(pub)
         print('SSH keys written to %s' % out_dir)

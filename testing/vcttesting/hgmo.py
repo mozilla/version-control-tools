@@ -230,7 +230,9 @@ class HgCluster(object):
         if not all(len(state.attrs['NetworkSettings']['Networks']) == 1 for state in all_states.values()):
             raise Exception('Each container should only have one network attached')
 
-        network_name = cluster_containers['hgssh'].attrs['NetworkSettings']['Networks'].keys()[0]
+        network_name = list(
+            cluster_containers['hgssh'].attrs['NetworkSettings']['Networks'].keys()
+        )[0]
 
         master_id = cluster_containers['hgssh'].id
         web_ids = [state.id for state in web_states.values()]
@@ -279,7 +281,12 @@ class HgCluster(object):
         # Tell the master about all the mirrors.
         args = ['/set-mirrors.py']
         for ip, f_key in f_mirror_host_keys:
-            key = f_key.result().strip()
+            key = (
+                f_key
+                .result()
+                .decode('utf-8')
+                .strip()
+            )
             key = ' '.join(key.split()[0:2])
             args.extend([ip, key])
         self._d.execute(master_id, args)
@@ -377,10 +384,26 @@ class HgCluster(object):
             f_host_rsa_key = e.submit(self._d.get_file_content, master_id,
                                       '/etc/mercurial/ssh/ssh_host_rsa_key.pub')
 
-        host_ed25519_key = ' '.join(f_host_ed25519_key.result().split()[0:2])
-        host_rsa_key = ' '.join(f_host_rsa_key.result().split()[0:2])
+        host_ed25519_key = ' '.join(
+            f_host_ed25519_key
+            .result()
+            .decode('utf-8')
+            .split()[0:2]
+        )
+        host_rsa_key = ' '.join(
+            f_host_rsa_key
+            .result()
+            .decode('utf-8')
+            .split()[0:2]
+        )
 
-        return f_private_key.result(), f_public_key.result(), host_ed25519_key, host_rsa_key
+        return (
+            f_private_key.result().decode('utf-8'),
+            f_public_key.result().decode('utf-8'),
+            host_ed25519_key,
+            host_rsa_key,
+        )
+            
 
     def create_repo(self, name, group='scm_level_1'):
         """Create a repository on the cluster.
