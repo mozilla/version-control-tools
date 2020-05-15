@@ -44,16 +44,6 @@ if __name__ == '__main__':
         sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
         os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
 
-    venv_name = os.path.relpath(os.environ['VIRTUAL_ENV'],
-                                os.path.join(HERE, 'venv'))
-
-    if venv_name == '.':
-        venv_name = 'global'
-
-    if venv_name not in ('global', 'hgdev', 'vcssync', 'cross-channel-l10n'):
-        print('unknown virtualenv: %s (this should not happen)' % venv_name)
-        sys.exit(1)
-
     try:
         import vcttesting.docker as vctdocker
     except ImportError:
@@ -68,9 +58,6 @@ if __name__ == '__main__':
         produce_coverage_reports,
         remove_err_files,
     )
-
-    # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--with-hg')
@@ -155,7 +142,7 @@ if __name__ == '__main__':
         os.path.join(HERE, 'coverage', 'results.xml')])
 
     extensions = get_extensions()
-    test_files = get_test_files(extensions, venv_name)
+    test_files = get_test_files(extensions)
     extension_tests = test_files['extension']
     unit_tests = test_files['unit']
     hg_tests = test_files['hg']
@@ -270,7 +257,7 @@ if __name__ == '__main__':
             #
             # But only do this if a test we are running utilizes Docker.
             os.environ.update(
-                get_docker_state(docker, venv_name, run_all_tests,
+                get_docker_state(docker, run_all_tests,
                                  verbose=verbose,
                                  use_last=options.use_last_images))
 

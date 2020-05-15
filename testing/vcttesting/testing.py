@@ -148,7 +148,7 @@ def get_extensions():
     return extensions
 
 
-def get_test_files(extensions, venv):
+def get_test_files(extensions):
     """Resolves test files to run.
 
     ``extensions`` is the result of ``get_extensions()``. ``venv`` is the
@@ -182,18 +182,12 @@ def get_test_files(extensions, venv):
     """
     extension_tests = []
 
-    if venv in ('global', 'hgdev'):
-        for e in extensions:
-            extension_tests.extend(e['tests'])
+    for e in extensions:
+        extension_tests.extend(e['tests'])
 
     hg_tests = []
     unit_tests = []
     for base, settings in sorted(UNIT_TEST_DIRS.items()):
-        # Only add tests from path if marked as compatible with the
-        # current virtualenv.
-        if venv not in settings['venvs']:
-            continue
-
         base = os.path.join(ROOT, base)
         for root, dirs, files in os.walk(base):
             relative = root[len(ROOT) + 1:]
@@ -255,7 +249,7 @@ def docker_requirements(tests):
     return res
 
 
-def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
+def get_docker_state(docker, tests, verbose=False, use_last=False):
     """Obtain usable Docker images, possibly by building them.
 
     Given a Docker client, name of virtualenv, and list of .t test paths,
@@ -269,10 +263,6 @@ def get_docker_state(docker, venv_name, tests, verbose=False, use_last=False):
     Only Docker images "allowed" by the specified virtualenv will be built.
     Not all virtualenvs support all Docker images.
     """
-
-    if venv_name == 'hgdev':
-        return {}
-
     requirements = docker_requirements(tests)
 
     env = {}
