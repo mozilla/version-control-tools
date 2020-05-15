@@ -1306,7 +1306,10 @@ class Test(unittest.TestCase):
     # Tracking MOZ - add _localhostnames for cross-platform compat
     def _localhostnames(self):
         hostname, aliaslist, _ = socket.gethostbyaddr(self._localip())
-        return [b'%s' % hostname] + [b'%s' % alias for alias in aliaslist]
+        return [
+            bytes(alias.encode('utf-8'))
+            for alias in [hostname] + aliaslist
+        ]
 
     def _genrestoreenv(self, testenv):
         """Generate a script that can be used by tests to restore the original
@@ -1663,10 +1666,18 @@ class TTest(Test):
             return self._have.get(allreqs)
 
         # TRACKING MOZ
+        # use custom hghave and use instead of tdir
         hghave_path = os.path.join(REPO_ROOT, 'testing', 'hghave.py')
-        proc = Popen4(b'%s -c "%s %s"' %
-                      (self._shell, hghave_path, allreqs),
-                      self._testtmp, 0, self._getenv())
+
+        # TODO do something smarter when all other uses of hghave are gone.
+        runtestdir = osenvironb[b'RUNTESTDIR']
+        tdir = runtestdir.replace(b'\\', b'/')
+        proc = Popen4(
+            b'%s -c "%s %s"' % (self._shell, hghave_path.encode('utf-8'), allreqs),
+            self._testtmp,
+            0,
+            self._getenv(),
+        )
         stdout, stderr = proc.communicate()
         ret = proc.wait()
         if wifexited(ret):
@@ -3398,18 +3409,23 @@ class TestRunner(object):
 
         # TRACKING MOZ
         # self._outputdir -> errdir
-        t = testcls(refpath, errdir, tmpdir,
-                    keeptmpdir=self.options.keep_tmpdir,
-                    debug=self.options.debug,
-                    first=self.options.first,
-                    timeout=self.options.timeout,
-                    startport=self._getport(count),
-                    extraconfigopts=self.options.extra_config_opt,
-                    py3warnings=self.options.py3_warnings,
-                    shell=self.options.shell,
-                    hgcommand=self._hgcommand,
-                    usechg=bool(self.options.with_chg or self.options.chg),
-                    useipv6=useipv6, **kwds)
+        t = testcls(
+            refpath,
+            errdir,
+            tmpdir,
+            keeptmpdir=self.options.keep_tmpdir,
+            debug=self.options.debug,
+            first=self.options.first,
+            timeout=self.options.timeout,
+            startport=self._getport(count),
+            extraconfigopts=self.options.extra_config_opt,
+            py3warnings=self.options.py3_warnings,
+            shell=self.options.shell,
+            hgcommand=self._hgcommand,
+            usechg=bool(self.options.with_chg or self.options.chg),
+            useipv6=useipv6,
+            **kwds
+        )
         t.should_reload = True
         return t
 
@@ -3427,41 +3443,47 @@ class TestRunner(object):
                 pass
 
     def _usecorrectpython(self):
-        """Configure the environment to use the appropriate Python in tests."""
-        # Tests must use the same interpreter as us or bad things will happen.
-        pyexename = sys.platform == 'win32' and b'python.exe' or b'python'
+        # TRACKING MOZ - use the Python already on $PATH
+        pass
+        #"""Configure the environment to use the appropriate Python in tests."""
+        ## Tests must use the same interpreter as us or bad things will happen.
+        #pyexename = sys.platform == 'win32' and b'python.exe' or b'python'
 
-        # os.symlink() is a thing with py3 on Windows, but it requires
-        # Administrator rights.
-        if getattr(os, 'symlink', None) and os.name != 'nt':
-            vlog("# Making python executable in test path a symlink to '%s'" %
-                 sysexecutable)
-            mypython = os.path.join(self._tmpbindir, pyexename)
-            try:
-                if os.readlink(mypython) == sysexecutable:
-                    return
-                os.unlink(mypython)
-            except OSError as err:
-                if err.errno != errno.ENOENT:
-                    raise
-            if self._findprogram(pyexename) != sysexecutable:
-                try:
-                    os.symlink(sysexecutable, mypython)
-                    self._createdfiles.append(mypython)
-                except OSError as err:
-                    # child processes may race, which is harmless
-                    if err.errno != errno.EEXIST:
-                        raise
-        else:
-            exedir, exename = os.path.split(sysexecutable)
-            vlog("# Modifying search path to find %s as %s in '%s'" %
-                 (exename, pyexename, exedir))
-            path = os.environ['PATH'].split(os.pathsep)
-            while exedir in path:
-                path.remove(exedir)
-            os.environ['PATH'] = os.pathsep.join([exedir] + path)
-            if not self._findprogram(pyexename):
-                print("WARNING: Cannot find %s in search path" % pyexename)
+        ## os.symlink() is a thing with py3 on Windows, but it requires
+        ## Administrator rights.
+        #if getattr(os, 'symlink', None) and os.name != 'nt':
+        #    vlog(
+        #        "# Making python executable in test path a symlink to '%s'"
+        #        % sysexecutable
+        #    )
+        #    mypython = os.path.join(self._tmpbindir, pyexename)
+        #    try:
+        #        if os.readlink(mypython) == sysexecutable:
+        #            return
+        #        os.unlink(mypython)
+        #    except OSError as err:
+        #        if err.errno != errno.ENOENT:
+        #            raise
+        #    if self._findprogram(pyexename) != sysexecutable:
+        #        try:
+        #            os.symlink(sysexecutable, mypython)
+        #            self._createdfiles.append(mypython)
+        #        except OSError as err:
+        #            # child processes may race, which is harmless
+        #            if err.errno != errno.EEXIST:
+        #                raise
+        #else:
+        #    exedir, exename = os.path.split(sysexecutable)
+        #    vlog(
+        #        "# Modifying search path to find %s as %s in '%s'"
+        #        % (exename, pyexename, exedir)
+        #    )
+        #    path = os.environ['PATH'].split(os.pathsep)
+        #    while exedir in path:
+        #        path.remove(exedir)
+        #    os.environ['PATH'] = os.pathsep.join([exedir] + path)
+        #    if not self._findprogram(pyexename):
+        #        print("WARNING: Cannot find %s in search path" % pyexename)
 
     def _installhg(self):
         """Install hg into the test environment.
