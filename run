@@ -8,14 +8,62 @@
 # be done inside the container in a proper command line application
 # rather than this script.
 
+import getpass
+import grp
 import os
+import pwd
 import sys
 
 
+ENV_FILE_TEMPLATE = """
+UID={uid}
+GID={gid}
+DOCKER_GID={docker_gid}
+""".strip()
+
+
+def get_user_uid_gid(user: str) -> (int, int):
+    """Get the uid and gid for the specified user.
+    """
+    try:
+        pw_entry = pwd.getpwnam(user)
+
+        return pw_entry.pw_uid, pw_entry.pw_gid
+    except KeyError:
+        sys.exit(f"Couldn't find user `{user}`")
+
+
+def get_gid(group: str) -> int:
+    """Get the gid for the specified group.
+    """
+    try:
+        return grp.getgrnam(group).gr_gid
+    except KeyError:
+        sys.exit(f"Couldn't find group `{group}`")
+
+
+def env_cmd():
+    user = getpass.getuser()
+
+    uid, gid = get_user_uid_gid(user)
+    docker_gid = get_gid("docker")
+
+    env_content = ENV_FILE_TEMPLATE.format(
+        uid=uid,
+        gid=gid,
+        docker_gid=docker_gid,
+    )
+
+    print(env_content)
+    return 0
+
+
 COMMANDS = {
+    "env": env_cmd,
     "tests": ("docker-compose", "run", "--rm", "test-runner", "/vct/run-tests"),
     "shell": ("docker-compose", "run", "--rm", "test-runner", "/bin/bash"),
 }
+
 
 def main(args):
     if not args or args[0] not in COMMANDS:
@@ -27,6 +75,10 @@ def main(args):
         return 1
 
     cmd = COMMANDS[args[0]]
+    
+    if callable(cmd):
+        return cmd()
+    
     cmd = list(cmd) + args[1:]
 
     print("$ {}".format(" ".join(cmd)))

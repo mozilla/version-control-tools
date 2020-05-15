@@ -8,11 +8,8 @@
 #     GID=<gid-of-your-host-machine-user>
 #     DOCKER_GID=<gid-of-the-host-machine-docker-group>
 #
-# The values for UID, GID, and DOCKER_GID can be found using the
-# following respectively.
-#     $ id -u <username>
-#     $ id -g <username>
-#     $ echo "Group docker with GID="$(cut -d: -f3 < <(getent group docker))""
+# To create the `.env` file, you can run:
+# `$ ./run env > .env`
 #
 # Here is an example of my `.env` file at time of writing:
 #     UID=1000
