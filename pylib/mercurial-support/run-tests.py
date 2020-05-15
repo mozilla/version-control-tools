@@ -1673,7 +1673,7 @@ class TTest(Test):
         runtestdir = osenvironb[b'RUNTESTDIR']
         tdir = runtestdir.replace(b'\\', b'/')
         proc = Popen4(
-            b'%s -c "%s %s"' % (self._shell, hghave_path.encode('utf-8'), allreqs),
+            b'%s %s' % (hghave_path.encode('utf-8'), allreqs),
             self._testtmp,
             0,
             self._getenv(),

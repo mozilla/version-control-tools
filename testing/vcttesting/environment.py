@@ -127,7 +127,7 @@ def install_mercurials(venv, hg='hg', py3=False):
             '5.1.2',
         ])
 
-    hg_dir = os.path.join(ROOT, 'venv', 'hg')
+    hg_dir = os.path.join("/app", "venv", "hg")
     mercurials = os.path.join(venv['path'], 'mercurials')
 
     # Setting HGRCPATH to an empty value stops the global and user hgrc from
@@ -352,8 +352,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     venv = {
-        'path': os.path.join(ROOT, 'venv'),
-        'python': os.path.join(ROOT, 'venv', 'bin', 'python'),
+        'path': os.path.join('/app', 'venv'),
+        'python': os.path.join('/app', 'venv', 'bin', 'python'),
     }
 
     py3 = sys.argv[2] == '3'

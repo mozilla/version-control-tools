@@ -28,7 +28,7 @@ def try_find_hg(with_hg):
     Args:
       with_hg (str): a Mercurial version string. Example: `5.3.2`
     """
-    hg = os.path.join(HERE, 'venv', 'mercurials', with_hg, 'bin', 'hg')
+    hg = os.path.join('/app', 'venv', 'mercurials', with_hg, 'bin', 'hg')
 
     if not os.path.exists(hg):
         raise ValueError("Couldn't find hg version {} at a known path".format(with_hg))

@@ -22,9 +22,6 @@ def main(args):
     return m.run(args)
 
 if __name__ == '__main__':
-    # Unbuffer stdout.
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-
     if 'VIRTUAL_ENV' not in os.environ:
         activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
         with open(activate) as f:

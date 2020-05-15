@@ -3,7 +3,7 @@
   $ cat >> $HGRCPATH << EOF
   > [extensions]
   > hgmo = $TESTDIR/hgext/hgmo
-  > cinnabarclone = $TESTDIR/venv/git-cinnabar/mercurial/cinnabarclone.py
+  > cinnabarclone = /app/venv/git-cinnabar/mercurial/cinnabarclone.py
   > EOF
 
   $ startserver

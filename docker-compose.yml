@@ -32,6 +32,27 @@
 
 version: '3'
 services:
+  test-runner-py2:
+    build:
+      context: ./
+      dockerfile: ./testing/docker/test-runner-py2/Dockerfile
+      args:
+        USER_ID: ${UID}
+        GROUP_ID: ${GID}
+        DOCKER_GID: ${DOCKER_GID}
+    image: vct-test-runner-py2:built
+    command: ["/app/vct/run-tests", "--no-docker"]
+    network_mode: "host"
+    user: vct
+    environment:
+      - PYTHONUNBUFFERED=1
+      - USER=vct
+    volumes:
+      - ./:/app/vct
+      - test_runner_venv_py2:/app/venv
+      - test_runner_cache_py2:/app/vct/.cache
+      - /var/run/docker.sock:/var/run/docker.sock
+
   test-runner:
     build:
       context: ./
@@ -41,18 +62,21 @@ services:
         GROUP_ID: ${GID}
         DOCKER_GID: ${DOCKER_GID}
     image: vct-test-runner:built
-    command: ["/vct/run-tests", "--no-docker"]
+    command: ["/app/vct/run-tests", "--no-docker"]
     network_mode: "host"
     user: vct
     environment:
-      - NO_DOCKER=1
+      - PYTHONUNBUFFERED=1
       - USER=vct
     volumes:
-      - ./:/vct
-      - test_runner_venv:/vct/venv
-      - test_runner_cache:/vct/.cache
+      - ./:/app/vct
+      - test_runner_venv:/app/venv
+      - test_runner_cache:/app/vct/.cache
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
+  test_runner_venv_py2:
   test_runner_venv:
+  test_runner_cache_py2:
   test_runner_cache:
+

@@ -11,11 +11,8 @@ RUN apt-get update && apt-get install -yq \
     libldap2-dev \
     libsasl2-dev \
     libssl-dev \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    python3-wheel \
+    python \
+    python-dev \
     rsync \
     sqlite3
 
@@ -37,24 +34,21 @@ RUN addgroup --gid ${GROUP_ID} vct \
 RUN mkdir /app
 RUN chown -R vct:vct /app
 
+# Add the scripts we need to create our venv
+ADD ./scripts/download-verify /app/vct/scripts/download-verify
+ADD ./testing/create-virtualenv /app/vct/testing/create-virtualenv
 
-# For testing older versions of Mercurial against Python 3
-# TODO remove once Mercurial 5.1 is not supported
-ENV HGPYTHON3=1
-
-# Create Python 3 venv
-# Set `VIRTUAL_ENV` and `PATH` to replicate `source venv/bin/activate`
-# Install `wheel` since it seems to be missing
+# Create Python 2 venv
+# Set VIRTUAL_ENV and PATH to replicate `source venv/bin/activate`
 ENV VIRTUAL_ENV=/app/venv
-RUN python3 -m venv $VIRTUAL_ENV
+RUN VENV=$VIRTUAL_ENV \
+    PYTHON_VERSION=python2.7 \
+    ROOT=/app/vct \
+    /app/vct/testing/create-virtualenv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN pip install wheel
-
 
 # Install requirements for testing
-# Use /app as the workdir to the installed .egg-info
-# isn't mounted over by docker-compose
-ADD test-requirements-3.txt /requirements.txt
+ADD test-requirements.txt /requirements.txt
 WORKDIR /app
 RUN pip install \
     --upgrade \
@@ -62,11 +56,19 @@ RUN pip install \
     --require-hashes \
     -r /requirements.txt
 
-
-ADD ./ /app/vct/
+ADD ./ /app/vct
 RUN chown -R vct:vct /app
 
 USER vct
+
+# clone and install cinnabar into the venv
+RUN git clone \
+    --branch release \
+    https://github.com/glandium/git-cinnabar.git $VIRTUAL_ENV/git-cinnabar
+WORKDIR $VIRTUAL_ENV/git-cinnabar
+RUN make -j4 helper NO_OPENSSL=1 NO_GETTEXT=1
+
+WORKDIR /app
 
 # Install editable requirements py2/py3
 RUN pip install -e vct/pylib/Bugsy
@@ -79,18 +81,8 @@ RUN pip install -e vct/pylib/vcsreplicator
 RUN pip install -e vct/hghooks
 RUN pip install -e vct/testing
 
-# clone and install cinnabar
-RUN git clone \
-    --branch release \
-    https://github.com/glandium/git-cinnabar.git /app/venv/git-cinnabar
-WORKDIR /app/venv/git-cinnabar
-RUN make -j4 helper NO_OPENSSL=1 NO_GETTEXT=1
+# Install Mercurials
+RUN python -m vcttesting.environment install-mercurials 2
 
 WORKDIR /app/vct
-
-# Install Mercurials
-RUN python -m vcttesting.environment install-mercurials 3
-
-VOLUME /app/vct
-
 CMD ["sh"]
