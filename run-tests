@@ -313,7 +313,7 @@ if __name__ == '__main__':
 
         if have_docker and run_unit_tests_docker:
             print('Running Docker unit tests')
-            with docker.auto_clean_orphans():
+            with docker.auto_clean_orphans(run_unit_tests_docker):
                 nose_res2 = run_nose_tests(run_unit_tests_docker, docker_jobs,
                                            verbose=verbose)
             if nose_res2:
@@ -389,7 +389,7 @@ if __name__ == '__main__':
 
             if have_docker and tests_docker:
                 print('Running Docker Mercurial tests')
-                with docker.auto_clean_orphans():
+                with docker.auto_clean_orphans(tests_docker):
                     args = common_args + ['-j', str(docker_jobs)] + tests_docker
                     subprocess.call(args, cwd=HERE)
                 sys.stdout.flush()
