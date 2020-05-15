@@ -187,3 +187,8 @@ State of repo on pulling users machine.
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     initial
   
+
+Cleanup
+
+  $ hgmo clean
+

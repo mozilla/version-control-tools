@@ -195,3 +195,8 @@ Output can be formatted as JSON
     "unfiltered_heads": "e5e0d912bf64df57c6ae45158322023f7a929afa10409041f457d7b90e971d4c"
    }
   ]
+
+Cleanup
+
+  $ hgmo clean
+
