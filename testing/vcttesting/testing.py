@@ -136,11 +136,11 @@ def get_extensions():
                 lines = fh.readlines()
 
             for line in lines:
-                if not line.startswith('testedwith'):
+                if not line.startswith(b'testedwith'):
                     continue
 
-                v, value = line.split('=', 1)
-                value = value.strip().strip("'").strip('"').strip()
+                v, value = line.split(b'=', 1)
+                value = value.strip().strip(b"'").strip(b'"').strip()
                 e['testedwith'] = set(value.split())
 
         extensions.append(e)

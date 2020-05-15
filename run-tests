@@ -85,6 +85,7 @@ if __name__ == '__main__':
     options, extra = parser.parse_known_args(sys.argv)
 
     if not vctdocker:
+        print('vctdocker libraries not found; deactivating Docker tests')
         options.no_docker = True
 
     # This is somewhat arbitrary. It makes version management logic a bit

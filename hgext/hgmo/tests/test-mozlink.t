@@ -77,8 +77,8 @@ static analysis check that "mozlink" comes before "firstline".
   >     path = path.rstrip()
   >     lines = open(path, 'rb').readlines()
   >     for i, line in enumerate(lines):
-  >         if 'mozlink' in line and 'firstline' in line:
-  >             if line.index('firstline') < line.index('mozlink'):
+  >         if b'mozlink' in line and b'firstline' in line:
+  >             if line.index(b'firstline') < line.index(b'mozlink'):
   >                 relpath = os.path.relpath(path, os.environ['TESTDIR'])
   >                 print('%s:%d has firstline before mozlink' % (relpath, i + 1))
   > EOF
