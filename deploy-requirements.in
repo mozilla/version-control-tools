@@ -3,5 +3,5 @@
 -r ansible/files/requirements-ansible.in
 
 boto3
-mach==0.5.1
+mach==1.0.0
 mercurial==5.0.1

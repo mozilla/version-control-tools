@@ -19,6 +19,9 @@ flake8
 # Used by ansible plugin.
 lockfile
 
+# Used by a few tests
+mock
+
 # Used by docker.py.
 mechanize
 
