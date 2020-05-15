@@ -182,7 +182,10 @@ if __name__ == '__main__':
         try:
             hg = try_find_hg(options.with_hg)
         except ValueError:
-            sys.exit("{} is not a Mercurial version number or path to `hg`".format(with_hg))
+            sys.exit(
+                "{} is not a Mercurial version number or path to `hg`"
+                .format(options.with_hg)
+            )
         
         hg_harness_args.extend((['--with-hg', hg]))
     elif options.with_hg:
