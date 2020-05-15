@@ -21,6 +21,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
 
 
+def try_find_hg(with_hg):
+    """Attempt to find `with_hg` in the known install directory for Mercurial
+    versions.
+
+    Args:
+      with_hg (str): a Mercurial version string. Example: `5.3.2`
+    """
+    hg = os.path.join(HERE, 'venv', 'mercurials', with_hg, 'bin', 'hg')
+
+    if not os.path.exists(hg):
+        raise ValueError("Couldn't find hg version {} at a known path".format(with_hg))
+    
+    return hg
+
+
 if __name__ == '__main__':
     if 'VIRTUAL_ENV' not in os.environ:
         activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
@@ -135,12 +150,6 @@ if __name__ == '__main__':
 
     orig_args = list(hg_harness_args)
 
-    # Explicitly use our own HG from the virtualenv so other installs
-    # on the system don't interfere.
-    if not options.with_hg:
-        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
-        hg_harness_args.extend(['--with-hg', hg])
-
     # Always produce an XUnit result file.
     hg_harness_args.extend(['--xunit',
         os.path.join(HERE, 'coverage', 'results.xml')])
@@ -175,10 +184,20 @@ if __name__ == '__main__':
 
             continue
 
-    # Our custom HGHAVE introduces a check for running Mercurial version.
-    # This is done by consulting a HGVERSION environment variable.
-    hg = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'hg')
-    if options.with_hg:
+    # Explicitly use our own HG from the virtualenv so other installs
+    # on the system don't interfere.
+    if not options.with_hg:
+        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
+        hg_harness_args.extend(['--with-hg', hg])
+    elif options.with_hg and not os.path.exists(options.with_hg):
+        # Try and parse the Mercurial version as a convenience string
+        try:
+            hg = try_find_hg(options.with_hg)
+        except ValueError:
+            sys.exit("{} is not a Mercurial version number or path to `hg`".format(with_hg))
+        
+        hg_harness_args.extend((['--with-hg', hg]))
+    elif options.with_hg:
         hg = options.with_hg
     hgversion, pyversion = get_hg_version(hg)
     if hgversion is None:
