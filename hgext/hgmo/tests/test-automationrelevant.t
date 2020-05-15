@@ -129,7 +129,7 @@ web command for exposing automation relevance works
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "changesets": [
           {

@@ -99,7 +99,7 @@ Unless --hidden is used
   $ http http://localhost:$HGPORT/json-automationrelevance/3208166ea109 --no-headers --body-file body
   200
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "changesets": [
           {

@@ -42,7 +42,7 @@ json-info requires a rev argument
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "error": "missing parameter 'node'"
   }
@@ -53,7 +53,7 @@ A regular commit
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "96ee1d7354c4": {
           "branch": "default",
@@ -83,7 +83,7 @@ A commit with a tag
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "761494ef3bb1": {
           "branch": "default",
@@ -113,7 +113,7 @@ A commit on a branch
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "2ea2f52a79ba": {
           "branch": "new_branch",
@@ -141,7 +141,7 @@ Multiple nodes
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "2ea2f52a79ba": {
           "branch": "new_branch",

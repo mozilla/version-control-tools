@@ -4,7 +4,7 @@
   $ http "http://localhost:$HGPORT/json-repoinfo" --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "group_owner": "*" (glob)
   }

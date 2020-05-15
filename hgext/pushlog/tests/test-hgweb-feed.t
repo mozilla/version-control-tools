@@ -18,7 +18,7 @@ Get all JSON data
   content-type: application/json
 
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -283,7 +283,7 @@ Get all JSON data with details
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -1294,7 +1294,7 @@ Query with fromchange and an endID
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "13": {
           "changesets": [
@@ -1329,7 +1329,7 @@ Query with a startID and tochange
   content-type: application/json
 
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "10": {
           "changesets": [
@@ -1349,7 +1349,7 @@ Query for two changesets at once
   content-type: application/json
 
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "16": {
           "changesets": [
@@ -1387,7 +1387,7 @@ Test paging
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "lastpushid": 32,
       "pushes": {
@@ -1477,7 +1477,7 @@ Test paging
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "lastpushid": 32,
       "pushes": {
@@ -1570,7 +1570,7 @@ Format version 1 works
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "19": {
           "changesets": [
@@ -1600,7 +1600,7 @@ Format version 2 has pushes in a child object and a last push id
   200
   content-type: application/json
 
-  $ python -m json.tool  body
+  $ ppjson  body
   {
       "lastpushid": 32,
       "pushes": {
@@ -1622,7 +1622,7 @@ Query with a startID and an enddate
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "2": {
           "changesets": [
@@ -1656,7 +1656,7 @@ Query with a startdate and an endID
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -1690,7 +1690,7 @@ Query with fromchange and an enddate
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "2": {
           "changesets": [
@@ -1725,7 +1725,7 @@ Query with a startdate and tochange
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -1753,7 +1753,7 @@ Test that we can parse partial dates, missing seconds
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -1797,7 +1797,7 @@ Test that we can parse partial dates, missing seconds and minutes
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -1842,7 +1842,7 @@ Test that we can parse partial dates, missing seconds, minutes and hours
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [

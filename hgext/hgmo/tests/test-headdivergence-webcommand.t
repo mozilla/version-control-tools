@@ -40,7 +40,7 @@ Ask for changes since initial and no files
   $ http http://localhost:$HGPORT/json-headdivergence/?node=55482a6fb4b1 --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "commitsbehind": 3,
       "filemerges": {},
@@ -52,7 +52,7 @@ Ask for changes since initial and relevant to file1
   $ http "http://localhost:$HGPORT/json-headdivergence/?node=55482a6fb4b1&p=file1" --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "commitsbehind": 3,
       "filemerges": {
@@ -69,7 +69,7 @@ Ask for changes relevant to multiple files
   $ http "http://localhost:$HGPORT/json-headdivergence/?node=55482a6fb4b1&p=file1&p=file3" --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "commitsbehind": 3,
       "filemerges": {
@@ -107,7 +107,7 @@ that head
   $ http "http://localhost:$HGPORT/json-headdivergence/?node=55482a6fb4b1&p=file1" --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "commitsbehind": 1,
       "filemerges": {
@@ -132,7 +132,7 @@ Verify headdivergencemaxnodes limit works
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "commitsbehind": 2,
       "filemerges": {},

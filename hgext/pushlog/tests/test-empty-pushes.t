@@ -36,7 +36,7 @@ JSON output should render empty changeset array
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "1": {
           "changesets": [
@@ -60,7 +60,7 @@ Full output should do the same
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "1": {
           "changesets": [

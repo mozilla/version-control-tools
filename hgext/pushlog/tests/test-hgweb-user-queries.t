@@ -6,7 +6,7 @@ Query for an individual user's pushes
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -109,7 +109,7 @@ Query for an individual user's pushes
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "12": {
           "changesets": [
@@ -199,7 +199,7 @@ Query for two users' pushes
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -383,7 +383,7 @@ Querying for all users' pushes + a startID should be equivalent to just querying
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "21": {
           "changesets": [
@@ -487,7 +487,7 @@ Querying for all users' pushes + a startID should be equivalent to just querying
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "21": {
           "changesets": [
@@ -592,7 +592,7 @@ Query for a user and a startdate
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "11": {
           "changesets": [
@@ -681,7 +681,7 @@ Query for a user with a startdate and an enddate
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "1": {
           "changesets": [
@@ -709,7 +709,7 @@ as only one changeset was pushed by this user
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "14": {
           "changesets": [
@@ -726,7 +726,7 @@ as only one changeset was pushed by this user
   200
   content-type: application/json
 
-  $ python -m json.tool body
+  $ ppjson body
   {
       "14": {
           "changesets": [

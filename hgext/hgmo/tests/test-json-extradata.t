@@ -46,7 +46,7 @@ Check the last changeset
   200
   content-type: application/json
 
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "backedoutby": "",
       "bookmarks": [],

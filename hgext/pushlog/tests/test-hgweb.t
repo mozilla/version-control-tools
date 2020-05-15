@@ -1,3 +1,5 @@
+  $ . $TESTDIR/hgext/pushlog/tests/helpers.sh
+
   $ hg init server
   $ cd server
   $ cat >> .hg/hgrc << EOF
@@ -59,7 +61,7 @@ Push info should show up in changeset view
 pushhead() works in search
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushhead()" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {
@@ -112,7 +114,7 @@ pushhead() works in search
 pushdate() works in search
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushdate('>2017')" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {
@@ -186,7 +188,7 @@ pushdate() works in search
 pushuser() works in search
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushuser(user1)" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {
@@ -216,7 +218,7 @@ pushuser() works in search
 pushid() works in search
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushid(1)" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {
@@ -244,7 +246,7 @@ pushid() works in search
   }
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushid(3)" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [],
       "node": "82f53df85e9f23d81dbcfbf7debf9900cdc1e2ce",
@@ -254,7 +256,7 @@ pushid() works in search
 pushrev() works in search
 
   $ http "http://localhost:$HGPORT/json-log?rev=pushrev(1)" --body-file body > /dev/null
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {

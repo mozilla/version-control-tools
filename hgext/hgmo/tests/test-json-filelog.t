@@ -26,7 +26,7 @@ Single file with 3 commits
   $ http "http://localhost:$HGPORT/json-filelog?file=foo&node=tip" --header content-type --body-file body
   200
   content-type: application/json
-  $ python -m json.tool < body
+  $ ppjson < body
   {
       "entries": [
           {
