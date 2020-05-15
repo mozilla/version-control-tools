@@ -59,6 +59,7 @@ def env_cmd():
 
 
 COMMANDS = {
+    "build": ("docker-compose", "build"),
     "env": env_cmd,
     "tests": ("docker-compose", "run", "--rm", "test-runner", "/vct/run-tests"),
     "shell": ("docker-compose", "run", "--rm", "test-runner", "/bin/bash"),
