@@ -76,10 +76,10 @@ def main(args):
         return 1
 
     cmd = COMMANDS[args[0]]
-    
+
     if callable(cmd):
         return cmd()
-    
+
     cmd = list(cmd) + args[1:]
 
     print("$ {}".format(" ".join(cmd)))

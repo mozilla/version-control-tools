@@ -343,3 +343,19 @@ def create_global():
 
     # Return info about Py2 venv since we still require that to run tests
     return venv_py2
+
+
+if __name__ == '__main__':
+    import sys
+
+    if sys.argv[1] != 'install-mercurials':
+        sys.exit(1)
+
+    venv = {
+        'path': os.path.join(ROOT, 'venv'),
+        'python': os.path.join(ROOT, 'venv', 'bin', 'python'),
+    }
+
+    py3 = sys.argv[2] == '3'
+    install_mercurials(venv, hg='hg', py3=py3)
+    sys.exit(0)
