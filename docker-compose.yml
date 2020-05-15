@@ -49,7 +49,6 @@ services:
       - USER=vct
     volumes:
       - ./:/app/vct
-      - test_runner_venv_py2:/app/venv
       - test_runner_cache_py2:/app/vct/.cache
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -70,13 +69,10 @@ services:
       - USER=vct
     volumes:
       - ./:/app/vct
-      - test_runner_venv:/app/venv
       - test_runner_cache:/app/vct/.cache
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
-  test_runner_venv_py2:
-  test_runner_venv:
   test_runner_cache_py2:
   test_runner_cache:
 
