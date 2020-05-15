@@ -417,9 +417,9 @@ Obsolescence, not stripping, should occur when enabled
   $ echo obs2 > foo
   $ hg commit -m 'obsolete 2'
 
-  $ hg --config extensions.obs=$TESTTMP/obs.py rewritemessage 12
+  $ hg --config experimental.evolution=true rewritemessage 12
 
-  $ hg --config extensions.obs=$TESTTMP/obs.py log -G -r 11:
+  $ hg --config experimental.evolution=true log -G -r 11:
   @  changeset:   15:fa1584f69cf7
   |  tag:         tip
   |  user:        test
@@ -438,7 +438,7 @@ Obsolescence, not stripping, should occur when enabled
      summary:     secret 2
   
 
-  $ hg --config extensions.obs=$TESTTMP/obs.py --hidden log -G -r 11:
+  $ hg --config experimental.evolution=true --hidden log -G -r 11:
   @  changeset:   15:fa1584f69cf7
   |  tag:         tip
   |  user:        test

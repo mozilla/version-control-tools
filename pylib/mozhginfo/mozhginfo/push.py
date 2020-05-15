@@ -35,15 +35,14 @@ class Push(object):
             for changeset in push_info.get('changesets'):
                 # When we query push date without 'full=1' option, the changeset
                 # we get will be a list of strings rather than an object.
-                if isinstance(changeset, basestring):
-                    assert len(changeset) == 40, \
-                        'All changesets have to be of 40 chars in length.'
-                    self._push['changesets'].append(Changeset(node=changeset))
-                else:
+                if isinstance(changeset, dict):
                     assert len(changeset['node']) == 40, \
                         'All changesets have to be of 40 chars in length.'
                     self._push['changesets'].append(Changeset(**changeset))
-
+                else:
+                    assert len(changeset) == 40, \
+                        'All changesets have to be of 40 chars in length.'
+                    self._push['changesets'].append(Changeset(node=changeset))
     def __repr__(self):
         return "<Push id:%s info:%s>" % (self._id, self._push)
 

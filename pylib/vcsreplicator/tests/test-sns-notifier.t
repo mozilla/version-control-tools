@@ -52,9 +52,9 @@ Create an obsolete changeset with a large commit message to test SNS message siz
 
   $ echo orig > foo
   >>> with open('message', 'wb') as fh:
-  ...     fh.write('this is a long commit message\n')
-  ...     fh.write('\n')
-  ...     fh.write('a' * 259800)
+  ...     _ = fh.write(b'this is a long commit message\n')
+  ...     _ = fh.write(b'\n')
+  ...     _ = fh.write(b'a' * 259800)
   $ hg commit -l message
 
   $ hg -q push

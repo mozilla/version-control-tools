@@ -245,10 +245,16 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b'replacing'):
                                   user=oldctx.user(), date=oldctx.date(),
                                   extra=oldctx.extra())
             status = oldctx.p1().status(oldctx)
-            mctx.modified = lambda: status[0]
-            mctx.added = lambda: status[1]
-            mctx.removed = lambda: status[2]
 
+            # TRACKING hg53 - status is an object instead of a tuple
+            if util.versiontuple(n=2) >= (5, 3):
+                mctx.modified = lambda: status.modified
+                mctx.added = lambda: status.added
+                mctx.removed = lambda: status.removed
+            else:
+                mctx.modified = lambda: status[0]
+                mctx.added = lambda: status[1]
+                mctx.removed = lambda: status[2]
             newnode = mctx.commit()
             revmap[rev] = repo[newnode].rev()
             nodemap[oldctx.node()] = newnode

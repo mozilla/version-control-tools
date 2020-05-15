@@ -8,6 +8,7 @@ import os
 
 from mercurial import (
     cmdutil,
+    pycompat,
     registrar,
     util,
 )
@@ -30,11 +31,11 @@ configitem = registrar.configitem(configtable)
 register_config_items(configitem)
 
 
-@command('bzauth', [
-    ('', 'require', False, 'Require auth'),
-    ('', 'fakegetpass', '', 'Provide a fake getpass.getpass answer'),
-    ('', 'ffprofile', '', 'Firefox profile to use'),
-    ], 'hg bzauth',
+@command(b'bzauth', [
+    (b'', b'require', False, b'Require auth'),
+    (b'', b'fakegetpass', b'', b'Provide a fake getpass.getpass answer'),
+    (b'', b'ffprofile', b'', b'Firefox profile to use'),
+    ], b'hg bzauth',
     norepo=True)
 def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
     if fakegetpass:
@@ -44,16 +45,16 @@ def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
 
     a = getbugzillaauth(ui, require=require, profile=ffprofile)
     if a:
-        ui.write('userid: %s\n' % a.userid)
-        ui.write('cookie: %s\n' % a.cookie)
-        ui.write('username: %s\n' % a.username)
-        ui.write('password: %s\n' % a.password)
-        ui.write('apikey: %s\n' % a.apikey)
+        ui.write(b'userid: %s\n' % pycompat.bytestr(a.userid))
+        ui.write(b'cookie: %s\n' % pycompat.bytestr(a.cookie))
+        ui.write(b'username: %s\n' % pycompat.bytestr(a.username))
+        ui.write(b'password: %s\n' % pycompat.bytestr(a.password))
+        ui.write(b'apikey: %s\n' % pycompat.bytestr(a.apikey))
     else:
-        ui.write('no auth\n')
+        ui.write(b'no auth\n')
 
-@command('bzcreatecookie', [],
-         'hg bzcreatecookie [profiledir] [url] [userid] [cookie]',
+@command(b'bzcreatecookie', [],
+         b'hg bzcreatecookie [profiledir] [url] [userid] [cookie]',
          norepo=True)
 def bzcreatecookie(ui, profiledir, url, userid, cookie):
     from mozhg.tests.test_auth import create_login_cookie

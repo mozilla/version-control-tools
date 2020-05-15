@@ -239,8 +239,8 @@ class FirefoxReleaseDatabase(object):
         Therefore, old data belonging to an incoming insertion key will be
         dropped and replaced by the incoming data.
         """
-        params = (b'insertion_key', b'channel', b'platform', b'build_id',
-                  b'app_version', b'revision', b'day', b'artifacts_url')
+        params = ('insertion_key', 'channel', 'platform', 'build_id',
+                  'app_version', 'revision', 'day', 'artifacts_url')
 
         insertion_keys = set()
 
@@ -248,11 +248,11 @@ class FirefoxReleaseDatabase(object):
         for entry in data:
             build = json.loads(entry)
 
-            if build[b'_format'] != 1:
+            if build['_format'] != 1:
                 raise Exception('unknown data format %s' %
-                                build[b'_format'])
+                                build['_format'])
 
-            insertion_keys.add(build[b'insertion_key'])
+            insertion_keys.add(build['insertion_key'])
             builds.append(tuple(build[k] for k in params))
 
         with self._db:

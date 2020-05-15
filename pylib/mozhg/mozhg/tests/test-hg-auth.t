@@ -133,7 +133,7 @@ Empty profile should have no cookies and should get nothing
 
 Profile with cookie from an unknown Bugzilla should get nothing
 
-  $ hg bzcreatecookie profiles/foo http://dummy/ dummyuser dummypass
+  $ hg bzcreatecookie profiles/foo http://dummy/ dummyuser dummypass --traceback
   $ hg bzauth
   bugzilla username: 
   no auth

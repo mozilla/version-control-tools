@@ -17,6 +17,7 @@ from cgi import escape
 
 from mozautomation.commitparser import (
     add_hyperlinks,
+    htmlescape,
     parse_backouts,
     parse_bugs,
     parse_commit_id,
@@ -30,18 +31,18 @@ from mozautomation.commitparser import (
 
 class TestBugParsing(unittest.TestCase):
     def test_bug(self):
-        self.assertEqual(parse_bugs('bug 1'), [1])
-        self.assertEqual(parse_bugs('bug 123456'), [123456])
-        self.assertEqual(parse_bugs('testb=1234x'), [])
-        self.assertEqual(parse_bugs('ab4665521e2f'), [])
-        self.assertEqual(parse_bugs('Aug 2008'), [])
-        self.assertEqual(parse_bugs('b=#12345'), [12345])
-        self.assertEqual(parse_bugs('GECKO_191a2_20080815_RELBRANCH'), [])
-        self.assertEqual(parse_bugs('12345 is a bug'), [12345])
-        self.assertEqual(parse_bugs(' 123456 whitespace!'), [123456])
+        self.assertEqual(parse_bugs(b'bug 1'), [1])
+        self.assertEqual(parse_bugs(b'bug 123456'), [123456])
+        self.assertEqual(parse_bugs(b'testb=1234x'), [])
+        self.assertEqual(parse_bugs(b'ab4665521e2f'), [])
+        self.assertEqual(parse_bugs(b'Aug 2008'), [])
+        self.assertEqual(parse_bugs(b'b=#12345'), [12345])
+        self.assertEqual(parse_bugs(b'GECKO_191a2_20080815_RELBRANCH'), [])
+        self.assertEqual(parse_bugs(b'12345 is a bug'), [12345])
+        self.assertEqual(parse_bugs(b' 123456 whitespace!'), [123456])
 
         # Duplicate bug numbers should be stripped.
-        msg = '''Bug 1235097 - Add support for overriding the site root
+        msg = b'''Bug 1235097 - Add support for overriding the site root
 
 On brasstacks, `web.ctx.home` is incorrect (see bug 1235097 comment 23), which
 means that the URL used by mohawk to verify the authenticated request hashes
@@ -49,18 +50,18 @@ differs from that used to generate the hash.'''
         self.assertEqual(parse_bugs(msg), [1235097])
 
         # Merge numbers should not be considered bug numbers.
-        msg = '''servo: Merge #19754 - Implement element.innerText getter (from ferjm:innertext); r=mbrubeck
+        msg = b'''servo: Merge #19754 - Implement element.innerText getter (from ferjm:innertext); r=mbrubeck
 
 Source-Repo: https://github.com/servo/servo
 Source-Revision: 9e64008e759a678a3971d04977c2b20b66fa8229'''
         self.assertEqual(parse_bugs(msg), [])
 
-        msg = '''Bug 123456 - Fix all of the things
+        msg = b'''Bug 123456 - Fix all of the things
 
 Source-Repo: https://github.com/mozilla/foo'''
         self.assertEqual(parse_bugs(msg), [123456])
 
-        msg = '''Merge #4256
+        msg = b'''Merge #4256
 
 This fixes #9000 and bug 324521
 
@@ -84,463 +85,459 @@ Source-Repo: https://github.com/mozilla/foo'''
     def test_reviewers(self):
 
         # first with r? reviewer request syntax
-        self.assertEqual(list(parse_reviewers('Bug 1 - some stuff; r?romulus')), ['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, r?remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus,r?remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus,remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; (r?romulus)')),['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; (r?romulus,remus)')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r?romulus]')), ['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]')), ['remus', 'romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, a=test-only')), ['romulus', 'test-only'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r?romulus, ux-r=test-only')), ['romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - some stuff; r?romulus')), [b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus, r?remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus,r?remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus, remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus,remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; (r?romulus)')),[b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; (r?romulus,remus)')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; [r?romulus]')), [b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; [r?remus, r?romulus]')), [b'remus', b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus, a=test-only')), [b'romulus', b'test-only'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r?romulus, ux-r=test-only')), [b'romulus'])
 
         # now with r= review granted syntax
-        self.assertEqual(list(parse_reviewers('Bug 1 - some stuff; r=romulus')), ['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r=romulus, r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r=romulus,r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r=romulus, remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r=romulus,remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; (r=romulus)')),['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; (r=romulus,remus)')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r=romulus]')), ['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus', 'test-only'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - some stuff; r=romulus')), [b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r=romulus, r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r=romulus,r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r=romulus, remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r=romulus,remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; (r=romulus)')),[b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; (r=romulus,remus)')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; [r=romulus]')), [b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; [r=remus, r=romulus]')), [b'remus', b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff; r=romulus, a=test-only')), [b'romulus', b'test-only'])
 
         # try some other separators than ;
-        self.assertEqual(list(parse_reviewers('Bug 1 - some stuff r=romulus')), ['romulus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff. r=romulus, r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff - r=romulus,r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff, r=romulus, remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.. r=romulus,remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff | (r=romulus)')),['romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - some stuff r=romulus')), [b'romulus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff. r=romulus, r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff - r=romulus,r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff, r=romulus, remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff.. r=romulus,remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff | (r=romulus)')),[b'romulus'])
 
         # make sure things work with different spacing
-        self.assertEqual(list(parse_reviewers('Bug 1 - some stuff;r=romulus,r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=romulus, r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=romulus, remus')), ['romulus', 'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - some stuff;r=romulus,r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff.r=romulus, r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff,r=romulus, remus')), [b'romulus', b'remus'])
 
         # test that periods in names are OK
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff.r=jimmy.jones, r=bill.mcneal')), ['jimmy.jones', 'bill.mcneal'])
-        self.assertEqual(list(parse_reviewers('Bug 1 - More stuff,r=jimmy.')), ['jimmy'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff.r=jimmy.jones, r=bill.mcneal')), [b'jimmy.jones', b'bill.mcneal'])
+        self.assertEqual(list(parse_reviewers(b'Bug 1 - More stuff,r=jimmy.')), [b'jimmy'])
 
 
         # check some funky names too
-        self.assertEqual(list(parse_reviewers("stuff;r=a")), ["a"])
-        self.assertEqual(list(parse_reviewers("stuff;r=aa")), ["aa"])
-        self.assertEqual(list(parse_reviewers("stuff;r=.a")), [".a"])
-        self.assertEqual(list(parse_reviewers("stuff;r=..a")), ["..a"])
-        self.assertEqual(list(parse_reviewers("stuff;r=...a")), ["...a"])
-        self.assertEqual(list(parse_reviewers("stuff;r=a...a")), ["a...a"])
-        self.assertEqual(list(parse_reviewers("stuff;r=a.b")), ["a.b"])
-        self.assertEqual(list(parse_reviewers("stuff;r=a.b.c")), ["a.b.c"])
-        self.assertEqual(list(parse_reviewers("stuff;r=-.-.-")), ["-.-.-"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a")), [b"a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=aa")), [b"aa"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=.a")), [b".a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=..a")), [b"..a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=...a")), [b"...a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a...a")), [b"a...a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a.b")), [b"a.b"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a.b.c")), [b"a.b.c"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=-.-.-")), [b"-.-.-"])
 
         # NOTE: a string such as "stuff;r=a.,b" will not be parsed as expected
         # and will yield ["a"]. TODO: fix this in the future in the regex, or
         # do some post processing in `parse_reviewers` if this is needed. The
         # following test is testing the current behaviour only.
 
-        self.assertEqual(list(parse_reviewers("stuff;r=a.,b")), ["a"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a.,b")), [b"a"])
 
         # altogether now with some spaces sprinkled here and there
         self.assertEqual(
-            list(parse_reviewers("hi;r=a,aa,.a,..a,...a, a...a,a.b, a.b.c, -.-.-")),
-            [ "a", "aa", ".a", "..a", "...a", "a...a", "a.b", "a.b.c", "-.-.-"]
+            list(parse_reviewers(b"hi;r=a,aa,.a,..a,...a, a...a,a.b, a.b.c, -.-.-")),
+            [ b"a", b"aa", b".a", b"..a", b"...a", b"a...a", b"a.b", b"a.b.c", b"-.-.-"]
         )
 
         # bare r?
-        self.assertEqual(list(parse_reviewers('Bug 123 - Blah blah; r?')), [])
+        self.assertEqual(list(parse_reviewers(b'Bug 123 - Blah blah; r?')), [])
         self.assertEqual(list(parse_reviewers(
-            'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
+            b'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
             [])
 
         # oddball real-world examples
         self.assertEqual(list(parse_reviewers(
-            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
-            '- Relevant spec text:\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
-            ['roc', 'ehsan'])
+            b'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            b'- Relevant spec text:\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            [b'roc', b'ehsan'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
-            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
-            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
-            ['bsmedberg', 'dbaron', 'dbaron'])
+            b'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            b'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            b'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            [b'bsmedberg', b'dbaron', b'dbaron'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)')),
-            ['gps'])
+            b'Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)')),
+            [b'gps'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 123 - Blah blah; r=gps DONTBUILD')),
-            ['gps'])
+            b'Bug 123 - Blah blah; r=gps DONTBUILD')),
+            [b'gps'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 123 - Blah blah; r=gps (DONTBUILD)')),
-            ['gps'])
+            b'Bug 123 - Blah blah; r=gps (DONTBUILD)')),
+            [b'gps'])
 
         self.assertEqual(list(parse_reviewers(
-             'Bug 1181382: move declaration into namespace to resolve conflict. r=hsinyi. try: -b d -p all -u none -t none')),
-             ['hsinyi'])
+             b'Bug 1181382: move declaration into namespace to resolve conflict. r=hsinyi. try: -b d -p all -u none -t none')),
+             [b'hsinyi'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
-            ['bsmedberg'])
+            b'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            [b'bsmedberg'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 1199050 - Round off the corners of browser-extension-panel\'s content. ui-r=maritz, r=gijs')),
-            ['maritz', 'gijs'])
+            b'Bug 1199050 - Round off the corners of browser-extension-panel\'s content. ui-r=maritz, r=gijs')),
+            [b'maritz', b'gijs'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 1197422 - Part 2: [webext] Implement the pageAction API. r=billm ui-r=bwinton')),
-            ['billm', 'bwinton'])
+            b'Bug 1197422 - Part 2: [webext] Implement the pageAction API. r=billm ui-r=bwinton')),
+            [b'billm', b'bwinton'])
 
         # 'ui-reviewer=' isn't supported (less than 4% of ui-review commits use
         # it, 'ui-r=' being the preferred syntax)
         self.assertEqual(list(parse_reviewers(
-            'Bug 1217369 - "Welcome to ..." has extra padding on Loop''s standalone UI making it feel strange. r=mikedeboer,ui-review=sevaan')),
-            ['mikedeboer'])
+            b'Bug 1217369 - "Welcome to ..." has extra padding on Loop\'s standalone UI making it feel strange. r=mikedeboer,ui-review=sevaan')),
+            [b'mikedeboer'])
 
         self.assertEqual(list(parse_reviewers(
-            'Bug 1182996 - Fix and add missing namespace comments. rs=ehsan\n'
-            'run-clang-tidy.py \\\n'
-            '-checks=\'-*,llvm-namespace-comment\' \\\n'
-            '-header-filter=^/.../mozilla-central/.* \\\n'
-            '-fix')),
-            ['ehsan'])
+            b'Bug 1182996 - Fix and add missing namespace comments. rs=ehsan\n'
+            b'run-clang-tidy.py \\\n'
+            b'-checks=\'-*,llvm-namespace-comment\' \\\n'
+            b'-header-filter=^/.../mozilla-central/.* \\\n'
+            b'-fix')),
+            [b'ehsan'])
 
     @unittest.skip
     def test_first_reviewer_with_period_at_end_of_name():
         # TODO: this is not the current behaviour, but implementing this would
         # yield more expected results. We should probably also account for the
         # case of users having a period at the end of their username.
-        self.assertEqual(list(parse_reviewers("stuff;r=a.,b")), ["a", "b"])
+        self.assertEqual(list(parse_reviewers(b"stuff;r=a.,b")), [b"a", b"b"])
 
     def test_requal_reviewers(self):
         # empty
-        self.assertEqual(list(parse_requal_reviewers('')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'')), [])
 
         # first with r? reviewer request syntax
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - some stuff; r?romulus')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r?romulus, r?remus')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r?romulus,r?remus')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r?romulus, remus')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r?romulus,remus')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; (r?romulus)')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; (r?romulus,remus)')),[])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r?romulus]')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]')), [])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r?romulus, a=test-only')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - some stuff; r?romulus')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r?romulus, r?remus')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r?romulus,r?remus')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r?romulus, remus')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r?romulus,remus')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; (r?romulus)')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; (r?romulus,remus)')),[])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; [r?romulus]')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; [r?remus, r?romulus]')), [])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r?romulus, a=test-only')), [])
 
         # now with r= review granted syntax
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - some stuff; r=romulus')), ['romulus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus,r=remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus,remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; (r=romulus)')),['romulus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; (r=romulus,remus)')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=romulus]')), ['romulus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), ['remus', 'romulus'])
-        self.assertEqual(list(parse_requal_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), ['romulus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - some stuff; r=romulus')), [b'romulus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r=romulus, r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r=romulus,r=remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r=romulus, remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r=romulus,remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; (r=romulus)')),[b'romulus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; (r=romulus,remus)')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; [r=romulus]')), [b'romulus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; [r=remus, r=romulus]')), [b'remus', b'romulus'])
+        self.assertEqual(list(parse_requal_reviewers(b'Bug 1 - More stuff; r=romulus, a=test-only')), [b'romulus'])
 
         # bare r?
         self.assertEqual(list(parse_requal_reviewers(
-            'Bug 123 - Blah blah; r?')), [])
+            b'Bug 123 - Blah blah; r?')), [])
         self.assertEqual(list(parse_requal_reviewers(
-            'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
+            b'Bug 1313324 - Cover the screensharing UI with browser chrome test, r=')),
             [])
 
         # oddball real-world examples
         self.assertEqual(list(parse_requal_reviewers(
-            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
-            '- Relevant spec text:\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
-            ['roc', 'ehsan'])
+            b'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            b'- Relevant spec text:\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            [b'roc', b'ehsan'])
 
         self.assertEqual(list(parse_requal_reviewers(
-            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
-            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
-            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
-            ['bsmedberg', 'dbaron'])
+            b'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            b'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            b'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            [b'bsmedberg', b'dbaron'])
 
         self.assertEqual(list(parse_requal_reviewers(
-             'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
-             '\n'
-             'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
-             'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
-             'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
-             'Fixing form test for date fields r=me\n')),
+             b'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
+             b'\n'
+             b'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
+             b'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
+             b'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
+             b'Fixing form test for date fields r=me\n')),
              [])
 
         self.assertEqual(list(parse_requal_reviewers(
-            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
-            ['bsmedberg'])
+            b'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            [b'bsmedberg'])
 
     def test_rquestion_reviewers(self):
         # empty
-        self.assertEqual(list(parse_rquestion_reviewers('')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'')), [])
 
         # first with r? reviewer request syntax
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - some stuff; r?romulus')), ['romulus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, r?remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus,r?remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus,remus')), ['romulus', 'remus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r?romulus)')), ['romulus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r?romulus,remus)')),['romulus', 'remus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r?romulus]')), ['romulus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]')), ['remus', 'romulus'])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r?romulus, a=test-only')), ['romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - some stuff; r?romulus')), [b'romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r?romulus, r?remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r?romulus,r?remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r?romulus, remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r?romulus,remus')), [b'romulus', b'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; (r?romulus)')), [b'romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; (r?romulus,remus)')),[b'romulus', b'remus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; [r?romulus]')), [b'romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; [r?remus, r?romulus]')), [b'remus', b'romulus'])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r?romulus, a=test-only')), [b'romulus'])
 
         # now with r= review granted syntax
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - some stuff; r=romulus')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, r=remus')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus,r=remus')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, remus')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus,remus')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r=romulus)')),[])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; (r=romulus,remus)')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r=romulus]')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]')), [])
-        self.assertEqual(list(parse_rquestion_reviewers('Bug 1 - More stuff; r=romulus, a=test-only')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - some stuff; r=romulus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r=romulus, r=remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r=romulus,r=remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r=romulus, remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r=romulus,remus')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; (r=romulus)')),[])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; (r=romulus,remus)')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; [r=romulus]')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; [r=remus, r=romulus]')), [])
+        self.assertEqual(list(parse_rquestion_reviewers(b'Bug 1 - More stuff; r=romulus, a=test-only')), [])
 
         # oddball real-world examples
         self.assertEqual(list(parse_rquestion_reviewers(
-            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
-            '- Relevant spec text:\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
+            b'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            b'- Relevant spec text:\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n')),
             [])
 
         self.assertEqual(list(parse_rquestion_reviewers(
-            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
-            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
-            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
+            b'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            b'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            b'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz')),
             [])
 
         self.assertEqual(list(parse_rquestion_reviewers(
-             'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
-             '\n'
-             'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
-             'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
-             'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
-             'Fixing form test for date fields r=me\n')),
-             [])
+            b'Bumping gaia.json for 2 gaia revision(s) a=gaia-bump\n'
+            b'\n'
+            b'https://hg.mozilla.org/integration/gaia-central/rev/2b738dae9970\n'
+            b'Author: Francisco Jordano <arcturus@ardeenelinfierno.com>\n'
+            b'Desc: Merge pull request #30407 from arcturus/fix-contacts-test\n'
+            b'Fixing form test for date fields r=me\n')),
+            [])
 
         self.assertEqual(list(parse_rquestion_reviewers(
-            'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
+            b'Bug 1024110 - Change Aurora\'s default profile behavior to use channel-specific profiles. r=bsmedberg f=gavin,markh')),
             [])
 
     def test_replace_reviewers(self):
         # empty
-        self.assertEqual(replace_reviewers('', ['remus']), 'r=remus')
+        self.assertEqual(replace_reviewers(b'', [b'remus']), b'r=remus')
 
         # first with r? reviewer request syntax
-        self.assertEqual(replace_reviewers('Bug 1 - some stuff; r?romulus', ['remus']), 'Bug 1 - some stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, r?remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus,r?remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus,remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r?romulus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r?romulus,remus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r?romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r?remus, r?romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, a=test-only', ['remus']), 'Bug 1 - More stuff; r=remus, a=test-only')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r?romulus, ux-r=test-only', ['remus', 'romulus']), 'Bug 1 - More stuff; r=remus,romulus, ux-r=test-only')
+        self.assertEqual(replace_reviewers(b'Bug 1 - some stuff; r?romulus', [b'remus']), b'Bug 1 - some stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus, r?remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus,r?remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus, remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus,remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; (r?romulus)', [b'remus']), b'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; (r?romulus,remus)', [b'remus']), b'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; [r?romulus]', [b'remus']), b'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; [r?remus, r?romulus]', [b'remus']), b'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus, a=test-only', [b'remus']), b'Bug 1 - More stuff; r=remus, a=test-only')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r?romulus, ux-r=test-only', [b'remus', b'romulus']), b'Bug 1 - More stuff; r=remus,romulus, ux-r=test-only')
 
         # now with r= review granted syntax
-        self.assertEqual(replace_reviewers('Bug 1 - some stuff; r=romulus', ['remus']), 'Bug 1 - some stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus,r=remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus,remus', ['remus']), 'Bug 1 - More stuff; r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r=romulus)',['remus']), 'Bug 1 - More stuff; (r=remus)')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; (r=romulus,remus)', ['remus']), 'Bug 1 - More stuff; (r=remus)')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r=romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; [r=remus, r=romulus]', ['remus']), 'Bug 1 - More stuff; [r=remus]')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff; r=romulus, a=test-only', ['remus']), 'Bug 1 - More stuff; r=remus, a=test-only')
+        self.assertEqual(replace_reviewers(b'Bug 1 - some stuff; r=romulus', [b'remus']), b'Bug 1 - some stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r=romulus, r=remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r=romulus,r=remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r=romulus, remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r=romulus,remus', [b'remus']), b'Bug 1 - More stuff; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; (r=romulus)',[b'remus']), b'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; (r=romulus,remus)', [b'remus']), b'Bug 1 - More stuff; (r=remus)')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; [r=romulus]', [b'remus']), b'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; [r=remus, r=romulus]', [b'remus']), b'Bug 1 - More stuff; [r=remus]')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff; r=romulus, a=test-only', [b'remus']), b'Bug 1 - More stuff; r=remus, a=test-only')
 
         # try some other separators than ;
-        self.assertEqual(replace_reviewers('Bug 1 - some stuff r=romulus', ['remus']), 'Bug 1 - some stuff r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff. r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff. r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff - r=romulus,r=remus', ['remus']), 'Bug 1 - More stuff - r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff, r=romulus, remus', ['remus']), 'Bug 1 - More stuff, r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff.. r=romulus,remus', ['remus']), 'Bug 1 - More stuff.. r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff | (r=romulus)',['remus']), 'Bug 1 - More stuff | (r=remus)')
+        self.assertEqual(replace_reviewers(b'Bug 1 - some stuff r=romulus', [b'remus']), b'Bug 1 - some stuff r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff. r=romulus, r=remus', [b'remus']), b'Bug 1 - More stuff. r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff - r=romulus,r=remus', [b'remus']), b'Bug 1 - More stuff - r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff, r=romulus, remus', [b'remus']), b'Bug 1 - More stuff, r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff.. r=romulus,remus', [b'remus']), b'Bug 1 - More stuff.. r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff | (r=romulus)',[b'remus']), b'Bug 1 - More stuff | (r=remus)')
 
         # make sure things work with different spacing
-        self.assertEqual(replace_reviewers('Bug 1 - some stuff;r=romulus,r=remus', ['remus']), 'Bug 1 - some stuff;r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff.r=romulus, r=remus', ['remus']), 'Bug 1 - More stuff.r=remus')
-        self.assertEqual(replace_reviewers('Bug 1 - More stuff,r=romulus, remus', ['remus']), 'Bug 1 - More stuff,r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - some stuff;r=romulus,r=remus', [b'remus']), b'Bug 1 - some stuff;r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff.r=romulus, r=remus', [b'remus']), b'Bug 1 - More stuff.r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 1 - More stuff,r=romulus, remus', [b'remus']), b'Bug 1 - More stuff,r=remus')
 
         self.assertEqual(replace_reviewers(
-            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
-            '- Relevant spec text:\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n',
-            ['remus']),
-            'Bug 1094764 - Implement AudioContext.suspend and friends.  r=remus\n'
-            '- Relevant spec text:\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
-            '- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise')
+            b'Bug 1094764 - Implement AudioContext.suspend and friends.  r=roc,ehsan\n'
+            b'- Relevant spec text:\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise\n',
+            [b'remus']),
+            b'Bug 1094764 - Implement AudioContext.suspend and friends.  r=remus\n'
+            b'- Relevant spec text:\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-suspend-Promise\n'
+            b'- http://webaudio.github.io/web-audio-api/#widl-AudioContext-resume-Promise')
 
         self.assertEqual(replace_reviewers(
-            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
-            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
-            'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz',
-            ['remus']),
-            'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
-            'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
-            'r=remus, sr=dbaron, a1.9=bz')
+            b'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            b'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            b'r=bsmedberg/dbaron, sr=dbaron, a1.9=bz',
+            [b'remus']),
+            b'Bug 380783 - nsStringAPI.h: no equivalent of IsVoid (tell if '
+            b'string is null), patch by Mook <mook.moz+mozbz@gmail.com>, '
+            b'r=remus, sr=dbaron, a1.9=bz')
 
         self.assertEqual(replace_reviewers(
-            'Bug 1 - blah r?dminor, r?gps, r?abc, sr=abc',
-            ['dminor', 'glob', 'gps', 'abc']),
-            'Bug 1 - blah r=dminor,glob,gps,abc, sr=abc')
+            b'Bug 1 - blah r?dminor, r?gps, r?abc, sr=abc',
+            [b'dminor', b'glob', b'gps', b'abc']),
+            b'Bug 1 - blah r=dminor,glob,gps,abc, sr=abc')
 
         self.assertEqual(replace_reviewers(
-            'Bug 1 - blah r?dminor r?gps r?abc sr=abc',
-            ['dminor', 'glob', 'gps', 'abc']),
-            'Bug 1 - blah r=dminor,glob,gps,abc sr=abc')
+            b'Bug 1 - blah r?dminor r?gps r?abc sr=abc',
+            [b'dminor', b'glob', b'gps', b'abc']),
+            b'Bug 1 - blah r=dminor,glob,gps,abc sr=abc')
 
         self.assertEqual(replace_reviewers(
-            'Bug 1 - blah r?dminor,r?gps,r?abc,sr=abc',
-            ['dminor', 'glob', 'gps', 'abc']),
-            'Bug 1 - blah r=dminor,glob,gps,abc,sr=abc')
+            b'Bug 1 - blah r?dminor,r?gps,r?abc,sr=abc',
+            [b'dminor', b'glob', b'gps', b'abc']),
+            b'Bug 1 - blah r=dminor,glob,gps,abc,sr=abc')
 
-        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD (NPOTB)')
-        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
-        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r=gps (DONTBUILD)', ['remus']), 'Bug 123 - Blah blah; r=remus (DONTBUILD)')
+        self.assertEqual(replace_reviewers(b'Bug 123 - Blah blah; r=gps DONTBUILD (NPOTB)', [b'remus']), b'Bug 123 - Blah blah; r=remus DONTBUILD (NPOTB)')
+        self.assertEqual(replace_reviewers(b'Bug 123 - Blah blah; r=gps DONTBUILD', [b'remus']), b'Bug 123 - Blah blah; r=remus DONTBUILD')
+        self.assertEqual(replace_reviewers(b'Bug 123 - Blah blah; r=gps (DONTBUILD)', [b'remus']), b'Bug 123 - Blah blah; r=remus (DONTBUILD)')
 
-        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r?', ['remus']), 'Bug 123 - Blah blah; r=remus')
-        self.assertEqual(replace_reviewers('Bug 123 - Blah blah; r? DONTBUILD', ['remus']), 'Bug 123 - Blah blah; r=remus DONTBUILD')
+        self.assertEqual(replace_reviewers(b'Bug 123 - Blah blah; r?', [b'remus']), b'Bug 123 - Blah blah; r=remus')
+        self.assertEqual(replace_reviewers(b'Bug 123 - Blah blah; r? DONTBUILD', [b'remus']), b'Bug 123 - Blah blah; r=remus DONTBUILD')
 
     def test_backout_partial(self):
         # bug without node
         self.assertIsNone(parse_backouts(
-            'Bug 1 - More stuff; r=romulus'))
+            b'Bug 1 - More stuff; r=romulus'))
 
         # node without bug
         self.assertEqual(parse_backouts(
-            'Backout f484160e0a08 for causing slow heat death of the universe'),
-            (['f484160e0a08'], []))
+            b'Backout f484160e0a08 for causing slow heat death of the universe'),
+            ([b'f484160e0a08'], []))
 
         # backout not on first line
         self.assertIsNone(parse_backouts(
-            'Bug 123 - Blah blah; r=gps\n'
-            'Backout ffffffffffff'))
+            b'Bug 123 - Blah blah; r=gps\n'
+            b'Backout ffffffffffff'))
 
     def test_backout_single(self):
-        # 'backed out'
+        # b'backed out'
         self.assertEqual(parse_backouts(
-            'Backed out changeset 6435d5aab611 (bug 858680)'),
-            (['6435d5aab611'], [858680]))
+            b'Backed out changeset 6435d5aab611 (bug 858680)'),
+            ([b'6435d5aab611'], [858680]))
 
-        # 'backout of'
+        # b'backout of'
         self.assertEqual(parse_backouts(
-            'backout of f9abb9c83452 (bug 1319111) for crashes, r=bz'),
-            (['f9abb9c83452'], [1319111]))
+            b'backout of f9abb9c83452 (bug 1319111) for crashes, r=bz'),
+            ([b'f9abb9c83452'], [1319111]))
 
-        # 'backout revision'
+        # b'backout revision'
         self.assertEqual(parse_backouts(
-            'Backout revision 20a9d741cdf4 (bug 1354641) a=me'),
-            (['20a9d741cdf4'], [1354641]))
+            b'Backout revision 20a9d741cdf4 (bug 1354641) a=me'),
+            ([b'20a9d741cdf4'], [1354641]))
 
-        # 'backout'
+        # b'backout'
         self.assertEqual(parse_backouts(
-            'Backout b8601df335c1 (Bug 1174857) for bustage'),
-            (['b8601df335c1'], [1174857]))
+            b'Backout b8601df335c1 (Bug 1174857) for bustage'),
+            ([b'b8601df335c1'], [1174857]))
 
     def test_backout_multiple_changesets(self):
-        # 'and' separated
+        # b'and' separated
         self.assertEqual(parse_backouts(
-            'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b (bug 1150549) for Mulet crashes.'),
-            (['4b6aa5c0a1bf', 'fdf38a41d92b'], [1150549]))
+            b'Backed out changesets 4b6aa5c0a1bf and fdf38a41d92b (bug 1150549) for Mulet crashes.'),
+            ([b'4b6aa5c0a1bf', b'fdf38a41d92b'], [1150549]))
 
         # more than two
         self.assertEqual(parse_backouts(
-            'Backed out changesets a8abdd77a92c, dda84d1fb12b and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
-            (['a8abdd77a92c', 'dda84d1fb12b', '21fdf73bbb17'], [1302907]))
+            b'Backed out changesets a8abdd77a92c, dda84d1fb12b and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
+            ([b'a8abdd77a92c', b'dda84d1fb12b', b'21fdf73bbb17'], [1302907]))
 
         # oxford comma
         self.assertEqual(parse_backouts(
-            'Backed out changesets a8abdd77a92c, dda84d1fb12b, and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
-            (['a8abdd77a92c', 'dda84d1fb12b', '21fdf73bbb17'], [1302907]))
+            b'Backed out changesets a8abdd77a92c, dda84d1fb12b, and 21fdf73bbb17 (bug 1302907) for Windows build bustage'),
+            ([b'a8abdd77a92c', b'dda84d1fb12b', b'21fdf73bbb17'], [1302907]))
 
     def test_backout_n_changesets(self):
         # all nodes returned
         self.assertEqual(
             parse_backouts(
-            'Backed out 3 changesets (bug 1310885) for heap write hazard failures\n'
-            'Backed out changeset 77352010d8e8 (bug 1310885)\n'
-            'Backed out changeset 9245a2fbb974 (bug 1310885)\n'
-            'Backed out changeset 7c2db290c4b6 (bug 1310885)'),
-            (['77352010d8e8', '9245a2fbb974', '7c2db290c4b6'], [1310885]))
+            b'Backed out 3 changesets (bug 1310885) for heap write hazard failures\n'
+            b'Backed out changeset 77352010d8e8 (bug 1310885)\n'
+            b'Backed out changeset 9245a2fbb974 (bug 1310885)\n'
+            b'Backed out changeset 7c2db290c4b6 (bug 1310885)'),
+            ([b'77352010d8e8', b'9245a2fbb974', b'7c2db290c4b6'], [1310885]))
 
         # nodes must be provided on following lines in strict mode
         self.assertIsNone(parse_backouts(
-            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
+            b'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
             strict=True))
 
         # .. but is ok without strict mode
         self.assertEqual(parse_backouts(
-            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
+            b'Backed out 2 changesets (bug 1335751) for mochitest devtools failures',
             strict=False),
             ([], [1335751]))
 
         # .. default should be with strict disabled
         self.assertEqual(parse_backouts(
-            'Backed out 2 changesets (bug 1335751) for mochitest devtools failures'),
+            b'Backed out 2 changesets (bug 1335751) for mochitest devtools failures'),
             ([], [1335751]))
 
         # the correct number of nodes must be provided in strict mode
         self.assertIsNone(parse_backouts(
-            'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
-            'Backed out changeset ab9fdee3a6a4 (bug 1360992)',
+            b'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
+            b'Backed out changeset ab9fdee3a6a4 (bug 1360992)',
             strict=True))
 
         # .. but is ok without strict mode
         self.assertEqual(parse_backouts(
-            'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
-            'Backed out changeset ab9fdee3a6a4 (bug 1360992)'),
-            (['ab9fdee3a6a4'], [1360992]))
+            b'Backed out 2 changesets (bug 1360992) for a 70% failure rate in test_fileReader.html on ASan e10s\n'
+            b'Backed out changeset ab9fdee3a6a4 (bug 1360992)'),
+            ([b'ab9fdee3a6a4'], [1360992]))
 
     def test_strip_commit_metadata(self):
-        self.assertEqual(strip_commit_metadata('foo'), 'foo')
+        self.assertEqual(strip_commit_metadata(b'foo'), b'foo')
 
-        self.assertEqual(strip_commit_metadata('foo\n\nbar'), 'foo\n\nbar')
-
-        self.assertEqual(strip_commit_metadata(
-            'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef'),
-            'Bug 1 - foo')
+        self.assertEqual(strip_commit_metadata(b'foo\n\nbar'), b'foo\n\nbar')
 
         self.assertEqual(strip_commit_metadata(
-            'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz\n\n'),
-            'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz')
+            b'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef'),
+            b'Bug 1 - foo')
 
         self.assertEqual(strip_commit_metadata(
-            'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef\n\nTrailing desc'),
-            'Bug 1 - foo\n\n\nTrailing desc')
+            b'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz\n\n'),
+            b'Bug 1 - foo\n\nMore description\n\nFoo-Bar: baz')
 
-        # unicode in should get unicode out
-        res = strip_commit_metadata(u'foo\n\nbar')
-        self.assertEqual(res, u'foo\n\nbar')
-        self.assertIsInstance(res, unicode)
+        self.assertEqual(strip_commit_metadata(
+            b'Bug 1 - foo\n\nMozReview-Commit-ID: abcdef\n\nTrailing desc'),
+            b'Bug 1 - foo\n\n\nTrailing desc')
+
 
     def test_parse_commit_id(self):
-        self.assertIsNone(parse_commit_id('foo'))
-        self.assertIsNone(parse_commit_id('foo\n\nMozReview-Commit-ID\nbar'))
+        self.assertIsNone(parse_commit_id(b'foo'))
+        self.assertIsNone(parse_commit_id(b'foo\n\nMozReview-Commit-ID\nbar'))
 
-        self.assertEqual(parse_commit_id('MozReview-Commit-ID: foo123'),
-                         'foo123')
+        self.assertEqual(parse_commit_id(b'MozReview-Commit-ID: foo123'),
+                         b'foo123')
         self.assertEqual(parse_commit_id(
-            'Bug 1 - foo\n\nMozReview-Commit-ID: abc456'),
-            'abc456')
+            b'Bug 1 - foo\n\nMozReview-Commit-ID: abc456'),
+            b'abc456')
 
 
 class TestAddHyperlinks(unittest.TestCase):
@@ -701,7 +698,7 @@ class TestAddHyperlinks(unittest.TestCase):
             b'X-Channel-Repo: releases/mozilla-beta\n'
             b'X-Channel-Revision: a1234567890123456789')
         # try html through |escape|mozlink
-        self.assertEqual(add_hyperlinks(escape(
+        self.assertEqual(add_hyperlinks(htmlescape(
             b'X-Channel-Repo: mozilla-&\n'
             b'X-Channel-Revision: a1234567890123456789')),
             b'X-Channel-Repo: mozilla-&amp;\n'

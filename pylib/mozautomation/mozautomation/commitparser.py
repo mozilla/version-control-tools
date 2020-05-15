@@ -135,7 +135,7 @@ def filter_reviewers(s):
 
 
 def parse_reviewers(commit_description, flag_re=None):
-    if commit_description == '':
+    if commit_description == b'':
         return
 
     commit_summary = commit_description.splitlines().pop(0)
@@ -276,14 +276,7 @@ def strip_commit_metadata(s):
     while lines and not lines[-1].strip():
         lines.pop(-1)
 
-    if type(s) == str:
-        joiner = b'\n'
-    elif type(s) == unicode:
-        joiner = u'\n'
-    else:
-        raise TypeError('do not know type of commit message: %s' % type(s))
-
-    return joiner.join(lines)
+    return b'\n'.join(lines)
 
 
 def parse_commit_id(s):

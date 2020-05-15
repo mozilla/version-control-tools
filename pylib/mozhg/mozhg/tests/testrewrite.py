@@ -24,9 +24,9 @@ cmdtable = {}
 command = registrar.command(cmdtable)
 
 
-@command('rewritemessage', [
-    ('', 'unmodified', False, _('Do not modify the revision'), '')
-], 'hg rewrite REVS')
+@command(b'rewritemessage', [
+    (b'', b'unmodified', False, _(b'Do not modify the revision'), b'')
+], b'hg rewrite REVS')
 def rewritemessage(ui, repo, revs=None, **opts):
     nodes = [repo[rev].node() for rev in repo.revs(revs)]
     offset = [0]
@@ -35,14 +35,20 @@ def rewritemessage(ui, repo, revs=None, **opts):
         parents = newparents(repo, ctx, revmap)
         description = ctx.description()
         if not opts['unmodified']:
-            description += '\n%d' % offset[0]
+            description += b'\n%d' % offset[0]
         memctx = context.memctx(repo, parents, description,
                                 ctx.files(), filectxfn, user=ctx.user(),
                                 date=ctx.date(), extra=ctx.extra())
         status = ctx.p1().status(ctx)
-        memctx.modified = lambda: status[0]
-        memctx.added = lambda: status[1]
-        memctx.removed = lambda: status[2]
+        # TRACKING hg53 - status is an object instead of a tuple
+        if util.versiontuple(n=2) >= (5, 3):
+            memctx.modified = lambda: status.modified
+            memctx.added = lambda: status.added
+            memctx.removed = lambda: status.removed
+        else:
+            memctx.modified = lambda: status[0]
+            memctx.added = lambda: status[1]
+            memctx.removed = lambda: status[2]
         offset[0] += 1
 
         return memctx
@@ -50,7 +56,7 @@ def rewritemessage(ui, repo, revs=None, **opts):
     replacechangesets(repo, nodes, createfn)
 
 
-@command('rewritechangefile', [], 'hg rewrite REVS')
+@command(b'rewritechangefile', [], b'hg rewrite REVS')
 def rewritechangefile(ui, repo, revs=None):
     nodes = [repo[rev].node() for rev in repo.revs(revs)]
 

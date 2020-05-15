@@ -7,12 +7,13 @@ import os
 import platform
 import shutil
 import tempfile
-import urlparse
 
 from mercurial import (
     config,
     configitems,
     error,
+    pycompat,
+    urllibcompat,
 )
 from mercurial.i18n import _
 
@@ -150,21 +151,21 @@ def find_profiles_path():
                                       Folders.kApplicationSupportFolderType,
                                       Folders.kDontCreateFolder)
         basepath = pathref.FSRefMakePath()
-        path = os.path.join(basepath, 'Firefox')
+        path = pycompat.bytestr(os.path.join(basepath, 'Firefox'))
     elif platform.system() == 'Windows':
         # From http://msdn.microsoft.com/en-us/library/windows/desktop/bb762494%28v=vs.85%29.aspx
         CSIDL_APPDATA = 26
-        path = win_get_folder_path(CSIDL_APPDATA)
+        path = pycompat.bytestr(win_get_folder_path(CSIDL_APPDATA))
         if path:
-            path = os.path.join(path, 'Mozilla', 'Firefox')
+            path = os.path.join(path, b'Mozilla', b'Firefox')
     else:
         # Assume POSIX
         # Pretty simple in comparison, eh?
-        path = os.path.expanduser('~/.mozilla/firefox')
+        path = pycompat.bytestr(os.path.expanduser('~/.mozilla/firefox'))
 
     # This is a backdoor to facilitate testing, since find_profiles_path()
     # doesn't need to be run-time configurable.
-    path = os.environ.get('FIREFOX_PROFILES_DIR', path)
+    path = pycompat.bytestr(os.environ.get('FIREFOX_PROFILES_DIR', path))
 
     return path
 
@@ -175,22 +176,22 @@ def get_profiles(profilesdir):
     dicts describing each profile will be returned. The list is sorted
     according to profile preference. The default profile is always first.
     """
-    profileini = os.path.join(profilesdir, 'profiles.ini')
+    profileini = os.path.join(profilesdir, b'profiles.ini')
     if not os.path.exists(profileini):
         return []
 
     c = config.config()
-    c.read(profileini)
+    c.read(pycompat.bytestr(profileini))
 
     profiles = []
     for s in c.sections():
-        if not c.get(s, 'Path') or not c.get(s, 'Name'):
+        if not c.get(s, b'Path') or not c.get(s, b'Name'):
             continue
 
-        name = c.get(s, 'Name')
-        path = c.get(s, 'Path')
+        name = c.get(s, b'Name')
+        path = c.get(s, b'Path')
 
-        if c.get(s, 'IsRelative') == '1':
+        if c.get(s, b'IsRelative') == b'1':
             path = os.path.join(profilesdir, path)
 
         newest = -1
@@ -208,27 +209,38 @@ def get_profiles(profilesdir):
             newest = max(mtimes)
 
         p = {
-            'name': name,
-            'path': path,
-            'default': c.get(s, 'Default', False) and True,
-            'mtime': newest,
+            b'name': name,
+            b'path': path,
+            b'default': c.get(s, b'Default', False) and True,
+            b'mtime': newest,
         }
 
         profiles.append(p)
 
     def compare(a, b):
         """Sort profile by default first, file mtime second."""
-        if a['default']:
+        if a[b'default']:
             return -1
 
-        if a['mtime'] > b['mtime']:
+        if a[b'mtime'] > b[b'mtime']:
             return -1
-        elif a['mtime'] < b['mtime']:
+        elif a[b'mtime'] < b[b'mtime']:
             return 1
 
         return 0
 
-    return sorted(profiles, cmp=compare)
+    # TRACKING py3 - sorted takes a `key`
+    if pycompat.ispy3:
+        import functools
+        sorted_kwargs = {
+            'key': functools.cmp_to_key(compare),
+        }
+    else:
+        sorted_kwargs = {
+            'cmp': compare,
+        }
+
+    return sorted(profiles, **sorted_kwargs)
 
 def win_get_folder_path(folder):
     import ctypes
@@ -263,12 +275,12 @@ def get_bugzilla_login_cookie_from_profile(profile, url):
     except:
         raise NoSQLiteError()
 
-    cookies = os.path.join(profile, 'cookies.sqlite')
+    cookies = os.path.join(profile, b'cookies.sqlite')
     if not os.path.exists(cookies):
         return None, None
 
-    host = urlparse.urlparse(url).hostname
-    path = urlparse.urlparse(url).path
+    host = pycompat.sysstr(urllibcompat.urlreq.urlparse(url).hostname)
+    path = pycompat.sysstr(urllibcompat.urlreq.urlparse(url).path)
 
     # Firefox locks this file, so if we can't open it (browser is running)
     # then copy it somewhere else and try to open it.
@@ -283,7 +295,7 @@ def get_bugzilla_login_cookie_from_profile(profile, url):
         # Patch the file to give it an older version number so we can open it.
         with open(tempcookies, 'r+b') as f:
             f.seek(18, 0)
-            f.write('\x01\x01')
+            f.write(b'\x01\x01')
         conn = sqlite3.connect(tempcookies)
         logins = conn.execute("select value, path from moz_cookies "
                               "where name = 'Bugzilla_login' and (host = ? or host = ?)",
@@ -296,9 +308,8 @@ def get_bugzilla_login_cookie_from_profile(profile, url):
                               " and path = ?",
                               (host, "." + host, row[1])).fetchone()[0]
         conn.close()
-        if isinstance(login, unicode):
-            login = login.encode('utf-8')
-            cookie = cookie.encode('utf-8')
+        login = pycompat.bytestr(login)
+        cookie = pycompat.bytestr(cookie)
         return login, cookie
 
     except IndexError:
