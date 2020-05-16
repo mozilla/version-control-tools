@@ -16,9 +16,8 @@ Single valid pushlog verifies OK
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
 
   $ echo second > foo
   $ hg commit -m 'second'
@@ -30,9 +29,8 @@ Single valid pushlog verifies OK
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 2 changesets with 2 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
 
   $ hg -R ../server verifypushlog
   pushlog contains all 3 changesets across 2 pushes

@@ -20,9 +20,8 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
 
   $ echo p1_1 > file0
   $ hg -q commit -A -m 'push 1 commit 1'
@@ -43,9 +42,8 @@ Create some obsolete changesets
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 2 changesets with 2 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
 
   $ hg rebase -s 11743f808184 -d 96ee1d7354c4
   rebasing 3:11743f808184 "file1 1"
@@ -56,9 +54,8 @@ Create some obsolete changesets
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 2 changesets with 0 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: obsoleted 2 changesets (?)
 
@@ -67,8 +64,7 @@ Create some obsolete changesets
 Local revset evaluation against hidden changeset renders hidden message
 
   $ hg log -r 'automationrelevant(3208166ea109)'
-  abort: hidden revision '3208166ea109'! (no-hg45 !)
-  abort: hidden revision '3208166ea109' was rewritten as: 22296b97e5de! (hg45 !)
+  abort: hidden revision '3208166ea109' was rewritten as: 22296b97e5de!
   (use --hidden to access hidden revisions)
   [255]
 

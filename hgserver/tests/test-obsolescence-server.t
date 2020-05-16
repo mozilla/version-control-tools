@@ -79,9 +79,8 @@ Create initial repo content
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 3 changesets with 3 changes to 3 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -121,9 +120,8 @@ Create some obsolescence markers
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -145,8 +143,7 @@ Pulling should get the obsmarkers
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
   obsoleted 1 changesets
-  new changesets 5217e2ac5b15 (no-hg48 !)
-  new changesets 5217e2ac5b15 (1 drafts) (hg48 !)
+  new changesets 5217e2ac5b15 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg debugobsolete
   ba1c6c2be69c46fed329d3795c9d906d252fdaf7 5217e2ac5b1538d1630aa54377056dbfab270508 0 (*) {*'user': 'Test User <someone@example.com>'} (glob)
@@ -184,9 +181,8 @@ Pushing a changeset then hiding it works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/8713015ee6f2dc22a64a7821684d7119323dc119
@@ -197,9 +193,8 @@ Pushing a changeset then hiding it works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/users/user_example.com/repo-1/rev/6ddbc9389e710d9b4f3c880d7c99320f9581dbd5
@@ -213,9 +208,8 @@ Pushing a changeset then hiding it works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -303,9 +297,8 @@ and we're not in the allowed user list
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/integration/autoland/rev/d57129f00b2f329fc2cf3371a0c28796bcfbde1c
@@ -338,9 +331,8 @@ Pushing again should send obsolescence markers
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: obsoleted 2 changesets
   remote: 

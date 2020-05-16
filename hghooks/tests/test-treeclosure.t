@@ -31,10 +31,8 @@ Pushing to an open tree should succeed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
-  intercepting url (no-hg52 !)
-  intercepting url (hg52 !)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  intercepting url
+  added 1 changesets with 1 changes to 1 files
 
 Pushing to a closed tree should fail
 
@@ -51,7 +49,6 @@ Pushing to a closed tree should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -75,11 +72,10 @@ Pushing to a closed tree with the magic words is allowed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   mozilla-central is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
 
 Pushing multiple changesets to a closed tree is accepted if CLOSED TREE
 is on the tip commit
@@ -96,11 +92,10 @@ is on the tip commit
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   intercepting url
   mozilla-central is CLOSED! Reason: splines won't reticulate
   But you included the magic words.  Hope you had permission!
-  added 3 changesets with 3 changes to 1 files (hg52 !)
+  added 3 changesets with 3 changes to 1 files
 
 Pushing to an approval required tree should fail
 
@@ -117,7 +112,6 @@ Pushing to an approval required tree should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -140,10 +134,8 @@ Adding an approver should allow pushing on an approval only tree
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
-  intercepting url (no-hg52 !)
-  intercepting url (hg52 !)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  intercepting url
+  added 1 changesets with 1 changes to 1 files
 
 Approval of the form "a1.2=foo" works
 
@@ -155,10 +147,8 @@ Approval of the form "a1.2=foo" works
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
-  intercepting url (no-hg52 !)
-  intercepting url (hg52 !)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  intercepting url
+  added 1 changesets with 1 changes to 1 files
 
 Approval is only needed on tip-most commit
 
@@ -174,9 +164,8 @@ Approval is only needed on tip-most commit
   adding changesets
   adding manifests
   adding file changes
-  intercepting url (hg52 !)
+  intercepting url
   added 3 changesets with 3 changes to 1 files
-  intercepting url (no-hg52 !)
 
   $ cd ..
 

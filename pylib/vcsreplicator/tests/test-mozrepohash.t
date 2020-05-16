@@ -50,9 +50,8 @@ Repo with single changeset has a hash
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/repo/rev/af1e0a150cd431eced63336021855fd2f59077f6
@@ -130,9 +129,8 @@ Adding a bookmark changes the hash
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/repo
   searching for changes
   no changes found
-  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re) (hg52 !)
+  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   exporting bookmark mymark
-  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re) (no-hg52 !)
   [1]
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag

@@ -1,4 +1,3 @@
-  $ . $TESTDIR/hghooks/tests/common.sh
   $ export USER=hguser
   $ hg init server
   $ configurepushlog server
@@ -28,10 +27,9 @@ Introducing changesets via pulling does not run the pushlog hook
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   calling hook pretxnchangegroup.pushlog: hgext_pushlog.pretxnchangegrouphook
   (not updating pushlog since changesets come from pull)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
   new changesets 96ee1d7354c4 (?)
   (run 'hg update' to get a working copy)
 

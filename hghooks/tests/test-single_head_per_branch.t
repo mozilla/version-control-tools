@@ -37,7 +37,6 @@ Creating a new head on the default branch is not allowed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (+1 heads) (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -127,11 +126,11 @@ Hidden changesets should not impact head detection.
   $ hg commit -m 'hidden head 2'
   created new head
   $ hg debugobsolete 0e85a332921b9487fc3b6b033653d9b250b1716c
-  1 new obsolescence markers (hg52 !)
-  obsoleted 1 changesets (?)
+  1 new obsolescence markers
+  obsoleted 1 changesets
   $ hg debugobsolete befc484a90fb5120f14f15a65e24e1b84e773e76
-  1 new obsolescence markers (hg52 !)
-  obsoleted 1 changesets (?)
+  1 new obsolescence markers
+  obsoleted 1 changesets
 
   $ cd ..
 

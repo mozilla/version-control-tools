@@ -1376,10 +1376,9 @@ Query a changeset that doesn't exist
   content-type: application/json
 
   $ cat body
-  "unknown revision 'foobar'" (no-eol) (no-hg48 !)
-  { (hg48 !)
-  "error": "unknown revision 'foobar'" (hg48 !)
-  } (no-eol) (hg48 !)
+  {
+  "error": "unknown revision 'foobar'"
+  } (no-eol)
 
 Test paging
 
@@ -1589,10 +1588,10 @@ Format version 3 fails
   content-type: application/json
 
   $ cat body
-  "version parameter must be 1 or 2" (no-eol) (no-hg48 !)
-  { (hg48 !)
-  "error": "version parameter must be 1 or 2" (hg48 !)
-  } (no-eol) (hg48 !)
+  "version parameter must be 1 or 2" (no-eol)
+  {
+  "error": "version parameter must be 1 or 2"
+  } (no-eol)
 
 Format version 2 has pushes in a child object and a last push id
 

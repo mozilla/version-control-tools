@@ -51,8 +51,7 @@ Test pushing an outstanding change preserves executable bits.
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 1 changesets, 1 total revisions (no-hg48 !)
-  checked 1 changesets with 1 changes to 1 files (hg48 !)
+  checked 1 changesets with 1 changes to 1 files
 
 Test the uncommited changes made it to our remote (with the right bits set).
 

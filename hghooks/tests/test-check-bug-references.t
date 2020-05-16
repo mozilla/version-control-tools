@@ -108,7 +108,7 @@ Test that the hook rejects commits when Bugzilla can not be accessed.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
+  added 1 changesets with 1 changes to 1 files
   
   ********************************* ERROR **********************************
   Could not access bugzilla.mozilla.org to check if a bug referenced in your

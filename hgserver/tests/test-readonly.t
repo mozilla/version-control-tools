@@ -22,9 +22,8 @@ Pushing works as expected
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72

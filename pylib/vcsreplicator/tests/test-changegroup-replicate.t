@@ -23,9 +23,8 @@ Pushing the initial commit will result in replication messages
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -94,11 +93,9 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (no-hg52 !)
   vcsreplicator.consumer   > new changesets 77538e1ce4be
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -120,9 +117,8 @@ Pushing multiple commits results in sane behavior
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 3 changesets with 3 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e325efa1b1fb7cb9e7f231851436db4de63e0a26
@@ -188,11 +184,9 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (no-hg52 !)
   vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -208,9 +202,8 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
   vcsreplicator.consumer   > added 3 changesets with 3 changes to 1 files
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
   vcsreplicator.consumer   > new changesets e325efa1b1fb:4f52aeca631d (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -236,9 +229,8 @@ Pushing multiple heads results in appropriate behavior
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 4 changesets with 4 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/5d9ed3f8efffe0777be762f2a35927cc3be3eeef
@@ -312,11 +304,9 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
+  vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
-  vcsreplicator.consumer   > updating moz-owner file (no-hg52 !)
   vcsreplicator.consumer   > new changesets 77538e1ce4be (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -332,9 +322,8 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
   vcsreplicator.consumer   > added 3 changesets with 3 changes to 1 files
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
   vcsreplicator.consumer   > new changesets e325efa1b1fb:4f52aeca631d (?)
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -350,9 +339,8 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 pushes (hg52 !)
+  vcsreplicator.consumer   > added 1 pushes
   vcsreplicator.consumer   > added 4 changesets with 4 changes to 1 files (+1 heads)
-  vcsreplicator.consumer   > added 1 pushes (no-hg52 !)
   vcsreplicator.consumer   > new changesets 5d9ed3f8efff:4b11352745a6 (?)
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]

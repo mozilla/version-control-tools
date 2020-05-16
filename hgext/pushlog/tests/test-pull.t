@@ -27,9 +27,8 @@
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
 
 Pulling from a remote that has pushlog will fetch pushlog data
 
@@ -68,9 +67,8 @@ Pulling from a remote that has pushlog will fetch pushlog data
   adding changesets
   adding manifests
   adding file changes
-  added 2 pushes (hg52 !)
+  added 2 pushes
   added 3 changesets with 3 changes to 1 files
-  added 2 pushes (no-hg52 !)
   new changesets d0fddd3a3fb5:77a9042f9faf (?)
   (run 'hg update' to get a working copy)
   $ dumppushlog client
@@ -114,10 +112,9 @@ Incremental pushlog fetch works over SSH
   adding changesets
   adding manifests
   adding file changes
-  added 1 pushes (hg52 !)
+  added 1 pushes
   added 1 changesets with 1 changes to 1 files
-  added 1 pushes (no-hg52 !)
-  new changesets f77647c7d4e3 (?)
+  new changesets f77647c7d4e3
   (run 'hg update' to get a working copy)
 
   $ dumppushlog clone-ssh
@@ -146,11 +143,10 @@ Pulling an old changeset only pulls relevant changesets
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   received pushlog entry for unknown changeset 2e70e96c7d550e541406a47d87df354309fe9a72; ignoring
   added 1 pushes
-  added 1 changesets with 1 changes to 1 files (hg52 !)
-  new changesets 1a68e4eb4da6 (?)
+  added 1 changesets with 1 changes to 1 files
+  new changesets 1a68e4eb4da6
   (run 'hg update' to get a working copy)
 
   $ hg --config extensions.pushlog=$TESTDIR/hgext/pushlog pull
@@ -159,10 +155,9 @@ Pulling an old changeset only pulls relevant changesets
   adding changesets
   adding manifests
   adding file changes
-  added 1 pushes (hg52 !)
+  added 1 pushes
   added 1 changesets with 1 changes to 1 files
-  added 1 pushes (no-hg52 !)
-  new changesets 2e70e96c7d55 (?)
+  new changesets 2e70e96c7d55
   (run 'hg update' to get a working copy)
 
   $ dumppushlog clone-ssh

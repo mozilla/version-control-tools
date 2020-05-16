@@ -26,7 +26,7 @@ Pulling is allowed
   adding manifests
   adding file changes
   added 1 changesets with 1 changes to 1 files
-  new changesets 68986213bd44 (hg44 !)
+  new changesets 68986213bd44
   (run 'hg update' to get a working copy)
   $ hg up tip
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -59,7 +59,6 @@ Pushing is not allowed
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   illegal change to repository
   changes to repositories on HTTP replicas can only be made through the replication system; a change via push is not allowed
   transaction abort!

@@ -49,8 +49,7 @@ Test pushing with outstanding changes that delete a file works.
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  2 files, 1 changesets, 2 total revisions (no-hg48 !)
-  checked 1 changesets with 2 changes to 2 files (hg48 !)
+  checked 1 changesets with 2 changes to 2 files
 
   $ hg diff
   diff -r 61db39535340 file1.txt

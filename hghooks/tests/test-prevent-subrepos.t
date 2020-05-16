@@ -40,7 +40,6 @@ We cannot create subrepos on user repos (but a warning is printed)
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files (no-hg52 !)
   
   *********************************** ERROR ************************************
   5e42dc5815d5 contains subrepositories.
@@ -82,7 +81,6 @@ We need this to exist so sub-repo push works
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files (no-hg52 !)
   
   *********************************** ERROR ************************************
   5e42dc5815d5 contains subrepositories.

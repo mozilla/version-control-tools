@@ -49,9 +49,8 @@ Disabling a single Kafka node should still allow push to go through
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/40a8cea9915cba8d31ed63df374ae8847350a99b
@@ -64,7 +63,6 @@ Disabling 2 Kafka nodes should result in no quorum and failure to push
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg sendheartbeat
   sending heartbeat to partition 0
   abort: error sending heartbeat: NOT_ENOUGH_REPLICAS
-  abort: error sending heartbeat: NOT_ENOUGH_REPLICAS (no-hg52 !)
   [255]
 
   $ echo 2 > foo
@@ -101,9 +99,8 @@ Adding node back in should result in being able to push again
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/f783dc6187dd50644a1db0d923e877cdac181f5b
@@ -157,9 +154,8 @@ clean shutdown (which there was).
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/324ebd5068e8c3efc0e493d3f4ce1b4012bec0ec
@@ -190,9 +186,8 @@ Stopping Kafka on hgssh node doesn't break pushes
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/145bfa9e345587f76bb4967d00ad7e0204fd9dd0

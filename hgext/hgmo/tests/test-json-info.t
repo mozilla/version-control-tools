@@ -1,4 +1,3 @@
-  $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
 
   $ startserver
 
@@ -32,9 +31,8 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 5 changesets with 5 changes to 4 files (+2 heads)
-  remote: recorded push in pushlog (no-hg52 !)
 
 json-info requires a rev argument
 

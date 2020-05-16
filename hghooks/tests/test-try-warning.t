@@ -18,7 +18,6 @@ Pushing a changeset without using try syntax should print a warning
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   **************************** WARNING ****************************
   Your push does not specify any jobs to run on try. You can still
@@ -28,7 +27,7 @@ Pushing a changeset without using try syntax should print a warning
   For more information, see https://wiki.mozilla.org/Try.
   *****************************************************************
   
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
 
 
 Pushing a changeset with '-p none' should error out
@@ -41,7 +40,6 @@ Pushing a changeset with '-p none' should error out
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ***************************** ERROR ******************************
   Your try syntax would not trigger any jobs. Either specify a build

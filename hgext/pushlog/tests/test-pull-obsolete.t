@@ -30,9 +30,8 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
 
   $ touch file0
   $ hg -q commit -A -m file0
@@ -49,9 +48,8 @@
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets (?)
 
@@ -139,10 +137,8 @@ An uncompressed clone transfers obsolete changesets and markers
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-obsolete2
   streaming all changes
-  10 files to transfer, 1.49 KB of data (no-hg50 !)
-  11 files to transfer, 1.63 KB of data (hg50 !)
-  transferred 1.49 KB in * seconds (* KB/sec) (glob) (no-hg50 !)
-  transferred 1.63 KB in * seconds (* KB/sec) (glob) (hg50 !)
+  11 files to transfer, 1.63 KB of data
+  transferred 1.63 KB in * seconds (* KB/sec) (glob)
 
 #endif
 
@@ -197,10 +193,8 @@ for hidden changesets should still be fetched.
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
   streaming all changes
-  10 files to transfer, 1.49 KB of data (no-hg50 !)
-  11 files to transfer, 1.63 KB of data (hg50 !)
-  transferred 1.49 KB in * seconds (* KB/sec) (glob) (no-hg50 !)
-  transferred 1.63 KB in * seconds (* KB/sec) (glob) (hg50 !)
+  11 files to transfer, 1.63 KB of data
+  transferred 1.63 KB in * seconds (* KB/sec) (glob)
 
 #endif
 
@@ -229,14 +223,11 @@ Hidden changesets aren't transferred, so we can't apply the pushlog data.
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 3 files (no-hg52 !)
-  1 new obsolescence markers (no-hg52 !)
   received pushlog entry for unknown changeset 80c2c663cb8364f6898662a8379cb25df3ebe719; ignoring
   added 2 pushes
-  added 3 changesets with 3 changes to 3 files (hg52 !)
-  1 new obsolescence markers (hg52 !)
-  new changesets 96ee1d7354c4:a129f82339bb (no-hg48 !)
-  new changesets 96ee1d7354c4:a129f82339bb (3 drafts) (hg48 !)
+  added 3 changesets with 3 changes to 3 files
+  1 new obsolescence markers
+  new changesets 96ee1d7354c4:a129f82339bb (3 drafts)
   (run 'hg update' to get a working copy)
 
   $ dumppushlog pull-empty
@@ -258,10 +249,8 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
 #else
   $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
   streaming all changes
-  10 files to transfer, 1.49 KB of data (no-hg50 !)
-  11 files to transfer, 1.63 KB of data (hg50 !)
-  transferred 1.49 KB in * seconds (* KB/sec) (glob) (no-hg50 !)
-  transferred 1.63 KB in * seconds (* KB/sec) (glob) (hg50 !)
+  11 files to transfer, 1.63 KB of data
+  transferred 1.63 KB in * seconds (* KB/sec) (glob)
 #endif
 
   $ rm incremental-pull/.hg/store/obsstore
@@ -275,13 +264,11 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
   adding changesets
   adding manifests
   adding file changes
-  added 4 pushes (hg52 !)
+  added 4 pushes
   added 1 changesets with 0 changes to 1 files
   1 new obsolescence markers
-  added 4 pushes (no-hg52 !)
   obsoleted 1 changesets (?)
-  new changesets a129f82339bb (?)
-  new changesets a129f82339bb (1 drafts) (hg48 !)
+  new changesets a129f82339bb (1 drafts)
   (run 'hg update' to get a working copy)
 
 We'll apply the pushlog for the locally-known but now-hidden changeset

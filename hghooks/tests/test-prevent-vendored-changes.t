@@ -32,7 +32,6 @@ User not in list can't change servo/
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: 5230edf787fb)
   ************************************************************************
   you do not have permissions to modify files under servo/
@@ -59,10 +58,9 @@ User in list can change servo/
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: 5230edf787fb)
   (you have permission to change servo/)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
 
 Multiple changesets handled properly
 
@@ -77,7 +75,6 @@ Multiple changesets handled properly
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: b2df976eda4d)
   ************************************************************************
   you do not have permissions to modify files under servo/
@@ -115,10 +112,9 @@ Well formed servo fixup commit
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: 8e552ce6e2d1)
   (allowing valid fixup commit to servo: 8e552ce6e2d1)
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
 
 Servo fixup commit with bad description
 
@@ -132,7 +128,6 @@ Servo fixup commit with bad description
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: 4396af38cc9d)
   ************************************************************************
   invalid servo fixup commit: 4396af38cc9d
@@ -158,7 +153,6 @@ Servo fixup commit that touches non-servo files
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: c1c0d69286cf)
   ************************************************************************
   invalid servo fixup commit: c1c0d69286cf
@@ -181,7 +175,6 @@ Servo fixup commit missing extra data
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   (1 changesets contain changes to protected servo/ directory: 104a9759c1bc)
   ************************************************************************
   you do not have permissions to modify files under servo/

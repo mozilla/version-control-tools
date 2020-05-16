@@ -34,9 +34,8 @@ Create the repository and push a change
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -90,9 +89,8 @@ Creating a bookmark will write a pushkey message
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
-  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re) (hg52 !)
+  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re)
   exporting bookmark my-bookmark
-  remote: recorded updates to bookmarks in replication log in \d\.\d+s (re) (no-hg52 !)
   [1]
 
   $ consumer --dump --partition 2
@@ -139,15 +137,13 @@ We send a changegroup and a pushkey but don't process them immediately
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
-  updating bookmark my-bookmark (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/2777163b593873bfa63c7129e02a21becc299ff0
   remote: recorded changegroup in replication log in \d\.\d+s (re)
-  updating bookmark my-bookmark (hg52 !)
+  updating bookmark my-bookmark
 
   $ consumer --dump
   - _created: \d+\.\d+ (re)
@@ -183,9 +179,8 @@ Mirror gets bookmark updates when pulling the changegroup.
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > adding remote bookmark my-bookmark (hg52 !)
+  vcsreplicator.consumer   > adding remote bookmark my-bookmark
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > adding remote bookmark my-bookmark (no-hg52 !)
   vcsreplicator.consumer   > new changesets 2777163b5938
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -292,9 +287,8 @@ But processing the next changegroup message should advance the bookmark by 1
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > adding remote bookmark my-bookmark (hg52 !)
+  vcsreplicator.consumer   > adding remote bookmark my-bookmark
   vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
-  vcsreplicator.consumer   > adding remote bookmark my-bookmark (no-hg52 !)
   vcsreplicator.consumer   > new changesets e20ecd72ffa9
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
@@ -312,9 +306,8 @@ Now test bookmark divergence
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   searching for changes
   no changes found
-  remote: recorded updates to bookmarks in replication log in \d+\.\d+s (re) (hg52 !)
+  remote: recorded updates to bookmarks in replication log in \d+\.\d+s (re)
   exporting bookmark divergent
-  remote: recorded updates to bookmarks in replication log in \d+\.\d+s (re) (no-hg52 !)
   [1]
 
   $ consumer --dump --partition 2
@@ -353,15 +346,13 @@ Now test bookmark divergence
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
-  updating bookmark divergent (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/e84fdf206e79496713b3a56eae2e16c490475cc8
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
-  updating bookmark divergent (hg52 !)
+  updating bookmark divergent
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
@@ -396,10 +387,9 @@ Now test bookmark divergence
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads) (no-hg52 !)
   vcsreplicator.consumer   > adding remote bookmark divergent
   vcsreplicator.consumer   > adding remote bookmark my-bookmark
-  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads) (hg52 !)
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (+1 heads)
   vcsreplicator.consumer   > new changesets e84fdf206e79
   vcsreplicator.consumer   > (run 'hg heads' to see heads, 'hg merge' to merge)
   vcsreplicator.consumer   [0]

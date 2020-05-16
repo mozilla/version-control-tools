@@ -33,15 +33,15 @@ Pushing a tag should not populate the tags cache unless without the hook
   [1]
 
   $ cat ../server/.hg/blackbox.log
-  *> reposetup for blackbox took * (glob) (hg49 !)
-  *> all reposetup took * (glob) (hg49 !)
-  *> reposetup for blackbox took * (glob) (hg49 !)
-  *> all reposetup took * (glob) (hg49 !)
+  *> reposetup for blackbox took * (glob)
+  *> all reposetup took * (glob)
+  *> reposetup for blackbox took * (glob)
+  *> all reposetup took * (glob)
   *> updated base branch cache in * seconds (glob)
   *> wrote base branch cache with 1 labels and 1 nodes (glob)
   *> 1 incoming changes - new heads: 96ee1d7354c4 (glob)
-  *> reposetup for blackbox took * (glob) (hg49 !)
-  *> all reposetup took * (glob) (hg49 !)
+  *> reposetup for blackbox took * (glob)
+  *> all reposetup took * (glob)
   *> updated base branch cache in * seconds (glob)
   *> wrote base branch cache with 1 labels and 1 nodes (glob)
   *> 1 incoming changes - new heads: 5e849d85a748 (glob)
@@ -59,12 +59,9 @@ Activating the hook causes tags cache to get populated
   $ [ -f ../server/.hg/cache/hgtagsfnodes1 ]
 
   $ tail -12 ../server/.hg/blackbox.log
-  *> 1 incoming changes - new heads: 5e849d85a748 (glob) (hg49 !)
-  *> reposetup for blackbox took * (glob) (hg49 !)
-  *> all reposetup took * (glob) (hg49 !)
-  *> updated base branch cache in * seconds (glob) (no-hg49 !)
-  *> wrote base branch cache with 1 labels and 1 nodes (glob) (no-hg49 !)
-  *> 1 incoming changes - new heads: 5e849d85a748 (glob) (no-hg49 !)
+  *> 1 incoming changes - new heads: 5e849d85a748 (glob)
+  *> reposetup for blackbox took * (glob)
+  *> all reposetup took * (glob)
   *> writing 72 bytes to cache/hgtagsfnodes1 (glob)
   *> 0/1 cache hits/lookups in * seconds (glob)
   *> writing .hg/cache/tags2-served with 2 tags (glob)

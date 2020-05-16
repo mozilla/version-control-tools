@@ -40,7 +40,6 @@ Case only rename of file should be rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -63,7 +62,6 @@ Case only rename that isn't tip should fail
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************
@@ -100,7 +98,6 @@ Case only rename of directory should be rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   
   ************************** ERROR ****************************

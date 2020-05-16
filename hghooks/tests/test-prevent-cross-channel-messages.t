@@ -50,7 +50,6 @@ Can't push with X-Channel- message
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   **************************** ERROR ****************************
   You are trying to commit with a message that conflicts with
@@ -80,7 +79,6 @@ Can't push with X-Channel- message
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   **************************** ERROR ****************************
   You are trying to commit with a message that conflicts with
@@ -128,7 +126,6 @@ Can't push with X-Channel- message
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   **************************** ERROR ****************************
   You are trying to commit with a message that conflicts with

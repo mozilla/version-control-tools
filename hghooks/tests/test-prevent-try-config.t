@@ -63,7 +63,6 @@ Can't push try_task_config.json
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ***************************** ERROR ******************************
   You are trying to commit the temporary 'try_task_config.json' file
@@ -89,7 +88,6 @@ Multiple changesets handled properly
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 3 files (no-hg52 !)
   
   ***************************** ERROR ******************************
   You are trying to commit the temporary 'try_task_config.json' file

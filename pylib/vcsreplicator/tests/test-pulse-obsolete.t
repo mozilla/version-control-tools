@@ -50,9 +50,8 @@ them. So disable the pulse consumer until all repo changes have been made.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 0 changes to 1 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: obsoleted 1 changesets
   remote: 
@@ -107,9 +106,8 @@ Send a precursor marker referencing a node unknown to the server
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 2 new obsolescence markers
   remote: 
   remote: View your change here:
@@ -137,9 +135,8 @@ Commit message with multiple lines works
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 2 files (+1 heads)
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 1 new obsolescence markers
   remote: 
   remote: View your change here:
@@ -365,15 +362,6 @@ Commit message with multiple lines works
       - precursor:
           desc: null
           known: false
-          node: 0a1055f8c9cb8d183d9e5b843e182038f51cbe6e (no-hg44 !)
-          push: null (no-hg44 !)
-          visible: null (no-hg44 !)
-        successors: [] (no-hg44 !)
-        time: \d+\.\d+ (re) (no-hg44 !)
-        user: Test User <someone@example.com> (no-hg44 !)
-      - precursor: (no-hg44 !)
-          desc: null (no-hg44 !)
-          known: false (no-hg44 !)
           node: 2d43215925d94eb9e5792ae70344b3c8be755e5f
           push: null
           visible: null

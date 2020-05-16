@@ -26,7 +26,6 @@ Verify hooks are working by pushing something that should be rejected
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (no-hg52 !)
   remote: 
   remote: 
   remote: ************************** ERROR ****************************

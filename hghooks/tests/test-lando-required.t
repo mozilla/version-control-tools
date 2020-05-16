@@ -23,9 +23,8 @@ Pushing to not-mozilla-central should succeed if user has "active_scm_allow_dire
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/not-mozilla-central/rev/57a078f147413eada087f5d2ace88598c06d2c42
@@ -58,7 +57,6 @@ provided neither MAGIC_WORDS nor a justification in their top commit.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (no-hg52 !)
   remote: 
   remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
@@ -83,10 +81,9 @@ magic words with justification
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (no-hg52 !)
   remote: l3user@example.com pushed: "because I want to". (not-mozilla-central@ce3b4a58cd35, ACTIVE_SCM_LEVEL_3)
   remote: recorded push in pushlog
-  remote: added 1 changesets with 1 changes to 1 files (hg52 !)
+  remote: added 1 changesets with 1 changes to 1 files
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/not-mozilla-central/rev/ce3b4a58cd35be233796dbc19347bc77c72da472
@@ -110,10 +107,9 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 4 changesets with 4 changes to 1 files (no-hg52 !)
   remote: l3user@example.com pushed: "because I can". (not-mozilla-central@1235dd2aeaf5, ACTIVE_SCM_LEVEL_3)
   remote: recorded push in pushlog
-  remote: added 4 changesets with 4 changes to 1 files (hg52 !)
+  remote: added 4 changesets with 4 changes to 1 files
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/not-mozilla-central/rev/0c601082542dc49efb346c2a5d527d2ff25d35fe
@@ -137,7 +133,6 @@ ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is m
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 3 changesets with 3 changes to 1 files (no-hg52 !)
   remote: 
   remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.
@@ -166,7 +161,6 @@ ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 6 changesets with 6 changes to 1 files (no-hg52 !)
   remote: 
   remote: *********************************** ERROR ***********************************
   remote: Pushing directly to this repo is disallowed, please use Lando.

@@ -19,9 +19,8 @@ Create some repository and a few commits
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/2d30fb72c11e311c32234b1c6b05a916a30aafcc
@@ -86,10 +85,9 @@ Output of consumer logs:
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
-  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (no-hg52 !)
   vcsreplicator.consumer   > added 1 pushes
   vcsreplicator.consumer   > updating moz-owner file
-  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files (hg52 !)
+  vcsreplicator.consumer   > added 1 changesets with 1 changes to 1 files
   vcsreplicator.consumer   > new changesets 2d30fb72c11e
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]

@@ -53,7 +53,6 @@ Symlinks on other repos are prohibited
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 3 changes to 3 files (no-hg52 !)
   
   ****************************** ERROR *******************************
   af08f309d8f2 adds or modifies the following symlinks:
@@ -116,7 +115,6 @@ We can't change the target of a symlink
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ****************************** ERROR *******************************
   07fa4de1b0ce adds or modifies the following symlinks:

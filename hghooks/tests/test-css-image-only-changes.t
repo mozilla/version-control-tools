@@ -32,7 +32,6 @@ Add file (tracked extension), no approval flag, should not work because approval
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   intercepting url
   
   
@@ -59,7 +58,6 @@ Add file (untracked extension), no approval flag, should not work because approv
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files (no-hg52 !)
   intercepting url
   
   
@@ -98,10 +96,9 @@ Add file (tracked extension), approval flag, should work
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   Thanks for your a=css-image-only push, it's the best!
   intercepting url
-  added 1 changesets with 1 changes to 1 files (hg52 !)
+  added 1 changesets with 1 changes to 1 files
 
 Add file (untracked extension), approval flag, should fail
 
@@ -114,7 +111,6 @@ Add file (untracked extension), approval flag, should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ************************** ERROR ****************************
   * non-image/css-file (test.txt) altered in this changeset
@@ -138,7 +134,6 @@ Add file (untracked extension), generic approval flag, should work
   adding changesets
   adding manifests
   adding file changes
-  intercepting url (hg52 !)
+  intercepting url
   added 2 changesets with 2 changes to 1 files
-  intercepting url (no-hg52 !)
 

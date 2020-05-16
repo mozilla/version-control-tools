@@ -38,7 +38,6 @@ wptsync user cannot push changes beyond testing/web-platform/tests or meta
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 5 changes to 5 files (no-hg52 !)
   
   ****************** ERROR *******************
   wptsync@mozilla.com can only make changes to
@@ -68,7 +67,6 @@ wptsync user cannot push changes beyond testing/web-platform, multiple
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 6 changes to 6 files (no-hg52 !)
   
   ****************** ERROR *******************
   wptsync@mozilla.com can only make changes to
@@ -213,7 +211,6 @@ wptsync user cannot push changes to a repo other than autoland or try
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ***************** ERROR *****************
   wptsync@mozilla.com cannot push to server
@@ -256,7 +253,6 @@ wptsync user cannot push wpt changes to any non-Firefox repo
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   
   ********************** ERROR **********************
   wptsync@mozilla.com cannot push to non-firefox-repo
@@ -277,7 +273,6 @@ wptsync user cannot push changes to any non-Firefox repo
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files (no-hg52 !)
   
   ********************** ERROR **********************
   wptsync@mozilla.com cannot push to non-firefox-repo

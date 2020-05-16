@@ -38,9 +38,8 @@ Seed the pushlog for our next test
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
-  remote: recorded push in pushlog (no-hg52 !)
 
 Lack of permissions on pushlog should prevent pushes from completing
 
@@ -53,7 +52,6 @@ Lack of permissions on pushlog should prevent pushes from completing
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files (no-hg52 !)
   remote: error recording into pushlog (attempt to write a readonly database); please retry your push
   remote: transaction abort!
   remote: rolling back pushlog

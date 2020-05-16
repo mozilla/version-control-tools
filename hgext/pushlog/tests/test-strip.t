@@ -15,9 +15,8 @@
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
   $ echo foo2 > foo
   $ hg commit -m 'second'
   $ hg push ../server
@@ -26,9 +25,8 @@
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 1 changesets with 1 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
 
 Stripping changesets should result in pushlog getting stripped
 
@@ -51,7 +49,6 @@ Stripping changesets should result in pushlog getting stripped
 
   $ cat .hg/blackbox.log
   * deleted 1 changesets from pushlog: d0fddd3a3fb51076c33010ecf66692621f989a2c (glob)
-  * --config 'extensions.strip=' strip -r 1 --no-backup exited 0 after * (glob) (no-hg49 !)
   * log exited 0 after * seconds (glob) (?)
 
   $ rm .hg/blackbox.log
@@ -73,9 +70,8 @@ being stripped. This tests rev reordering in pushlog database
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 2 changesets with 2 changes to 1 files
-  recorded push in pushlog (no-hg52 !)
 
   $ hg -q up -r 0
   $ echo c3 > foo
@@ -89,9 +85,8 @@ being stripped. This tests rev reordering in pushlog database
   adding changesets
   adding manifests
   adding file changes
-  recorded push in pushlog (hg52 !)
+  recorded push in pushlog
   added 2 changesets with 2 changes to 1 files (+1 heads)
-  recorded push in pushlog (no-hg52 !)
 
   $ cd ../server
 
@@ -124,5 +119,4 @@ Note the missing push ID 2!
   * log -T '{rev} {node} {desc}\n' exited 0 after * seconds (glob) (?)
   * deleted 1 changesets from pushlog: 919c29ac42c0b25851d19be2d9d3883c45ba2ce4 (glob)
   * reordered 2 changesets in pushlog (glob)
-  * --config 'extensions.strip=' strip -r 2 --no-backup exited 0 after * (glob) (no-hg49 !)
   * log -T '{rev} {node} {desc}\n' exited 0 after * seconds (glob) (?)

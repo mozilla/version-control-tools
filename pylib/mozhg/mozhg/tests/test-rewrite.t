@@ -20,8 +20,7 @@ Attempting to rewrite in the middle of another operation results in error
   $ touch .hg/graftstate
   $ hg rewritemessage 0
   abort: graft in progress
-  (use 'hg graft --continue' or 'hg update' to abort) (no-hg47 !)
-  (use 'hg graft --continue' or 'hg graft --stop' to stop) (hg47 !)
+  (use 'hg graft --continue' or 'hg graft --stop' to stop)
   [255]
 
   $ rm .hg/graftstate

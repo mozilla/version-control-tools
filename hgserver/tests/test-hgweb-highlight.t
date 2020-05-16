@@ -30,9 +30,8 @@ Create a repository
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: recorded push in pushlog (hg52 !)
+  remote: recorded push in pushlog
   remote: added 2 changesets with 3 changes to 3 files
-  remote: recorded push in pushlog (no-hg52 !)
   remote: 
   remote: View your changes here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -63,4 +62,3 @@ Check logs for errors
 
 Cleanup
 
-  $ hgmo clean

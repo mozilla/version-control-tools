@@ -16,8 +16,7 @@
   $ cat server/.hg/blackbox.log
   *> * BEGIN_REQUEST $TESTTMP/server $LOCALIP /?cmd=capabilities (glob)
   *> * BEGIN_PROTOCOL capabilities (glob)
-  *> * END_REQUEST 472 * * (glob) (no-hg49 !)
-  *> * END_REQUEST 485 * * (glob) (hg49 !)
+  *> * END_REQUEST 485 * * (glob)
   *> * BEGIN_REQUEST $TESTTMP/server $LOCALIP /?cmd=batch (glob)
   *> * BEGIN_PROTOCOL batch (glob)
   *> * END_REQUEST 42 * * (glob)

@@ -30,7 +30,6 @@ Just a user name with no email is rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset d28cf3d35b22: Just Username
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -59,7 +58,6 @@ Just an email address is rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset 7912d5cf9855: someone@example.com
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -88,7 +86,6 @@ Just an email address in brackets is rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset 171604c7eccc: <someone@example.com>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -117,7 +114,6 @@ No space between author and email is rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset c7bd56f10523: No Space<someone@example.com>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -146,7 +142,6 @@ Multiple angle brackets are rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset 3ff22b11fa53: Multiple LessThan <<someone@example.com>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -173,7 +168,6 @@ Multiple angle brackets are rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset 57a242fa12b7: Multiple GreaterTHan <someone@example.com>>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -202,7 +196,6 @@ More complicated strings are rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset ee5f32d2fdc3: First Author <someone1@example.com>, Second Author <someone@example.com>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -229,7 +222,6 @@ More complicated strings are rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset ccd3d34a2a22: First Author <someone1@example.com> with tweaks by Second Author <someone2@example.com>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -258,7 +250,6 @@ Emails without @<domain> are rejected
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files (no-hg52 !)
   malformed user field in changeset 514432ecc4d9: Valid Author <someone>
   user fields must be of the format "author <email>"
   e.g. "Mozilla Contributor <someone@example.com>"
@@ -291,7 +282,6 @@ Multiple changesets are listed in error message
   adding changesets
   adding manifests
   adding file changes
-  added 3 changesets with 3 changes to 1 files (no-hg52 !)
   malformed user field in changeset e9718df8a2f3: Invalid
   malformed user field in changeset f088c66168eb: <invalid2@example.com>
   user fields must be of the format "author <email>"
