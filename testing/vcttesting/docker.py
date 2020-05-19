@@ -535,7 +535,7 @@ class Docker(object):
 
             if verbose:
                 for l in s.strip().splitlines():
-                    sys.stdout.write('%s> %s\n' % (name, l))
+                    sys.stdout.write('%s> %s\n' % (name, l.decode('utf-8')))
 
             match = re.match('^Successfully built ([a-f0-9]{12})$', s.rstrip())
             if match:
@@ -761,7 +761,7 @@ class Docker(object):
                             if line != '':
                                 output.append(line)
                                 if verbose:
-                                    print('%s> %s' % (repository, line))
+                                    print('%s> %s' % (repository, line.decode('utf-8')))
 
                     state = self.api_client.inspect_container(cid)
 
@@ -775,7 +775,7 @@ class Docker(object):
                 if state['State']['ExitCode']:
                     # This should arguably be part of the exception.
                     for line in output:
-                        print('ERROR %s> %s' % (repository, line))
+                        print('ERROR %s> %s' % (repository, line.decode('utf-8')))
                     raise Exception('Ansible did not run on %s successfully' %
                                     repository)
 
