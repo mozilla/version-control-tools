@@ -535,7 +535,7 @@ class Docker(object):
 
             if verbose:
                 for l in s.strip().splitlines():
-                    sys.stdout.write('%s> %s\n' % (name, l.decode('utf-8')))
+                    sys.stdout.write('%s> %s\n' % (name, l))
 
             match = re.match('^Successfully built ([a-f0-9]{12})$', s.rstrip())
             if match:
