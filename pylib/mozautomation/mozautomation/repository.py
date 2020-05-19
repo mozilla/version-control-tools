@@ -135,6 +135,10 @@ REPOS = {
     # Misc
     b'try': b'try',
     b'try-comm': b'try-comm-central',
+
+    # KaiOS
+    b'kaios': b'projects/kaios',
+    b'kaios-try': b'projects/kaios-try',
 }
 
 OFFICIAL_MAP = {
@@ -183,6 +187,7 @@ RELEASE_TREES = set([
 TRY_TREES = set([
     b'try',
     b'try-comm',
+    b'kaios-try',
 ])
 
 def resolve_trees_to_official(trees):
