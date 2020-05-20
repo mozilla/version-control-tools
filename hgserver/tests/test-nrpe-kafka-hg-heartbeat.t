@@ -3,7 +3,7 @@
   $ . $TESTDIR/hgserver/tests/helpers.sh
   $ hgmoenv
 
-  $ alias check='hgmo exec hgssh /usr/lib64/nagios/plugins/custom/check_kafka_hg_heartbeat'
+  $ alias check='hgmo exec hgssh /var/hg/version-control-tools/scripts/check_kafka_hg_heartbeat'
 
 Check should pass by default
 

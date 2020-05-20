@@ -270,38 +270,6 @@
   notify: systemd daemon reload
   when: is_testing is not defined
 
-- name: create directory for Nagios files
-  file: path={{ item }}
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-  with_items:
-    - /etc/nagios/nrpe.d
-    - /usr/lib64/nagios/plugins/custom
-
-- name: install Nagios check for hg writing into kafka
-  copy: src=check_kafka_hg_heartbeat
-        dest=/usr/lib64/nagios/plugins/custom/check_kafka_hg_heartbeat
-        owner=root
-        group=root
-        mode=0755
-
-- name: install NRPE check configs
-  copy: src={{ item }}
-        dest=/etc/nagios/nrpe.d/{{ item }}
-        owner=root
-        group=root
-        mode=0644
-  with_items:
-    - check_hg_bundle_generate_age.cfg
-    - check_kafka_hg_heartbeat.cfg
-    - check_pulsenotifier_lag.cfg
-    - check_pushdataaggregator_lag.cfg
-    - check_pushdataaggregator_pending_lag.cfg
-    - check_snsnotifier_lag.cfg
-  notify: restart nrpe.service
-
 - name: install systemd unit files
   copy: src={{ item }}
         dest=/etc/systemd/system/{{ item }}

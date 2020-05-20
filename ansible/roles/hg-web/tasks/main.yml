@@ -579,24 +579,6 @@
   command: /usr/bin/systemctl restart vcsreplicator-heads.service
   when: is_testing is not defined
 
-- name: create Nagios config directory
-  file: path=/etc/nagios/nrpe.d
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-
-- name: install check_vcsreplicator_lag NRPE config
-  copy: src={{ item }}
-        dest=/etc/nagios/nrpe.d/{{ item }}
-        owner=root
-        group=root
-        mode=0644
-  notify: restart nrpe
-  with_items:
-    - check_vcsreplicator_lag.cfg
-    - check_vcsreplicator_pending_lag.cfg
-
 # Needs to come near end for fresh server provisioning scenario to work
 # right.
 - name: ensure httpd service enabled and running (server only)

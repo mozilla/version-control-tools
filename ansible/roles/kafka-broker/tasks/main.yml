@@ -128,19 +128,3 @@
     - kafka
     - zookeeper
   when: is_testing is not defined
-
-# We can remove this is we ever install NRPE in Docker.
-- name: create directory for NRPE check configs
-  file: path=/etc/nagios/nrpe.d
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-
-- name: install NRPE check config
-  template: src=check_zookeeper.cfg.j2
-            dest=/etc/nagios/nrpe.d/check_zookeeper.cfg
-            owner=root
-            group=root
-            mode=0644
-  notify: restart nrpe
