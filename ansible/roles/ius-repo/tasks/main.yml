@@ -1,5 +1,5 @@
 ---
 - name: configure IUS Community Repos
   yum:
-    name: https://centos7.iuscommunity.org/ius-release.rpm
+    name: https://repo.ius.io/ius-release-el7.rpm
     state: present
