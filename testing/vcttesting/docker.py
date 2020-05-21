@@ -1060,17 +1060,47 @@ class Docker(object):
                 self.api_client.stop(cid)
 
     @contextmanager
-    def auto_clean_orphans(self, tests):
-        if not self.is_alive():
+    def auto_clean_orphans(self, runtests_label):
+        """Ensure all Docker containers with the special `runtests_label`
+        are cleaned up after test execution.
+        """
+        if not runtests_label or not self.is_alive():
             yield
             return
 
         try:
             yield
         finally:
-            # Attempt to shut down any lingering clusters
-            for norm_test in map(normalize_testname, tests):
-                docker_compose_down_background(norm_test)
+            # Get all containers with a matching shutdown label
+            try:
+                filters = {
+                    'label': 'hgcluster.run-tests={}'.format(runtests_label),
+                }
+                orphan_containers = self.client.containers.list(
+                    filters=filters,
+                )
+                orphan_networks = self.client.networks.list(
+                    filters=filters,
+                )
+            except docker.errors.APIError as err:
+                print("Failed to retrieve networks and containers for cleanup.", file=sys.stderr)
+                print(err, file=sys.stderr)
+                return
+
+            # Remove leftover containers
+            for container in orphan_containers:
+                try:
+                    container.remove(force=True, v=True)
+                except docker.errors.APIError as err:
+                    print("Failed to cleanup containers and networks.", file=sys.stderr)
+                    print(err, file=sys.stderr)
+            for network in orphan_networks:
+                try:
+                    network.remove()
+                except docker.errors.APIError as err:
+                    print("Failed to cleanup containers and networks.", file=sys.stderr)
+                    print(err, file=sys.stderr)
+    
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False,
                 detach=False):

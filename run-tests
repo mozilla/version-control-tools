@@ -14,6 +14,7 @@ import multiprocessing
 import os
 import subprocess
 import sys
+import uuid
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
@@ -255,6 +256,13 @@ if __name__ == '__main__':
             have_docker = True
             os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
 
+            # Add a label to the containers so any orphans can be
+            # shutdown after the test run is complete. This should permeate
+            # to the environment of the `docker-compose` process created
+            # by `hgmo start`.
+            runtests_label = str(uuid.uuid4())
+            os.environ['RUNTESTS_LABEL'] = runtests_label
+
             # We build the base docker images in the test runner because doing it
             # from tests would be racey. It is easier to do it here instead of
             # complicating code with locks.
@@ -295,7 +303,7 @@ if __name__ == '__main__':
             # the Mercurial test harness allows tests to register cleanup
             # actions, there is only so much we can do.
             print('Running Docker Mercurial tests')
-            with docker.auto_clean_orphans(run_hg_tests_docker):
+            with docker.auto_clean_orphans(runtests_label):
                 args = hg_harness_args + ['-j', str(docker_jobs)] + run_hg_tests_docker
                 res2 = subprocess.call(args, cwd=HERE)
                 if res2:
@@ -316,7 +324,7 @@ if __name__ == '__main__':
 
         if have_docker and run_unit_tests_docker:
             print('Running Docker unit tests')
-            with docker.auto_clean_orphans(run_unit_tests_docker):
+            with docker.auto_clean_orphans(runtests_label):
                 nose_res2 = run_nose_tests(run_unit_tests_docker, docker_jobs,
                                            verbose=verbose)
             if nose_res2:
@@ -392,7 +400,7 @@ if __name__ == '__main__':
 
             if have_docker and tests_docker:
                 print('Running Docker Mercurial tests')
-                with docker.auto_clean_orphans(tests_docker):
+                with docker.auto_clean_orphans(runtests_label):
                     args = common_args + ['-j', str(docker_jobs)] + tests_docker
                     subprocess.call(args, cwd=HERE)
                 sys.stdout.flush()

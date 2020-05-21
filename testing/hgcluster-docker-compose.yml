@@ -18,6 +18,8 @@ services:
       hgcluster_network:
     environment:
       - BROKER_ID=0
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
 
   hgweb0:
     command: /usr/bin/supervisord -n
@@ -31,6 +33,8 @@ services:
       hgcluster_network:
     environment:
       - BROKER_ID=1
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
   hgweb1:
     command: /usr/bin/supervisord -n
     image: hgweb:hgweb
@@ -43,6 +47,8 @@ services:
       hgcluster_network:
     environment:
       - BROKER_ID=2
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
 
   ldap:
     image: ldap:ldap
@@ -50,6 +56,8 @@ services:
       - "389"
     networks:
       hgcluster_network:
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
 
   pulse:
     image: pulse:pulse
@@ -57,7 +65,11 @@ services:
       - "5672"
     networks:
       hgcluster_network:
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
 
 networks:
   hgcluster_network:
     driver: bridge
+    labels:
+      hgcluster.run-tests: "${RUNTESTS_LABEL}"
