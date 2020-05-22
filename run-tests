@@ -37,6 +37,19 @@ def try_find_hg(with_hg):
     return hg
 
 
+def int_floor(number):
+    """Return the integer floor of a number.
+
+    >>> int_floor(14.0)
+    14
+    >>> int_floor(14)
+    14
+    int_floor(14.5)
+    14
+    """
+    return int(math.floor(number))
+        
+
 if __name__ == '__main__':
     if 'VIRTUAL_ENV' not in os.environ:
         activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
@@ -237,9 +250,8 @@ if __name__ == '__main__':
     # Memory constrained environments may not be able to handle the Docker
     # default. We may want to consider taking memory capacity into account
     # as well.
-    no_docker_jobs = max(int(math.floor(float(multiprocessing.cpu_count()) * 1.25)),
-                         1)
-    docker_jobs = max(multiprocessing.cpu_count() / 2, 1)
+    no_docker_jobs = max(int_floor(multiprocessing.cpu_count() * 1.25), 1)
+    docker_jobs = max(int_floor(multiprocessing.cpu_count() / 2), 1)
 
     if options.jobs:
         no_docker_jobs = options.jobs
