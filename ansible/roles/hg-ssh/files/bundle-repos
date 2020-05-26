@@ -4,7 +4,7 @@ integration/mozilla-inbound
 releases/mozilla-release
 releases/mozilla-beta
 releases/mozilla-esr68
-releases/mozilla-esr60
+releases/mozilla-esr78
 mozilla-unified zstd_max
 build/tools
 build/mozharness
