@@ -69,7 +69,6 @@ if __name__ == '__main__':
         get_hg_version,
         get_test_files,
         run_nose_tests,
-        produce_coverage_reports,
         remove_err_files,
     )
 
@@ -121,29 +120,11 @@ if __name__ == '__main__':
     hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
 
-    coveragerc = os.path.join(HERE, '.coveragerc')
-    cover_dir = os.path.join(HERE, 'coverage')
-    cover_data_dir = os.path.join(cover_dir, 'data')
-    try:
-        os.makedirs(cover_data_dir)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-    # run-tests.py's coverage options don't work for us... yet. So, we hack
-    # in code coverage manually.
-    if options.cover:
-        os.environ['COVERAGE_DIR'] = cover_dir
-        os.environ['CODE_COVERAGE'] = '1'
-
-    if options.headless:
-        os.environ['ONLY_HEADLESS_TESTS'] = '1'
 
     if options.no_docker:
         os.environ['SKIP_DOCKER_TESTS'] = '1'
 
-    # We do our own code coverage. Strip it so run-tests.py doesn't try to do
-    # it's own.
+    # Strip code coverage flags
     hg_harness_args = [a for a in hg_harness_args if a != '--cover']
     verbose = '-v' in hg_harness_args or '--verbose' in hg_harness_args
 
@@ -151,10 +132,6 @@ if __name__ == '__main__':
     os.environ['BUGZILLA_PASSWORD'] = 'password'
 
     orig_args = list(hg_harness_args)
-
-    # Always produce an XUnit result file.
-    hg_harness_args.extend(['--xunit',
-        os.path.join(HERE, 'coverage', 'results.xml')])
 
     extensions = get_extensions()
     test_files = get_test_files(extensions)
@@ -348,15 +325,6 @@ if __name__ == '__main__':
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
     if options.all_hg_versions:
-        # No need to grab code coverage for legacy versions - it just slows
-        # us down.
-        # Assertion: we have no tests that only work on legacy Mercurial
-        # versions.
-        try:
-            del os.environ['CODE_COVERAGE']
-        except KeyError:
-            pass
-
         mercurials_dir = os.path.join(os.environ['VIRTUAL_ENV'], 'mercurials')
 
         # Maps directories/versions to lists of tests to run.
@@ -434,9 +402,5 @@ if __name__ == '__main__':
                 all_hg_tests.extend(sorted(m['tests']))
             all_hg_tests.extend(hg_tests)
             run_hg_tests('@', all_hg_tests)
-
-
-    if options.cover:
-        produce_coverage_reports(cover_dir)
 
     sys.exit(res)
