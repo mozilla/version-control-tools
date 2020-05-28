@@ -344,9 +344,9 @@ if __name__ == '__main__':
 
             for m in extensions:
                 for extver in m['testedwith']:
-                    normever = '.'.join(extver.split('.')[0:2])
+                    normever = b'.'.join(extver.split(b'.')[0:2])
 
-                    if extver == dirver or normever == normdirver:
+                    if extver == dirver or normever.decode('utf-8') == normdirver:
                         tests |= m['tests']
 
         def run_hg_tests(version, tests):
