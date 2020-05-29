@@ -1588,7 +1588,6 @@ Format version 3 fails
   content-type: application/json
 
   $ cat body
-  "version parameter must be 1 or 2" (no-eol)
   {
   "error": "version parameter must be 1 or 2"
   } (no-eol)
