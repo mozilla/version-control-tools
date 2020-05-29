@@ -224,7 +224,10 @@ def pushlog_setup(repo, req):
     build a PushlogQuery object and populate it with data from the request.
     The returned query object will have its query already run, and
     its entries member can be read."""
-    page = int(req.qsparams.get(b'node', b'1'))
+    try:
+        page = int(req.qsparams.get(b'node', b'1'))
+    except ValueError:
+        page = 1
 
     tipsonly = req.qsparams.get(b'tipsonly', None) == b'1'
 

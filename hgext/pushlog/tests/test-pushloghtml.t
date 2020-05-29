@@ -47,6 +47,10 @@ Pushlog HTML sanity test
   200
   content-type: text/html; charset=ascii
 
+  $ http http://localhost:$HGPORT/pushloghtml/blah --header content-type --no-body
+  200
+  content-type: text/html; charset=ascii
+
 Main HTML page lists all pushes
 
   $ http http://localhost:$HGPORT/pushloghtml --body-file body --no-headers
