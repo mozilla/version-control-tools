@@ -1,3 +1,4 @@
+  $ . $TESTDIR/hghooks/tests/common.sh
   $ export USER=hguser
   $ hg init server
   $ configurepushlog server
