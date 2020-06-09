@@ -60,7 +60,6 @@ def get_check_classes(hook):
         return (
             merge_day.MergeDayCheck,
             prevent_cross_channel_messages.XChannelMessageCheck,
-            check_bug_references.CheckBugReferencesCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
             prevent_sync_ipc_changes.SyncIPCCheck,
@@ -74,6 +73,11 @@ def get_check_classes(hook):
     elif hook == b'changegroup':
         return (
             advertise_upgrade.AdvertiseUpgradeCheck,
+        )
+
+    elif hook == b'pretxnclose':
+        return (
+            check_bug_references.CheckBugReferencesCheck,
         )
 
 
@@ -152,6 +156,35 @@ def pretxnchangegroup(ui, repo, node, source=None, **kwargs):
         return 0
 
 
+def pretxnclose(ui, repo, node=None, source=None, txnname=None, **kwargs):
+    # Only run hooks on a `push` transaction. `commit`, etc are not relevant
+    if txnname != b"push":
+        return 0
+
+    checks = get_checks(ui, repo, source,
+                        get_check_classes(b'pretxnclose'))
+
+    with timers(ui, b'mozhooks', b'mozhooks.pretxnclose.') as times:
+        for check in checks:
+            with times.timeit(check.name):
+                check.pre(node)
+
+        for rev in repo.changelog.revs(repo[node].rev()):
+            ctx = repo[rev]
+
+            for check in checks:
+                with times.timeit(check.name):
+                    if not check.check(ctx):
+                        return 1
+
+        for check in checks:
+            with times.timeit(check.name):
+                if not check.post_check():
+                    return 1
+
+        return 0
+
+
 def changegroup(ui, repo, source=None, **kwargs):
     checks = get_checks(ui, repo, source, get_check_classes(b'changegroup'))
 
@@ -167,3 +200,4 @@ def changegroup(ui, repo, source=None, **kwargs):
 def reposetup(ui, repo):
     ui.setconfig(b'hooks', b'pretxnchangegroup.mozhooks', pretxnchangegroup)
     ui.setconfig(b'hooks', b'changegroup.mozhooks', changegroup)
+    ui.setconfig(b'hooks', b'pretxnclose.mozhooks', pretxnclose)

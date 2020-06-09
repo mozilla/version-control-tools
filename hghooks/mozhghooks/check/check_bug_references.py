@@ -12,7 +12,7 @@ from mercurial import (
 )
 
 from ..checks import (
-    PreTxnChangegroupCheck,
+    PreTxnCloseCheck,
     print_banner,
 )
 
@@ -168,7 +168,7 @@ class BMOAPIClient(object):
         return code
 
 
-class CheckBugReferencesCheck(PreTxnChangegroupCheck):
+class CheckBugReferencesCheck(PreTxnCloseCheck):
     """
     This pre-transaction check iterates through all commits in a given push
     attempt, filters out any bug IDs that are present in any commit messages

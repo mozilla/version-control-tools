@@ -3,7 +3,14 @@
 Setup the try repo and add a single file after enabling the check in hgrc.
   $ hg init try
   $ configurehooks try 
-  $ sed -i '/^\[mozilla\]$/a check_bug_references_repos = try' try/.hg/hgrc
+
+  $ cat >> try/.hg/hgrc << EOF
+  > [mozilla]
+  > check_bug_references_repos = try
+  > [phases]
+  > publish = False
+  > EOF
+
   $ cd try
   $ touch hello
   $ hg -q commit -A -m 'first commit'
@@ -108,7 +115,6 @@ Test that the hook rejects commits when Bugzilla can not be accessed.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ********************************* ERROR **********************************
   Could not access bugzilla.mozilla.org to check if a bug referenced in your
@@ -121,7 +127,7 @@ Test that the hook rejects commits when Bugzilla can not be accessed.
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
 Test that the hook reject commits when bug IDs could not be verified.
@@ -147,7 +153,7 @@ Test that the hook reject commits when bug IDs could not be verified.
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
 Test that the hook rejects references to bugs that do not have public permissions.
@@ -177,7 +183,7 @@ Test that the hook rejects references to bugs that do not have public permission
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
   $ hg commit --amend -m "fix for bug 4010000 and bug 2000000"
@@ -206,7 +212,7 @@ Test that the hook rejects references to bugs that do not have public permission
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
 Test that the hook rejects references to bugs that do not exist.
@@ -232,7 +238,7 @@ Test that the hook rejects references to bugs that do not exist.
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
 Test that the hook rejects commits when BMO returns a server error.
@@ -258,7 +264,7 @@ Test that the hook rejects commits when BMO returns a server error.
   
   transaction abort!
   rollback completed
-  abort: pretxnchangegroup.mozhooks hook failed
+  abort: pretxnclose.mozhooks hook failed
   [255]
 
 Test that the hook allows push when override flag is included in commit message.
@@ -294,15 +300,28 @@ Test that the hook does not reject public commits.
   $ touch another_file
   $ hg commit -A -m "fix for bug 4010000"
   adding another_file
+  $ echo bar > foo
+  $ hg commit -q -A -m "fix for bug 5000000"
   $ hg phase -v  --public
-  phase changed for 1 changesets
+  phase changed for 5 changesets
+  $ echo foo > bar
+  $ hg commit -q -A -m "fix for bug 2000000"
+  $ hg out -G -T "{node|short} '{desc}' (phase: {phase})\n" ../try   
+  comparing with ../try
+  searching for changes
+  @  b12e8f632e15 'fix for bug 2000000' (phase: draft)
+  |
+  o  09be8babcd05 'fix for bug 5000000' (phase: public)
+  |
+  o  aaa32720c179 'fix for bug 4010000' (phase: public)
+  
   $ hg push ../try
   pushing to ../try
   searching for changes
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
+  added 3 changesets with 3 changes to 3 files
 
 Test disabling the hook via hgrc config (i.e. no checks/warnings should occur)
   $ sed -i 's/check_bug_references_repos = try//g' ../try/.hg/hgrc
