@@ -12,7 +12,7 @@
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd client
 
-Pushing to not-mozilla-central should succeed if user has "active_scm_allow_direct_push" (scm level 4)
+Pushing to not-mozilla-central should succeed if user has "scm_allow_direct_push" (scm level 4)
 
   $ touch foo
   $ hg commit -A -m 'a new file'
@@ -46,7 +46,7 @@ Pushing to not-mozilla-central should succeed if user has "active_scm_allow_dire
 
   $ cd client2
 
-Pushing to not-mozilla-central should fail if the ACTIVE_SCM_LEVEL_3 user has 
+Pushing to not-mozilla-central should fail if the SCM_LEVEL_3 user has 
 provided neither MAGIC_WORDS nor a justification in their top commit.
 
   $ echo closed > foo
@@ -71,7 +71,7 @@ provided neither MAGIC_WORDS nor a justification in their top commit.
   [255]
 
 
-Pushing to not-mozilla-central should succeed if the user has ACTIVE_SCM_LEVEL_3 and
+Pushing to not-mozilla-central should succeed if the user has SCM_LEVEL_3 and
 magic words with justification
 
   $ hg commit --amend -q -m 'MANUAL PUSH: because I want to'
@@ -81,7 +81,7 @@ magic words with justification
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: l3user@example.com pushed: "because I want to". (not-mozilla-central@ce3b4a58cd35, ACTIVE_SCM_LEVEL_3)
+  remote: l3user@example.com pushed: "because I want to". (not-mozilla-central@ce3b4a58cd35, SCM_LEVEL_3)
   remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
   remote: 
@@ -91,7 +91,7 @@ magic words with justification
 
 
 Pushing multiple changesets to not-mozilla-central is accepted if the user has
-ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
+SCM_LEVEL_3 and the magic words and justification are on the top commit.
 
   $ echo dummy0 > foo
   $ hg commit -m 'dummy0'
@@ -107,7 +107,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: l3user@example.com pushed: "because I can". (not-mozilla-central@1235dd2aeaf5, ACTIVE_SCM_LEVEL_3)
+  remote: l3user@example.com pushed: "because I can". (not-mozilla-central@1235dd2aeaf5, SCM_LEVEL_3)
   remote: recorded push in pushlog
   remote: added 4 changesets with 4 changes to 1 files
   remote: 
@@ -119,7 +119,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words and justification are on the top commit.
   remote: recorded changegroup in replication log in *s (glob)
 
 Pushing multiple changesets to not-mozilla-central should fail if the user has
-ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is missing.
+SCM_LEVEL_3 and the magic words on the top commit, but justification is missing.
 
   $ echo dummy4 >> foo
   $ hg commit -m 'dummy4'
@@ -147,7 +147,7 @@ ACTIVE_SCM_LEVEL_3 and the magic words on the top commit, but justification is m
   [255]
 
 Pushing multiple changesets to not-mozilla-central should fail if the user has
-ACTIVE_SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
+SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
 
   $ echo dummy6 >> foo
   $ hg commit -m 'dummy6'

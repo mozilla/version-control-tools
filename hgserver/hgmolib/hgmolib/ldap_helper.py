@@ -129,24 +129,3 @@ def get_scm_groups(mail):
             groups.add(group.decode('ascii'))
 
     return groups
-
-
-def get_active_scm_groups(mail):
-    """Obtain active SCM LDAP group membership for a specified user."""
-    settings = get_ldap_settings()
-    conn = ldap_connect(settings['url'])
-    if not conn:
-        return None
-
-    dn = get_user_dn_by_mail(conn, 'dc=mozilla', mail)
-    fltr = '(&(cn=active_scm_*)(member=%s))' % dn
-
-    result = conn.search_s('ou=groups,dc=mozilla', ldap.SCOPE_ONELEVEL,
-                           fltr, ['cn'])
-
-    groups = set()
-    for dn, attrs in result:
-        for group in attrs['cn']:
-            groups.add(group.decode('ascii'))
-
-    return groups

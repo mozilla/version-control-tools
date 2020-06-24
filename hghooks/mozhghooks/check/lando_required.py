@@ -16,16 +16,16 @@ from mercurial import (
     pycompat,
 )
 
-from hgmolib.ldap_helper import get_active_scm_groups
+from hgmolib.ldap_helper import get_scm_groups
 
 MAGIC_WORDS = b"MANUAL PUSH:"
 MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
     br".*(%s)\s*(.+)" % re.escape(MAGIC_WORDS)
 )
 
-ACTIVE_SCM_ALLOW_DIRECT_PUSH = "active_scm_allow_direct_push"
+SCM_ALLOW_DIRECT_PUSH = b"scm_allow_direct_push"
 
-ACTIVE_SCM_LEVEL_3 = "active_scm_level_3"
+SCM_LEVEL_3 = b"scm_level_3"
 
 SENTRY_LOG_MESSAGE = (
     b'%(user)s pushed: "%(justification)s". (%(repo)s@%(node)s, %(scm_level)s)'
@@ -77,7 +77,9 @@ def get_user_and_group_affiliations():
     user_name = os.environ.get("USER", None)
     if not user_name:
         return None, []
-    return user_name, get_active_scm_groups(user_name)
+    return user_name, [
+        pycompat.bytestr(group) for group in get_scm_groups(user_name)
+    ]
 
 
 def get_changeset_justification(description):
@@ -168,8 +170,8 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             )
 
     def pre(self, node):
-        # `privilege_level` has only three allowable states: None, ACTIVE_SCM_ALLOW_DIRECT_PUSH, and
-        # ACTIVE_SCM_LEVEL_3.
+        # `privilege_level` has only three allowable states: None, SCM_ALLOW_DIRECT_PUSH, and
+        # SCM_LEVEL_3.
         self.privilege_level = None
         self.head = None
         self.justification = None
@@ -180,9 +182,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             self.user_name, self.user_groups = get_user_and_group_affiliations()
         except Exception as e:
             # The `_get_user_and_group_affiliations` method has raised an unexpected exception.
-            # It is not likely an LDAP connection error because the `get_active_scm_groups` method
+            # It is not likely an LDAP connection error because the `get_scm_groups` method
             # suppresses all LDAP exceptions in favor of logging to stderr and returning None.
-            # However,`get_active_scm_groups` does have other opportunities to raise exceptions that
+            # However,`get_scm_groups` does have other opportunities to raise exceptions that
             # have not been suppressed. As we have no user information at this point, we cannot
             # let the push proceed.
             # Since this method `pre` cannot react to fatal errors, the `None` value in
@@ -196,12 +198,12 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # `privilege_level` will abort this check in the future call to method `check`
             print_banner(self.ui, b"error", LDAP_USER_FAILURE_MESSAGE)
             return
-        if ACTIVE_SCM_ALLOW_DIRECT_PUSH in self.user_groups:
-            self.privilege_level = ACTIVE_SCM_ALLOW_DIRECT_PUSH
-        elif ACTIVE_SCM_LEVEL_3 in self.user_groups:
-            self.privilege_level = ACTIVE_SCM_LEVEL_3
+        if SCM_ALLOW_DIRECT_PUSH in self.user_groups:
+            self.privilege_level = SCM_ALLOW_DIRECT_PUSH
+        elif SCM_LEVEL_3 in self.user_groups:
+            self.privilege_level = SCM_LEVEL_3
         else:
-            # neither ACTIVE_SCM_ALLOW_DIRECT_PUSH nor ACTIVE_SCM_LEVEL_3
+            # neither SCM_ALLOW_DIRECT_PUSH nor SCM_LEVEL_3
             # Since this method `pre` cannot react to fatal errors, the `None` value in
             # `privilege_level` will abort this check in the future call to method `check`
             print_banner(self.ui, b"error", INSUFFICIENT_PRIVILEGE_FAILURE_MESSAGE)
@@ -214,7 +216,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             False - the tests fail and the push should be disallowed
             True - the tests succeed and the push should be accepted
         """
-        if self.privilege_level not in {ACTIVE_SCM_ALLOW_DIRECT_PUSH, ACTIVE_SCM_LEVEL_3, None}:
+        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, SCM_LEVEL_3, None}:
             # this is some bad internal state where `privilege_level` is outside its allowed values.
             print_banner(self.ui, b"error", INTERNAL_ERROR_MESSAGE)
             return False
@@ -224,10 +226,10 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
 
         self.head = ctx.hex()
 
-        if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
+        if self.privilege_level == SCM_ALLOW_DIRECT_PUSH:
             return True
 
-        # Level is active_scm_level_3
+        # Level is scm_level_3
         if len(ctx.children()) != 0:
             # this isn't the last commit in the changegroup. Just accept it.
             return True
@@ -242,7 +244,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         return False
 
     def post_check(self):
-        if self.privilege_level not in {ACTIVE_SCM_ALLOW_DIRECT_PUSH, ACTIVE_SCM_LEVEL_3}:
+        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, SCM_LEVEL_3}:
             # this is some bad internal state. At this point, `privilege_level` should have only been
             # one of the two allowed values above.  Getting to this point indicates an unexpected value
             # that should not happen.  Give an appropriate error message and abort.
@@ -250,7 +252,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             return False
 
         # We don't want notifications for scm_allow_direct_push
-        if self.privilege_level == ACTIVE_SCM_ALLOW_DIRECT_PUSH:
+        if self.privilege_level == SCM_ALLOW_DIRECT_PUSH:
             return True
 
         message = SENTRY_LOG_MESSAGE % {
