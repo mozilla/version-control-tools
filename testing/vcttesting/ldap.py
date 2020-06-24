@@ -98,9 +98,9 @@ class LDAP(object):
 
             for level in range(1, scm_level + 1):
                 if level == 4:
-                    group = b'scm_allow_direct_push'
+                    group = 'scm_allow_direct_push'
                 else:
-                    group = b'scm_level_%d' % level
+                    group = 'scm_level_%d' % level
 
                 self.add_user_to_group(email, group)
                 res['ldap_groups'].add(group)
@@ -182,13 +182,13 @@ class LDAP(object):
         """
         dn = 'mail=%s,o=com,dc=mozilla' % email
 
-        group_dn = 'cn=%s,ou=groups,dc=mozilla' % group.decode('utf-8')
+        group_dn = 'cn=%s,ou=groups,dc=mozilla' % group
         modlist = [(ldap.MOD_ADD, 'memberUid', email.encode('utf-8'))]
         self.c.modify_s(group_dn, modlist)
 
         # MoCo LDAP has an active_* for each scm_level_* group, which we need
         # to emulate here.
-        if group.startswith(b'scm_level_') or group == b"scm_allow_direct_push":
-            group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group.decode('utf-8')
+        if group.startswith('scm_level_') or group == "scm_allow_direct_push":
+            group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group
             modlist = [(ldap.MOD_ADD, 'member', dn.encode('utf-8'))]
             self.c.modify_s(group_dn, modlist)

@@ -120,7 +120,7 @@ class HgmoCommands(object):
     @CommandArgument('group',
                      help='Name of LDAP group to add user to')
     def add_user_to_group(self, email, group):
-        self.c.ldap.add_user_to_group(email, group.encode('utf-8'))
+        self.c.ldap.add_user_to_group(email, group)
 
     @Command('create-repo', category='hgmo',
              description='Create a repository in the cluster')
