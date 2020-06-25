@@ -95,12 +95,16 @@ class HgmoCommands(object):
                      help='Do not grant Mercurial access to user')
     @CommandArgument('--hg-disabled', action='store_true',
                      help='Set hgAccess to FALSE')
+    @CommandArgument('--group', action='append', dest='groups',
+                     help='Additional group to add the user to. (can be specified multiple times')
     def create_ldap_user(self, email, username, uid, fullname, key_file=None,
-                         scm_level=None, no_hg_access=False, hg_disabled=False):
+                         scm_level=None, no_hg_access=False, hg_disabled=False,
+                         groups=[]):
         self.c.ldap.create_user(email, username, uid, fullname,
                                 key_filename=key_file, scm_level=scm_level,
                                 hg_access=not no_hg_access,
-                                hg_enabled=not hg_disabled)
+                                hg_enabled=not hg_disabled,
+                                groups=groups)
 
     @Command('add-ssh-key', category='hgmo',
              description='Add an SSH public key to a user')

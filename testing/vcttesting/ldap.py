@@ -21,7 +21,7 @@ class LDAP(object):
 
     def create_user(self, email, username, uid, fullname,
                     key_filename=None, scm_level=None, hg_access=True,
-                    hg_enabled=True, bugzilla_email=None):
+                    hg_enabled=True, bugzilla_email=None, groups=None):
         """Create a new user in LDAP.
 
         The user has an ``email`` address, a full ``name``, a
@@ -102,6 +102,11 @@ class LDAP(object):
                 else:
                     group = 'scm_level_%d' % level
 
+                self.add_user_to_group(email, group)
+                res['ldap_groups'].add(group)
+
+        if groups:
+            for group in groups:
                 self.add_user_to_group(email, group)
                 res['ldap_groups'].add(group)
 
@@ -188,7 +193,7 @@ class LDAP(object):
 
         # MoCo LDAP has an active_* for each scm_level_* group, which we need
         # to emulate here.
-        if group.startswith('scm_level_') or group == "scm_allow_direct_push":
+        if group.startswith('scm_'):
             group_dn = 'cn=active_%s,ou=groups,dc=mozilla' % group
             modlist = [(ldap.MOD_ADD, 'member', dn.encode('utf-8'))]
             self.c.modify_s(group_dn, modlist)
