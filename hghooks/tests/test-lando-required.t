@@ -174,4 +174,29 @@ SCM_LEVEL_3 and the magic words & justification are on the wrong commit.
   abort: push failed on remote
   [255]
 
+  $ cd ..
+  $ standarduser
+  $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/not-mozilla-central client3
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 6 changesets with 6 changes to 1 files
+  new changesets 57a078f14741:1235dd2aeaf5
+  updating to branch default
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+
+  $ cd client3
+
+Pushing to not-mozilla-central should fail for a SCM_LEVEL_1 user.
+
+  $ echo closed > foo
+  $ hg commit -m 'this should fail'
+  $ hg push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/not-mozilla-central
+  searching for changes
+  remote: abort: could not lock working directory of /repo/hg/mozilla/not-mozilla-central: Permission denied
+  abort: stream ended unexpectedly (got 0 bytes, expected 4)
+  [255]
   $ hgmo clean

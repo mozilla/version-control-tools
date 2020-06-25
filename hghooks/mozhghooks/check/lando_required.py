@@ -206,6 +206,8 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # neither SCM_ALLOW_DIRECT_PUSH nor SCM_LEVEL_3
             # Since this method `pre` cannot react to fatal errors, the `None` value in
             # `privilege_level` will abort this check in the future call to method `check`
+            # Note: We should never get here, as the user will not have permission to start
+            # a transaction on this repository, but provide a good error message anyway.
             print_banner(self.ui, b"error", INSUFFICIENT_PRIVILEGE_FAILURE_MESSAGE)
 
     def check(self, ctx):
