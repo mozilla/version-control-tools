@@ -39,6 +39,7 @@ request access be restored for %s.
 '''.lstrip()
 
 AUTOLAND_USER = 'bind-autoland@mozilla.com'
+LANDING_WORKER_USER = 'lando_landing_worker@mozilla.com'
 
 
 def source_environment(path):
@@ -103,8 +104,15 @@ def process_login(user):
 
     touch_hg_access_date(user)
 
+    # landing_users are both autoland-transplant and Lando landing worker
+    # users that push on behalf of other users.
+    landing_users = (
+        pash_settings.get('autoland_user', AUTOLAND_USER),
+        pash_settings.get('landing_worker_user', LANDING_WORKER_USER),
+    )
+
     # Touch the initiator of the autoland request, if required.
-    if user == pash_settings.get('autoland_user', AUTOLAND_USER):
+    if user in landing_users:
         request_user = os.environ.get('AUTOLAND_REQUEST_USER')
         if request_user:
             touch_hg_access_date(request_user)

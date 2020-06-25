@@ -54,6 +54,8 @@ configitem = registrar.configitem(configtable)
 
 configitem(b'pushlog', b'autolanduser',
            default=configitems.dynamicdefault)
+configitem(b'pushlog', b'landingworkeruser',
+           default=configitems.dynamicdefault)
 configitem(b'pushlog', b'remoteuserprefix',
            default=None)
 configitem(b'pushlog', b'timeoutro',
@@ -77,6 +79,7 @@ SCHEMA = [
 ]
 
 AUTOLAND_USER = b'bind-autoland@mozilla.com'
+LANDING_WORKER_USER = b'lando_landing_worker@mozilla.com'
 
 
 # Wraps capabilities wireproto command to advertise pushlog availability.
@@ -856,13 +859,17 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
                  b'refusing to write into pushlog\n')
         return 1
 
-    # If the push user is the AUTOLAND_USER we check the AUTOLAND_REQUEST_USER
+    # If the push user is in landing_users, we check the AUTOLAND_REQUEST_USER
     # environment variable. If set, we use that as the user in the pushlog
     # rather than the pusher. This allows us to track who actually
     # initiated the push.
-    autoland_user = ui.config(b'pushlog', b'autolanduser', AUTOLAND_USER)
-    if user == autoland_user:
-        ui.write(b'autoland push detected\n')
+    landing_users = (
+        ui.config(b'pushlog', b'autolanduser', AUTOLAND_USER),
+        ui.config(b'pushlog', b'landingworkeruser', LANDING_WORKER_USER),
+    )
+
+    if user in landing_users:
+        ui.write(b'autoland or landing worker push detected\n')
         user = os.environ.get('AUTOLAND_REQUEST_USER', user)
 
     remoteprefix = ui.config(b'pushlog', b'remoteuserprefix')

@@ -178,8 +178,14 @@ bind-autoland account
   $ hgmo add-user-to-group bind-autoland@mozilla.com scm_autoland
   $ hgmo add-ssh-key bind-autoland@mozilla.com - < keyA.pub
 
+lando landing worker account
+  $ ssh-keygen -b 2048 -t rsa -f keyB -N '' > /dev/null
+  $ hgmo create-ldap-user --key-file keyB lando_landing_worker@mozilla.com lando_landing_worker 1002 'lando_landing_worker'
+  $ hgmo add-user-to-group lando_landing_worker@mozilla.com scm_autoland
+  $ hgmo add-ssh-key lando_landing_worker@mozilla.com - < keyB.pub
+
 user2
-  $ hgmo create-ldap-user user2@example.com user2 1002 'other user'
+  $ hgmo create-ldap-user user2@example.com user2 1003 'other user'
 
 ssh as autoland, tagging user2 as the originator of the request
   $ AUTOLAND_REQUEST_USER=user2@example.com ssh -T -F ssh_config -i keyA -l bind-autoland@mozilla.com -p $HGPORT $SSH_SERVER -o SendEnv=AUTOLAND_REQUEST_USER
@@ -201,6 +207,31 @@ ssh as autoland, tagging user2 as the originator of the request
   
      Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
   
+  You did not specify a command to run on the server. This server only
+  supports running specific commands. Since there is nothing to do, you
+  are being disconnected.
+  [1]
+
+ssh as lando_landing_worker user, tagging user2 as the originator of the request
+  $ AUTOLAND_REQUEST_USER=user2@example.com ssh -T -F ssh_config -i keyB -l lando_landing_worker@mozilla.com -p $HGPORT $SSH_SERVER -o SendEnv=AUTOLAND_REQUEST_USER
+  A SSH connection has been successfully established.
+
+  Your account (lando_landing_worker@mozilla.com) has privileges to access Mercurial over
+  SSH.
+
+  You are a member of the following LDAP groups that govern source control
+  access:
+
+     scm_autoland
+
+  This will give you write access to the following repos:
+
+     Autoland (integration/autoland)
+
+  You will NOT have write access to the following repos:
+
+     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
+
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
   are being disconnected.
@@ -303,7 +334,7 @@ Do another login to verify no pash errors are present
 
 hgAccountEnabled=FALSE shows account disabled message
 
-  $ hgmo create-ldap-user --hg-disabled --key-file key1 hgdisabled@example.com hgdisabled 1002 'HgAccess Disabled'
+  $ hgmo create-ldap-user --hg-disabled --key-file key1 hgdisabled@example.com hgdisabled 1004 'HgAccess Disabled'
   $ hgmo exec hgssh /usr/bin/ldapsearch -b 'dc=mozilla' -s sub -x mail=hgdisabled@example.com
   # extended LDIF
   #
@@ -328,7 +359,7 @@ hgAccountEnabled=FALSE shows account disabled message
   homeDirectory: /home/hgdisabled
   sn: Disabled
   uid: hgdisabled
-  uidNumber: 1002
+  uidNumber: 1004
   bugzillaEmail: hgdisabled@example.com
   fakeHome: /tmp
   hgAccountEnabled: FALSE

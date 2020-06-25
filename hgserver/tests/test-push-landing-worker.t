@@ -8,10 +8,10 @@ Create repository and user
   $ export AUTOLAND_REQUEST_USER="autolandrequester@example.com"
   $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
-  $ hgmo create-ldap-user bind-autoland@mozilla.com user1 1500 'Otto Land' --scm-level 3 --key-file autoland
+  $ hgmo create-ldap-user lando_landing_worker@mozilla.com user1 1500 'Lando Landing Worker' --scm-level 3 --key-file lando_landing_worker
   $ cat >> $HGRCPATH << EOF
   > [ui]
-  > ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER" -F `pwd`/ssh_config -i `pwd`/autoland -l bind-autoland@mozilla.com
+  > ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER" -F `pwd`/ssh_config -i `pwd`/lando_landing_worker -l lando_landing_worker@mozilla.com
   > EOF
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
