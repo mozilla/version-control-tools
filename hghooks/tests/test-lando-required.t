@@ -5,6 +5,9 @@
   $ hgmoenv
   $ hgmo create-repo not-mozilla-central scm_level_3
   (recorded repository creation in replication log)
+  $ hgmo create-repo project scm_project
+  (recorded repository creation in replication log)
+  $ hgmo exec hgssh /set-hgrc-option project mozilla lando_required_repo_list project
   $ scm4user
   $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/not-mozilla-central client
   no changes found
@@ -199,4 +202,56 @@ Pushing to not-mozilla-central should fail for a SCM_LEVEL_1 user.
   remote: abort: could not lock working directory of /repo/hg/mozilla/not-mozilla-central: Permission denied
   abort: stream ended unexpectedly (got 0 bytes, expected 4)
   [255]
+
+  $ cd ..
+  $ scm_project_user
+  $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/project client4
+  no changes found
+  updating to branch default
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+  $ cd client4
+
+Pushing to project should fail if the SCM_PROJECT user has 
+provided neither MAGIC_WORDS nor a justification in their top commit.
+
+  $ touch foo
+  $ hg commit -A -m 'this should fail'
+  adding foo
+  $ hg push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/project
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: 
+  remote: *********************************** ERROR ***********************************
+  remote: Pushing directly to this repo is disallowed, please use Lando.
+  remote: To override, in your head commit, include the literal string, "MANUAL PUSH:",
+  remote: followed by a sentence of justification.
+  remote: *****************************************************************************
+  remote: 
+  remote: transaction abort!
+  remote: rollback completed
+  remote: pretxnchangegroup.mozhooks hook failed
+  abort: push failed on remote
+  [255]
+
+Pushing to project should succeed if the user has SCM_PROJECT and
+magic words with justification
+
+  $ hg commit --amend -q -m 'MANUAL PUSH: because I want to'
+  $ hg push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/project
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: project_user@example.com pushed: "because I want to". (project@5d1da14daca6, SCM_PROJECT)
+  remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/project/rev/5d1da14daca6a78e2e6b21f6cfbffbe417ae54f9
+  remote: recorded changegroup in replication log in *s (glob)
   $ hgmo clean

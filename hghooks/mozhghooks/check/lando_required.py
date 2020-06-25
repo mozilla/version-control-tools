@@ -17,6 +17,9 @@ from mercurial import (
 )
 
 from hgmolib.ldap_helper import get_scm_groups
+from mozhg.util import (
+    repo_owner,
+)
 
 MAGIC_WORDS = b"MANUAL PUSH:"
 MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
@@ -24,8 +27,6 @@ MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
 )
 
 SCM_ALLOW_DIRECT_PUSH = b"scm_allow_direct_push"
-
-SCM_LEVEL_3 = b"scm_level_3"
 
 SENTRY_LOG_MESSAGE = (
     b'%(user)s pushed: "%(justification)s". (%(repo)s@%(node)s, %(scm_level)s)'
@@ -170,8 +171,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             )
 
     def pre(self, node):
+        self.repo_level = repo_owner(self.repo)
         # `privilege_level` has only three allowable states: None, SCM_ALLOW_DIRECT_PUSH, and
-        # SCM_LEVEL_3.
+        # and self.repo_level
         self.privilege_level = None
         self.head = None
         self.justification = None
@@ -200,10 +202,10 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             return
         if SCM_ALLOW_DIRECT_PUSH in self.user_groups:
             self.privilege_level = SCM_ALLOW_DIRECT_PUSH
-        elif SCM_LEVEL_3 in self.user_groups:
-            self.privilege_level = SCM_LEVEL_3
+        elif self.repo_level in self.user_groups:
+            self.privilege_level = self.repo_level
         else:
-            # neither SCM_ALLOW_DIRECT_PUSH nor SCM_LEVEL_3
+            # neither SCM_ALLOW_DIRECT_PUSH nor self.repo_level
             # Since this method `pre` cannot react to fatal errors, the `None` value in
             # `privilege_level` will abort this check in the future call to method `check`
             # Note: We should never get here, as the user will not have permission to start
@@ -218,7 +220,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             False - the tests fail and the push should be disallowed
             True - the tests succeed and the push should be accepted
         """
-        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, SCM_LEVEL_3, None}:
+        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, self.repo_level, None}:
             # this is some bad internal state where `privilege_level` is outside its allowed values.
             print_banner(self.ui, b"error", INTERNAL_ERROR_MESSAGE)
             return False
@@ -246,7 +248,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         return False
 
     def post_check(self):
-        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, SCM_LEVEL_3}:
+        if self.privilege_level not in {SCM_ALLOW_DIRECT_PUSH, self.repo_level}:
             # this is some bad internal state. At this point, `privilege_level` should have only been
             # one of the two allowed values above.  Getting to this point indicates an unexpected value
             # that should not happen.  Give an appropriate error message and abort.
