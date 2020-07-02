@@ -74,5 +74,13 @@ ssh = ssh -F `pwd`/ssh_config -i `pwd`/project_user -l project_user@example.com
 EOF
 }
 
+scm4_project_user() {
+  hgmo create-ldap-user direct_project_user@example.com direct_project_user 5500 'Project User (with direct push)' --key-file direct_project_user --scm-level 4 --group scm_project
+  cat >> $HGRCPATH << EOF
+[ui]
+ssh = ssh -F `pwd`/ssh_config -i `pwd`/direct_project_user -l direct_project_user@example.com
+EOF
+}
+
 alias standarduserssh='ssh -F ssh_config -i testuser -l user@example.com -p $HGPORT'
 alias pulseconsumer='vcsreplicator-consumer $TESTTMP/pulse-consumer.ini'

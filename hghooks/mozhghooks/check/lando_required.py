@@ -106,6 +106,17 @@ def get_changeset_justification(description):
         return None
 
 
+def is_repo_in_list(ui, repo_name, config):
+    repo_config = ui.config(b"mozilla", config)
+    if not repo_config:
+        return False
+    repo_list = (
+        x.strip()
+        for x in repo_config.split(b",")
+    )
+    return repo_name in repo_list
+
+
 class LandoRequiredCheck(PreTxnChangegroupCheck):
 
     @property
@@ -113,17 +124,12 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         return b"lando_required"
 
     def relevant(self):
-        lando_required_list = self.ui.config(b"mozilla", b"lando_required_repo_list")
-        if not lando_required_list:
-            return False
-
-        target_repo_names = (
-            x.strip()
-            for x in lando_required_list.split(b",")
-        )
-
         self.repo_name = self.repo.root.replace(b"/repo/hg/mozilla/", b"", 1)
-        return self.repo_name in target_repo_names
+
+        lando_required = is_repo_in_list(self.ui, self.repo_name, b"lando_required_repo_list")
+        self.direct_push_enabled = not is_repo_in_list(self.ui, self.repo_name, b"direct_push_disabled_repo_list")
+
+        return lando_required
 
     def _log_push_attempt(self, event_message):
         """send an event message to Sentry
@@ -200,7 +206,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # `privilege_level` will abort this check in the future call to method `check`
             print_banner(self.ui, b"error", LDAP_USER_FAILURE_MESSAGE)
             return
-        if SCM_ALLOW_DIRECT_PUSH in self.user_groups:
+        if self.direct_push_enabled and SCM_ALLOW_DIRECT_PUSH in self.user_groups:
             self.privilege_level = SCM_ALLOW_DIRECT_PUSH
         elif self.repo_level in self.user_groups:
             self.privilege_level = self.repo_level
@@ -269,4 +275,3 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         }
         self._log_push_attempt(message)
         return True
-

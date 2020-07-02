@@ -31,6 +31,8 @@ configitem(b'mozilla', b'treeherder_repo',
            default=None)
 configitem(b'mozilla', b'lando_required_repo_list',
            default=b'')
+configitem(b'mozilla', b'direct_push_disabled_repo_list',
+           default=b'')
 configitem(b'mozilla', b'sentry_dsn',
            default=b"")
 configitem(b'mozilla', b'check_bug_references_repos',
