@@ -13,6 +13,8 @@ services:
       - "2181"
       - "2888"
       - "3888"
+      # Port 5001 is the `moto` mock S3 server
+      - "5001"
       - "9092"
     networks:
       hgcluster_network:
