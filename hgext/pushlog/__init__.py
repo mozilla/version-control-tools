@@ -534,7 +534,10 @@ class pushlog(object):
             # an extra SQL statement to resolve the push id from a node.
             if start_node is not None:
                 start_node = self.repo.lookup(start_node)
-                start_id = self.pushfromnode(start_node).pushid
+                start_push = self.pushfromnode(start_node)
+                # If the changeset exists, but wasn't pushed,
+                # start at 0.
+                start_id = start_push.pushid if start_push else 0
                 start_id_exclusive = start_node_exclusive
 
             if end_node is not None:
