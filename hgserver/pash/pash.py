@@ -116,6 +116,9 @@ def process_login(user):
         request_user = os.environ.get('AUTOLAND_REQUEST_USER')
         if request_user:
             touch_hg_access_date(request_user)
+    else:
+        if 'AUTOLAND_REQUEST_USER' in os.environ:
+            del os.environ['AUTOLAND_REQUEST_USER']
 
     hg_helper.serve(
         cname=pash_settings['hostname'],
