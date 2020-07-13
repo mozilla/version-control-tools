@@ -14,7 +14,7 @@ Create some repositories
   ...     reqs = f.read().splitlines()
   >>> reqs.remove('store')
   >>> with open('no_requirement/.hg/requires', 'w') as f:
-  ...     f.write('\n'.join(reqs))
+  ...     _ = f.write('\n'.join(reqs))
 
   $ hg init has_obsstore
   $ touch has_obsstore/.hg/store/obsstore
