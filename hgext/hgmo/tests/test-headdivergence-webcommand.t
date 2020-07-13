@@ -1,3 +1,4 @@
+  $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
   $ startserver
 
 Simple setup

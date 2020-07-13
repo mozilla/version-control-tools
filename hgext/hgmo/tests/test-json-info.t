@@ -1,4 +1,4 @@
-
+  $ . $TESTDIR/hgext/hgmo/tests/helpers.sh
   $ startserver
 
   $ hg clone http://localhost:$HGPORT repo
