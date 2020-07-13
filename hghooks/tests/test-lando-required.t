@@ -314,4 +314,43 @@ magic words with justification
   remote:   https://hg.mozilla.org/project/rev/35eba5179e43c5a6dfc4a790f8ea58a01dd3ae7b
   remote: recorded changegroup in replication log in *s (glob)
 
+
+  $ cd ..
+  $ export AUTOLAND_REQUEST_USER="autolandrequester@example.com"
+  $ hgmo create-ldap-user bind-autoland@mozilla.com user1 1500 'Otto Land' --scm-level 4 --key-file autoland --group scm_project
+  $ cat >> $HGRCPATH << EOF
+  > [ui]
+  > ssh = ssh -o "SendEnv AUTOLAND_REQUEST_USER" -F `pwd`/ssh_config -i `pwd`/autoland -l bind-autoland@mozilla.com
+  > EOF
+  $ hg clone ssh://${SSH_SERVER}:${SSH_PORT}/project client6
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 1 files
+  new changesets 5d1da14daca6:35eba5179e43
+  updating to branch default
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+
+  $ cd client6
+
+Pushing to project should succeed for an auoland user.
+
+  $ echo opened > foo
+  $ hg commit -q -m 'this should succeed'
+  $ hg push
+  pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/project
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: autoland or landing worker push detected
+  remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
+  remote: 
+  remote: View your change here:
+  remote:   https://hg.mozilla.org/project/rev/64ad9f49289f770653c3d533bdd1f5694d7dfe62
+  remote: recorded changegroup in replication log in *s (glob)
+
   $ hgmo clean

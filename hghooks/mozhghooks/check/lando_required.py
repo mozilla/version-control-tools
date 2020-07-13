@@ -28,6 +28,9 @@ MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
 
 SCM_ALLOW_DIRECT_PUSH = b"scm_allow_direct_push"
 
+AUTOLAND_USER = b'bind-autoland@mozilla.com'
+LANDING_WORKER_USER = b'lando_landing_worker@mozilla.com'
+
 SENTRY_LOG_MESSAGE = (
     b'%(user)s pushed: "%(justification)s". (%(repo)s@%(node)s, %(scm_level)s)'
 )
@@ -129,6 +132,15 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         lando_required = is_repo_in_list(self.ui, self.repo_name, b"lando_required_repo_list")
         self.direct_push_enabled = not is_repo_in_list(self.ui, self.repo_name, b"direct_push_disabled_repo_list")
 
+        # If the push user is in landing_users, we check the AUTOLAND_REQUEST_USER
+        # environment variable. If set, we use that as the user in the pushlog
+        # rather than the pusher. This allows us to track who actually
+        # initiated the push.
+        self.landing_users = (
+            self.ui.config(b'pushlog', b'autolanduser', AUTOLAND_USER),
+            self.ui.config(b'pushlog', b'landingworkeruser', LANDING_WORKER_USER),
+        )
+
         return lando_required
 
     def _log_push_attempt(self, event_message):
@@ -206,7 +218,10 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # `privilege_level` will abort this check in the future call to method `check`
             print_banner(self.ui, b"error", LDAP_USER_FAILURE_MESSAGE)
             return
-        if self.direct_push_enabled and SCM_ALLOW_DIRECT_PUSH in self.user_groups:
+        elif (
+            (self.direct_push_enabled or pycompat.bytestr(self.user_name) in self.landing_users)
+            and SCM_ALLOW_DIRECT_PUSH in self.user_groups
+        ):
             self.privilege_level = SCM_ALLOW_DIRECT_PUSH
         elif self.repo_level in self.user_groups:
             self.privilege_level = self.repo_level
