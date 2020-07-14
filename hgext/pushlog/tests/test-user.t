@@ -84,6 +84,7 @@ autoland user or the landing worker user.
   adding file changes
   autoland or landing worker push detected
   recorded push in pushlog
+  added 1 changesets with 1 changes to 1 files
 
   $ dumppushlog server
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
@@ -97,9 +98,9 @@ autoland user or the landing worker user.
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   autoland or landing worker push detected
   recorded push in pushlog
+  added 1 changesets with 1 changes to 1 files
 
   $ dumppushlog server
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
