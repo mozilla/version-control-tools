@@ -966,12 +966,12 @@ def _checkevolve(ui, cw, hg_version):
     evolve_clone_dir = ui.config(b'mozilla', b'mozbuild_state_path', _vcthome())
 
     local_evolve_path = b'%(evolve_clone_dir)s/evolve' % {b'evolve_clone_dir': evolve_clone_dir}
-    evolve_config_value = '%(evolve_path)s/hgext3rd/evolve' % \
-                          {'evolve_path': pycompat.sysstr(local_evolve_path)}
+    evolve_config_value = os.path.normpath('%(evolve_path)s/hgext3rd/evolve' % \
+                                           {'evolve_path': pycompat.sysstr(local_evolve_path)})
 
     users_evolve_path = ui.config(b'extensions', b'evolve')
     if users_evolve_path:
-        users_evolve_path = pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path)))
+        users_evolve_path = os.path.normpath(pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path))))
 
     # If evolve is not installed, install it. (If the user's path to evolve is
     # the path that we manage, but it doesn't exist yet, assume that their
