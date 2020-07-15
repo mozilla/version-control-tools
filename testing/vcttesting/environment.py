@@ -114,7 +114,7 @@ def install_mercurials(venv, hg='hg', py3=False):
     VERSIONS = [
         '5.2.2',
         '5.3.2',
-        '5.4',
+        '5.4.2',
         '@',
     ]
 
