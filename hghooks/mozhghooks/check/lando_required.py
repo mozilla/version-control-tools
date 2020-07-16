@@ -162,18 +162,21 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         try:
             sentry_sdk.init(sentry_dsn)
 
+            sentry_head = self.head.decode("utf-8")
+            sentry_repo = self.repo_name.decode("utf-8")
+
             with sentry_sdk.push_scope() as scope:
-                scope.user = {'username': self.user_name}
-                scope.set_tag('repo', self.repo_name)
-                scope.set_tag('scm_level', self.privilege_level)
-                scope.set_extra('changeset', self.head)
-                scope.set_extra('justification', self.justification)
-                scope.set_extra('url', REV_URL % {
-                    'repo': self.repo_name,
-                    'rev': self.head,
+                scope.user = {"username": self.user_name}
+                scope.set_tag("repo", sentry_repo)
+                scope.set_tag("scm_level", self.privilege_level.decode("utf-8"))
+                scope.set_extra("changeset", sentry_head)
+                scope.set_extra("justification", self.justification.decode("utf-8"))
+                scope.set_extra("url", REV_URL % {
+                    "repo": sentry_repo,
+                    "rev": sentry_head,
                 })
 
-                sentry_sdk.capture_message(event_message)
+                sentry_sdk.capture_message(event_message.decode("utf-8"))
 
         except Exception as e:
             # The Sentry Documentation does not mention any exceptions that it could raise.
