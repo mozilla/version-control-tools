@@ -83,6 +83,12 @@ objectClass: top
 cn: active_scm_project
 member: mail=autoland@example.com,o=com,dc=mozilla
 
+dn: cn=active_scm_autoland,ou=groups,dc=mozilla
+objectClass: groupOfNames
+objectClass: top
+cn: active_scm_autoland
+member: mail=autoland@example.com,o=com,dc=mozilla
+
 dn: cn=scm_l10n,ou=groups,dc=mozilla
 gidNumber: 678
 objectClass: posixGroup
