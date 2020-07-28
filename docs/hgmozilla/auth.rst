@@ -37,7 +37,15 @@ You can specify an alternate key path in the configuration file, as shown in the
     User me@mozilla.com
     IdentityFile /path/to/my/key
 
-You can run ``ssh -vvv hg.mozilla.org`` to troubleshoot any key or connection related issues.
+You can generate a key using ``ssh-keygen``. It will print a message with
+the location of the generated key. You can then go to login.mozilla.com,
+authenticate and navigate to the “SSH Keys” section.
+You might need to authenticate a second time, and when that's done you
+should see in the page an “Upload SSH Public Key” button.
+Clicking on it will show a text area in which you need to copy
+the whole content of the file ssh-keygen generated.
+
+You can then run ``ssh -vvv hg.mozilla.org`` to troubleshoot any key or connection related issues.
 
 The first time you connect, you will be asked to verify the host SSH
 key.
