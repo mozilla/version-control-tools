@@ -26,8 +26,13 @@ User is directed to Phabricator documentation if they are committing to Mozilla
   To begin, press the enter/return key.
    <RETURN>
   Will you be submitting commits to Mozilla (Yn)?  y
-  Commits to Mozilla projects are typically sent to Phabricator. This is the
-  preferred code review tool at Mozilla.
-  Phabricator installation instructions are here
-  http://moz-conduit.readthedocs.io/en/latest/phabricator-user.html
+  Commits to Mozilla projects are sent to Phabricator for review. To submit changes
+  to Phabricator you should use the `moz-phab` tool, which supports Mozilla workflows.
+  
+  You can install `moz-phab` by running the following command after bootstrap:
+      $ ./mach install-moz-phab
+  
+  More information and a user guide to Mozilla Phabricator can be found here:
+      http://moz-conduit.readthedocs.io/en/latest/phabricator-user.html
+  
   
