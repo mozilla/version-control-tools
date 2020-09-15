@@ -37,6 +37,10 @@ configitem(b'mozilla', b'sentry_dsn',
            default=b"")
 configitem(b'mozilla', b'check_bug_references_repos',
            default=None)
+configitem(b'pushlog', b'autolanduser',
+           default=b'bind-autoland@mozilla.com')
+configitem(b'pushlog', b'landingworkeruser',
+           default=b'lando_landing_worker@mozilla.com')
 
 
 def get_check_classes(hook):
