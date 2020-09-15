@@ -4,8 +4,8 @@
 # Needed because wireproto caching extension is enabled globally.
 boto3
 
-cbor2
 mercurial==5.3.2
+cbor2==4.1.2
 python-hglib
 requests
 tabulate

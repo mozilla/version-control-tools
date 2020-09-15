@@ -1,4 +1,4 @@
-cbor2
+cbor2==4.1.2
 datadiff
 dnspython
 requests

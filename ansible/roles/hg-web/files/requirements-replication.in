@@ -2,7 +2,7 @@
 --find-links /var/tmp/pip
 
 # Used to load replication state file.
-cbor2
+cbor2==4.1.2
 
 # Needed because wireproto caching extension is enabled globally.
 boto3

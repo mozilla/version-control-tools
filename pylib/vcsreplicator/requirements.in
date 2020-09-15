@@ -1,4 +1,4 @@
-cbor2
+cbor2==4.1.2
 kafka-python==1.4.6
 kombu==3.0.35
 python-hglib
