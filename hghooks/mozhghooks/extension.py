@@ -14,7 +14,7 @@ from mozhg.util import (
     timers,
 )
 
-testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3'
+testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5'
 minimumhgversion = b'4.8'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org'
 
