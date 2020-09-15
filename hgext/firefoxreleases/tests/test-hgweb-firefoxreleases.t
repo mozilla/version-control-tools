@@ -35,7 +35,7 @@ Page showing table of Firefox releases is available
   </style>
   <script type="text/javascript" src="/static/mercurial.js"></script>
   
-  <meta property="og:image" content="/static/hgicon.png"/>
+  <meta property="og:image" content="/static/moz-logo-bw-rgb.svg"/>
   <meta property="og:type" content="website"/>
   
   <title>$TESTTMP/server: Firefox Releases</title>
