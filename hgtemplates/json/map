@@ -100,6 +100,8 @@ changeset = '\{
   "tags": [{join(changesettag, ", ")}],
   "user": {author|utf8|json},
   "parents": [{join(parent%changesetparent, ", ")}],
+  "files": [{join(files, ", ")}],
+  "diff": [{join(diff, ", ")}],
   "phase": {phase|json},
   "pushid": {pushid|json},
   "pushdate": {pushdate|json},
@@ -268,8 +270,11 @@ help = '\{
   "topic": {topic|utf8|json},
   "rawdoc": {doc|utf8|json}
   }'
-filenodelink = ''
-filenolink = ''
+filenodelink = '\{
+  "file": {file|json},
+  "status": {status|json}
+  }'
+filenolink = '{filenodelink}'
 index = '\{
   "entries": [{join(entries%indexentry, ", ")}]
   }'

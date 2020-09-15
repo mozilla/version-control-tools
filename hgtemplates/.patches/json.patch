@@ -67,6 +67,8 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
    "tags": [{join(changesettag, ", ")}],
    "user": {author|utf8|json},
    "parents": [{join(parent%changesetparent, ", ")}],
+   "files": [{join(files, ", ")}],
+   "diff": [{join(diff, ", ")}],
 -  "phase": {phase|json}
 +  "phase": {phase|json},
 +  "pushid": {pushid|json},
