@@ -29,6 +29,7 @@ DOM_PEERS = [
     {'name': b'Andrea Marchesini', 'nick': [b'baku'], 'email': [b'amarchesini@mozilla.com']},
     {'name': b'Andreas Farre', 'nick': [b'farre'], 'email': [b'afarre@mozilla.com']},
     {'name': b'Andrew McCreight', 'nick': [b'mccr8'], 'email': [b'continuation@gmail.com']},
+    {'name': b'Andrew Sutherland', 'nick': [b'asuth'], 'email': [b'bugmail@asutherland.org', b'asuth@mozilla.com']},
     {'name': b'Bobby Holley', 'nick': [b'bholley'], 'email': [b'bholley@mozilla.com']},
     {'name': b'Ehsan Akhgari', 'nick': [b'ehsan'], 'email': [b'ehsan@mozilla.com', b'ehsan.akhgari@gmail.com']},
     {'name': b'Emilio Cobos', 'nick': [b'emilio'], 'email': [b'emilio@crisal.io']},
