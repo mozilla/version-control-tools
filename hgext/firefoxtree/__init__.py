@@ -339,7 +339,13 @@ def prepushoutgoinghook(*args):
     if not tree or tree == b'try':
         return
 
-    if len(outgoing.ancestorsof) > 1:
+    # TRACKING hg55 - `missingheads` renamed to `ancestorsof`
+    if util.safehasattr(outgoing, 'ancestorsof'):
+        ancestorsof = outgoing.ancestorsof
+    else:
+        ancestorsof = outgoing.missingheads
+
+    if len(ancestorsof) > 1:
         raise error.Abort(_(b'cannot push multiple heads to a Firefox tree; '
                             b'limit pushed revisions using the -r argument'))
 
