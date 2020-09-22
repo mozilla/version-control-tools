@@ -289,19 +289,6 @@ want to disable format-source since the big format of Gecko has been performed.
 We will re-enable this when we will need it again.\n
 '''
 
-CODEREVIEW_INFO = b'''
-Commits to Mozilla projects are sent to Phabricator for review. To submit changes
-to Phabricator you should use the `moz-phab` tool, which supports Mozilla workflows.
-
-You can install `moz-phab` by running the following command after bootstrap:
-    $ ./mach install-moz-phab
-
-More information and a user guide to Mozilla Phabricator can be found here:
-    http://moz-conduit.readthedocs.io/en/latest/phabricator-user.html
-
-
-'''.lstrip()
-
 PUSHTOTRY_INFO = b'''
 The push-to-try extension generates a temporary commit with a given
 try syntax and pushes it to the try server. The extension is intended
@@ -482,7 +469,6 @@ wizardsteps = set([
     b'format-source',
     b'wip',
     b'smartannotate',
-    b'codereview',
     b'pushtotry',
     b'multiplevct',
     b'configchange',
@@ -592,9 +578,6 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if b'smartannotate' in runsteps:
         _checksmartannotate(ui, cw)
-
-    if b'codereview' in runsteps:
-        _checkcodereview(ui, cw)
 
     if b'pushtotry' in runsteps:
         _promptvctextension(ui, cw, b'push-to-try', PUSHTOTRY_INFO)
@@ -1223,13 +1206,6 @@ def _checksecurity(ui, cw, hgversion):
         # Delete empty config section.
         if 'hostfingerprints' in cw.c and not cw.c['hostfingerprints']:
             del cw.c['hostfingerprints']
-
-
-def _checkcodereview(ui, cw):
-    if ui.promptchoice(b'Will you be submitting commits to Mozilla (Yn)? $$ &Yes $$ &No'):
-        return
-
-    ui.write(CODEREVIEW_INFO)
 
 
 def _checkmultiplevct(ui, cw):
