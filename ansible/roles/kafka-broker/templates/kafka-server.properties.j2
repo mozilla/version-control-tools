@@ -21,7 +21,7 @@ log.retention.check.interval.ms={{ kafka_log_retention_check_interval | default(
 log.cleaner.enable={{ kafka_log_cleaner_enable | default("false") }}
 
 replica.socket.timeout.ms=5000
-replica.lag.time.max.ms=5000
+replica.lag.time.max.ms=30000
 
 # Default to RF3 and requiring 2 in sync replicas to ensure that
 # producers with ack=-1 only succeed if a majority of replicas have
