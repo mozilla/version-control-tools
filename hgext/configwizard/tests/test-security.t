@@ -117,7 +117,7 @@ Modern Mercurial doesn't need to pin fingerprints
   -[hostfingerprints]
   -hg.mozilla.org = aa:bb:cc:dd
   +[hostsecurity]
-  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
+  +hg.mozilla.org:fingerprints = sha256:FF:E7:8D:93:E9:56:3C:C0:19:FC:00:4C:18:B9:86:E5:08:E5:10:F5:E2:EA:48:E8:22:D3:A3:3A:CA:99:C3:4C, sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   
   Write changes to hgrc file (Yn)?  y
 
@@ -147,7 +147,7 @@ Old fingerprint in [hostsecurity] is updated
   @@ -1,2 +1,2 @@
    [hostsecurity]
   -hg.mozilla.org:fingerprints = sha256:aa:bb:cc:dd
-  +hg.mozilla.org:fingerprints = sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
+  +hg.mozilla.org:fingerprints = sha256:FF:E7:8D:93:E9:56:3C:C0:19:FC:00:4C:18:B9:86:E5:08:E5:10:F5:E2:EA:48:E8:22:D3:A3:3A:CA:99:C3:4C, sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   
   Write changes to hgrc file (Yn)?  y
 
