@@ -15,18 +15,19 @@ RSA
 
 
 The x509 certificate for https://hg.mozilla.org/ was last issued on
-2018-10-09 by DigiCert Secure Server CA and has the following
+2020-09-29 by DigiCert Secure Server CA and has the following
+fingerprints:
+
+SHA256:FF:E7:8D:93:E9:56:3C:C0:19:FC:00:4C:18:B9:86:E5:08:E5:10:F5:E2:EA:48:E8:22:D3:A3:3A:CA:99:C3:4C
+SHA1:01:B4:17:F7:F8:A9:E6:13:39:68:B3:0A:76:76:48:8D:E0:41:B3:B9
+
+This certificate expires on 2021-10-31
+
+The previous certificate was issued 2018-10-09 by DigiCert Secure Server CA and has the following
 fingerprints:
 
 SHA256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
 SHA1:1c:a5:7d:a1:28:db:78:f6:52:4d:c0:e6:38:9b:08:43:ec:1f:ef:64
+ 
+This certificate expired on 2020-10-13.
 
-This certificate expires on 2020-10-13.
-
-The previous certificate was issued on 2016-08-29 by DigiCert Secure Server
-CA and had the following fingerprints:
-
-SHA256:8E:AD:F7:6A:EB:44:06:15:ED:F3:E4:69:A6:64:60:37:2D:FF:98:88:37:BF:D7:B8:40:84:01:48:9C:26:CE:D9
-SHA1:73:7F:EF:AB:68:0F:49:3F:88:91:F0:B7:06:69:FD:8F:F2:55:C9:56
-
-This certificate expired on 2018-11-02.
