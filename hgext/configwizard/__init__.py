@@ -36,7 +36,7 @@ from configobj import ConfigObj
 HOST_FINGERPRINTS = {
     'bitbucket.org': '3f:d3:c5:17:23:3c:cd:f5:2d:17:76:06:93:7e:ee:97:42:21:14:aa',
     'bugzilla.mozilla.org': '7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17',
-    'hg.mozilla.org': '1c:a5:7d:a1:28:db:78:f6:52:4d:c0:e6:38:9b:08:43:ec:1f:ef:64',
+    'hg.mozilla.org': '01:B4:17:F7:F8:A9:E6:13:39:68:B3:0A:76:76:48:8D:E0:41:B3:B9',
 }
 
 MODERN_FINGERPRINTS = {
