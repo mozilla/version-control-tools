@@ -24,19 +24,12 @@ ALLOWED_FILES = (
     b'browser/config/mozconfigs/',
     b'browser/config/version.txt',
     b'browser/config/version_display.txt',
-    b'browser/confvars.sh',
+    b'browser/locales/l10n-changesets.json',
+    b'build/defines.sh',
     b'build/mozconfig.common',
     b'config/milestone.txt',
-    b'mobile/android/config/mozconfigs/',
     b'services/sync/modules/constants.js',
     b'xpcom/components/Module.h',
-    b'mobile/android/config/version-files/beta/version.txt',
-    b'mobile/android/config/version-files/beta/version_display.txt',
-    b'mobile/android/config/version-files/nightly/version.txt',
-    b'mobile/android/config/version-files/nightly/version_display.txt',
-    b'mobile/android/config/version-files/release/version.txt',
-    b'mobile/android/config/version-files/release/version_display.txt',
-
 )
 
 INVALID_PATH_FOUND = b"""
