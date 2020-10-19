@@ -38,7 +38,7 @@ ffxbld-merge user cannot push non-merge day changes
   adding manifests
   adding file changes
   
-  **************************** ERROR ****************************
+  *************** ERROR ***************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -46,23 +46,17 @@ ffxbld-merge user cannot push non-merge day changes
   browser/config/mozconfigs/
   browser/config/version.txt
   browser/config/version_display.txt
-  browser/confvars.sh
+  browser/locales/l10n-changesets.json
+  build/defines.sh
   build/mozconfig.common
   config/milestone.txt
-  mobile/android/config/mozconfigs/
-  mobile/android/config/version-files/beta/version.txt
-  mobile/android/config/version-files/beta/version_display.txt
-  mobile/android/config/version-files/nightly/version.txt
-  mobile/android/config/version-files/nightly/version_display.txt
-  mobile/android/config/version-files/release/version.txt
-  mobile/android/config/version-files/release/version_display.txt
   services/sync/modules/constants.js
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  ***************************************************************
+  *************************************
   
   transaction abort!
   rollback completed
@@ -80,7 +74,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   adding manifests
   adding file changes
   
-  **************************** ERROR ****************************
+  *************** ERROR ***************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -88,23 +82,17 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   browser/config/mozconfigs/
   browser/config/version.txt
   browser/config/version_display.txt
-  browser/confvars.sh
+  browser/locales/l10n-changesets.json
+  build/defines.sh
   build/mozconfig.common
   config/milestone.txt
-  mobile/android/config/mozconfigs/
-  mobile/android/config/version-files/beta/version.txt
-  mobile/android/config/version-files/beta/version_display.txt
-  mobile/android/config/version-files/nightly/version.txt
-  mobile/android/config/version-files/nightly/version_display.txt
-  mobile/android/config/version-files/release/version.txt
-  mobile/android/config/version-files/release/version_display.txt
   services/sync/modules/constants.js
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  ***************************************************************
+  *************************************
   
   transaction abort!
   rollback completed
