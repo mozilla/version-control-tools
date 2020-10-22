@@ -41,7 +41,7 @@ from mercurial import (
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = b'4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
+testedwith = b'4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5'
 minimumhgversion = b'4.5'
 
 cmdtable = {}
