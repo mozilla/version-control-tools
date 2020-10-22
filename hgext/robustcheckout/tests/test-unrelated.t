@@ -4,14 +4,12 @@
   (using Mercurial *) (glob)
   ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets b8b78f0253d8:aada1b3e573f (?)
+  streaming all changes
+  6 files to transfer, 1.08 KB of data
+  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
@@ -27,14 +25,12 @@ Attempting to pull/checkout an unrelated repo will blow away the destination
   (repository is unrelated; deleting)
   ensuring http://$LOCALHOST:$HGPORT/repo1@7d5b54cb09e1 is available at dest
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 2 changes to 1 files
-  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
+  streaming all changes
+  7 files to transfer, 760 bytes of data
+  transferred 760 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
 

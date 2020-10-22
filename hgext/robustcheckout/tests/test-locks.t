@@ -98,14 +98,12 @@ to be acquired.
   (existing repository shared store: $TESTTMP/share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg)
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 2 changesets with 2 changes to 1 files
-  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
+  streaming all changes
+  6 files to transfer, 717 bytes of data
+  transferred 717 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 65cd4e3b46a3f22a08ec4162871e67f57c322f6a
 
@@ -134,14 +132,12 @@ Simulate a held lock on the store for a pull plus working directory update.
   (existing repository shared store: $TESTTMP/share/65cd4e3b46a3f22a08ec4162871e67f57c322f6a/.hg)
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 2 files
-  new changesets 65cd4e3b46a3:fca136d824da (?)
+  streaming all changes
+  7 files to transfer, 1.02 KB of data
+  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets 65cd4e3b46a3:fca136d824da (?)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to fca136d824dac41b19345549edfda68fe63213c4
 
@@ -156,14 +152,12 @@ Simulate a held lock on the store without a working directory
   ensuring http://$LOCALHOST:$HGPORT/repo1@7d5b54cb09e1 is available at storelock-nowdir
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 2 files
-  new changesets 65cd4e3b46a3:fca136d824da (?)
+  streaming all changes
+  7 files to transfer, 1.02 KB of data
+  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets 65cd4e3b46a3:fca136d824da (?)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 7d5b54cb09e1172a3684402520112cab3f3a1b70
 

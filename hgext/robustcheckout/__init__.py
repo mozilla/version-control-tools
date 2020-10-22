@@ -519,7 +519,8 @@ def _docheckout(ui, url, dest, upstream, revision, branch, purge, sharebase,
             with timeit('clone', 'clone'):
                 shareopts = {b'pool': sharebase, b'mode': b'identity'}
                 res = hg.clone(ui, {}, clonepeer, dest=dest, update=False,
-                               shareopts=shareopts)
+                               shareopts=shareopts,
+                               stream=True)
         except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
             if handlepullerror(e):
                 return callself()

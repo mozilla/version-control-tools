@@ -5,12 +5,9 @@
   (using Mercurial *.*) (glob)
   ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets b8b78f0253d8:aada1b3e573f (hg44 !)
+  streaming all changes
+  6 files to transfer, 1.08 KB of data
+  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

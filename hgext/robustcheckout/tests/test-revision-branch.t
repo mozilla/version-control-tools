@@ -36,14 +36,12 @@ Specifying branch argument will checkout branch
   (using Mercurial *) (glob)
   ensuring http://$LOCALHOST:$HGPORT/repo0@default is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 3 changesets with 3 changes to 1 files (+1 heads)
-  new changesets b8b78f0253d8:aada1b3e573f (?)
+  streaming all changes
+  6 files to transfer, 1.08 KB of data
+  transferred 1.08 KB in 0.0 seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
+  new changesets b8b78f0253d8:aada1b3e573f (?)
   (pulling to obtain default)
   (remote resolved default to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce; result is not deterministic)
   (revision already present locally; not pulling)
