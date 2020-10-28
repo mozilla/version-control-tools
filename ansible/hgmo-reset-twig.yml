@@ -52,21 +52,21 @@
       command: mv /repo/hg/mozilla/projects/{{ twig }} /repo/hg/mozilla/projects/{{ twig }}-old
                creates=/repo/hg/mozilla/projects/{{ twig }}-old
       tags: rename
+    
+    - name: stream clone repository
+      command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! --config extensions.pushlog=! --config extensions.replicateowner=! --config extensions.readonly=! clone -U --stream https://hg.mozilla.org/{{ hostvars['localhost'].source_repo }} /repo/hg/mozilla/projects/{{ twig }}
+
+- hosts: hgweb-prod:hgweb-mirrors
+  gather_facts: no
+  tasks:
+    - name: Set permissions
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg hg wwr
 
 - hosts: hgssh-prod-master
   gather_facts: no
   tasks:
-    - name: Initialize new twig repo
-      become_user: hg
-      command: /var/hg/venv_tools/bin/hg init /repo/hg/mozilla/projects/{{ twig }}
-               creates=/repo/hg/mozilla/projects/{{ twig }}
-      tags: reset
-
-    - name: Pull new repo
-      become_user: hg
-      command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! pull -r {{ revision | default("tip") }} /repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}
-               chdir=/repo/hg/mozilla/projects/{{ twig }}
-      register: hg_pull
+    - name: Set permissions
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg scm_level_2 wwr
       tags: reset
 
     - name: Create hgrc
@@ -80,10 +80,6 @@
       with_items:
         - { section: paths, option: default, value: "/repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}" }
         - { section: hooks, option: pretxnchangegroup.a_treeclosure, value: "python:mozhghooks.treeclosure.hook" }
-      tags: reset
-
-    - name: Set permissions
-      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg scm_level_2 wwr
       tags: reset
 
     - name: Check revision
