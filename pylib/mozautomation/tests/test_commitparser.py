@@ -68,6 +68,46 @@ This fixes #9000 and bug 324521
 Source-Repo: https://github.com/mozilla/foo'''
         self.assertEqual(parse_bugs(msg), [324521])
 
+        msg = b'''Bumping gaia.json for 2 gaia-central revision(s)
+
+========
+
+https://hg.mozilla.org/integration/gaia-central/rev/bb795b36fc34
+Author: Arthur Chen <crh0716@gmail.com>
+Desc: Merge pull request #11050 from fabi1cazenave/i18nDefaultMediaLocation-bug892788
+
+Bug 892788 - [Settings] "Cancel" and "Change" are not localized r=arthurcc
+
+========
+
+https://hg.mozilla.org/integration/gaia-central/rev/532b7b572923
+Author: Fabien Cazenave <fabien@cazenave.cc>
+Desc:  Bug 892788 - [Settings] "Cancel" and "Change" are not localized'''
+        self.assertEqual(parse_bugs(msg), [892788])
+
+        msg = b'''Bumping gaia.json for 3 gaia revision(s) a=gaia-bump
+
+========
+
+https://hg.mozilla.org/integration/gaia-central/rev/acfb759dfe5a
+Author: Dale Harvey <dale@arandomurl.com>
+Desc: Bug 952098 - Add places as a rocketbar provider. r=kgrandon
+
+========
+
+https://hg.mozilla.org/integration/gaia-central/rev/13833975424a
+Author: lissyx <lissyx+github@lissyx.dyndns.org>
+Desc: Merge pull request #15404 from lissyx/bug960081
+
+Bug 960081 - Make use of shared mock Notification in Dialer call log tests r=etienne
+
+========
+
+https://hg.mozilla.org/integration/gaia-central/rev/c010e5ae36e4
+Author: Alexandre Lissy <lissyx+github@lissyx.dyndns.org>
+Desc: Bug 960081 - Make use of shared mock Notification in Dialer call log tests'''
+        self.assertEqual(parse_bugs(msg), [952098, 960081])
+
     def test_bug_conservatively(self):
         self.assertEqual(parse_bugs(b'bug 1', conservative=True), [1])
         self.assertEqual(parse_bugs(b'bug 123456', conservative=True), [123456])

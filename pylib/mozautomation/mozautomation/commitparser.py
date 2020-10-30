@@ -102,6 +102,9 @@ def parse_bugs(s, conservative=False):
         if source_repo.startswith(b'https://github.com/'):
             conservative = True
 
+    if s.startswith(b'Bumping gaia.json'):
+        conservative = True
+
     bugzilla_re = BUG_CONSERVATIVE_RE if conservative else BUG_RE
 
     bugs_with_duplicates = [int(m[1]) for m in bugzilla_re.findall(s)]
