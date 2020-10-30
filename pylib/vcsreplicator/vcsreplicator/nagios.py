@@ -58,12 +58,12 @@ def check_consumer_lag():
             help='Path to config file to load')
     parser.add_argument('--consumer-section', default='consumer',
             help='Config section Kafka config should be read from')
-    parser.add_argument('--warning-lag-count', default=5, type=int,
+    parser.add_argument('--warning-lag-count', default=30, type=int,
             help='Number of messages behind after which a warning will be '
                  'issued')
     parser.add_argument('--warning-lag-time', default=30.0, type=float,
             help='Time behind after which a warning will be issued')
-    parser.add_argument('--critical-lag-count', default=10, type=int,
+    parser.add_argument('--critical-lag-count', default=60, type=int,
             help='Number of messages behind after which an error will be '
                  'issued')
     parser.add_argument('--critical-lag-time', default=60.0, type=float,
