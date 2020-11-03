@@ -225,7 +225,169 @@ web command for exposing automation relevance works
       "visible": true
   }
 
+Backout a node
+
+  $ cd ../client
+  $ hg backout -r 5
+  reverting foo
+  changeset 6:2acc8e431833 backs out changeset 5:5d04c4fd236c
+  $ hg push
+  pushing to http://$LOCALHOST:$HGPORT/
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
+
+  $ http http://localhost:$HGPORT/json-automationrelevance/2acc8e431833 --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [
+                  {
+                      "node": "5d04c4fd236c19e241d1587e120b39840344eee8"
+                  }
+              ],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "Backed out changeset 5d04c4fd236c",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "parents": [
+                  "5d04c4fd236c19e241d1587e120b39840344eee8"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "pushid": 4,
+              "pushuser": "testuser",
+              "rev": 6,
+              "reviewers": []
+          }
+      ],
+      "visible": true
+  }
+
+  $ http http://localhost:$HGPORT/json-automationrelevance/5d04c4fd236c --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 1",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+              "parents": [
+                  "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 3,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 2",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+              "parents": [
+                  "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 4,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backedoutby": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 3",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "parents": [
+                  "66a66c6c6ae312ec88240754300468a6cea8f71d"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 5,
+              "reviewers": []
+          }
+      ],
+      "visible": true
+  }
 
 Confirm no errors in log
 
+  $ cd ../server
   $ cat error.log
