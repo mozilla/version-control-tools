@@ -393,9 +393,10 @@ def automationrelevancewebcommand(web):
             ctx = urepo[rev]
             entry = webutil.changelistentry(web, ctx)
 
-            backout_node = get_backoutbynode(b'hgmo', repo, ctx)
-            if backout_node is not None:
-                entry[b'backedoutby'] = backout_node
+            if req.qsparams.get(b'backouts'):
+                backout_node = get_backoutbynode(b'hgmo', repo, ctx)
+                if backout_node is not None:
+                    entry[b'backedoutby'] = backout_node
 
             # The pushnodes list is redundant with data from other changesets.
             # The amount of redundant data for pushes containing N>100
