@@ -1,7 +1,0 @@
--r prod-requirements.in
--r ../deploy-requirements.in
-
-betamax<0.9
-betamax-serializers<0.3
-coverage
-nose
