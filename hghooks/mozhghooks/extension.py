@@ -41,6 +41,8 @@ configitem(b'pushlog', b'autolanduser',
            default=b'bind-autoland@mozilla.com')
 configitem(b'pushlog', b'landingworkeruser',
            default=b'lando_landing_worker@mozilla.com')
+configitem(b'pushlog', b'landingworkeruserdev',
+           default=b'lando_landing_worker_dev@mozilla.com')
 
 
 def get_check_classes(hook):

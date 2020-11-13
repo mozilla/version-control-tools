@@ -79,11 +79,22 @@ Test landing worker pushes
   autoland or landing worker push detected
   recorded push in pushlog
 
+Test landing worker (dev) pushes
+
+  $ export USER=lando_landing_worker_dev@mozilla.com
+  $ export AUTOLAND_REQUEST_USER=user4@example.com
+  $ echo somethingsomethingsomething > foo
+  $ hg commit -m "landing worker" 
+  $ hg -q push
+  autoland or landing worker push detected
+  recorded push in pushlog
+
   $ cd ../server
 
 {pushuser} shows who did the push
 
   $ hg log -T '{rev} {pushuser}\n'
+  5 user4@example.com
   4 user4@example.com
   3 user3@example.com
   2 user2@example.com

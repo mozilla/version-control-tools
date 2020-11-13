@@ -40,6 +40,7 @@ request access be restored for %s.
 
 AUTOLAND_USER = 'bind-autoland@mozilla.com'
 LANDING_WORKER_USER = 'lando_landing_worker@mozilla.com'
+LANDING_WORKER_USER_DEV = 'lando_landing_worker_dev@mozilla.com'
 
 
 def source_environment(path):
@@ -109,6 +110,7 @@ def process_login(user):
     landing_users = (
         pash_settings.get('autoland_user', AUTOLAND_USER),
         pash_settings.get('landing_worker_user', LANDING_WORKER_USER),
+        pash_settings.get('landing_worker_user_dev', LANDING_WORKER_USER_DEV),
     )
 
     # Touch the initiator of the autoland request, if required.

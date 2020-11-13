@@ -9,9 +9,10 @@
   $ hg -q commit -A -m initial
 
 We set AUTOLAND_REQUEST_USER here but it should only used if the push is
-performed by the AUTOLAND_USER or LANDING_WORKER_USER.
+performed by the AUTOLAND_USER, LANDING_WORKER_USER, or LANDING_WORKER_USER_DEV.
 
   $ export LANDING_WORKER_USER=lando_landing_worker@mozilla.com
+  $ export LANDING_WORKER_USER_DEV=lando_landing_worker_dev@mozilla.com
   $ export AUTOLAND_USER=bind-autoland@mozilla.com
   $ export AUTOLAND_REQUEST_USER=autolandrequestuser
 
@@ -107,6 +108,24 @@ autoland user or the landing worker user.
   ID: 2; user: autolandrequestuser; Date: *; Rev: 1; Node: 6cce86f0aeb7e26325de47bb83f18377deb5c741 (glob)
   ID: 3; user: autolandrequestuser; Date: *; Rev: 2; Node: 2ea22efe949df1eaec2cfefa8322a394f1bb3c8d (glob)
 
+  $ echo hello again world > foo
+  $ hg commit -m 'landing worker dev'
+  $ USER=$LANDING_WORKER_USER_DEV hg push ../server
+  pushing to ../server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  autoland or landing worker push detected
+  recorded push in pushlog
+  added 1 changesets with 1 changes to 1 files
+
+  $ dumppushlog server
+  ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
+  ID: 2; user: autolandrequestuser; Date: *; Rev: 1; Node: 6cce86f0aeb7e26325de47bb83f18377deb5c741 (glob)
+  ID: 3; user: autolandrequestuser; Date: *; Rev: 2; Node: 2ea22efe949df1eaec2cfefa8322a394f1bb3c8d (glob)
+  ID: 4; user: autolandrequestuser; Date: *; Rev: 3; Node: cce08fa09941b3f978b3bcca182ebbdb8f120b94 (glob)
+
 User prefixing works
 
   $ cat >> ../server/.hg/hgrc << EOF
@@ -143,5 +162,6 @@ User prefixing works
   ID: 1; user: remoteuser; Date: *; Rev: 0; Node: 96ee1d7354c4ad7372047672c36a1f561e3a6a4c (glob)
   ID: 2; user: autolandrequestuser; Date: *; Rev: 1; Node: 6cce86f0aeb7e26325de47bb83f18377deb5c741 (glob)
   ID: 3; user: autolandrequestuser; Date: *; Rev: 2; Node: 2ea22efe949df1eaec2cfefa8322a394f1bb3c8d (glob)
-  ID: 4; user: remote:remoteuser; Date: *; Rev: 3; Node: 47565279129e868c7f3a6bff6545c749f5e84a05 (glob)
-  ID: 5; user: local:localuser; Date: *; Rev: 4; Node: dfaa70d4c32931a54cbf5ffc157e94c916b8c948 (glob)
+  ID: 4; user: autolandrequestuser; Date: *; Rev: 3; Node: cce08fa09941b3f978b3bcca182ebbdb8f120b94 (glob)
+  ID: 5; user: remote:remoteuser; Date: *; Rev: 4; Node: f820777a860c4cce3d98a51e09b15e345b52d230 (glob)
+  ID: 6; user: local:localuser; Date: *; Rev: 5; Node: 3a31c5bd57b89259cc5da60cf5743a8681ffe9fc (glob)
