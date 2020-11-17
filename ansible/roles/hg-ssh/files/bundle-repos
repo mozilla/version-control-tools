@@ -23,3 +23,4 @@ projects/oak
 projects/pine
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
+conduit-testing/m-c
