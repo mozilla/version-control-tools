@@ -26,6 +26,8 @@ And raises during upload since we don't have credentials in the test env
 
   $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 PYTHONUNBUFFERED=1 /var/hg/venv_bundles/bin/generate-hg-s3-bundles mozilla-central
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  verifying or rebuilding fncache
+  fncache for mozilla-central: fncache already up to date
   1 changesets found
   1 changesets found
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
@@ -55,12 +57,18 @@ The manifest should be empty because there were no successful uploads
   200
   
   
+Remove fncache to test rebuilding code path
+
+  $ hgmo exec hgssh rm /repo/hg/mozilla/mozilla-central/.hg/store/fncache
 
 An index.html and bundles.json document should be produced
 
   $ hgmo exec hgssh sudo -u hg SINGLE_THREADED=1 /var/hg/venv_bundles/bin/generate-hg-s3-bundles mozilla-central --no-upload
   wrote synchronization message into replication log
   tip is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  verifying or rebuilding fncache
+  fncache for mozilla-central: adding data/foo.i
+  fncache for mozilla-central: 1 items added, 0 removed from fncache
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   bundle already exists, skipping: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-v2.hg
