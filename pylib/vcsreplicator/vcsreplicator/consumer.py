@@ -159,7 +159,37 @@ def repofilter(message_handler):
     return filterwrapper
 
 
+def autorecover(message_handler):
+    """Automatically run `hg recover` when suggested in the output of
+    the failed `hg` command.
+    """
+    @functools.wraps(message_handler)
+    def autorecoverwrapper(config, payload):
+        try:
+            return message_handler(config, payload)
+        except hglib.error.CommandError as err:
+            # Attempt to recover a dead transaction without human interaction
+            if b"run 'hg recover' to clean up transaction" not in err.err:
+                raise err
+
+            logger.warn("attempting to autorecover from abandoned transaction")
+
+            path = config.parse_wire_repo_path(payload["path"])
+            with get_hg_client(path) as c:
+                args = hglib.util.cmdbuilder("recover")
+                res, out, err = run_command(c, args)
+                if res:
+                    logger.warn("`hg recover` failed to automatically resolve the "
+                                "problem")
+                    raise err
+
+            return message_handler(config, payload)
+
+    return autorecoverwrapper
+
+
 @repofilter
+@autorecover
 def handle_message_main(config, payload):
     """Process a decoded event message.
 
