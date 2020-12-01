@@ -70,7 +70,7 @@ Remove file (untracked extension, inside expected path), should work
   adding file changes
   added 1 changesets with 0 changes to 0 files
 
-Add file (tracked extension, inside expected path), wrong commit message, should fail
+Add DTD files (tracked extension, inside expected path), wrong commit message, should fail
 
   $ mkdir -p browser/locales/en-US
   $ echo "DTD file #1" >> browser/locales/en-US/test.dtd
@@ -84,6 +84,7 @@ Add file (tracked extension, inside expected path), wrong commit message, should
   adding changesets
   adding manifests
   adding file changes
+  added 1 changesets with 2 changes to 2 files
   
   ************************** ERROR ****************************
   
@@ -110,8 +111,49 @@ Amend commit message to use correct keyword, should work
   adding changesets
   adding manifests
   adding file changes
-  You've signaled approval for changes to strings in your push, thanks.
   added 1 changesets with 2 changes to 2 files
+  You've signaled approval for changes to strings in your push, thanks.
+
+Add Fluent file (tracked extension, inside expected path), wrong commit message, should fail
+
+  $ mkdir -p browser/locales/en-US
+  $ echo "FTL file" >> browser/locales/en-US/test.ftl
+  $ hg commit -A -m "Commit .ftl files inside l10n path, a=l10n"
+  adding browser/locales/en-US/test.ftl
+  $ hg push ../server
+  pushing to ../server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  
+  ************************** ERROR ****************************
+  
+  * File used for localization (browser/locales/en-US/test.ftl) altered in this changeset *
+  
+  This repository is string frozen. Please request explicit permission from
+  release managers to break string freeze in your bug.
+  If you have that explicit permission, denote that by including in
+  your commit message l10n=...
+  *************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.prevent_string_changes hook failed
+  [255]
+
+Amend commit message to use correct keyword, should work
+
+  $ hg -q commit --amend -m "Commit .ftl files inside l10n path, l10n=foo"
+  $ hg push ../server
+  pushing to ../server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+  You've signaled approval for changes to strings in your push, thanks.
 
 Edit existing file and commit with correct keyword, should work
 
@@ -123,8 +165,8 @@ Edit existing file and commit with correct keyword, should work
   adding changesets
   adding manifests
   adding file changes
-  You've signaled approval for changes to strings in your push, thanks.
   added 1 changesets with 1 changes to 1 files
+  You've signaled approval for changes to strings in your push, thanks.
 
 Delete a file and commit without the correct keyword, should fail
 
@@ -136,6 +178,7 @@ Delete a file and commit without the correct keyword, should fail
   adding changesets
   adding manifests
   adding file changes
+  added 1 changesets with 0 changes to 0 files
   
   ************************** ERROR ****************************
   
@@ -159,8 +202,8 @@ Delete a file and commit without the correct keyword, should fail
   adding changesets
   adding manifests
   adding file changes
-  You've signaled approval for changes to strings in your push, thanks.
   added 1 changesets with 0 changes to 0 files
+  You've signaled approval for changes to strings in your push, thanks.
 
 Edit a file (tracked extension, inside expected path), as part of code uplift, should work
 
@@ -190,6 +233,7 @@ Same edit of a tracked file after release uplift, should fail
   adding changesets
   adding manifests
   adding file changes
+  added 2 changesets with 2 changes to 2 files
   
   ************************** ERROR ****************************
   
@@ -217,8 +261,8 @@ Message check should be case insensitive
   adding changesets
   adding manifests
   adding file changes
-  You've signaled approval for changes to strings in your push, thanks.
   added 3 changesets with 3 changes to 2 files
+  You've signaled approval for changes to strings in your push, thanks.
 
   $ cd ..
 

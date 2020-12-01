@@ -38,7 +38,7 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         # Loop through each file for the current changeset
         for file in repo[change_id].files():
             # Interested only in files potentially used for l10n
-            if (re.search(b'locales/en-US/', file) and file.endswith((b'.dtd', b'.ini', b'.properties'))):
+            if (re.search(b'locales/en-US/', file) and file.endswith((b'.dtd', b'.ftl', b'.ini', b'.properties'))):
                 changed_strings = True
                 if not re.search(b'l10n=', repo[b'tip'].description().lower()):
                     error += b"* File used for localization (%s) altered in this changeset *\n" % file
