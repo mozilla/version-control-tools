@@ -10,6 +10,7 @@
     include_role:
       name: hg-web
     vars:
+      httpd_max_clients: 25
       # We have to use hostvars to reference variables on other hosts.
       # slurp captures content in base64 encoded form. Decode it
       # before it is passed in.
@@ -18,14 +19,6 @@
       # The Zeus load balancer in MDC1 resolves to multiple IPs.
       mirror_ips: ["63.245.215.25", "63.245.215.102"]
       vct_node: "{{ lookup('file', '../.vctnode') }}"
-      # Comment out these variables for now, since they are managed by
-      # RelOps puppet and we don't need them on the mirror instances
-#            chroot_mozbuild_exists: "{{ hostvars['localhost'].chroot_mozbuild.stat.exists }}"
-#            bloxtool_user: "{{ (bloxtool_config.content | b64decode | from_json).user }}"
-#            bloxtool_password: "{{ (bloxtool_config.content | b64decode | from_json).password }}"
-#            bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}"
-#            s3_cache_access_key_id: "{{ (s3cacher_config.content | b64decode | from_json).access_key_id }}"
-#            s3_cache_secret_key: "{{ (s3cacher_config.content | b64decode | from_json).secret_access_key }}"
       replication_filters: True
 
   - name: apply monitoring-agent role
