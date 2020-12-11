@@ -10,8 +10,5 @@ test-evolve.t
 # printing
 test-overlay-dest-state.t
 
-# CI data output regex doesn't match under Python 3
-test-perfherder.t
-
 # Not properly recovering from abandoned transaction
 test-abandonded-transaction.t
