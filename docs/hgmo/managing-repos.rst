@@ -78,7 +78,7 @@ or cloning (forking) from an existing repository.
    the operation or the servers may be left in an inconsistent state.
 
    If you encounter a problem, file a bug or say something in ``#vcs``
-   on IRC.
+   on Matrix.
 
 Editing a User Repository
 =========================

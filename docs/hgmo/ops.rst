@@ -231,7 +231,7 @@ by performing dummy merges. The procedure for this is as follows::
    # Do the merge by invoking `hg debugsetparents` repeatedly
    $ for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
    # Push to try without scheduling any jobs
-   # You may wish to post in IRC or Slack with a notice as well
+   # You may wish to post in Matric or Slack with a notice as well
    $ hg push -r . ssh://hg.mozilla.org/try
 
 Clonebundles Management
