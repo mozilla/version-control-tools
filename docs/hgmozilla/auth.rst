@@ -64,14 +64,6 @@ The fingerprints of the host keys for ``hg.mozilla.org`` are as follows:
    4096 SHA1:p2MGe4wSw8ZnQ5J9ShBk/6VA+Co hg.mozilla.org
    4096 MD5:1c:f9:cf:76:de:b8:46:d6:5a:a3:00:8d:3b:0c:53:77 hg.mozilla.org
 
-A GPG signed document stating asserting the validity of these keys can
-be verified:
-
-.. code-block:: bash
-
-   curl https://hg.mozilla.org/hgcustom/version-control-tools/raw-file/tip/docs/vcs-server-info.asc > mozilla-vcs-info.asc
-   gpg --verify mozilla-vcs-info.asc
-
 Verify your SSH settings are working by attempting to SSH into a server.
 Your terminal output should resemble the following::
 
