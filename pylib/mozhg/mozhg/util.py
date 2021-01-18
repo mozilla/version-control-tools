@@ -76,6 +76,8 @@ def identify_repo(repo):
        Bool if this is a Firefox repo where released Firefoxen could come
        from. These repos have more stringent requirements than a typical
        Firefox repo.
+    thunderbird
+       Bool indicating if the repo is a Thunderbird repo.
     hosted
        Bool indicating if the repo is hosted. (In a path used by servers.)
     user_repo
