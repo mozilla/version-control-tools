@@ -51,7 +51,7 @@ parlance) and add it to the DAG::
 
 (``-m A`` says to use ``A`` for the commit message).
 
-Now let's take a look a the DAG::
+Now let's take a look at the DAG::
 
    $ hg log -G -T '{desc}'
    @  A
