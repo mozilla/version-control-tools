@@ -975,6 +975,8 @@ def _checkevolve(ui, cw, hg_version):
         try:
             # Clone the evolve extension and enable
             hg.clone(ui, {}, remote_evolve_path, branch=(b'stable',), dest=local_evolve_path)
+            local_evolve_repo = hg.repository(ui, local_evolve_path)
+            hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
             _enableext(cw, 'evolve', evolve_config_value)
 
             ui.write(b'Evolve was downloaded successfully.\n')
@@ -994,9 +996,9 @@ def _checkevolve(ui, cw, hg_version):
         try:
             local_evolve_repo = hg.repository(ui, local_evolve_path)
 
-            # Pull the latest stable, update to tip
+            # Pull the latest stable, update to latest tag/release
             hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
-            hgupdate(ui, local_evolve_repo, rev=b'stable')
+            hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
 
             ui.write(b'Evolve was updated successfully.\n')
 
