@@ -275,7 +275,7 @@ resource "google_storage_bucket" "gcp-bundles-uc1" {
 resource "google_storage_bucket_iam_member" "hgbundler-access" {
   bucket = google_storage_bucket.gcp-bundles-uc1.name
   role   = "roles/storage.objectAdmin"
-  member = google_service_account.gcp-hgbundler.name
+  member = "serviceAccount:${google_service_account.gcp-hgbundler.email}"
 }
 
 # Allow public read access to the world for the bundles bucket
