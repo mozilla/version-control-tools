@@ -329,6 +329,35 @@ module "hgweb-mirror-b" {
   user_data = file("${path.module}/user_data.yml")
 }
 
+resource "aws_instance" "hgweb-backup" {
+  # Create this instance if `backup_node` is non-zero
+  count = var.backup_node
+
+  ami                    = var.mirror_ami
+  instance_type          = "c5d.2xlarge"
+  subnet_id              = module.privsubnet-b.subnet_id
+  vpc_security_group_ids = [
+    aws_security_group.hgci-securitygroup.id,
+  ]
+  ebs_optimized          = true
+
+  user_data = file("${path.module}/user_data.yml")
+
+  root_block_device {
+    delete_on_termination = false
+    volume_size           = 500
+    volume_type           = "standard"
+  }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+
+  tags = {
+    Name = "repo data backup instance"
+  }
+}
+
 resource "aws_route53_record" "dns-record" {
   name    = "${data.aws_region.current.name}.hgmointernal.net"
   type    = "A"
