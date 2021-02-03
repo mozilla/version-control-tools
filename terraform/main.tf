@@ -247,11 +247,6 @@ resource "google_service_account" "gcp-hgbundler" {
   display_name = "hgbundler"
 }
 
-resource "google_service_account_key" "gcp-hgbundler-key" {
-  service_account_id = google_service_account.gcp-hgbundler.id
-  public_key_type    = "TYPE_X509_PEM_FILE"
-}
-
 # Bucket for bundles
 resource "google_storage_bucket" "gcp-bundles-uc1" {
   name          = "moz-hg-bundles-gcp-us-central1"
