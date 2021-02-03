@@ -345,7 +345,7 @@ resource "aws_instance" "hgweb-backup" {
 
   root_block_device {
     delete_on_termination = false
-    volume_size           = 500
+    volume_size           = 1000
     volume_type           = "standard"
   }
 
