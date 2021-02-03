@@ -245,6 +245,7 @@ module "vpc-ue1" {
 resource "google_service_account" "gcp-hgbundler" {
   account_id   = "hgbundler"
   display_name = "hgbundler"
+  description  = "Upload Mercurial clonebundles to Google Cloud Storage buckets"
 }
 
 # Bucket for bundles
