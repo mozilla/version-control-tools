@@ -98,12 +98,6 @@ acceptable.
 (Relevant config option: ui.username)
 '''.lstrip()
 
-MISSING_IRCNICK = b'''
-You don't have a Mozilla IRC nickname defined in your Mercurial config file.
-
-(Relevant config option: mozilla.ircnick)
-'''
-
 BAD_DIFF_SETTINGS = b'''
 Mercurial is not configured to produce diffs in a more readable format.
 
