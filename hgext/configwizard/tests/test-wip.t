@@ -15,7 +15,9 @@ Rejecting wip doesn't install it
    <RETURN>
   It is common to want a quick view of changesets that are in progress.
   
-  The ``hg wip`` command provides such a view.
+  ``hg show`` can describe active bookmarks and the current stack, and a
+  tree of changesets that are in development.
+  ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
   Example Usage:
   
@@ -34,9 +36,9 @@ Rejecting wip doesn't install it
   (Not shown are the colors that help denote the state each changeset
   is in.)
   
-  (Relevant config options: alias.wip, revsetalias.wip, templates.wip)
+  (Relevant config options: extensions.show, alias.wip, revsetalias.wip, templates.wip)
   
-  Would you like to install the `hg wip` alias (Yn)?  n
+  Would you like to install the `hg show` extension and `hg wip` alias (Yn)?  n
 
 wip enabled when requested
 
@@ -50,7 +52,9 @@ wip enabled when requested
    <RETURN>
   It is common to want a quick view of changesets that are in progress.
   
-  The ``hg wip`` command provides such a view.
+  ``hg show`` can describe active bookmarks and the current stack, and a
+  tree of changesets that are in development.
+  ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
   Example Usage:
   
@@ -69,16 +73,18 @@ wip enabled when requested
   (Not shown are the colors that help denote the state each changeset
   is in.)
   
-  (Relevant config options: alias.wip, revsetalias.wip, templates.wip)
+  (Relevant config options: extensions.show, alias.wip, revsetalias.wip, templates.wip)
   
-  Would you like to install the `hg wip` alias (Yn)?  y
+  Would you like to install the `hg show` extension and `hg wip` alias (Yn)?  y
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -0,0 +1,17 @@
+  @@ -0,0 +1,19 @@
   +[alias]
   +wip = log --graph --rev=wip --template=wip
+  +[extensions]
+  +show =
   +[revsetalias]
   +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
   +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
@@ -101,6 +107,8 @@ wip enabled when requested
   $ cat .hgrc
   [alias]
   wip = log --graph --rev=wip --template=wip
+  [extensions]
+  show = 
   [revsetalias]
   wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
   wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
@@ -165,7 +173,9 @@ wip alias ignores old esrs if using firefoxtree
   Would you like to activate firefoxtree (Yn)?  y
   It is common to want a quick view of changesets that are in progress.
   
-  The ``hg wip`` command provides such a view.
+  ``hg show`` can describe active bookmarks and the current stack, and a
+  tree of changesets that are in development.
+  ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
   Example Usage:
   
@@ -184,16 +194,18 @@ wip alias ignores old esrs if using firefoxtree
   (Not shown are the colors that help denote the state each changeset
   is in.)
   
-  (Relevant config options: alias.wip, revsetalias.wip, templates.wip)
+  (Relevant config options: extensions.show, alias.wip, revsetalias.wip, templates.wip)
   
-  Would you like to install the `hg wip` alias (Yn)?  y
+  Would you like to install the `hg show` extension and `hg wip` alias (Yn)?  y
   Your config file needs updating.
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,7 +1,7 @@
-   [alias]
+  @@ -2,8 +2,9 @@
    wip = log --graph --rev=wip --template=wip
+   [extensions]
+   show =
+  +firefoxtree = */hgext/firefoxtree (glob)
    [revsetalias]
   -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed() (no-hg46 !)
   -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() (hg46 !)
@@ -202,12 +214,6 @@ wip alias ignores old esrs if using firefoxtree
    [templates]
    wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
    [color]
-  @@ -15,3 +15,5 @@
-   wip.user = magenta
-   [experimental]
-   graphshorten = true
-  +[extensions]
-  +firefoxtree = */hgext/firefoxtree (glob)
   
   Write changes to hgrc file (Yn)?  y
 
@@ -242,9 +248,10 @@ Check that when on 4.6 with the old wip enabled, the alias is updated with a mes
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,4 +1,19 @@
+  @@ -1,4 +1,20 @@
    [extensions]
    configwizard = */hgext/configwizard (glob)
+  +show =
    [revsetalias]
   -wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
   +wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed()

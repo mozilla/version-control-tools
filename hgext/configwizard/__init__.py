@@ -185,7 +185,9 @@ Please upgrade to Mercurial 3.8+ so this feature is available.
 WIP_INFO = b'''
 It is common to want a quick view of changesets that are in progress.
 
-The ``hg wip`` command provides such a view.
+``hg show`` can describe active bookmarks, the current stack, or a
+tree of changesets that are in development.
+``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
 
 Example Usage:
 
@@ -204,9 +206,9 @@ Example Usage:
 (Not shown are the colors that help denote the state each changeset
 is in.)
 
-(Relevant config options: alias.wip, revsetalias.wip, templates.wip)
+(Relevant config options: extensions.show, alias.wip, revsetalias.wip, templates.wip)
 
-Would you like to install the `hg wip` alias (Yn)? $$ &Yes $$ &No
+Would you like to install the `hg show` extension and `hg wip` alias (Yn)? $$ &Yes $$ &No
 '''.lstrip()
 
 WIP_UPDATED_EXPRESSION = b'''
@@ -1049,9 +1051,11 @@ def _checkwip(ui, cw):
 
     # The wip configuration changes over time. Ensure it is up to date.
     cw.c.setdefault('alias', {})
+    cw.c.setdefault('extensions', {})
     cw.c.setdefault('revsetalias', {})
     cw.c.setdefault('templates', {})
 
+    cw.c['extensions']['show'] = ''
     cw.c['alias']['wip'] = 'log --graph --rev=wip --template=wip'
 
     if hg_version < (4, 6):
