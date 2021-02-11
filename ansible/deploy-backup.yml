@@ -1,0 +1,38 @@
+---
+- hosts: "{{ var_hostgroup | default('hgweb-backup') }}"
+  tasks:
+  - name: set SELinux to permissive mode
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: apply hgweb role with replication filters
+    include_role:
+      name: hg-web
+    vars:
+      httpd_max_clients: 25
+      # We have to use hostvars to reference variables on other hosts.
+      # slurp captures content in base64 encoded form. Decode it
+      # before it is passed in.
+      mirror_private_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_private_key.content | b64decode }}"
+      mirror_host_key: "{{ hostvars[groups['hgssh-prod-master'][0]].mirror_host_key.content | b64decode }}"
+      # The Zeus load balancer in MDC1 resolves to multiple IPs.
+      mirror_ips: ["63.245.215.25", "63.245.215.102"]
+      vct_node: "{{ lookup('file', '../.vctnode') }}"
+
+  - name: apply monitoring-agent role
+    include_role:
+      name: monitoring-agent
+    vars:
+      hosttype: hgweb
+
+  # TODO: refactor hg-web role so we don't install unnecessary services in the first place
+  - name: turn off services considered irrelevant to mirror hosts
+    service: name={{ item }}
+             enabled=no
+             state=stopped
+    with_items:
+      # These hosts will never serve to Mozilla offices, and don't
+      # have bloxtool credentials. No need for them here.
+      - mozilla-ip-scraper.service
+      - mozilla-ip-scraper.timer

@@ -19,6 +19,13 @@ ci-uw1-b ansible_host=10.191.11.157
 ci-ue1-a ansible_host=10.191.12.125
 ci-ue1-b ansible_host=10.191.12.152
 
+[backup-node]
+hgweb-backup-uw2 ansible_host=10.191.5.147
+
+[backup-node:vars]
+ansible_sudo=yes
+ansible_become=yes
+
 [hgweb-mirrors:children]
 ci-uw1
 ci-uw2
@@ -32,6 +39,7 @@ ansible_become=yes
 hgssh-prod
 hgweb-prod
 hgweb-mirrors
+backup-node
 bootstrap
 
 [reviewbot]
