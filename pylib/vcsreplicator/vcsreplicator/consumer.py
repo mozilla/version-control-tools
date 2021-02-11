@@ -403,6 +403,11 @@ def process_hg_delete(config, wire_path):
     """Process message indicating repository at path should be deleted"""
     local_path = config.parse_wire_repo_path(wire_path)
 
+    # Don't delete repos on backup nodes
+    if config.is_backup():
+        logger.warn("node is a backup; ignoring delete for %s" % local_path)
+        return
+
     if not os.path.exists(local_path):
         logger.warn('delete message received for path that does not exist: %s' % local_path)
         return

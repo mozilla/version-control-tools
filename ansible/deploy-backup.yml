@@ -19,6 +19,7 @@
       # The Zeus load balancer in MDC1 resolves to multiple IPs.
       mirror_ips: ["63.245.215.25", "63.245.215.102"]
       vct_node: "{{ lookup('file', '../.vctnode') }}"
+      is_backup: true
 
   - name: apply monitoring-agent role
     include_role:

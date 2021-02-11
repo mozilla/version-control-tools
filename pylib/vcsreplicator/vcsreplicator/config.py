@@ -116,6 +116,15 @@ class Config(object):
 
         return 'hg'
 
+    def is_backup(self):
+        """Return `True` if the consumer is acting as a backup of core repo
+        data.
+        """
+        return (
+            self.c.has_section('consumer')
+            and self.c.getboolean('consumer', 'backup', fallback=False)
+        )
+
     def parse_wire_repo_path(self, path):
         """Parse a normalized repository path into a local path."""
         for source, dest in self._path_rewrites:

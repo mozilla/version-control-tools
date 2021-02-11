@@ -15,6 +15,11 @@ topic = pushdata
 # copy of the message. So the group name must be unique.
 group = {{ ansible_hostname }}
 
+{% if is_backup is defined %}
+# This ensures `hg-repo-delete-1` messages are ignored.
+backup = {{ is_backup }}
+{% endif %}
+
 [path_rewrites]
 {moz} = /repo/hg/mozilla
 
