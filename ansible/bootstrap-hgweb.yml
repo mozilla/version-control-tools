@@ -1,4 +1,3 @@
-# The host is assumed to have the hg-web role applied.
 # Add the name of the host you wish to bootstrap to the "bootstrap"
 # Ansible inventory group.
 #
@@ -42,13 +41,19 @@
   import_playbook: deploy-hgweb.yml
   vars:
     var_hostgroup: bootstrap
-  when: instance == 'hgweb'
+  when: instance is defined and instance == 'hgweb'
 
 - name: bootstrap an hgweb mirror
   import_playbook: deploy-mirrors.yml
   vars:
     var_hostgroup: bootstrap
-  when: instance == 'mirror'
+  when: instance is defined and instance == 'mirror'
+
+- name: bootstrap backup node
+  import_playbook: deploy-backup.yml
+  vars:
+    var_hostgroup: bootstrap
+  when: instance is defined and instance == 'backup'
 
 - hosts: bootstrap
   become: true

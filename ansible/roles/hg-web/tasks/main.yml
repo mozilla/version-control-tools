@@ -33,7 +33,6 @@
 
 - name: ensure critical system packages are locked so they aren't auto-upgraded
   command: /usr/bin/yum versionlock add {{ item }}
-  warn: False
   with_items:
     # Important server functionality uses Python 2 and upgrading the Python
     # package can be sensitive. So we lock the package version so it isn't
