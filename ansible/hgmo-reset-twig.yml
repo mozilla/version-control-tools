@@ -45,7 +45,7 @@
       when: old_st.stat.exists == True
       tags: check
 
-- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors
+- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors:hgweb-backup
   gather_facts: no
   tasks:
     - name: Rename twig to twig-old
@@ -56,7 +56,7 @@
     - name: stream clone repository
       command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! --config extensions.pushlog=! --config extensions.replicateowner=! --config extensions.readonly=! clone -U --stream https://hg.mozilla.org/{{ hostvars['localhost'].source_repo }} /repo/hg/mozilla/projects/{{ twig }}
 
-- hosts: hgweb-prod:hgweb-mirrors
+- hosts: hgweb-prod:hgweb-mirrors:hgweb-backup
   gather_facts: no
   tasks:
     - name: Set permissions
@@ -96,7 +96,7 @@
     - name: Show revision
       debug: var=hg_log.stdout.split('\n')
 
-- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors
+- hosts: hgssh-prod-master:hgweb-prod:hgweb-mirrors:hgweb-backup
   gather_facts: no
   tasks:
     - name: Stat twig-old
