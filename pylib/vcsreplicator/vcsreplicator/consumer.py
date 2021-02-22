@@ -347,7 +347,7 @@ def stream_clone_repo(canonical_path, local_path):
     Returns on success and raises on error.
     '''
     args = hglib.util.cmdbuilder('clone', canonical_path, local_path,
-                                 stream=True)
+                                 stream=True, noupdate=True)
     args.insert(0, hglib.HGPATH)
     logger.warn('performing stream clone of %s to %s' % (canonical_path, local_path))
 
