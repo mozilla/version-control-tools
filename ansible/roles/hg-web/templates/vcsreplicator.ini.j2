@@ -26,6 +26,8 @@ backup = {{ is_backup }}
 [pull_url_rewrites]
 {moz}/ = ssh://{{ mirror_source }}/
 
-{% if replication_filters == True %}
+{% if replication_filters == "mirror" %}
 {% include 'mirror-filters.j2' %}
+{% elif replication_filters == "on-premises" %}
+{% include 'on-premises-filters.j2' %}
 {% endif %}
