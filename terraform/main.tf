@@ -200,7 +200,7 @@ resource "aws_route53_zone" "hgzone" {
 module "vpc-uw2" {
   source = "./modules/aws-vpc"
 
-  az_c_count           = 1
+  az_b_count           = 2
   backup_node          = 1
   cidr_block           = "10.191.5.0/24"
   metadata_bucket_name = aws_s3_bucket.metadata-bucket.bucket
@@ -232,7 +232,7 @@ module "vpc-uw1" {
 module "vpc-ue1" {
   source = "./modules/aws-vpc"
 
-  az_c_count           = 1
+  az_b_count           = 2
   cidr_block           = "10.191.12.0/24"
   metadata_bucket_name = aws_s3_bucket.metadata-bucket.bucket
   mirror_ami           = var.centos7_amis["us-east-1"]

@@ -12,11 +12,6 @@ variable "az_b_count" {
   default = 1
 }
 
-variable "az_c_count" {
-  description = "Count of nodes in availability zone C"
-  default = 0
-}
-
 variable "backup_node" {
   description = "Boolean indicating if a backup node should be created"
   default     = 0

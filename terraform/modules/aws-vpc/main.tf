@@ -331,21 +331,6 @@ module "hgweb-mirror-b" {
   user_data = file("${path.module}/user_data.yml")
 }
 
-module "hgweb-mirror-c" {
-  source = "../hgweb-mirror"
-  count  = var.az_c_count
-
-  availability_zone    = "c"
-  elb_target_group_arn = aws_lb_target_group.http-mirror-target-group.arn
-  instance_type        = "c5d.2xlarge"
-  mirror_ami           = var.mirror_ami
-  security_group_ids = [
-    aws_security_group.hgci-securitygroup.id,
-  ]
-  subnet_id = module.privsubnet-b.subnet_id
-  user_data = file("${path.module}/user_data.yml")
-}
-
 resource "aws_instance" "hgweb-backup" {
   # Create this instance if `backup_node` is non-zero
   count = var.backup_node
