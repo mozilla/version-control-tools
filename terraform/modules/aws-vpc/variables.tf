@@ -2,6 +2,21 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+variable "az_a_count" {
+  description = "Count of nodes in availability zone A"
+  default = 1
+}
+
+variable "az_b_count" {
+  description = "Count of nodes in availability zone B"
+  default = 1
+}
+
+variable "az_c_count" {
+  description = "Count of nodes in availability zone C"
+  default = 0
+}
+
 variable "backup_node" {
   description = "Boolean indicating if a backup node should be created"
   default     = 0
