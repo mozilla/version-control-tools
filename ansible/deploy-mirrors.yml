@@ -27,13 +27,3 @@
     vars:
       hosttype: hgweb
 
-  # TODO: refactor hg-web role so we don't install unnecessary services in the first place
-  - name: turn off services considered irrelevant to mirror hosts
-    service: name={{ item }}
-             enabled=no
-             state=stopped
-    with_items:
-      # These hosts will never serve to Mozilla offices, and don't
-      # have bloxtool credentials. No need for them here.
-      - mozilla-ip-scraper.service
-      - mozilla-ip-scraper.timer
