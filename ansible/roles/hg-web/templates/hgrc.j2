@@ -107,7 +107,7 @@ awsippath = /var/hg/aws-ip-ranges.json
 gcpippath = /var/hg/gcp-ip-ranges.txt
 pullclonebundlesmanifest = true
 
-{% if replication_filters == True %}
+{% if replication_filters == "mirror" %}
 # Set the instance data path only on mirrors
 instance-data-path = /var/hg/instance_data.json
 {% endif %}

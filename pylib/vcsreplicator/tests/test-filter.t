@@ -44,7 +44,7 @@ Dump state to confirm N replication messages were received
     name: hg-repo-init-2
     path: '{moz}/users/cosheehan_mozilla.com/vct'
 
-Use "onetime" consumer N times
+Use "onetime" consumer N times for mirror-like host
 
   $ filteredconsumer --start-from 0 --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
@@ -66,6 +66,29 @@ Use "onetime" consumer N times
   $ filteredconsumer --onetime
   vcsreplicator.consumer processing hg-repo-init-2 from partition 5 offset 0
   vcsreplicator.consumer repo {moz}/users/cosheehan_mozilla.com/vct filtered by rule users
+
+Use "onetime" consumer N times for non-mirror-like host
+
+  $ filteredconsumerdefault --start-from 0 --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 1
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 2
+  vcsreplicator.consumer created Mercurial repository: {moz}/mozilla-unified
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 3
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 4
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 5
+  vcsreplicator.consumer repo {moz}/projects/ash filtered by rule ash
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer repository already exists: {moz}/mozilla-central
+  $ filteredconsumerdefault --onetime
+  vcsreplicator.consumer processing hg-repo-init-2 from partition 5 offset 0
+  vcsreplicator.consumer created Mercurial repository: {moz}/users/cosheehan_mozilla.com/vct
 
 Clean
 

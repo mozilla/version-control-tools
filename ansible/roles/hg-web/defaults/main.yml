@@ -28,4 +28,4 @@ bloxtool_password: bloxtool_password
 bloxtool_url: https://bloxtool
 
 # Flag used to turn on/off replication filters on a host, default off
-replication_filters: False
+replication_filters: null
