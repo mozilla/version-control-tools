@@ -17,23 +17,46 @@ BANNER = b"""
 Merge day push contains unexpected changes.
 """
 
+ALLOWED_FILES = {
+    b'firefox': (
+        b'.hgtags',
+        b'CLOBBER',
+        b'browser/config/mozconfigs/',
+        b'browser/config/version.txt',
+        b'browser/config/version_display.txt',
+        b'browser/locales/l10n-changesets.json',
+        b'build/defines.sh',
+        b'build/mozconfig.common',
+        b'config/milestone.txt',
+        b'services/sync/modules/constants.js',
+        b'xpcom/components/Module.h',
+    ),
+    b'thunderbird': (
+        b'.hgtags',
+        b'.gecko_rev.yml',
+        b'mail/config/mozconfigs/',
+        b'mail/config/version.txt',
+        b'mail/config/version_display.txt',
+        b'mail/locales/l10n-changesets.json',
+    ),
+}
 
-ALLOWED_FILES = (
-    b'.hgtags',
-    b'CLOBBER',
-    b'browser/config/mozconfigs/',
-    b'browser/config/version.txt',
-    b'browser/config/version_display.txt',
-    b'browser/locales/l10n-changesets.json',
-    b'build/defines.sh',
-    b'build/mozconfig.common',
-    b'config/milestone.txt',
-    b'services/sync/modules/constants.js',
-    b'xpcom/components/Module.h',
-)
+FF_MERGE_USER = b'ffxbld-merge'
+FF_STAGE_USER = b'stage-ffxbld-merge'
+TB_MERGE_USER = b'tbbld-merge'
+TB_STAGE_USER = b'stage-tbbld-merge'
+
+ALL_MERGE_USERS = {FF_MERGE_USER, FF_STAGE_USER,
+                   TB_MERGE_USER, TB_STAGE_USER}
+
+UNIFIED_REPOS = {
+    b'firefox': b'mozilla-unified',
+    b'thunderbird': b'comm-central',
+}
+
 
 INVALID_PATH_FOUND = b"""
-ffxbld-merge can only push changes to
+%s can only push changes to
 the following paths:
 %s
 
@@ -43,23 +66,37 @@ Illegal paths found:
 
 
 class MergeDayCheck(PreTxnChangegroupCheck):
-    """ffxbld-merge user should only be able to push merges"""
+    """merge user should only be able to push merges"""
     @property
     def name(self):
         return b'merge_day'
 
+    @property
+    def current_user(self):
+        return self.ui.environ[b'USER']
+
+    @property
+    def relevant_repos(self):
+        if self.current_user in {FF_MERGE_USER, FF_STAGE_USER}:
+            return b'firefox'
+        elif self.current_user in {TB_MERGE_USER, TB_STAGE_USER}:
+            return b'thunderbird'
+
+    def allowed_files(self):
+        return ALLOWED_FILES[self.relevant_repos]
+
     def relevant(self):
-        return self.ui.environ[b'USER'] in {b'stage-ffxbld-merge', b'ffxbld-merge'}
+        return self.current_user in ALL_MERGE_USERS
 
     def pre(self, node):
-        self._unified = _get_unified_repo(self.ui)
+        self._unified = _get_unified_repo(self.ui, self.relevant_repos)
 
     def check(self, ctx):
-        if not self.repo_metadata[b'firefox']:
+        if not self.repo_metadata[self.relevant_repos]:
             print_banner(
                 self.ui, b'error',
-                b'ffxbld-merge cannot push to non-firefox repository %s' %
-                    self.repo_metadata[b'path'],
+                b'%s cannot push to non-%s repository %s' %
+                (self.current_user, self.relevant_repos, self.repo_metadata[b'path']),
             )
             return False
 
@@ -77,7 +114,7 @@ class MergeDayCheck(PreTxnChangegroupCheck):
             else:
                 print_banner(
                     self.ui, b'error',
-                    b'ffxbld-merge cannot push non-trivial merges.',
+                    b'%s cannot push non-trivial merges.' % self.current_user,
                 )
                 return False
 
@@ -85,7 +122,7 @@ class MergeDayCheck(PreTxnChangegroupCheck):
         # they can only touch files in the allow list.
         matcher = match(
             ctx.repo().root, b'',
-            [b'path:%s' % path for path in ALLOWED_FILES],
+            [b'path:%s' % path for path in self.allowed_files()],
         )
         invalid_paths = {
             path for path in ctx.files()
@@ -95,7 +132,8 @@ class MergeDayCheck(PreTxnChangegroupCheck):
             print_banner(
                 self.ui, b'error',
                 INVALID_PATH_FOUND % (
-                    b"\n".join(item for item in sorted(ALLOWED_FILES)),
+                    self.current_user,
+                    b"\n".join(item for item in sorted(self.allowed_files())),
                     b"\n".join(item for item in sorted(invalid_paths)[:20]),
                     b"\n..." if len(invalid_paths) > 20 else b"",
                 ),
@@ -109,9 +147,10 @@ class MergeDayCheck(PreTxnChangegroupCheck):
         return True
 
 
-def _get_unified_repo(ui):
+def _get_unified_repo(ui, repos):
     repo_root = ui.config(b'mozilla', b'repo_root', b'/repo/hg/mozilla')
     if not repo_root.endswith(b'/'):
         repo_root += b'/'
 
-    return repository(ui, os.path.join(repo_root, b'mozilla-unified'))
+    unified_name = UNIFIED_REPOS[repos]
+    return repository(ui, os.path.join(repo_root, unified_name))
