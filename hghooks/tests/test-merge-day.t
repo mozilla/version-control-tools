@@ -243,3 +243,219 @@ ffxbld-merge user cannot push changes to any non-Firefox repo
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
+
+Test tbbld-merge user
+
+  $ cd ..
+  $ rm -rf client
+  $ rm -rf non-firefox-repo
+  $ hg init comm-central
+  $ hg init releases/comm-beta
+  $ configurehooks releases/comm-beta
+  $ touch releases/comm-beta/.hg/IS_THUNDERBIRD_REPO
+  $ hg -q clone releases/comm-beta client
+  $ cd client
+  $ mkdir -p mail/config
+  $ mkdir other
+
+tbbld-merge user cannot push non-merge day changes
+
+  $ touch file0a
+  $ touch other/file1a
+  $ echo 60.1.0 > mail/config/version.txt
+  $ hg -q commit -A -m mix-of-legal-illegal-changes
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/releases/comm-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ************** ERROR ***************
+  tbbld-merge can only push changes to
+  the following paths:
+  .gecko_rev.yml
+  .hgtags
+  mail/config/mozconfigs/
+  mail/config/version.txt
+  mail/config/version_display.txt
+  mail/locales/l10n-changesets.json
+  
+  Illegal paths found:
+  file0a
+  other/file1a
+  ************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+tbbld-merge user cannot push non-merge day changes, multiple
+
+  $ touch file1a
+  $ hg -q commit -A -m illegal-changes
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/releases/comm-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ************** ERROR ***************
+  tbbld-merge can only push changes to
+  the following paths:
+  .gecko_rev.yml
+  .hgtags
+  mail/config/mozconfigs/
+  mail/config/version.txt
+  mail/config/version_display.txt
+  mail/locales/l10n-changesets.json
+  
+  Illegal paths found:
+  file0a
+  other/file1a
+  ************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+tbbld-merge can push changes that have been pushed to comm-central
+
+  $ USER=someone@example.com hg push $TESTTMP/comm-central
+  pushing to $TESTTMP/comm-central
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 4 changes to 4 files
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/releases/comm-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 4 changes to 4 files
+
+Test legal changes for tbbld-merge user on comm-beta
+
+  $ cd ..
+  $ rm -rf client
+  $ hg -q clone releases/comm-beta client
+  $ cd client
+
+tbbld-merge user can push merge-day changes
+
+  $ echo 60.2 > mail/config/version.txt
+  $ hg -q commit -A -m initial
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/releases/comm-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
+ffxbld-merge user cannot push change to any Thunderbird repo
+
+  $ echo 78.7 > mail/config/version_display.txt
+  $ hg -q commit -A -m ffx-change
+  $ USER=ffxbld-merge hg push $TESTTMP/releases/comm-beta
+  pushing to $TESTTMP/releases/comm-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ******************************* ERROR *******************************
+  ffxbld-merge cannot push to non-firefox repository releases/comm-beta
+  *********************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+
+Test pushes to a non-Thunderbird repo
+
+  $ cd ..
+  $ rm -rf client
+  $ hg init non-thunderbird-repo
+  $ configurehooks non-thunderbird-repo
+  $ hg -q clone non-thunderbird-repo client
+  $ cd client
+
+tbbld-merge user cannot push merge day changes to any non-Thunderbird repo
+
+  $ mkdir -p mail/config
+  $ echo 78.6.0 > mail/config/version.txt
+  $ hg -q commit -A -m add-a-file
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/non-thunderbird-repo
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ********************************* ERROR **********************************
+  tbbld-merge cannot push to non-thunderbird repository non-thunderbird-repo
+  **************************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+tbbld-merge user cannot push changes to any non-Thunderbird repo
+
+  $ touch file1
+  $ hg -q commit -A -m add-a-file
+  $ USER=tbbld-merge hg push
+  pushing to $TESTTMP/non-thunderbird-repo
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ********************************* ERROR **********************************
+  tbbld-merge cannot push to non-thunderbird repository non-thunderbird-repo
+  **************************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
+
+Test pushes to a Firefox repo
+
+  $ cd ..
+  $ rm -rf client
+  $ hg -q clone releases/mozilla-beta client
+  $ cd client
+  $ mkdir -p browser/config
+
+
+tbbld-merge user cannot push changes to any Firefox repo
+
+  $ echo 78.0.0 > browser/config/version.txt
+  $ hg -q commit -A -m initial
+  $ USER=tbbld-merge hg push $TESTTMP/releases/mozilla-beta
+  pushing to $TESTTMP/releases/mozilla-beta
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  ********************************** ERROR **********************************
+  tbbld-merge cannot push to non-thunderbird repository releases/mozilla-beta
+  ***************************************************************************
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.mozhooks hook failed
+  [255]
+
