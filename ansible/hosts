@@ -32,6 +32,7 @@ ansible_become=yes
 ci-uw1
 ci-uw2
 ci-ue1
+backup-node
 
 [hgweb-mirrors:vars]
 ansible_sudo=yes
@@ -41,7 +42,6 @@ ansible_become=yes
 hgssh-prod
 hgweb-prod
 hgweb-mirrors
-backup-node
 bootstrap
 
 [reviewbot]
