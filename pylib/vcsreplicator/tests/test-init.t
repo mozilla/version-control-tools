@@ -31,14 +31,14 @@ Creating a repository should record an event saying so
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: $TESTTMP/repos/mozilla-central
 
   $ hgmo exec hgweb0 tail -n 5 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
 
   $ hgmo exec hgweb0 ls /repo/hg/mozilla

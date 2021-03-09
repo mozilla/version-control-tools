@@ -65,21 +65,21 @@ them. So disable the pulse consumer until all repo changes have been made.
 
   $ paconsumer --wait-for-n 16
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
-  got a hg-hgrc-update-1 message
+  got a hg-repo-init-2: (repo: {moz}/obs) message
+  got a hg-hgrc-update-1: (repo: {moz}/obs) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['4da703b7f59b720f524f709aa07eed3182ba1acd']) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['4da703b7f59b720f524f709aa07eed3182ba1acd'], last_push_id: 2) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2']) message
+  got a hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2', '191bac0e7569669cb49be69831c8cdf40047b014'], last_push_id: 3) message
 
 Create an obsolescence marker on the server
 
@@ -146,34 +146,34 @@ Commit message with multiple lines works
 
   $ paconsumer --wait-for-n 29
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
-  got a hg-hgrc-update-1 message
+  got a hg-repo-init-2: (repo: {moz}/obs) message
+  got a hg-hgrc-update-1: (repo: {moz}/obs) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['4da703b7f59b720f524f709aa07eed3182ba1acd']) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['4da703b7f59b720f524f709aa07eed3182ba1acd'], last_push_id: 2) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2']) message
+  got a hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2', '191bac0e7569669cb49be69831c8cdf40047b014'], last_push_id: 3) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-pushkey-1 message
+  got a hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['7066e27cce8ca811f9f80da78e330c72af5a49f8']) message
+  got a hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['7066e27cce8ca811f9f80da78e330c72af5a49f8', '191bac0e7569669cb49be69831c8cdf40047b014'], last_push_id: 4) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['821cb8db71235562a3ee752f0b67502e93835a9f']) message
+  got a hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) message
+  got a hg-heads-1: (repo: {moz}/obs, heads: ['821cb8db71235562a3ee752f0b67502e93835a9f', '7066e27cce8ca811f9f80da78e330c72af5a49f8', '191bac0e7569669cb49be69831c8cdf40047b014'], last_push_id: 5) message
 
   $ hgmo exec hgssh supervisorctl start pulsenotifier
   pulsenotifier: started

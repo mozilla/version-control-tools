@@ -44,9 +44,9 @@
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-repo-sync-2 from partition 2 offset 1
+  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['0000000000000000000000000000000000000000'], bootstrap: False) from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/mozilla-central
@@ -71,7 +71,7 @@ We should not see any pulls, even after waiting for no lag
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 tail -n 2 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-repo-sync-2 from partition 2 offset 2
+  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['0000000000000000000000000000000000000000'], bootstrap: True) from partition 2 offset 2
 
 Cleanup
 

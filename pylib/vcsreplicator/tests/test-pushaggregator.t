@@ -13,7 +13,7 @@ The aggregate pending topic should contain a heartbeat and repo creation message
 
   $ papendingconsumer --wait-for-n 2
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mozilla-central) message
   $ papendingconsumer --dump
   - _created: \d+\.\d+ (re)
     _original_created: \d+\.\d+ (re)
@@ -30,7 +30,7 @@ The aggregate topic should contain a heartbeat and repo creation message
 
   $ paconsumer --wait-for-n 2
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mozilla-central) message
 
   $ paconsumer --dump
   - _created: \d+\.\d+ (re)
@@ -67,8 +67,8 @@ The aggregate pending topic should contain a changegroup message
   $ papendingconsumer --start-from 2 --wait-for-n 4
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
 
   $ papendingconsumer --dump --start-from 2
   - _created: \d+\.\d+ (re)
@@ -102,8 +102,8 @@ The aggregate topic should contain a changegroup message
   $ paconsumer --start-from 2 --wait-for-n 4
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
 
   $ paconsumer --dump --start-from 2
   - _created: \d+\.\d+ (re)
@@ -167,8 +167,8 @@ Starting the replication consumer should result in the message being written
 
   $ papendingconsumer --start-from 7 --wait-for-n 3
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['8f2fa335d20b56ae20f663553e7e94e4ccdda8ed']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['8f2fa335d20b56ae20f663553e7e94e4ccdda8ed'], last_push_id: 2) message
 
   $ papendingconsumer --dump --start-from 7
   - _created: \d+\.\d+ (re)
@@ -195,8 +195,8 @@ Starting the replication consumer should result in the message being written
 
   $ paconsumer --start-from 7 --wait-for-n 3
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['8f2fa335d20b56ae20f663553e7e94e4ccdda8ed']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['8f2fa335d20b56ae20f663553e7e94e4ccdda8ed'], last_push_id: 2) message
 
   $ paconsumer --dump --start-from 7
   - _created: \d+\.\d+ (re)
@@ -256,9 +256,9 @@ Aggregation of messages from multiple partitions works
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
-  got a hg-repo-init-2 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mc2) message
+  got a hg-repo-init-2: (repo: {moz}/try) message
+  got a hg-repo-init-2: (repo: {moz}/users/foo) message
 
   $ papendingconsumer --dump --start-from 10
   - _created: \d+\.\d+ (re)
@@ -296,9 +296,9 @@ Aggregation of messages from multiple partitions works
   got a heartbeat-1 message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
-  got a hg-repo-init-2 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mc2) message
+  got a hg-repo-init-2: (repo: {moz}/try) message
+  got a hg-repo-init-2: (repo: {moz}/users/foo) message
 
   $ paconsumer --dump --start-from 10
   - _created: \d+\.\d+ (re)

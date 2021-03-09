@@ -67,6 +67,7 @@ def send_pulse_message(config, exchange, repo_url, payload):
         }
 
         logger.warn('publishing message to %s#%s' % (exchange, routing_key))
+        logger.warn('payload: %s' % payload)
         producer.publish(data)
 
 

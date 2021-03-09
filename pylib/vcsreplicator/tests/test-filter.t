@@ -51,20 +51,20 @@ Use "onetime" consumer N times for mirror-like host
   $ filteredconsumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 1
   $ filteredconsumer --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 2
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-unified) from partition 0 offset 2
   vcsreplicator.consumer repo {moz}/mozilla-unified filtered by rule unified
   $ filteredconsumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 3
   $ filteredconsumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 4
   $ filteredconsumer --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 5
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/projects/ash) from partition 0 offset 5
   vcsreplicator.consumer created Mercurial repository: {moz}/projects/ash
   $ filteredconsumer --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: {moz}/mozilla-central
   $ filteredconsumer --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 5 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/users/cosheehan_mozilla.com/vct) from partition 5 offset 0
   vcsreplicator.consumer repo {moz}/users/cosheehan_mozilla.com/vct filtered by rule users
 
 Use "onetime" consumer N times for non-mirror-like host
@@ -74,20 +74,20 @@ Use "onetime" consumer N times for non-mirror-like host
   $ filteredconsumerdefault --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 1
   $ filteredconsumerdefault --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 2
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-unified) from partition 0 offset 2
   vcsreplicator.consumer created Mercurial repository: {moz}/mozilla-unified
   $ filteredconsumerdefault --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 3
   $ filteredconsumerdefault --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 4
   $ filteredconsumerdefault --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 5
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/projects/ash) from partition 0 offset 5
   vcsreplicator.consumer repo {moz}/projects/ash filtered by rule ash
   $ filteredconsumerdefault --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 2 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer repository already exists: {moz}/mozilla-central
   $ filteredconsumerdefault --onetime
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 5 offset 0
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/users/cosheehan_mozilla.com/vct) from partition 5 offset 0
   vcsreplicator.consumer created Mercurial repository: {moz}/users/cosheehan_mozilla.com/vct
 
 Clean

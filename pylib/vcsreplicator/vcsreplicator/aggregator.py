@@ -19,7 +19,10 @@ from .daemon import (
     run_in_loop,
 )
 from .producer import Producer
-from .util import consumer_offsets
+from .util import (
+    consumer_offsets,
+    payload_log_display,
+)
 
 
 logger = logging.getLogger('vcsreplicator.aggregator')
@@ -175,7 +178,7 @@ def _copy_messages(consumer, producer, count, alive):
 
         partition, message, payload = r
 
-        logger.warn('copying %s from partition %d' % (payload['name'], partition))
+        logger.warn('copying %s from partition %d' % (payload_log_display(payload), partition))
 
         payload['_original_created'] = payload['_created']
         payload['_original_partition'] = partition

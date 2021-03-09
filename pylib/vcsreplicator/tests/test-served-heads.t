@@ -34,22 +34,22 @@ wait for the consumer to have no lag.
 
   $ papendingconsumer --wait-for-n 6
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mozilla-central) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-headsconsumer --wait-for-no-lag /etc/mercurial/vcsreplicator-pending.ini
 
   $ hgmo exec hgweb0 tail -n 9 /var/log/vcsreplicator/consumer-heads.log
   vcsreplicator.consumer starting consumer for topic=replicatedpushdatapending group=* partitions=all (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
-  vcsreplicator.consumer processing hg-repo-init-2 from partition 0 offset 1
+  vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 0 offset 1
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 2
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 3
-  vcsreplicator.consumer processing hg-changegroup-2 from partition 0 offset 4
-  vcsreplicator.consumer processing hg-heads-1 from partition 0 offset 5
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) from partition 0 offset 4
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) from partition 0 offset 5
   vcsreplicator.consumer updating replicated data for /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 1 heads successfully; last push id: 1
 
@@ -121,16 +121,16 @@ Wait for it to be processed by the heads consumer daemon
   $ papendingconsumer --start-from 6 --wait-for-n 4
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['4c9443886fe84db9a4a5f29a5777517d2890d308', '4b11352745a6b3eb429ca8cd486dfdc221a4bc62']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['4b11352745a6b3eb429ca8cd486dfdc221a4bc62', '4c9443886fe84db9a4a5f29a5777517d2890d308'], last_push_id: 2) message
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-headsconsumer --wait-for-no-lag /etc/mercurial/vcsreplicator-pending.ini
 
   $ hgmo exec hgweb0 tail -n 6 /var/log/vcsreplicator/consumer-heads.log
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 6
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 7
-  vcsreplicator.consumer processing hg-changegroup-2 from partition 0 offset 8
-  vcsreplicator.consumer processing hg-heads-1 from partition 0 offset 9
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['4c9443886fe84db9a4a5f29a5777517d2890d308', '4b11352745a6b3eb429ca8cd486dfdc221a4bc62']) from partition 0 offset 8
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['4b11352745a6b3eb429ca8cd486dfdc221a4bc62', '4c9443886fe84db9a4a5f29a5777517d2890d308'], last_push_id: 2) from partition 0 offset 9
   vcsreplicator.consumer updating replicated data for /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer /repo/hg/mozilla/mozilla-central/.hg/replicated-data wrote with 2 heads successfully; last push id: 2
 
@@ -230,8 +230,8 @@ Re-enabling consumer will result in heads replication and changeset being visibl
   $ papendingconsumer --start-from 10 --wait-for-n 4
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['36638cc83b4d9084a2a38f41f345da73390ad05b']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['36638cc83b4d9084a2a38f41f345da73390ad05b', '4c9443886fe84db9a4a5f29a5777517d2890d308'], last_push_id: 3) message
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-headsconsumer --wait-for-no-lag /etc/mercurial/vcsreplicator-pending.ini
 

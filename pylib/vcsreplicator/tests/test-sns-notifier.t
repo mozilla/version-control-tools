@@ -71,23 +71,23 @@ An SNS message should be sent with the event details
 
   $ paconsumer --wait-for-n 18
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
+  got a hg-repo-init-2: (repo: {moz}/mozilla-central) message
   got a heartbeat-1 message
-  got a hg-repo-init-2 message
-  got a hg-hgrc-update-1 message
-  got a heartbeat-1 message
-  got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-repo-init-2: (repo: {moz}/try) message
+  got a hg-hgrc-update-1: (repo: {moz}/mozilla-central) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2 message
-  got a hg-pushkey-1 message
-  got a hg-heads-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['2971b4149fdfe8541e8ddddd0a2dce39b90f5e70']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['2971b4149fdfe8541e8ddddd0a2dce39b90f5e70'], last_push_id: 2) message
+  got a heartbeat-1 message
+  got a heartbeat-1 message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['76bf70283ec77e25c4ce99d27dccc12d6ede5837']) message
+  got a hg-pushkey-1: (repo: {moz}/mozilla-central, namespace/key: obsolete/dump0) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['76bf70283ec77e25c4ce99d27dccc12d6ede5837'], last_push_id: 3) message
 
   $ snsconsumer --wait-for-no-lag
 

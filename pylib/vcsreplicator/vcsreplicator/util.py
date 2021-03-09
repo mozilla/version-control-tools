@@ -10,6 +10,27 @@ import time
 from kafka.common import OffsetRequestPayload as OffsetRequest
 from kafka.consumer.base import Consumer
 
+PAYLOAD_LOGS = {
+    'hg-repo-init-1': 'repo: {path}',
+    'hg-repo-init-2': 'repo: {path}',
+    'hg-hgrc-update-1': 'repo: {path}',
+    'hg-changegroup-1': 'repo: {path}, heads: {heads}',
+    'hg-changegroup-2': 'repo: {path}, heads: {heads}',
+    'hg-pushkey-1': 'repo: {path}, namespace/key: {namespace}/{key}',
+    'hg-repo-sync-1': 'repo: {path}, heads: {heads}',
+    'hg-repo-sync-2': 'repo: {path}, heads: {heads}, bootstrap: {bootstrap}',
+    'hg-heads-1': 'repo: {path}, heads: {heads}, last_push_id: {last_push_id}',
+    'hg-repo-delete-1': 'repo: {path}',
+}
+
+def payload_log_display(payload):
+    """Return a string that adds information about the payload for use in logs."""
+    name = payload['name']
+    if name == 'heartbeat-1':
+        return 'heartbeat-1'
+
+    return '{}: ({})'.format(name, PAYLOAD_LOGS[name].format(**payload))
+
 
 def wait_for_topic(client, topic, timeout=-1):
     """Wait for a topic to exist on a Kafka connection.

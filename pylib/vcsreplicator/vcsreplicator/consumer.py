@@ -28,6 +28,7 @@ from mercurial import (
 from .config import Config
 from .util import (
     consumer_offsets,
+    payload_log_display,
     wait_for_topic,
 )
 
@@ -123,7 +124,7 @@ def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
             if r:
                 partition, message, payload = r
                 logger.warn('processing %s from partition %s offset %s' % (
-                            payload['name'], partition, message.offset))
+                            payload_log_display(payload), partition, message.offset))
                 message_handler(config, payload)
                 # Only commit offset from partition message came from.
                 consumer.commit(partitions=[partition])
@@ -755,8 +756,7 @@ def run_cli(message_handler):
             if not m:
                 continue
 
-            name = m[2]['name']
-            print('got a %s message' % name)
+            print('got a %s message' % payload_log_display(m[2]))
 
             left -= 1
 
