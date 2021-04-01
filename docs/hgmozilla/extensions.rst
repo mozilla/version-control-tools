@@ -190,11 +190,3 @@ The ``evolve`` extension also enables useful Mercurial commands such as
 ``hg previous``, ``hg next``, and ``hg amend`` (which is a shortcut for
 ``hg commit --amend``).
 
-githelp
--------
-
-Are you a Git user learning Mercurial for the first time? The
-`githelp extension <https://bitbucket.org/facebook/hg-experimental/>`_
-adds a ``hg githelp`` command that suggests Mercurial equivalent
-commands from Git commands. Just type a Git command and learn how to
-use Mercurial!

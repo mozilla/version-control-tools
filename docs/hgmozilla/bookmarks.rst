@@ -61,9 +61,7 @@ Integrate the Active Bookmark into the Shell Prompt
 If you find yourself forgetting which bookmark is active and you
 want a constant reminder, consider printing the active bookmark as
 part of your shell prompt. To do this, use the
-`prompt extension <https://www.mercurial-scm.org/wiki/PromptExtension>`_
-or the *scm-prompt.sh* script from Facebook's
-`hg-experimental repository <https://bitbucket.org/facebook/hg-experimental>`_.
+`prompt extension <https://www.mercurial-scm.org/wiki/PromptExtension>`_.
 
 Sharing Changesets
 ==================

@@ -88,13 +88,6 @@ way to do this is::
    $ hg up .
    (leaving bookmark central)
 
-.. tip::
-
-   Facebook's `scm-prompt.sh <https://bitbucket.org/facebook/hg-experimental/src/default/scripts/scm-prompt.sh?at=default&fileviewer=file-view-default>`_
-   implements shell prompt integration for both Mercurial and Git. It displays
-   the currently active bookmark, which is useful to prevent accidentally
-   committing on bookmark belonging to a Firefox repo.
-
 Working with the Unified Repo (firefoxtree)
 -------------------------------------------
 
