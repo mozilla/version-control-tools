@@ -993,7 +993,12 @@ def _checkevolve(ui, cw, hg_version):
             local_evolve_repo = hg.repository(ui, local_evolve_path)
 
             # Pull the latest stable, update to latest tag/release
-            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
+            # TRACKING hg58 `source` param is now set via positional args
+            if util.versiontuple() >= (5, 8):
+                hgpull(ui, local_evolve_repo, remote_evolve_path, branch=(b'stable',))
+            else:
+                hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
+            
             hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
 
             ui.write(b'Evolve was updated successfully.\n')
