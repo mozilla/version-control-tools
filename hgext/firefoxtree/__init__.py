@@ -465,8 +465,26 @@ def updateremoterefs(repo, remote, tree):
     repo.firefoxtrees[tree] = node
     writefirefoxtrees(repo)
 
+def pullcommand(orig, ui, repo, *sources, **opts):
+    """Wraps built-in pull command to expand special aliases."""
+    if not isfirefoxrepo(repo) or not sources:
+        return orig(ui, repo, *sources, **opts)
 
-def pullcommand(orig, ui, repo, source=b'default', **opts):
+    expanded_sources = []
+    for source in sources:
+        # The special source "fxtrees" will pull all trees we've pulled before.
+        if source == b'fxtrees':
+            for tag, node, tree, uri in get_firefoxtrees(repo):
+                expanded_sources.append(tree)
+        elif source in MULTI_TREE_ALIASES:
+            for tree, uri in resolve_trees_to_uris([source]):
+                expanded_sources.append(tree)
+        else:
+            expanded_sources.append(source)
+
+    return orig(ui, repo, *expanded_sources, **opts)
+
+def pullcommand_legacy(orig, ui, repo, source=b'default', **opts):
     """Wraps built-in pull command to expand special aliases."""
     if not isfirefoxrepo(repo):
         return orig(ui, repo, source=source, **opts)
@@ -489,7 +507,30 @@ def pullcommand(orig, ui, repo, source=b'default', **opts):
 
     return orig(ui, repo, source=source, **opts)
 
-def outgoingcommand(orig, ui, repo, dest=None, **opts):
+def outgoingcommand(orig, ui, repo, *dests, **opts):
+    """Wraps command.outgoing to limit considered nodes.
+
+    We wrap commands.outgoing rather than hg._outgoing because the latter is a
+    low-level API used by discovery. Manipulating it could lead to unintended
+    consequences.
+    """
+    if not opts.get('rev'):
+        ui.status(_(b'no revisions specified; '
+                    b'using . to avoid inspecting multiple heads\n'))
+        opts['rev'] = [b'.']
+    # Note: this behavior varies from upstream Mercurial. Mercurial will use
+    # the :pushurl [paths] option for the `hg outgoing` URL. We use the
+    # read-only URL. Not all users will have access to the ssh:// server.
+    # And the HTTP service should be in sync with the canonical ssh://
+    # service. So we choose to use the endpoint that is always available.
+    expanded_dests = []
+    for tree, uri in resolve_trees_to_uris(dests):
+        if uri:
+            expanded_dests.append(uri)
+
+    return orig(ui, repo, *expanded_dests, **opts)
+
+def outgoingcommand_legacy(orig, ui, repo, dest=None, **opts):
     """Wraps command.outgoing to limit considered nodes.
 
     We wrap commands.outgoing rather than hg._outgoing because the latter is a
@@ -512,7 +553,28 @@ def outgoingcommand(orig, ui, repo, dest=None, **opts):
 
     return orig(ui, repo, dest=dest, **opts)
 
-def pushcommand(orig, ui, repo, dest=None, **opts):
+def pushcommand(orig, ui, repo, *dests, **opts):
+    """Wraps commands.push to resolve names to tree URLs.
+
+    Ideally we'd patch ``ui.expandpath()``. However, It isn't easy to tell
+    from that API whether we should be giving out HTTP or SSH URLs.
+    This was proposed and rejected as a core feature to Mercurial.
+    http://www.selenic.com/pipermail/mercurial-devel/2014-September/062052.html
+    """
+    if isfirefoxrepo(repo) and dests:
+        expanded_dests = []
+        for dest in dests:
+            tree, uri = resolve_trees_to_uris([dest], write_access=True)[0]
+            if uri:
+                expanded_dests.append(uri)
+            else:
+                expanded_dests.append(dest)
+
+        dests = expanded_dests
+
+    return orig(ui, repo, *dests, **opts)
+
+def pushcommand_legacy(orig, ui, repo, dest=None, **opts):
     """Wraps commands.push to resolve names to tree URLs.
 
     Ideally we'd patch ``ui.expandpath()``. However, It isn't easy to tell
@@ -605,9 +667,15 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, b'_pullobsolete', wrappedpullobsolete)
     extensions.wrapfunction(exchange, b'_pullbookmarks', wrappedpullbookmarks)
     extensions.wrapfunction(wireprotov1server, b'_capabilities', capabilities)
-    extensions.wrapcommand(commands.table, b'outgoing', outgoingcommand)
-    extensions.wrapcommand(commands.table, b'pull', pullcommand)
-    extensions.wrapcommand(commands.table, b'push', pushcommand)
+    # TRACKING hg58 - pull function has a different signature
+    if util.versiontuple() >= (5, 8):
+        extensions.wrapcommand(commands.table, b'outgoing', outgoingcommand)
+        extensions.wrapcommand(commands.table, b"pull", pullcommand)
+        extensions.wrapcommand(commands.table, b'push', pushcommand)
+    else:
+        extensions.wrapcommand(commands.table, b'outgoing', outgoingcommand_legacy)
+        extensions.wrapcommand(commands.table, b'pull', pullcommand_legacy)
+        extensions.wrapcommand(commands.table, b'push', pushcommand_legacy)
     revset.symbols[b'fxheads'] = fxheadsrevset
 
 
