@@ -264,6 +264,20 @@ Message check should be case insensitive
   added 3 changesets with 3 changes to 2 files
   You've signaled approval for changes to strings in your push, thanks.
 
+Hook lets approval for non-tip commits pass
+
+  $ echo "DTD file in uplift3" >> browser/locales/en-US/test.dtd
+  $ hg commit -m 'Change DTD file for uplift3. l10n='
+  $ echo "uplift4" > dummy
+  $ hg commit -m 'Doing uplift4 without localization change and approval'
+  $ hg push ../server
+  pushing to ../server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 2 files
+
   $ cd ..
 
 Hook should not run when stripping
