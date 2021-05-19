@@ -74,6 +74,8 @@ class PushlogQuery(object):
         self.userquery = []
         # Allow query-by-individual-changeset
         self.changesetquery = []
+        # Allow query-by-branch
+        self.branch = None
 
         self.formatversion = 1
         # ID of the last known push in the database.
@@ -92,6 +94,7 @@ class PushlogQuery(object):
                 offset=(self.page - 1) * self.querystart_value,
                 limit=self.querystart_value,
                 reverse=True,
+                branch=self.branch,
                 only_replicated=True,
             )
 
@@ -145,6 +148,7 @@ class PushlogQuery(object):
                 end_node=end_node,
                 end_node_exclusive=False,
                 nodes=self.changesetquery,
+                branch=self.branch,
                 only_replicated=True,
             )
 
@@ -269,6 +273,8 @@ def pushlog_setup(repo, req):
 
     #TODO: use rev here, switch page to ?page=foo ?
     query.changesetquery = req.qsparams.getall(b'changeset')
+
+    query.branch = req.qsparams.get(b'branch')
 
     try:
         query.formatversion = int(req.qsparams.get(b'version', b'1'))

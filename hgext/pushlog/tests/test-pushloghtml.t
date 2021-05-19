@@ -64,6 +64,22 @@ Main HTML page lists all pushes
   <tr class="pushlogentry parity0  id2"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/a8ffcd74ae3e26c8de570853b7a1adb404aed1f9">a8ffcd74ae3e26c8de570853b7a1adb404aed1f9</a></td><td><strong>test &mdash; first commit on branch_foo</strong> <span class="logtags"><span class="inbranchtag" title="branch_foo">branch_foo</span> </span></td></tr> (glob)
   <tr class="pushlogentry parity1  id1"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/04caf62ca417ed4e9edfaca2b81c5f68f0e58e7d">04caf62ca417ed4e9edfaca2b81c5f68f0e58e7d</a></td><td><strong>test &mdash; initial commit</strong> <span class="logtags"><span class="branchtag" title="default">default</span> </span></td></tr> (glob)
 
+Using `branch` query string parameter only shows entries for a specific branch
+
+  $ http http://localhost:$HGPORT/pushloghtml?branch=branch_foo --body-file body --no-headers
+  200
+  $ grep pushlogentry body
+  <tr class="pushlogentry parity0  id3"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/0cebc5195347dd8baccbf85b25ab8170068d5c83">0cebc5195347dd8baccbf85b25ab8170068d5c83</a></td><td><strong>test &mdash; tagging foo2</strong> <span class="logtags"><span class="branchtag" title="branch_foo">branch_foo</span> </span></td></tr> (glob)
+  <tr class="pushlogentry parity0  id3"><td></td><td><a href="/rev/17880384fe19f0157250bab9af41b3f7a7b74db1">17880384fe19f0157250bab9af41b3f7a7b74db1</a></td><td><strong>test &mdash; second commit on branch_foo</strong> <span class="logtags"><span class="inbranchtag" title="branch_foo">branch_foo</span> <span class="tagtag" title="foo2">foo2</span> </span></td></tr>
+  <tr class="pushlogentry parity1  id2"><td><cite>hguser<br/><span class="date">*</span></cite></td><td><a href="/rev/a8ffcd74ae3e26c8de570853b7a1adb404aed1f9">a8ffcd74ae3e26c8de570853b7a1adb404aed1f9</a></td><td><strong>test &mdash; first commit on branch_foo</strong> <span class="logtags"><span class="inbranchtag" title="branch_foo">branch_foo</span> </span></td></tr> (glob)
+
+A branch that doesn't exist produces an error
+
+  $ http http://localhost:$HGPORT/pushloghtml?branch=branch_asdf --body-file body --no-headers
+  404
+  $ grep branch_asdf body
+  unknown revision 'branch_asdf'
+
 Confirm no errors in log
 
   $ cat ../server/error.log

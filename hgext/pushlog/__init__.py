@@ -475,7 +475,7 @@ class pushlog(object):
                end_time=None, end_time_exclusive=False,
                start_node=None, start_node_exclusive=False,
                end_node=None, end_node_exclusive=False,
-               nodes=None,
+               nodes=None, branch=None,
                only_replicated=False):
         """Return information about pushes to this repository.
 
@@ -514,6 +514,8 @@ class pushlog(object):
         ``limit`` can be used to limit the number of returned pushes to that
         count.
 
+        ``branch`` is the name of the branch to filter pushes for as a byte string.
+
         ``only_replicated`` can be specified to only include info about pushes
         that have been fully replicated.
 
@@ -524,6 +526,9 @@ class pushlog(object):
 
         if end_id is not None and end_node is not None:
             raise ValueError('cannot specify both end_id and end_node')
+
+        if branch and not self.repo.lookupbranch(branch):
+            raise ValueError('branch "%s" not found in repo' % branch)
 
         with self.conn(readonly=True) as c:
             if not c:
@@ -637,6 +642,10 @@ class pushlog(object):
             lastid = None
             current = None
             for pushid, who, when, rev, node in res:
+                # Only yield pushes for our specified branch.
+                if branch and self.repo[node].branch() != branch:
+                    continue
+
                 if pushid != lastid:
                     if current:
                         yield current
