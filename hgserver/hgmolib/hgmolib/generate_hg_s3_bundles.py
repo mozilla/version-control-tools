@@ -288,7 +288,8 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         shutil.copy2(source, dest)
 
         # Replicate manifest to mirrors.
-        subprocess.check_call([HG, 'replicatesync'], cwd=dest_repo)
+        # Bug 1714463: don't replicate `copyfrom` (ie try)
+        #subprocess.check_call([HG, 'replicatesync'], cwd=dest_repo)
 
         return {}
 
