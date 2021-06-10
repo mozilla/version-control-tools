@@ -13,7 +13,7 @@ resource "aws_instance" "hgweb-mirror" {
 
   root_block_device {
     delete_on_termination = true
-    volume_size           = 200
+    volume_size           = 250
     volume_type           = "standard"
   }
 
