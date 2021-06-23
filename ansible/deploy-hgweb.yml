@@ -20,7 +20,6 @@
       bloxtool_user: "{{ (bloxtool_config.content | b64decode | from_json).user }}"
       bloxtool_password: "{{ (bloxtool_config.content | b64decode | from_json).password }}"
       bloxtool_url: "{{ (bloxtool_config.content | b64decode | from_json).url }}"
-      replication_filters: on-premises
 
   - name: apply monitoring-agent role
     include_role:
