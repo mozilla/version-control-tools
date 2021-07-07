@@ -104,7 +104,8 @@ def get_user_dn_by_mail(conn, ldap_basedn, email):
         user_obj = conn.search_s(
             ldap_basedn,
             ldap.SCOPE_SUBTREE,
-            '(mail=%s)' % email
+            '(mail=%s)' % email,
+            attrlist=["mail"]
         )
         return user_obj[0][0]
     except (IndexError, ldap.NO_SUCH_OBJECT):

@@ -169,7 +169,7 @@ class LDAP(object):
         modlist = []
 
         try:
-            existing = self.c.search_s(dn, ldap.SCOPE_BASE)[0][1]
+            existing = self.c.search_s(dn, ldap.SCOPE_BASE, attrlist=["objectClass"])[0][1]
             if b'ldapPublicKey' not in existing['objectClass']:
                 modlist.append((ldap.MOD_ADD, 'objectClass', b'ldapPublicKey'))
         except ldap.NO_SUCH_OBJECT:
