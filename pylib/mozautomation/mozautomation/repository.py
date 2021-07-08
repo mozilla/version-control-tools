@@ -135,6 +135,7 @@ REPOS = {
     b'comm-esr60': b'releases/comm-esr60',
     b'comm-esr68': b'releases/comm-esr68',
     b'comm-esr78': b'releases/comm-esr78',
+    b'comm-esr91': b'releases/comm-esr91',
 
     # Misc
     b'try': b'try',
