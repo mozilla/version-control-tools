@@ -38,6 +38,8 @@ ALLOWED_FILES = {
         b'mail/config/version.txt',
         b'mail/config/version_display.txt',
         b'mail/locales/l10n-changesets.json',
+        b'suite/config/version.txt',
+        b'suite/config/version_display.txt',
     ),
 }
 
