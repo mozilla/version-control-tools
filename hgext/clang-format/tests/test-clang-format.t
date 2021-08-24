@@ -92,7 +92,8 @@ Rebase (should not run the hook)
   
   $ hg rebase -s 2 -d 0
   rebasing 2:0088d44a4e42 "second commit"
-  rebasing 3:059cd3ee4b4d "third commit" (tip)
+  rebasing 3:059cd3ee4b4d tip "third commit" (hg59 !)
+  rebasing 3:059cd3ee4b4d "third commit" (tip) (no-hg59 !)
   saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/0088d44a4e42-bbfa5a85-rebase.hg
   $ hg export -r 1 | grep -v -q "int clang_format=42"
   $ hg export -r 2 | grep -q "int clang_format=42"

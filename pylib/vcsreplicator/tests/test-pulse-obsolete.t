@@ -43,7 +43,8 @@ them. So disable the pulse consumer until all repo changes have been made.
   pulsenotifier: stopped
 
   $ hg rebase -s . -d 0
-  rebasing 2:4da703b7f59b "file1" (tip)
+  rebasing 2:4da703b7f59b tip "file1" (hg59 !)
+  rebasing 2:4da703b7f59b "file1" (tip) (no-hg59 !)
   $ hg push -f
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   searching for changes

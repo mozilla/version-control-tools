@@ -41,7 +41,9 @@
   $ hg -q commit -A -m file1
   $ hg -q push -f
   $ hg rebase -s . -d 1
-  rebasing 2:80c2c663cb83 "file1" (tip)
+  rebasing 2:80c2c663cb83 "file1" (tip) (no-hg59 !)
+  rebasing 2:80c2c663cb83 tip "file1" (hg59 !)
+
   $ hg push
   pushing to ssh://user@dummy/$TESTTMP/server
   searching for changes

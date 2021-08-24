@@ -92,7 +92,8 @@ Rebase (should not run the hook)
   
   $ hg rebase -s 2 -d 0
   rebasing 2:af87cd2e6ed2 "second commit"
-  rebasing 3:204033503640 "third commit" (tip)
+  rebasing 3:204033503640 tip "third commit" (hg59 !)
+  rebasing 3:204033503640 "third commit" (tip) (no-hg59 !)
   saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/af87cd2e6ed2-4eae2e22-rebase.hg
   $ hg export -r 1 | grep -v -q "let js_format=42"
   $ hg export -r 2 | grep -q "let js_format=42"

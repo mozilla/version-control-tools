@@ -201,7 +201,8 @@ Pushing a changeset then hiding it works
   remote: recorded changegroup in replication log in \d+\.\d+s (re)
 
   $ hg rebase -s 6ddbc9389e71 -d 8713015ee6f2
-  rebasing 5:6ddbc9389e71 "head2" (tip)
+  rebasing 5:6ddbc9389e71 tip "head2" (hg59 !)
+  rebasing 5:6ddbc9389e71 "head2" (tip) (no-hg59 !)
   $ hg push -f ssh://$SSH_SERVER:$HGPORT/users/user_example.com/repo-1
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/users/user_example.com/repo-1
   searching for changes
@@ -286,7 +287,8 @@ Create a repo that only has the createmarkers feature enabled
   $ hg -q commit -A -m file1
   $ hg -q push -f
   $ hg rebase -s . -d 1
-  rebasing 2:5fb779ae39de "file1" (tip)
+  rebasing 2:5fb779ae39de tip "file1" (hg59 !)
+  rebasing 2:5fb779ae39de "file1" (tip) (no-hg59 !)
 
 Pushing should not send obsolescence markers because marker exchange isn't allowed
 and we're not in the allowed user list
@@ -324,7 +326,8 @@ processes on both server and mirror)
 Pushing again should send obsolescence markers
 
   $ hg rebase -s . -d 0
-  rebasing 3:d57129f00b2f "file1" (tip)
+  rebasing 3:d57129f00b2f tip "file1" (hg59 !)
+  rebasing 3:d57129f00b2f "file1" (tip) (no-hg59 !)
   $ hg push -f
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/integration/autoland
   searching for changes

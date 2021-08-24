@@ -313,7 +313,8 @@ Pushing obsolescence marker without bundle2 works
   vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/obs, heads: ['de9a6dc9203d34261c1e2bea219bdd6053d74dda'], last_push_id: 4) from partition 2 offset 21
 
   $ hg rebase -s . -d 77538e1ce4be
-  rebasing 5:de9a6dc9203d "file3" (tip)
+  rebasing 5:de9a6dc9203d tip "file3" (hg59 !)
+  rebasing 5:de9a6dc9203d "file3" (tip) (no-hg59 !)
   $ hg --config experimental.bundle2-exp=false push -f
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   searching for changes
@@ -403,7 +404,8 @@ Now let's check what happens when replication is lagging
 
   $ hg rebase -s 63d556ea5b9f -d 33e52188e177
   rebasing 8:63d556ea5b9f "file5"
-  rebasing 9:87d2d20529e7 "file6" (tip)
+  rebasing 9:87d2d20529e7 tip "file6" (hg59 !)
+  rebasing 9:87d2d20529e7 "file6" (tip) (no-hg59 !)
   $ hg push -f
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   searching for changes
@@ -423,7 +425,8 @@ Now let's check what happens when replication is lagging
 
   $ hg rebase -s 274cd1d986ab -d 3694f932529e
   rebasing 10:274cd1d986ab "file5"
-  rebasing 11:27eddb78301f "file6" (tip)
+  rebasing 11:27eddb78301f tip "file6" (hg59 !)
+  rebasing 11:27eddb78301f "file6" (tip) (no-hg59 !)
   $ hg push
   pushing to ssh://$DOCKER_HOSTNAME:$HGPORT/obs
   searching for changes

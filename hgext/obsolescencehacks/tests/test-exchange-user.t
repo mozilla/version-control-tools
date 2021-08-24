@@ -62,7 +62,8 @@ Enabling obsolescence won't enable marker exchange since the user doesn't match
   > evolution.createmarkers = true
   > EOF
   $ hg rebase -s tip -d 0
-  rebasing 2:f63449cbe54b "commit0" (tip)
+  rebasing 2:f63449cbe54b tip "commit0" (hg59 !)
+  rebasing 2:f63449cbe54b "commit0" (tip) (no-hg59 !)
 
   $ hg debugobsolete
   f63449cbe54b827336a7f1ffc693d3bae1ade0a7 e5c676115f5fcffb7934901030505da37e515075 0 (*) {*'user': 'test'} (glob)
