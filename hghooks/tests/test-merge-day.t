@@ -280,6 +280,8 @@ tbbld-merge user cannot push non-merge day changes
   mail/config/version.txt
   mail/config/version_display.txt
   mail/locales/l10n-changesets.json
+  suite/config/version.txt
+  suite/config/version_display.txt
   
   Illegal paths found:
   file0a
@@ -311,6 +313,8 @@ tbbld-merge user cannot push non-merge day changes, multiple
   mail/config/version.txt
   mail/config/version_display.txt
   mail/locales/l10n-changesets.json
+  suite/config/version.txt
+  suite/config/version_display.txt
   
   Illegal paths found:
   file0a
@@ -321,6 +325,7 @@ tbbld-merge user cannot push non-merge day changes, multiple
   rollback completed
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
+
 
 tbbld-merge can push changes that have been pushed to comm-central
 
