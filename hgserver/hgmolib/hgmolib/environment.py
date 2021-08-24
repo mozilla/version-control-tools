@@ -59,8 +59,8 @@ def script_find_hg_repos():
 
         if args.requirement or args.no_requirement:
             try:
-                with open(os.path.join(path, '.hg', 'requires'), 'rb') as fh:
-                    requirements = set(fh.read().split())
+                with open(os.path.join(path, '.hg', 'requires'), 'r') as fh:
+                    requirements = set(fh.read().splitlines())
             except IOError as e:
                 if e.errno != errno.ENOENT:
                     raise
