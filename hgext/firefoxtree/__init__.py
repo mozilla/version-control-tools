@@ -103,6 +103,9 @@ from mercurial.node import (
     nullrev,
     short,
 )
+from mercurial.utils import (
+    urlutil,
+)
 
 OUR_DIR = os.path.dirname(__file__)
 with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
@@ -119,7 +122,10 @@ from mozhg.util import import_module
 # TRACKING hg47
 templateutil = import_module('mercurial.templateutil')
 
-testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5'
+# TRACKING hg59
+urlutil = import_module("mercurial.utils.urlutil")
+
+testedwith = b'4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8 5.9'
 minimumhgversion = b'4.6'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree'
 # The root revisions in mozilla-central and comm-central, respectively.
@@ -190,8 +196,14 @@ def share(orig, ui, source, *args, **kwargs):
     res = orig(ui, source, *args, **kwargs)
 
     if not util.safehasattr(source, 'local'):
-        origsource = ui.expandpath(source)
-        source, branches = hg.parseurl(origsource)
+        # TRACKING hg59 - `ui.expandpath` is deprecated
+        if util.versiontuple(n=2) >= (5, 9):
+            origsource, source, branches = urlutil.get_clone_path(ui, source)
+            srcrepo = hg.repository(ui, source)
+        else:
+            origsource = ui.expandpath(source)
+            source, branches = hg.parseurl(origsource)
+        
         srcrepo = hg.repository(ui, source)
     else:
         srcrepo = source.local()
@@ -209,7 +221,11 @@ def share(orig, ui, source, *args, **kwargs):
     if not dest:
         dest = hg.defaultdest(source)
     else:
-        dest = ui.expandpath(dest)
+        # TRACKING hg59 - ui.expandpath is deprecated
+        if util.versiontuple(n=2) >= (5, 9):
+            dest = urlutil.get_clone_path(ui, dest)[0]
+        else:
+            dest = ui.expandpath(dest)
 
     try:
         from mercurial.vfs import vfs
