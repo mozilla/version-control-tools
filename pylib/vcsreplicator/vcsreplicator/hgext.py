@@ -180,9 +180,12 @@ def phase_heads_handler(op, inpart):
 
     # We make assumptions later that we only update from the draft phase. Double
     # check that the source repo doesn't have any secret, etc phase roots.
-    seen_phases = set(i for i, v
-                      in enumerate(op.repo.unfiltered()._phasecache.phaseroots)
-                      if v)
+    seen_phases = set(
+        phase
+        for phase, roots in
+        op.repo.unfiltered()._phasecache.phaseroots.items()
+        if roots
+    )
     supported_phases = {phases.public, phases.draft}
 
     if seen_phases - supported_phases:
