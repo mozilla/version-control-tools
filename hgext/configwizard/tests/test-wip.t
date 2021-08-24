@@ -15,7 +15,7 @@ Rejecting wip doesn't install it
    <RETURN>
   It is common to want a quick view of changesets that are in progress.
   
-  ``hg show`` can describe active bookmarks and the current stack, and a
+  ``hg show`` can describe active bookmarks, the current stack, or a
   tree of changesets that are in development.
   ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
@@ -52,7 +52,7 @@ wip enabled when requested
    <RETURN>
   It is common to want a quick view of changesets that are in progress.
   
-  ``hg show`` can describe active bookmarks and the current stack, and a
+  ``hg show`` can describe active bookmarks, the current stack, or a
   tree of changesets that are in development.
   ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
@@ -173,7 +173,7 @@ wip alias ignores old esrs if using firefoxtree
   Would you like to activate firefoxtree (Yn)?  y
   It is common to want a quick view of changesets that are in progress.
   
-  ``hg show`` can describe active bookmarks and the current stack, and a
+  ``hg show`` can describe active bookmarks, the current stack, or a
   tree of changesets that are in development.
   ``hg wip`` provides a Mozilla-specific overview of in-progress changesets: 
   
