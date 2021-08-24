@@ -16,7 +16,7 @@ class TestBMOAPIClient(unittest.TestCase):
         the BMO API. Expects the correct parameters to be passed to
         urlopen.
         """
-        client = BMOAPIClient("https://example.ca", {})
+        client = BMOAPIClient(b"https://example.ca", {})
         mock_path = b"/hello_world"
         mock_params = (
             (b"hello", b"world"),
@@ -31,7 +31,7 @@ class TestBMOAPIClient(unittest.TestCase):
         # Check that the URL requested is composed of the base URL (BMO API)
         # plus the path plus the query parameters
         self.assertEqual(
-            mock_urlopen.call_args[0][0].get_full_url(),
+            mock_urlopen.call_args[0][0].get_full_url().encode("utf-8"),
             (client.base_url + mock_path + b"?" + mock_params_encoded),
         )
 
@@ -48,7 +48,7 @@ class TestBMOAPIClient(unittest.TestCase):
         filter bug IDs and determine which ones are missing. Expects that the
         URL and parameters be passed correctly to client._get.
         """
-        client = BMOAPIClient("https://example.ca", {})
+        client = BMOAPIClient(b"https://example.ca", {})
         client.search_bugs([b"bug-1", b"bug-2"])
 
         # Check that we indeed called client._get and that it was called only
@@ -75,7 +75,7 @@ class TestBMOAPIClient(unittest.TestCase):
         request that is sent by urlopen. Ensures the correct parameters are
         passed to client._get.
         """
-        client = BMOAPIClient("https://example.ca", {})
+        client = BMOAPIClient(b"https://example.ca", {})
         result = client.get_status_code_for_bug(b"bug-3")
 
         # Check that client._get was indeed called, and only once.
