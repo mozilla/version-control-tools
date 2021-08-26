@@ -13,17 +13,17 @@ amqp==1.4.9 \
 anyjson==0.3.3 \
     --hash=sha256:37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba \
     # via kombu
-boto3==1.18.23 \
-    --hash=sha256:1b08ace99e7b92965780e5ce759430ad62b7b7e037560bc772f9a8789f4f36d2 \
-    --hash=sha256:31cc69e665f773390c4c17ce340d2420e45fbac51d46d945cc4a58d483ec5da6 \
+boto3==1.18.25 \
+    --hash=sha256:057196ac15de4de2221a24a3a0a41692414fa1dd697994d062ebd447163265e7 \
+    --hash=sha256:852e776cea4287f74edcb45564f8345fb6b0168dde0fd5bf46668b94c3f21177 \
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
 boto==2.49.0 \
     --hash=sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8 \
     --hash=sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a \
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-botocore==1.21.23 \
-    --hash=sha256:3877d69e0b718b786f1696cd04ddbdb3a57aef6adb0239a29aa88754489849a4 \
-    --hash=sha256:d0146d31dbc475942b578b47dd5bcf94d18fbce8c6d2ce5f12195e005de9b754 \
+botocore==1.21.25 \
+    --hash=sha256:201e10d3b1b40d65b7c9214be7087d78ed65de00e7362bd1e020741301d09fbc \
+    --hash=sha256:b9820ee29d70059c9b0e2a69ec13ebf80f4a0bc85f47578f17e951438c506b2d \
     # via boto3, s3transfer
 cbor2==4.1.2 \
     --hash=sha256:17b615da69964f87e48c5adb34ba63db3068f65b9cd14a7b099503d9f8a0e9ae \
@@ -41,14 +41,8 @@ kombu==3.0.35 \
     --hash=sha256:22ab336a17962717a5d9470547e5508d4bcf1b6ec10cd9486868daf4e5edb727 \
     --hash=sha256:2c59a5e087d5895675cdb4d6a38a0aa147f0411366e68330a76e480ba3b25727 \
     # via -r ansible/roles/hg-ssh/files/../../../../pylib/vcsreplicator/requirements.in
-mercurial==5.5.1 \
-    --hash=sha256:0f861955143710e0ad711e6fd9b207b415a381efd23516080277400a4d7c0a9a \
-    --hash=sha256:1e65e522dfb79886214da3e2cad97a30e0ba33e981c7257ff12b312709e57a7e \
-    --hash=sha256:28c7ff77c48520903bc6b3ca5a3da045d90ff494fd777177773ebef3d2fef6f1 \
-    --hash=sha256:38173ad4b6e92adf855571fa80ad39354179746272425c0f80c41a05213ef2b4 \
-    --hash=sha256:3dd711c915762c579ce1a7d1ea09e2dca82ed8bcce9d0e78b8f8993123257037 \
-    --hash=sha256:4f95ad8d575941835d67210e9f8700cc594a441e4fd0bd029c084923b4f40874 \
-    --hash=sha256:bdfbcb2685e10d156ac40f4dd5dc3875b781a3e0f2a7f51af7a166bbc084f288 \
+mercurial==5.9 \
+    --hash=sha256:70d53f72d495e97f1bac6e6bf65b9c760dc1d52e166c0b9754d1e54371c1307a \
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
 pyasn1-modules==0.2.8 \
     --hash=sha256:905f84c712230b2c592c19470d3ca8d552de726050d1d1716282a1f6146be65e \

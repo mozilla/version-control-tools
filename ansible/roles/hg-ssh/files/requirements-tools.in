@@ -5,7 +5,7 @@
 
 boto3
 boto
-mercurial==5.5.1
+mercurial==5.9
 python-hglib
 python-ldap==3.2.0
 tabulate

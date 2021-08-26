@@ -7,22 +7,16 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
-certifi==2020.6.20 \
-    --hash=sha256:5930595817496dd21bb8dc35dad090f1c2cd0adfaf21204bf6732ca5d8ee34d3 \
-    --hash=sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41 \
+certifi==2021.5.30 \
+    --hash=sha256:2bbf76fd432960138b3ef6dda3dde0544f27cbf8546c458e60baf371917ba9ee \
+    --hash=sha256:50b1e4f8446b06f41be7dd6338db18e0990601dce795c2b1686458aa7e8fa7d8 \
     # via sentry-sdk
 kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-mercurial==5.5.1 \
-    --hash=sha256:0f861955143710e0ad711e6fd9b207b415a381efd23516080277400a4d7c0a9a \
-    --hash=sha256:1e65e522dfb79886214da3e2cad97a30e0ba33e981c7257ff12b312709e57a7e \
-    --hash=sha256:28c7ff77c48520903bc6b3ca5a3da045d90ff494fd777177773ebef3d2fef6f1 \
-    --hash=sha256:38173ad4b6e92adf855571fa80ad39354179746272425c0f80c41a05213ef2b4 \
-    --hash=sha256:3dd711c915762c579ce1a7d1ea09e2dca82ed8bcce9d0e78b8f8993123257037 \
-    --hash=sha256:4f95ad8d575941835d67210e9f8700cc594a441e4fd0bd029c084923b4f40874 \
-    --hash=sha256:bdfbcb2685e10d156ac40f4dd5dc3875b781a3e0f2a7f51af7a166bbc084f288 \
+mercurial==5.9 \
+    --hash=sha256:70d53f72d495e97f1bac6e6bf65b9c760dc1d52e166c0b9754d1e54371c1307a \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
 pyasn1-modules==0.2.8 \
     --hash=sha256:905f84c712230b2c592c19470d3ca8d552de726050d1d1716282a1f6146be65e \
@@ -39,11 +33,11 @@ sentry-sdk==0.7.14 \
     --hash=sha256:5818289868755cfea74e61e532b4b0d11d523901041338d473277db91d4d8173 \
     --hash=sha256:b50948bbb553eef11ba650db858e31f5bb7c8d821a9d7338a01d01487d964e8c \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-six==1.15.0 \
-    --hash=sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259 \
-    --hash=sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced \
+six==1.16.0 \
+    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
+    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254 \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-urllib3==1.25.10 \
-    --hash=sha256:91056c15fa70756691db97756772bb1eb9678fa585d9184f24534b100dc60f4a \
-    --hash=sha256:e7983572181f5e1522d9c98453462384ee92a0be7fac5f1413a1e35c56cc0461 \
+urllib3==1.26.6 \
+    --hash=sha256:39fb8672126159acb139a7718dd10806104dec1e2f0f6c88aab05d17df10c8d4 \
+    --hash=sha256:f57b4c16c62fa2760b7e3d97c35b255512fb6b59a259730f36ba32ce9f8e342f \
     # via sentry-sdk
