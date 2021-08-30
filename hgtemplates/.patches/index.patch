@@ -11,7 +11,7 @@ We've changed the index page in various ways.
 diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/index.tmpl
 --- a/hgtemplates/gitweb_mozilla/index.tmpl
 +++ b/hgtemplates/gitweb_mozilla/index.tmpl
-@@ -12,13 +12,152 @@
+@@ -12,13 +12,156 @@
      <tr>
          <td><a href="?sort={sort_name}">Name</a></td>
          <td><a href="?sort={sort_description}">Description</a></td>
@@ -44,6 +44,10 @@ diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/
 +    <tr>
 +        <td><a href="/ci">ci</a></td>
 +        <td>Firefox CI related repositories</td>
++    </tr>
++    <tr>
++        <td><a href="/conduit-testing">conduit-testing</a></td>
++        <td>Test repos that integrate with lower environments</td>
 +    </tr>
 +    <tr>
 +        <td><a href="/experimental">experimental</a></td>
