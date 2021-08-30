@@ -6,13 +6,23 @@ Create a repo so we can test differences against v-c-t
   $ hg init templates
   $ cd templates
 
+  $ cat >> .hgignore << EOF
+  > syntax: glob
+  > 
+  > *.pyc
+  > EOF
+
+  $ hg commit -q -A -m "add .hgignore to avoid pyc files"
+
 Run script to apply our templates changes.
 Always test against the version of Mercurial we have deployed to hg.mo
 
   $ HG=`which hg` $TESTDIR/hgtemplates/.patches/mozify-templates.py \
-  >   /app/venv/mercurials/5.5.1/lib/python3.7/site-packages/mercurial/templates \
+  >   /app/venv/mercurials/5.9.1/lib/python3.7/site-packages/mercurial/templates \
   >   $TESTDIR/hgtemplates \
   >   `pwd`/hgtemplates
+  adding __init__.py
+  adding atom/__init__.py
   adding atom/bookmarkentry.tmpl
   adding atom/bookmarks.tmpl
   adding atom/branchentry.tmpl
@@ -27,6 +37,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding atom/pushlogentry.tmpl
   adding atom/tagentry.tmpl
   adding atom/tags.tmpl
+  adding gitweb/__init__.py
   adding gitweb/bookmarks.tmpl
   adding gitweb/branches.tmpl
   adding gitweb/changelog.tmpl
@@ -52,6 +63,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding gitweb/shortlog.tmpl
   adding gitweb/summary.tmpl
   adding gitweb/tags.tmpl
+  adding gitweb_mozilla/__init__.py
   adding gitweb_mozilla/bookmarks.tmpl
   adding gitweb_mozilla/branches.tmpl
   adding gitweb_mozilla/changelog.tmpl
@@ -80,6 +92,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding gitweb_mozilla/shortlog.tmpl
   adding gitweb_mozilla/summary.tmpl
   adding gitweb_mozilla/tags.tmpl
+  adding json/__init__.py
   adding json/changelist.tmpl
   adding json/graph.tmpl
   adding json/map
@@ -91,6 +104,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding map-cmdline.show
   adding map-cmdline.status
   adding map-cmdline.xml
+  adding paper/__init__.py
   adding paper/bookmarks.tmpl
   adding paper/branches.tmpl
   adding paper/changeset.tmpl
@@ -116,6 +130,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding paper/shortlog.tmpl
   adding paper/shortlogentry.tmpl
   adding paper/tags.tmpl
+  adding raw/__init__.py
   adding raw/changelog.tmpl
   adding raw/changeset.tmpl
   adding raw/error.tmpl
@@ -130,6 +145,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding raw/map
   adding raw/notfound.tmpl
   adding raw/search.tmpl
+  adding rss/__init__.py
   adding rss/bookmarkentry.tmpl
   adding rss/bookmarks.tmpl
   adding rss/branchentry.tmpl
@@ -143,6 +159,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding rss/map
   adding rss/tagentry.tmpl
   adding rss/tags.tmpl
+  adding static/__init__.py
   adding static/coal-file.png
   adding static/coal-folder.png
   adding static/feed-icon-14x14.png
