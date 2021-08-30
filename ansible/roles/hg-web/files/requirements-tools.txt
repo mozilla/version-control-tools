@@ -7,13 +7,13 @@
 --find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
 --find-links /var/tmp/pip
 
-boto3==1.18.25 \
-    --hash=sha256:057196ac15de4de2221a24a3a0a41692414fa1dd697994d062ebd447163265e7 \
-    --hash=sha256:852e776cea4287f74edcb45564f8345fb6b0168dde0fd5bf46668b94c3f21177 \
+boto3==1.18.32 \
+    --hash=sha256:a299d0c6b5a30dc2e823944286ec782aec415d83965a51f97fc9a779a04ff194 \
+    --hash=sha256:f4b17a2b6e04e5ec6f494e643d05b06dd60c88943f33d6f9650dd9e7f89a7022 \
     # via -r ansible/roles/hg-web/files/requirements-tools.in
-botocore==1.21.25 \
-    --hash=sha256:201e10d3b1b40d65b7c9214be7087d78ed65de00e7362bd1e020741301d09fbc \
-    --hash=sha256:b9820ee29d70059c9b0e2a69ec13ebf80f4a0bc85f47578f17e951438c506b2d \
+botocore==1.21.32 \
+    --hash=sha256:5803bf852304a301de41dccc3c0431053354144f3aefc7571dbe240a4288d3c5 \
+    --hash=sha256:95ff61534b2a423d0e70067c39615e4e70c119773d2180d7254bf4025c54396d \
     # via boto3, s3transfer
 cbor2==4.1.2 \
     --hash=sha256:17b615da69964f87e48c5adb34ba63db3068f65b9cd14a7b099503d9f8a0e9ae \
@@ -35,8 +35,16 @@ jmespath==0.10.0 \
     --hash=sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9 \
     --hash=sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f \
     # via boto3, botocore
-mercurial==5.9 \
-    --hash=sha256:70d53f72d495e97f1bac6e6bf65b9c760dc1d52e166c0b9754d1e54371c1307a \
+mercurial==5.9.1 \
+    --hash=sha256:1bd3d60e2b3f90f338fd96c32032f3bebb1ad4cee781f157de47a1388408272e \
+    --hash=sha256:22564856bcfefe8f8bb22221821564db03f0b00b9011ae174860672bd87e3853 \
+    --hash=sha256:32eff9433c62d781dc93e5a6103327264d897ad2bbce3ecb5d2d78a93cf49f27 \
+    --hash=sha256:371b41adad5198be4c3f0bb4c5cb8878129109c35b25e3a0836402ac8bf94f25 \
+    --hash=sha256:4ab8145182103b4eccdacfe1f655bd9f077723df36f7d1502e6c2ef4268de2ba \
+    --hash=sha256:4b9d0594c367311f05687fdcdc1dae4a0de41ec5e6128d3986f525546e4ad1e5 \
+    --hash=sha256:7f1fb74f1fa26ab9209cf65d9ac8a8e12a72a6a39f6331762c941c1446c70e1f \
+    --hash=sha256:9cb37c3496023929000c10af79bfe8c85b3b931e053f8de65fe829c9c30db8dd \
+    --hash=sha256:bd0e31562107db0b8f5b363da5b3940d03ffca84aee8e24be543465eb126338b \
     # via -r ansible/roles/hg-web/files/requirements-tools.in
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
