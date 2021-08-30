@@ -15,8 +15,16 @@ kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-mercurial==5.9 \
-    --hash=sha256:70d53f72d495e97f1bac6e6bf65b9c760dc1d52e166c0b9754d1e54371c1307a \
+mercurial==5.9.1 \
+    --hash=sha256:1bd3d60e2b3f90f338fd96c32032f3bebb1ad4cee781f157de47a1388408272e \
+    --hash=sha256:22564856bcfefe8f8bb22221821564db03f0b00b9011ae174860672bd87e3853 \
+    --hash=sha256:32eff9433c62d781dc93e5a6103327264d897ad2bbce3ecb5d2d78a93cf49f27 \
+    --hash=sha256:371b41adad5198be4c3f0bb4c5cb8878129109c35b25e3a0836402ac8bf94f25 \
+    --hash=sha256:4ab8145182103b4eccdacfe1f655bd9f077723df36f7d1502e6c2ef4268de2ba \
+    --hash=sha256:4b9d0594c367311f05687fdcdc1dae4a0de41ec5e6128d3986f525546e4ad1e5 \
+    --hash=sha256:7f1fb74f1fa26ab9209cf65d9ac8a8e12a72a6a39f6331762c941c1446c70e1f \
+    --hash=sha256:9cb37c3496023929000c10af79bfe8c85b3b931e053f8de65fe829c9c30db8dd \
+    --hash=sha256:bd0e31562107db0b8f5b363da5b3940d03ffca84aee8e24be543465eb126338b \
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
 pyasn1-modules==0.2.8 \
     --hash=sha256:905f84c712230b2c592c19470d3ca8d552de726050d1d1716282a1f6146be65e \
