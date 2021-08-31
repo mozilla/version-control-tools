@@ -69,6 +69,12 @@ No prompt if extension enabled but not managed by the wizard
   
   To begin, press the enter/return key.
    <RETURN>
+  
+  WARNING: your copy of the evolve extension is not managed by this wizard.
+  Please update evolve manually when upgrading your Mercurial version.
+  
+  To allow this wizard to manage evolve on your behalf, remove `evolve` from
+  your hgrc files `extensions` section and re-run the wizard.
 
 
 #if internet

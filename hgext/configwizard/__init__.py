@@ -349,6 +349,14 @@ once the `evolve` extension is enabled.
 Would you like to enable the evolve extension? (Yn) $$ &Yes $$ &No
 '''
 
+EVOLVE_UNMANAGED_WARNING = b"""
+WARNING: your copy of the evolve extension is not managed by this wizard.
+Please update evolve manually when upgrading your Mercurial version.
+
+To allow this wizard to manage evolve on your behalf, remove `evolve` from
+your hgrc files `extensions` section and re-run the wizard.
+"""
+
 EVOLVE_UPDATE_PROMPT = b'''
 It looks like the setup wizard has already installed a copy of the
 evolve extension on your machine, at %(evolve_dir)s.
@@ -983,30 +991,32 @@ def _checkevolve(ui, cw, hg_version):
 
         return
 
+    # If evolve is not managed by this wizard, print a warning.
+    if users_evolve_path != evolve_config_value:
+        ui.write(EVOLVE_UNMANAGED_WARNING)
+        return
+
     # If evolve is installed and managed by this wizard,
     # update it via pull/update
-    if users_evolve_path == evolve_config_value:
-        if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT % {b'evolve_dir': local_evolve_path}):
-            return
+    if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT % {b'evolve_dir': local_evolve_path}):
+        return
 
-        try:
-            local_evolve_repo = hg.repository(ui, local_evolve_path)
+    try:
+        local_evolve_repo = hg.repository(ui, local_evolve_path)
 
-            # Pull the latest stable, update to latest tag/release
-            # TRACKING hg58 `source` param is now set via positional args
-            if util.versiontuple() >= (5, 8):
-                hgpull(ui, local_evolve_repo, remote_evolve_path, branch=(b'stable',))
-            else:
-                hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
-            
-            hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
+        # Pull the latest stable, update to latest tag/release
+        # TRACKING hg58 `source` param is now set via positional args
+        if util.versiontuple() >= (5, 8):
+            hgpull(ui, local_evolve_repo, remote_evolve_path, branch=(b'stable',))
+        else:
+            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
+        
+        hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
 
-            ui.write(b'Evolve was updated successfully.\n')
+        ui.write(b'Evolve was updated successfully.\n')
 
-        except error.Abort as hg_err:
-            ui.write(EVOLVE_CLONE_ERROR)
-
-    # If evolve is not managed by this wizard, do nothing
+    except error.Abort as hg_err:
+        ui.write(EVOLVE_CLONE_ERROR)
 
 
 def _checkfsmonitor(ui, cw, hgversion):
