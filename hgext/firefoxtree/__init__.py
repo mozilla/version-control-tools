@@ -103,9 +103,6 @@ from mercurial.node import (
     nullrev,
     short,
 )
-from mercurial.utils import (
-    urlutil,
-)
 
 OUR_DIR = os.path.dirname(__file__)
 with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
