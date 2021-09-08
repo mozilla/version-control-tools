@@ -506,14 +506,16 @@ def _docheckout(
             else:
                 ui.warn(
                     b"unhandled URLError; reason type: %s; value: %s\n"
-                    % (pycompat.bytestr(e.reason.__class__.__name__),
-                       pycompat.bytestr(str(e.reason)))
+                    % (
+                        pycompat.bytestr(e.reason.__class__.__name__),
+                        pycompat.bytestr(str(e.reason)),
+                    )
                 )
         else:
             ui.warn(
                 b"unhandled exception during network operation; type: %s; "
-                b"value: %s\n" % (pycompat.bytestr(e.__class__.__name__),
-                                  pycompat.bytestr(str(e)))
+                b"value: %s\n"
+                % (pycompat.bytestr(e.__class__.__name__), pycompat.bytestr(str(e)))
             )
 
         return False
