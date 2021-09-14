@@ -78,7 +78,7 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > transaction abort!
   vcsreplicator.consumer   > rollback completed
-  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest.i!
+  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
@@ -100,7 +100,7 @@ Pulling into corrupt repo should result in abort
       payload['heads'])
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
       raise hglib.error.CommandError(args, res, out, err)
-  hglib.error.CommandError: (255, 'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', 'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest.i!')
+  hglib.error.CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
   [1]
 
 And the message should still be not consumed
@@ -132,7 +132,7 @@ We should get the same failure if we try again
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > transaction abort!
   vcsreplicator.consumer   > rollback completed
-  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest.i!
+  vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
@@ -150,7 +150,7 @@ We should get the same failure if we try again
       payload['heads'])
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
       raise hglib.error.CommandError(args, res, out, err)
-  hglib.error.CommandError: (255, 'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', 'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest.i!')
+  hglib.error.CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
   [1]
 
 We can skip over the message
