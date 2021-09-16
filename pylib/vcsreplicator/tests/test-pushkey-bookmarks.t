@@ -67,7 +67,7 @@ Phases should be updated on normal push
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) from partition 2 offset 3
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be']) from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -80,7 +80,7 @@ Phases should be updated on normal push
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) from partition 2 offset 4
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be'], last_push_id: 1) from partition 2 offset 4
 
 Creating a bookmark will write a pushkey message
 
@@ -171,7 +171,7 @@ Mirror gets bookmark updates when pulling the changegroup.
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 9
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['2777163b593873bfa63c7129e02a21becc299ff0']) from partition 2 offset 10
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['2777163b5938']) from partition 2 offset 10
   vcsreplicator.consumer pulling 1 heads (2777163b593873bfa63c7129e02a21becc299ff0) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r2777163b593873bfa63c7129e02a21becc299ff0 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -186,7 +186,7 @@ Mirror gets bookmark updates when pulling the changegroup.
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['2777163b593873bfa63c7129e02a21becc299ff0'], last_push_id: 2) from partition 2 offset 11
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['2777163b5938'], last_push_id: 2) from partition 2 offset 11
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               1:2777163b5938
@@ -253,7 +253,7 @@ the bookmark.
      my-bookmark               1:2777163b5938
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['031adcaa8ee7e23dd05ce5900645e771a3637682']) from partition 2 offset 14
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['031adcaa8ee7']) from partition 2 offset 14
   vcsreplicator.consumer pulling 1 heads (031adcaa8ee7e23dd05ce5900645e771a3637682) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r031adcaa8ee7e23dd05ce5900645e771a3637682 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -267,7 +267,7 @@ the bookmark.
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['031adcaa8ee7e23dd05ce5900645e771a3637682'], last_push_id: 3) from partition 2 offset 15
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['031adcaa8ee7'], last_push_id: 3) from partition 2 offset 15
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               1:2777163b5938
@@ -279,7 +279,7 @@ But processing the next changegroup message should advance the bookmark by 1
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 17
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['e20ecd72ffa991598a1b26333788345377318231']) from partition 2 offset 18
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['e20ecd72ffa9']) from partition 2 offset 18
   vcsreplicator.consumer pulling 1 heads (e20ecd72ffa991598a1b26333788345377318231) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -re20ecd72ffa991598a1b26333788345377318231 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -294,7 +294,7 @@ But processing the next changegroup message should advance the bookmark by 1
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['e20ecd72ffa991598a1b26333788345377318231'], last_push_id: 4) from partition 2 offset 19
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['e20ecd72ffa9'], last_push_id: 4) from partition 2 offset 19
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      my-bookmark               3:e20ecd72ffa9
@@ -379,7 +379,7 @@ Now test bookmark divergence
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 24
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['e84fdf206e79496713b3a56eae2e16c490475cc8']) from partition 2 offset 25
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['e84fdf206e79']) from partition 2 offset 25
   vcsreplicator.consumer pulling 1 heads (e84fdf206e79496713b3a56eae2e16c490475cc8) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -re84fdf206e79496713b3a56eae2e16c490475cc8 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -395,7 +395,7 @@ Now test bookmark divergence
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['e84fdf206e79496713b3a56eae2e16c490475cc8', 'e20ecd72ffa991598a1b26333788345377318231'], last_push_id: 5) from partition 2 offset 26
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['e84fdf206e79', 'e20ecd72ffa9'], last_push_id: 5) from partition 2 offset 26
 
   $ hg -R $TESTTMP/repos/mozilla-central bookmarks
      divergent                 4:e84fdf206e79

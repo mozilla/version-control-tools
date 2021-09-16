@@ -34,8 +34,8 @@ Create a repository
   got a hg-repo-init-2: (repo: {moz}/mozilla-central) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
-  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
+  got a hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be']) message
+  got a hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be'], last_push_id: 1) message
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 v1
@@ -93,8 +93,8 @@ Repos under ignore paths are ignored
   got a hg-repo-init-2: (repo: {moz}/private/ignore) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2: (repo: {moz}/private/ignore, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
-  got a hg-heads-1: (repo: {moz}/private/ignore, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
+  got a hg-changegroup-2: (repo: {moz}/private/ignore, heads: ['77538e1ce4be']) message
+  got a hg-heads-1: (repo: {moz}/private/ignore, heads: ['77538e1ce4be'], last_push_id: 1) message
   $ pulseconsumer --wait-for-no-lag
 
   $ hgmo exec hgssh grep private /var/log/pulsenotifier.log
@@ -119,8 +119,8 @@ Routing keys with slashes and dashes and underscores work
   got a hg-repo-init-2: (repo: {moz}/integration/foo_Bar-baz) message
   got a heartbeat-1 message
   got a heartbeat-1 message
-  got a hg-changegroup-2: (repo: {moz}/integration/foo_Bar-baz, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) message
-  got a hg-heads-1: (repo: {moz}/integration/foo_Bar-baz, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) message
+  got a hg-changegroup-2: (repo: {moz}/integration/foo_Bar-baz, heads: ['77538e1ce4be']) message
+  got a hg-heads-1: (repo: {moz}/integration/foo_Bar-baz, heads: ['77538e1ce4be'], last_push_id: 1) message
   $ pulseconsumer --wait-for-no-lag
 
   $ pulse dump-messages exchange/hgpushes/v1 v1

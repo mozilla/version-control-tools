@@ -23,7 +23,7 @@
   $ consumer --onetime
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) from partition 2 offset 3
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be']) from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -36,7 +36,7 @@
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into $TESTTMP/repos/mozilla-central
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) from partition 2 offset 4
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be'], last_push_id: 1) from partition 2 offset 4
 
 Corrupt the local repo
 
@@ -69,7 +69,7 @@ Pulling into corrupt repo should result in abort
     path: '{moz}/mozilla-central'
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458675af812e445c8ab9b809e321f57']) from partition 2 offset 7
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458']) from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -91,6 +91,10 @@ Pulling into corrupt repo should result in abort
     File "*/vcsreplicator/consumer.py", line *, in consume (glob)
       message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in filterwrapper (glob)
+      return message_handler(config, payload)
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 174, in autorecoverwrapper
+      raise err
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 170, in autorecoverwrapper
       return message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
       payload['heads'])
@@ -119,7 +123,7 @@ And the message should still be not consumed
 We should get the same failure if we try again
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458675af812e445c8ab9b809e321f57']) from partition 2 offset 7
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458']) from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (0c6b2090d458675af812e445c8ab9b809e321f57) and 1 nodes from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central into $TESTTMP/repos/mozilla-central
   vcsreplicator.consumer   $ hg pull -r0c6b2090d458675af812e445c8ab9b809e321f57 -- ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central
@@ -155,7 +159,7 @@ We can skip over the message
   skipped message in partition 2 for group ttest
 
   $ consumer --onetime
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458675af812e445c8ab9b809e321f57'], last_push_id: 2) from partition 2 offset 8
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['0c6b2090d458'], last_push_id: 2) from partition 2 offset 8
 
 Cleanup
 

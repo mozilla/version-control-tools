@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import copy
 import time
 
 
@@ -23,11 +24,31 @@ PAYLOAD_LOGS = {
     'hg-repo-delete-1': 'repo: {path}',
 }
 
+MAX_HEADS_PER_MESSAGE = 25
+
 def payload_log_display(payload):
     """Return a string that adds information about the payload for use in logs."""
     name = payload['name']
     if name == 'heartbeat-1':
         return 'heartbeat-1'
+
+    if "heads" in payload:
+        # Deepcopy because we don't want to modify the original payload.
+        payload = copy.deepcopy(payload)
+
+        # Print only the short version of the hash.
+        payload["heads"] = [
+            head[:12]
+            for head in payload["heads"]
+        ]
+
+        # Enforce a maximum number of heads per message.
+        num_heads = len(payload["heads"])
+        if num_heads > MAX_HEADS_PER_MESSAGE:
+            payload["heads"] = "{heads} and {remaining} more".format(
+                heads=payload["heads"][:MAX_HEADS_PER_MESSAGE],
+                remaining=num_heads - MAX_HEADS_PER_MESSAGE,
+            )
 
     return '{}: ({})'.format(name, PAYLOAD_LOGS[name].format(**payload))
 
