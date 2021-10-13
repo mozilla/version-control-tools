@@ -16,7 +16,7 @@ Rejecting pushtotry doesn't enable it
   The push-to-try extension generates a temporary commit with a given
   try syntax and pushes it to the try server. The extension is intended
   to be used in concert with other tools generating try syntax so that
-  they can push to try without depending on mq or other workarounds.
+  they can push to try without depending on other workarounds.
   
   (Relevant config option: extensions.push-to-try)
   
@@ -46,7 +46,7 @@ push-to-try enabled when requested
   The push-to-try extension generates a temporary commit with a given
   try syntax and pushes it to the try server. The extension is intended
   to be used in concert with other tools generating try syntax so that
-  they can push to try without depending on mq or other workarounds.
+  they can push to try without depending on other workarounds.
   
   (Relevant config option: extensions.push-to-try)
   

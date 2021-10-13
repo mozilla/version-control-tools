@@ -29,7 +29,7 @@ Rejecting firefoxtree doesn't enable it
   The firefoxtree extension is *strongly* recommended if you:
   
   a) aggregate multiple Firefox repositories into a single local repo
-  b) perform head/bookmark-based development (as opposed to mq)
+  b) perform head/bookmark-based development
   
   (Relevant config option: extensions.firefoxtree)
   
@@ -72,7 +72,7 @@ firefoxtree enabled when requested
   The firefoxtree extension is *strongly* recommended if you:
   
   a) aggregate multiple Firefox repositories into a single local repo
-  b) perform head/bookmark-based development (as opposed to mq)
+  b) perform head/bookmark-based development
   
   (Relevant config option: extensions.firefoxtree)
   

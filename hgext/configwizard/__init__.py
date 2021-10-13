@@ -243,7 +243,7 @@ repositories easier:
 The firefoxtree extension is *strongly* recommended if you:
 
 a) aggregate multiple Firefox repositories into a single local repo
-b) perform head/bookmark-based development (as opposed to mq)
+b) perform head/bookmark-based development
 
 (Relevant config option: extensions.firefoxtree)
 
@@ -292,7 +292,7 @@ PUSHTOTRY_INFO = b'''
 The push-to-try extension generates a temporary commit with a given
 try syntax and pushes it to the try server. The extension is intended
 to be used in concert with other tools generating try syntax so that
-they can push to try without depending on mq or other workarounds.
+they can push to try without depending on other workarounds.
 
 (Relevant config option: extensions.push-to-try)
 
