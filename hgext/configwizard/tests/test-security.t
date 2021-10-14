@@ -93,8 +93,7 @@ Modern Mercurial doesn't need to pin fingerprints
 #endif
 
 #if hg39
-[hostfingerprints] deleted and converted to [hostsecurity]
-(Note: no new fingerprints are added)
+[hostfingerprints] deleted our fingerprints
 
   $ cat > .hgrc << EOF
   > [hostfingerprints]
@@ -113,11 +112,9 @@ Modern Mercurial doesn't need to pin fingerprints
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,2 +1,2 @@
-  -[hostfingerprints]
+  @@ -1,2 +1 @@
+   [hostfingerprints]
   -hg.mozilla.org = aa:bb:cc:dd
-  +[hostsecurity]
-  +hg.mozilla.org:fingerprints = sha256:FF:E7:8D:93:E9:56:3C:C0:19:FC:00:4C:18:B9:86:E5:08:E5:10:F5:E2:EA:48:E8:22:D3:A3:3A:CA:99:C3:4C, sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
   
   Write changes to hgrc file (Yn)?  y
 
@@ -125,11 +122,12 @@ Modern Mercurial doesn't need to pin fingerprints
 #endif
 
 #if hg39
-Old fingerprint in [hostsecurity] is updated
+Old hg.mozilla.org fingerprint in [hostsecurity] is deleted
 
   $ cat > .hgrc << EOF
   > [hostsecurity]
   > hg.mozilla.org:fingerprints = sha256:aa:bb:cc:dd
+  > unrelated.host:fingerprints = sha256:aa:bb:cc:dd
   > EOF
 
   $ hg --config configwizard.steps=security,configchange configwizard
@@ -144,10 +142,10 @@ Old fingerprint in [hostsecurity] is updated
   Would you like to see a diff of the changes first (Yn)?  y
   --- hgrc.old
   +++ hgrc.new
-  @@ -1,2 +1,2 @@
+  @@ -1,3 +1,2 @@
    [hostsecurity]
   -hg.mozilla.org:fingerprints = sha256:aa:bb:cc:dd
-  +hg.mozilla.org:fingerprints = sha256:FF:E7:8D:93:E9:56:3C:C0:19:FC:00:4C:18:B9:86:E5:08:E5:10:F5:E2:EA:48:E8:22:D3:A3:3A:CA:99:C3:4C, sha256:17:38:aa:92:0b:84:3e:aa:8e:52:52:e9:4c:2f:98:a9:0e:bf:6c:3e:e9:15:ff:0a:29:80:f7:06:02:5b:e8:48
+   unrelated.host:fingerprints = sha256:aa:bb:cc:dd
   
   Write changes to hgrc file (Yn)?  y
 

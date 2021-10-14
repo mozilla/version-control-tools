@@ -1200,17 +1200,33 @@ def _checksecurity(ui, cw, hgversion):
 
     if not modernssl:
         setfingerprints()
+        return
 
-    # We always update fingerprints if they are present. We /could/ offer to
-    # remove fingerprints if running modern Python and Mercurial. But that
-    # just adds more UI complexity and isn't worth it.
+    # If there are pre-existing pinned fingerprints in the hgrc file,
+    # un-pin them.
     have_legacy = any(k in cw.c.get('hostfingerprints', {})
                       for k in HOST_FINGERPRINTS)
     have_modern = any('%s:fingerprints' % k in cw.c.get('hostsecurity', {})
                       for k in MODERN_FINGERPRINTS)
 
-    if have_legacy or have_modern:
-        setfingerprints(porting=True)
+    if hg39 and (have_legacy or have_modern):
+        for host in sorted(MODERN_FINGERPRINTS.keys()):
+            option = "%s:fingerprints" % host
+
+            try:
+                del cw.c["hostsecurity"][option]
+            except KeyError:
+                pass
+
+        for host in sorted(HOST_FINGERPRINTS.keys()):
+            try:
+                del cw.c["hostfingerprints"][host]
+            except KeyError:
+                pass
+
+        # If we remove the pinned fingerprints we can return.
+        return
+
 
     # If we're using Mercurial 3.9, remove legacy fingerprints if they
     # are present.
