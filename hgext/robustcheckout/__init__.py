@@ -41,7 +41,7 @@ from mercurial import (
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
-testedwith = b"4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8"
+testedwith = b"4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8 5.9"
 minimumhgversion = b"4.5"
 
 cmdtable = {}
@@ -795,7 +795,11 @@ def _docheckout(
             # one to change the sparse profile and another to update to the new
             # revision. This is not desired. But there's not a good API in
             # Mercurial to do this as one operation.
-            with repo.wlock(), timeit("sparse_update_config", "sparse-update-config"):
+            with (
+                repo.wlock(), 
+                repo.dirstate.parentchange(),
+                timeit("sparse_update_config", "sparse-update-config"),
+            ):
                 # pylint --py3k: W1636
                 fcounts = list(
                     map(
