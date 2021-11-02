@@ -796,7 +796,7 @@ def _docheckout(
             # revision. This is not desired. But there's not a good API in
             # Mercurial to do this as one operation.
             with (
-                repo.wlock(), 
+                repo.wlock(),
                 repo.dirstate.parentchange(),
                 timeit("sparse_update_config", "sparse-update-config"),
             ):
