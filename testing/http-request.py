@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -8,9 +8,9 @@
 from __future__ import print_function
 
 import base64
-import httplib
+import http.client as httplib
 import sys
-import urlparse
+import urllib.parse as urlparse
 from argparse import ArgumentParser
 
 def main(args):
@@ -70,12 +70,12 @@ def main(args):
     print(response.status)
 
     for header, value in sorted(response.getheaders()):
-        if not args.no_headers and (all_headers or header in display_headers):
-            print('%s: %s' % (header, value))
+        if not args.no_headers and (all_headers or header.lower() in display_headers):
+            print('%s: %s' % (header.lower(), value))
 
-    data = response.read()
+    data = response.read().decode("utf-8")
     if args.body_file:
-        with open(args.body_file, 'wb') as fh:
+        with open(args.body_file, 'w') as fh:
             fh.write(data)
     elif not args.no_body:
         print('')
