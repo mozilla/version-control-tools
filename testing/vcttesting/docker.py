@@ -436,98 +436,12 @@ class Docker(object):
         if not os.path.isdir(p):
             raise Exception('Unknown Docker builder name: %s' % name)
 
-        dockerfile_lines = []
-        vct_paths = []
-        with open(os.path.join(p, 'Dockerfile'), 'r') as fh:
-            for line in fh:
-                line = line.rstrip()
-                if line.startswith('# %include'):
-                    vct_paths.append(line[len('# %include '):])
-
-                # Detect our security optimized pull mode.
-                if line.startswith('FROM secure:'):
-                    parts = line[len('FROM secure:'):]
-                    repository, tagprefix, digest, url = parts.split(':', 3)
-                    if not digest.startswith('sha256 '):
-                        raise Exception('FROM secure: requires sha256 digests')
-
-                    digest = digest[len('sha256 '):]
-
-                    base_image = self.import_base_image(repository, tagprefix,
-                                                        url, digest)
-                    line = 'FROM %s' % base_image
-
-                dockerfile_lines.append(line)
-
-        # We build the build context for the image manually because we need to
-        # include things outside of the directory containing the Dockerfile.
-        buf = BytesIO()
-        tar = tarfile.open(mode='w', fileobj=buf)
-
-        for root, dirs, files in os.walk(p):
-            for f in files:
-                if f == '.dockerignore':
-                    raise Exception('.dockerignore not currently supported!')
-
-                full = os.path.join(root, f)
-                rel = full[len(p) + 1:]
-
-                ti = tar.gettarinfo(full, arcname=rel)
-
-                # Make files owned by root:root to prevent mismatch between
-                # host and container. Without this, files can be owned by
-                # undefined users.
-                ti.uid = 0
-                ti.gid = 0
-
-                fh = None
-
-                # We may modify the content of the Dockerfile. Grab it from
-                # memory.
-                if rel == 'Dockerfile':
-                    df = '\n'.join(dockerfile_lines).encode('utf-8')
-                    ti.size = len(df)
-                    fh = BytesIO(df)
-                    fh.seek(0)
-                else:
-                    fh = open(full, 'rb')
-
-                tar.addfile(ti, fileobj=fh)
-                fh.close()
-
-        if vct_paths:
-            # We grab the set of tracked files in this repository.
-            vct_files = sorted(self._get_vct_files().keys())
-            added = set()
-            for p in vct_paths:
-                ap = os.path.join(ROOT, p)
-                if not os.path.exists(ap):
-                    raise Exception('specified path not under version '
-                                    'control: %s' % p)
-                if p.endswith('/'):
-                    for f in vct_files:
-                        if not f.startswith(p) and p != '/':
-                            continue
-                        full = os.path.join(ROOT, f)
-                        rel = 'extra/vct/%s' % f
-                        if full in added:
-                            continue
-                        tar.add(full, rel)
-                else:
-                    full = os.path.join(ROOT, p)
-                    if full in added:
-                        continue
-                    rel = 'extra/vct/%s' % p
-                    tar.add(full, rel)
-
-        tar.close()
-
-        # Need to seek to beginning so .read() inside docker.client will return
-        # data.
-        buf.seek(0)
-
-        for s in self.api_client.build(fileobj=buf, custom_context=True,
-                                       rm=True, decode=True):
+        for s in self.api_client.build(
+            decode=True,
+            dockerfile=os.path.join(p, "Dockerfile"),
+            path=ROOT,                                        
+            rm=True, 
+        ):
             if 'stream' not in s:
                 continue
 

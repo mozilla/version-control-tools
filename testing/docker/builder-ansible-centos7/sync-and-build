@@ -9,4 +9,4 @@ set -e
 # Docker filesystems, like overlay2.
 /usr/bin/rsync -rlpt --delete-after /vct-mount/ /vct/
 cd /vct/ansible
-/usr/bin/python -u /usr/bin/ansible-playbook -c local $1
+ansible-playbook -c local $1
