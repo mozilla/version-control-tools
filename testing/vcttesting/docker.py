@@ -432,13 +432,13 @@ class Docker(object):
                     if repo == name:
                         return image['Id']
 
-        p = os.path.join(self._ddir, 'builder-%s' % name)
-        if not os.path.isdir(p):
+        builder_dir = os.path.join(self._ddir, 'builder-%s' % name)
+        if not os.path.isdir(builder_dir):
             raise Exception('Unknown Docker builder name: %s' % name)
 
         for s in self.api_client.build(
             decode=True,
-            dockerfile=os.path.join(p, "Dockerfile"),
+            dockerfile=os.path.join(builder_dir, "Dockerfile"),
             path=ROOT,                                        
             rm=True, 
         ):
