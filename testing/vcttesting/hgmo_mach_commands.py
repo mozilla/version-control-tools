@@ -46,6 +46,12 @@ class HgmoCommands(object):
         print('Web URL 1: %s' % s['hgweb_1_url'])
         print('Pulse: %s:%d' % (s['pulse_hostname'], s['pulse_hostport']))
 
+    @Command('build', category='hgmo', description='Build hgmo test images')
+    @CommandArgument('--image', type=str, help="Name of image to build")
+    def build(self, image=None):
+        from vcttesting.hgmo import HgCluster
+        HgCluster.build(image=image)
+
     @Command('shellinit', category='hgmo',
              description='Print shell commands to export variables')
     def shellinit(self):

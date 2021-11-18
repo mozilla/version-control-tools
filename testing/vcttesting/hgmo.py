@@ -124,7 +124,7 @@ class HgCluster(object):
         return params
 
     @staticmethod
-    def build():
+    def build(image=None):
         """Build the hgcluster images."""
         docker_compose_build_command = [
             'docker-compose',
@@ -132,6 +132,10 @@ class HgCluster(object):
             '--file', HGCLUSTER_DOCKER_COMPOSE,
             'build',
         ]
+
+        if image:
+            docker_compose_build_command.append(image)
+
         subprocess.run(
             docker_compose_build_command,
             check=True,
