@@ -22,7 +22,7 @@ DOCKER_GID={docker_gid}
 """.strip()
 
 
-def get_user_uid_gid(user: str) -> (int, int):
+def get_user_uid_gid(user: str) -> tuple[int, int]:
     """Get the uid and gid for the specified user.
     """
     try:
