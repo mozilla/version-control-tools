@@ -31,35 +31,6 @@ ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 HGCLUSTER_DOCKER_COMPOSE = os.path.join(ROOT, 'testing', 'hgcluster-docker-compose.yml')
 
 
-def get_hgweb_mozbuild_chroot(d):
-    """Obtain files needed for a moz.build evaluation sandbox.
-
-    Returns contents of binary files as a tuple. Files are:
-
-    * tar.gz of chroot archive
-    * executable for launching the moz.build evaluation process
-    """
-    image = d.ensure_built('hgweb-chroot', verbose=True)
-
-    # The chroot archive contains a copy of version-control-tools. Need to
-    # attach a vct container so we can rsync it over.
-    with d.vct_container(verbose=True) as vct_state:
-        host_config = d.api_client.create_host_config(
-            volumes_from=[vct_state['Name']])
-        with d.create_container(image, labels=['hgweb-chroot'],
-                                host_config=host_config) as state:
-            cid = state['Id']
-            d.api_client.start(cid)
-
-            for s in d.api_client.attach(cid, stream=True, logs=True):
-                print(s, end='')
-
-            tarball = d.get_file_content(state['Id'], '/chroot.tar.gz')
-            executable = d.get_file_content(state['Id'], 'mozbuild-eval')
-
-            return tarball, executable
-
-
 class HgCluster(object):
     """Interface to a cluster of HG servers.
 
