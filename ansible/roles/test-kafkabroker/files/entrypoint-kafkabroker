@@ -27,18 +27,18 @@ servers = [
 
 # Tell ZooKeeper what the servers are.
 lines = []
-with open(zoo_cfg, 'rb') as fh:
+with open(zoo_cfg, 'r') as fh:
     for line in fh:
-        if not line.startswith(b'server.'):
+        if not line.startswith('server.'):
             lines.append(line.rstrip())
 
 for i, server in enumerate(servers):
     line = 'server.%d=%s' % (i, server)
-    lines.append(line.encode('utf-8'))
-lines.append(b'')
+    lines.append(line)
+lines.append('')
 
-with open(zoo_cfg, 'wb') as fh:
-    fh.write(b'\n'.join(lines))
+with open(zoo_cfg, 'w') as fh:
+    fh.write('\n'.join(lines))
 
 print('wrote zookeeper server list')
 
@@ -50,30 +50,29 @@ print('wrote zookeeper id')
 
 # Set the Kafka broker ID and ZooKeeper server list.
 lines = []
-with open(server_properties, 'rb') as fh:
+with open(server_properties, 'r') as fh:
     for line in fh:
-        if line.startswith(b'advertised.host.name='):
+        if line.startswith('advertised.host.name='):
             continue
-        if line.startswith(b'advertised.port='):
+        if line.startswith('advertised.port='):
             continue
-        if line.startswith(b'broker.id='):
+        if line.startswith('broker.id='):
             continue
-        if line.startswith(b'zookeeper.connect='):
+        if line.startswith('zookeeper.connect='):
             continue
 
         lines.append(line.rstrip())
 
-lines.append(b'broker.id=' + broker_id.encode('utf-8'))
-lines.append(b'advertised.host.name=' + advertise_host.encode('utf-8'))
-lines.append(b'advertised.port=' + advertise_port.encode('utf-8'))
+lines.append('broker.id=' + broker_id)
+lines.append('advertised.host.name=' + advertise_host)
+lines.append('advertised.port=' + advertise_port)
 
 hostports = ['%s:2181/hgmoreplication' % h for h in hostnames]
 connect = ','.join(hostports)
-connect = connect.encode('utf-8')
-lines.append(b'zookeeper.connect=' + connect)
-lines.append(b'')
+lines.append('zookeeper.connect=' + connect)
+lines.append('')
 
-with open(server_properties, 'wb') as fh:
-    fh.write(b'\n'.join(lines))
+with open(server_properties, 'w') as fh:
+    fh.write('\n'.join(lines))
 
 print('wrote kafka server.properties')
