@@ -131,6 +131,12 @@ class HgCluster(object):
             # Use the `hgcluster-docker-compose` file
             '--file', HGCLUSTER_DOCKER_COMPOSE,
             'build',
+            '--parallel',
+            # Specify which images to avoid building hgweb twice
+            'hgweb0',
+            'hgssh',
+            'pulse',
+            'ldap',
         ]
 
         if image:
