@@ -21,17 +21,16 @@ def process_input_file(source: pathlib.Path, dest: pathlib.Path, pip_compile: pa
 
     try:
         subprocess.run([
-            pip_compile,
+            str(pip_compile),
+            '--output-file', str(dest.absolute()),
+            # We have a transitive dependency on setuptools, which requires this flag to be pinned
+            '--allow-unsafe',
             '--generate-hashes',
             '--emit-trusted-host',
             '--annotate',
             '--header',
-            '--index',
-            '--output-file', '%s' % dest,
-            # We have a transitive dependency on setuptools, which requires this flag to be pinned
-            '--allow-unsafe',
-            '-U',
-            '%s' % source
+            '--upgrade',
+            str(source),
         ],
         check=True, capture_output=True, env=env)
     except subprocess.CalledProcessError as err:
