@@ -39,9 +39,11 @@ class HgmoCommands(object):
              description='Start a hg.mozilla.org cluster')
     @CommandArgument('--master-ssh-port', type=int,
                      help='Port number on which SSH server should listen')
-    def start(self, master_ssh_port=None):
+    @CommandArgument('--show-output', action='store_true',
+                     help='Display output of shutdown process')
+    def start(self, master_ssh_port=None, show_output=False):
         s = self.c.start(master_ssh_port=master_ssh_port,
-                         show_output=False)
+                         show_output=show_output)
         print('SSH Hostname: %s' % s['master_ssh_hostname'])
         print('SSH Port: %s' % s['master_ssh_port'])
         print('LDAP URI: %s' % s['ldap_uri'])
