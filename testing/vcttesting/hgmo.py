@@ -123,6 +123,20 @@ class HgCluster(object):
 
         return params
 
+    @staticmethod
+    def build():
+        """Build the hgcluster images."""
+        docker_compose_build_command = [
+            'docker-compose',
+            # Use the `hgcluster-docker-compose` file
+            '--file', HGCLUSTER_DOCKER_COMPOSE,
+            'build',
+        ]
+        subprocess.run(
+            docker_compose_build_command,
+            check=True,
+        )
+
     def start(self, master_ssh_port=None, show_output=False):
         """Start the cluster.
 

@@ -249,42 +249,6 @@ def docker_requirements(tests):
     return res
 
 
-def get_docker_state(docker, tests, verbose=False, use_last=False):
-    """Obtain usable Docker images, possibly by building them.
-
-    Given a Docker client, name of virtualenv, and list of .t test paths,
-    determine what Docker images are needed/allowed to run the tests and
-    then return a dictionary of environment variables that define the Docker
-    image IDs.
-
-    If ``use_last`` is set, existing Docker images will be used. Otherwise,
-    Docker images are rebuilt to ensure they are up-to-date.
-
-    Only Docker images "allowed" by the specified virtualenv will be built.
-    Not all virtualenvs support all Docker images.
-    """
-    requirements = docker_requirements(tests)
-
-    env = {}
-    print('generating Docker images needed for tests')
-    t_start = time.time()
-    mr_images, hgmo_images = docker.build_all_images(
-            verbose=verbose,
-            use_last=use_last,
-            hgmo='hgmo' in requirements)
-
-    t_end = time.time()
-    print('got Docker images in %.2fs' % (t_end - t_start))
-
-    if 'hgmo' in requirements:
-        env['DOCKER_HGMASTER_IMAGE'] = hgmo_images['hgmaster']
-        env['DOCKER_HGWEB_IMAGE'] = hgmo_images['hgweb']
-        env['DOCKER_LDAP_IMAGE'] = hgmo_images['ldap']
-        env['DOCKER_PULSE_IMAGE'] = hgmo_images['pulse']
-
-    return env
-
-
 def produce_coverage_reports(coverdir):
     cov = Coverage(data_file='coverage')
     cov.combine(data_paths=[os.path.join(coverdir, 'data')])

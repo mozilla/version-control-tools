@@ -4,6 +4,10 @@ services:
     command: /usr/bin/supervisord -n
     entrypoint: /entrypoint.py
     image: hgmaster:hgmaster
+    build:
+      # Relative paths in compose files are relative to the location of the file.
+      context: ..
+      dockerfile: ./testing/docker/test-hgssh/Dockerfile
     ports:
       # Note the lack of a `:` here - it should be provided in the environment variable.
       # This is a hack so the compose file works without specifying a master ssh port.
@@ -26,6 +30,10 @@ services:
   hgweb0:
     command: /usr/bin/supervisord -n
     image: hgweb:hgweb
+    build:
+      # Relative paths in compose files are relative to the location of the file.
+      context: ..
+      dockerfile: ./testing/docker/test-hgweb/Dockerfile
     entrypoint: /entrypoint.py
     ports:
       - "22"
@@ -40,6 +48,10 @@ services:
   hgweb1:
     command: /usr/bin/supervisord -n
     image: hgweb:hgweb
+    build:
+      # Relative paths in compose files are relative to the location of the file.
+      context: ..
+      dockerfile: ./testing/docker/test-hgweb/Dockerfile
     entrypoint: /entrypoint.py
     ports:
       - "22"
@@ -54,6 +66,10 @@ services:
 
   ldap:
     image: ldap:ldap
+    build:
+      # Relative paths in compose files are relative to the location of the file.
+      context: ..
+      dockerfile: ./testing/docker/builder-ldap/Dockerfile
     ports:
       - "389"
     networks:
@@ -63,6 +79,10 @@ services:
 
   pulse:
     image: pulse:pulse
+    build:
+      # Relative paths in compose files are relative to the location of the file.
+      context: ..
+      dockerfile: ./testing/docker/builder-pulse/Dockerfile
     ports:
       - "5672"
     networks:

@@ -60,13 +60,10 @@ def env_cmd():
 
 COMMANDS = {
     "build": ("docker-compose", "build"),
-    "d0cker": ("docker-compose", "run", "--rm", "test-runner", "/app/vct/d0cker"),
     "env": env_cmd,
     "hgmo": (
         "docker-compose", "run",
         "-e", "TESTNAME=test",
-        # TODO: remove `DOCKER_STATE_FILE` once it's no longer necessary
-        "-e", "DOCKER_STATE_FILE=/app/dockerstate",
         "test-runner",
         "/app/vct/hgmo"),
     "shell": ("docker-compose", "run", "--rm", "test-runner", "/bin/bash"),

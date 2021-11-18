@@ -16,7 +16,6 @@
 
 import os
 import sys
-import tempfile
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, '..'))
@@ -28,14 +27,18 @@ with open(HGHAVE_PY) as f:
 
 
 def have_docker_images(images):
-    # These environment variables are exported by run-tests. If they aren't
-    # present, we assume the Docker image isn't built and available.
-    # If the environment variables aren't present, the test still works because
-    # d0cker will build images automatically if needed. This slows down tests
-    # drastically. So it is better to catch the issue sooner so the slowdown
-    # can be identified.
-    keys = ['DOCKER_%s_IMAGE' % i.upper() for i in images]
-    return all(k in os.environ for k in keys)
+    from vcttesting.docker import Docker, params_from_env
+
+    url, tls = params_from_env(os.environ)
+
+    d = Docker(url, tls=tls)
+    for image in images:
+        try:
+            d.client.images.get("%s:%s" % (image, image))
+        except Exception:
+            return False
+
+    return True
 
 
 # Define custom checks for our environment.
@@ -48,9 +51,7 @@ def has_docker():
 
     url, tls = params_from_env(os.environ)
 
-    tf = tempfile.NamedTemporaryFile()
-    tf.close()
-    d = Docker(tf.name, url, tls=tls)
+    d = Docker(url, tls=tls)
     return d.is_alive()
 
 

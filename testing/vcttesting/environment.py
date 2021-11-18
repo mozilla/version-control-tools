@@ -208,10 +208,9 @@ def docker_client():
         params_from_env,
     )
 
-    state_file = os.path.join(ROOT, '.dockerstate')
     docker_url, tls = params_from_env(os.environ)
 
-    d = Docker(state_file, docker_url, tls=tls)
+    d = Docker(docker_url, tls=tls)
 
     return d if d.is_alive() else None
 
@@ -296,6 +295,10 @@ def create_global():
 
     This functions the same as ./create-test-environment
     """
+    from .hgmo import (
+        HgCluster,
+    )
+
     # No `name` parameter since this will be the top-level venv
     venv_py2 = create_virtualenv(python='python2')
     venv_py3 = create_virtualenv(name='py3', python='python3')
@@ -336,9 +339,7 @@ def create_global():
         print("If you don't want Docker images, it is safe to hit CTRL+c to abort this.")
 
         try:
-            subprocess.check_call([
-                os.path.join(ROOT, 'd0cker'), 'build-all'
-            ])
+            HgCluster.build()
         except subprocess.CalledProcessError:
             print("You will not be able to run tests that require Docker.")
             print("Please see https://docs.docker.com/installation/ for how to install Docker.")

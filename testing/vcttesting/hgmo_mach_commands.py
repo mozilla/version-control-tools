@@ -23,13 +23,8 @@ class HgmoCommands(object):
         from vcttesting.docker import Docker, params_from_env
         from vcttesting.hgmo import HgCluster
 
-        if 'DOCKER_STATE_FILE' not in os.environ:
-            print('Do not where to store Docker state.')
-            print('Set the DOCKER_STATE_FILE environment variable and try again.')
-            sys.exit(1)
-
         docker_url, tls = params_from_env(os.environ)
-        docker = Docker(os.environ['DOCKER_STATE_FILE'], docker_url, tls=tls)
+        docker = Docker(docker_url, tls=tls)
         if not docker.is_alive():
             print('Docker not available')
             sys.exit(1)

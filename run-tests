@@ -14,6 +14,7 @@ import multiprocessing
 import os
 import subprocess
 import sys
+import time
 import uuid
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
@@ -63,8 +64,9 @@ if __name__ == '__main__':
     except ImportError:
         vctdocker = None
 
+    import vcttesting.hgmo as vcthgmo
+
     from vcttesting.testing import (
-        get_docker_state,
         get_extensions,
         get_hg_version,
         get_test_files,
@@ -228,7 +230,8 @@ if __name__ == '__main__':
     if not options.no_docker:
         docker_state = os.path.join(HERE, '.dockerstate')
         docker_url, docker_tls = vctdocker.params_from_env(os.environ)
-        docker = vctdocker.Docker(docker_state, docker_url, tls=docker_tls)
+        docker = vctdocker.Docker(docker_url, tls=docker_tls)
+        hgcluster = vcthgmo.HgCluster(docker)
 
         if docker.is_alive():
             have_docker = True
@@ -246,10 +249,14 @@ if __name__ == '__main__':
             # complicating code with locks.
             #
             # But only do this if a test we are running utilizes Docker.
-            os.environ.update(
-                get_docker_state(docker, run_all_tests,
-                                 verbose=verbose,
-                                 use_last=options.use_last_images))
+            if not options.use_last_images:
+                print('generating Docker images needed for tests')
+                t_start = time.time()
+
+                hgcluster.build()
+
+                t_end = time.time()
+                print('got Docker images in %.2fs' % (t_end - t_start))
 
     print('Will run %d non-Docker tests concurrently' % no_docker_jobs)
     if have_docker:

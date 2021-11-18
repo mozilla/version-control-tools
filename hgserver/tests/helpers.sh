@@ -11,8 +11,6 @@ alias http=$TESTDIR/testing/http-request.py
 alias pulse='$TESTDIR/pulse'
 
 hgmoenv() {
-  export DOCKER_STATE_FILE=`pwd`/.dockerstate
-
   hgmo start --master-ssh-port $HGPORT > /dev/null
   $(hgmo shellinit)
 

@@ -22,8 +22,11 @@ ENV LC_ALL=en_US.UTF-8
 
 RUN pip3 install --upgrade pip setuptools
 
-ADD ansible/files/requirements-ansible.txt /tmp/
-RUN pip3 install --require-hashes -r /tmp/requirements-ansible.txt
+COPY . /vct
+
+RUN pip3 install --require-hashes -r /vct/ansible/files/requirements-ansible.txt
 RUN mkdir /etc/ansible && echo -e '[local]\nlocalhost\n' > /etc/ansible/hosts
-RUN mkdir /vct
-ADD testing/docker/builder-ansible-centos7/sync-and-build /sync-and-build
+
+WORKDIR /vct/ansible
+RUN ansible-playbook -c local test-hgweb.yml
+

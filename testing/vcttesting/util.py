@@ -29,33 +29,6 @@ def get_available_port():
     return port
 
 
-def wait_for_http(host, port, path='', timeout=240, extra_check_fn=None):
-    """Wait for an HTTP server to respond.
-
-    If extra_check_fn is defined, it will be called as an extra check to see if
-    we should still poll. If we should not (e.g. the underlying container
-    stopped running), that function should raise an exception.
-    """
-
-    start = time.time()
-
-    while True:
-        try:
-            res = requests.get('http://%s:%s/%s' % (host, port, path), timeout=1)
-            if res.status_code == 200:
-                return
-        except requests.exceptions.RequestException:
-            pass
-
-        if extra_check_fn:
-            extra_check_fn()
-
-        if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for HTTP')
-
-        time.sleep(0.1)
-
-
 def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
                   extra_check_fn=None):
     # Delay import to facilitate module use in limited virtualenvs.
@@ -163,35 +136,6 @@ def wait_for_kafka_topic(hostport, topic, timeout=60):
 
         time.sleep(0.1)
         client.load_metadata_for_topics()
-
-
-def limited_threadpoolexecutor(wanted_workers, max_workers=None):
-    """Return a ThreadPoolExecutor with up to ``max_workers`` executors.
-
-    Call with ``wanted_workers`` equal to None to ask for the default number
-    of workers, which is the number of processors on the machine multiplied
-    by 5.
-
-    Call with ``max_workers`` less than 1 or ``max_workers=None`` to specify
-    no limit on worker threads.
-
-    See https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor
-    """
-    # Are we trying to ask for default workers, which is the "number of
-    # processors on the machine, multiplied by 5"?
-    # See https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor
-    wants_unlimited = (wanted_workers is None) or (wanted_workers < 1)
-
-    max_unlimited = (max_workers is None) or (max_workers < 1)
-
-    if max_unlimited:
-        workers = wanted_workers
-    elif wants_unlimited:
-        workers = max_workers
-    else:
-        workers = min(wanted_workers, max_workers)
-
-    return futures.ThreadPoolExecutor(workers)
 
 
 def docker_compose_down_background(project_name, show_output=False):
