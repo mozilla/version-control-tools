@@ -142,6 +142,10 @@ Do not pull if evolve enabled, in sibling directory to v-c-t (managed by wizard)
   > <RETURN>
   > n
   > EOF
+  pulling from https://www.mercurial-scm.org/repo/evolve/
+  no changes found
+  \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
+  Evolve was updated successfully.
   This wizard will guide you through configuring Mercurial for an optimal
   experience contributing to Mozilla projects.
   
@@ -149,13 +153,6 @@ Do not pull if evolve enabled, in sibling directory to v-c-t (managed by wizard)
   
   To begin, press the enter/return key.
    <RETURN>
-  
-  It looks like the setup wizard has already installed a copy of the
-  evolve extension on your machine, at * (glob)
-  
-  (Relevant config option: extensions.evolve)
-  
-  Would you like to update evolve to the latest version?  (Yn)  n
 
 
 Pull latest revision if evolve enabled, in sibling directory to v-c-t (managed by wizard) and confirmed prompt
@@ -166,6 +163,18 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   saved backup bundle to * (glob)
 
   $ hg --config mozilla.mozbuild_state_path="$EVOLVETMP" --config extensions.evolve=$EVOLVETMP/evolve/hgext3rd/evolve --config configwizard.steps=evolve,configchange configwizard
+  pulling from https://www.mercurial-scm.org/repo/evolve/
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  \d+ new obsolescence markers (re) (?)
+  updating bookmark @
+  added \d+ changesets with \d+ changes to \d+ files (re)
+  new changesets *:* (glob)
+  (run 'hg update' to get a working copy)
+  \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
+  Evolve was updated successfully.
   This wizard will guide you through configuring Mercurial for an optimal
   experience contributing to Mozilla projects.
   
@@ -173,25 +182,6 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   
   To begin, press the enter/return key.
    <RETURN>
-  
-  It looks like the setup wizard has already installed a copy of the
-  evolve extension on your machine, at * (glob)
-  
-  (Relevant config option: extensions.evolve)
-  
-  Would you like to update evolve to the latest version?  (Yn)  y
-  pulling from https://www.mercurial-scm.org/repo/evolve/
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added \d+ changesets with \d+ changes to \d+ files (re)
-  \d+ new obsolescence markers (re) (?)
-  new changesets * (glob) (?)
-  (run 'hg update' to get a working copy)
-  \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
-  Evolve was updated successfully.
-
 
 Ensure evolve still works after pull by checking the help output
 

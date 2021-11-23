@@ -325,6 +325,7 @@ rebase
 Would you like to enable these history editing extensions (Yn)? $$ &Yes $$ &No
 '''.strip()
 
+REMOTE_EVOLVE_PATH = b'https://www.mercurial-scm.org/repo/evolve/'
 
 EVOLVE_INFO_WARNING = b'''
 The evolve extension is a Mercurial extension for faster and
@@ -356,15 +357,6 @@ Please update evolve manually when upgrading your Mercurial version.
 To allow this wizard to manage evolve on your behalf, remove `evolve` from
 your hgrc files `extensions` section and re-run the wizard.
 """
-
-EVOLVE_UPDATE_PROMPT = b'''
-It looks like the setup wizard has already installed a copy of the
-evolve extension on your machine, at %(evolve_dir)s.
-
-(Relevant config option: extensions.evolve)
-
-Would you like to update evolve to the latest version?  (Yn) $$ &Yes $$ &No
-'''
 
 EVOLVE_CLONE_ERROR = b'''
 Could not clone the evolve extension for installation.
@@ -510,6 +502,8 @@ def configwizard(ui, repo, statedir=None, **opts):
             MINIMUM_SUPPORTED_VERSION[0], MINIMUM_SUPPORTED_VERSION[1],
         ))
         raise error.Abort(b'upgrade Mercurial then run again')
+    
+    update_evolve(ui)
 
     uiprompt(ui, INITIAL_MESSAGE, default=b'<RETURN>')
 
@@ -950,17 +944,44 @@ def _checkhistoryediting(ui, cw, hg_version):
     # Turn on in-memory rebase if a user wants rebase
     _activate_inmemory_rebase(cw)
 
+def get_local_evolve_path(ui):
+    # Install to the same dir as v-c-t, unless the mozbuild directory path is passed (testing)
+    evolve_clone_dir = ui.config(b'mozilla', b'mozbuild_state_path', _vcthome())
+    local_evolve_path = b'%(evolve_clone_dir)s/evolve' % {b'evolve_clone_dir': evolve_clone_dir}
+    return local_evolve_path
+
+def update_evolve(ui):
+    local_evolve_path = get_local_evolve_path(ui)
+
+    # If we've never cloned evolve, we can't update.
+    if not os.path.exists(local_evolve_path):
+        return
+
+    # Pull and update evolve
+    try:
+        local_evolve_repo = hg.repository(ui, local_evolve_path)
+
+        # Pull the latest stable, update to latest tag/release
+        # TRACKING hg58 `source` param is now set via positional args
+        if util.versiontuple() >= (5, 8):
+            hgpull(ui, local_evolve_repo, REMOTE_EVOLVE_PATH, branch=(b'stable',))
+        else:
+            hgpull(ui, local_evolve_repo, source=REMOTE_EVOLVE_PATH, branch=(b'stable',))
+        
+        hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
+
+        ui.write(b'Evolve was updated successfully.\n')
+
+    except error.Abort as hg_err:
+        ui.write(EVOLVE_CLONE_ERROR)
+
 
 def _checkevolve(ui, cw, hg_version):
     if hg_version < (4, 3, 0):
         ui.warn(EVOLVE_INCOMPATIBLE)
         return
 
-    remote_evolve_path = b'https://www.mercurial-scm.org/repo/evolve/'
-    # Install to the same dir as v-c-t, unless the mozbuild directory path is passed (testing)
-    evolve_clone_dir = ui.config(b'mozilla', b'mozbuild_state_path', _vcthome())
-
-    local_evolve_path = b'%(evolve_clone_dir)s/evolve' % {b'evolve_clone_dir': evolve_clone_dir}
+    local_evolve_path = get_local_evolve_path(ui)
     evolve_config_value = os.path.normpath('%(evolve_path)s/hgext3rd/evolve' % \
                                            {'evolve_path': pycompat.sysstr(local_evolve_path)})
 
@@ -978,7 +999,7 @@ def _checkevolve(ui, cw, hg_version):
 
         try:
             # Clone the evolve extension and enable
-            hg.clone(ui, {}, remote_evolve_path, branch=(b'stable',), dest=local_evolve_path)
+            hg.clone(ui, {}, REMOTE_EVOLVE_PATH, branch=(b'stable',), dest=local_evolve_path)
             local_evolve_repo = hg.repository(ui, local_evolve_path)
             hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
             _enableext(cw, 'evolve', evolve_config_value)
@@ -995,28 +1016,6 @@ def _checkevolve(ui, cw, hg_version):
     if users_evolve_path != evolve_config_value:
         ui.write(EVOLVE_UNMANAGED_WARNING)
         return
-
-    # If evolve is installed and managed by this wizard,
-    # update it via pull/update
-    if uipromptchoice(ui, EVOLVE_UPDATE_PROMPT % {b'evolve_dir': local_evolve_path}):
-        return
-
-    try:
-        local_evolve_repo = hg.repository(ui, local_evolve_path)
-
-        # Pull the latest stable, update to latest tag/release
-        # TRACKING hg58 `source` param is now set via positional args
-        if util.versiontuple() >= (5, 8):
-            hgpull(ui, local_evolve_repo, remote_evolve_path, branch=(b'stable',))
-        else:
-            hgpull(ui, local_evolve_repo, source=remote_evolve_path, branch=(b'stable',))
-        
-        hgupdate(ui, local_evolve_repo, rev=b'last(tag())')
-
-        ui.write(b'Evolve was updated successfully.\n')
-
-    except error.Abort as hg_err:
-        ui.write(EVOLVE_CLONE_ERROR)
 
 
 def _checkfsmonitor(ui, cw, hgversion):
