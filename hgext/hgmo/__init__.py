@@ -40,6 +40,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    phases,
     pycompat,
     registrar,
     revset,
@@ -528,6 +529,8 @@ def revset_automationrelevant(repo, subset, x):
     ctx = repo[s.first()]
     revs = {ctx.rev()}
 
+    drafts = repo.ui.configbool(b'hgmo', b'automationrelevantdraftancestors', False)
+
     # The pushlog is used to get revisions part of the same push as
     # the requested revision.
     pushlog = getattr(repo, 'pushlog', None)
@@ -535,14 +538,14 @@ def revset_automationrelevant(repo, subset, x):
         push = repo.pushlog.pushfromchangeset(ctx)
         for n in push.nodes:
             pctx = repo[n]
-            if pctx.rev() <= ctx.rev():
+            if pctx.rev() <= ctx.rev() and (not drafts or pctx.phase() > phases.draft):
                 revs.add(pctx.rev())
 
     # Union with non-public ancestors if configured. By default, we only
     # consider changesets from the push. However, on special repositories
     # (namely Try), we want changesets from previous pushes to come into
     # play too.
-    if repo.ui.configbool(b'hgmo', b'automationrelevantdraftancestors', False):
+    if drafts:
         for rev in repo.revs(b'::%d & not public()', ctx.rev()):
             revs.add(rev)
 

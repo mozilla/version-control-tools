@@ -106,6 +106,19 @@ Draft from previous push head not included unless config option changes behavior
   4 push 2 commit 2
   5 push 2 commit 3
 
+Only draft changesets from current push included when automationrelevantdraftancestors set.
+
+  $ hg phase -f --public -r 3
+
+  $ hg log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
+  3 push 2 commit 1
+  4 push 2 commit 2
+  5 push 2 commit 3
+
+  $ hg --config hgmo.automationrelevantdraftancestors=true log -r 'automationrelevant(5)' -T '{rev} {desc}\n'
+  4 push 2 commit 2
+  5 push 2 commit 3
+
 Draft from previous push base not included unless config option changes behavior
 
   $ hg phase -f --draft -r 1
