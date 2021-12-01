@@ -4,10 +4,10 @@ set -eu
 
 ROOT=`pwd`
 VENV=${ROOT}/venv
-PYTHON_VERSION=python2.7
+PYTHON_VERSION=python3
 
 if [ ! -d ${VENV}/lib ]; then
-  . ${ROOT}/testing/create-virtualenv
+  python3 -m venv ${VENV}
 fi
 
 cd ${ROOT}
@@ -16,6 +16,9 @@ cd ${ROOT}
 set +u
 source ${VENV}/bin/activate
 set -u
+
+# Install `wheel` so `python setup.py bdist_wheel` works.
+pip install wheel
 
 # Note: pycrypto may not build on OSX with hombrew gmp unless you add:
 # export CFLAGS='-I/usr/local/include -L/usr/local/lib'
