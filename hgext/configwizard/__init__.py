@@ -982,12 +982,12 @@ def _checkevolve(ui, cw, hg_version):
         return
 
     local_evolve_path = get_local_evolve_path(ui)
-    evolve_config_value = os.path.normpath('%(evolve_path)s/hgext3rd/evolve' % \
-                                           {'evolve_path': pycompat.sysstr(local_evolve_path)})
+    evolve_config_value = os.path.normcase(os.path.normpath('%(evolve_path)s/hgext3rd/evolve' % \
+                                           {'evolve_path': pycompat.sysstr(local_evolve_path)}))
 
     users_evolve_path = ui.config(b'extensions', b'evolve')
     if users_evolve_path:
-        users_evolve_path = os.path.normpath(pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path))))
+        users_evolve_path = os.path.normcase(os.path.normpath(pycompat.fsdecode(util.normpath(util.expandpath(users_evolve_path)))))
 
     # If evolve is not installed, install it. (If the user's path to evolve is
     # the path that we manage, but it doesn't exist yet, assume that their
