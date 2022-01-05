@@ -131,13 +131,6 @@ Please select one of the following for configuring pager:
 Which option would you like? $$ &1 $$ &2 $$ &3
 '''.strip()
 
-CURSES_INFO = b'''
-Mercurial can provide richer terminal interactions for some operations
-by using the popular "curses" library.
-
-Would you like to enable "curses" interfaces (Yn)? $$ &Yes $$ &No
-'''.strip()
-
 EVOLVE_INCOMPATIBLE = b'''
 Evolve requires Mercurial 4.3+. Your Mercurial is too old to run evolve.
 
@@ -458,7 +451,6 @@ wizardsteps = set([
     b'diff',
     b'color',
     b'pager',
-    b'curses',
     b'historyediting',
     b'evolve',
     b'fsmonitor',
@@ -536,9 +528,6 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if b'pager' in runsteps:
         _checkpager(ui, cw, hgversion)
-
-    if b'curses' in runsteps:
-        _checkcurses(ui, cw)
 
     if b'historyediting' in runsteps:
         _checkhistoryediting(ui, cw, hgversion)
@@ -699,7 +688,35 @@ def _checkdiffsettings(ui, cw):
 
 
 def _checktweakdefaults(ui, cw):
+    def set_ui_interface():
+        # Update the "ui.interface" config option depending on
+        # whether the current Python environment can use "curses".
+        #
+        # The MozillaBuild 4.0 release now ships with "windows-curses",
+        # but it's likely that some users may switch between it and
+        # curses-less MozillaBuild 3.4. If so, re-running configwizard
+        # should reapply the "ui.interface" restriction/removal.
+        #
+        # So, re-run this function if "tweakdefaults = true", even
+        # if "tweakdefaults" wasn't set in the current configwizard
+        # invocation.
+
+        has_curses = _try_curses_import()
+        interface = ui.config(b'ui', b'interface')
+        if has_curses and interface == b'text':
+            # Remove the unnecessary "text" restriction from these
+            # clients so they can embrace "interface = curses" from
+            # tweakdefaults
+            del cw.c['ui']['interface']
+        elif not has_curses and interface != b'text':
+            # This client doesn't have support for curses, so
+            # override the "interface = curses" option set by
+            # tweakdefaults. Otherwise, hg commands will abort with a
+            # curses-related error.
+            cw.c['ui']['interface'] = 'text'
+
     if ui.configbool(b'ui', b'tweakdefaults'):
+        set_ui_interface()
         return
 
     if not uipromptchoice(ui, TWEAKDEFAULTS_INFO):
@@ -707,11 +724,7 @@ def _checktweakdefaults(ui, cw):
             cw.c['ui'] = {}
 
         cw.c['ui']['tweakdefaults'] = 'true'
-
-        # Determine if curses is available on the system
-        # and use the text interface if unavailable
-        if not _try_curses_import():
-            cw.c['ui']['interface'] = 'text'
+        set_ui_interface()
 
 
 def _promptnativeextension(ui, cw, ext, msg):
@@ -896,19 +909,6 @@ def _try_curses_import():
                 return False
 
     return True
-
-
-def _checkcurses(ui, cw):
-    if ui.hasconfig(b'ui', b'interface'):
-        return
-
-    # curses isn't available on all platforms. Don't prompt if not
-    # available.
-    if not _try_curses_import() or uipromptchoice(ui, CURSES_INFO):
-        return
-
-    cw.c.setdefault('ui', {})
-    cw.c['ui']['interface'] = 'curses'
 
 
 def _activate_inmemory_rebase(cw):
