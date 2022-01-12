@@ -104,11 +104,15 @@ def is_good_message(ui, c):
                 b"'r=' instead.")
         return False
 
+    desc_lower = desc.lower()
+    if desc_lower.startswith(b'wip:'):
+        message(b"Rev %(rev)s seems to be marked as WIP.")
+        return False
+
     for r in goodMessage:
         if r.search(firstline):
             return True
 
-    desc_lower = desc.lower()
     if desc_lower.startswith((b'merge', b'merging', b'automated merge')):
         if len(c.parents()) == 2:
             return True
