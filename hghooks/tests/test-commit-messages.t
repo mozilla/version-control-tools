@@ -473,6 +473,31 @@ Test some bad commit messages
   rollback completed
   abort: pretxnchangegroup.commit_message hook failed
   [255]
+  $ hg strip -r . > /dev/null
+
+Ensure `WIP:` commit messages are rejected.
+
+  $ echo a > b
+  $ hg -q commit -A -m 'WIP: bug 123: this is a wip r=reviewer'
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  
+  
+  ************************** ERROR ****************************
+  Rev c3e477021244 seems to be marked as WIP.
+  test
+  WIP: bug 123: this is a wip r=reviewer
+  *************************************************************
+  
+  
+  transaction abort!
+  rollback completed
+  abort: pretxnchangegroup.commit_message hook failed
+  [255]
 
 IGNORE BAD COMMIT MESSAGES should work
 
@@ -484,7 +509,7 @@ IGNORE BAD COMMIT MESSAGES should work
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 1 files
+  added 2 changesets with 2 changes to 2 files
 
 "try" at the end of words should not trigger the try syntax checking
 
