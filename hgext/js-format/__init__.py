@@ -49,7 +49,7 @@ def call_js_format(repo, changed_files):
     mach_path = os.path.join(repo.root, b'mach')
     arguments = [b'eslint', b'--fix'] + path_list
     if os.name == 'nt':
-        js_format_cmd = [b'sh', b'mach'] + arguments
+        js_format_cmd = [b'python3', b'mach'] + arguments
     else:
         js_format_cmd = [mach_path] + arguments
     subprocess.call(js_format_cmd)
