@@ -228,7 +228,7 @@ def make_post_close(repo, conn):
             except sqlite3.OperationalError as e:
                 repo.ui.write(b'error committing pushlog transaction on'
                               b' attempt %d; retrying\n' % (attempt + 1))
-                repo.ui.log(b'pushlog', b'Exception: %s' % pycompat.bytestr(e))
+                repo.ui.log(b'pushlog', b'Exception: %s\n' % pycompat.bytestr(e))
                 time.sleep(attempt * 1.0)
         else:
             raise error.Abort(b'could not complete push due to pushlog operational errors; '
