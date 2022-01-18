@@ -86,7 +86,7 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
     }
 
     prefixes_in_new_document = {
-        prefix_object["region"]
+        prefix_object["scope"]
         for prefix_object in prefixes
     }
 
