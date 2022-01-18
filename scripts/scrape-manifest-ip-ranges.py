@@ -170,7 +170,7 @@ def get_aws_ips():
             sys.exit('HTTP response from Amazon was not 200 OK')
 
         # Sanity check: ensure the file is an appropriate size
-        if len(ip_ranges_response.content) < 8000:
+        if len(ip_ranges_response.content) < 88000:
             sys.exit('The retrieved AWS JSON document is smaller than the minimum allowable file size')
 
 
@@ -255,7 +255,7 @@ def get_gcp_ips():
             sys.exit('HTTP response from Google was not 200 OK')
 
         # Sanity check: ensure the file is an appropriate size
-        if len(ip_ranges_response.content) < 88000:
+        if len(ip_ranges_response.content) < 8000:
             sys.exit('The retrieved GCP JSON document is smaller than the minimum allowable file size')
 
         # JSON Schema for the Google IP Ranges JSON document
