@@ -268,7 +268,7 @@ def get_gcp_ips():
             'prefixes': All(all_required_gcp_regions_exist, [
                 {
                     # One of these tags must be present, and it's value must be an IP block.
-                    In('ipv4Prefix', 'ipv6Prefix'): is_ip_address_network,
+                    In({'ipv4Prefix', 'ipv6Prefix'}): is_ip_address_network,
                     'scope': str,
                     'service': str,
                 },
