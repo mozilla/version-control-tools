@@ -769,15 +769,22 @@ def processbundlesmanifest(orig, repo, proto):
     if gcppath and b'gceregion=' in manifest.data:
         try:
             with open(gcppath, 'rb') as f:
-                gcpdata = f.read().splitlines()
+                gcpdata = json.load(f)
 
-            for entry in gcpdata:
-                network = ipaddress.IPv4Network(pycompat.unicode(pycompat.sysstr(entry)))
+            for ipentry in gcpdata["prefixes"]:
+                # Each entry either has `ipv4Prefix` or `ipv6Prefix`, but we only
+                # care about `ipv4Prefix`.
+                if "ipv4Prefix" not in ipentry:
+                    continue
+
+                network = ipaddress.IPv4Network(ipentry["ipv4Prefix"])
 
                 if sourceip not in network:
                     continue
 
-                return filter_manifest_for_region(manifest, b'gceregion=us-central1')
+                region = ipentry["scope"]
+
+                return filter_manifest_for_region(manifest, b'gceregion=%s' % pycompat.bytestr(region))
 
         except Exception as e:
             repo.ui.log(b'hgmo', b'exception filtering GCP bundle source IPs: %s\n', e)

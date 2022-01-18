@@ -1,0 +1,21 @@
+{
+  "syncToken": "1642010944354",
+  "creationTime": "2022-01-12T10:09:04.354971",
+  "prefixes": [{
+    "ipv4Prefix": "130.211.64.0/19",
+    "service": "Google Cloud",
+    "scope": "europe-west1"
+  }, {
+    "ipv6Prefix": "2600:1901:1:8000::/49",
+    "service": "Google Cloud",
+    "scope": "global"
+  }, {
+    "ipv4Prefix": "8.34.210.0/24",
+    "service": "Google Cloud",
+    "scope": "us-central1"
+  }, {
+    "ipv4Prefix": "8.34.212.0/22",
+    "service": "Google Cloud",
+    "scope": "us-central1"
+  }]
+}

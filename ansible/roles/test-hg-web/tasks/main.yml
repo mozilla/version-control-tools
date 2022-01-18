@@ -45,7 +45,7 @@
   with_items:
     - moz-ip-ranges.txt
     - aws-ip-ranges.json
-    - gcp-ip-ranges.txt
+    - gcp-ip-ranges.json
     - test_instance_data.json
 
 - name: set moz-ip-path for tests

@@ -15,14 +15,14 @@ import sys
 import time
 from pathlib import Path
 
-import dns.resolver
 import requests
 from datadiff import diff
 from voluptuous import (
     All,
+    In,
+    Invalid as VoluptuousInvalid,
     Optional,
     Schema,
-    Invalid as VoluptuousInvalid,
     truth,
 )
 from voluptuous.humanize import validate_with_humanized_errors
@@ -58,8 +58,8 @@ def is_ip_address_network(value: str) -> bool:
         return False
 
 @truth
-def all_required_regions_exist(prefixes: list) -> bool:
-    '''Validates that the set of all required regions is a subset
+def all_required_aws_regions_exist(prefixes: list) -> bool:
+    '''Validates that the set of all required AWS regions is a subset
     of all the regions in the iterable of IP networks'''
     required_regions = {
         'us-west-2',
@@ -71,6 +71,22 @@ def all_required_regions_exist(prefixes: list) -> bool:
 
     prefixes_in_new_document = {
         prefix_object['region']
+        for prefix_object in prefixes
+    }
+
+    return required_regions <= prefixes_in_new_document
+
+
+@truth
+def all_required_gcp_regions_exist(prefixes: list) -> bool:
+    """Validates that the set of all required GCP regions is a subset
+    of all the regions in the iterable of IP networks"""
+    required_regions = {
+        "us-central1",
+    }
+
+    prefixes_in_new_document = {
+        prefix_object["region"]
         for prefix_object in prefixes
     }
 
@@ -166,7 +182,7 @@ def get_aws_ips():
             # The prefixes field must meet both requirements:
             # 1. There must be at least one entry for each region containing CI and S3 bundles
             # 2. Must be a list of dicts that fit the schema below
-            'prefixes': All(all_required_regions_exist, [
+            'prefixes': All(all_required_aws_regions_exist, [
                 {
                     'ip_prefix': is_ip_address_network,
                     'region': str,
@@ -222,59 +238,87 @@ def get_aws_ips():
         sys.exit(1)
 
 
-def recursive_domain_query(dnsresolver: dns.resolver.Resolver, blocks: list, domain: str):
-    '''Perform a DNS query for `domain`, which may return more subdomains
-    which need to be queried.
-
-    GCP advertises it's IP address blocks via TXT DNS records. The initial domain
-    returns a list of subdomains to query. Those subdomains can contain IP address
-    blocks, or further subdomains to query for more block lists.
-    '''
-    response = dnsresolver.query(domain, rdtype='txt')
-
-    if len(response) != 1:
-        logger.warn('Initial DNS query expected 1 result (actual: %d)' % len(response))
-
-    # Parse each record in the response
-    for item in response.rrset.items:
-        for field in item.to_text().split(' '):
-            if field.startswith('ip4:'):
-                ip = field[len('ip4:'):]
-                blocks.append(ip)
-            elif field.startswith('include:'):
-                subdomain = field[len('include:'):]
-                recursive_domain_query(dnsresolver, blocks, subdomain)
-
-
 def get_gcp_ips():
-    '''Entry point for the AWS IP address scraper
-
-    Queries GCP advertised DNS records to determine GCP public IP blocks and write them
-    to disk.
+    '''Entry point for the GCP IP address scraper.
+    
+    Downloads the GCP IP ranges JSON document from Google and verifies against a
+    known schema. Atomically rewrites a file with the CIDR representations of
+    GCP IP address spaces.
     '''
     try:
-        gcp_ip_ranges_file = Path('/var/hg/gcp-ip-ranges.txt')
+        # Grab the new data from Amazon
+        gcp_ip_ranges_file = Path('/var/hg/gcp-ip-ranges.json')
+        ip_ranges_response = requests.get('https://www.gstatic.com/ipranges/cloud.json')
 
-        # Create a dns resolver that uses Google's nameservers
-        # Not entirely necessary but since we're querying Google's
-        # records it's probably not a bad idea
-        dnsresolver = dns.resolver.Resolver()
-        dnsresolver.nameservers = ['8.8.8.8', '8.8.4.4']
+        # Ensure 200 OK response code
+        if ip_ranges_response.status_code != 200:
+            sys.exit('HTTP response from Google was not 200 OK')
 
-        blocks = []
+        # Sanity check: ensure the file is an appropriate size
+        if len(ip_ranges_response.content) < 88000:
+            sys.exit('The retrieved GCP JSON document is smaller than the minimum allowable file size')
 
-        recursive_domain_query(dnsresolver, blocks, '_cloud-netblocks.googleusercontent.com')
+        # JSON Schema for the Google IP Ranges JSON document
+        google_json_schema = Schema({
+            'syncToken': str,
+            'creationTime': str,
+            # The prefixes field must meet both requirements:
+            # 1. There must be at least one entry for each region containing CI and S3 bundles
+            # 2. Must be a list of dicts that fit the schema below
+            'prefixes': All(all_required_gcp_regions_exist, [
+                {
+                    # One of these tags must be present, and it's value must be an IP block.
+                    In('ipv4Prefix', 'ipv6Prefix'): is_ip_address_network,
+                    'scope': str,
+                    'service': str,
+                },
+            ]),
+        }, extra=False, required=True)
 
-        if not blocks:
-            raise Exception('domain query returned no blocks')
 
-        # Write to path atomically
-        write_to_file_atomically(gcp_ip_ranges_file, '\n'.join(blocks))
+        # Validate dict schema
+        output_as_dict = ip_ranges_response.json()
+        validate_with_humanized_errors(output_as_dict, google_json_schema)
 
-    except Exception as e:
-        logger.exception('Error fetching GCP records: %s' % e)
+        # Sanity check: ensure the syncToken indicates an IP space change has been made
+        # since the last recorded change. Only check if a file exists, in case of new deployments
+        if gcp_ip_ranges_file.is_file():
+            file_bytes = gcp_ip_ranges_file.read_bytes()
+            existing_document_as_dict = json.loads(file_bytes)
+
+            file_diff = diff(existing_document_as_dict, output_as_dict, context=0)
+
+            # Exit if the file contents are the same or the syncToken has not changed
+            if not file_diff or int(output_as_dict['syncToken']) <= int(existing_document_as_dict['syncToken']):
+                sys.exit()
+
+        else:
+            existing_document_as_dict = {}  # No existing document means whole file is the diff
+            file_diff = diff(existing_document_as_dict, output_as_dict, context=0)
+
+
+        write_to_file_atomically(gcp_ip_ranges_file, json.dumps(output_as_dict))
+
+        # Print the diff for collection as systemd unit output
+        logger.info('GCP IP ranges document has been updated')
+        logger.info(file_diff)
+
+    except subprocess.CalledProcessError as cpe:
+        logger.exception('An error occurred when notifying about changes to the file: exit code %s' % cpe.returncode)
+        logger.exception('STDOUT: %s' % cpe.stdout)
+        logger.exception('STDERR: %s' % cpe.stderr)
         sys.exit(1)
 
+    except json.JSONDecodeError as jde:
+        logger.exception('An error occurred parsing the data retrieved from GCP as JSON: %s' % jde.msg)
+        sys.exit(1)
+
+    except VoluptuousInvalid as vi:
+        logger.exception('The JSON data from GCP does not match the required schema.')
+        logger.exception('Error message: %s' % vi.msg)
+        logger.exception('Error path: %s' % vi.path)
+        logger.exception('Exception message: %s' % vi.error_message)
+        sys.exit(1)
 
 # Register possible commands
 COMMANDS = {
