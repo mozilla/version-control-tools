@@ -28,7 +28,7 @@ def decrypt_sops_files():
         return
 
     for path in files:
-        subprocess.call([
+        subprocess.check_call([
             'sops', '--in-place', '--decrypt', path,
         ], cwd=ROOT)
 
