@@ -552,7 +552,7 @@ def revset_automationrelevant(repo, subset, x):
     return subset & revset.baseset(revs)
 
 
-def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
+def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, **kwargs):
     """Custom bookmarks applicator that overwrites with remote state.
 
     The default bookmarks merging code adds divergence. When replicating from
@@ -561,7 +561,7 @@ def bmupdatefromremote(orig, ui, repo, remotemarks, path, trfunc, explicit=()):
     the complicated merging algorithm with a simple "remote wins" version.
     """
     if not ui.configbool(b'hgmo', b'replacebookmarks', False):
-        return orig(ui, repo, remotemarks, path, trfunc, explicit=explicit)
+        return orig(ui, repo, remotemarks, path, trfunc, **kwargs)
 
     localmarks = repo._bookmarks
 
