@@ -79,6 +79,10 @@ RUN pip install -e vct/pylib/vcsreplicator
 RUN pip install -e vct/hghooks
 RUN pip install -e vct/testing
 
+# clone cinnabar for the `cinnabarclone` extension
+RUN git clone \
+    --branch release \
+    https://github.com/glandium/git-cinnabar.git /app/venv/git-cinnabar
 WORKDIR /app/vct
 
 # Install Mercurials

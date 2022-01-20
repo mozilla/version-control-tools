@@ -61,6 +61,11 @@ RUN chown -R vct:vct /app
 
 USER vct
 
+# clone cinnabar for the `cinnabarclone` extension
+RUN git clone \
+    --branch release \
+    https://github.com/glandium/git-cinnabar.git $VIRTUAL_ENV/git-cinnabar
+
 WORKDIR /app
 
 # Install editable requirements py2/py3
