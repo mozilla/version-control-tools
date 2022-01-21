@@ -17,7 +17,6 @@ from mercurial import (
     error,
     hg,
     pycompat,
-    ui as uimod,
     util,
 )
 from mercurial.i18n import _
