@@ -254,32 +254,6 @@ It relies on ./mach eslint --fix directly.
 Would you like to activate js-format (Yn)? $$ &Yes $$ &No
 '''.strip()
 
-FORMATSOURCE_INFO = b'''
-The "format-source" extension provides a way to run code-formatting tools in a way that
-avoids conflicts related to this formatting when merging/rebasing code across the
-reformatting.
-An example of a .hgrc configuration that uses our embedded clang-format and prettier-format
-utilities from 'mach' is as follows:
-[format-source]
-clang-format = [Path To Mozilla Repo]/mach clang-format --assume-filename $HG_FILENAME -p
-clang-format:configpaths = .clang-format, .clang-format-ignore
-clang-format:fileext = .cpp, .c, .h
-prettier-format = [Path To Mozilla Repo]/mach prettier-format --assume-filename $HG_FILENAME -p
-prettier-format:configpaths = .prettierrc, .prettierignore
-prettier-format:fileext = .js, .jsx, .jsm
-
-If `clang-format` or `prettier-format` are not present under `[format-source]`, a default
-configuration will be used that is embedded in this extension. The default configuration
-can be used in most cases.
-Would you like to activate format-source (Yn)? $$ &Yes $$ &No
-'''.strip()
-
-FORMATSOURCE_DISABLE_INFO = b'''
-Removing extensions.format-source since it\'s no longer needed. For the moment we
-want to disable format-source since the big format of Gecko has been performed.
-We will re-enable this when we will need it again.\n
-'''
-
 PUSHTOTRY_INFO = b'''
 The push-to-try extension generates a temporary commit with a given
 try syntax and pushes it to the try server. The extension is intended
@@ -456,7 +430,6 @@ wizardsteps = set([
     b'blackbox',
     b'security',
     b'firefoxtree',
-    b'format-source',
     b'wip',
     b'smartannotate',
     b'pushtotry',
@@ -557,10 +530,6 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if b'js-format' in runsteps:
         _promptvctextension(ui, cw, b'js-format', JS_FORMAT_INFO)
-
-
-    if b'format-source' in runsteps:
-        _checkformatsource(ui, cw)
 
     if b'wip' in runsteps:
         _checkwip(ui, cw)
@@ -803,18 +772,6 @@ def _checkcolor(ui, cw, hg_version):
     else:
         _promptnativeextension(ui, cw, b'color',
                                b'Enable color output to your terminal')
-
-
-def _checkformatsource(ui, cw):
-    disable_format_source = True
-
-    if disable_format_source:
-        ext = cw.c.get('extensions', {})
-        if 'format-source' in ext:
-            ui.write(FORMATSOURCE_DISABLE_INFO)
-            del ext['format-source']
-    else:
-        _promptvctextension(ui, cw, b'format-source', FORMATSOURCE_INFO)
 
 
 def _checkpager(ui, cw, hg_version):
