@@ -17,44 +17,6 @@ repositories much more pleasant.
 
 For more, read :ref:`it's documentation <firefoxtree>`.
 
-format-source
-============
-
-The extension provides a way to run code-formatting tools in a way that avoids
-conflicts related to this formatting when merging/rebasing code across the
-reformatting.
-
-A new `format-source` command is provided, to apply a code formatting tool on
-some specific files. This information is recorded into the repository and
-reused when merging. The client doing the merge needs the extension for this
-logic to kick in.
-
-Code formatting tools have to be registered in the configuration. The tool
-"name" will be used to identify a specific command accross all repositories.
-It is mapped to a command line that must output the formatted content on its
-standard output.
-
-For each tool a list of files affecting the result of the formatting can be
-configured with the "configpaths" suboption, which is read and registered at
-"hg format-source" time.  Any change in those files should trigger
-reformatting.
-
-Example:
-    [format-source]
-    clang-format = [Path To Mozilla Repo]/mach clang-format --assume-filename $HG_FILENAME -p
-    clang-format:configpaths = .clang-format, .clang-format-ignore
-    clang-format:fileext = .cpp, .c, .h
-
-We do not support specifying the mapping of tool name to tool command in the
-repository itself for security reasons.
-
-The code formatting information is tracked in a .hg-format-source file at the
-root of the repository.
-
-Warning: There is no special logic handling renames so moving files to a
-directory not covered by the patterns used for the initial formatting will
-likely fail.
-
 mozext
 ======
 
