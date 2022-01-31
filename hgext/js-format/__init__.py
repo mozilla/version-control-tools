@@ -52,7 +52,13 @@ def call_js_format(repo, changed_files):
         js_format_cmd = [b'python3', b'mach'] + arguments
     else:
         js_format_cmd = [mach_path] + arguments
-    subprocess.call(js_format_cmd)
+
+    # Set `PYTHONIOENCODING` since `hg.exe` will detect `cp1252` as the encoding
+    # and pass it as the encoding to `mach` via the environment.
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    subprocess.call(js_format_cmd, env=env)
 
 
 def wrappedcommit(orig, repo, *args, **kwargs):
