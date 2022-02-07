@@ -11,6 +11,7 @@ and call the mercurial commit function
 
 import os
 import subprocess
+import sys
 
 from mercurial import (
     cmdutil,
@@ -31,6 +32,9 @@ from mozhg.util import is_firefox_repo
 testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 minimumhgversion = b'4.4'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
+
+def find_python():
+    return pycompat.bytestr(sys.executable) if sys.version_info[0] >= 3 else b"python3"
 
 
 def call_clang_format(repo, changed_files):
@@ -54,7 +58,7 @@ def call_clang_format(repo, changed_files):
     mach_path = os.path.join(repo.root, b'mach')
     arguments = [b'clang-format', b'-p'] + path_list
     if os.name == 'nt':
-        clang_format_cmd = [b'python3', b'mach'] + arguments
+        clang_format_cmd = [find_python(), b'mach'] + arguments
     else:
         clang_format_cmd = [mach_path] + arguments
 
