@@ -44,7 +44,6 @@ Table of Contents
    hgmozilla/index
    hgmo/index
    githubwebhooks
-   vcssync/index
    cross-channel-l10n/index
 
 Python Module Documentation
