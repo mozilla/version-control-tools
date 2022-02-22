@@ -23,7 +23,6 @@ PYTHON_COVERAGE_DIRS = (
     'hgext',
     'pylib',
     'hghooks',
-    'vcssync',
 )
 
 # Directories containing tests. See ``get_test_files()``.
@@ -37,20 +36,11 @@ UNIT_TEST_DIRS = {
     'git/tests': {
         'venvs': {'global'},
     },
-    'hgext/manualoverlay': {
-        'venvs': {'vcssync'},
-    },
-    'hgext/overlay': {
-        'venvs': {'vcssync'},
-    },
     'hgserver/tests': {
         'venvs': {'global'},
     },
     'pylib': {
         'venvs': {'global', 'hgdev'},
-    },
-    'vcssync/tests': {
-        'venvs': {'vcssync'},
     },
     'cross-channel-l10n/tests': {
         'venvs': {'cross-channel-l10n',},

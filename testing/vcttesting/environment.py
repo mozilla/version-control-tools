@@ -249,18 +249,6 @@ def create_hgdev():
     return venv
 
 
-def create_vcssync():
-    """Create an environment used for testing VCSSync."""
-    venv = create_virtualenv('vcssync')
-    process_pip_requirements(venv, 'vcssync/test-requirements.txt')
-    install_editable(venv, 'pylib/mozautomation')
-    install_editable(venv, 'testing')
-    install_editable(venv, 'vcssync',
-                     extra_env={'VCSSYNC_ENABLE_TESTING_COMMANDS': '1'})
-
-    return venv
-
-
 def create_xchannel():
     """Create an environment used for testing VCSSync."""
     venv = create_virtualenv('cross-channel-l10n')
