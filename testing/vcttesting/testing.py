@@ -7,10 +7,8 @@ from __future__ import absolute_import, unicode_literals
 import errno
 import json
 import os
-import re
 import subprocess
 import sys
-import time
 
 from coverage import Coverage
 
