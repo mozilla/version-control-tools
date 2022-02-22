@@ -38,11 +38,15 @@ the container about which user on the host system is running the tests.
 
 You can run the following command to create a `.env` file:
 
-  $ ./run env > .env
+```shell
+  ./run env > .env
+```
 
 Now you can run the tests via:
 
-  $ ./run tests path/to/test --with-hg=5.3.2
+```shell
+  ./run tests path/to/test --with-hg=5.3.2
+```
 
 #### Ansible-to-Docker Cluster
 
