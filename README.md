@@ -1,5 +1,4 @@
-Mozilla Version Control Tools
-=============================
+# Mozilla Version Control Tools
 
 This repository contains tools, extensions, hooks, etc to support version
 control at Mozilla.
@@ -8,7 +7,7 @@ Most documentation exists in the ``docs/`` directory. It can be
 [viewed online](https://mozilla-version-control-tools.readthedocs.io/en/latest/)
 on Read the Docs.
 
-### Contributing
+## Contributing
 
 - All contributors must abide by the Mozilla Code of Conduct.
 
@@ -24,7 +23,7 @@ on Read the Docs.
 - If you are interested in getting in touch with the people who maintain
   this repository, join the ``vcs`` channel on ``chat.mozilla.org``.
 
-### Testing
+## Testing
 
 To create a test environment and run tests, you should use the `./run` script
 at the root of the repository. This script wraps common `docker-compose`
@@ -48,12 +47,12 @@ Now you can run the tests via:
   ./run tests path/to/test --with-hg=5.3.2
 ```
 
-#### Ansible-to-Docker Cluster
+### Ansible-to-Docker Cluster
 
 The configuration of the production server is managed by the Ansible configs
 in `ansible/`. To test these configs and much of the code that depends on them,
 we have a custom Docker image build process which applies the Ansible roles to
-Docker images and creates a mock cluster of Docker containers that is mostly 
+Docker images and creates a mock cluster of Docker containers that is mostly
 identical to the production hosts of `hg.mozilla.org`.
 
 Running these tests is slow and uses a lot of CPU resources. It is recommended
