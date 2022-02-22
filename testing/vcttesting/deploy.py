@@ -71,12 +71,6 @@ def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
     return res
 
 
-def deploy_vcs_sync(verbosity=0):
-    extra = {'vct': ROOT}
-    return run_playbook('vcssync-deploy', extra_vars=extra,
-                        verbosity=verbosity)
-
-
 def hgmo_strip(repo, rev, verbosity=0):
     extra = {
         'repo': repo,

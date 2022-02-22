@@ -117,10 +117,3 @@ class DeployCommands(object):
 
         return run_playbook('deploy-reviewbot', verbosity=verbosity)
 
-    @Command('vcs-sync', category='deploy')
-    @CommandArgument('--verbosity', type=int, default=0,
-                     help='How verbose to be with output')
-    def vcs_sync(self, verbosity=0):
-        from vcttesting.deploy import deploy_vcs_sync
-
-        return deploy_vcs_sync(verbosity=verbosity)

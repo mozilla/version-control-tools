@@ -1,5 +1,0 @@
-[ui]
-username = Servo VCS Sync <servo-vcs-sync@mozilla.com>
-
-[extensions]
-overlay = ~/overlayext.py
