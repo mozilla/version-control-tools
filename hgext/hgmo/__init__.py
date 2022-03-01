@@ -28,7 +28,6 @@ import types
 from mercurial.i18n import _
 from mercurial.node import bin
 from mercurial.utils import (
-    cborutil,
     dateutil,
 )
 from mercurial import (
@@ -48,12 +47,9 @@ from mercurial import (
     templatefilters,
     templateutil,
     util,
-    wireprototypes,
     wireprotov1server,
-    wireprotov2server,
 )
 from mercurial.hgweb import (
-    request as requestmod,
     webcommands,
     webutil,
 )
