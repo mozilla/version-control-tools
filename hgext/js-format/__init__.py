@@ -10,11 +10,12 @@ and call the mercurial commit function
 """
 
 import os
+import shutil
 import subprocess
-import sys
 
 from mercurial import (
     cmdutil,
+    error,
     extensions,
     localrepo,
     match,
@@ -34,7 +35,11 @@ minimumhgversion = b'4.4'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
 
 def find_python():
-    return pycompat.bytestr(sys.executable) if sys.version_info[0] >= 3 else b"python3"
+    for python_variant in (b"py", b"python3", b"python"):
+        if shutil.which(python_variant):
+            return python_variant
+
+    raise error.Abort(b"Could not find a suitable Python to run `mach`!")
 
 
 def call_js_format(repo, changed_files):
@@ -50,12 +55,9 @@ def call_js_format(repo, changed_files):
         # No files have been touched
         return
 
-    mach_path = os.path.join(repo.root, b'mach')
-    arguments = [b'eslint', b'--fix'] + path_list
-    if os.name == 'nt':
-        js_format_cmd = [find_python(), b'mach'] + arguments
-    else:
-        js_format_cmd = [mach_path] + arguments
+    js_format_cmd = [
+        find_python(), os.path.join(repo.root, b'mach'), b'eslint', b'--fix'
+    ] + path_list
 
     # Set `PYTHONIOENCODING` since `hg.exe` will detect `cp1252` as the encoding
     # and pass it as the encoding to `mach` via the environment.

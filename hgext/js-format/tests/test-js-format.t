@@ -13,10 +13,12 @@ Create the fake mach
 It will take the file and add something at the end of the file
 
   $ cat > mach << EOF
-  > #!/bin/sh
-  > filename=\$3
-  > echo "Reformatting '\$filename'"
-  > echo 'let js_format=42;' >> \$filename
+  > import sys
+  > filename = sys.argv[-1]
+  > print("Reformatting '%s'" % filename)
+  > with open(filename, 'a') as f:
+  >     f.write('let js_format=42;\n')
+  > 
   > EOF
   $ chmod +x mach
   $ hg add mach
@@ -40,7 +42,7 @@ Configure the hook
 Test the js-format hook
 
   $ touch foo.js
-  $ ./mach eslint --fix foo.js
+  $ python mach eslint --fix foo.js
   Reformatting 'foo.js'
   $ grep -q "let js_format=42" foo.js
   $ rm foo.js
@@ -69,32 +71,32 @@ Rebase (should not run the hook)
   Reformatting 'dir-2/bar.js'
   $ grep -q "let js_format=42" dir-2/bar.js
   $ hg log --graph
-  @  changeset:   3:204033503640
+  @  changeset:   3:90e129020fa7
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   2:af87cd2e6ed2
+  o  changeset:   2:9b431be05fe2
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   1:8bd73e1c68d1
+  o  changeset:   1:35241f108edc
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add bar.js before the hook is set
   |
-  o  changeset:   0:9533808dc03a
+  o  changeset:   0:6ba776e40796
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add mach
   
   $ hg rebase -s 2 -d 0
-  rebasing 2:af87cd2e6ed2 "second commit"
-  rebasing 3:204033503640 tip "third commit" (hg59 !)
-  rebasing 3:204033503640 "third commit" (tip) (no-hg59 !)
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/af87cd2e6ed2-4eae2e22-rebase.hg
+  rebasing 2:9b431be05fe2 "second commit"
+  rebasing 3:90e129020fa7 tip "third commit" (hg59 !)
+  rebasing 3:90e129020fa7 "third commit" (tip) (no-hg59 !)
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/9b431be05fe2-58db80a5-rebase.hg
   $ hg export -r 1 | grep -v -q "let js_format=42"
   $ hg export -r 2 | grep -q "let js_format=42"
   $ hg export -r 3 | grep -q "let js_format=42"
@@ -106,8 +108,8 @@ Update (should not run the hook)
   $ hg export -r 1 | grep -v -q "let js_format=42"
   $ hg export -r 2 | grep -q "let js_format=42"
   $ hg rebase -s 1 -d 3
-  rebasing 1:8bd73e1c68d1 "Add bar.js before the hook is set"
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/8bd73e1c68d1-4e7d2c14-rebase.hg
+  rebasing 1:35241f108edc "Add bar.js before the hook is set"
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/35241f108edc-93e75ffd-rebase.hg
   $ hg update -r tip
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
@@ -115,31 +117,31 @@ Histedit
 
   $ echo "histedit =" >> $HGRCPATH
   $ cat > histeditcommands << EOF
-  > mess b0267487d4b7 3
-  > pick 739da735cf64 2
-  > pick 9533808dc03a 0
-  > pick 98dc618a2a76 1
+  > mess c0be2ad63b31 3
+  > pick b4f546d348ab 2
+  > pick 6ba776e40796 0
+  > pick 47ccb8c84472 1
   > EOF
   $ hg histedit --commands histeditcommands
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/9533808dc03a-8d60e6b6-histedit.hg
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/6ba776e40796-62ae6ca4-histedit.hg
   $ hg log --graph
-  @  changeset:   3:24829f7ea929
+  @  changeset:   3:2fd8827288c4
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   2:8fd8c0250e2b
+  o  changeset:   2:ee9d92c29808
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add mach
   |
-  o  changeset:   1:e3754d0980d3
+  o  changeset:   1:fae7b6a64e0f
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   0:e57c97e90ee4
+  o  changeset:   0:a4f4d7995acf
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add bar.js before the hook is set

@@ -13,10 +13,12 @@ Create the fake mach
 It will take the file and add something at the end of the file
 
   $ cat > mach << EOF
-  > #!/bin/sh
-  > filename=\$3
-  > echo "Reformatting '\$filename'"
-  > echo 'int clang_format=42;' >> \$filename
+  > import sys
+  > filename = sys.argv[-1]
+  > print("Reformatting '%s'" % filename)
+  > with open(filename, 'a') as f:
+  >     f.write('int clang_format=42;\n')
+  > 
   > EOF
   $ chmod +x mach
   $ hg add mach
@@ -40,7 +42,7 @@ Configure the hook
 Test the clang-format hook
 
   $ touch foo.cpp
-  $ ./mach clang-format -p foo.cpp
+  $ python mach clang-format -p foo.cpp
   Reformatting 'foo.cpp'
   $ grep -q "int clang_format=42" foo.cpp
   $ rm foo.cpp
@@ -69,32 +71,32 @@ Rebase (should not run the hook)
   Reformatting 'dir-2/bar.cpp'
   $ grep -q "int clang_format=42" dir-2/bar.cpp
   $ hg log --graph
-  @  changeset:   3:059cd3ee4b4d
+  @  changeset:   3:423309da9f44
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   2:0088d44a4e42
+  o  changeset:   2:94f859340388
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   1:a23f48517f2e
+  o  changeset:   1:ba0c923d4430
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add bar.cpp before the hook is set
   |
-  o  changeset:   0:7ee4c4e22a8d
+  o  changeset:   0:e9bf9f146b90
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add mach
   
   $ hg rebase -s 2 -d 0
-  rebasing 2:0088d44a4e42 "second commit"
-  rebasing 3:059cd3ee4b4d tip "third commit" (hg59 !)
-  rebasing 3:059cd3ee4b4d "third commit" (tip) (no-hg59 !)
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/0088d44a4e42-bbfa5a85-rebase.hg
+  rebasing 2:94f859340388 "second commit"
+  rebasing 3:423309da9f44 tip "third commit" (hg59 !)
+  rebasing 3:423309da9f44 "third commit" (tip) (no-hg59 !)
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/94f859340388-a6dc420b-rebase.hg
   $ hg export -r 1 | grep -v -q "int clang_format=42"
   $ hg export -r 2 | grep -q "int clang_format=42"
   $ hg export -r 3 | grep -q "int clang_format=42"
@@ -106,8 +108,8 @@ Update (should not run the hook)
   $ hg export -r 1 | grep -v -q "int clang_format=42"
   $ hg export -r 2 | grep -q "int clang_format=42"
   $ hg rebase -s 1 -d 3
-  rebasing 1:a23f48517f2e "Add bar.cpp before the hook is set"
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/a23f48517f2e-a25c03d1-rebase.hg
+  rebasing 1:ba0c923d4430 "Add bar.cpp before the hook is set"
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/ba0c923d4430-cefd6852-rebase.hg
   $ hg update -r tip
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
@@ -115,31 +117,31 @@ Histedit
 
   $ echo "histedit =" >> $HGRCPATH
   $ cat > histeditcommands << EOF
-  > mess 866d807fd982 3
-  > pick fdf8beeead16 2
-  > pick 7ee4c4e22a8d 0
-  > pick bc49f9b033d1 1
+  > mess ba4e12a3249d 3
+  > pick 7f98a115cbbc 2
+  > pick e9bf9f146b90 0
+  > pick e1bd65ca6d5f 1
   > EOF
   $ hg histedit --commands histeditcommands
-  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/7ee4c4e22a8d-1462040c-histedit.hg
+  saved backup bundle to $TESTTMP/repo1/.hg/strip-backup/e9bf9f146b90-3976ffbc-histedit.hg
   $ hg log --graph
-  @  changeset:   3:72c566e9cf17
+  @  changeset:   3:44ee0173f95e
   |  tag:         tip
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     second commit
   |
-  o  changeset:   2:cfc3e492707a
+  o  changeset:   2:36d2eb569efd
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Add mach
   |
-  o  changeset:   1:77a3ec17cbe9
+  o  changeset:   1:6f3da0e785ee
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     third commit
   |
-  o  changeset:   0:3e55a2746795
+  o  changeset:   0:5c9f66f821de
      user:        test
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     Add bar.cpp before the hook is set
