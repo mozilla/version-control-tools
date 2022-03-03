@@ -7,7 +7,6 @@ import json
 from mercurial import (
     commands,
     context,
-    pycompat,
     registrar,
 )
 from mercurial.i18n import _

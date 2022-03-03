@@ -4,7 +4,6 @@
 """Manage Mercurial configuration in a Mozilla-tailored way."""
 
 import difflib
-import io
 import os
 import stat
 import subprocess

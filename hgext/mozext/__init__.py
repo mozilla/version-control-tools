@@ -185,7 +185,10 @@ import gc
 import os
 import re
 import sys
-from collections import namedtuple, Counter, defaultdict
+from collections import (
+    defaultdict,
+    namedtuple,
+)
 
 from operator import methodcaller
 
@@ -221,7 +224,6 @@ from mercurial import (
     scmutil,
     sshpeer,
     templatefilters,
-    templatekw,
     util,
     pathutil,
     url
