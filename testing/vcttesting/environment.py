@@ -125,15 +125,6 @@ def install_mercurials(venv, hg='hg', py3=False):
         '@',
     ]
 
-    # Python 2 only Mercurials
-    if not py3:
-        VERSIONS.extend([
-            '4.8.2',
-            '4.9.1',
-            '5.0.1',
-            '5.1.2',
-        ])
-
     hg_dir = os.path.join("/app", "venv", "hg")
     mercurials = os.path.join(venv['path'], 'mercurials')
 
