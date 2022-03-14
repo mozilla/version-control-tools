@@ -4,11 +4,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
-# TRACKING py3
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
 import collections
 import os

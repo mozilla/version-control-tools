@@ -354,11 +354,7 @@ def sendreposyncmessage(ui, repo, bootstrap=False):
         repo.producerlog('SYNC_SENDING')
         producer = ui.replicationproducer
 
-        # TRACKING py3
-        if pycompat.ispy3:
-            requirements = yield_encoded_requirements(repo.requirements)
-        else:
-            requirements = repo.requirements
+        requirements = yield_encoded_requirements(repo.requirements)
 
         vcsrproducer.record_hg_repo_sync(producer, repo.replicationwireprotopath,
                                          hgrc, heads, requirements,

@@ -8,10 +8,6 @@ import shlex
 import subprocess
 import sys
 
-# TRACKING py3 raw_input -> input
-if sys.version_info[0] >= 3:
-    raw_input = input
-
 
 def run_command(command_string, input=None, verbose=False):
     subcommand = None
@@ -59,7 +55,7 @@ def prompt_user(prompt_string, options, period=True):
             s += '.'
         print(s)
     print('')
-    selection = raw_input(prompt_string + ' ')
+    selection = input(prompt_string + ' ')
     if selection.isdigit():
         selection = int(selection)
         if selection == 0:

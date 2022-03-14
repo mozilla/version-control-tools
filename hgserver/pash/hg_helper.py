@@ -4,22 +4,14 @@
 
 from __future__ import print_function
 
-# TRACKING py3
-# ConfigParser -> configparser, raw_input -> input,
-# cgi.escape -> html.escape
-try:
-    from configparser import RawConfigParser
-    from html import escape
-    raw_input = input
-except ImportError:
-    from ConfigParser import RawConfigParser
-    from cgi import escape
-
 import os
 import sys
 import re
 import shlex
 import subprocess
+
+from configparser import RawConfigParser
+from html import escape
 
 from hgmolib.ldap_helper import (
     get_ldap_attribute,
@@ -347,8 +339,9 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
             print('List of available public repos')
             source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
     elif selection == 'Clone a private repository':
-        source_user = raw_input('Please enter the e-mail address of the user '
-                                'owning the repo: ')
+        source_user = input(
+            'Please enter the e-mail address of the user owning the repo: '
+        )
         valid_user = is_valid_user(source_user)
         if valid_user == True:
             source_user = source_user.replace('@', '_')
@@ -443,7 +436,7 @@ def edit_repo_description(repo_name):
         return
 
     repo_path = get_and_validate_user_repo(repo_name)
-    repo_description = raw_input('Enter a one line descripton for the '
+    repo_description = input('Enter a one line descripton for the '
                                  'repository: ')
     if repo_description == '':
         return

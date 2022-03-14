@@ -3,15 +3,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# TRACKING py3
-# configparser module renamed
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import ConfigParser
-
 import os
 import sys
+
+from configparser import ConfigParser
 
 configpath, section, key, value = sys.argv[1:]
 

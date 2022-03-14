@@ -9,12 +9,7 @@ import os
 import subprocess
 import sys
 
-# TRACKING py3
-# configparser module renamed
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 if 'BROKER_ID' not in os.environ:
     print('error: BROKER_ID not in environment', file=sys.stderr)
