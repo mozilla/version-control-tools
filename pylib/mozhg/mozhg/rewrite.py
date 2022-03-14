@@ -75,18 +75,10 @@ def preservefilectx(oldctx):
             islink = b'l' in fctx.flags()
             isexec = b'x' in fctx.flags()
 
-            # TRACKING hg50
-            # `copied` renamed to `copysource`
-            if util.versiontuple(n=2) >= (5, 0):
-                return context.memfilectx(repo, memctx, path, fctx.data(),
-                                          islink=islink,
-                                          isexec=isexec,
-                                          copysource=copied)
-            else:
-                return context.memfilectx(repo, memctx, path, fctx.data(),
-                                          islink=islink,
-                                          isexec=isexec,
-                                          copied=copied)
+            return context.memfilectx(repo, memctx, path, fctx.data(),
+                                      islink=islink,
+                                      isexec=isexec,
+                                      copysource=copied)
         except KeyError:
             return None
 

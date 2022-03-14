@@ -719,14 +719,7 @@ def _docheckout(
         try:
             old_sparse_fn = getattr(repo.dirstate, "_sparsematchfn", None)
             if old_sparse_fn is not None:
-                # TRACKING hg50
-                # Arguments passed to `matchmod.always` were unused and have been removed
-                if util.versiontuple(n=2) >= (5, 0):
-                    repo.dirstate._sparsematchfn = lambda: matchmod.always()
-                else:
-                    repo.dirstate._sparsematchfn = lambda: matchmod.always(
-                        repo.root, ""
-                    )
+                repo.dirstate._sparsematchfn = lambda: matchmod.always()
 
             with timeit("purge", "purge"):
                 if purge(
