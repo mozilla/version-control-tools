@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -u
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,10 +14,6 @@ from configparser import ConfigParser
 if 'BROKER_ID' not in os.environ:
     print('error: BROKER_ID not in environment', file=sys.stderr)
     sys.exit(1)
-
-# Disable output buffering.
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-sys.stderr = sys.stdout
 
 if not os.path.exists('/etc/ssh/ssh_host_ed25519_key'):
     subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'ed25519',
