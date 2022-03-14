@@ -224,6 +224,7 @@ from mercurial import (
     scmutil,
     sshpeer,
     templatefilters,
+    templateutil,
     util,
     pathutil,
     url
@@ -241,11 +242,6 @@ from mozhg.util import (
     import_module,
     get_backoutbynode,
 )
-
-
-# TRACKING hg47
-templateutil = import_module('mercurial.templateutil')
-
 
 logcmdutil = import_module('mercurial.logcmdutil')
 getlogrevs = logcmdutil.getrevs
@@ -883,11 +879,7 @@ def template_bugs(context, mapping, **args):
 
     bugs = parse_bugs(ctx.description())
 
-    # TRACKING hg47
-    if templateutil:
-        return templateutil.hybridlist(bugs, b'bugs')
-    else:
-        return bugs
+    return templateutil.hybridlist(bugs, b'bugs')
 
 
 @templatekeyword(b'backsoutnodes', requires={b'ctx'})
@@ -898,10 +890,7 @@ def template_backsoutnodes(context, mapping):
     backouts = parse_backouts(description)
     # return just the nodes, not the bug numbers
     if backouts and backouts[0]:
-        # TRACKING hg47
-        if templateutil:
-            return templateutil.hybridlist(backouts[0], b'backouts')
-        return backouts[0]
+        return templateutil.hybridlist(backouts[0], b'backouts')
 
 
 @templatekeyword(b'reviewer', requires={b'ctx'})
@@ -924,11 +913,7 @@ def template_reviewers(context, mapping):
 
     reviewers = parse_reviewers(ctx.description())
 
-    # TRACKING hg47
-    if templateutil:
-        return templateutil.hybridlist(parse_reviewers(ctx.description()), b'reviewers')
-    else:
-        return reviewers
+    return templateutil.hybridlist(reviewers, b'reviewers')
 
 
 def _compute_first_version(repo, ctx, what, cache):
@@ -1121,11 +1106,7 @@ def template_pushdates(context, mapping):
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushdates = [dateutil.makedate(p[2]) for p in pushes]
 
-    # TRACKING hg47
-    if templateutil:
-        pushdates = templateutil.hybridlist(pushdates, b'pushdates')
-
-    return pushdates
+    return templateutil.hybridlist(pushdates, b'pushdates')
 
 
 def template_pushheaddates(context, mapping):
@@ -1138,11 +1119,7 @@ def template_pushheaddates(context, mapping):
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushheaddates = [dateutil.makedate(p[2]) for p in pushes if pycompat.bytestr(p[4]) == node]
 
-    # TRACKING hg47
-    if templateutil:
-        pushheaddates = templateutil.hybridlist(pushheaddates, b'pushheaddates')
-
-    return pushheaddates
+    return templateutil.hybridlist(pushheaddates, b'pushheaddates')
 
 
 def _trees(repo, ctx):
@@ -1158,11 +1135,7 @@ def template_trees(context, mapping):
 
     trees = _trees(repo, ctx)
 
-    # TRACKING hg47
-    if templateutil:
-        trees = templateutil.hybridlist(trees, b'trees')
-
-    return trees
+    return templateutil.hybridlist(trees, b'trees')
 
 
 def template_reltrees(context, mapping):
@@ -1173,11 +1146,7 @@ def template_reltrees(context, mapping):
 
     reltrees = [t for t in _trees(repo, ctx) if t in RELEASE_TREES]
 
-    # TRACKING hg47
-    if templateutil:
-        reltrees = templateutil.hybridlist(reltrees, b'reltrees')
-
-    return reltrees
+    return templateutil.hybridlist(reltrees, b'reltrees')
 
 
 # [gps] This function may not be necessary. However, I was unable to figure out

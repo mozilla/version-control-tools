@@ -91,7 +91,7 @@ from mercurial import (
     registrar,
     revset,
     scmutil,
-    templatekw,
+    templateutil,
     util,
     wireprotov1server,
 )
@@ -115,9 +115,6 @@ from mozautomation.repository import (
     TRY_TREES,
 )
 from mozhg.util import import_module
-
-# TRACKING hg47
-templateutil = import_module('mercurial.templateutil')
 
 # TRACKING hg59
 urlutil = import_module("mercurial.utils.urlutil")
@@ -666,11 +663,7 @@ def template_fxheads(context, mapping):
     res = set(tag for tag, node, tree, uri in labels if node == ctx.node())
     sortedres = sorted(res)
 
-    # TRACKING hg47
-    if templateutil:
-        return templateutil.hybridlist(sortedres, b'log.tag')
-    else:
-        return sortedres
+    return templateutil.hybridlist(sortedres, b'log.tag')
 
 
 def extsetup(ui):

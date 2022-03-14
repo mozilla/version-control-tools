@@ -3,20 +3,13 @@
 
 from __future__ import absolute_import
 
-from mercurial import util
+from mercurial.utils import stringutil
 from mercurial.node import short
 from mozautomation.commitparser import (
     parse_requal_reviewers,
     is_backout,
 )
-from mozhg.util import import_module
 
-# TRACKING hg47 util.email -> stringutil.email
-stringutil = import_module('mercurial.utils.stringutil')
-if stringutil:
-    email = stringutil.email
-else:
-    email = util.email
 
 from ..checks import (
     PreTxnChangegroupCheck,
@@ -71,7 +64,7 @@ class SyncIPCCheck(PreTxnChangegroupCheck):
             return True
 
         # Allow patches authored by peers
-        if self._is_peer_email(email(ctx.user())):
+        if self._is_peer_email(stringutil.email(ctx.user())):
             return True
 
         # Allow if reviewed by any peer
