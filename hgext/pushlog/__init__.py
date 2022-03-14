@@ -216,13 +216,12 @@ def commonentry(orig, repo, ctx):
 Push = collections.namedtuple('Push', ('pushid', 'user', 'when', 'nodes'))
 
 
-def make_post_close(repo, conn):
-    """Make a function to be called when a Mercurial transaction closes."""
-    def pushlog_tr_post_close(tr):
+def make_finalize(repo, conn):
+    """Make a function to be called immediately before a Mercurial transaction closes."""
+    def pushlog_tr_finalize(tr):
         for attempt in range(3):
             try:
                 conn.commit()
-                conn.close()
 
                 return
             except sqlite3.OperationalError as e:
@@ -234,6 +233,21 @@ def make_post_close(repo, conn):
             raise error.Abort(b'could not complete push due to pushlog operational errors; '
                               b'please retry, and file a bug if the issue persists')
 
+    return pushlog_tr_finalize
+
+
+def make_post_close(repo, conn):
+    """Make a function to be called after a Mercurial transaction closes."""
+    def pushlog_tr_post_close(tr):
+        try:
+            conn.close()
+
+            return
+        except sqlite3.OperationalError as e:
+            repo.ui.log(
+                b'pushlog', b'Error closing pushlog connection: %s\n' % pycompat.bytestr(e)
+            )
+
     return pushlog_tr_post_close
 
 
@@ -243,6 +257,7 @@ def make_abort(repo, conn):
         if tr:
             tr._report(b'rolling back pushlog\n')
 
+        conn.rollback()
         conn.close()
 
     return pushlog_tr_abort
@@ -350,6 +365,7 @@ class pushlog(object):
                 create = True
 
         if tr:
+            tr.addfinalize(b'pushlog', make_finalize(self.repo, conn))
             tr.addpostclose(b'pushlog', make_post_close(self.repo, conn))
             tr.addabort(b'pushlog', make_abort(self.repo, conn))
 
