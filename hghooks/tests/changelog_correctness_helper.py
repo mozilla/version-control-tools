@@ -5,6 +5,7 @@ from mercurial import (
     changelog,
     context,
     hg,
+    metadata,
     ui,
 )
 
@@ -12,7 +13,11 @@ changelog_add = changelog.changelog.add
 
 def add(self, manifest, files, desc, transaction, p1, p2,
         user, date=None, extra=None, p1copies=None, p2copies=None, *args, **kwargs):
-    files = [b'foo', b'bar']
+    files = metadata.ChangingFiles()
+
+    for filename in [b'foo', b'bar']:
+        files.mark_added(filename)
+
     return changelog_add(self, manifest, files, desc, transaction, p1, p2,
         user, date=date, extra=extra, *args, **kwargs)
 
