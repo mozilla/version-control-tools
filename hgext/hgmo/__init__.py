@@ -244,11 +244,7 @@ def infowebcommand(web):
     req = web.req
 
     if b'node' not in req.qsparams:
-        # TRACKING hg48
-        if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
-        else:
-            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
+        return web.sendtemplate(b'error', error=b"missing parameter 'node'")
 
     nodes = req.qsparams.getall(b'node')
 
@@ -285,11 +281,7 @@ def headdivergencewebcommand(web):
     req = web.req
 
     if b'node' not in req.qsparams:
-        # TRACKING hg48
-        if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
-        else:
-            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
+        return web.sendtemplate(b'error', error=b"missing parameter 'node'")
 
     repo = web.repo
 
@@ -347,11 +339,7 @@ def automationrelevancewebcommand(web):
     req = web.req
 
     if b'node' not in req.qsparams:
-        # TRACKING hg48
-        if util.versiontuple(n=2) >= (4, 8):
-            return web.sendtemplate(b'error', error=b"missing parameter 'node'")
-        else:
-            return web.sendtemplate(b'error', error={b'error': b"missing parameter 'node'"})
+        return web.sendtemplate(b'error', error=b"missing parameter 'node'")
 
     repo = web.repo
     deletefields = {
@@ -412,13 +400,7 @@ def automationrelevancewebcommand(web):
                 if k == b'files':
                     entry[b'files'] = sorted(ctx.files())
                 elif k == b'allparents':
-                    # TRACKING hg48
-                    # generic template keyword args needed (context, mapping)
-                    # they are not actually used, so `None, None` is sufficient
-                    if util.versiontuple(n=2) >= (4, 8):
-                        iterator = v(None, None).itermaps(ctx)
-                    else:
-                        iterator = v().itermaps(ctx)
+                    iterator = v(None, None).itermaps(ctx)
 
                     entry[b'parents'] = [p[b'node'] for p in iterator]
                     del entry[b'allparents']

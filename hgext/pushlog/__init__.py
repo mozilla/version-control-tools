@@ -241,11 +241,7 @@ def make_abort(repo, conn):
     """Make a function to be called when a Mercurial transaction aborts."""
     def pushlog_tr_abort(tr):
         if tr:
-            # TRACKING hg48 - report is now private
-            if util.safehasattr(tr, '_report'):
-                tr._report(b'rolling back pushlog\n')
-            else:
-                tr.report(b'rolling back pushlog\n')
+            tr._report(b'rolling back pushlog\n')
 
         conn.close()
 

@@ -763,13 +763,9 @@ def _docheckout(
                 b"%s" % (sparse_profile, checkoutrevision)
             )
 
-        # TRACKING hg48 - parseconfig takes `action` param
-        if util.versiontuple(n=2) >= (4, 8):
-            old_config = sparsemod.parseconfig(
-                repo.ui, repo.vfs.tryread(b"sparse"), b"sparse"
-            )
-        else:
-            old_config = sparsemod.parseconfig(repo.ui, repo.vfs.tryread(b"sparse"))
+        old_config = sparsemod.parseconfig(
+            repo.ui, repo.vfs.tryread(b"sparse"), b"sparse"
+        )
 
         old_includes, old_excludes, old_profiles = old_config
 
