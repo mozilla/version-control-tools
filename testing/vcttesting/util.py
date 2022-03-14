@@ -10,9 +10,6 @@ import string
 import subprocess
 import time
 
-import concurrent.futures as futures
-import requests
-
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
@@ -23,7 +20,7 @@ def get_available_port():
     """Obtain a port number available for binding."""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('', 0))
-    host, port = s.getsockname()
+    _host, port = s.getsockname()
     s.close()
 
     return port
