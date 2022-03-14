@@ -7,7 +7,6 @@ from __future__ import absolute_import
 
 import errno
 
-# TRACKING hg46 use module bundles with Mercurial.
 import cbor2
 
 from mercurial.i18n import _

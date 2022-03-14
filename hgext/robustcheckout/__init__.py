@@ -61,12 +61,8 @@ def getsparse():
 
 
 def peerlookup(remote, v):
-    # TRACKING hg46 4.6 added commandexecutor API.
-    if util.safehasattr(remote, "commandexecutor"):
-        with remote.commandexecutor() as e:
-            return e.callcommand(b"lookup", {b"key": v}).result()
-    else:
-        return remote.lookup(v)
+    with remote.commandexecutor() as e:
+        return e.callcommand(b"lookup", {b"key": v}).result()
 
 
 @command(
