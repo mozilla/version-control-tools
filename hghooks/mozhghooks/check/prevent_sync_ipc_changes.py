@@ -19,8 +19,8 @@ from ..checks import (
 IPC_PEERS = [
     {'name': b'Andrew McCreight', 'nick': [b'mccr8'], 'email': [b'continuation@gmail.com']},
     {'name': b'Jed Davis', 'nick': [b'jld'], 'email': [b'jld@mozilla.com']},
-    {'name': b'Nathan Froyd', 'nick': [b'froydnj'], 'email': [b'nfroyd@mozilla.com']},
     {'name': b'Nika Layzell', 'nick': [b'nika'], 'email': [b'nika@thelayzells.com']},
+    {'name': b'David Parks', 'nick': [b'handyman'], 'email': [b'daparks@mozilla.com']},
 ]
 
 MISSING_REVIEW = b"""

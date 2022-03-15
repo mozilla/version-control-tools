@@ -37,8 +37,8 @@ Editing the sync-messages.ini file without any review should fail
   Please, request review from either:
     - Andrew McCreight (:mccr8)
     - Jed Davis (:jld)
-    - Nathan Froyd (:froydnj)
     - Nika Layzell (:nika)
+    - David Parks (:handyman)
   ************************************************************************
   
   transaction abort!
@@ -62,8 +62,8 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   Please, request review from either:
     - Andrew McCreight (:mccr8)
     - Jed Davis (:jld)
-    - Nathan Froyd (:froydnj)
     - Nika Layzell (:nika)
+    - David Parks (:handyman)
   ************************************************************************
   
   transaction abort!
