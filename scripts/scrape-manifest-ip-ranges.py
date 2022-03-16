@@ -83,6 +83,7 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
     of all the regions in the iterable of IP networks"""
     required_regions = {
         "us-central1",
+        "us-west1",
     }
 
     prefixes_in_new_document = {

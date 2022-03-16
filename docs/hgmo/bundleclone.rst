@@ -78,8 +78,8 @@ ec2region
    You should prefer the region that is closest to you.
 
 gceregion
-   The GCE region the bundle file should be served from. We only support
-   ``us-central1`` at this time.
+   The GCE region the bundle file should be served from. We support
+   ``us-central1`` and ``us-west1`` at this time.
 
 cdn
    Indicates whether the URL is on a CDN. Value is ``true`` to indicate

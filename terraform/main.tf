@@ -251,10 +251,33 @@ resource "google_service_account" "gcp-hgbundler" {
   description  = "Upload Mercurial clonebundles to Google Cloud Storage buckets"
 }
 
-# Bucket for bundles
+# GCP buckets for bundles
 resource "google_storage_bucket" "gcp-bundles-uc1" {
   name          = "moz-hg-bundles-gcp-us-central1"
   location      = "us-central1"
+  storage_class = "STANDARD"
+
+  # Delete after 1 week inactive
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age        = 7
+      with_state = "ANY"
+    }
+  }
+
+  # Ensure bundles are around for 1 week minimum
+  retention_policy {
+    is_locked        = false
+    retention_period = 604800
+  }
+}
+
+resource "google_storage_bucket" "gcp-bundles-uw1" {
+  name          = "moz-hg-bundles-gcp-us-west1"
+  location      = "us-west1"
   storage_class = "STANDARD"
 
   # Delete after 1 week inactive

@@ -63,6 +63,7 @@ S3_HOSTS = (
 # GCP buckets all use the same prefix, unlike AWS
 GCP_HOSTS = (
     ('moz-hg-bundles-gcp-us-central1', 'us-central1'),
+    ('moz-hg-bundles-gcp-us-west1', 'us-west1'),
 )
 
 GCS_ENDPOINT = 'https://storage.googleapis.com'
