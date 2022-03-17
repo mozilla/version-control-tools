@@ -275,6 +275,20 @@ resource "google_storage_bucket" "gcp-bundles-uc1" {
   }
 }
 
+resource "google_storage_bucket_iam_member" "hgbundler-access-uc1" {
+  bucket = google_storage_bucket.gcp-bundles-uc1.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.gcp-hgbundler.email}"
+}
+
+# Allow public read access to the world for the bundles buckets
+resource "google_storage_bucket_iam_member" "public-bundle-rule-uc1" {
+  bucket = google_storage_bucket.gcp-bundles-uc1.name
+  role   = "roles/storage.objectViewer"
+
+  member = "allUsers"
+}
+
 resource "google_storage_bucket" "gcp-bundles-uw1" {
   name          = "moz-hg-bundles-gcp-us-west1"
   location      = "us-west1"
@@ -298,15 +312,14 @@ resource "google_storage_bucket" "gcp-bundles-uw1" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "hgbundler-access" {
-  bucket = google_storage_bucket.gcp-bundles-uc1.name
+resource "google_storage_bucket_iam_member" "hgbundler-access-uw1" {
+  bucket = google_storage_bucket.gcp-bundles-uw1.name
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.gcp-hgbundler.email}"
 }
 
-# Allow public read access to the world for the bundles bucket
-resource "google_storage_bucket_iam_member" "public-bundle-rule" {
-  bucket = google_storage_bucket.gcp-bundles-uc1.name
+resource "google_storage_bucket_iam_member" "public-bundle-rule-uw1" {
+  bucket = google_storage_bucket.gcp-bundles-uw1.name
   role   = "roles/storage.objectViewer"
 
   member = "allUsers"
