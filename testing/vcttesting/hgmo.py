@@ -4,8 +4,6 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import errno
-import json
 import os
 import subprocess
 import sys
@@ -16,7 +14,6 @@ import concurrent.futures as futures
 from .ldap import LDAP
 from .util import (
     docker_compose_down_background,
-    get_available_port,
     normalize_testname,
     wait_for_amqp,
     wait_for_kafka,
