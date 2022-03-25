@@ -245,6 +245,7 @@ Blowing away the repo on hgweb and re-cloning should retain pushlog and hidden c
   /repo/hg/mozilla/users/user_example.com/repo-1: changed owner on 7; mode on 7
   $ hgmo exec hgssh /var/hg/venv_pash/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 replicatesync
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg --hidden -R /repo/hg/mozilla/users/user_example.com/repo-1 log -r 0:tip -T '{rev}:{node|short} {phase} {pushid} {pushuser}\n'

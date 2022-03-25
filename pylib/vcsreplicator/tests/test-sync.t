@@ -12,6 +12,7 @@
 
   $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
 
   $ consumer --dump --partition 2
   - _created: \d+\.\d+ (re)
@@ -34,22 +35,28 @@
     - dotencode
     - fncache
     - generaldelta
+    - revlog-compression-zstd
     - revlogv1
     - sparserevlog (hg49 !)
     - store
+  - _created: 1648222565.020264
+    heads:
+    - '0000000000000000000000000000000000000000'
+    last_push_id: 0
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
 
   $ hgmo exec hgweb0 tail -n 16 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
-  vcsreplicator.consumer starting consumer for topic=pushdata group=* partitions=[*] (glob)
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['0000000000000000000000000000000000000000'], bootstrap: False) from partition 2 offset 1
+  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['000000000000'], bootstrap: False) from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   > not trusting file /vct/.hg/hgrc from untrusted user root, group root
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > no changes found
@@ -57,6 +64,7 @@
   vcsreplicator.consumer   > updating moz-owner file
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['000000000000'], last_push_id: 0) from partition 2 offset 2
 
   $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/hgrc
   [hooks]
@@ -70,8 +78,87 @@ We should not see any pulls, even after waiting for no lag
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb0 tail -n 2 /var/log/vcsreplicator/consumer.log
-  vcsreplicator.consumer pulled 0 changesets into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['0000000000000000000000000000000000000000'], bootstrap: True) from partition 2 offset 2
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['000000000000'], last_push_id: 0) from partition 2 offset 2
+  vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['000000000000'], bootstrap: True) from partition 2 offset 3
+
+Running `replicatesync --no-heads` will not send heads message.
+
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/mozilla-central replicatesync --no-heads
+  wrote synchronization message into replication log
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
+
+  $ consumer --dump --partition 2
+  - _created: 1648222562.9029722
+    generaldelta: true
+    name: hg-repo-init-2
+    path: '{moz}/mozilla-central'
+  - _created: 1648222565.0108953
+    bootstrap: false
+    heads:
+    - '0000000000000000000000000000000000000000'
+    hgrc: '[hooks]
+  
+      foo = bar
+  
+  
+      '
+    name: hg-repo-sync-2
+    path: '{moz}/mozilla-central'
+    requirements:
+    - dotencode
+    - fncache
+    - generaldelta
+    - revlog-compression-zstd
+    - revlogv1
+    - sparserevlog
+    - store
+  - _created: 1648222565.020264
+    heads:
+    - '0000000000000000000000000000000000000000'
+    last_push_id: 0
+    name: hg-heads-1
+    path: '{moz}/mozilla-central'
+  - _created: 1648222569.4841566
+    bootstrap: true
+    heads:
+    - '0000000000000000000000000000000000000000'
+    hgrc: '[hooks]
+  
+      foo = bar
+  
+  
+      '
+    name: hg-repo-sync-2
+    path: '{moz}/mozilla-central'
+    requirements:
+    - dotencode
+    - fncache
+    - generaldelta
+    - revlog-compression-zstd
+    - revlogv1
+    - sparserevlog
+    - store
+  - _created: 1648222572.5529828
+    bootstrap: false
+    heads:
+    - '0000000000000000000000000000000000000000'
+    hgrc: '[hooks]
+  
+      foo = bar
+  
+  
+      '
+    name: hg-repo-sync-2
+    path: '{moz}/mozilla-central'
+    requirements:
+    - dotencode
+    - fncache
+    - generaldelta
+    - revlog-compression-zstd
+    - revlogv1
+    - sparserevlog
+    - store
 
 Cleanup
 

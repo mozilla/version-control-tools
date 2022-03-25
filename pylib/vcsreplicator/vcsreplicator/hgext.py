@@ -488,7 +488,12 @@ def sendheartbeat(ui):
             len(partitions))
 
 
-@command(b'replicatesync', [(b'b', b'bootstrap', False, b'Use bootstrap mode')], b'replicate this repository to mirrors')
+@command(b'replicatesync', 
+    [
+        (b'b', b'bootstrap', False, b'Use bootstrap mode'),
+        (b'h', b'heads', True, b'Send heads message'),
+    ],
+    b'replicate this repository to mirrors')
 def replicatecommand(ui, repo, **opts):
     """Tell mirrors to synchronize their copy of this repo.
 
@@ -498,6 +503,10 @@ def replicatecommand(ui, repo, **opts):
     """
     sendreposyncmessage(ui, repo, bootstrap=opts.get('bootstrap'))
     ui.status(_(b'wrote synchronization message into replication log\n'))
+
+    if opts.get('heads') and not opts.get('bootstrap'):
+        sendheadsmessage(ui, repo)
+        ui.status(_(b'wrote heads synchronization message into replication log\n'))
 
 
 @command(b'replicatedelete', [], b'delete this repository and all mirrors')

@@ -37,10 +37,13 @@ Create a repo as the origin repo and make copies
 
   $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/repo1 replicatesync
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
   $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/repo2 replicatesync
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
   $ hgmo exec hgssh /var/hg/venv_tools/bin/hg -R /repo/hg/mozilla/repo3 replicatesync
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
