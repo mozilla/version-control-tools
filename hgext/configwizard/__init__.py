@@ -357,6 +357,14 @@ stolen if others have access to this file/machine.
 Would you like to fix the file permissions (Yn) $$ &Yes $$ &No
 '''.strip()
 
+PYTHON_VERSION_WARNING = b"""
+Mercurial is installed into a Python 2 interpreter environment on
+your machine. In the near future Python 2 will no longer be supported
+by Mozilla or the upstream Mercurial project.
+
+Please upgrade your Mercurial to a Python 3 interpreter.
+""".strip()
+
 
 testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
 buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20configwizard'
@@ -418,6 +426,7 @@ if registrar and util.safehasattr(registrar, b'configitem'):
 
 wizardsteps = set([
     b'hgversion',
+    b'pyversion',
     b'username',
     b'tweakdefaults',
     b'diff',
@@ -484,6 +493,9 @@ def configwizard(ui, repo, statedir=None, **opts):
     if b'hgversion' in runsteps:
         if _checkhgversion(ui, hgversion):
             return 1
+
+    if b"pyversion" in runsteps:
+        _checkpyversion(ui)
 
     if b'username' in runsteps:
         _checkusername(ui, cw)
@@ -596,6 +608,11 @@ def _checkhgversion(ui, hgversion):
 
     if not uipromptchoice(ui, b'Would you like to exit to upgrade your Mercurial version (Yn)? $$ &Yes $$ &No'):
         return 1
+
+def _checkpyversion(ui):
+    """Check the Python version for this install."""
+    if not pycompat.ispy3:
+        ui.warn(PYTHON_VERSION_WARNING)
 
 
 def uiprompt(ui, msg, default=None):
