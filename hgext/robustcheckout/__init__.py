@@ -780,10 +780,8 @@ def _docheckout(
             # one to change the sparse profile and another to update to the new
             # revision. This is not desired. But there's not a good API in
             # Mercurial to do this as one operation.
-            with (
-                repo.wlock(),
-                repo.dirstate.parentchange(),
-                timeit("sparse_update_config", "sparse-update-config"),
+            with repo.wlock(), repo.dirstate.parentchange(), timeit(
+                "sparse_update_config", "sparse-update-config"
             ):
                 # pylint --py3k: W1636
                 fcounts = list(
