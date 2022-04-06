@@ -4,6 +4,7 @@
 """Manage Mercurial configuration in a Mozilla-tailored way."""
 
 import difflib
+import io
 import os
 import stat
 import subprocess
@@ -394,6 +395,10 @@ try:
 except ImportError:
     configitems = None
 
+def bytesio():
+    if util.versiontuple(n=2) >= (6, 2):
+        return io.BytesIO()
+    return pycompat.bytesio()
 
 def _vcthome():  # Returns the directory where the vct clone is located
     here = os.path.dirname(os.path.abspath(__file__))
@@ -1236,7 +1241,7 @@ def _checkmultiplevct(ui, cw):
 
 def _handleconfigchange(ui, cw):
     # Obtain the old and new content so we can show a diff.
-    newbuf = pycompat.bytesio()
+    newbuf = bytesio()
     cw.write(newbuf)
     newbuf.seek(0)
     newlines = [pycompat.sysstr(l.rstrip()) for l in newbuf.readlines()]

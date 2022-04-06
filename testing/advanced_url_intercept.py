@@ -27,8 +27,8 @@ Possible values for "code" include an integer (this will be used directly when
 creating the HTTPError exception), or None (null in JSON) which will cause a
 URLError to be raised.
 """
-
-# TODO: deprecate url-interceptor.
+import io
+import json
 
 from mercurial import (
     error,
@@ -37,10 +37,6 @@ from mercurial import (
     url,
     urllibcompat,
 )
-
-
-import json
-
 
 configtable = {}
 configitem = registrar.configitem(configtable)
@@ -58,8 +54,7 @@ class AdvancedURLInterceptor(object):
             req (Request)
 
         Returns:
-            pycompat.bytesio (Python version dependent) object with
-            extra `getcode` attribute.
+            io.BytesIO object with extra `getcode` attribute.
 
         Raises:
             HTTPError, URLError
@@ -83,7 +78,7 @@ class AdvancedURLInterceptor(object):
                 response["code"],
                 b"", None, None)
 
-        return_obj = pycompat.bytesio(
+        return_obj = io.BytesIO(
             pycompat.bytestr(json.dumps(response["data"]))
         )
 

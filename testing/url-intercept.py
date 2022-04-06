@@ -11,6 +11,7 @@ returned by that URL.
 Currently, some defaults are assumed. Functionality can be expanded as
 needed.
 """
+import io
 
 from mercurial import (
     error,
@@ -49,7 +50,7 @@ class URLInterceptor(object):
                 url, expected))
 
         self.ui.write(b'intercepting url\n')
-        return pycompat.bytesio(response)
+        return io.BytesIO(response)
 
 
 def extsetup(ui):
