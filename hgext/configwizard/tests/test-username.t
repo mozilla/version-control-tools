@@ -89,3 +89,46 @@ Name and email will result in ui.username being set
   $ cat .hgrc
   [ui]
   username = Joe Smith <jsmith@example.com>
+
+Usernames with non-ascii characters should be accepted.
+
+  $ hg --config ui.interactive=true --config configwizard.steps=username,configchange configwizard << EOF
+  > 
+  > Emilio Cobos Álvarez
+  > emilio@example.com
+  > y
+  > y
+  > EOF
+  This wizard will guide you through configuring Mercurial for an optimal
+  experience contributing to Mozilla projects.
+  
+  The wizard makes no changes without your permission.
+  
+  To begin, press the enter/return key.
+   <RETURN>
+  You don't have a username defined in your Mercurial config file. In order
+  to author commits, you'll need to define a name and e-mail address.
+  
+  This data will be publicly available when you send commits/patches to others.
+  If you aren't comfortable giving us your full name, pseudonames are
+  acceptable.
+  
+  (Relevant config option: ui.username)
+  What is your name? Emilio Cobos \xc3\x81lvarez (esc)
+  What is your e-mail address? emilio@example.com
+  setting ui.username=Emilio Cobos \xc3\x81lvarez <emilio@example.com> (esc)
+  
+  Your config file needs updating.
+  Would you like to see a diff of the changes first (Yn)?  y
+  --- hgrc.old
+  +++ hgrc.new
+  @@ -1,2 +1,2 @@
+   [ui]
+  -username = Joe Smith <jsmith@example.com>
+  +username = Emilio Cobos \xc3\x83\xc2\x83\xc3\x82\xc2\x81lvarez <emilio@example.com> (esc)
+  
+  Write changes to hgrc file (Yn)?  y
+
+  $ cat .hgrc
+  [ui]
+  username = Emilio Cobos \xc3\x83\xc2\x81lvarez <emilio@example.com> (esc)

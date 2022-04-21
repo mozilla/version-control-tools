@@ -1258,7 +1258,7 @@ def _handleconfigchange(ui, cw):
         ui.write(b'Your config file needs updating.\n')
         if not ui.promptchoice(b'Would you like to see a diff of the changes first (Yn)? $$ &Yes $$ &No'):
             for line in diff:
-                ui.write(b'%s\n' % pycompat.bytestr(line))
+                ui.write(b'%s\n' % pycompat.bytestr(line.encode('utf-8')))
             ui.write(b'\n')
 
         if not ui.promptchoice(b'Write changes to hgrc file (Yn)? $$ &Yes $$ &No'):
