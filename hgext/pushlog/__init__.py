@@ -398,6 +398,8 @@ class pushlog(object):
         don't have a need to support them, so we error in these scenarios.
         '''
         c = self._getconn(tr=self.repo._transref())
+        if not c:
+            raise error.Abort(b"Could not get sqlite connection to record push.")
 
         # Operate against unfiltered repo so we can insert entries for hidden
         # changesets.
@@ -433,6 +435,8 @@ class pushlog(object):
         operation to.
         """
         c = self._getconn(tr=tr)
+        if not c:
+            raise error.Abort(b"Could not get sqlite connection to record push.")
 
         # Operate against unfiltered repo so we can insert entries for hidden
         # changesets.
