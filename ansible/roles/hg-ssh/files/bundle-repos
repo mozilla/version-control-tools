@@ -6,6 +6,7 @@ releases/mozilla-beta
 releases/mozilla-esr68
 releases/mozilla-esr78
 releases/mozilla-esr91
+releases/mozilla-esr102
 mozilla-unified zstd_max
 build/tools
 build/mozharness
