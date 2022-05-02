@@ -44,13 +44,13 @@ TREE_ALIASES = {
     b'c-r': (b'comm-release',),
     b'cr': (b'comm-release',),
 
-    b'releases': (b'esr78', b'esr91', b'release', b'beta', b'aurora', b'central'),
+    b'releases': (b'esr91', b'esr102', b'release', b'beta', b'aurora', b'central'),
     b'integration': (b'inbound', b'fx-team', b'autoland'),
     b'twigs': (b'alder', b'ash', b'birch', b'cedar', b'cypress', b'date', b'elm',
               b'fig', b'gum', b'holly', b'jamun', b'kaios', b'larch', b'maple', b'oak',
               b'pine', b'stylo'),
     b'obsolete': (b'esr10', b'esr17', b'b2ginbound', b'b2g18', b'esr24', b'esr31',
-                 b'esr38', b'esr45', b'esr52', b'esr60', b'esr68',
+                 b'esr38', b'esr45', b'esr52', b'esr60', b'esr68', b'esr78',
                  b'b2g26', b'b2g28', b'b2g30', b'b2g32',
                  b'b2g34', b'b2g37', b'b2g44', b'b2g-ota'),
 }
@@ -81,6 +81,7 @@ REPOS = {
     b'esr68': b'releases/mozilla-esr68',
     b'esr78': b'releases/mozilla-esr78',
     b'esr91': b'releases/mozilla-esr91',
+    b'esr102': b'releases/mozilla-esr102',
     b'b2g18': b'releases/mozilla-b2g18',
     b'b2g26': b'releases/mozilla-b2g26_v1_2',
     b'b2g28': b'releases/mozilla-b2g28_v1_3',
@@ -164,6 +165,7 @@ OFFICIAL_MAP = {
     b'esr68': b'mozilla-esr68',
     b'esr78': b'mozilla-esr78',
     b'esr91': b'mozilla-esr91',
+    b'esr102': b'mozilla-esr102',
 }
 
 RELEASE_TREES = set([
@@ -185,6 +187,7 @@ RELEASE_TREES = set([
     b'esr68',
     b'esr78',
     b'esr91',
+    b'esr102',
     b'b2g32',
     b'b2g34',
     b'b2g37',
