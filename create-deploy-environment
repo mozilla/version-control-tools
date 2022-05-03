@@ -17,6 +17,9 @@ set +u
 source ${VENV}/bin/activate
 set -u
 
+# Upgrade `pip` from potentially old version to avoid `cryptography` Rust toolchain failures.
+pip install --upgrade pip
+
 # Install `wheel` so `python setup.py bdist_wheel` works.
 pip install wheel
 
