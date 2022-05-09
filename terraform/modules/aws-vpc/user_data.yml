@@ -8,21 +8,6 @@ users:
     sudo:  ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDF1QPKh9Qe7uLewUXKJj66zwYngDJM3UbmyO/6jhdFSbsSB1528THQjZYjemj1JyWmvuKk7lCEJD06alGMN54jEm0qccjZEQc1jQ3ZIa6YZpEjHyFuqgIrTVj3N6LXBBbENOdSFt+V3WGRNw9cXq30rr8vD6tmk4+IjXgTHuTqyGCfTBIx48qvbC7CszF8CkoQYFGOHMpP9R/VN3BjTnOSf9ULIqyxZ0BNJ+SMtMYn+DKefOiNNtYsDz5GcjbJFnGidAw3/Zqpz19wrfKwIDfIBgAgrrYAMzYOawCFWINevhGbQUuUJNXk78ZC6ouiaenvtsPgC1hnxth3neazS0sX69wKIYP1ECZLK86dm4fSKVqkazjI2TyQ7T9NHAEbO0i6XUQhAaXC6hbTCa7uLknJY4/NkAL0s9G70lTlw/uRFhhlK44/fW5c7tURbgw5N3mGO5dYWL0xzFECSfQkiSWZBSBviD9rUh6FVRxFVpPE+HpDhEtVd0HoybXnFXr7Zrayfv6K4Xsls5JSrf149YVKr/mrXYbIY8MzaFRDO9Q9yoiNZcbIVe8wVhq+1afUA7ME/xbDzBxlaXmwflhs8lfeOgG8d9rgsgrXsRZFuIi2KLM420iaWk+/yhzjhg/ZrJ/2DFRKCbMdO3SYkBFwPr+QDQYs83nliGhuNqS4KTZMsw==
-  - name: mhentges
-    lock_passwd: true
-    groups: sudo
-    shell: /bin/bash
-    sudo:  ['ALL=(ALL) NOPASSWD:ALL']
-    ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3PGTR2Z4vBf5OEIdOVWuQVI1QfP9IDRuSJNiSnFAqjXPbEV/AgKtoS6fIp27jQWmWkzJS1wVrNuR05R8fz19f8TKx2jY2Q47H1Y8OYEhhdsgBjLJgZttbKEt1whzhFFhkJpmQ1jnLcNdWYXTjoQnsnhKlcQaGbf2vnUkf5g/P/CZjmeGuUGQ5tgFpwQhr68r2eGui1LIBkgs46CMrNNsRhQLvzjJ7YRYn1/sNa9/TxGd1T77NQ1AF9DDCJsvgZQRlUYty9+SnFHqekivzYpQCqc11KuZeYFRpR10RafA7ySSBxtX7jNiQ7rFihhClT3s9pG9vcQ47i9+UWuHpkqkh
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1RDfc8TMGOuIEzyJjodlI5OGANJEIFLf/47mabosU0JYeYfLJ/xHi1WMQshJmDTfGd+Gxv6YQ0cv3p8npmkv8XdEVSnrU6pTd6jB/x0kcprqgcN471geYdzhuN0Su9zAKsE5tJf/AVBxWvg3nDMkZnctklWK3YvrB3Feh4DfrFy5F3DVeZvnZ4j533TsksvoZmtitqfXRwn2Xo/Uo5oNrifXpp3LH0p7FQRK9vUfmTaTdB4sWEjuym6761ItRu9R6DKQq2Yz/dwKGIPG4EkcBDETA/30zY9sjNRjW4HoUllg1IvBxTBo72bzcNO9Pll98lI6wuCgniqIzl/70YVFh
-  - name: smacleod
-    lock_passwd: true
-    groups: sudo
-    shell: /bin/bash
-    sudo:  ['ALL=(ALL) NOPASSWD:ALL']
-    ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCfbx7u9QYqv6FhKmPXfZ7gXQhdWVgLNiKRP2/6ypN7mq5jijtAFlRPKTsI3Ux4qc52fA8iTd1G8JzPCb9bcwdymKBQUzoX58ym74iXlRx0Xx95CaPstIDcPtU7qiUn4Dm0jHyq4+CJ3vNzWAGNxNTiDhTxFB3BO2P5XsohjE/msEtFICWWSh7FkaxeHLBKmQD0xY4kgJDJiEDFGUefJiOl9TRTFQW6FTDZJwHFJz7S+BQjPHREm/hTig9rsILf3MuIJJvKR1igzxJn1f8MJpWfTgpDzd6X3VLMij/iGIZ/yzGjZxduV3iPruvzLISMgg2zmBB0nWXeoDhMzf6atlCQuAIte1WnNGU+aQCtu44Fhr3AF4YimV0WBw5/2f/Mgrr74O9SW0ilbfphJ9RrGSrLJArrZjkzIIxny2LvN4yeHwItCaDoMBzTmiy1SvsBMr/DgRCz1HiNc9LmzRgjpUGHzH5MYtMNVNVhDXJPVu3qXE+JXUOVEV/RtT8VNeuH1vJQ25jvR70rLJccEpwcTejxIhanphi7ua8+feSx+IX4IN2K9SYCAUXJD53dxzxEJiLsMGxTDbe4koHkQX939bGMpcJRUGv6A32a7+i3PL+c3Q8cUorZgxtGpBYWdIxcfPJxp3nmiR1TG7VBwlemKrcEbGFIoUzzktToQEIzhtO1ew==
   - name: zzabaneh
     lock_passwd: true
     groups: sudo
