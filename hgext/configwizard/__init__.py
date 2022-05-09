@@ -390,10 +390,6 @@ try:
 except ImportError:
     registrar = None
 
-try:
-    from mercurial import configitems
-except ImportError:
-    configitems = None
 
 def bytesio():
     if util.versiontuple(n=2) >= (6, 2):
