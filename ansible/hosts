@@ -44,8 +44,5 @@ hgweb-prod
 hgweb-mirrors
 bootstrap
 
-[reviewbot]
-54.244.13.202 ansible_ssh_user=ubuntu ansible_become=yes ansible_python_interpreter=/usr/bin/python2.7
-
 # Add hosts to this group to run the bootstrap procedure
 [bootstrap]
