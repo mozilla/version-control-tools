@@ -2,7 +2,7 @@
 hgweb[1:4].dmz.mdc1.mozilla.com ansible_become=yes
 
 [hgssh-prod]
-hgssh[1:3].dmz.mdc1.mozilla.com ansible_become=yes
+hgssh[1:2].dmz.mdc1.mozilla.com ansible_become=yes
 
 [hgssh-prod-master]
 hgssh1.dmz.mdc1.mozilla.com ansible_become=yes
