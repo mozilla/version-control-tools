@@ -241,17 +241,24 @@ def resolve_trees_to_uris(trees, write_access=False):
 
 def resolve_uri_to_tree(uri):
     """Try to resolve a URI back to a known tree."""
+    # Account for a trailing `/`.
+    if uri.endswith(b'/'):
+        uri = uri[:-1]
 
     for tree, path in REPOS.items():
-        if uri.startswith(b'%s%s' % (BASE_READ_URI, path)):
+        # Try `https` URI first.
+        read_url_https = b'%s%s' % (BASE_READ_URI, path)
+        if uri == read_url_https:
             return tree
 
-        if uri.startswith(b'%s%s' % (
-            BASE_READ_URI.replace(b'https://', b'http://'),
-            path)):
+        # Try `http` URI next.
+        read_url_http = read_url_https.replace(b'https://', b'http://')
+        if uri == read_url_http:
             return tree
 
-        if uri.startswith(b'%s%s' % (BASE_WRITE_URI, path)):
+        # Try `ssh` URI last.
+        write_url_ssh = b'%s%s' % (BASE_WRITE_URI, path)
+        if uri == write_url_ssh:
             return tree
 
     return None
