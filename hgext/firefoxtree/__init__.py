@@ -73,12 +73,10 @@ list of the last-known commits for the Firefox repositories.
 """
 
 import errno
-import inspect
 import os
 
 from mercurial import (
     bookmarks,
-    cmdutil,
     commands,
     configitems,
     error,
