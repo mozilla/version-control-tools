@@ -48,7 +48,7 @@ TREE_ALIASES = {
     b'integration': (b'inbound', b'fx-team', b'autoland'),
     b'twigs': (b'alder', b'ash', b'birch', b'cedar', b'cypress', b'date', b'elm',
               b'fig', b'gum', b'holly', b'jamun', b'kaios', b'larch', b'maple', b'oak',
-              b'pine', b'stylo'),
+              b'pine', b'pine-stable', b'stylo'),
     b'obsolete': (b'esr10', b'esr17', b'b2ginbound', b'b2g18', b'esr24', b'esr31',
                  b'esr38', b'esr45', b'esr52', b'esr60', b'esr68', b'esr78',
                  b'b2g26', b'b2g28', b'b2g30', b'b2g32',
@@ -119,6 +119,7 @@ REPOS = {
     b'maple': b'projects/maple',
     b'oak': b'projects/oak',
     b'pine': b'projects/pine',
+    b'pine-stable': b'projects/pine-stable',
     b'stylo': b'incubator/stylo',
 
     # Comm repositories.
