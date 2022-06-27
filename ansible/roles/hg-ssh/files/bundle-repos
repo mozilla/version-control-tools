@@ -23,6 +23,7 @@ projects/larch
 projects/maple
 projects/oak
 projects/pine
+projects/pine-stable
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
 conduit-testing/m-c
