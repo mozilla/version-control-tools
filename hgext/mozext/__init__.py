@@ -1219,7 +1219,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
 
         opts = mdiff.defaultopts
         opts.git = True
-        rpatch = pycompat.stringio()
+        rpatch = util.stringio()
         orig, mod = (node, p1) if reverse else (p1, node)
         for chunk in patch.diff(repo, node1=orig, node2=mod, opts=opts):
             rpatch.write(chunk)
