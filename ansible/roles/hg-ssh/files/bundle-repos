@@ -15,6 +15,7 @@ comm-central zstd_max
 projects/ash
 projects/birch
 projects/cedar
+projects/clang-trunk
 projects/elm
 projects/holly
 projects/jamun
