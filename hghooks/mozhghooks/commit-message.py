@@ -33,8 +33,6 @@ goodMessage = [re.compile(x, re.I) for x in [
     br'^add(ed|ing)? tag'
 ]]
 
-trySyntax = re.compile(br'\btry:')
-
 VENDORED_PATHS = (
     b'servo/',
 )
@@ -87,11 +85,6 @@ def is_good_message(ui, c):
 
     if c.user() in [b"ffxbld", b"seabld", b"tbirdbld", b"cltbld"]:
         return True
-
-    if trySyntax.search(desc):
-        message(b"Rev %(rev)s uses try syntax. (Did you mean to push to Try "
-                b"instead?)")
-        return False
 
     # Match against [PATCH] and [PATCH n/m]
     if b"[PATCH" in desc:

@@ -400,35 +400,6 @@ Test some bad commit messages
   [255]
   $ hg strip -r . > /dev/null
 
-  $ echo try > foo
-  $ hg commit -l - << EOF
-  > Bug 123 - foo
-  > checkin 1
-  > try: -b do -p all
-  > EOF
-  $ hg push
-  pushing to $TESTTMP/server
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  
-  
-  ************************** ERROR ****************************
-  Rev 53f34037defb uses try syntax. (Did you mean to push to Try instead?)
-  test
-  Bug 123 - foo
-  checkin 1
-  try: -b do -p all
-  *************************************************************
-  
-  
-  transaction abort!
-  rollback completed
-  abort: pretxnchangegroup.commit_message hook failed
-  [255]
-  $ hg strip -r . > /dev/null
-
   $ echo review > foo
   $ hg commit -m "Bug 100 - Foo. r?bar"
   $ hg push
