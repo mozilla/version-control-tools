@@ -273,7 +273,7 @@ Show the dag
 {firstpushtreeherder} template works
 
   $ hg log -r 4 --template '{firstpushtreeherder}\n'
-  https://treeherder.mozilla.org/#/jobs?repo=mozilla-central&revision=d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
+  https://treeherder.mozilla.org/jobs?repo=mozilla-central&revision=d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
 
 {pushdates} template works
 

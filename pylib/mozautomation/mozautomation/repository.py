@@ -291,7 +291,7 @@ def treeherder_url(tree, rev):
     if not tree:
         return None
 
-    return b'https://treeherder.mozilla.org/#/jobs?repo=%s&revision=%s' % (tree, rev)
+    return b'https://treeherder.mozilla.org/jobs?repo=%s&revision=%s' % (tree, rev)
 
 
 class PushInfo(object):

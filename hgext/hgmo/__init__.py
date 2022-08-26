@@ -153,7 +153,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     # with.
     treeherder = repo.ui.config(b'mozilla', b'treeherder_repo')
     if treeherder:
-        d[b'treeherderrepourl'] = b'https://treeherder.mozilla.org/#/jobs?repo=%s' % treeherder
+        d[b'treeherderrepourl'] = b'https://treeherder.mozilla.org/jobs?repo=%s' % treeherder
         d[b'treeherderrepo'] = treeherder
 
         push = repo.pushlog.pushfromchangeset(ctx)

@@ -39,9 +39,9 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
     if treeherder_repo:
         treeherder_base_url = b'https://treeherder.mozilla.org'
         ui.write(b'\nFollow the progress of your build on Treeherder:\n')
-        ui.write(b'  %s/#/jobs?repo=%s&revision=%s\n' % (treeherder_base_url,
-                                                        treeherder_repo,
-                                                        tip_node))
+        ui.write(b'  %s/jobs?repo=%s&revision=%s\n' % (treeherder_base_url,
+                                                       treeherder_repo,
+                                                       tip_node))
         # if specifying a try build and talos jobs are enabled, suggest that
         # user use compareperf
         if treeherder_repo == b'try':
