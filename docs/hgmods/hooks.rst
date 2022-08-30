@@ -80,12 +80,6 @@ trymandatory.py
 This hook enforces the requirement that pushes to the Try repository contain
 Try job selection syntax.
 
-whitelist_releng.py
--------------------
-
-This hook enforces a whitelist of accounts that are allowed to push to certain
-Release Engineer repositories.
-
 Hook Development Standards
 ==========================
 
