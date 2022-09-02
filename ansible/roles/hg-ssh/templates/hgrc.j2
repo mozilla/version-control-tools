@@ -97,3 +97,7 @@ sentry_dsn = {{ sentry_dsn_encrypted }}
 # Leave empty to disable this check, or add comma or space separated
 # values of repos to check.
 check_bug_references_repos = try
+
+# Bug 1788716
+[storage]
+revlog.issue6528.fix-incoming = no
