@@ -53,6 +53,7 @@ def get_check_classes(hook):
         merge_day,
         prevent_cross_channel_messages,
         check_bug_references,
+        prevent_conduit_arcconfig,
         prevent_subrepos,
         prevent_symlinks,
         prevent_sync_ipc_changes,
@@ -67,6 +68,7 @@ def get_check_classes(hook):
     if hook == b'pretxnchangegroup':
         return (
             merge_day.MergeDayCheck,
+            prevent_conduit_arcconfig.PreventConduitArcconfig,
             prevent_cross_channel_messages.XChannelMessageCheck,
             prevent_subrepos.PreventSubReposCheck,
             prevent_symlinks.PreventSymlinksCheck,
