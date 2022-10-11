@@ -84,7 +84,7 @@ to make a new message, take care to replace the substitution variables appropria
   certificate level, this transition is pretty boring: just a standard
   certificate renewal from the same CA.
 
-  The Matric channel for this operational change will be #vcs. Fallout in
+  The Matrix channel for this operational change will be #vcs. Fallout in
   Firefox CI should be discussed in #ci. Please track any bugs related to
   this change against Bug {TRACKING_BUG_NUMBER}.
 

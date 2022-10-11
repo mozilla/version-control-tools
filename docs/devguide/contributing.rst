@@ -19,7 +19,7 @@ Contacting Us
 =============
 
 The people that maintain the code in this repository lurk in the
-following Matric channels on ``chat.mozilla.org``:
+following Matrix channels on ``chat.mozilla.org``:
 
 #vcs
    Where everybody who maintains all the version control properties
