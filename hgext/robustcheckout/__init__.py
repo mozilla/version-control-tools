@@ -566,6 +566,11 @@ def _docheckout(
 
     if storevfs.exists(b".hg/requires"):
         requires = set(storevfs.read(b".hg/requires").splitlines())
+        # "share-safe" (enabled by default as of hg 6.1) moved most
+        # requirements to a new file, so we need to look there as well to avoid
+        # deleting and re-cloning each time
+        if b"share-safe" in requires:
+            requires |= set(storevfs.read(b".hg/store/requires").splitlines())
         # FUTURE when we require generaldelta, this is where we can check
         # for that.
         required = {b"dotencode", b"fncache"}
