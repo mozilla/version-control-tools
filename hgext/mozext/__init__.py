@@ -1587,13 +1587,14 @@ class DropoffCounter(object):
 
 
 def fullpaths(repo, paths):
-    cwd = os.getcwd()
+    cwd = repo.getcwd()
     return [pathutil.canonpath(repo.root, cwd, path) for path in paths]
 
 
-def get_logrevs_for_files(repo, files, opts):
+def get_logrevs_for_files(ui, repo, files, opts):
     limit = opts['limit'] or 1000000
-    revs = getlogrevs(repo, files, {b'follow': True, b'limit': limit})[0]
+    wopts = logcmdutil.parseopts(ui, files, {b'follow': True, b'limit': limit})
+    revs = getlogrevs(repo, wopts)[0]
     for rev in revs:
         yield rev
 
@@ -1695,7 +1696,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         if len(exact_files) == 0:
             return
 
-    for rev in get_logrevs_for_files(repo, exact_files, opts):
+    for rev in get_logrevs_for_files(ui, repo, exact_files, opts):
         yield repo[rev]
 
 
