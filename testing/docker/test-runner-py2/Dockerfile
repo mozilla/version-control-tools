@@ -80,7 +80,7 @@ RUN pip install -e vct/hghooks
 RUN pip install -e vct/testing
 
 # Install Mercurials
-RUN python -m vcttesting.environment install-mercurials 2
+RUN python -m vcttesting.environment install-mercurials
 
 WORKDIR /app/vct
 CMD ["sh"]

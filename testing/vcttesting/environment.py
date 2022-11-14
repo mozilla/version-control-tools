@@ -109,7 +109,7 @@ def install_editable(venv, relpath, extra_env=None):
     subprocess.check_call(args, env=env)
 
 
-def install_mercurials(venv, hg='hg', py3=False):
+def install_mercurials(venv, hg='hg'):
     """Install supported Mercurial versions in a central location."""
     VERSIONS = [
         '5.5.2',
@@ -295,7 +295,7 @@ def create_global():
             install_editable(venv, package)
 
     install_mercurials(venv_py2)
-    install_mercurials(venv_py3, py3=True)
+    install_mercurials(venv_py3)
 
     cinnabar_dest = os.path.join(venv_py2['path'], 'git-cinnabar')
     install_cinnabar(dest=cinnabar_dest)
@@ -332,6 +332,5 @@ if __name__ == '__main__':
         'python': os.path.join('/app', 'venv', 'bin', 'python'),
     }
 
-    py3 = sys.argv[2] == '3'
-    install_mercurials(venv, hg='hg', py3=py3)
+    install_mercurials(venv, hg='hg')
     sys.exit(0)

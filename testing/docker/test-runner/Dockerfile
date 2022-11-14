@@ -87,7 +87,7 @@ RUN git clone \
 WORKDIR /app/vct
 
 # Install Mercurials
-RUN python -m vcttesting.environment install-mercurials 3
+RUN python -m vcttesting.environment install-mercurials
 
 VOLUME /app/vct
 
