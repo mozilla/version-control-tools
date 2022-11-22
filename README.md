@@ -31,7 +31,7 @@ commands to provide better ergonomics and good testing defaults.
 
 The test runner and all it's dependencies are contained in a Docker image.
 The state of your version-control-tools checkout is mounted into the container
-built from that image and tests are run inside the contianer using the source
+built from that image and tests are run inside the container using the source
 on your host's filesystem. To do this, a `.env` file must be created to tell
 the container about which user on the host system is running the tests.
 

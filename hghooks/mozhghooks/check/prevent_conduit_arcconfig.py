@@ -16,13 +16,14 @@ from ..checks import (
 REJECT_MESSAGE = b"""
 Push contains unwanted changes to `.arcconfig` files.
 
-Please ensure `.arcconfig` points to the Phab dev server for
+Please ensure `.arcconfig` points to the Phab dev or stage servers for
 `conduit-testing` repos.
 """
 
 ARCCONFIG_PATH = b".arcconfig"
 
 DEV_PHAB_URL = "https://phabricator-dev.allizom.org/"
+STAGE_PHAB_URL = "https://phabricator.allizom.org/"
 
 
 class PreventConduitArcconfig(PreTxnChangegroupCheck):
@@ -55,8 +56,8 @@ class PreventConduitArcconfig(PreTxnChangegroupCheck):
         except json.JSONDecodeError as exc:
             raise error.Abort(b"Could not decode `.arcconfig` to JSON.") from exc
 
-        if arcconfig["phabricator.uri"].startswith(DEV_PHAB_URL):
-            # Latest state of `.arcconfig` maintains dev URL.
+        if arcconfig["phabricator.uri"].startswith((DEV_PHAB_URL, STAGE_PHAB_URL)):
+            # Latest state of `.arcconfig` maintains dev/stage URL.
             return True
 
         # `.arcconfig` has been updated to point to the wrong server (prod).
