@@ -318,11 +318,9 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
     if selection != 'yes':
         return
 
-    print('You can clone an existing public repo or a users private repo.')
-    print('You can also create an empty repository.')
+    print('You can clone an existing public repo or create an empty repo.')
     selection = prompt_user('Source repository:', [
                             'Clone a public repository',
-                            'Clone a private repository',
                             'Create an empty repository'])
     if selection == 'Clone a public repository':
         exec_command = "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
@@ -337,33 +335,6 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
             repo_list = [x.strip() for x in sorted(repo_list) if x.strip()]
             print('List of available public repos')
             source_repo = prompt_user('Pick a source repo:', repo_list, period=False)
-    elif selection == 'Clone a private repository':
-        source_user = input(
-            'Please enter the e-mail address of the user owning the repo: '
-        )
-        valid_user = is_valid_user(source_user)
-        if valid_user == True:
-            source_user = source_user.replace('@', '_')
-        elif valid_user == False:
-            sys.stderr.write('Unknown user.\n')
-            sys.exit(1)
-        elif valid_user == 'Invalid Email Address':
-            sys.stderr.write('Invalid Email Address.\n')
-            sys.exit(1)
-        source_user_path = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 1 -mindepth 1 -type d')
-        if not source_user_path:
-            print('That user does not have any private repositories.')
-            print('Check https://' + cname + '/users for a list of valid users.')
-            sys.exit(1)
-        else:
-            user_repo_list = run_command('find ' + DOC_ROOT + '/users/' + source_user + ' -maxdepth 3 -mindepth 2 -type d -name .hg')
-            user_repo_list = map(lambda x: x.replace(DOC_ROOT + '/users/' + source_user, ''), user_repo_list)
-            user_repo_list = map(lambda x: x.replace('/.hg', ''), user_repo_list)
-            user_repo_list = map(lambda x: x.strip('/'), user_repo_list)
-            user_repo_list = sorted(user_repo_list)
-            print('Select the users repo you wish to clone.')
-            source_repo = prompt_user('Pick a source repo:', user_repo_list, period=False)
-        source_repo = 'users/' + source_user + '/' + source_repo
     elif selection == 'Create an empty repository':
         source_repo = ''
     else:

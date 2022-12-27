@@ -85,13 +85,11 @@ Choosing "yes" will prompt us how to create the new repo
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository:  (no-eol)
 
@@ -114,13 +112,11 @@ Cloning a public repo will show a list of existing repos
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository: We have the repo_list
   List of available public repos
@@ -152,13 +148,11 @@ Selecting a repo will result in a prompt
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository: We have the repo_list
   List of available public repos
@@ -198,13 +192,11 @@ Saying "no" is handled properly
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository: We have the repo_list
   List of available public repos
@@ -244,13 +236,11 @@ Saying "yes" to clone the repo will clone it.
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository: We have the repo_list
   List of available public repos
@@ -390,13 +380,11 @@ We can create a new empty repo
   1) yes.
   2) no.
   
-  Proceed? You can clone an existing public repo or a users private repo.
-  You can also create an empty repository.
+  You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
-  2) Clone a private repository.
-  3) Create an empty repository.
+  2) Create an empty repository.
   
   Source repository: About to create an empty repository at /users/user_example.com/empty-1
   
