@@ -311,7 +311,6 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=''):
         # New user repositories are non-publishing by default.
         set_repo_publishing(repo_name, False)
         sys.exit(0)
-        return
 
     print(MAKING_REPO.format(repo=repo_name, user=user, cname=cname,
                              user_dir=user_repo_dir))
