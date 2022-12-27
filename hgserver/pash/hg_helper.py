@@ -406,8 +406,10 @@ def edit_repo_description(repo_name):
         return
 
     repo_path = get_and_validate_user_repo(repo_name)
-    repo_description = input('Enter a one line descripton for the '
-                                 'repository: ')
+    repo_description = input(
+        'Enter a one line descripton for the repository: '
+    )
+    repo_description = repo_description.splitlines()[0]
     if repo_description == '':
         return
 
