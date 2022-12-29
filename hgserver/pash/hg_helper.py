@@ -541,8 +541,7 @@ def edit_repo(cname, repo_name, do_quick_delete):
 
 
 def serve(cname, enable_repo_config=False, enable_repo_group=False,
-          enable_user_repos=False,
-          enable_mozreview_ldap_associate=False):
+          enable_user_repos=False):
     ssh_command = os.getenv('SSH_ORIGINAL_COMMAND')
     if not ssh_command:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ['USER'])
