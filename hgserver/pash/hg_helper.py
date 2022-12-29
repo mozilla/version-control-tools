@@ -437,8 +437,6 @@ def set_repo_publishing(repo_name, publish):
     Non-publishing repositories have their commits stay in the draft phase
     when pushed.
     """
-    user = os.getenv('USER')
-    user_repo_dir = user.replace('@', '_')
     repo_path = get_and_validate_user_repo(repo_name)
     config_path, config = get_user_repo_config(repo_path)
 
@@ -464,8 +462,6 @@ def set_repo_publishing(repo_name, publish):
 
 def set_repo_obsolescence(repo_name, enabled):
     """Enable or disable obsolescence support on a repository."""
-    user = os.getenv('USER')
-    user_repo_dir = user.replace('@', '_')
     repo_path = get_and_validate_user_repo(repo_name)
     config_path, config = get_user_repo_config(repo_path)
 
