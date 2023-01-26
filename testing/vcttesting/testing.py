@@ -14,13 +14,13 @@ from coverage import Coverage
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 
 
 PYTHON_COVERAGE_DIRS = (
-    'hgext',
-    'pylib',
-    'hghooks',
+    "hgext",
+    "pylib",
+    "hghooks",
 )
 
 # Directories containing tests. See ``get_test_files()``.
@@ -31,46 +31,46 @@ PYTHON_COVERAGE_DIRS = (
 # be executed by the Mercurial test harness and ``.py`` tests will be executed
 # by the Python test harness.
 UNIT_TEST_DIRS = {
-    'git/tests': {
-        'venvs': {'global'},
+    "git/tests": {
+        "venvs": {"global"},
     },
-    'hgserver/tests': {
-        'venvs': {'global'},
+    "hgserver/tests": {
+        "venvs": {"global"},
     },
-    'pylib': {
-        'venvs': {'global', 'hgdev'},
+    "pylib": {
+        "venvs": {"global", "hgdev"},
     },
-    'hghooks/tests': {
-       'venvs': {'global'},
-    }
+    "hghooks/tests": {
+        "venvs": {"global"},
+    },
 }
 
 # Directories whose Python unit tests we should ignore.
 UNIT_TEST_IGNORES = (
-    'pylib/Bugsy',
-    'pylib/flake8',
-    'pylib/mccabe',
-    'pylib/pycodestyle',
-    'pylib/pyflakes',
-    'pylib/requests',
-    'third_party',
+    "pylib/Bugsy",
+    "pylib/flake8",
+    "pylib/mccabe",
+    "pylib/pycodestyle",
+    "pylib/pyflakes",
+    "pylib/requests",
+    "third_party",
 )
 
 COVERAGE_OMIT = (
-    'venv/*',
-    'pylib/Bugsy/*',
-    'pylib/flake/*',
-    'pylib/mccabe/*',
-    'pylib/mercurial-support/*',
-    'pylib/pycodestyle/*',
-    'pylib/pyflakes/*',
-    'pylib/requests/*',
+    "venv/*",
+    "pylib/Bugsy/*",
+    "pylib/flake/*",
+    "pylib/mccabe/*",
+    "pylib/mercurial-support/*",
+    "pylib/pycodestyle/*",
+    "pylib/pyflakes/*",
+    "pylib/requests/*",
 )
 
 
 def is_test_filename(f):
     """Is a path a test file."""
-    return f.startswith('test-') and f.endswith(('.py', '.t'))
+    return f.startswith("test-") and f.endswith((".py", ".t"))
 
 
 def get_extension_dirs():
@@ -79,17 +79,16 @@ def get_extension_dirs():
     yields 2-tuples of (base dir, directory to scan for extension files).
     """
     # Directories under hgext/ are extensions.
-    for d in os.listdir(os.path.join(ROOT, 'hgext')):
-        full = os.path.join(ROOT, 'hgext', d)
+    for d in os.listdir(os.path.join(ROOT, "hgext")):
+        full = os.path.join(ROOT, "hgext", d)
 
-        if d.startswith('.') or not os.path.isdir(full):
+        if d.startswith(".") or not os.path.isdir(full):
             continue
 
         yield full, full
 
     # Add other well-known directories.
-    yield os.path.join(ROOT, 'hghooks'), os.path.join(ROOT, 'hghooks',
-                                                      'mozhghooks')
+    yield os.path.join(ROOT, "hghooks"), os.path.join(ROOT, "hghooks", "mozhghooks")
 
 
 def get_extensions():
@@ -100,33 +99,33 @@ def get_extensions():
     extensions = []
 
     for ext_dir, compat_dir in get_extension_dirs():
-        e = {'tests': set(), 'testedwith': set()}
+        e = {"tests": set(), "testedwith": set()}
 
         # Find test files.
-        test_dir = os.path.join(ext_dir, 'tests')
+        test_dir = os.path.join(ext_dir, "tests")
         if os.path.isdir(test_dir):
             for f in os.listdir(test_dir):
-                if f.startswith('.'):
+                if f.startswith("."):
                     continue
 
                 if is_test_filename(f):
-                    e['tests'].add(os.path.join(test_dir, f))
+                    e["tests"].add(os.path.join(test_dir, f))
 
         # Look for compatibility info.
         for f in os.listdir(compat_dir):
-            if f.startswith('.') or not f.endswith('.py'):
+            if f.startswith(".") or not f.endswith(".py"):
                 continue
 
-            with open(os.path.join(compat_dir, f), 'rb') as fh:
+            with open(os.path.join(compat_dir, f), "rb") as fh:
                 lines = fh.readlines()
 
             for line in lines:
-                if not line.startswith(b'testedwith'):
+                if not line.startswith(b"testedwith"):
                     continue
 
-                v, value = line.split(b'=', 1)
+                v, value = line.split(b"=", 1)
                 value = value.strip().strip(b"'").strip(b'"').strip()
-                e['testedwith'] = set(value.split())
+                e["testedwith"] = set(value.split())
 
         extensions.append(e)
 
@@ -168,32 +167,31 @@ def get_test_files(extensions):
     extension_tests = []
 
     for e in extensions:
-        extension_tests.extend(e['tests'])
+        extension_tests.extend(e["tests"])
 
     hg_tests = []
     unit_tests = []
     for base, settings in sorted(UNIT_TEST_DIRS.items()):
         base = os.path.join(ROOT, base)
         for root, dirs, files in os.walk(base):
-            relative = root[len(ROOT) + 1:]
+            relative = root[len(ROOT) + 1 :]
             if relative.startswith(UNIT_TEST_IGNORES):
                 continue
 
             for f in files:
-                if f.startswith('test') and f.endswith('.py'):
+                if f.startswith("test") and f.endswith(".py"):
                     unit_tests.append(os.path.join(root, f))
-                elif f.startswith('test') and f.endswith('.t'):
+                elif f.startswith("test") and f.endswith(".t"):
                     hg_tests.append(os.path.join(root, f))
 
     all_tests = set(extension_tests) | set(hg_tests) | set(unit_tests)
 
     return {
-        'extension': sorted(extension_tests),
-        'hg': sorted(hg_tests),
-        'unit': sorted(unit_tests),
-        'all': all_tests,
-        'docker_requirements': {t: docker_requirements_for_test(t)
-                                for t in all_tests}
+        "extension": sorted(extension_tests),
+        "hg": sorted(hg_tests),
+        "unit": sorted(unit_tests),
+        "all": all_tests,
+        "docker_requirements": {t: docker_requirements_for_test(t) for t in all_tests},
     }
 
 
@@ -210,16 +208,16 @@ def docker_requirements_for_test(path):
 
     res = set()
 
-    with open(path, 'rb') as fh:
+    with open(path, "rb") as fh:
         content = fh.read()
 
-        if b'#require hgmodocker' in content:
-            res.add('hgmo')
+        if b"#require hgmodocker" in content:
+            res.add("hgmo")
 
         for keyword in docker_keywords:
             if keyword in content:
                 # This could probably be defined better.
-                res.add('hgmo')
+                res.add("hgmo")
 
     return res
 
@@ -235,8 +233,8 @@ def docker_requirements(tests):
 
 
 def produce_coverage_reports(coverdir):
-    cov = Coverage(data_file='coverage')
-    cov.combine(data_paths=[os.path.join(coverdir, 'data')])
+    cov = Coverage(data_file="coverage")
+    cov.combine(data_paths=[os.path.join(coverdir, "data")])
 
     pydirs = [os.path.join(ROOT, d) for d in PYTHON_COVERAGE_DIRS]
     omit = [os.path.join(ROOT, d) for d in COVERAGE_OMIT]
@@ -245,34 +243,38 @@ def produce_coverage_reports(coverdir):
     for d in pydirs:
         for root, dirs, files in os.walk(d):
             for f in files:
-                if f.endswith('.py'):
+                if f.endswith(".py"):
                     cov.data.touch_file(os.path.join(root, f))
 
-    cov.html_report(directory=os.path.join(coverdir, 'html'),
-                    ignore_errors=True, omit=omit)
-    cov.xml_report(outfile=os.path.join(coverdir, 'coverage.xml'),
-                   ignore_errors=True, omit=omit)
+    cov.html_report(
+        directory=os.path.join(coverdir, "html"), ignore_errors=True, omit=omit
+    )
+    cov.xml_report(
+        outfile=os.path.join(coverdir, "coverage.xml"), ignore_errors=True, omit=omit
+    )
 
 
 def run_nose_tests(tests, process_count=None, verbose=False):
     """Run nose tests and return result code."""
-    noseargs = [sys.executable, '-m', 'nose.core', '-s']
+    noseargs = [sys.executable, "-m", "nose.core", "-s"]
 
     if process_count and process_count > 1:
-        noseargs.extend([
-            '--processes=%d' % process_count,
-            '--process-timeout=120',
-        ])
+        noseargs.extend(
+            [
+                "--processes=%d" % process_count,
+                "--process-timeout=120",
+            ]
+        )
 
     if verbose:
-        noseargs.append('-v')
+        noseargs.append("-v")
     else:
-        noseargs.append('--nologcapture')
+        noseargs.append("--nologcapture")
 
     noseargs.extend(tests)
 
     env = dict(os.environ)
-    paths = [p for p in env.get('PYTHONPATH', '').split(os.pathsep) if p]
+    paths = [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p]
 
     # We need the directory with sitecustomize.py in sys.path for code
     # coverage to work. This is arguably a bug in the location of
@@ -284,23 +286,24 @@ def run_nose_tests(tests, process_count=None, verbose=False):
 
 def get_hg_version(hg):
     env = dict(os.environ)
-    env[b'HGPLAIN'] = b'1'
-    env[b'HGRCPATH'] = b'/dev/null'
+    env[b"HGPLAIN"] = b"1"
+    env[b"HGRCPATH"] = b"/dev/null"
     try:
-        out = subprocess.check_output('%s debuginstall -T json' % hg,
-                                      env=env, shell=True)
+        out = subprocess.check_output(
+            "%s debuginstall -T json" % hg, env=env, shell=True
+        )
     except subprocess.CalledProcessError as e:
         out = e.output
 
     # index 0 because Mercurial's JSON templates always emit
     # a list, with a single element in our case
     debuginstall_info = json.loads(out)[0]
-    return debuginstall_info['hgver'], debuginstall_info['pythonver']
+    return debuginstall_info["hgver"], debuginstall_info["pythonver"]
 
 
 def remove_err_files(tests):
     for t in tests:
-        err = '%s.err' % t
+        err = "%s.err" % t
         try:
             os.remove(err)
         except OSError as e:

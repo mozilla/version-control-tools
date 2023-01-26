@@ -24,15 +24,16 @@ from mercurial import (
 )
 
 OUR_DIR = os.path.dirname(__file__)
-with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
 
 from mozhg.util import is_firefox_repo
 
 
-testedwith = b'4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3'
-minimumhgversion = b'4.4'
-buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting'  # noqa: E501
+testedwith = b"4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3"
+minimumhgversion = b"4.4"
+buglink = b"https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%20System&component=Lint%20and%20Formatting"  # noqa: E501
+
 
 def find_python():
     for python_variant in (b"py", b"python3", b"python"):
@@ -43,7 +44,7 @@ def find_python():
 
 
 def call_clang_format(repo, changed_files):
-    '''Call `./mach clang-format` on the changed files'''
+    """Call `./mach clang-format` on the changed files"""
     # We have also a copy of this list in:
     # python/mozbuild/mozbuild/mach_commands.py
     # tools/lint/hooks_clang_format.py
@@ -61,8 +62,11 @@ def call_clang_format(repo, changed_files):
         return
 
     clang_format_cmd = [
-        find_python(), os.path.join(repo.root, b'mach'), b'clang-format', b'-p'
-    ] + path_list 
+        find_python(),
+        os.path.join(repo.root, b"mach"),
+        b"clang-format",
+        b"-p",
+    ] + path_list
 
     # Set `PYTHONIOENCODING` since `hg.exe` will detect `cp1252` as the encoding
     # and pass it as the encoding to `mach` via the environment.
@@ -92,7 +96,7 @@ def wrappedcommit(orig, repo, *args, **kwargs):
             call_clang_format(repo, changed_files)
 
     except Exception as e:
-        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
+        repo.ui.warn(b"Exception %s\n" % pycompat.bytestr(str(e)))
 
     finally:
         lock.release()
@@ -100,7 +104,7 @@ def wrappedcommit(orig, repo, *args, **kwargs):
 
 
 def wrappedamend(orig, ui, repo, old, extra, pats, opts):
-    '''Wraps cmdutil.amend to run clang-format during `hg commit --amend`'''
+    """Wraps cmdutil.amend to run clang-format during `hg commit --amend`"""
     wctx = repo[None]
     matcher = scmutil.match(wctx, pats, opts)
     filestoamend = [f for f in wctx.files() if matcher(f)]
@@ -113,7 +117,7 @@ def wrappedamend(orig, ui, repo, old, extra, pats, opts):
             call_clang_format(repo, filestoamend)
 
     except Exception as e:
-        repo.ui.warn(b'Exception %s\n' % pycompat.bytestr(str(e)))
+        repo.ui.warn(b"Exception %s\n" % pycompat.bytestr(str(e)))
 
     return orig(ui, repo, old, extra, pats, opts)
 
@@ -122,8 +126,8 @@ def reposetup(ui, repo):
     # Avoid setup altogether if `moz-phab` is executing hg,
     # or the repository is not a Firefox derivative,
     # or the repo is not local
-    if not repo.local() or 'MOZPHAB' in os.environ or not is_firefox_repo(repo):
+    if not repo.local() or "MOZPHAB" in os.environ or not is_firefox_repo(repo):
         return
 
-    extensions.wrapfunction(localrepo.localrepository, b'commit', wrappedcommit)
-    extensions.wrapfunction(cmdutil, b'amend', wrappedamend)
+    extensions.wrapfunction(localrepo.localrepository, b"commit", wrappedcommit)
+    extensions.wrapfunction(cmdutil, b"amend", wrappedamend)

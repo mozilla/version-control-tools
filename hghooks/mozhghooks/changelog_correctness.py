@@ -23,7 +23,7 @@ rewrote history, we would want to fix this issue as part of the conversion.
 But we can prevent more such broken changesets from entering history.
 """
 
-LEGACY_REBASE_WARNING = b'''
+LEGACY_REBASE_WARNING = b"""
 You apparently used `hg rebase` before pushing, and your mercurial
 version stores inconsistent metadata when doing so. Please upgrade
 mercurial or avoid `hg rebase`.
@@ -33,7 +33,8 @@ inconsistent metadata:
 
 See http://wiki.mozilla.org/Troubleshooting_Mercurial#Fix_rebase
 for possible instructions how to fix your push.
-'''
+"""
+
 
 def get_changed_files(repo, cs1, cs2):
     """
@@ -51,7 +52,7 @@ def get_changed_files(repo, cs1, cs2):
     # 4.1 overhauled the manifest API.
     # TODO much of the code below can likely be written in terms of
     # the new API. So look into that.
-    if hasattr(repo, 'manifestlog'):
+    if hasattr(repo, "manifestlog"):
         manifest1 = repo.manifestlog[cs1.manifestnode()].read().text()
         manifest2 = repo.manifestlog[cs2.manifestnode()].read().text()
     else:
@@ -78,9 +79,9 @@ def get_changed_files(repo, cs1, cs2):
             line2 = get_next(lines2)
             continue
         if line1 is not None:
-            f1, _ = line1.split('\0', 1)
+            f1, _ = line1.split("\0", 1)
         if line2 is not None:
-            f2, _ = line2.split('\0', 1)
+            f2, _ = line2.split("\0", 1)
 
         if line1 is not None and line2 is not None and f1 == f2:
             changed_files.add(f2)
@@ -97,14 +98,14 @@ def get_changed_files(repo, cs1, cs2):
 
 
 def hook(ui, repo, node, source=None, **kwargs):
-    if source in (b'pull', b'strip'):
+    if source in (b"pull", b"strip"):
         return 0
 
     broken = []
 
     # All changesets from node to "tip" inclusive are part of this push.
     rev = repo[node].rev()
-    tip = repo[b'tip'].rev()
+    tip = repo[b"tip"].rev()
     for i in range(rev, tip + 1):
         ctx = repo[i]
 
@@ -116,7 +117,7 @@ def hook(ui, repo, node, source=None, **kwargs):
         # Running this check thoroughly on all changesets reveals that all the
         # detected ones have a 'rebase_source' marker. As the test is rather
         # slow, skip changesets without such a marker.
-        if b'rebase_source' not in ctx.extra():
+        if b"rebase_source" not in ctx.extra():
             continue
         changed_files = get_changed_files(repo, parents[0], ctx)
 
@@ -124,7 +125,7 @@ def hook(ui, repo, node, source=None, **kwargs):
             broken.append(short(ctx.node()))
 
     if broken:
-        ui.write(LEGACY_REBASE_WARNING % b'\n   '.join(broken))
+        ui.write(LEGACY_REBASE_WARNING % b"\n   ".join(broken))
         return 1
 
     return 0

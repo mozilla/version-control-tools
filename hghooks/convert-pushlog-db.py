@@ -47,6 +47,8 @@ from mercurial import ui, hg
 from mercurial.node import hex
 
 reader = re.compile(r'^"([a-f0-9]{40})"\t"([^\t]*)"\t"([^\t]*)"$')
+
+
 def readlog(logfile):
     """Read a pushlog and yield (node, user, date) for each line. Returns
     all the entries in chronological order. |date| is a timestamp."""
@@ -61,6 +63,7 @@ def readlog(logfile):
     fd.close()
     return entries
 
+
 def readpushdb(pushdb):
     """Read a pushlog db and yield (node, user, date) for each line. Returns
     all the entries in chronological order. |date| is a timestamp."""
@@ -69,29 +72,35 @@ def readpushdb(pushdb):
         entries = []
         res = conn.execute("SELECT node, user, date FROM pushlog ORDER BY date ASC")
         for (node, user, date) in res:
-            entries.append((node, user, timegm(time.strptime(date, "%Y-%m-%dT%H:%M:%SZ"))))
+            entries.append(
+                (node, user, timegm(time.strptime(date, "%Y-%m-%dT%H:%M:%SZ")))
+            )
         return entries
     except:
         return []
 
+
 def nodeindb(pushdb, node):
-    return pushdb.execute("SELECT COUNT(*) from changesets WHERE node = ?", (node,)) == 1
+    return (
+        pushdb.execute("SELECT COUNT(*) from changesets WHERE node = ?", (node,)) == 1
+    )
+
 
 if len(sys.argv) != 2:
-    print >>sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
+    print >> sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
     sys.exit(1)
 
 ### Main entrypoint
 
 repo_path = os.path.abspath(sys.argv[1])
 if not os.path.exists(repo_path):
-    print >>sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
+    print >> sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
     sys.exit(1)
 
 try:
     repo = hg.repository(ui.ui(), repo_path)
 except:
-    print >>sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
+    print >> sys.stderr, "Must specify a repository as the only parameter (/path/to/repo/)"
     sys.exit(1)
 
 # we need to read both the old text pushlog
@@ -103,8 +112,12 @@ pushdb = pushlog + "2.db"
 
 # Open or create our new db
 conn = sqlite.connect(pushdb)
-conn.execute("CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)")
-conn.execute("CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)")
+conn.execute(
+    "CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)"
+)
+conn.execute(
+    "CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)"
+)
 conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)")
 conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)")
 conn.execute("CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)")
@@ -122,8 +135,10 @@ if len(logentries) == 0:
     logentries = flatlogentries
 
 # sort by revision #, just in case we have two pushes with the same date
-logentries = [(node, repo.changectx(node), user, date) for (node,user,date) in logentries]
-logentries.sort(lambda a,b: cmp(a[1].rev(),b[1].rev()))
+logentries = [
+    (node, repo.changectx(node), user, date) for (node, user, date) in logentries
+]
+logentries.sort(lambda a, b: cmp(a[1].rev(), b[1].rev()))
 
 # start at the beginning
 lastrev = -1
@@ -134,20 +149,23 @@ for (node, ctx, user, date) in logentries:
         # already in the database, move along
         lastrev = ctx.rev()
         continue
-    res = conn.execute("INSERT INTO pushlog (user, date) VALUES(?,?)",
-                       (user, date))
+    res = conn.execute("INSERT INTO pushlog (user, date) VALUES(?,?)", (user, date))
     pushid = res.lastrowid
     # insert this change first
-    conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                 (pushid, ctx.rev(), node))
+    conn.execute(
+        "INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+        (pushid, ctx.rev(), node),
+    )
     if node in flatnodes:
         # this was a HEAD revision, see if any other changes were pushed
         # along with it
         if lastrev != ctx.rev() - 1:
-            for i in range(lastrev+1, ctx.rev()):
+            for i in range(lastrev + 1, ctx.rev()):
                 c = repo.changectx(i)
-                conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                 (pushid, c.rev(), hex(c.node())))
+                conn.execute(
+                    "INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+                    (pushid, c.rev(), hex(c.node())),
+                )
         lastrev = ctx.rev()
     else:
         # this was the first change in a set of changes pushed, see
@@ -155,19 +173,23 @@ for (node, ctx, user, date) in logentries:
         if next < len(logentries):
             nextctx = repo.changectx(logentries[next][0])
             if ctx.rev() + 1 != nextctx.rev():
-                for i in range(ctx.rev()+1, nextctx.rev()):
+                for i in range(ctx.rev() + 1, nextctx.rev()):
                     c = repo.changectx(i)
-                    conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                                 (pushid, c.rev(), hex(c.node())))
+                    conn.execute(
+                        "INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+                        (pushid, c.rev(), hex(c.node())),
+                    )
                     lastrev = c.rev()
-        else: # end of the list, see if we're missing any changes to tip
-            if not 'tip' in ctx.tags():
-                tip =  repo.changectx('tip')
+        else:  # end of the list, see if we're missing any changes to tip
+            if not "tip" in ctx.tags():
+                tip = repo.changectx("tip")
                 # we want everything up to and including tip
-                for i in range(ctx.rev()+1, tip.rev()+1):
+                for i in range(ctx.rev() + 1, tip.rev() + 1):
                     c = repo.changectx(i)
-                    conn.execute("INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
-                                 (pushid, c.rev(), hex(c.node())))
+                    conn.execute(
+                        "INSERT INTO changesets (pushid,rev,node) VALUES(?,?,?)",
+                        (pushid, c.rev(), hex(c.node())),
+                    )
                     lastrev = c.rev()
 
 conn.commit()

@@ -43,7 +43,7 @@ class PreventConduitArcconfig(PreTxnChangegroupCheck):
         if ARCCONFIG_PATH in ctx.files():
             fctx = ctx[ARCCONFIG_PATH]
             self.latest_arcconfig_contents = fctx.data().decode("utf-8")
-        
+
         return True
 
     def post_check(self) -> bool:
@@ -63,4 +63,3 @@ class PreventConduitArcconfig(PreTxnChangegroupCheck):
         # `.arcconfig` has been updated to point to the wrong server (prod).
         print_banner(self.ui, b"error", REJECT_MESSAGE)
         return False
-

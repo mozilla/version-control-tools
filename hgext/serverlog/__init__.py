@@ -198,57 +198,49 @@ from mercurial.hgweb import (
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
 
-testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5'
-minimumhgversion = b'4.8'
+testedwith = b"4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5"
+minimumhgversion = b"4.8"
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'serverlog', b'blackbox',
-           default=True)
-configitem(b'serverlog', b'blackbox.service',
-           default=b'hgweb')
-configitem(b'serverlog', b'reporoot',
-           default='')
-configitem(b'serverlog', b'hgweb',
-           default=True)
-configitem(b'serverlog', b'ssh',
-           default=True)
-configitem(b'serverlog', b'datalogsizeinterval',
-           default=10000000)
-configitem(b'serverlog', b'syslog',
-           default=True)
-configitem(b'serverlog', b'syslog.ident',
-           default=b'hgweb')
-configitem(b'serverlog', b'syslog.facility',
-           b'LOG_LOCAL2')
+configitem(b"serverlog", b"blackbox", default=True)
+configitem(b"serverlog", b"blackbox.service", default=b"hgweb")
+configitem(b"serverlog", b"reporoot", default="")
+configitem(b"serverlog", b"hgweb", default=True)
+configitem(b"serverlog", b"ssh", default=True)
+configitem(b"serverlog", b"datalogsizeinterval", default=10000000)
+configitem(b"serverlog", b"syslog", default=True)
+configitem(b"serverlog", b"syslog.ident", default=b"hgweb")
+configitem(b"serverlog", b"syslog.facility", b"LOG_LOCAL2")
 
 
 class fileobjectproxy(object):
     """A proxy around a file object that stores a serverlog reference."""
+
     __slots__ = (
-        '_fp',
-        '_serverlog',
+        "_fp",
+        "_serverlog",
     )
 
     def __init__(self, fp, serverlog):
-        object.__setattr__(self, '_fp', fp)
-        object.__setattr__(self, '_serverlog', serverlog)
+        object.__setattr__(self, "_fp", fp)
+        object.__setattr__(self, "_serverlog", serverlog)
 
     def __getattribute__(self, name):
-        if name in ('_fp', '_serverlog'):
+        if name in ("_fp", "_serverlog"):
             return object.__getattribute__(self, name)
 
-        return getattr(object.__getattribute__(self, '_fp'), name)
+        return getattr(object.__getattribute__(self, "_fp"), name)
 
     def __delattr__(self, name):
-        return delattr(object.__getattribute__(self, '_fp'), name)
+        return delattr(object.__getattribute__(self, "_fp"), name)
 
     def __setattr__(self, name, value):
-        return setattr(object.__getattribute__(self, '_fp'), name, value)
+        return setattr(object.__getattribute__(self, "_fp"), name, value)
 
 
 def wrappeddispatch(orig, repo, proto, command):
@@ -260,44 +252,46 @@ def wrappeddispatch(orig, repo, proto, command):
     # code path completely.
 
     if isinstance(proto, wireprotoserver.httpv1protocolhandler):
-        logevent(repo.ui, repo._serverlog, 'BEGIN_PROTOCOL', command)
+        logevent(repo.ui, repo._serverlog, "BEGIN_PROTOCOL", command)
     elif isinstance(proto, wireprotoserver.sshv1protocolhandler):
-        logevent(repo.ui, repo._serverlog, 'BEGIN_SSH_COMMAND', command)
+        logevent(repo.ui, repo._serverlog, "BEGIN_SSH_COMMAND", command)
 
         startusage = resource.getrusage(resource.RUSAGE_SELF)
 
-        repo._serverlog.update({
-            'requestid': pycompat.bytestr(uuid.uuid1()),
-            'startcpu': startusage.ru_utime + startusage.ru_stime,
-            'starttime': time.time(),
-            'ui': weakref.ref(repo.ui),
-        })
+        repo._serverlog.update(
+            {
+                "requestid": pycompat.bytestr(uuid.uuid1()),
+                "startcpu": startusage.ru_utime + startusage.ru_stime,
+                "starttime": time.time(),
+                "ui": weakref.ref(repo.ui),
+            }
+        )
     else:
-        raise error.ProgrammingError(b'unhandled protocol handler: %r' % proto)
+        raise error.ProgrammingError(b"unhandled protocol handler: %r" % proto)
 
     # If the return type is a `pushres`, `_sshv1respondbytes` will be called twice.
     # We only want to log a completed SSH event on the second call, so flip the
     # `ignorecall` flag here.
     res = orig(repo, proto, command)
     if isinstance(res, wireprototypes.pushres):
-        repo._serverlog['ignorecall'] = True
+        repo._serverlog["ignorecall"] = True
 
     return res
 
 
 def wrapped_getpayload(orig, self):
-    '''Wraps `sshv1protocolhandler.getpayload` to mark bytes responses as
+    """Wraps `sshv1protocolhandler.getpayload` to mark bytes responses as
     non-terminating.
-    '''
-    self._fout._serverlog['ignorecall'] = True
+    """
+    self._fout._serverlog["ignorecall"] = True
     return orig(self)
 
 
 def wrappedsshv1respondbytes(orig, fout, rsp):
     # check if this response is non-terminating (ie if `wrapped_getpayload`
     # set the flag just before this)
-    if fout._serverlog.get('ignorecall'):
-        fout._serverlog['ignorecall'] = False
+    if fout._serverlog.get("ignorecall"):
+        fout._serverlog["ignorecall"] = False
         return orig(fout, rsp)
 
     try:
@@ -322,7 +316,7 @@ def wrappedsshv1respondooberror(orig, fout, ferr, message):
 
 def record_completed_ssh_command(fout):
     serverlog = fout._serverlog
-    ui = serverlog['ui']()
+    ui = serverlog["ui"]()
 
     # This should not occur. But weakrefs are weakrefs. Be paranoid.
     if not ui:
@@ -332,28 +326,26 @@ def record_completed_ssh_command(fout):
     endusage = resource.getrusage(resource.RUSAGE_SELF)
     endcpu = endusage.ru_utime + endusage.ru_stime
 
-    deltatime = endtime - serverlog['starttime']
-    deltacpu = endcpu - serverlog['startcpu']
+    deltatime = endtime - serverlog["starttime"]
+    deltacpu = endcpu - serverlog["startcpu"]
 
-    logevent(ui, serverlog, 'END_SSH_COMMAND',
-             b'%.3f' % deltatime,
-             b'%.3f' % deltacpu)
+    logevent(ui, serverlog, "END_SSH_COMMAND", b"%.3f" % deltatime, b"%.3f" % deltacpu)
 
-    del serverlog['ui']
-    del serverlog['starttime']
-    del serverlog['startcpu']
-    serverlog['requestid'] = b''
+    del serverlog["ui"]
+    del serverlog["starttime"]
+    del serverlog["startcpu"]
+    serverlog["requestid"] = b""
 
 
 def repopath(repo):
-    root = repo.ui.config(b'serverlog', b'reporoot')
-    if root and not root.endswith(b'/'):
-        root += b'/'
+    root = repo.ui.config(b"serverlog", b"reporoot")
+    if root and not root.endswith(b"/"):
+        root += b"/"
 
     path = repo.path
     if root and path.startswith(root):
-        path = path[len(root):]
-    path = path.rstrip(b'/').rstrip(b'/.hg')
+        path = path[len(root) :]
+    path = path.rstrip(b"/").rstrip(b"/.hg")
 
     return path
 
@@ -366,24 +358,23 @@ def logevent(ui, context, action, *args):
     ``action`` is the event name and ``args`` are arguments specific to the
     ``action``.
     """
-    fmt = b'%s %s %s'
-    formatters = (context['requestid'], pycompat.bytestr(action), b' '.join(args))
-    if context.get('sessionid'):
-        fmt = b'%s:' + fmt
-        formatters = tuple([context['sessionid']] + list(formatters))
+    fmt = b"%s %s %s"
+    formatters = (context["requestid"], pycompat.bytestr(action), b" ".join(args))
+    if context.get("sessionid"):
+        fmt = b"%s:" + fmt
+        formatters = tuple([context["sessionid"]] + list(formatters))
 
-    if ui.configbool(b'serverlog', b'blackbox'):
-        ui.log(ui.config(b'serverlog', b'blackbox.service'),
-               fmt + b'\n', *formatters)
+    if ui.configbool(b"serverlog", b"blackbox"):
+        ui.log(ui.config(b"serverlog", b"blackbox.service"), fmt + b"\n", *formatters)
 
-    if ui.configbool(b'serverlog', b'syslog'):
+    if ui.configbool(b"serverlog", b"syslog"):
         logsyslog(ui, fmt % formatters)
 
 
 def logsyslog(ui, message):
     """Log a formatted message to syslog."""
-    ident = pycompat.sysstr(ui.config(b'serverlog', b'syslog.ident'))
-    facility_config = pycompat.sysstr(ui.config(b'serverlog', b'syslog.facility'))
+    ident = pycompat.sysstr(ui.config(b"serverlog", b"syslog.ident"))
+    facility_config = pycompat.sysstr(ui.config(b"serverlog", b"syslog.facility"))
     facility = getattr(syslog, facility_config)
 
     syslog.openlog(ident, 0, facility)
@@ -392,11 +383,10 @@ def logsyslog(ui, message):
 
 
 def wrapped_runwsgi(orig, self, req, res, repo):
-    '''Wrap hgweb._runwsgi to capture timing and CPU usage information
-    '''
+    """Wrap hgweb._runwsgi to capture timing and CPU usage information"""
     serverlog = {
-        'requestid': pycompat.bytestr(uuid.uuid1()),
-        'writecount': 0,
+        "requestid": pycompat.bytestr(uuid.uuid1()),
+        "writecount": 0,
     }
 
     env = req.rawenv
@@ -404,10 +394,11 @@ def wrapped_runwsgi(orig, self, req, res, repo):
     # Resolve the repository path.
     # If serving with multiple repos via hgwebdir_mod, REPO_NAME will be
     # set to the relative path of the repo (I think).
-    serverlog['path'] = req.apppath or repopath(repo)
+    serverlog["path"] = req.apppath or repopath(repo)
 
-    serverlog['ip'] = env.get(b'HTTP_X_CLUSTER_CLIENT_IP') or \
-        env.get(b'REMOTE_ADDR') or b'UNKNOWN'
+    serverlog["ip"] = (
+        env.get(b"HTTP_X_CLUSTER_CLIENT_IP") or env.get(b"REMOTE_ADDR") or b"UNKNOWN"
+    )
 
     # Stuff a reference to the state and the bound logging method so we can
     # record and log inside request handling.
@@ -416,27 +407,26 @@ def wrapped_runwsgi(orig, self, req, res, repo):
 
     # TODO REQUEST_URI may not be defined in all WSGI environments,
     # including wsgiref. We /could/ copy code from hgweb_mod here.
-    uri = env.get(b'REQUEST_URI', b'UNKNOWN')
+    uri = env.get(b"REQUEST_URI", b"UNKNOWN")
 
     sl = serverlog
-    logevent(repo.ui, sl, 'BEGIN_REQUEST', sl['path'], sl['ip'], uri)
+    logevent(repo.ui, sl, "BEGIN_REQUEST", sl["path"], sl["ip"], uri)
 
     startusage = resource.getrusage(resource.RUSAGE_SELF)
     startcpu = startusage.ru_utime + startusage.ru_stime
     starttime = time.time()
 
-    datasizeinterval = repo.ui.configint(b'serverlog', b'datalogsizeinterval')
+    datasizeinterval = repo.ui.configint(b"serverlog", b"datalogsizeinterval")
     lastlogamount = 0
 
     try:
         for what in orig(self, req, res, repo):
-            sl['writecount'] += len(what)
+            sl["writecount"] += len(what)
             yield what
 
-            if sl['writecount'] - lastlogamount > datasizeinterval:
-                logevent(repo.ui, sl, 'WRITE_PROGRESS',
-                         b'%d' % sl['writecount'])
-                lastlogamount = sl['writecount']
+            if sl["writecount"] - lastlogamount > datasizeinterval:
+                logevent(repo.ui, sl, "WRITE_PROGRESS", b"%d" % sl["writecount"])
+                lastlogamount = sl["writecount"]
     finally:
         # It is easy to introduce cycles in localrepository instances.
         # Versions of Mercurial up to and including 4.5 leak repo instances
@@ -451,10 +441,14 @@ def wrapped_runwsgi(orig, self, req, res, repo):
         deltatime = endtime - starttime
         deltacpu = endcpu - startcpu
 
-        logevent(repo.ui, sl, 'END_REQUEST',
-                 b'%d' % sl['writecount'],
-                 b'%.3f' % deltatime,
-                 b'%.3f' % deltacpu)
+        logevent(
+            repo.ui,
+            sl,
+            "END_REQUEST",
+            b"%d" % sl["writecount"],
+            b"%.3f" % deltatime,
+            b"%.3f" % deltacpu,
+        )
 
 
 class sshserverwrapped(wireprotoserver.sshserver):
@@ -464,9 +458,9 @@ class sshserverwrapped(wireprotoserver.sshserver):
         repo = self._repo
 
         serverlog = {
-            'sessionid': pycompat.bytestr(uuid.uuid1()),
-            'requestid': b'',
-            'path': repopath(repo),
+            "sessionid": pycompat.bytestr(uuid.uuid1()),
+            "requestid": b"",
+            "path": repopath(repo),
         }
 
         # Stuff a reference to the state so we can do logging within repo
@@ -475,9 +469,13 @@ class sshserverwrapped(wireprotoserver.sshserver):
 
         self._fout = fileobjectproxy(self._fout, serverlog)
 
-        logevent(repo.ui, serverlog, 'BEGIN_SSH_SESSION',
-                 serverlog['path'],
-                 repo.ui.environ[b'USER'])
+        logevent(
+            repo.ui,
+            serverlog,
+            "BEGIN_SSH_SESSION",
+            serverlog["path"],
+            repo.ui.environ[b"USER"],
+        )
 
         self._serverlog = serverlog
 
@@ -495,30 +493,37 @@ class sshserverwrapped(wireprotoserver.sshserver):
             deltatime = endtime - starttime
             deltacpu = endcpu - startcpu
 
-            logevent(repo.ui, serverlog, 'END_SSH_SESSION',
-                     b'%.3f' % deltatime,
-                     b'%.3f' % deltacpu)
+            logevent(
+                repo.ui,
+                serverlog,
+                "END_SSH_SESSION",
+                b"%.3f" % deltatime,
+                b"%.3f" % deltacpu,
+            )
 
             self._serverlog = None
 
 
 def extsetup(ui):
     if wireprotov1server:
-        extensions.wrapfunction(wireprotov1server, b'dispatch',
-                                wrappeddispatch)
+        extensions.wrapfunction(wireprotov1server, b"dispatch", wrappeddispatch)
 
     if wireprotoserver:
-        extensions.wrapfunction(wireprotoserver.sshv1protocolhandler, b'getpayload',
-                                wrapped_getpayload)
-        extensions.wrapfunction(wireprotoserver, b'_sshv1respondbytes',
-                                wrappedsshv1respondbytes)
-        extensions.wrapfunction(wireprotoserver, b'_sshv1respondstream',
-                                wrappedsshv1respondstream)
-        extensions.wrapfunction(wireprotoserver, b'_sshv1respondooberror',
-                                wrappedsshv1respondooberror)
+        extensions.wrapfunction(
+            wireprotoserver.sshv1protocolhandler, b"getpayload", wrapped_getpayload
+        )
+        extensions.wrapfunction(
+            wireprotoserver, b"_sshv1respondbytes", wrappedsshv1respondbytes
+        )
+        extensions.wrapfunction(
+            wireprotoserver, b"_sshv1respondstream", wrappedsshv1respondstream
+        )
+        extensions.wrapfunction(
+            wireprotoserver, b"_sshv1respondooberror", wrappedsshv1respondooberror
+        )
 
-    if ui.configbool(b'serverlog', b'hgweb'):
-        extensions.wrapfunction(hgweb_mod.hgweb, '_runwsgi', wrapped_runwsgi)
+    if ui.configbool(b"serverlog", b"hgweb"):
+        extensions.wrapfunction(hgweb_mod.hgweb, "_runwsgi", wrapped_runwsgi)
 
-    if ui.configbool(b'serverlog', b'ssh'):
+    if ui.configbool(b"serverlog", b"ssh"):
         wireprotoserver.sshserver = sshserverwrapped

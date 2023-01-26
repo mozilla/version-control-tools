@@ -10,6 +10,7 @@ import hg_helper
 import os
 import sys
 
+
 def repo_owner(repo):
     repo_root = "/repo/hg/mozilla"
 
@@ -35,6 +36,7 @@ def repo_owner(repo):
     gid = fdata.st_gid
     group = getgrgid(gid)[0]
     return group
+
 
 # Local variables:
 # mode: python

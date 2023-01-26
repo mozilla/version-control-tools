@@ -8,23 +8,23 @@ import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
+
 def main(args):
-    if 'VIRTUAL_ENV' not in os.environ:
-        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+    if "VIRTUAL_ENV" not in os.environ:
+        activate = os.path.join(HERE, "venv", "bin", "activate_this.py")
         with open(activate) as f:
             exec(f.read(), dict(__file__=activate))
-        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
+        sys.executable = os.path.join(HERE, "venv", "bin", "python")
 
     from mach.main import Mach
 
     m = Mach(os.getcwd())
 
-    m.define_category('deploy', 'Deployment',
-                      'Deploy changes to remote servers', 50)
+    m.define_category("deploy", "Deployment", "Deploy changes to remote servers", 50)
     import vcttesting.deploy_mach_commands
 
     return m.run(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

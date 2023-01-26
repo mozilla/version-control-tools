@@ -21,21 +21,21 @@ from mercurial import (
 try:
     from mozautomation import repository
 except ImportError:
-    root = os.path.join(os.path.dirname(__file__), '..')
-    sys.path.insert(0, os.path.normpath(os.path.join(root, 'pylib', 'mozautomation')))
+    root = os.path.join(os.path.dirname(__file__), "..")
+    sys.path.insert(0, os.path.normpath(os.path.join(root, "pylib", "mozautomation")))
 
     from mozautomation import repository
 
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'localmozrepo', b'readuri', default=None)
-configitem(b'localmozrepo', b'writeuri', default=None)
+configitem(b"localmozrepo", b"readuri", default=None)
+configitem(b"localmozrepo", b"writeuri", default=None)
 
 
 def extsetup(ui):
-    read_uri = ui.config(b'localmozrepo', b'readuri')
-    write_uri = ui.config(b'localmozrepo', b'writeuri')
+    read_uri = ui.config(b"localmozrepo", b"readuri")
+    write_uri = ui.config(b"localmozrepo", b"writeuri")
 
     if read_uri:
         repository.BASE_READ_URI = read_uri

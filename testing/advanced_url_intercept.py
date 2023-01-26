@@ -41,7 +41,7 @@ from mercurial import (
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'advancedurlintercept', b'path', default=None)
+configitem(b"advancedurlintercept", b"path", default=None)
 
 
 class AdvancedURLInterceptor(object):
@@ -59,11 +59,11 @@ class AdvancedURLInterceptor(object):
         Raises:
             HTTPError, URLError
         """
-        path = self.ui.config(b'advancedurlintercept', b'path')
+        path = self.ui.config(b"advancedurlintercept", b"path")
         if not path:
-            raise error.Abort(b'no urlintercept path defined!')
+            raise error.Abort(b"no urlintercept path defined!")
 
-        with open(path, 'rb') as fh:
+        with open(path, "rb") as fh:
             data = json.load(fh)
 
         response = data[req.get_full_url()]
@@ -73,14 +73,9 @@ class AdvancedURLInterceptor(object):
             raise urllibcompat.urlerr.urlerror(b"fake error")
 
         if response["code"] != 200:
-            raise urllibcompat.urlerr.httperror(
-                url,
-                response["code"],
-                b"", None, None)
+            raise urllibcompat.urlerr.httperror(url, response["code"], b"", None, None)
 
-        return_obj = io.BytesIO(
-            pycompat.bytestr(json.dumps(response["data"]))
-        )
+        return_obj = io.BytesIO(pycompat.bytestr(json.dumps(response["data"])))
 
         # Urllib "openers" expect a file-like object with some
         # extra helper parameters. Add them here.

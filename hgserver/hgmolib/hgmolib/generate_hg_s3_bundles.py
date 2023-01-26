@@ -23,62 +23,75 @@ from google.cloud import storage
 
 # Use a separate hg for bundle generation for zstd support until we roll
 # out Mercurial 4.1 everywhere.
-HG = '/var/hg/venv_bundles/bin/hg'
+HG = "/var/hg/venv_bundles/bin/hg"
 
 # The types of bundles to generate.
 #
 # Define in order bundles should be listed in manifest.
 CREATES = [
-    ('gzip-v2', ['bundle', '-a', '-t', 'gzip-v2'], {}),
+    ("gzip-v2", ["bundle", "-a", "-t", "gzip-v2"], {}),
     # ``zstd`` uses default compression settings and is reasonably fast.
     # ``zstd-max`` uses the highest available compression settings and is
     # absurdly slow. But it produces significantly smaller bundles. Level 20
     # (and not higher) is used because it is the largest level supported
     # by the zstd library in 32-bit processes.
-    ('zstd', ['bundle', '-a', '-t', 'zstd-v2'], {}),
-    ('zstd-max', ['--config', 'experimental.bundlecomplevel=20',
-                  'bundle', '-a', '-t', 'zstd-v2'], {}),
-    ('stream-v2', ['bundle', '-a', '-t', 'none-v2;stream=v2'], {})
+    ("zstd", ["bundle", "-a", "-t", "zstd-v2"], {}),
+    (
+        "zstd-max",
+        [
+            "--config",
+            "experimental.bundlecomplevel=20",
+            "bundle",
+            "-a",
+            "-t",
+            "zstd-v2",
+        ],
+        {},
+    ),
+    ("stream-v2", ["bundle", "-a", "-t", "none-v2;stream=v2"], {}),
 ]
 
 CLONEBUNDLES_ORDER = [
-    ('zstd-max', 'BUNDLESPEC=zstd-v2'),
-    ('zstd', 'BUNDLESPEC=zstd-v2'),
-    ('gzip-v2', 'BUNDLESPEC=gzip-v2'),
-    ('stream-v2', 'BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore'),
+    ("zstd-max", "BUNDLESPEC=zstd-v2"),
+    ("zstd", "BUNDLESPEC=zstd-v2"),
+    ("gzip-v2", "BUNDLESPEC=gzip-v2"),
+    (
+        "stream-v2",
+        "BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore",
+    ),
 ]
 
 # Defines S3 hostname and bucket where uploads should go.
 S3_HOSTS = (
     # We list Oregon (us-west-2) before N. California (us-west-1) because it is
     # cheaper.
-    ('s3-us-west-2.amazonaws.com', 'moz-hg-bundles-us-west-2', 'us-west-2'),
-    ('s3-us-west-1.amazonaws.com', 'moz-hg-bundles-us-west-1', 'us-west-1'),
-    ('s3-us-east-2.amazonaws.com', 'moz-hg-bundles-us-east-2', 'us-east-2'),
-    ('s3-external-1.amazonaws.com', 'moz-hg-bundles-us-east-1', 'us-east-1'),
-    ('s3-eu-central-1.amazonaws.com', 'moz-hg-bundles-eu-central-1', 'eu-central-1'),
+    ("s3-us-west-2.amazonaws.com", "moz-hg-bundles-us-west-2", "us-west-2"),
+    ("s3-us-west-1.amazonaws.com", "moz-hg-bundles-us-west-1", "us-west-1"),
+    ("s3-us-east-2.amazonaws.com", "moz-hg-bundles-us-east-2", "us-east-2"),
+    ("s3-external-1.amazonaws.com", "moz-hg-bundles-us-east-1", "us-east-1"),
+    ("s3-eu-central-1.amazonaws.com", "moz-hg-bundles-eu-central-1", "eu-central-1"),
 )
 
 # Defines GCP bucket name and region where uploads should go.
 # GCP buckets all use the same prefix, unlike AWS
 GCP_HOSTS = (
-    ('moz-hg-bundles-gcp-us-central1', 'us-central1'),
-    ('moz-hg-bundles-gcp-us-west1', 'us-west1'),
+    ("moz-hg-bundles-gcp-us-central1", "us-central1"),
+    ("moz-hg-bundles-gcp-us-west1", "us-west1"),
 )
 
-GCS_ENDPOINT = 'https://storage.googleapis.com'
+GCS_ENDPOINT = "https://storage.googleapis.com"
 
-CDN = 'https://hg.cdn.mozilla.net'
+CDN = "https://hg.cdn.mozilla.net"
 
-BUNDLE_ROOT = '/repo/hg/bundles'
+BUNDLE_ROOT = "/repo/hg/bundles"
 
 CONCURRENT_THREADS = 4
 
 # Testing backdoor so results are deterministic.
-if 'SINGLE_THREADED' in os.environ:
+if "SINGLE_THREADED" in os.environ:
     CONCURRENT_THREADS = 1
 
-HTML_INDEX = '''
+HTML_INDEX = """
 <html>
   <head>
     <title>Mercurial Bundles</title>
@@ -128,9 +141,9 @@ HTML_INDEX = '''
     <p>This page generated at %s.</p>
   </body>
 </html>
-'''.strip()
+""".strip()
 
-HTML_ENTRY = '''
+HTML_ENTRY = """
 <tr>
   <td>{repo}</td>
   <td class="numeric">{zstd_entry}</td>
@@ -138,7 +151,7 @@ HTML_ENTRY = '''
   <td class="numeric">{gzip_v2_entry}</td>
   <td class="numeric">{stream_v2_entry}</td>
 </tr>
-'''.strip()
+""".strip()
 
 
 def upload_to_s3(region_name, bucket_name, local_path, remote_path):
@@ -149,7 +162,7 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
     while attempt < 3:
         attempt += 1
         try:
-            c = session.resource('s3')
+            c = session.resource("s3")
 
             b = c.Bucket(bucket_name)
             key = b.Object(remote_path)
@@ -160,7 +173,7 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
                 key.load()
                 exists = True
             except botocore.exceptions.ClientError as e:
-                if e.response['Error']['Code'] != '404':
+                if e.response["Error"]["Code"] != "404":
                     raise
 
                 exists = False
@@ -173,26 +186,32 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
             # Copying the object resets the modification time to current and
             # prevents unwanted early expiration.
             if exists:
-                print('copying %s:%s to reset expiration time' % (bucket_name,
-                                                                  remote_path))
+                print(
+                    "copying %s:%s to reset expiration time"
+                    % (bucket_name, remote_path)
+                )
                 key.copy_from(
-                    CopySource={'Bucket': bucket_name, 'Key': remote_path},
+                    CopySource={"Bucket": bucket_name, "Key": remote_path},
                     # This magic is needed to prevent S3 from complaining that
                     # metadata wasn't updated as part of the copy.
-                    MetadataDirective='REPLACE')
-                print('copying %s:%s completed' % (bucket_name, remote_path))
+                    MetadataDirective="REPLACE",
+                )
+                print("copying %s:%s completed" % (bucket_name, remote_path))
             else:
-                print('uploading %s:%s from %s' % (bucket_name, remote_path,
-                                                   local_path))
+                print(
+                    "uploading %s:%s from %s" % (bucket_name, remote_path, local_path)
+                )
                 key.upload_file(local_path)
-                print('uploading %s:%s completed' % (bucket_name, remote_path))
+                print("uploading %s:%s completed" % (bucket_name, remote_path))
 
             return
         except socket.error as e:
-            print('%s:%s failed: %s' % (bucket_name, remote_path, e))
+            print("%s:%s failed: %s" % (bucket_name, remote_path, e))
             time.sleep(15)
-    raise Exception('S3 upload of %s:%s not successful after %s attempts, '
-                    'giving up' % (bucket_name, remote_path, attempt))
+    raise Exception(
+        "S3 upload of %s:%s not successful after %s attempts, "
+        "giving up" % (bucket_name, remote_path, attempt)
+    )
 
 
 def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
@@ -207,7 +226,9 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
             blob = bucket.blob(remote_path)
 
             if blob.exists():
-                print('resetting expiration time for %s:%s' % (bucket_name, remote_path))
+                print(
+                    "resetting expiration time for %s:%s" % (bucket_name, remote_path)
+                )
 
                 # Set a temporary hold on an object and then remove the hold, to reset the
                 # retention period of the object. See below for details:
@@ -218,29 +239,32 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
                 blob.event_based_hold = False
                 blob.patch()
 
-                print('expiration time reset for %s:%s' % (bucket_name, remote_path))
+                print("expiration time reset for %s:%s" % (bucket_name, remote_path))
             else:
-                print('uploading %s:%s from %s' % (bucket_name, remote_path,
-                                                   local_path))
+                print(
+                    "uploading %s:%s from %s" % (bucket_name, remote_path, local_path)
+                )
                 blob.upload_from_filename(local_path)
-                print('uploading %s:%s completed' % (bucket_name, remote_path))
+                print("uploading %s:%s completed" % (bucket_name, remote_path))
 
             return
 
         except socket.error as e:
-            print('%s:%s failed: %s' % (bucket_name, remote_path, e))
+            print("%s:%s failed: %s" % (bucket_name, remote_path, e))
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback)
             time.sleep(15)
     else:
-        raise Exception('GCP cloud storage upload of %s:%s not successful after'
-                        '3 attempts, giving up' % (bucket_name, remote_path))
+        raise Exception(
+            "GCP cloud storage upload of %s:%s not successful after"
+            "3 attempts, giving up" % (bucket_name, remote_path)
+        )
 
 
 def bundle_paths(root, repo, tag, typ):
-    basename = '%s.%s.hg' % (tag, typ)
+    basename = "%s.%s.hg" % (tag, typ)
     final_path = os.path.join(root, basename)
-    remote_path = '%s/%s' % (repo, basename)
+    remote_path = "%s/%s" % (repo, basename)
 
     return final_path, remote_path
 
@@ -251,9 +275,11 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
     Generates using the command specified by ``extra_args`` into ``temp_path``
     before moving the fully created bundle to ``final_path``.
     """
-    args = [HG,
-            '--config', 'extensions.vcsreplicator=!',
-            '-R', repo] + extra_args + [temp_path]
+    args = (
+        [HG, "--config", "extensions.vcsreplicator=!", "-R", repo]
+        + extra_args
+        + [temp_path]
+    )
     subprocess.check_call(args)
     os.rename(temp_path, final_path)
 
@@ -272,18 +298,18 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     if copyfrom:
         # We assume all paths are pinned from a common root.
         assert not os.path.isabs(copyfrom)
-        source_repo = os.path.join('/repo/hg/mozilla', copyfrom)
-        dest_repo = os.path.join('/repo/hg/mozilla', repo)
-        source = os.path.join(source_repo, '.hg', 'clonebundles.manifest')
-        dest = os.path.join(dest_repo, '.hg', 'clonebundles.manifest')
-        backup = os.path.join(dest_repo, '.hg', 'clonebundles.manifest.last')
+        source_repo = os.path.join("/repo/hg/mozilla", copyfrom)
+        dest_repo = os.path.join("/repo/hg/mozilla", repo)
+        source = os.path.join(source_repo, ".hg", "clonebundles.manifest")
+        dest = os.path.join(dest_repo, ".hg", "clonebundles.manifest")
+        backup = os.path.join(dest_repo, ".hg", "clonebundles.manifest.last")
 
         # Create a backup of the last manifest so it can be restored easily.
         if os.path.exists(dest):
-            print('copying %s -> %s' % (dest, backup))
+            print("copying %s -> %s" % (dest, backup))
             shutil.copy2(dest, backup)
 
-        print('copying %s -> %s' % (source, dest))
+        print("copying %s -> %s" % (source, dest))
 
         # copy2 copies metadata.
         shutil.copy2(source, dest)
@@ -291,13 +317,13 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         # Replicate manifest to mirrors.
         # Bug 1714463: don't replicate `copyfrom` for try
         if repo != "try":
-            subprocess.check_call([HG, 'replicatesync'], cwd=dest_repo)
+            subprocess.check_call([HG, "replicatesync"], cwd=dest_repo)
 
         return {}
 
-    repo_full = os.path.join('/repo/hg/mozilla', repo)
+    repo_full = os.path.join("/repo/hg/mozilla", repo)
 
-    hg_stat = os.stat(os.path.join(repo_full, '.hg'))
+    hg_stat = os.stat(os.path.join(repo_full, ".hg"))
     uid = hg_stat.st_uid
     gid = hg_stat.st_gid
 
@@ -305,24 +331,24 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     # the time the bundle was created. This is the easiest way to name
     # bundle files.
     tip = subprocess.check_output(
-        [HG, '-R', repo_full, 'log', '-r', 'tip', '-T', '{node}']
-    ).decode('latin-1')
-    print('tip is %s' % tip)
+        [HG, "-R", repo_full, "log", "-r", "tip", "-T", "{node}"]
+    ).decode("latin-1")
+    print("tip is %s" % tip)
 
-    with open(os.path.join(repo_full, '.hg', 'requires'), 'rb') as fh:
-        generaldelta = b'generaldelta\n' in fh.readlines()
+    with open(os.path.join(repo_full, ".hg", "requires"), "rb") as fh:
+        generaldelta = b"generaldelta\n" in fh.readlines()
 
     if not generaldelta:
-        raise Exception('non-generaldelta repo not supported: %s' % repo_full)
+        raise Exception("non-generaldelta repo not supported: %s" % repo_full)
 
     # Verify the fncache is correct
-    print('verifying or rebuilding fncache')
+    print("verifying or rebuilding fncache")
     out = subprocess.check_output(
-        [HG, '-R', repo_full, 'debugrebuildfncache'], encoding='latin-1'
+        [HG, "-R", repo_full, "debugrebuildfncache"], encoding="latin-1"
     )
 
     for line in out.splitlines():
-        print('fncache for %s: %s' % (repo, line))
+        print("fncache for %s: %s" % (repo, line))
 
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
 
@@ -336,11 +362,11 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     # We keep the last bundle files around so we can reuse them if necessary.
     # Prune irrelevant files.
     for p in os.listdir(bundle_path):
-        if p.startswith('.') or p.startswith(tip):
+        if p.startswith(".") or p.startswith(tip):
             continue
 
         full = os.path.join(bundle_path, p)
-        print('removing old bundle file: %s' % full)
+        print("removing old bundle file: %s" % full)
         os.unlink(full)
 
     # Bundle generation is pretty straightforward. We simply invoke
@@ -362,24 +388,23 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
         for t, args, opts in CREATES:
             # Only generate 1 of zstd or zstd-max since they are redundant.
-            if t == 'zstd' and zstd_max:
+            if t == "zstd" and zstd_max:
                 continue
 
-            if t == 'zstd-max' and not zstd_max:
+            if t == "zstd-max" and not zstd_max:
                 continue
 
             final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
-            temp_path = '%s.tmp' % final_path
+            temp_path = "%s.tmp" % final_path
 
             # Record that this bundle is relevant.
             bundles.append((t, final_path, remote_path))
 
             if os.path.exists(final_path):
-                print('bundle already exists, skipping: %s' % final_path)
+                print("bundle already exists, skipping: %s" % final_path)
                 continue
 
-            fs.append(e.submit(generate_bundle, repo_full, temp_path,
-                               final_path, args))
+            fs.append(e.submit(generate_bundle, repo_full, temp_path, final_path, args))
 
     for f in fs:
         # Will re-raise exceptions.
@@ -411,15 +436,23 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
             for host, bucket, name in S3_HOSTS:
                 for t, bundle_path, remote_path in bundles:
-                    print('uploading to %s/%s/%s' % (host, bucket, remote_path))
-                    fs.append(e.submit(upload_to_s3, name, bucket,
-                                       bundle_path, remote_path))
+                    print("uploading to %s/%s/%s" % (host, bucket, remote_path))
+                    fs.append(
+                        e.submit(upload_to_s3, name, bucket, bundle_path, remote_path)
+                    )
 
             for bucket, region in GCP_HOSTS:
                 for t, bundle_path, remote_path in bundles:
-                    print('uploading to %s/%s/%s'% (GCS_ENDPOINT, bucket, remote_path))
-                    fs.append(e.submit(upload_to_gcpstorage, region, bucket,
-                                       bundle_path, remote_path))
+                    print("uploading to %s/%s/%s" % (GCS_ENDPOINT, bucket, remote_path))
+                    fs.append(
+                        e.submit(
+                            upload_to_gcpstorage,
+                            region,
+                            bucket,
+                            bundle_path,
+                            remote_path,
+                        )
+                    )
 
         # Future.result() will raise if a future raised. This will
         # abort script execution, which is fine since failure should
@@ -440,31 +473,41 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
             continue
 
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
-        clonebundles_manifest.append('%s/%s %s REQUIRESNI=true cdn=true' % (
-            CDN, remote_path, params))
+        clonebundles_manifest.append(
+            "%s/%s %s REQUIRESNI=true cdn=true" % (CDN, remote_path, params)
+        )
 
         # Prefer S3 buckets over GCP buckets for the time being,
         # so add them first
         for host, bucket, name in S3_HOSTS:
-            entry = 'https://%s/%s/%s %s ec2region=%s' % (
-                host, bucket, remote_path, params, name)
-            clonebundles_manifest.append(entry)
-
-        for bucket, name in GCP_HOSTS:
-            entry = '%s/%s/%s %s gceregion=%s' % (
-                GCS_ENDPOINT, bucket, remote_path, params, name
+            entry = "https://%s/%s/%s %s ec2region=%s" % (
+                host,
+                bucket,
+                remote_path,
+                params,
+                name,
             )
             clonebundles_manifest.append(entry)
 
-    backup_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest.old')
-    clonebundles_path = os.path.join(repo_full, '.hg', 'clonebundles.manifest')
+        for bucket, name in GCP_HOSTS:
+            entry = "%s/%s/%s %s gceregion=%s" % (
+                GCS_ENDPOINT,
+                bucket,
+                remote_path,
+                params,
+                name,
+            )
+            clonebundles_manifest.append(entry)
+
+    backup_path = os.path.join(repo_full, ".hg", "clonebundles.manifest.old")
+    clonebundles_path = os.path.join(repo_full, ".hg", "clonebundles.manifest")
 
     if os.path.exists(clonebundles_path):
-        print('Copying %s -> %s' % (clonebundles_path, backup_path))
+        print("Copying %s -> %s" % (clonebundles_path, backup_path))
         shutil.copy2(clonebundles_path, backup_path)
 
-    with open(clonebundles_path, 'w') as fh:
-        fh.write('\n'.join(clonebundles_manifest))
+    with open(clonebundles_path, "w") as fh:
+        fh.write("\n".join(clonebundles_manifest))
 
     # Ensure manifest is owned by same user who owns repo and has sane
     # permissions.
@@ -474,7 +517,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     os.chmod(clonebundles_path, 0o664)
 
     # Replicate manifest to mirrors.
-    subprocess.check_call([HG, 'replicatesync'], cwd=repo_full)
+    subprocess.check_call([HG, "replicatesync"], cwd=repo_full)
 
     return paths
 
@@ -487,31 +530,30 @@ def generate_index(repos):
         p = repos[repo]
 
         # Should only be for bundles with copyfrom.
-        if 'gzip-v2' not in p:
-            print('ignoring repo %s in index because no gzip bundle' % repo)
+        if "gzip-v2" not in p:
+            print("ignoring repo %s in index because no gzip bundle" % repo)
             continue
 
-        opts = {'repo': repo}
+        opts = {"repo": repo}
 
-        for k in ('gzip-v2', 'stream-v2', 'zstd', 'zstd-max'):
-            key = '%s_entry' % k.replace('-', '_')
+        for k in ("gzip-v2", "stream-v2", "zstd", "zstd-max"):
+            key = "%s_entry" % k.replace("-", "_")
             if k in p:
                 opts[key] = '<a href="{path}">{size:,}</a>'.format(
                     path=p[k][0],
                     size=p[k][1],
                 )
-                opts['basename'] = os.path.basename(p[k][0])
+                opts["basename"] = os.path.basename(p[k][0])
             else:
-                opts[key] = '-'
+                opts[key] = "-"
 
         entries.append(HTML_ENTRY.format(**opts))
 
-    html = HTML_INDEX % ('\n'.join(entries),
-                         datetime.datetime.utcnow().isoformat())
+    html = HTML_INDEX % ("\n".join(entries), datetime.datetime.utcnow().isoformat())
 
     # We rely on the mtime of this file for monitoring to ensure
     # bundle generation is working.
-    with open(os.path.join(BUNDLE_ROOT, 'index.html'), 'w') as fh:
+    with open(os.path.join(BUNDLE_ROOT, "index.html"), "w") as fh:
         fh.write(html)
 
     return html
@@ -519,16 +561,16 @@ def generate_index(repos):
 
 def upload_index(html):
     for host, bucket, region in S3_HOSTS:
-        client = boto3.client('s3', region_name=region)
+        client = boto3.client("s3", region_name=region)
         client.put_object(
             Bucket=bucket,
-            Key='index.html',
+            Key="index.html",
             Body=html,
-            ContentType='text/html',
+            ContentType="text/html",
             # Without this, the CDN caches objects for an indeterminate amount
             # of time. We want this page to be fairly current, so establish a
             # less aggressive caching policy.
-            CacheControl='max-age=60',
+            CacheControl="max-age=60",
         )
 
 
@@ -541,12 +583,12 @@ def generate_json_manifest(repos):
         d[repo] = {}
         for t, (path, size) in bundles.items():
             d[repo][t] = {
-                'path': path,
-                'size': size,
+                "path": path,
+                "size": size,
             }
 
     data = json.dumps(d, sort_keys=True, indent=4)
-    with open(os.path.join(BUNDLE_ROOT, 'bundles.json'), 'w') as fh:
+    with open(os.path.join(BUNDLE_ROOT, "bundles.json"), "w") as fh:
         fh.write(data)
 
     return data
@@ -554,27 +596,30 @@ def generate_json_manifest(repos):
 
 def upload_json_manifest(data):
     for host, bucket, region in S3_HOSTS:
-        c = boto3.client('s3', region_name=region)
+        c = boto3.client("s3", region_name=region)
         c.put_object(
             Bucket=bucket,
-            Key='bundles.json',
+            Key="bundles.json",
             Body=data,
-            ContentType='application/json',
-            CacheControl='max-age=60',
+            ContentType="application/json",
+            CacheControl="max-age=60",
         )
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', help='file to read repository list from')
-    parser.add_argument('--no-upload', action='store_true',
-                        help='do not upload to servers (useful for testing)')
+    parser.add_argument("-f", help="file to read repository list from")
+    parser.add_argument(
+        "--no-upload",
+        action="store_true",
+        help="do not upload to servers (useful for testing)",
+    )
 
     repos = []
 
     args, remaining = parser.parse_known_args()
     if args.f:
-        with open(args.f, 'r') as fh:
+        with open(args.f, "r") as fh:
             items = [l.rstrip() for l in fh]
     else:
         items = remaining
@@ -584,7 +629,7 @@ def main():
         fields = item.split()
         # fields[0] is the repo path.
         for field in fields[1:]:
-            vals = field.split('=', 1)
+            vals = field.split("=", 1)
             if len(vals) == 2:
                 attrs[vals[0]] = vals[1]
             else:
@@ -600,7 +645,7 @@ def main():
         for repo, opts in repos:
             paths[repo] = generate_bundles(repo, upload=upload, **opts)
     except (botocore.exceptions.NoCredentialsError, OSError) as e:
-        print('%s: %s' % (e.__class__.__name__, e))
+        print("%s: %s" % (e.__class__.__name__, e))
         return 1
 
     html_index = generate_index(paths)
@@ -612,6 +657,5 @@ def main():
 
     # Touch a file after successful execution. We monitor this file's age
     # and alert when the bundle generation process is busted.
-    with open(os.path.join(BUNDLE_ROOT, 'lastrun'), 'w') as fh:
-        fh.write('%sZ\n' % datetime.datetime.utcnow().isoformat())
-
+    with open(os.path.join(BUNDLE_ROOT, "lastrun"), "w") as fh:
+        fh.write("%sZ\n" % datetime.datetime.utcnow().isoformat())

@@ -6,6 +6,7 @@
 import datetime
 import sys
 
+
 def totals_by_hour(fh):
     hours = {}
 
@@ -15,9 +16,9 @@ def totals_by_hour(fh):
         try:
             when, repo, ip, command, size, t_wall, t_cpu = parts
             try:
-                when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S.%f')
+                when = datetime.datetime.strptime(when, "%Y-%m-%dT%H:%M:%S.%f")
             except ValueError:
-                when = datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M:%S')
+                when = datetime.datetime.strptime(when, "%Y-%m-%dT%H:%M:%S")
         except (TypeError, ValueError):
             continue
 
@@ -37,8 +38,11 @@ def totals_by_hour(fh):
 
     for date, repos in sorted(hours.items()):
         for repo, totals in sorted(repos.items()):
-            print('%s\t%s\t%d\t%d\t%d\t%d' % (date.isoformat(), repo, totals[0],
-                                              totals[1], totals[2], totals[3]))
+            print(
+                "%s\t%s\t%d\t%d\t%d\t%d"
+                % (date.isoformat(), repo, totals[0], totals[1], totals[2], totals[3])
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     totals_by_hour(sys.stdin)

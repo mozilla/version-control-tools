@@ -7,10 +7,10 @@ import difflib
 import json
 import sys
 
-with open(sys.argv[1], 'rb') as fh:
+with open(sys.argv[1], "rb") as fh:
     a = json.load(fh)
 
-with open(sys.argv[2], 'rb') as fh:
+with open(sys.argv[2], "rb") as fh:
     b = json.load(fh)
 
 if a == b:
@@ -19,7 +19,7 @@ if a == b:
 alines = json.dumps(a, indent=2, sort_keys=True).splitlines()
 blines = json.dumps(b, indent=2, sort_keys=True).splitlines()
 
-diff = difflib.unified_diff(alines, blines, sys.argv[1], sys.argv[2], lineterm='')
+diff = difflib.unified_diff(alines, blines, sys.argv[1], sys.argv[2], lineterm="")
 
 for line in diff:
     print(line)

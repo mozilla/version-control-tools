@@ -23,7 +23,7 @@ from push import Push
 from redo import retry
 
 
-LOG = logging.getLogger('pushlog_client')
+LOG = logging.getLogger("pushlog_client")
 JSON_PUSHES = "%(repo_url)s/json-pushes"
 VALID_CACHE = {}
 VERSION = 2
@@ -41,8 +41,14 @@ def _pushes_to_list(pushes):
     return revisions
 
 
-def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version=VERSION,
-                                   tipsonly=True, return_revision_list=False):
+def query_pushes_by_revision_range(
+    repo_url,
+    from_revision,
+    to_revision,
+    version=VERSION,
+    tipsonly=True,
+    return_revision_list=False,
+):
     """
     Return an ordered list of pushes (by date - oldest (starting) first).
 
@@ -58,11 +64,11 @@ def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version
         JSON_PUSHES % {"repo_url": repo_url},
         from_revision,
         to_revision,
-        version
+        version,
     )
 
     if tipsonly:
-        url += '&tipsonly=1'
+        url += "&tipsonly=1"
 
     LOG.debug("About to fetch %s" % url)
     req = retry(requests.get, args=(url,))
@@ -81,8 +87,9 @@ def query_pushes_by_revision_range(repo_url, from_revision, to_revision, version
     return push_list
 
 
-def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=VERSION,
-                                 return_revision_list=False):
+def query_pushes_by_pushid_range(
+    repo_url, start_id, end_id, version=VERSION, return_revision_list=False
+):
     """
     Return an ordered list of pushes (oldest first).
 
@@ -97,7 +104,7 @@ def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=VERSION,
         JSON_PUSHES % {"repo_url": repo_url},
         start_id - 1,  # off by one to compensate for pushlog as it skips start_id
         end_id,
-        version
+        version,
     )
     LOG.debug("About to fetch %s" % url)
     req = retry(requests.get, args=(url,))
@@ -114,8 +121,9 @@ def query_pushes_by_pushid_range(repo_url, start_id, end_id, version=VERSION,
     return push_list
 
 
-def query_pushes_by_specified_revision_range(repo_url, revision, before, after,
-                                             return_revision_list=False):
+def query_pushes_by_specified_revision_range(
+    repo_url, revision, before, after, return_revision_list=False
+):
     """
     Get the start and end revisions' pushlog based on the number of revisions before and after.
     Raises PushlogError if pushlog data cannot be retrieved.
@@ -133,8 +141,10 @@ def query_pushes_by_specified_revision_range(repo_url, revision, before, after,
         push_list = query_pushes_by_pushid_range(repo_url, start_id, end_id)
     except Exception as e:
         LOG.exception(e)
-        raise PushlogError('Unable to retrieve pushlog data. '
-                           'Please check repo_url and revision specified.')
+        raise PushlogError(
+            "Unable to retrieve pushlog data. "
+            "Please check repo_url and revision specified."
+        )
 
     if return_revision_list:
         return _pushes_to_list(push_list)
@@ -154,7 +164,10 @@ def query_push_by_revision(repo_url, revision, full=False, return_revision_list=
     full                   - query whole information of a push if it's True
     return_revision_list   - return a list of revisions if it's True
     """
-    url = "%s?changeset=%s&tipsonly=1" % (JSON_PUSHES % {"repo_url": repo_url}, revision)
+    url = "%s?changeset=%s&tipsonly=1" % (
+        JSON_PUSHES % {"repo_url": repo_url},
+        revision,
+    )
     if full:
         url += "&full=1"
     LOG.debug("About to fetch %s" % url)
@@ -167,8 +180,10 @@ def query_push_by_revision(repo_url, revision, full=False, return_revision_list=
         push_id, push_info = data.popitem()
         push = Push(push_id=push_id, push_info=push_info)
     else:
-        LOG.debug("Requesting the info with full=1 can yield too much unnecessary output "
-                  "to debug anything properly")
+        LOG.debug(
+            "Requesting the info with full=1 can yield too much unnecessary output "
+            "to debug anything properly"
+        )
     if return_revision_list:
         return push.changesets[0].node
 
@@ -193,7 +208,7 @@ def valid_revision(repo_url, revision):
     LOG.debug("Determine if the revision is valid.")
     url = "%s?changeset=%s&tipsonly=1" % (
         JSON_PUSHES % {"repo_url": repo_url},
-        revision
+        revision,
     )
     data = retry(requests.get, args=(url,)).json()
     ret = True

@@ -1,7 +1,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-'''Record pushes to Mercurial repositories.'''
+"""Record pushes to Mercurial repositories."""
 
 from __future__ import absolute_import
 
@@ -35,16 +35,16 @@ from mercurial.utils import (
 )
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
 
 
 Abort = error.Abort
 RepoLookupError = error.RepoLookupError
 
-minimumhgversion = b'4.8'
-testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.9'
-buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog'
+minimumhgversion = b"4.8"
+testedwith = b"4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.9"
+buglink = b"https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20Pushlog"
 
 cmdtable = {}
 command = registrar.command(cmdtable)
@@ -52,46 +52,40 @@ command = registrar.command(cmdtable)
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'pushlog', b'autolanduser',
-           default=configitems.dynamicdefault)
-configitem(b'pushlog', b'landingworkeruser',
-           default=configitems.dynamicdefault)
-configitem(b'pushlog', b'landingworkeruserdev',
-           default=configitems.dynamicdefault)
-configitem(b'pushlog', b'remoteuserprefix',
-           default=None)
-configitem(b'pushlog', b'timeoutro',
-           default=configitems.dynamicdefault)
-configitem(b'pushlog', b'timeoutrw',
-           default=configitems.dynamicdefault)
-configitem(b'pushlog', b'userprefix',
-           default=None)
+configitem(b"pushlog", b"autolanduser", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"landingworkeruser", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"landingworkeruserdev", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"remoteuserprefix", default=None)
+configitem(b"pushlog", b"timeoutro", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"timeoutrw", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"userprefix", default=None)
 
 
 revsetpredicate = registrar.revsetpredicate()
 
 SCHEMA = [
-    'CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)',
-    'CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)',
-    'CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)',
-    'CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)',
-    'CREATE INDEX IF NOT EXISTS changeset_pushid ON changesets (pushid)',
-    'CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)',
-    'CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)',
+    "CREATE TABLE IF NOT EXISTS changesets (pushid INTEGER, rev INTEGER, node text)",
+    "CREATE TABLE IF NOT EXISTS pushlog (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, date INTEGER)",
+    "CREATE UNIQUE INDEX IF NOT EXISTS changeset_node ON changesets (node)",
+    "CREATE UNIQUE INDEX IF NOT EXISTS changeset_rev ON changesets (rev)",
+    "CREATE INDEX IF NOT EXISTS changeset_pushid ON changesets (pushid)",
+    "CREATE INDEX IF NOT EXISTS pushlog_date ON pushlog (date)",
+    "CREATE INDEX IF NOT EXISTS pushlog_user ON pushlog (user)",
 ]
 
-AUTOLAND_USER = b'bind-autoland@mozilla.com'
-LANDING_WORKER_USER = b'lando_landing_worker@mozilla.com'
-LANDING_WORKER_USER_DEV = b'lando_landing_worker_dev@mozilla.com'
+AUTOLAND_USER = b"bind-autoland@mozilla.com"
+LANDING_WORKER_USER = b"lando_landing_worker@mozilla.com"
+LANDING_WORKER_USER_DEV = b"lando_landing_worker_dev@mozilla.com"
 
 
 # Wraps capabilities wireproto command to advertise pushlog availability.
 def capabilities(orig, repo, proto):
     caps = orig(repo, proto)
-    caps.append(b'pushlog')
+    caps.append(b"pushlog")
     return caps
 
-@wireproto.wireprotocommand(b'pushlog', b'firstpush', permission=b'pull')
+
+@wireproto.wireprotocommand(b"pushlog", b"firstpush", permission=b"pull")
 def pushlogwireproto(repo, proto, firstpush):
     """Return pushlog data from a start offset.
 
@@ -113,17 +107,17 @@ def pushlogwireproto(repo, proto, firstpush):
       * Integer seconds since UNIX epoch when this push was performed
       * A list of 40 byte hex changesets included in the push, in revset order
     """
-    lines = [b'1']
+    lines = [b"1"]
 
     try:
         firstpush = int(firstpush)
 
         for pushid, who, when, nodes in repo.pushlog.pushes(start_id=firstpush):
-            lines.append(b'%d %s %d %s' % (pushid, who, when, b' '.join(nodes)))
+            lines.append(b"%d %s %d %s" % (pushid, who, when, b" ".join(nodes)))
 
-        return b'\n'.join(lines)
+        return b"\n".join(lines)
     except Exception as e:
-        return b'\n'.join([b'0', pycompat.bytestr(e)])
+        return b"\n".join([b"0", pycompat.bytestr(e)])
 
 
 def exchangepullpushlog(orig, pullop):
@@ -137,26 +131,25 @@ def exchangepullpushlog(orig, pullop):
     # check stepsdone for future compatibility with bundle2 pushlog exchange.
     res = orig(pullop)
 
-    if b'pushlog' in pullop.stepsdone or not pullop.remote.capable(b'pushlog'):
+    if b"pushlog" in pullop.stepsdone or not pullop.remote.capable(b"pushlog"):
         return res
 
-    pullop.stepsdone.add(b'pushlog')
+    pullop.stepsdone.add(b"pushlog")
     repo = pullop.repo
     urepo = repo.unfiltered()
     fetchfrom = repo.pushlog.lastpushid() + 1
-    lines = pullop.remote._call(b'pushlog', firstpush=pycompat.bytestr(fetchfrom))
+    lines = pullop.remote._call(b"pushlog", firstpush=pycompat.bytestr(fetchfrom))
     lines = iter(lines.splitlines())
 
     statusline = pycompat.bytestr(next(lines))
-    if statusline[0] == b'0':
-        raise Abort(b'remote error fetching pushlog: %s' % next(lines))
-    elif statusline != b'1':
-        raise Abort(b'error fetching pushlog: unexpected response: %s\n' %
-            statusline)
+    if statusline[0] == b"0":
+        raise Abort(b"remote error fetching pushlog: %s" % next(lines))
+    elif statusline != b"1":
+        raise Abort(b"error fetching pushlog: unexpected response: %s\n" % statusline)
 
     pushes = []
     for line in lines:
-        pushid, who, when, nodes = line.split(b' ', 3)
+        pushid, who, when, nodes = line.split(b" ", 3)
         nodes = [bin(n) for n in nodes.split()]
 
         # We stop processing if there is a reference to an unknown changeset.
@@ -181,29 +174,31 @@ def exchangepullpushlog(orig, pullop):
             [urepo[n] for n in nodes]
         except error.RepoLookupError:
             missing = [hex(n) for n in nodes if n not in urepo]
-            repo.ui.warn(b'received pushlog entry for unknown changeset %s; '
-                         b'ignoring\n' % b', '.join(missing))
+            repo.ui.warn(
+                b"received pushlog entry for unknown changeset %s; "
+                b"ignoring\n" % b", ".join(missing)
+            )
             break
 
         pushes.append((int(pushid), who, int(when), nodes))
 
     repo.pushlog.recordpushes(pushes, tr=pullop.trmanager.transaction())
-    repo.ui.status(b'added %d pushes\n' % len(pushes))
+    repo.ui.status(b"added %d pushes\n" % len(pushes))
 
     return res
 
 
 def addpushmetadata(repo, ctx, d):
-    if not util.safehasattr(repo, 'pushlog'):
+    if not util.safehasattr(repo, "pushlog"):
         return
 
     push = repo.pushlog.pushfromchangeset(ctx)
     if push:
-        d[b'pushid'] = push.pushid
-        d[b'pushuser'] = push.user
-        d[b'pushdate'] = dateutil.makedate(push.when)
-        d[b'pushnodes'] = push.nodes
-        d[b'pushhead'] = push.nodes[-1]
+        d[b"pushid"] = push.pushid
+        d[b"pushuser"] = push.user
+        d[b"pushdate"] = dateutil.makedate(push.when)
+        d[b"pushnodes"] = push.nodes
+        d[b"pushhead"] = push.nodes[-1]
 
 
 def commonentry(orig, repo, ctx):
@@ -213,11 +208,12 @@ def commonentry(orig, repo, ctx):
     return d
 
 
-Push = collections.namedtuple('Push', ('pushid', 'user', 'when', 'nodes'))
+Push = collections.namedtuple("Push", ("pushid", "user", "when", "nodes"))
 
 
 def make_finalize(repo, conn):
     """Make a function to be called immediately before a Mercurial transaction closes."""
+
     def pushlog_tr_finalize(tr):
         for attempt in range(3):
             try:
@@ -225,19 +221,24 @@ def make_finalize(repo, conn):
 
                 return
             except sqlite3.OperationalError as e:
-                repo.ui.write(b'error committing pushlog transaction on'
-                              b' attempt %d; retrying\n' % (attempt + 1))
-                repo.ui.log(b'pushlog', b'Exception: %s\n' % pycompat.bytestr(e))
+                repo.ui.write(
+                    b"error committing pushlog transaction on"
+                    b" attempt %d; retrying\n" % (attempt + 1)
+                )
+                repo.ui.log(b"pushlog", b"Exception: %s\n" % pycompat.bytestr(e))
                 time.sleep(attempt * 1.0)
         else:
-            raise error.Abort(b'could not complete push due to pushlog operational errors; '
-                              b'please retry, and file a bug if the issue persists')
+            raise error.Abort(
+                b"could not complete push due to pushlog operational errors; "
+                b"please retry, and file a bug if the issue persists"
+            )
 
     return pushlog_tr_finalize
 
 
 def make_post_close(repo, conn):
     """Make a function to be called after a Mercurial transaction closes."""
+
     def pushlog_tr_post_close(tr):
         try:
             conn.close()
@@ -245,7 +246,8 @@ def make_post_close(repo, conn):
             return
         except sqlite3.OperationalError as e:
             repo.ui.log(
-                b'pushlog', b'Error closing pushlog connection: %s\n' % pycompat.bytestr(e)
+                b"pushlog",
+                b"Error closing pushlog connection: %s\n" % pycompat.bytestr(e),
             )
 
     return pushlog_tr_post_close
@@ -253,9 +255,10 @@ def make_post_close(repo, conn):
 
 def make_abort(repo, conn):
     """Make a function to be called when a Mercurial transaction aborts."""
+
     def pushlog_tr_abort(tr):
         if tr:
-            tr._report(b'rolling back pushlog\n')
+            tr._report(b"rolling back pushlog\n")
 
         conn.rollback()
         conn.close()
@@ -264,10 +267,10 @@ def make_abort(repo, conn):
 
 
 class pushlog(object):
-    '''An interface to pushlog data.'''
+    """An interface to pushlog data."""
 
     def __init__(self, repo):
-        '''Create an instance bound to a sqlite database in a path.'''
+        """Create an instance bound to a sqlite database in a path."""
         # Use a weak ref to avoid cycle. This object's lifetime should be no
         # greater than the repo's.
         self.repo = repo
@@ -295,7 +298,7 @@ class pushlog(object):
         closed when the transaction is committed. The connection will roll back
         and be closed if the transaction is aborted.
         """
-        path = self.repo.vfs.join(b'pushlog2.db')
+        path = self.repo.vfs.join(b"pushlog2.db")
         create = False
         if not os.path.exists(path):
             if readonly:
@@ -345,29 +348,31 @@ class pushlog(object):
         # successful SQLite commit.
 
         if readonly:
-            option = b'timeoutro'
+            option = b"timeoutro"
             default = 10000
         else:
-            option = b'timeoutrw'
+            option = b"timeoutrw"
             default = 30000
 
-        timeout = self.repo.ui.configint(b'pushlog', option, default)
+        timeout = self.repo.ui.configint(b"pushlog", option, default)
         timeout = float(timeout) / 1000.0
 
-        conn = sqlite3.connect(pycompat.sysstr(path), timeout=timeout,
-                               detect_types=sqlite3.PARSE_DECLTYPES)
+        conn = sqlite3.connect(
+            pycompat.sysstr(path), timeout=timeout, detect_types=sqlite3.PARSE_DECLTYPES
+        )
         conn.text_factory = pycompat.bytestr
 
         if not create:
             res = conn.execute(
-                "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'")
+                "SELECT COUNT(*) FROM SQLITE_MASTER WHERE name='pushlog'"
+            )
             if res.fetchone()[0] != 1:
                 create = True
 
         if tr:
-            tr.addfinalize(b'pushlog', make_finalize(self.repo, conn))
-            tr.addpostclose(b'pushlog', make_post_close(self.repo, conn))
-            tr.addabort(b'pushlog', make_abort(self.repo, conn))
+            tr.addfinalize(b"pushlog", make_finalize(self.repo, conn))
+            tr.addpostclose(b"pushlog", make_post_close(self.repo, conn))
+            tr.addabort(b"pushlog", make_abort(self.repo, conn))
 
         if create:
             for sql in SCHEMA:
@@ -388,7 +393,7 @@ class pushlog(object):
                 conn.close()
 
     def recordpush(self, nodes, user, when):
-        '''Record a push into the pushlog.
+        """Record a push into the pushlog.
 
         A push consists of a list of nodes, a username, and a time of the
         push.
@@ -396,7 +401,7 @@ class pushlog(object):
         This function assumes it is running in the context of a transaction.
         There are valid scenarios where this may not hold true. However, we
         don't have a need to support them, so we error in these scenarios.
-        '''
+        """
         c = self._getconn(tr=self.repo._transref())
         if not c:
             raise error.Abort(b"Could not get sqlite connection to record push.")
@@ -407,16 +412,20 @@ class pushlog(object):
 
         # Now that the hooks are installed, any exceptions will result in db
         # close via one of our abort handlers.
-        res = c.execute('INSERT INTO pushlog (user, date) VALUES (?, ?)',
-                        (pycompat.sysstr(user), when))
+        res = c.execute(
+            "INSERT INTO pushlog (user, date) VALUES (?, ?)",
+            (pycompat.sysstr(user), when),
+        )
         pushid = res.lastrowid
         for e in nodes:
             ctx = repo[e]
             rev = ctx.rev()
             node = ctx.hex()
 
-            c.execute('INSERT INTO changesets (pushid, rev, node) '
-                      'VALUES (?, ?, ?)', (pushid, rev, pycompat.sysstr(node)))
+            c.execute(
+                "INSERT INTO changesets (pushid, rev, node) " "VALUES (?, ?, ?)",
+                (pushid, rev, pycompat.sysstr(node)),
+            )
 
     def recordpushes(self, pushes, tr):
         """Record multiple pushes.
@@ -443,20 +452,25 @@ class pushlog(object):
         repo = self.repo.unfiltered()
 
         for pushid, user, when, nodes in pushes:
-            c.execute('INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)',
-                (pushid, pycompat.sysstr(user), when))
+            c.execute(
+                "INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)",
+                (pushid, pycompat.sysstr(user), when),
+            )
             for n in nodes:
                 ctx = repo[n]
                 rev = ctx.rev()
                 node = ctx.hex()
 
-                c.execute('INSERT INTO changesets (pushid, rev, node) '
-                          'VALUES (?, ?, ?)', (pushid, rev, pycompat.sysstr(node)))
+                c.execute(
+                    "INSERT INTO changesets (pushid, rev, node) " "VALUES (?, ?, ?)",
+                    (pushid, rev, pycompat.sysstr(node)),
+                )
 
     def lastpushid(self, conn=None):
         """Obtain the integer pushid of the last known push."""
+
         def query(c):
-            res = c.execute('SELECT id from pushlog ORDER BY id DESC').fetchone()
+            res = c.execute("SELECT id from pushlog ORDER BY id DESC").fetchone()
             if not res:
                 return 0
             return res[0]
@@ -476,23 +490,35 @@ class pushlog(object):
 
         # If replicated data isn't available or the last push id isn't recorded,
         # there's nothing special to do.
-        data = getattr(self.repo, r'replicated_data', None)
+        data = getattr(self.repo, r"replicated_data", None)
 
-        if data and data[b'last_push_id'] is not None:
-            return min(data[b'last_push_id'], actual)
+        if data and data[b"last_push_id"] is not None:
+            return min(data[b"last_push_id"], actual)
 
         return actual
 
-    def pushes(self, start_id=None, start_id_exclusive=False,
-               end_id=None, end_id_exclusive=False,
-               reverse=False, limit=None, offset=None,
-               users=None,
-               start_time=None, start_time_exclusive=False,
-               end_time=None, end_time_exclusive=False,
-               start_node=None, start_node_exclusive=False,
-               end_node=None, end_node_exclusive=False,
-               nodes=None, branch=None,
-               only_replicated=False):
+    def pushes(
+        self,
+        start_id=None,
+        start_id_exclusive=False,
+        end_id=None,
+        end_id_exclusive=False,
+        reverse=False,
+        limit=None,
+        offset=None,
+        users=None,
+        start_time=None,
+        start_time_exclusive=False,
+        end_time=None,
+        end_time_exclusive=False,
+        start_node=None,
+        start_node_exclusive=False,
+        end_node=None,
+        end_node_exclusive=False,
+        nodes=None,
+        branch=None,
+        only_replicated=False,
+    ):
         """Return information about pushes to this repository.
 
         This is a generator of Push namedtuples describing each push. Each
@@ -538,10 +564,10 @@ class pushlog(object):
         When multiple filters are defined, they are logically ANDed together.
         """
         if start_id is not None and start_node is not None:
-            raise ValueError('cannot specify both start_id and start_node')
+            raise ValueError("cannot specify both start_id and start_node")
 
         if end_id is not None and end_node is not None:
-            raise ValueError('cannot specify both end_id and end_node')
+            raise ValueError("cannot specify both end_id and end_node")
 
         if branch and not self.repo.lookupbranch(branch):
             raise ValueError('branch "%s" not found in repo' % branch)
@@ -569,35 +595,34 @@ class pushlog(object):
                 end_id = self.pushfromnode(end_node).pushid
                 end_id_exclusive = end_node_exclusive
 
-            op = '>' if start_id_exclusive else '>='
+            op = ">" if start_id_exclusive else ">="
 
             # In order to support LIMIT and OFFSET at the push level,
             # we need to use an inner SELECT to apply the filtering there.
             # That's because LIMIT and OFFSET apply to the SELECT as a whole.
             # Since we're doing a LEFT JOIN, LIMIT and OFFSET would count nodes,
             # not pushes.
-            inner_q = ('SELECT id, user, date FROM pushlog '
-                       'WHERE id %s ? ' % op)
+            inner_q = "SELECT id, user, date FROM pushlog " "WHERE id %s ? " % op
             args = [start_id]
 
             if end_id is not None:
-                op = '<' if end_id_exclusive else '<='
-                inner_q += 'AND id %s ? ' % op
+                op = "<" if end_id_exclusive else "<="
+                inner_q += "AND id %s ? " % op
                 args.append(end_id)
 
             if start_time is not None:
-                op = '>' if start_time_exclusive else '>='
-                inner_q += 'AND date %s ? ' % op
+                op = ">" if start_time_exclusive else ">="
+                inner_q += "AND date %s ? " % op
                 args.append(start_time)
 
             if end_time is not None:
-                op = '<' if end_time_exclusive else '<='
-                inner_q += 'AND date %s ? ' % op
+                op = "<" if end_time_exclusive else "<="
+                inner_q += "AND date %s ? " % op
                 args.append(end_time)
 
             user_q = []
             for user in users or []:
-                user_q.append('user=?')
+                user_q.append("user=?")
                 # `user` will be a byte string, but later on
                 # we attempt to use it as a value for a unicode
                 # format string. The operation succeeds but our
@@ -607,19 +632,17 @@ class pushlog(object):
                 args.append(pycompat.sysstr(user))
 
             if user_q:
-                inner_q += 'AND (%s) ' % ' OR '.join(user_q)
+                inner_q += "AND (%s) " % " OR ".join(user_q)
 
             # We include the push for each listed node. We do this via multiple
             # subqueries to select the pushid for each node.
             node_q = []
             for node in nodes or []:
-                node_q.append('id=(SELECT pushid FROM changesets WHERE node=?)')
-                args.append(
-                    pycompat.sysstr(hex(self.repo.lookup(node)))
-                )
+                node_q.append("id=(SELECT pushid FROM changesets WHERE node=?)")
+                args.append(pycompat.sysstr(hex(self.repo.lookup(node))))
 
             if node_q:
-                inner_q += 'AND (%s) ' % ' OR '.join(node_q)
+                inner_q += "AND (%s) " % " OR ".join(node_q)
 
             # Implement max push ID filtering separately from end_id. This makes
             # things simpler, as we don't need to take inclusive/exclusive into
@@ -629,29 +652,31 @@ class pushlog(object):
             else:
                 max_push_id = self.lastpushid(conn=c)
 
-            inner_q += 'AND id <= ? '
+            inner_q += "AND id <= ? "
             args.append(max_push_id)
 
             if reverse:
-                inner_q += 'ORDER BY id DESC '
+                inner_q += "ORDER BY id DESC "
             else:
-                inner_q += 'ORDER BY id ASC '
+                inner_q += "ORDER BY id ASC "
 
             if limit is not None:
-                inner_q += 'LIMIT ? '
+                inner_q += "LIMIT ? "
                 args.append(limit)
 
             if offset is not None:
-                inner_q += 'OFFSET ? '
+                inner_q += "OFFSET ? "
                 args.append(offset)
 
-            q = ('SELECT id, user, date, rev, node FROM (%s) '
-                 'LEFT JOIN changesets on id=pushid ' % inner_q)
+            q = (
+                "SELECT id, user, date, rev, node FROM (%s) "
+                "LEFT JOIN changesets on id=pushid " % inner_q
+            )
 
             if reverse:
-                q += 'ORDER BY id DESC, rev DESC '
+                q += "ORDER BY id DESC, rev DESC "
             else:
-                q += 'ORDER BY id ASC, rev ASC '
+                q += "ORDER BY id ASC, rev ASC "
 
             res = c.execute(q, args)
 
@@ -681,7 +706,7 @@ class pushlog(object):
             if not c:
                 return 0
 
-            return c.execute('SELECT COUNT(*) FROM pushlog').fetchone()[0]
+            return c.execute("SELECT COUNT(*) FROM pushlog").fetchone()[0]
 
     def pushfromnode(self, node):
         """Obtain info about a push that added the specified changeset.
@@ -702,8 +727,9 @@ class pushlog(object):
             return self._push_from_node(c, node)
 
     def _push_from_node(self, conn, node):
-        res = conn.execute('SELECT pushid from changesets WHERE node=?',
-                           (pycompat.sysstr(hex(node)),)).fetchone()
+        res = conn.execute(
+            "SELECT pushid from changesets WHERE node=?", (pycompat.sysstr(hex(node)),)
+        ).fetchone()
         if not res:
             return None
 
@@ -722,9 +748,12 @@ class pushlog(object):
         if push:
             return push
 
-        res = conn.execute('SELECT id, user, date, node from pushlog '
-                           'LEFT JOIN changesets on id=pushid '
-                           'WHERE id=? ORDER BY rev ASC', (pushid,))
+        res = conn.execute(
+            "SELECT id, user, date, node from pushlog "
+            "LEFT JOIN changesets on id=pushid "
+            "WHERE id=? ORDER BY rev ASC",
+            (pushid,),
+        )
         nodes = []
         for pushid, who, when, node in res:
             nodes.append(node)
@@ -776,16 +805,19 @@ class pushlog(object):
         pushcount = 0
         for pushcount, push in enumerate(self.pushes(), 1):
             if not push.nodes:
-                ui.warn(b'pushlog entry has no nodes: #%s\n' %
-                        pycompat.bytestr(push.pushid))
+                ui.warn(
+                    b"pushlog entry has no nodes: #%s\n" % pycompat.bytestr(push.pushid)
+                )
                 continue
 
             for node in push.nodes:
                 try:
                     repo[node]
                 except RepoLookupError:
-                    ui.warn(b'changeset in pushlog entry #%s does not exist: %s\n' %
-                            (pycompat.bytestr(push.pushid), pycompat.bytestr(node)))
+                    ui.warn(
+                        b"changeset in pushlog entry #%s does not exist: %s\n"
+                        % (pycompat.bytestr(push.pushid), pycompat.bytestr(node))
+                    )
                     ret = 1
 
                 seennodes.add(bin(node))
@@ -793,14 +825,16 @@ class pushlog(object):
         for rev in repo:
             ctx = repo[rev]
             if ctx.node() not in seennodes:
-                ui.warn(b'changeset does not exist in pushlog: %s\n' % ctx.hex())
+                ui.warn(b"changeset does not exist in pushlog: %s\n" % ctx.hex())
                 ret = 1
 
         if ret:
-            ui.status(b'pushlog has errors\n')
+            ui.status(b"pushlog has errors\n")
         else:
-            ui.status(b'pushlog contains all %d changesets across %d pushes\n' %
-                (len(seennodes), pushcount))
+            ui.status(
+                b"pushlog contains all %d changesets across %d pushes\n"
+                % (len(seennodes), pushcount)
+            )
 
         return ret
 
@@ -819,8 +853,9 @@ class pushlog(object):
             if not c:
                 return
 
-            res = c.execute('SELECT pushid, rev, node FROM changesets '
-                            'ORDER BY pushid, rev ASC')
+            res = c.execute(
+                "SELECT pushid, rev, node FROM changesets " "ORDER BY pushid, rev ASC"
+            )
 
             deletes = []
             revupdates = []
@@ -831,30 +866,39 @@ class pushlog(object):
                     # Changeset has new ordering in revlog. Correct it.
                     if ctx.rev() != rev:
                         revupdates.append((node, ctx.rev()))
-                        repo.ui.warn(b'changeset rev will be updated in '
-                                     b'pushlog: %s\n' % node)
+                        repo.ui.warn(
+                            b"changeset rev will be updated in " b"pushlog: %s\n" % node
+                        )
                 except RepoLookupError:
                     # The changeset was stripped. Remove it from the pushlog.
                     deletes.append(node)
-                    repo.ui.warn(b'changeset will be deleted from '
-                                 b'pushlog: %s\n' % node)
+                    repo.ui.warn(
+                        b"changeset will be deleted from " b"pushlog: %s\n" % node
+                    )
 
             for node in deletes:
-                c.execute('DELETE FROM changesets WHERE node = ?', (pycompat.sysstr(node),))
+                c.execute(
+                    "DELETE FROM changesets WHERE node = ?", (pycompat.sysstr(node),)
+                )
 
             if deletes:
-                repo.ui.log(b'pushlog',
-                            b'deleted %d changesets from pushlog: %s\n' % (
-                            len(deletes), b', '.join(deletes)))
+                repo.ui.log(
+                    b"pushlog",
+                    b"deleted %d changesets from pushlog: %s\n"
+                    % (len(deletes), b", ".join(deletes)),
+                )
 
             for node, rev in revupdates:
-                c.execute('UPDATE changesets SET rev=? WHERE node=?',
-                          (rev, pycompat.sysstr(node)))
+                c.execute(
+                    "UPDATE changesets SET rev=? WHERE node=?",
+                    (rev, pycompat.sysstr(node)),
+                )
 
             if revupdates:
-                repo.ui.log(b'pushlog',
-                            b'reordered %d changesets in pushlog\n' %
-                            len(revupdates))
+                repo.ui.log(
+                    b"pushlog",
+                    b"reordered %d changesets in pushlog\n" % len(revupdates),
+                )
 
             c.commit()
 
@@ -868,8 +912,8 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # all changes to the store is the right thing to do. However, things are
     # like this for backwards compatibility with the original intent of
     # pushlog.
-    if source not in (b'push', b'serve'):
-        ui.note(b'(not updating pushlog since changesets come from %s)\n' % source)
+    if source not in (b"push", b"serve"):
+        ui.note(b"(not updating pushlog since changesets come from %s)\n" % source)
         return 0
 
     # REMOTE_USER comes from authenticated Apache httpd request.
@@ -882,12 +926,10 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # WSGI environment variables are passed in as part of the request data.
     # hgweb sets the WSGI environment variables on ui.environ but not in
     # os.environ. For SSH, ui.environ should be equivalent to os.environ.
-    remoteuser = ui.environ.get(b'REMOTE_USER',
-                                encoding.environ.get(b'REMOTE_USER'))
-    user = encoding.environ.get(b'USER')
+    remoteuser = ui.environ.get(b"REMOTE_USER", encoding.environ.get(b"REMOTE_USER"))
+    user = encoding.environ.get(b"USER")
     if not remoteuser and not user:
-        ui.write(b'authenticated user not found; '
-                 b'refusing to write into pushlog\n')
+        ui.write(b"authenticated user not found; " b"refusing to write into pushlog\n")
         return 1
 
     # If the push user is in landing_users, we check the AUTOLAND_REQUEST_USER
@@ -895,23 +937,23 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     # rather than the pusher. This allows us to track who actually
     # initiated the push.
     landing_users = (
-        ui.config(b'pushlog', b'autolanduser', AUTOLAND_USER),
-        ui.config(b'pushlog', b'landingworkeruser', LANDING_WORKER_USER),
-        ui.config(b'pushlog', b'landingworkeruserdev', LANDING_WORKER_USER_DEV),
+        ui.config(b"pushlog", b"autolanduser", AUTOLAND_USER),
+        ui.config(b"pushlog", b"landingworkeruser", LANDING_WORKER_USER),
+        ui.config(b"pushlog", b"landingworkeruserdev", LANDING_WORKER_USER_DEV),
     )
 
     if user in landing_users:
-        ui.write(b'autoland or landing worker push detected\n')
-        user = os.environ.get('AUTOLAND_REQUEST_USER', user)
+        ui.write(b"autoland or landing worker push detected\n")
+        user = os.environ.get("AUTOLAND_REQUEST_USER", user)
 
-    remoteprefix = ui.config(b'pushlog', b'remoteuserprefix')
-    userprefix = ui.config(b'pushlog', b'userprefix')
+    remoteprefix = ui.config(b"pushlog", b"remoteuserprefix")
+    userprefix = ui.config(b"pushlog", b"userprefix")
 
     if remoteprefix and remoteuser:
-        remoteuser = b'%s:%s' % (remoteprefix, remoteuser)
+        remoteuser = b"%s:%s" % (remoteprefix, remoteuser)
 
     if userprefix and user:
-        user = b'%s:%s' % (userprefix, user)
+        user = b"%s:%s" % (userprefix, user)
 
     pushuser = remoteuser or user
 
@@ -919,22 +961,24 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         t = int(time.time())
         revs = range(repo[node].rev(), len(repo))
         repo.pushlog.recordpush(revs, pushuser, t)
-        ui.write(b'recorded push in pushlog\n')
+        ui.write(b"recorded push in pushlog\n")
         return 0
     except Exception as e:
-        ui.write(b'error recording into pushlog (%s); please retry your '
-                 b'push\n' % pycompat.bytestr(e.args[0]))
+        ui.write(
+            b"error recording into pushlog (%s); please retry your "
+            b"push\n" % pycompat.bytestr(e.args[0])
+        )
 
     return 1
 
 
-@revsetpredicate(b'pushhead()', safe=True)
+@revsetpredicate(b"pushhead()", safe=True)
 def revset_pushhead(repo, subset, x):
     """``pushhead()``
 
     Changesets that were heads when they were pushed.
     """
-    revset.getargs(x, 0, 0, b'pushhead takes no arguments')
+    revset.getargs(x, 0, 0, b"pushhead takes no arguments")
 
     # Iterating over all pushlog data is unfortunate, as there is overhead
     # involved. However, this is less overhead than issuing a SQL query for
@@ -949,15 +993,15 @@ def revset_pushhead(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-@revsetpredicate(b'pushdate(interval)', safe=True)
+@revsetpredicate(b"pushdate(interval)", safe=True)
 def revset_pushdate(repo, subset, x):
     """``pushdate(interval)``
 
     Changesets that were pushed within the interval. See :hg:`help dates`.
     """
-    l = revset.getargs(x, 1, 1, b'pushdate requires one argument')
+    l = revset.getargs(x, 1, 1, b"pushdate requires one argument")
 
-    ds = revset.getstring(l[0], b'pushdate requires a string argument')
+    ds = revset.getstring(l[0], b"pushdate requires a string argument")
     dm = dateutil.matchdate(ds)
 
     def getrevs():
@@ -970,7 +1014,7 @@ def revset_pushdate(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-@revsetpredicate(b'pushuser(string)', safe=True)
+@revsetpredicate(b"pushuser(string)", safe=True)
 def revset_pushuser(repo, subset, x):
     """``pushuser(string)``
 
@@ -982,8 +1026,8 @@ def revset_pushuser(repo, subset, x):
     a regular expression. To match a user that actually contains `re:`, use
     the prefix `literal:`.
     """
-    l = revset.getargs(x, 1, 1, b'pushuser requires one argument')
-    n = encoding.lower(revset.getstring(l[0], b'pushuser requires a string'))
+    l = revset.getargs(x, 1, 1, b"pushuser requires one argument")
+    n = encoding.lower(revset.getstring(l[0], b"pushuser requires a string"))
     kind, pattern, matcher = revset._substringmatcher(n)
 
     def getrevs():
@@ -996,17 +1040,17 @@ def revset_pushuser(repo, subset, x):
     return subset & revset.generatorset(getrevs())
 
 
-@revsetpredicate(b'pushid(int)', safe=True)
+@revsetpredicate(b"pushid(int)", safe=True)
 def revset_pushid(repo, subset, x):
     """``pushid(int)``
 
     Changesets that were part of the specified numeric push id.
     """
-    l = revset.getargs(x, 1, 1, b'pushid requires one argument')
+    l = revset.getargs(x, 1, 1, b"pushid requires one argument")
     try:
-        pushid = int(revset.getstring(l[0], b'pushid requires a number'))
+        pushid = int(revset.getstring(l[0], b"pushid requires a number"))
     except (TypeError, ValueError):
-        raise error.ParseError(b'pushid expects a number')
+        raise error.ParseError(b"pushid expects a number")
 
     with repo.pushlog.conn(readonly=True) as conn:
         push = repo.pushlog.pushfromid(conn, pushid) if conn else None
@@ -1025,7 +1069,7 @@ def revset_pushid(repo, subset, x):
     return subset & pushrevs
 
 
-@revsetpredicate(b'pushrev(set)', safe=True)
+@revsetpredicate(b"pushrev(set)", safe=True)
 def revset_pushrev(repo, subset, x):
     """``pushrev(set)``
 
@@ -1045,6 +1089,7 @@ def revset_pushrev(repo, subset, x):
 
     return subset.filter(revs.__contains__)
 
+
 # Again, for performance reasons we read the entire pushlog database and cache
 # the results. Again, this is unfortunate. But, the alternative is a potential
 # very expensive series of database lookups.
@@ -1056,108 +1101,114 @@ def revset_pushrev(repo, subset, x):
 # swallow. Depending on how these templates are used in the wild, we should
 # revisit the decision to precache the pushlog.
 
+
 def _getpushinfo(repo, ctx, cache):
-    if b'nodetopush' not in cache:
+    if b"nodetopush" not in cache:
         nodetopush = {}
         for push in repo.pushlog.pushes():
             for node in push.nodes:
                 nodetopush[node] = push
 
-        cache[b'nodetopush'] = nodetopush
+        cache[b"nodetopush"] = nodetopush
 
-    return cache[b'nodetopush'].get(ctx.hex(), (None, None, None, None))
+    return cache[b"nodetopush"].get(ctx.hex(), (None, None, None, None))
 
 
 keywords = {}
 templatekeyword = registrar.templatekeyword(keywords)
 
 
-@templatekeyword(b'pushid', requires={b'repo', b'ctx', b'cache'})
+@templatekeyword(b"pushid", requires={b"repo", b"ctx", b"cache"})
 def template_pushid(context, mapping):
     """:pushid: Integer. The unique identifier for the push that introduced
     this changeset.
     """
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
-    cache = context.resource(mapping, b'cache')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
+    cache = context.resource(mapping, b"cache")
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return pushid
 
 
-@templatekeyword(b'pushuser', requires={b'repo', b'ctx', b'cache'})
+@templatekeyword(b"pushuser", requires={b"repo", b"ctx", b"cache"})
 def template_pushuser(context, mapping):
     """:pushuser: String. The user who pushed this changeset."""
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
-    cache = context.resource(mapping, b'cache')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
+    cache = context.resource(mapping, b"cache")
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return who
 
 
-@templatekeyword(b'pushdate', requires={b'repo', b'ctx', b'cache'})
+@templatekeyword(b"pushdate", requires={b"repo", b"ctx", b"cache"})
 def template_pushdate(context, mapping):
     """:pushdate: Date information. When this changeset was pushed."""
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
-    cache = context.resource(mapping, b'cache')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
+    cache = context.resource(mapping, b"cache")
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
-    return templateutil.date(dateutil.makedate(when), showfmt=b'%d.0%d') \
-        if when else None
+    return (
+        templateutil.date(dateutil.makedate(when), showfmt=b"%d.0%d") if when else None
+    )
 
 
-@templatekeyword(b'pushbasenode', requires={b'repo', b'ctx', b'cache'})
+@templatekeyword(b"pushbasenode", requires={b"repo", b"ctx", b"cache"})
 def template_pushbasenode(context, mapping):
     """:pushbasenode: String. The changeset identification hash, as a 40 digit
     hexadecimal string, that was the first/base node for the push this
     changeset was part of.
     """
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
-    cache = context.resource(mapping, b'cache')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
+    cache = context.resource(mapping, b"cache")
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return nodes[0] if nodes else None
 
 
-@templatekeyword(b'pushheadnode', requires={b'repo', b'ctx', b'mapping'})
+@templatekeyword(b"pushheadnode", requires={b"repo", b"ctx", b"mapping"})
 def template_pushheadnode(context, mapping):
     """:pushheadnode: String. The changeset identification hash, as a 40 digit
     hexadecimal string, that was the head for the push this changeset was
     part of.
     """
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
-    cache = context.resource(mapping, b'cache')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
+    cache = context.resource(mapping, b"cache")
 
     pushid, who, when, nodes = _getpushinfo(repo, ctx, cache)
     return nodes[-1] if nodes else None
 
-@command(b'verifypushlog', [], b'verify the pushlog data is sane')
+
+@command(b"verifypushlog", [], b"verify the pushlog data is sane")
 def verifypushlog(ui, repo):
     """Verify the pushlog data looks correct."""
     return repo.pushlog.verify()
 
-def extsetup(ui):
-    extensions.wrapfunction(wireproto, b'_capabilities', capabilities)
-    extensions.wrapfunction(exchange, b'_pullobsolete', exchangepullpushlog)
 
-    extensions.wrapfunction(webutil, b'commonentry', commonentry)
+def extsetup(ui):
+    extensions.wrapfunction(wireproto, b"_capabilities", capabilities)
+    extensions.wrapfunction(exchange, b"_pullobsolete", exchangepullpushlog)
+
+    extensions.wrapfunction(webutil, b"commonentry", commonentry)
 
 
 def reposetup(ui, repo):
     if not repo.local():
         return
 
-    ui.setconfig(b'hooks', b'pretxnchangegroup.pushlog', pretxnchangegrouphook, b'pushlog')
+    ui.setconfig(
+        b"hooks", b"pretxnchangegroup.pushlog", pretxnchangegrouphook, b"pushlog"
+    )
 
     class pushlogrepo(repo.__class__):
         # We /may/ be able to turn this into a property cache without the
         # filesystem check. But the filesystem check is safer in case pushlog
         # mutation invalidates cached state on type instances.
-        @localrepo.repofilecache(b'pushlog2.db')
+        @localrepo.repofilecache(b"pushlog2.db")
         def pushlog(self):
             return pushlog(self)
 

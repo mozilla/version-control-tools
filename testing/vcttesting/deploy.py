@@ -22,8 +22,8 @@ from .vctutil import (
 )
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
-ANSIBLE = os.path.join(ROOT, 'ansible')
+ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
+ANSIBLE = os.path.join(ROOT, "ansible")
 
 logger = logging.getLogger(__name__)
 
@@ -34,85 +34,95 @@ def run_playbook(name, extra_vars=None, verbosity=0):
     extra_vars = extra_vars or {}
 
     args = [
-        'ansible-playbook',
-        '-i', os.path.join(ANSIBLE, 'hosts'),
-        '-f', '20',
-        '%s.yml' % name,
-        '--extra-vars', json.dumps(extra_vars),
+        "ansible-playbook",
+        "-i",
+        os.path.join(ANSIBLE, "hosts"),
+        "-f",
+        "20",
+        "%s.yml" % name,
+        "--extra-vars",
+        json.dumps(extra_vars),
     ]
     if verbosity:
-        args.append('-%s' % ('v' * verbosity))
+        args.append("-%s" % ("v" * verbosity))
 
-    logger.info('$ %s' % ' '.join([quote(a) for a in args]))
+    logger.info("$ %s" % " ".join([quote(a) for a in args]))
     return subprocess.call(args, cwd=ANSIBLE)
 
 
-def deploy_hgmo(skip_hgssh=False, skip_hgweb=False, skip_mirrors=False,
-                clean_wdir=False, verbosity=0):
+def deploy_hgmo(
+    skip_hgssh=False,
+    skip_hgweb=False,
+    skip_mirrors=False,
+    clean_wdir=False,
+    verbosity=0,
+):
     """Deploy to hg.mozilla.org."""
     decrypt_sops_files()
 
     extra = {
-        'skip_mirrors': skip_mirrors,
-        'skip_hgssh': skip_hgssh,
-        'skip_hgweb': skip_hgweb,
-        'vct': ROOT,
+        "skip_mirrors": skip_mirrors,
+        "skip_hgssh": skip_hgssh,
+        "skip_hgweb": skip_hgweb,
+        "vct": ROOT,
     }
 
-    res = run_playbook('deploy-hgmo', extra_vars=extra,
-                        verbosity=verbosity)
+    res = run_playbook("deploy-hgmo", extra_vars=extra, verbosity=verbosity)
 
     if clean_wdir:
         # Wipe away encrypted secrets
-        subprocess.check_output(
-            ['hg', '-R', ROOT, 'update', '--clean', '-r', '.']
-        )
+        subprocess.check_output(["hg", "-R", ROOT, "update", "--clean", "-r", "."])
 
     return res
 
 
 def hgmo_strip(repo, rev, verbosity=0):
     extra = {
-        'repo': repo,
-        'rev': rev,
+        "repo": repo,
+        "rev": rev,
     }
 
-    return run_playbook('hgmo-strip-repo', extra_vars=extra,
-                        verbosity=verbosity)
+    return run_playbook("hgmo-strip-repo", extra_vars=extra, verbosity=verbosity)
 
 
 def hgmo_reclone_repos(repos, verbosity=0):
-    extra = {'repos': repos}
+    extra = {"repos": repos}
 
-    return run_playbook('hgmo-reclone-repos', extra_vars=extra,
-                        verbosity=verbosity)
+    return run_playbook("hgmo-reclone-repos", extra_vars=extra, verbosity=verbosity)
+
 
 def github_lambda_deploy_package():
     """Obtain a .zip file for a deployment package for GitHub Lambda foo."""
     d = tempfile.mkdtemp()
 
-    PIP = os.path.join(ROOT, 'venv', 'bin', 'pip')
+    PIP = os.path.join(ROOT, "venv", "bin", "pip")
 
     try:
         # Install Python packages.
-        subprocess.check_call([
-            PIP, 'install',
-            '-t', d,
-            '-r', os.path.join(ROOT, 'github-webhooks', 'lambda-requirements.txt'),
-            '--require-hashes',
-        ])
+        subprocess.check_call(
+            [
+                PIP,
+                "install",
+                "-t",
+                d,
+                "-r",
+                os.path.join(ROOT, "github-webhooks", "lambda-requirements.txt"),
+                "--require-hashes",
+            ]
+        )
 
         # Copy relevant files from the source directory.
-        for p in os.listdir(os.path.join(ROOT, 'github-webhooks')):
-            if not p.endswith('.py'):
+        for p in os.listdir(os.path.join(ROOT, "github-webhooks")):
+            if not p.endswith(".py"):
                 continue
 
-            shutil.copyfile(os.path.join(ROOT, 'github-webhooks', p),
-                            os.path.join(d, p))
+            shutil.copyfile(
+                os.path.join(ROOT, "github-webhooks", p), os.path.join(d, p)
+            )
 
         # Now make a zip file.
         zf = io.BytesIO()
-        with zipfile.ZipFile(zf, 'w') as z:
+        with zipfile.ZipFile(zf, "w") as z:
             for root, dirs, files in os.walk(d):
                 for f in sorted(files):
                     full = os.path.join(root, f)
@@ -129,21 +139,21 @@ def github_webhook_lambda():
     """Deploys code for GitHub WebHook processing in AWS Lambda."""
     zip_content = github_lambda_deploy_package()
 
-    S3_BUCKET = 'moz-github-webhooks'
-    S3_KEY = 'github_lambda.zip'
+    S3_BUCKET = "moz-github-webhooks"
+    S3_KEY = "github_lambda.zip"
 
     # The code package is shared. So upload to S3 and reference it there.
-    s3 = boto3.client('s3')
+    s3 = boto3.client("s3")
     s3.put_object(
         Bucket=S3_BUCKET,
         Key=S3_KEY,
         Body=zip_content,
-        ContentType='application/zip',
+        ContentType="application/zip",
     )
 
-    client = boto3.client('lambda', region_name='us-west-2')
+    client = boto3.client("lambda", region_name="us-west-2")
 
-    for fn in ('github-webhooks-receive', 'github-webhooks-pulse'):
+    for fn in ("github-webhooks-receive", "github-webhooks-pulse"):
         res = client.update_function_code(
             FunctionName=fn,
             S3Bucket=S3_BUCKET,
@@ -153,10 +163,10 @@ def github_webhook_lambda():
 
         # Lambda versions code/functions by default. So delete old versions
         # as part of upload so old versions don't pile up.
-        for v in client.list_versions_by_function(FunctionName=fn)['Versions']:
-            if v['Version'] in (res['Version'], '$LATEST'):
+        for v in client.list_versions_by_function(FunctionName=fn)["Versions"]:
+            if v["Version"] in (res["Version"], "$LATEST"):
                 continue
 
             client.delete_function(
-                FunctionName=v['FunctionArn'],
-                Qualifier=v['Version'])
+                FunctionName=v["FunctionArn"], Qualifier=v["Version"]
+            )

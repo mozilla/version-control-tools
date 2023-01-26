@@ -9,32 +9,37 @@ import sys
 
 
 def find_hg_repos(path):
-    '''Finds all Mercurial repositories contained in the
-    directory at `path`.'''
+    """Finds all Mercurial repositories contained in the
+    directory at `path`."""
     for root, dirs, files in os.walk(path):
         for d in sorted(dirs):
-            if d == '.hg':
+            if d == ".hg":
                 yield root
 
-        dirs[:] = [d for d in sorted(dirs) if d != '.hg']
+        dirs[:] = [d for d in sorted(dirs) if d != ".hg"]
 
 
 def script_find_hg_repos():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--group', help='Group owner to search for')
-    parser.add_argument('--hgrc', action='store_true',
-                        help='Find repositories having an hgrc file')
-    parser.add_argument('--requirement',
-                        help='Repository requirement to search for')
-    parser.add_argument('--no-requirement',
-                        help='Missing repository requirement to search for')
-    parser.add_argument('--upgrade-backup', action='store_true',
-                        help='Find repositories that have a backup repo from '
-                             'an upgrade')
-    parser.add_argument('--obsstore', action='store_true',
-                        help='Find repositories that have an obsolescence '
-                             'store')
-    parser.add_argument('paths', nargs='+')
+    parser.add_argument("--group", help="Group owner to search for")
+    parser.add_argument(
+        "--hgrc", action="store_true", help="Find repositories having an hgrc file"
+    )
+    parser.add_argument("--requirement", help="Repository requirement to search for")
+    parser.add_argument(
+        "--no-requirement", help="Missing repository requirement to search for"
+    )
+    parser.add_argument(
+        "--upgrade-backup",
+        action="store_true",
+        help="Find repositories that have a backup repo from " "an upgrade",
+    )
+    parser.add_argument(
+        "--obsstore",
+        action="store_true",
+        help="Find repositories that have an obsolescence " "store",
+    )
+    parser.add_argument("paths", nargs="+")
 
     args = parser.parse_args()
 
@@ -44,7 +49,7 @@ def script_find_hg_repos():
             group = grp.getgrnam(args.group)
             gid = group[2]
         except KeyError:
-            print('group %s is not known' % args.group)
+            print("group %s is not known" % args.group)
             sys.exit(1)
 
     def fltr(path):
@@ -54,12 +59,12 @@ def script_find_hg_repos():
                 return False
 
         if args.hgrc:
-            if not os.path.exists(os.path.join(path, '.hg', 'hgrc')):
+            if not os.path.exists(os.path.join(path, ".hg", "hgrc")):
                 return False
 
         if args.requirement or args.no_requirement:
             try:
-                with open(os.path.join(path, '.hg', 'requires'), 'r') as fh:
+                with open(os.path.join(path, ".hg", "requires"), "r") as fh:
                     requirements = set(fh.read().splitlines())
             except IOError as e:
                 if e.errno != errno.ENOENT:
@@ -74,12 +79,12 @@ def script_find_hg_repos():
                 return False
 
         if args.upgrade_backup:
-            entries = os.listdir(os.path.join(path, '.hg'))
-            if not any(e.startswith('upgradebackup.') for e in entries):
+            entries = os.listdir(os.path.join(path, ".hg"))
+            if not any(e.startswith("upgradebackup.") for e in entries):
                 return False
 
         if args.obsstore:
-            p = os.path.join(path, '.hg', 'store', 'obsstore')
+            p = os.path.join(path, ".hg", "store", "obsstore")
             if not os.path.exists(p):
                 return False
 
@@ -90,4 +95,4 @@ def script_find_hg_repos():
             if not fltr(path):
                 continue
 
-            print(path[len(d):])
+            print(path[len(d) :])

@@ -12,97 +12,108 @@ import subprocess
 import sys
 
 
-def process_input_file(source: pathlib.Path, dest: pathlib.Path, pip_compile: pathlib.Path):
-    print('processing %s' % dest)
+def process_input_file(
+    source: pathlib.Path, dest: pathlib.Path, pip_compile: pathlib.Path
+):
+    print("processing %s" % dest)
 
     env = dict(os.environ)
-    env['CUSTOM_COMPILE_COMMAND'] = sys.argv[0]
-    env['HGPYTHON3'] = '1'
+    env["CUSTOM_COMPILE_COMMAND"] = sys.argv[0]
+    env["HGPYTHON3"] = "1"
 
     try:
-        subprocess.run([
-            str(pip_compile),
-            '--output-file', str(dest.absolute()),
-            # We have a transitive dependency on setuptools, which requires this flag to be pinned
-            '--allow-unsafe',
-            '--generate-hashes',
-            '--emit-trusted-host',
-            '--annotate',
-            '--header',
-            '--upgrade',
-            str(source),
-        ],
-        check=True, capture_output=True, env=env)
+        subprocess.run(
+            [
+                str(pip_compile),
+                "--output-file",
+                str(dest.absolute()),
+                # We have a transitive dependency on setuptools, which requires this flag to be pinned
+                "--allow-unsafe",
+                "--generate-hashes",
+                "--emit-trusted-host",
+                "--annotate",
+                "--header",
+                "--upgrade",
+                str(source),
+            ],
+            check=True,
+            capture_output=True,
+            env=env,
+        )
     except subprocess.CalledProcessError as err:
-        print('`pip-compile` errored attempting to upgrade %s' % source)
-        print(err.stderr.decode('utf-8'))
+        print("`pip-compile` errored attempting to upgrade %s" % source)
+        print(err.stderr.decode("utf-8"))
         sys.exit(err.returncode)
 
     # pip-compile doesn't preserve --find-links from input file. So do
     # that manually.
-    with source.open('rb') as fh:
+    with source.open("rb") as fh:
         find_links = []
         for line in fh:
-            if line.startswith(b'--find-links'):
+            if line.startswith(b"--find-links"):
                 find_links.append(line)
 
     if find_links:
-        with dest.open('rb') as fh:
+        with dest.open("rb") as fh:
             dest_lines = []
             in_header = True
 
             for line in fh:
-                if in_header and not line.startswith(b'#'):
+                if in_header and not line.startswith(b"#"):
                     in_header = False
                     dest_lines.extend(find_links)
 
                 dest_lines.append(line)
 
-        with dest.open('wb') as fh:
-            fh.write(b''.join(dest_lines))
+        with dest.open("wb") as fh:
+            fh.write(b"".join(dest_lines))
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', nargs='*', default=[],
-                        help='Explicit requirements file to operate on')
-    parser.add_argument('--pip-compile', default='pip-compile',
-                        help='Path to `pip-compile` executable for desired interpreter')
+    parser.add_argument(
+        "path", nargs="*", default=[], help="Explicit requirements file to operate on"
+    )
+    parser.add_argument(
+        "--pip-compile",
+        default="pip-compile",
+        help="Path to `pip-compile` executable for desired interpreter",
+    )
 
     args = parser.parse_args()
 
     if not args.path:
-        files = subprocess.check_output(['hg', 'files'])
+        files = subprocess.check_output(["hg", "files"])
         files = {f.strip() for f in files.splitlines() if f.strip()}
 
         requirements = set()
 
         for f in files:
-            if b'requirements' not in f or not f.endswith(b'.txt'):
+            if b"requirements" not in f or not f.endswith(b".txt"):
                 continue
 
             base = f[:-4]
-            if b'%s.in' % base in files:
+            if b"%s.in" % base in files:
                 requirements.add(os.fsdecode(f))
 
     else:
         for p in args.path:
-            if 'requirements' not in p or not p.endswith('.txt'):
-                print('%s does not appear to be a requirements file' % p)
+            if "requirements" not in p or not p.endswith(".txt"):
+                print("%s does not appear to be a requirements file" % p)
                 sys.exit(1)
 
         requirements = set(args.path)
 
     for p in sorted(requirements):
-        assert p.endswith('.txt')
+        assert p.endswith(".txt")
         base = p[:-4]
 
-        source = pathlib.Path('%s.in' % base)
+        source = pathlib.Path("%s.in" % base)
         dest = pathlib.Path(p)
         pip_compile = pathlib.Path(args.pip_compile).expanduser()
 
         process_input_file(source, dest, pip_compile)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

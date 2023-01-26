@@ -4,6 +4,9 @@
 # Used by docker.py.
 backports.lzma
 
+# Code formatting.
+black==22.12.0
+
 # So we can obtain code coverage.
 coverage
 

@@ -32,7 +32,7 @@ class CookieTransportMixin:
     def cookies(self):
         # xmlrpc transport classes don't do a good job of calling __init__.
         # Create our cookies instance variable on demand.
-        if not hasattr(self, '_cookies'):
+        if not hasattr(self, "_cookies"):
             self._cookies = []
 
         return self._cookies
@@ -73,34 +73,37 @@ class CookieTransportMixin:
             self.cookies.append(cookie)
 
         if response.status != 200:
-            raise xmlrpclib.ProtocolError(host + handler, response.status,
-                                          response.reason,
-                                          response.msg.headers)
+            raise xmlrpclib.ProtocolError(
+                host + handler, response.status, response.reason, response.msg.headers
+            )
 
         return self.parse_response(response)
 
 
 class BugzillaTransportMixin(CookieTransportMixin):
 
-    LOGIN = 'Bugzilla_login'
-    LOGIN_COOKIE = 'Bugzilla_logincookie'
+    LOGIN = "Bugzilla_login"
+    LOGIN_COOKIE = "Bugzilla_logincookie"
 
     def remove_bugzilla_cookies(self):
-        self.cookies = [x for x in self.cookies
-                        if not x.startswith('%s=' % self.LOGIN) and
-                        not x.startswith('%s=' % self.LOGIN_COOKIE)]
+        self.cookies = [
+            x
+            for x in self.cookies
+            if not x.startswith("%s=" % self.LOGIN)
+            and not x.startswith("%s=" % self.LOGIN_COOKIE)
+        ]
 
     def set_bugzilla_cookies(self, login, login_cookie):
         self.remove_bugzilla_cookies()
-        self.cookies.append('%s=%s' % (self.LOGIN, login))
-        self.cookies.append('%s=%s' % (self.LOGIN_COOKIE, login_cookie))
+        self.cookies.append("%s=%s" % (self.LOGIN, login))
+        self.cookies.append("%s=%s" % (self.LOGIN_COOKIE, login_cookie))
 
     def bugzilla_cookies(self):
-        login = ''
-        login_cookie = ''
+        login = ""
+        login_cookie = ""
 
         for c in self.cookies:
-            name, _, val = c.partition('=')
+            name, _, val = c.partition("=")
 
             if name == self.LOGIN:
                 login = val

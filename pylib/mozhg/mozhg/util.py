@@ -37,8 +37,8 @@ def import_module(name):
         return None
 
 
-FIREFOX_ROOT_NODE = b'8ba995b74e18334ab3707f27e9eb8f4e37ba3d29'
-THUNDERBIRD_ROOT_NODE = b'e4f4569d451a5e0d12a6aa33ebd916f979dd8faa'
+FIREFOX_ROOT_NODE = b"8ba995b74e18334ab3707f27e9eb8f4e37ba3d29"
+THUNDERBIRD_ROOT_NODE = b"e4f4569d451a5e0d12a6aa33ebd916f979dd8faa"
 
 
 def is_firefox_repo(repo):
@@ -50,7 +50,7 @@ def is_firefox_repo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.vfs.exists(b'IS_FIREFOX_REPO')
+    return repo.vfs.exists(b"IS_FIREFOX_REPO")
 
 
 def is_thunderbird_repo(repo):
@@ -62,7 +62,7 @@ def is_thunderbird_repo(repo):
         pass
 
     # Backdoor for testing.
-    return repo.vfs.exists(b'IS_THUNDERBIRD_REPO')
+    return repo.vfs.exists(b"IS_THUNDERBIRD_REPO")
 
 
 def identify_repo(repo):
@@ -88,34 +88,35 @@ def identify_repo(repo):
        Path to the repository. If a hosted repo, this will be the repo path
        minus the hosting prefix. Else, this will be the repo's path.
     """
-    repo_root = repo.ui.config(b'mozilla', b'repo_root', b'/repo/hg/mozilla')
-    if not repo_root.endswith(b'/'):
-        repo_root += b'/'
+    repo_root = repo.ui.config(b"mozilla", b"repo_root", b"/repo/hg/mozilla")
+    if not repo_root.endswith(b"/"):
+        repo_root += b"/"
 
-    publishing = repo.ui.configbool(b'phases', b'publish')
+    publishing = repo.ui.configbool(b"phases", b"publish")
 
     d = {
-        b'firefox': is_firefox_repo(repo),
-        b'thunderbird': is_thunderbird_repo(repo),
-        b'publishing': publishing,
+        b"firefox": is_firefox_repo(repo),
+        b"thunderbird": is_thunderbird_repo(repo),
+        b"publishing": publishing,
     }
 
     if repo.root.startswith(repo_root):
-        d[b'hosted'] = True
-        d[b'path'] = repo.root[len(repo_root):]
-        d[b'user_repo'] = d[b'path'].startswith(b'users/')
+        d[b"hosted"] = True
+        d[b"path"] = repo.root[len(repo_root) :]
+        d[b"user_repo"] = d[b"path"].startswith(b"users/")
 
     else:
-        d[b'hosted'] = False
-        d[b'path'] = repo.root
-        d[b'user_repo'] = False
+        d[b"hosted"] = False
+        d[b"path"] = repo.root
+        d[b"user_repo"] = False
 
     # We could potentially exclude more Firefox repos from this list. For now,
     # be liberal in what we apply this label to.
-    d[b'firefox_releasing'] = (
-        d[b'firefox']
-        and repo.ui.configbool(b'mozilla', b'firefox_releasing', False)
-        and not d[b'user_repo'])
+    d[b"firefox_releasing"] = (
+        d[b"firefox"]
+        and repo.ui.configbool(b"mozilla", b"firefox_releasing", False)
+        and not d[b"user_repo"]
+    )
 
     return d
 
@@ -125,14 +126,14 @@ def repo_owner(repo):
     # Module not available on Windows. So delay import.
     import grp
 
-    group = repo.vfs.tryread(b'moz-owner').strip()
+    group = repo.vfs.tryread(b"moz-owner").strip()
 
     if not group:
         gid = os.stat(repo.root).st_gid
         try:
-            group = grp.getgrgid(gid).gr_name.encode('utf8')
+            group = grp.getgrgid(gid).gr_name.encode("utf8")
         except KeyError:
-            group = b'<unknown>'
+            group = b"<unknown>"
 
     return group
 
@@ -146,14 +147,13 @@ def get_backoutbynode(ext_name, repo, ctx):
     # shortly after a bad commit is introduced.
     thisshort = short(ctx.node())
     count = 0
-    searchlimit = repo.ui.configint(ext_name, b'backoutsearchlimit', 100)
-    for bctx in repo.set(b'%ld::', [ctx.rev()]):
+    searchlimit = repo.ui.configint(ext_name, b"backoutsearchlimit", 100)
+    for bctx in repo.set(b"%ld::", [ctx.rev()]):
         count += 1
         if count >= searchlimit:
             break
 
-        backouts = commitparser.parse_backouts(
-            encoding.fromlocal(bctx.description()))
+        backouts = commitparser.parse_backouts(encoding.fromlocal(bctx.description()))
         if backouts and thisshort in backouts[0]:
             return bctx.hex()
     return None
@@ -161,6 +161,7 @@ def get_backoutbynode(ext_name, repo, ctx):
 
 class timers(object):
     """Logs times to blackbox logger."""
+
     def __init__(self, ui, facility, prefix):
         self._ui = ui
         self._facility = facility
@@ -172,11 +173,13 @@ class timers(object):
 
     def __exit__(self, exc_type, exc_value, exc_tb):
         for name in sorted(self._times):
-            self._ui.log(self._facility,
-                         b'%s%s took %.3f seconds\n',
-                         self._prefix,
-                         name,
-                         self._times[name])
+            self._ui.log(
+                self._facility,
+                b"%s%s took %.3f seconds\n",
+                self._prefix,
+                name,
+                self._times[name],
+            )
 
     @contextlib.contextmanager
     def timeit(self, name):

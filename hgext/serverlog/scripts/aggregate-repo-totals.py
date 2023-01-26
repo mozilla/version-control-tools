@@ -6,6 +6,7 @@
 from optparse import OptionParser
 import sys
 
+
 def aggregate(fh, min_size=0, min_requests=0):
     entries = {}
 
@@ -30,17 +31,27 @@ def aggregate(fh, min_size=0, min_requests=0):
         if min_size and totals[1] < min_size:
             continue
 
-        print('%s\t%s\t%d\t%d\t%d\t%d' % (date, repo, totals[0], totals[1],
-                                          totals[2], totals[3]))
+        print(
+            "%s\t%s\t%d\t%d\t%d\t%d"
+            % (date, repo, totals[0], totals[1], totals[2], totals[3])
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option('--min-size', type=int, default=0,
-            help='Filter entries with transfer size less than this amount')
-    parser.add_option('--min-requests', type=int, default=0,
-            help='Filter entries with at least this many requests per interval')
+    parser.add_option(
+        "--min-size",
+        type=int,
+        default=0,
+        help="Filter entries with transfer size less than this amount",
+    )
+    parser.add_option(
+        "--min-requests",
+        type=int,
+        default=0,
+        help="Filter entries with at least this many requests per interval",
+    )
 
     options, args = parser.parse_args()
 
-    aggregate(sys.stdin, min_size=options.min_size,
-              min_requests=options.min_requests)
+    aggregate(sys.stdin, min_size=options.min_size, min_requests=options.min_requests)

@@ -9,7 +9,8 @@ from mozautomation.firefoxprofile import (
     get_cookies,
 )
 
-def get_cookie_auth(host='bugzilla.mozilla.org'):
+
+def get_cookie_auth(host="bugzilla.mozilla.org"):
     """Obtain Bugzilla auth cookies from Firefox.
 
     This returns an iterable of 2-tuples of (login, cookie) sorted by the
@@ -22,10 +23,10 @@ def get_cookie_auth(host='bugzilla.mozilla.org'):
     for name, path, is_default, newest_time in profiles:
         login, auth = None, None
         for cookie in get_cookies(path, host=host):
-            if cookie['name'] == 'Bugzilla_login':
-                login = cookie['value']
-            elif cookie['name'] == 'Bugzilla_logincookie':
-                auth = cookie['value']
+            if cookie["name"] == "Bugzilla_login":
+                login = cookie["value"]
+            elif cookie["name"] == "Bugzilla_logincookie":
+                auth = cookie["value"]
 
         if login and auth:
             auths.append((login, auth, is_default, newest_time))

@@ -24,7 +24,7 @@ from .daemon import (
     run_in_loop,
 )
 
-logger = logging.getLogger('vcsreplicator.pushnotifications')
+logger = logging.getLogger("vcsreplicator.pushnotifications")
 
 
 def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
@@ -38,27 +38,29 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
         return
 
     partition, message, payload = r
-    name = payload['name']
+    name = payload["name"]
 
-    if name == 'heartbeat-1':
-        logger.warn('%s message not relevant; ignoring' % name)
+    if name == "heartbeat-1":
+        logger.warn("%s message not relevant; ignoring" % name)
         consumer.commit(partitions=[partition])
         return
 
     # All other messages should be associated with a repo and have a "path"
     # key.
-    path = payload['path']
+    path = payload["path"]
     public_url = config.get_public_url_from_wire_path(path)
 
     if not public_url:
-        logger.warn('no public URL could be resolved for %s; not sending notification' % path)
+        logger.warn(
+            "no public URL could be resolved for %s; not sending notification" % path
+        )
         consumer.commit(partitions=[partition])
         return
 
-    if config.c.has_section('ignore_paths'):
-        for prefix, _ in config.c.items('ignore_paths'):
+    if config.c.has_section("ignore_paths"):
+        for prefix, _ in config.c.items("ignore_paths"):
             if path.startswith(prefix):
-                logger.warn('ignoring repo because path in ignore list: %s' % path)
+                logger.warn("ignoring repo because path in ignore list: %s" % path)
                 consumer.commit(partitions=[partition])
                 return
 
@@ -67,51 +69,58 @@ def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
     # FUTURE if we ever write a "repo deleted" message, this should be updated to
     # send the message through.
     if not os.path.exists(local_path):
-        logger.warn('repository %s does not exist; ignoring notification' % local_path)
+        logger.warn("repository %s does not exist; ignoring notification" % local_path)
         consumer.commit(partitions=[partition])
         return
 
     cbargs = dict(cbkwargs or {})
     firecb = True
 
-    if name in ('hg-changegroup-1', 'hg-changegroup-2'):
-        message_type = 'changegroup.1'
-        cbargs['data'] = _get_changegroup_payload(local_path,
-                                                  public_url,
-                                                  payload['heads'],
-                                                  payload['source'])
-    elif name in ('hg-repo-init-1', 'hg-repo-init-2'):
-        message_type = 'newrepo.1'
-        cbargs['data'] = {
-            'repo_url': public_url,
+    if name in ("hg-changegroup-1", "hg-changegroup-2"):
+        message_type = "changegroup.1"
+        cbargs["data"] = _get_changegroup_payload(
+            local_path, public_url, payload["heads"], payload["source"]
+        )
+    elif name in ("hg-repo-init-1", "hg-repo-init-2"):
+        message_type = "newrepo.1"
+        cbargs["data"] = {
+            "repo_url": public_url,
         }
-    elif name == 'hg-pushkey-1':
-        res = _get_pushkey_payload(local_path, public_url,
-                                   payload['namespace'],
-                                   payload['key'],
-                                   payload['old'],
-                                   payload['new'],
-                                   payload['ret'])
+    elif name == "hg-pushkey-1":
+        res = _get_pushkey_payload(
+            local_path,
+            public_url,
+            payload["namespace"],
+            payload["key"],
+            payload["old"],
+            payload["new"],
+            payload["ret"],
+        )
         if res:
-            message_type, cbargs['data'] = res
+            message_type, cbargs["data"] = res
         else:
             firecb = False
 
     else:
         # Ack unsupported messages.
-        logger.warn('%s message not relevant to push notifier; ignoring' % name)
+        logger.warn("%s message not relevant to push notifier; ignoring" % name)
         firecb = False
 
     if firecb:
-        cb(message_type=message_type, partition=partition, message=message,
-           created=payload['_original_created'], **cbargs)
+        cb(
+            message_type=message_type,
+            partition=partition,
+            message=message,
+            created=payload["_original_created"],
+            **cbargs
+        )
 
     consumer.commit(partitions=[partition])
 
 
 def _get_pushlog_info(hgclient, public_url, revs):
-    template = b'{node}\\0{pushid}\\0{pushuser}\\0{pushdate|hgdate}\n'
-    args = hglib.util.cmdbuilder(b'log', hidden=True, r=revs, template=template)
+    template = b"{node}\\0{pushid}\\0{pushuser}\\0{pushdate|hgdate}\n"
+    args = hglib.util.cmdbuilder(b"log", hidden=True, r=revs, template=template)
     out = hgclient.rawcommand(args)
 
     pushes = {}
@@ -121,11 +130,11 @@ def _get_pushlog_info(hgclient, public_url, revs):
         if not line:
             continue
 
-        node, pushid, pushuser, pushtime = line.split(b'\0')
+        node, pushid, pushuser, pushtime = line.split(b"\0")
         # Not all changegroup events have corresponding pushlog entries.
         # This should be rare.
         if not pushid:
-            logger.warn('pushlog data missing!')
+            logger.warn("pushlog data missing!")
             continue
 
         pushid = int(pushid)
@@ -133,15 +142,19 @@ def _get_pushlog_info(hgclient, public_url, revs):
         # `hgdate` format is "timestamp offset"
         pushtime = int(pushtime.split()[0])
 
-        q = 'startID=%d&endID=%d' % (pushid - 1, pushid)
+        q = "startID=%d&endID=%d" % (pushid - 1, pushid)
 
-        pushes.setdefault(pushid, {
-            'pushid': pushid,
-            'user': pycompat.sysstr(pushuser),
-            'time': pushtime,
-            'push_json_url': '%s/json-pushes?version=2&%s' % (public_url, q),
-            'push_full_json_url': '%s/json-pushes?version=2&full=1&%s' % (public_url, q),
-        })
+        pushes.setdefault(
+            pushid,
+            {
+                "pushid": pushid,
+                "user": pycompat.sysstr(pushuser),
+                "time": pushtime,
+                "push_json_url": "%s/json-pushes?version=2&%s" % (public_url, q),
+                "push_full_json_url": "%s/json-pushes?version=2&full=1&%s"
+                % (public_url, q),
+            },
+        )
 
     return pushes
 
@@ -155,16 +168,16 @@ def _get_changegroup_payload(local_path, public_url, heads, source):
     # available. We shouldn't be seeing too many changegroup messages
     # where a message doesn't correspond to a single push, so this shortcut
     # should be acceptable.
-    revs = [n.encode('latin1') for n in heads]
-    logger.warn('querying pushlog data for %s' % local_path)
-    with hglib.open(local_path, encoding='utf-8') as hgclient:
+    revs = [n.encode("latin1") for n in heads]
+    logger.warn("querying pushlog data for %s" % local_path)
+    with hglib.open(local_path, encoding="utf-8") as hgclient:
         pushes = _get_pushlog_info(hgclient, public_url, revs)
 
     return {
-        'repo_url': public_url,
-        'heads': heads,
-        'source': source,
-        'pushlog_pushes': [v for k, v in sorted(pushes.items())],
+        "repo_url": public_url,
+        "heads": heads,
+        "source": source,
+        "pushlog_pushes": [v for k, v in sorted(pushes.items())],
     }
 
 
@@ -174,33 +187,32 @@ def _get_pushkey_payload(local_path, public_url, namespace, key, old, new, ret):
     Returns a 2-tuple of (message_type, data) on success or None if no message
     is to be generated.
     """
-    if namespace == 'obsolete':
+    if namespace == "obsolete":
         return _get_obsolete_pushkey_message(local_path, public_url, new)
 
-    logger.warn('%s pushkey namespace not handled; ignoring' % namespace)
+    logger.warn("%s pushkey namespace not handled; ignoring" % namespace)
     return None
 
 
 def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
-    logger.warn('processing obsolete pushkey message for %s' % public_url)
+    logger.warn("processing obsolete pushkey message for %s" % public_url)
 
     # ASSERTION: vcsreplicator extension loaded in system/user config.
-    with hglib.open(local_path, encoding='utf-8') as hgclient:
-        out = hgclient.rawcommand([b'debugbase85obsmarkers', pycompat.bytestr(rawdata)])
+    with hglib.open(local_path, encoding="utf-8") as hgclient:
+        out = hgclient.rawcommand([b"debugbase85obsmarkers", pycompat.bytestr(rawdata)])
         markers = json.loads(out)
-        logger.warn('processing %d obsolete markers' % len(markers))
+        logger.warn("processing %d obsolete markers" % len(markers))
 
         def rev_info(node):
-            template = b'{node}\\0{desc}\\0{pushid}'
-            args = hglib.util.cmdbuilder(b'log', hidden=True, r=node,
-                                         template=template)
+            template = b"{node}\\0{desc}\\0{pushid}"
+            args = hglib.util.cmdbuilder(b"log", hidden=True, r=node, template=template)
             # Mercurial will abort with "unknown revision" if you give it
             # 40 character hash that isn't known.
             try:
                 out = hgclient.rawcommand(args)
-                return out.split(b'\0')
+                return out.split(b"\0")
             except hglib.error.CommandError as e:
-                if b'unknown revision' in e.err:
+                if b"unknown revision" in e.err:
                     return None
                 else:
                     raise
@@ -208,18 +220,18 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
         def node_payload(node):
             assert len(node) == 40
             if isinstance(node, pycompat.unicode):
-                node = node.encode('latin1')
+                node = node.encode("latin1")
 
             rev = rev_info(node)
 
             # Determine if changeset is visible/hidden..
             if rev:
-                args = hglib.util.cmdbuilder(b'log', r=node, template=b'{node}')
+                args = hglib.util.cmdbuilder(b"log", r=node, template=b"{node}")
                 try:
                     out = hgclient.rawcommand(args)
                     visible = bool(out.strip())
                 except hglib.error.CommandError as e:
-                    if b'hidden revision' in e.err:
+                    if b"hidden revision" in e.err:
                         visible = False
                     else:
                         visible = None
@@ -237,11 +249,11 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
                 push = None
 
             return {
-                'node': pycompat.sysstr(node),
-                'known': bool(rev),
-                'visible': visible,
-                'desc': pycompat.sysstr(rev[1]) if rev else None,
-                'push': push,
+                "node": pycompat.sysstr(node),
+                "known": bool(rev),
+                "visible": visible,
+                "desc": pycompat.sysstr(rev[1]) if rev else None,
+                "push": push,
             }
 
         data = []
@@ -250,24 +262,26 @@ def _get_obsolete_pushkey_message(local_path, public_url, rawdata):
             # We collect data about the new and old changesets (if available)
             # because the repo may not expose information on hidden
             # changesets to public consumers.
-            precursor = node_payload(marker['precursor'])
-            successors = [node_payload(node) for node in marker['successors']]
+            precursor = node_payload(marker["precursor"])
+            successors = [node_payload(node) for node in marker["successors"]]
 
             user = None
-            for m in marker['metadata']:
-                if m[0] == u'user':
+            for m in marker["metadata"]:
+                if m[0] == "user":
                     user = pycompat.sysstr(m[1])
 
-            data.append({
-                'precursor': precursor,
-                'successors': successors,
-                'user': user,
-                'time': float(marker['date'][0]),
-            })
+            data.append(
+                {
+                    "precursor": precursor,
+                    "successors": successors,
+                    "user": user,
+                    "time": float(marker["date"][0]),
+                }
+            )
 
-    return 'obsolete.1', {
-        'repo_url': public_url,
-        'markers': data,
+    return "obsolete.1", {
+        "repo_url": public_url,
+        "markers": data,
     }
 
 
@@ -291,9 +305,12 @@ def run_cli(config_section, cb, validate_config=None):
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('config', help='Path to config file to load')
-    parser.add_argument('--skip', action='store_true',
-                        help='Skip the consuming of the next message then exit')
+    parser.add_argument("config", help="Path to config file to load")
+    parser.add_argument(
+        "--skip",
+        action="store_true",
+        help="Skip the consuming of the next message then exit",
+    )
     args = parser.parse_args()
 
     config = Config(filename=args.config)
@@ -301,12 +318,12 @@ def run_cli(config_section, cb, validate_config=None):
     if validate_config:
         validate_config(config)
 
-    group = config.get(config_section, 'group')
-    topic = config.get(config_section, 'topic')
+    group = config.get(config_section, "group")
+    topic = config.get(config_section, "topic")
 
     root = logging.getLogger()
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('%(name)s %(message)s')
+    formatter = logging.Formatter("%(name)s %(message)s")
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
@@ -321,27 +338,35 @@ def run_cli(config_section, cb, validate_config=None):
         if args.skip:
             r = consumer.get_message()
             if not r:
-                print('no message available; nothing to skip')
+                print("no message available; nothing to skip")
                 sys.exit(1)
 
             partition = r[0]
 
             try:
-                message_type = r[2]['name']
+                message_type = r[2]["name"]
             except Exception:
-                message_type = 'UNKNOWN'
+                message_type = "UNKNOWN"
 
             consumer.commit(partitions=[partition])
-            print('skipped %s message in partition %d for group %s' % (
-                message_type, partition, group))
+            print(
+                "skipped %s message in partition %d for group %s"
+                % (message_type, partition, group)
+            )
             sys.exit(0)
 
         cbkwargs = {
-            'config': config,
+            "config": config,
         }
 
-        res = run_in_loop(logger, consume_one, config=config, consumer=consumer,
-                          cb=cb, cbkwargs=cbkwargs)
+        res = run_in_loop(
+            logger,
+            consume_one,
+            config=config,
+            consumer=consumer,
+            cb=cb,
+            cbkwargs=cbkwargs,
+        )
 
-    logger.warn('process exiting code %s' % res)
+    logger.warn("process exiting code %s" % res)
     sys.exit(res)

@@ -24,8 +24,7 @@ from mercurial import (
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'urlintercept', b'path',
-           default=None)
+configitem(b"urlintercept", b"path", default=None)
 
 
 class URLInterceptor(object):
@@ -33,11 +32,11 @@ class URLInterceptor(object):
         self.ui = ui
 
     def open(self, url, data=None, timeout=None):
-        path = self.ui.config(b'urlintercept', b'path')
+        path = self.ui.config(b"urlintercept", b"path")
         if not path:
-            raise error.Abort(b'no urlintercept path defined!')
+            raise error.Abort(b"no urlintercept path defined!")
 
-        with open(path, 'rb') as fh:
+        with open(path, "rb") as fh:
             expected = fh.readline().rstrip()
             response = fh.read()
 
@@ -46,10 +45,9 @@ class URLInterceptor(object):
             url = pycompat.bytestr(url.get_full_url())
 
         if url != expected:
-            raise error.Abort(b'Incorrect URL. Got %s; expected %s' % (
-                url, expected))
+            raise error.Abort(b"Incorrect URL. Got %s; expected %s" % (url, expected))
 
-        self.ui.write(b'intercepting url\n')
+        self.ui.write(b"intercepting url\n")
         return io.BytesIO(response)
 
 

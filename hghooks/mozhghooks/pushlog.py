@@ -16,14 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+
 def log(ui, repo, node, **kwargs):
-    if not hasattr(repo, 'pushlog'):
-        ui.write(b'repository not properly configured; missing pushlog extension.\n')
+    if not hasattr(repo, "pushlog"):
+        ui.write(b"repository not properly configured; missing pushlog extension.\n")
         return 1
 
     # As long as the pushlog extension is installed, we should never get
     # here because the extension installs its own hook which overwrites
     # us.
-    ui.write(b'Assertion failure: the pushlog hook code should not run any more. '
-             b'Please file a bug.\n')
+    ui.write(
+        b"Assertion failure: the pushlog hook code should not run any more. "
+        b"Please file a bug.\n"
+    )
     return 1

@@ -10,25 +10,26 @@ import optparse
 import sys
 
 hgweb_paths = [
-    ('/json-pushes', 'hgweb-json-pushes'),
-    ('/raw-rev', 'hgweb-raw-rev'),
-    ('/rev/', 'hgweb-rev'),
-    ('/raw-file/', 'hgweb-raw-file'),
-    ('/atom-log', 'hgweb-atom-log'),
-    ('/static/', 'hgweb-static'),
-    ('/json-info', 'hgweb-json-info'),
-    ('/archive', 'hgweb-archive'),
-    ('/info/refs', 'git'),
-    ('/diff/', 'hgweb-diff'),
-    ('/annotate/', 'hgweb-annotate'),
-    ('/shortlog', 'hgweb-shortlog'),
-    ('/pushlog', 'hgweb-pushlog'),
-    ('/pushloghtml', 'hgweb-pushloghtml'),
-    ('/log/', 'hgweb-log'),
-    ('/file/', 'hgweb-file'),
-    ('/comparison/', 'hgweb-comparison'),
-    ('/filelog/', 'hgweb-filelog'),
+    ("/json-pushes", "hgweb-json-pushes"),
+    ("/raw-rev", "hgweb-raw-rev"),
+    ("/rev/", "hgweb-rev"),
+    ("/raw-file/", "hgweb-raw-file"),
+    ("/atom-log", "hgweb-atom-log"),
+    ("/static/", "hgweb-static"),
+    ("/json-info", "hgweb-json-info"),
+    ("/archive", "hgweb-archive"),
+    ("/info/refs", "git"),
+    ("/diff/", "hgweb-diff"),
+    ("/annotate/", "hgweb-annotate"),
+    ("/shortlog", "hgweb-shortlog"),
+    ("/pushlog", "hgweb-pushlog"),
+    ("/pushloghtml", "hgweb-pushloghtml"),
+    ("/log/", "hgweb-log"),
+    ("/file/", "hgweb-file"),
+    ("/comparison/", "hgweb-comparison"),
+    ("/filelog/", "hgweb-filelog"),
 ]
+
 
 def normalize_path(path):
     for search, command in hgweb_paths:
@@ -50,9 +51,9 @@ class Request(object):
 
         # Start by stripping the query string.
         path = url
-        if '?' in path:
-            path = path[0:path.find('?')]
-        path = path.strip('/')
+        if "?" in path:
+            path = path[0 : path.find("?")]
+        path = path.strip("/")
 
         path, command = normalize_path(path)
 
@@ -69,6 +70,7 @@ class Request(object):
 
 class SSHSession(object):
     """Represents a full SSH session."""
+
     def __init__(self, sid, date, repo, username):
         self.id = sid
         self.start_date = date
@@ -93,16 +95,16 @@ class SSHSession(object):
         """
         commands = set([t[0] for t in self.commands])
 
-        if 'unbundle' in commands:
-            return 'push'
+        if "unbundle" in commands:
+            return "push"
 
-        if 'pushkey' in commands:
-            return 'pushkey'
+        if "pushkey" in commands:
+            return "pushkey"
 
-        if 'getbundle' in commands:
-            return 'pull'
+        if "getbundle" in commands:
+            return "pull"
 
-        return 'lookup'
+        return "lookup"
 
 
 def parse_events(fh, onlydate=None):
@@ -114,34 +116,34 @@ def parse_events(fh, onlydate=None):
     for line in fh:
         date = None
         host = None
-        if ' hgweb: ' in line:
+        if " hgweb: " in line:
             # Legacy logs: Apr 14 20:17:43
             # New logs: 2016-04-14T20:17:44.250678+00:00
-            if line.startswith('20'):
-                assert line[26:32] == '+00:00'
-                date = datetime.datetime.strptime(line[0:26], '%Y-%m-%dT%H:%M:%S.%f')
-                hostaction, line = line[33:].split(':', 1)
+            if line.startswith("20"):
+                assert line[26:32] == "+00:00"
+                date = datetime.datetime.strptime(line[0:26], "%Y-%m-%dT%H:%M:%S.%f")
+                hostaction, line = line[33:].split(":", 1)
                 host, action = hostaction.split()
             else:
                 date = line[0:15]
-                if date[4] == ' ':
-                    date = date[0:4] + '0' + date[5:]
+                if date[4] == " ":
+                    date = date[0:4] + "0" + date[5:]
 
                 # Year isn't in the logs and Python defaults to 1900.
                 # This can cause a problem during leap years because strptime
                 # will raise a "ValueError: day is out of range for month" for
                 # Feb 29. So we add the year to the string before parsing.
-                date = '%d %s' % (thisyear, date)
-                date = datetime.datetime.strptime(date, '%Y %b %d %H:%M:%S')
+                date = "%d %s" % (thisyear, date)
+                date = datetime.datetime.strptime(date, "%Y %b %d %H:%M:%S")
 
-                hostaction, line = line[16:].split(':', 1)
+                hostaction, line = line[16:].split(":", 1)
                 host, action = hostaction.split()
 
             line = line.strip()
         parts = line.rstrip().split()
 
         ids, action = parts[0:2]
-        ids = ids.split(':')
+        ids = ids.split(":")
 
         if len(ids) > 1:
             session = ids[0]
@@ -150,20 +152,20 @@ def parse_events(fh, onlydate=None):
             session = None
             request = ids[0]
 
-        if action == 'BEGIN_REQUEST':
+        if action == "BEGIN_REQUEST":
             if onlydate and date.date() != onlydate:
                 continue
             repo, ip, url = parts[2:]
             requests[request] = Request(date, repo, ip, url)
 
-        elif action == 'BEGIN_PROTOCOL':
+        elif action == "BEGIN_PROTOCOL":
             command = parts[2]
             r = requests.get(request)
             if r:
-                if command != 'None':
+                if command != "None":
                     r.command = command
 
-        elif action == 'END_REQUEST':
+        elif action == "END_REQUEST":
             r = requests.get(request)
             if not r:
                 continue
@@ -180,7 +182,7 @@ def parse_events(fh, onlydate=None):
             del requests[request]
             yield r
 
-        elif action == 'BEGIN_SSH_SESSION':
+        elif action == "BEGIN_SSH_SESSION":
             if onlydate and date.date() != onlydate:
                 continue
 
@@ -188,7 +190,7 @@ def parse_events(fh, onlydate=None):
             assert session
             sessions[session] = SSHSession(session, date, repo, username)
 
-        elif action == 'END_SSH_SESSION':
+        elif action == "END_SSH_SESSION":
             s = sessions.get(session)
             if not s:
                 continue
@@ -204,13 +206,13 @@ def parse_events(fh, onlydate=None):
             del sessions[session]
             yield s
 
-        elif action == 'BEGIN_SSH_COMMAND':
+        elif action == "BEGIN_SSH_COMMAND":
             command = parts[2]
             s = sessions.get(session)
             if s:
                 s.current_command = (request, command, date)
 
-        elif action == 'END_SSH_COMMAND':
+        elif action == "END_SSH_COMMAND":
             s = sessions.get(session)
             if not s:
                 continue
@@ -228,13 +230,14 @@ def parse_events(fh, onlydate=None):
 
             s.current_command = None
 
-        elif action == 'CHANGEGROUPSUBSET_START':
+        elif action == "CHANGEGROUPSUBSET_START":
             source, count = parts[2:]
-            #count = int(count)
+            # count = int(count)
 
-        elif action == 'WRITE_PROGRESS':
+        elif action == "WRITE_PROGRESS":
             count = parts[2]
-            #count = int(count)
+            # count = int(count)
+
 
 def print_stream(fh, onlydate=None):
     for thing in parse_events(fh, onlydate=onlydate):
@@ -243,32 +246,36 @@ def print_stream(fh, onlydate=None):
             if r.start_date:
                 d = r.start_date.isoformat()
             else:
-                d = 'None'
-            print('%s %s %s %s %s %s %s' % (d, r.repo, r.ip, r.command,
-                r.write_count, r.wall_time, r.cpu_time))
+                d = "None"
+            print(
+                "%s %s %s %s %s %s %s"
+                % (d, r.repo, r.ip, r.command, r.write_count, r.wall_time, r.cpu_time)
+            )
         elif isinstance(thing, SSHSession):
             s = thing
             if s.start_date:
                 d = s.start_date.isoformat()
             else:
-                d = 'None'
-            print('%s %s %s %s %s %s %s' % (d, s.id, s.repo, s.session_type,
-                s.username, s.wall_time, s.cpu_time))
+                d = "None"
+            print(
+                "%s %s %s %s %s %s %s"
+                % (d, s.id, s.repo, s.session_type, s.username, s.wall_time, s.cpu_time)
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option('--date',
-                      help='Only extract events on the specified date')
+    parser.add_option("--date", help="Only extract events on the specified date")
 
     options, args = parser.parse_args()
     date = None
     if options.date:
-        dt = datetime.datetime.strptime(options.date, '%Y-%m-%d')
+        dt = datetime.datetime.strptime(options.date, "%Y-%m-%d")
         date = dt.date()
 
     if args:
         for f in args:
-            with open(f, 'rb') as fh:
+            with open(f, "rb") as fh:
                 print_stream(fh, onlydate=date)
     else:
         print_stream(sys.stdin, onlydate=date)

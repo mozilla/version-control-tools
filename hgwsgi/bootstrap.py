@@ -8,7 +8,7 @@ import errno
 import os
 
 # Set this before importing mercurial.* modules.
-os.environ['HGENCODING'] = 'UTF-8'
+os.environ["HGENCODING"] = "UTF-8"
 
 
 from mercurial.hgweb import hgwebdir
@@ -21,15 +21,15 @@ from mercurial import pycompat
 # thinking the client sent a "Proxy: " request header.
 def set_env():
     try:
-        with open('/etc/environment', 'rb') as fh:
+        with open("/etc/environment", "rb") as fh:
             for line in fh:
-                if not line.startswith(b'HTTPS_PROXY='):
+                if not line.startswith(b"HTTPS_PROXY="):
                     continue
 
-                value = line.strip().split(b'=', 1)[1]
+                value = line.strip().split(b"=", 1)[1]
                 value = value.strip(b'"')
 
-                os.environ['HTTPS_PROXY'] = pycompat.strurl(value)
+                os.environ["HTTPS_PROXY"] = pycompat.strurl(value)
                 break
 
     except IOError as e:
@@ -40,6 +40,6 @@ def set_env():
 def make_application(wsgi_dir):
     set_env()
 
-    config = os.path.join(wsgi_dir, 'hgweb.config')
+    config = os.path.join(wsgi_dir, "hgweb.config")
 
     return hgwebdir(pycompat.bytestr(config))

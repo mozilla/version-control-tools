@@ -13,29 +13,27 @@ class StingrayConnection(object):
         self.session.auth = (username, password)
         # TODO plug in SSL verification
         self.session.verify = False
-        self._url = '%s/api/tm/3.2' % url.rstrip('/')
+        self._url = "%s/api/tm/3.2" % url.rstrip("/")
 
-    def request(self, path, method='GET', **kwargs):
+    def request(self, path, method="GET", **kwargs):
         response = self.session.request(
-                method,
-                '%s/%s' % (self._url, path.lstrip('/')),
-                **kwargs)
+            method, "%s/%s" % (self._url, path.lstrip("/")), **kwargs
+        )
 
         if response.status_code == 404:
             return None
 
         j = response.json()
-        if 'error_text' in j:
-            self.module.fail_json(
-                    msg='Error talking to Stingray: %s' % j['error_text'])
+        if "error_text" in j:
+            self.module.fail_json(msg="Error talking to Stingray: %s" % j["error_text"])
 
         return j
 
     def get_pool_state(self, pool):
-        state = self.request('config/active/pools/%s' % pool)
+        state = self.request("config/active/pools/%s" % pool)
 
         if not state:
-            self.module.fail_json(msg='Pool %s not found' % pool)
+            self.module.fail_json(msg="Pool %s not found" % pool)
 
         return state
 
@@ -52,23 +50,21 @@ class StingrayConnection(object):
 
         nodes = []
         found = False
-        for n in pool_state['properties']['basic']['nodes_table']:
-            if n['node'] == node:
-                if n['state'] == state:
+        for n in pool_state["properties"]["basic"]["nodes_table"]:
+            if n["node"] == node:
+                if n["state"] == state:
                     return False
 
                 found = True
-                n['state'] = state
+                n["state"] = state
 
             nodes.append(n)
 
         if not found:
-            self.module.fail_json(msg='Node %s not found in pool %s' % (
-                node, pool))
+            self.module.fail_json(msg="Node %s not found in pool %s" % (node, pool))
 
-        new_state = {'properties': {'basic': {'nodes_table': nodes}}}
+        new_state = {"properties": {"basic": {"nodes_table": nodes}}}
 
-        self.request('config/active/pools/%s' % pool, method='PUT',
-                     json=new_state)
+        self.request("config/active/pools/%s" % pool, method="PUT", json=new_state)
 
         return True

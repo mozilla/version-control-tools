@@ -23,14 +23,14 @@ from mozhg.util import (
 
 MAGIC_WORDS = b"MANUAL PUSH:"
 MAGICWORDS_WITH_JUSTIFICATION_RE = re.compile(
-    br".*(%s)\s*(.+)" % re.escape(MAGIC_WORDS)
+    rb".*(%s)\s*(.+)" % re.escape(MAGIC_WORDS)
 )
 
 SCM_ALLOW_DIRECT_PUSH = b"scm_allow_direct_push"
 
-AUTOLAND_USER = b'bind-autoland@mozilla.com'
-LANDING_WORKER_USER = b'lando_landing_worker@mozilla.com'
-LANDING_WORKER_USER_DEV = b'lando_landing_worker_dev@mozilla.com'
+AUTOLAND_USER = b"bind-autoland@mozilla.com"
+LANDING_WORKER_USER = b"lando_landing_worker@mozilla.com"
+LANDING_WORKER_USER_DEV = b"lando_landing_worker_dev@mozilla.com"
 
 SENTRY_LOG_MESSAGE = (
     b'%(user)s pushed: "%(justification)s". (%(repo)s@%(node)s, %(scm_level)s)'
@@ -73,7 +73,7 @@ INTERNAL_ERROR_MESSAGE = (
     b'Include "LandoRequiredCheck: invalid privilege_level" in your error report\n'
 ) % SUBMIT_BUGZILLA_URL
 
-REV_URL = 'https://hg.mozilla.org/%(repo)s/rev/%(rev)s'
+REV_URL = "https://hg.mozilla.org/%(repo)s/rev/%(rev)s"
 
 
 def get_user_and_group_affiliations():
@@ -82,9 +82,7 @@ def get_user_and_group_affiliations():
     user_name = os.environ.get("USER", None)
     if not user_name:
         return None, []
-    return user_name, [
-        pycompat.bytestr(group) for group in get_scm_groups(user_name)
-    ]
+    return user_name, [pycompat.bytestr(group) for group in get_scm_groups(user_name)]
 
 
 def get_changeset_justification(description):
@@ -114,15 +112,11 @@ def is_repo_in_list(ui, repo_name, config):
     repo_config = ui.config(b"mozilla", config)
     if not repo_config:
         return False
-    repo_list = (
-        x.strip()
-        for x in repo_config.split(b",")
-    )
+    repo_list = (x.strip() for x in repo_config.split(b","))
     return repo_name in repo_list
 
 
 class LandoRequiredCheck(PreTxnChangegroupCheck):
-
     @property
     def name(self):
         return b"lando_required"
@@ -130,17 +124,23 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
     def relevant(self):
         self.repo_name = self.repo.root.replace(b"/repo/hg/mozilla/", b"", 1)
 
-        lando_required = is_repo_in_list(self.ui, self.repo_name, b"lando_required_repo_list")
-        self.direct_push_enabled = not is_repo_in_list(self.ui, self.repo_name, b"direct_push_disabled_repo_list")
+        lando_required = is_repo_in_list(
+            self.ui, self.repo_name, b"lando_required_repo_list"
+        )
+        self.direct_push_enabled = not is_repo_in_list(
+            self.ui, self.repo_name, b"direct_push_disabled_repo_list"
+        )
 
         # If the push user is in landing_users, we check the AUTOLAND_REQUEST_USER
         # environment variable. If set, we use that as the user in the pushlog
         # rather than the pusher. This allows us to track who actually
         # initiated the push.
         self.landing_users = (
-            self.ui.config(b'pushlog', b'autolanduser', AUTOLAND_USER),
-            self.ui.config(b'pushlog', b'landingworkeruser', LANDING_WORKER_USER),
-            self.ui.config(b'pushlog', b'landingworkeruserdev', LANDING_WORKER_USER_DEV),
+            self.ui.config(b"pushlog", b"autolanduser", AUTOLAND_USER),
+            self.ui.config(b"pushlog", b"landingworkeruser", LANDING_WORKER_USER),
+            self.ui.config(
+                b"pushlog", b"landingworkeruserdev", LANDING_WORKER_USER_DEV
+            ),
         )
 
         return lando_required
@@ -173,10 +173,14 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
                 scope.set_tag("scm_level", self.privilege_level.decode("utf-8"))
                 scope.set_extra("changeset", sentry_head)
                 scope.set_extra("justification", self.justification.decode("utf-8"))
-                scope.set_extra("url", REV_URL % {
-                    "repo": sentry_repo,
-                    "rev": sentry_head,
-                })
+                scope.set_extra(
+                    "url",
+                    REV_URL
+                    % {
+                        "repo": sentry_repo,
+                        "rev": sentry_head,
+                    },
+                )
 
                 sentry_sdk.capture_message(event_message.decode("utf-8"))
 
@@ -190,7 +194,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # users' intent on pushing.  We have nowhere to log the failure, so we notify the
             # user with a warning and proceed as if nothing bad had happened.
             print_banner(
-                self.ui, b"warning", SENTRY_FAILURE_WARNING_MESSAGE % pycompat.bytestr(e)
+                self.ui,
+                b"warning",
+                SENTRY_FAILURE_WARNING_MESSAGE % pycompat.bytestr(e),
             )
 
     def pre(self, node):
@@ -215,7 +221,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             # Since this method `pre` cannot react to fatal errors, the `None` value in
             # `privilege_level` will abort this check in the future call to method `check`
             print_banner(
-                self.ui, b"error", LDAP_USER_EXCEPTION_FAILURE_MESSAGE % pycompat.bytestr(e)
+                self.ui,
+                b"error",
+                LDAP_USER_EXCEPTION_FAILURE_MESSAGE % pycompat.bytestr(e),
             )
             return
         if not self.user_groups:
@@ -224,9 +232,9 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             print_banner(self.ui, b"error", LDAP_USER_FAILURE_MESSAGE)
             return
         elif (
-            (self.direct_push_enabled or pycompat.bytestr(self.user_name) in self.landing_users)
-            and SCM_ALLOW_DIRECT_PUSH in self.user_groups
-        ):
+            self.direct_push_enabled
+            or pycompat.bytestr(self.user_name) in self.landing_users
+        ) and SCM_ALLOW_DIRECT_PUSH in self.user_groups:
             self.privilege_level = SCM_ALLOW_DIRECT_PUSH
         elif self.repo_level in self.user_groups:
             self.privilege_level = self.repo_level
@@ -286,12 +294,12 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
             return True
 
         message = SENTRY_LOG_MESSAGE % {
-            b'justification': self.justification,
-            b'node': self.head[:12],
-            b'repo': self.repo_name,
+            b"justification": self.justification,
+            b"node": self.head[:12],
+            b"repo": self.repo_name,
             # Fields from LDAP need conversion to byte strings
-            b'scm_level': pycompat.bytestr(self.privilege_level.upper()),
-            b'user': pycompat.bytestr(self.user_name),
+            b"scm_level": pycompat.bytestr(self.privilege_level.upper()),
+            b"user": pycompat.bytestr(self.user_name),
         }
         self._log_push_attempt(message)
         return True

@@ -7,13 +7,13 @@ from mercurial.node import short
 
 
 # From hgext/overlay/__init__.py
-REVISION_KEY = b'subtree_revision'
-SOURCE_KEY = b'subtree_source'
+REVISION_KEY = b"subtree_revision"
+SOURCE_KEY = b"subtree_source"
 
 
 def is_servo_vender_member(user):
     try:
-        g = grp.getgrnam('scm_servo_vendor')
+        g = grp.getgrnam("scm_servo_vendor")
         if user in g.gr_mem:
             return True
     except KeyError:
@@ -27,7 +27,7 @@ def is_servo_allowed(user):
         return True
 
     return user in {
-        b'servo-vcs-sync@mozilla.com',
+        b"servo-vcs-sync@mozilla.com",
     }
 
 
@@ -54,17 +54,17 @@ def has_fixup_extra_data(ctx):
 
     # SOURCE_KEY must be URL.
     try:
-        return ctx.extra().get(SOURCE_KEY).startswith(b'https://')
+        return ctx.extra().get(SOURCE_KEY).startswith(b"https://")
     except AttributeError:
         return False
 
 
 def valid_fixup_description(ctx):
-    return ctx.description().startswith(b'servo: Merge #')
+    return ctx.description().startswith(b"servo: Merge #")
 
 
 def valid_fixup_files(ctx):
-    return all(f.startswith(b'servo/') for f in ctx.files())
+    return all(f.startswith(b"servo/") for f in ctx.files())
 
 
 def is_fixup_commits(repo, nodes):
@@ -77,22 +77,22 @@ def is_fixup_commits(repo, nodes):
 
 
 def write_error(ui, lines):
-    header = b'*' * 72
-    ui.write(b'%s\n' % header)
+    header = b"*" * 72
+    ui.write(b"%s\n" % header)
     for line in lines:
-        ui.write(b'%s\n' % line)
-    ui.write(b'%s\n' % header)
+        ui.write(b"%s\n" % line)
+    ui.write(b"%s\n" % header)
 
 
 def hook(ui, repo, node, source=None, **kwargs):
-    if source in (b'pull', b'strip'):
+    if source in (b"pull", b"strip"):
         return 0
 
     servonodes = []
 
     for rev in repo.changelog.revs(repo[node].rev()):
         ctx = repo[rev]
-        haveservo = any(f.startswith(b'servo/') for f in ctx.files())
+        haveservo = any(f.startswith(b"servo/") for f in ctx.files())
 
         if haveservo:
             servonodes.append(ctx.node())
@@ -100,12 +100,13 @@ def hook(ui, repo, node, source=None, **kwargs):
     res = 0
 
     if servonodes:
-        ui.write(b'(%d changesets contain changes to protected servo/ '
-                 b'directory: %s)\n' % (len(servonodes),
-                                        b', '.join(map(short, servonodes))))
+        ui.write(
+            b"(%d changesets contain changes to protected servo/ "
+            b"directory: %s)\n" % (len(servonodes), b", ".join(map(short, servonodes)))
+        )
 
-        if is_servo_allowed(ui.environ[b'USER']):
-            ui.write(b'(you have permission to change servo/)\n')
+        if is_servo_allowed(ui.environ[b"USER"]):
+            ui.write(b"(you have permission to change servo/)\n")
 
         elif is_fixup_commits(repo, servonodes):
             for node in servonodes:
@@ -113,37 +114,47 @@ def hook(ui, repo, node, source=None, **kwargs):
 
                 if not valid_fixup_description(ctx):
                     res = 1
-                    write_error(ui, [
-                        b'invalid servo fixup commit: %s' % short(node),
-                        b'',
-                        b'commit description is malformed',
-                    ])
+                    write_error(
+                        ui,
+                        [
+                            b"invalid servo fixup commit: %s" % short(node),
+                            b"",
+                            b"commit description is malformed",
+                        ],
+                    )
 
                 if not valid_fixup_files(ctx):
                     res = 1
-                    write_error(ui, [
-                        b'invalid servo fixup commit: %s' % short(node),
-                        b'',
-                        b'commit modifies non-servo files',
-                    ])
+                    write_error(
+                        ui,
+                        [
+                            b"invalid servo fixup commit: %s" % short(node),
+                            b"",
+                            b"commit modifies non-servo files",
+                        ],
+                    )
 
                 if res == 0:
-                    ui.write(b'(allowing valid fixup commit to servo: %s)\n'
-                             % short(node))
+                    ui.write(
+                        b"(allowing valid fixup commit to servo: %s)\n" % short(node)
+                    )
 
         else:
             res = 1
-            write_error(ui, [
-                b'you do not have permissions to modify files under servo/',
-                b'',
-                b'the servo/ directory is kept in sync with the canonical upstream',
-                b'repository at https://github.com/servo/servo',
-                b'',
-                b'changes to servo/ are only allowed by the syncing tool and by sheriffs',
-                b'performing cross-repository "merges"',
-                b'',
-                b'to make changes to servo/, submit a Pull Request against the servo/servo',
-                b'GitHub project',
-            ])
+            write_error(
+                ui,
+                [
+                    b"you do not have permissions to modify files under servo/",
+                    b"",
+                    b"the servo/ directory is kept in sync with the canonical upstream",
+                    b"repository at https://github.com/servo/servo",
+                    b"",
+                    b"changes to servo/ are only allowed by the syncing tool and by sheriffs",
+                    b'performing cross-repository "merges"',
+                    b"",
+                    b"to make changes to servo/, submit a Pull Request against the servo/servo",
+                    b"GitHub project",
+                ],
+            )
 
     return res

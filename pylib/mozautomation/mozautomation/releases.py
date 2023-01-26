@@ -13,31 +13,31 @@ class Releases(object):
 
     Instances of this class are derived from the Releases API results.
     """
+
     def __init__(self, d):
         self._nightly_builds_by_type = {}
         self._release_builds_by_type = {}
 
-        for products in d.get(b'nightly', []):
+        for products in d.get(b"nightly", []):
             for product, builds in products.items():
                 by_type = self._nightly_builds_by_type.setdefault(product, {})
 
                 for build in builds:
-                    by_type.setdefault(build[b'build_type'], []).append(build)
+                    by_type.setdefault(build[b"build_type"], []).append(build)
 
-        for products in d.get(b'releases', []):
+        for products in d.get(b"releases", []):
             for product, builds in products.items():
                 by_type = self._release_builds_by_type.setdefault(product, {})
 
                 for build in builds:
-                    by_type.setdefault(build[b'build_type'], []).append(build)
+                    by_type.setdefault(build[b"build_type"], []).append(build)
 
     def firefox_nightly_releases(self):
         """All releases for Firefox Nightly."""
 
-        for release in self._nightly_builds_by_type.get(b'firefox', {})[b'Nightly']:
-            if b'mozilla-central' in release[b'repository']:
+        for release in self._nightly_builds_by_type.get(b"firefox", {})[b"Nightly"]:
+            if b"mozilla-central" in release[b"repository"]:
                 yield release
-
 
 
 class ReleasesClient(object):
@@ -46,7 +46,8 @@ class ReleasesClient(object):
     The releases API exposes information about builds on Firefox release
     channels.
     """
-    def __init__(self, base_uri=b'http://releases-api.mozilla.org/', opener=None):
+
+    def __init__(self, base_uri=b"http://releases-api.mozilla.org/", opener=None):
         self._base_uri = base_uri
 
         if opener is None:
@@ -55,7 +56,7 @@ class ReleasesClient(object):
         self._opener = opener
 
     def releases(self):
-        request = urllib2.Request(b'%sreleases' % self._base_uri, None)
+        request = urllib2.Request(b"%sreleases" % self._base_uri, None)
         response = self._opener.open(request)
 
         return Releases(json.load(response))

@@ -11,45 +11,64 @@ import sys
 
 from configparser import ConfigParser
 
-if 'BROKER_ID' not in os.environ:
-    print('error: BROKER_ID not in environment', file=sys.stderr)
+if "BROKER_ID" not in os.environ:
+    print("error: BROKER_ID not in environment", file=sys.stderr)
     sys.exit(1)
 
-if not os.path.exists('/etc/ssh/ssh_host_ed25519_key'):
-    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'ed25519',
-                           '-f', '/etc/ssh/ssh_host_ed25519_key', '-N', ''])
+if not os.path.exists("/etc/ssh/ssh_host_ed25519_key"):
+    subprocess.check_call(
+        [
+            "/usr/bin/ssh-keygen",
+            "-t",
+            "ed25519",
+            "-f",
+            "/etc/ssh/ssh_host_ed25519_key",
+            "-N",
+            "",
+        ]
+    )
 
-if not os.path.exists('/etc/ssh/ssh_host_rsa_key'):
-    subprocess.check_call(['/usr/bin/ssh-keygen', '-t', 'rsa', '-b', '2048',
-                           '-f', '/etc/ssh/ssh_host_rsa_key', '-N', ''])
+if not os.path.exists("/etc/ssh/ssh_host_rsa_key"):
+    subprocess.check_call(
+        [
+            "/usr/bin/ssh-keygen",
+            "-t",
+            "rsa",
+            "-b",
+            "2048",
+            "-f",
+            "/etc/ssh/ssh_host_rsa_key",
+            "-N",
+            "",
+        ]
+    )
 
 # Grab SSH host key from master. We'll get a prompt to accept the host key on
 # first connection unless we do this (since strict host key checking is on).
-p = subprocess.Popen(['/usr/bin/ssh-keyscan', '-H', 'hgssh'],
-                     stdout=subprocess.PIPE)
+p = subprocess.Popen(["/usr/bin/ssh-keyscan", "-H", "hgssh"], stdout=subprocess.PIPE)
 out = p.communicate()[0]
 if p.wait():
-    raise Exception('ssh-keyscan errored')
+    raise Exception("ssh-keyscan errored")
 
-with open('/home/hg/.ssh/known_hosts', 'wb') as fh:
+with open("/home/hg/.ssh/known_hosts", "wb") as fh:
     fh.write(out)
 
 # Setup consumer group names
-consumer_groupname = 'hgweb%d' % (int(os.environ['BROKER_ID']) - 1)
+consumer_groupname = "hgweb%d" % (int(os.environ["BROKER_ID"]) - 1)
 files = {
-    '/etc/mercurial/vcsreplicator.ini',
-    '/etc/mercurial/vcsreplicator-pending.ini',
+    "/etc/mercurial/vcsreplicator.ini",
+    "/etc/mercurial/vcsreplicator-pending.ini",
 }
 for filename in files:
     parser = ConfigParser()
     parser.read(filename)
 
-    parser.set('consumer', 'client_id', consumer_groupname)
-    parser.set('consumer', 'group', consumer_groupname)
+    parser.set("consumer", "client_id", consumer_groupname)
+    parser.set("consumer", "group", consumer_groupname)
 
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         parser.write(f)
 
-subprocess.check_call(['/entrypoint-kafkabroker'])
+subprocess.check_call(["/entrypoint-kafkabroker"])
 
 os.execl(sys.argv[1], *sys.argv[1:])

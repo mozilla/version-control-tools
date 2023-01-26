@@ -12,35 +12,33 @@ from kafka.common import OffsetRequestPayload as OffsetRequest
 from kafka.consumer.base import Consumer
 
 PAYLOAD_LOGS = {
-    'hg-repo-init-1': 'repo: {path}',
-    'hg-repo-init-2': 'repo: {path}',
-    'hg-hgrc-update-1': 'repo: {path}',
-    'hg-changegroup-1': 'repo: {path}, heads: {heads}',
-    'hg-changegroup-2': 'repo: {path}, heads: {heads}',
-    'hg-pushkey-1': 'repo: {path}, namespace/key: {namespace}/{key}',
-    'hg-repo-sync-1': 'repo: {path}, heads: {heads}',
-    'hg-repo-sync-2': 'repo: {path}, heads: {heads}, bootstrap: {bootstrap}',
-    'hg-heads-1': 'repo: {path}, heads: {heads}, last_push_id: {last_push_id}',
-    'hg-repo-delete-1': 'repo: {path}',
+    "hg-repo-init-1": "repo: {path}",
+    "hg-repo-init-2": "repo: {path}",
+    "hg-hgrc-update-1": "repo: {path}",
+    "hg-changegroup-1": "repo: {path}, heads: {heads}",
+    "hg-changegroup-2": "repo: {path}, heads: {heads}",
+    "hg-pushkey-1": "repo: {path}, namespace/key: {namespace}/{key}",
+    "hg-repo-sync-1": "repo: {path}, heads: {heads}",
+    "hg-repo-sync-2": "repo: {path}, heads: {heads}, bootstrap: {bootstrap}",
+    "hg-heads-1": "repo: {path}, heads: {heads}, last_push_id: {last_push_id}",
+    "hg-repo-delete-1": "repo: {path}",
 }
 
 MAX_HEADS_PER_MESSAGE = 25
 
+
 def payload_log_display(payload):
     """Return a string that adds information about the payload for use in logs."""
-    name = payload['name']
-    if name == 'heartbeat-1':
-        return 'heartbeat-1'
+    name = payload["name"]
+    if name == "heartbeat-1":
+        return "heartbeat-1"
 
     if "heads" in payload:
         # Deepcopy because we don't want to modify the original payload.
         payload = copy.deepcopy(payload)
 
         # Print only the short version of the hash.
-        payload["heads"] = [
-            head[:12]
-            for head in payload["heads"]
-        ]
+        payload["heads"] = [head[:12] for head in payload["heads"]]
 
         # Enforce a maximum number of heads per message.
         num_heads = len(payload["heads"])
@@ -50,7 +48,7 @@ def payload_log_display(payload):
                 remaining=num_heads - MAX_HEADS_PER_MESSAGE,
             )
 
-    return '{}: ({})'.format(name, PAYLOAD_LOGS[name].format(**payload))
+    return "{}: ({})".format(name, PAYLOAD_LOGS[name].format(**payload))
 
 
 def wait_for_topic(client, topic, timeout=-1):
@@ -63,7 +61,7 @@ def wait_for_topic(client, topic, timeout=-1):
     start = time.time()
     while not client.has_metadata_for_topic(topic):
         if timeout > 0 and time.time() - start > timeout:
-            raise Exception('timeout reached waiting for topic')
+            raise Exception("timeout reached waiting for topic")
 
         time.sleep(0.1)
 
@@ -108,14 +106,15 @@ def consumer_offsets(client, topic, groups):
     for a group may be larger than the listed available offset in the
     partition.
     """
-    res = {'group': {}}
+    res = {"group": {}}
 
     offsets = fetch_partition_offsets(client, topic)
-    res['available'] = offsets
+    res["available"] = offsets
 
     for group in groups:
-        consumer = Consumer(client, group, topic, partitions=offsets.keys(),
-                auto_commit=False)
-        res['group'][group] = dict(consumer.offsets)
+        consumer = Consumer(
+            client, group, topic, partitions=offsets.keys(), auto_commit=False
+        )
+        res["group"][group] = dict(consumer.offsets)
 
     return res

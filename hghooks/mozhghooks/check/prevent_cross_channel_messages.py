@@ -26,24 +26,24 @@ class XChannelMessageCheck(PreTxnChangegroupCheck):
     from coming in from upstream in all related repositories.
     That's affecting mozilla-central and comm-central at this point.
     """
+
     @property
     def name(self):
-        return b'x_channel_message'
+        return b"x_channel_message"
 
     def relevant(self):
-        return (
-            self.repo_metadata[b'firefox']
-            or self.repo_metadata[b'thunderbird'])
+        return self.repo_metadata[b"firefox"] or self.repo_metadata[b"thunderbird"]
 
     def pre(self, node):
         pass
 
     def check(self, ctx):
-        if not any(line.startswith(b'X-Channel-')
-                   for line in ctx.description().splitlines()):
+        if not any(
+            line.startswith(b"X-Channel-") for line in ctx.description().splitlines()
+        ):
             return True
 
-        print_banner(self.ui, b'error', X_CHANNEL_COMMIT_FOUND)
+        print_banner(self.ui, b"error", X_CHANNEL_COMMIT_FOUND)
         return False
 
     def post_check(self):

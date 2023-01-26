@@ -18,7 +18,7 @@ options = {}
 for path in sys.stdin:
     path = path.strip()
 
-    hgrc = os.path.join(path, '.hg', 'hgrc')
+    hgrc = os.path.join(path, ".hg", "hgrc")
     if not os.path.exists(hgrc):
         continue
 

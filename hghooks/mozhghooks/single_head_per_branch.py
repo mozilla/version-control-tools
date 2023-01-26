@@ -16,8 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+
 def hook(ui, repo, source=None, **kwargs):
-    if source in (b'pull', b'strip'):
+    if source in (b"pull", b"strip"):
         return 0
 
     for branch, heads in repo.branchmap().iteritems():
@@ -37,9 +38,13 @@ def hook(ui, repo, source=None, **kwargs):
             newheads.append(node)
 
         if len(newheads) > 1:
-            ui.write(b"\n\n************************** ERROR ****************************\n")
+            ui.write(
+                b"\n\n************************** ERROR ****************************\n"
+            )
             ui.write(b"Multiple heads detected on branch '%s'\n" % branch)
             ui.write(b"Only one head per branch is allowed!\n")
-            ui.write(b"*************************************************************\n\n\n")
+            ui.write(
+                b"*************************************************************\n\n\n"
+            )
             return 1
     return 0

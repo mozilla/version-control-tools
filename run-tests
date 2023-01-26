@@ -20,7 +20,7 @@ import uuid
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
 HERE = os.path.dirname(os.path.abspath(__file__))
-RUNTESTS = os.path.join(HERE, 'pylib', 'mercurial-support', 'run-tests.py')
+RUNTESTS = os.path.join(HERE, "pylib", "mercurial-support", "run-tests.py")
 
 
 def try_find_hg(with_hg):
@@ -30,11 +30,11 @@ def try_find_hg(with_hg):
     Args:
       with_hg (str): a Mercurial version string. Example: `5.3.2`
     """
-    hg = os.path.join('/app', 'venv', 'mercurials', with_hg, 'bin', 'hg')
+    hg = os.path.join("/app", "venv", "mercurials", with_hg, "bin", "hg")
 
     if not os.path.exists(hg):
         raise ValueError("Couldn't find hg version {} at a known path".format(with_hg))
-    
+
     return hg
 
 
@@ -49,15 +49,15 @@ def int_floor(number):
     14
     """
     return int(math.floor(number))
-        
 
-if __name__ == '__main__':
-    if 'VIRTUAL_ENV' not in os.environ:
-        activate = os.path.join(HERE, 'venv', 'bin', 'activate_this.py')
+
+if __name__ == "__main__":
+    if "VIRTUAL_ENV" not in os.environ:
+        activate = os.path.join(HERE, "venv", "bin", "activate_this.py")
         with open(activate) as f:
             exec(f.read(), dict(__file__=activate))
-        sys.executable = os.path.join(HERE, 'venv', 'bin', 'python')
-        os.environ['VIRTUAL_ENV'] = os.path.join(HERE, 'venv')
+        sys.executable = os.path.join(HERE, "venv", "bin", "python")
+        os.environ["VIRTUAL_ENV"] = os.path.join(HERE, "venv")
 
     try:
         import vcttesting.docker as vctdocker
@@ -75,85 +75,106 @@ if __name__ == '__main__':
     )
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--with-hg')
-    parser.add_argument('-C', '--cover', action='store_true')
-    parser.add_argument('-j', '--jobs', type=int)
-    parser.add_argument('--all-hg-versions', action='store_true',
-        help='Test against all marked compatible Mercurial versions')
-    parser.add_argument('--no-hg-tip', action='store_true',
-        help='Do not run tests against the @ bookmark of hg')
-    parser.add_argument('--no-unit', action='store_true',
-        help='Do not run Python unit tests')
-    parser.add_argument('--use-last-images', action='store_true',
-        help='Skip building new images when possible')
-    parser.add_argument('--headless', action='store_true',
-        help='Only run tests that do not require a framebuffer '
-             '(skips Selenium tests)')
-    parser.add_argument('--no-docker', action='store_true',
-        help='Only run tests that do not require Docker')
-    parser.add_argument('--run-flaky', action='store_true',
-        help='Run tests marked as intermittent failures')
+    parser.add_argument("--with-hg")
+    parser.add_argument("-C", "--cover", action="store_true")
+    parser.add_argument("-j", "--jobs", type=int)
+    parser.add_argument(
+        "--all-hg-versions",
+        action="store_true",
+        help="Test against all marked compatible Mercurial versions",
+    )
+    parser.add_argument(
+        "--no-hg-tip",
+        action="store_true",
+        help="Do not run tests against the @ bookmark of hg",
+    )
+    parser.add_argument(
+        "--no-unit", action="store_true", help="Do not run Python unit tests"
+    )
+    parser.add_argument(
+        "--use-last-images",
+        action="store_true",
+        help="Skip building new images when possible",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Only run tests that do not require a framebuffer "
+        "(skips Selenium tests)",
+    )
+    parser.add_argument(
+        "--no-docker",
+        action="store_true",
+        help="Only run tests that do not require Docker",
+    )
+    parser.add_argument(
+        "--run-flaky",
+        action="store_true",
+        help="Run tests marked as intermittent failures",
+    )
 
     options, extra = parser.parse_known_args(sys.argv)
 
     if not vctdocker:
-        print('vctdocker libraries not found; deactivating Docker tests')
+        print("vctdocker libraries not found; deactivating Docker tests")
         options.no_docker = True
 
     # This is somewhat arbitrary. It makes version management logic a bit
     # more complicated and isn't worth supporting.
     if options.all_hg_versions and options.with_hg:
-        print('abort: --all-hg-versions and --with-hg are mutually exclusive')
+        print("abort: --all-hg-versions and --with-hg are mutually exclusive")
         sys.exit(1)
 
     # some arguments belong to us only. Don't pass it along to run-tests.py.
     filter_args = {
-        '--all-hg-versions',
-        '--no-hg-tip',
-        '--use-last-images',
-        '--headless',
-        '--no-docker',
-        '--run-flaky',
+        "--all-hg-versions",
+        "--no-hg-tip",
+        "--use-last-images",
+        "--headless",
+        "--no-docker",
+        "--run-flaky",
     }
     hg_harness_args = [a for a in sys.argv if a not in filter_args]
     hg_harness_args[0] = RUNTESTS
 
-
     if options.no_docker:
-        os.environ['SKIP_DOCKER_TESTS'] = '1'
+        os.environ["SKIP_DOCKER_TESTS"] = "1"
 
     # Strip code coverage flags
-    hg_harness_args = [a for a in hg_harness_args if a != '--cover']
-    verbose = '-v' in hg_harness_args or '--verbose' in hg_harness_args
+    hg_harness_args = [a for a in hg_harness_args if a != "--cover"]
+    verbose = "-v" in hg_harness_args or "--verbose" in hg_harness_args
 
-    os.environ['BUGZILLA_USERNAME'] = 'admin@example.com'
-    os.environ['BUGZILLA_PASSWORD'] = 'password'
+    os.environ["BUGZILLA_USERNAME"] = "admin@example.com"
+    os.environ["BUGZILLA_PASSWORD"] = "password"
 
     orig_args = list(hg_harness_args)
 
     extensions = get_extensions()
     test_files = get_test_files(extensions)
-    extension_tests = test_files['extension']
-    unit_tests = test_files['unit']
-    hg_tests = test_files['hg']
+    extension_tests = test_files["extension"]
+    unit_tests = test_files["unit"]
+    hg_tests = test_files["hg"]
     # Tests requiring Docker in some form.
-    docker_tests = {t for t, reqs in test_files['docker_requirements'].items()
-                    if reqs}
+    docker_tests = {t for t, reqs in test_files["docker_requirements"].items() if reqs}
 
-    possible_tests = [os.path.normpath(os.path.abspath(a))
-                      for a in extra[1:] if not a.startswith('-')]
+    possible_tests = [
+        os.path.normpath(os.path.abspath(a)) for a in extra[1:] if not a.startswith("-")
+    ]
     # Filter out arguments that might be tests.
-    hg_harness_args = [a for a in hg_harness_args
-                if os.path.normpath(os.path.abspath(a)) not in possible_tests]
+    hg_harness_args = [
+        a
+        for a in hg_harness_args
+        if os.path.normpath(os.path.abspath(a)) not in possible_tests
+    ]
     requested_tests = []
     for t in possible_tests:
-        if t in test_files['all']:
+        if t in test_files["all"]:
             requested_tests.append(t)
             continue
 
         if os.path.isdir(t):
             t = os.path.normpath(t)
-            for test in test_files['all']:
+            for test in test_files["all"]:
                 common = os.path.commonprefix([t, test])
                 common = os.path.normpath(common)
                 if common == t and test not in requested_tests:
@@ -164,30 +185,31 @@ if __name__ == '__main__':
     # Explicitly use our own HG from the virtualenv so other installs
     # on the system don't interfere.
     if not options.with_hg:
-        hg = os.path.join(os.path.dirname(sys.executable), 'hg')
-        hg_harness_args.extend(['--with-hg', hg])
+        hg = os.path.join(os.path.dirname(sys.executable), "hg")
+        hg_harness_args.extend(["--with-hg", hg])
     elif options.with_hg and not os.path.exists(options.with_hg):
         # Try and parse the Mercurial version as a convenience string
         try:
             hg = try_find_hg(options.with_hg)
         except ValueError:
             sys.exit(
-                "{} is not a Mercurial version number or path to `hg`"
-                .format(options.with_hg)
+                "{} is not a Mercurial version number or path to `hg`".format(
+                    options.with_hg
+                )
             )
-        
-        hg_harness_args.extend((['--with-hg', hg]))
+
+        hg_harness_args.extend((["--with-hg", hg]))
     elif options.with_hg:
         hg = options.with_hg
     hgversion, _pyversion = get_hg_version(hg)
     if hgversion is None:
-        print('Unable to determine Mercurial version')
+        print("Unable to determine Mercurial version")
         sys.exit(1)
 
     # Add `--blacklist=testing/flaky-tests.txt` to the command line
     if not options.run_flaky:
-        flaky_tests_path = os.path.join(HERE, 'testing', 'flaky-tests.txt')
-        hg_harness_args.extend(['--blacklist', flaky_tests_path])
+        flaky_tests_path = os.path.join(HERE, "testing", "flaky-tests.txt")
+        hg_harness_args.extend(["--blacklist", flaky_tests_path])
 
     run_hg_tests = []
     run_unit_tests = []
@@ -228,21 +250,21 @@ if __name__ == '__main__':
     # Enable tests to interact with our Docker controlling script.
     have_docker = False
     if not options.no_docker:
-        docker_state = os.path.join(HERE, '.dockerstate')
+        docker_state = os.path.join(HERE, ".dockerstate")
         docker_url, docker_tls = vctdocker.params_from_env(os.environ)
         docker = vctdocker.Docker(docker_url, tls=docker_tls)
         hgcluster = vcthgmo.HgCluster(docker)
 
         if docker.is_alive():
             have_docker = True
-            os.environ['DOCKER_HOSTNAME'] = docker.docker_hostname
+            os.environ["DOCKER_HOSTNAME"] = docker.docker_hostname
 
             # Add a label to the containers so any orphans can be
             # shutdown after the test run is complete. This should permeate
             # to the environment of the `docker-compose` process created
             # by `hgmo start`.
             runtests_label = str(uuid.uuid4())
-            os.environ['RUNTESTS_LABEL'] = runtests_label
+            os.environ["RUNTESTS_LABEL"] = runtests_label
 
             # We build the base docker images in the test runner because doing it
             # from tests would be racey. It is easier to do it here instead of
@@ -250,19 +272,19 @@ if __name__ == '__main__':
             #
             # But only do this if a test we are running utilizes Docker.
             if not options.use_last_images:
-                print('generating Docker images needed for tests')
+                print("generating Docker images needed for tests")
                 t_start = time.time()
 
                 hgcluster.build()
 
                 t_end = time.time()
-                print('got Docker images in %.2fs' % (t_end - t_start))
+                print("got Docker images in %.2fs" % (t_end - t_start))
 
-    print('Will run %d non-Docker tests concurrently' % no_docker_jobs)
+    print("Will run %d non-Docker tests concurrently" % no_docker_jobs)
     if have_docker:
-        print('Will run %d Docker tests concurrently' % docker_jobs)
+        print("Will run %d Docker tests concurrently" % docker_jobs)
 
-    os.environ['HGVERSION'] = hgversion
+    os.environ["HGVERSION"] = hgversion
 
     res = 0
 
@@ -279,49 +301,55 @@ if __name__ == '__main__':
         # non-Docker tests. We perform multiple invocations. First without
         # Docker. Then with.
 
-        print('Running non-Docker Mercurial tests')
-        args = hg_harness_args + ['-j', str(no_docker_jobs)] + run_hg_tests_no_docker
+        print("Running non-Docker Mercurial tests")
+        args = hg_harness_args + ["-j", str(no_docker_jobs)] + run_hg_tests_no_docker
         res = subprocess.call(args, cwd=HERE)
 
         if have_docker and run_hg_tests_docker:
             # We should ideally not leak containers and images. But until
             # the Mercurial test harness allows tests to register cleanup
             # actions, there is only so much we can do.
-            print('Running Docker Mercurial tests')
+            print("Running Docker Mercurial tests")
             with docker.auto_clean_orphans(runtests_label):
-                args = hg_harness_args + ['-j', str(docker_jobs)] + run_hg_tests_docker
+                args = hg_harness_args + ["-j", str(docker_jobs)] + run_hg_tests_docker
                 res2 = subprocess.call(args, cwd=HERE)
                 if res2:
                     res = res2
         elif run_hg_tests_docker:
-            print('Skipping %d Docker Mercurial tests because Docker not '
-                  'available' % len(run_hg_tests_docker))
+            print(
+                "Skipping %d Docker Mercurial tests because Docker not "
+                "available" % len(run_hg_tests_docker)
+            )
 
     if run_unit_tests:
         nose_res = 0
 
         if run_unit_tests_no_docker:
-            print('Running non-Docker unit tests')
-            nose_res = run_nose_tests(run_unit_tests_no_docker, no_docker_jobs,
-                                      verbose=verbose)
+            print("Running non-Docker unit tests")
+            nose_res = run_nose_tests(
+                run_unit_tests_no_docker, no_docker_jobs, verbose=verbose
+            )
             if nose_res:
                 res = nose_res
 
         if have_docker and run_unit_tests_docker:
-            print('Running Docker unit tests')
+            print("Running Docker unit tests")
             with docker.auto_clean_orphans(runtests_label):
-                nose_res2 = run_nose_tests(run_unit_tests_docker, docker_jobs,
-                                           verbose=verbose)
+                nose_res2 = run_nose_tests(
+                    run_unit_tests_docker, docker_jobs, verbose=verbose
+                )
             if nose_res2:
                 res = nose_res2
         elif run_unit_tests_docker:
-            print('Skipping %d Docker unit tests because Docker not available' %
-                  len(run_unit_tests_docker))
+            print(
+                "Skipping %d Docker unit tests because Docker not available"
+                % len(run_unit_tests_docker)
+            )
 
     # If we're running the full compatibility run, figure out what versions
     # apply to what and run them.
     if options.all_hg_versions:
-        mercurials_dir = os.path.join(os.environ['VIRTUAL_ENV'], 'mercurials')
+        mercurials_dir = os.path.join(os.environ["VIRTUAL_ENV"], "mercurials")
 
         # Maps directories/versions to lists of tests to run.
         # We normalize X.Y.Z to X.Y for compatibility because the monthly
@@ -330,20 +358,20 @@ if __name__ == '__main__':
         # against all X.Y and X.Y.Z releases seen on disk.
         versions = {}
         for dirver in os.listdir(mercurials_dir):
-            if dirver.startswith('.') or dirver == '@':
+            if dirver.startswith(".") or dirver == "@":
                 continue
 
-            normdirver = '.'.join(dirver.split('.')[0:2])
+            normdirver = ".".join(dirver.split(".")[0:2])
 
             tests = versions.setdefault(dirver, set())
             tests |= set(hg_tests)
 
             for m in extensions:
-                for extver in m['testedwith']:
-                    normever = b'.'.join(extver.split(b'.')[0:2])
+                for extver in m["testedwith"]:
+                    normever = b".".join(extver.split(b".")[0:2])
 
-                    if extver == dirver or normever.decode('utf-8') == normdirver:
-                        tests |= m['tests']
+                    if extver == dirver or normever.decode("utf-8") == normdirver:
+                        tests |= m["tests"]
 
         def run_hg_tests(version, tests):
             if requested_tests:
@@ -354,36 +382,39 @@ if __name__ == '__main__':
 
             remove_err_files(tests)
 
-            hg_path = os.path.join(mercurials_dir, version, 'bin', 'hg')
+            hg_path = os.path.join(mercurials_dir, version, "bin", "hg")
 
-            common_args = [RUNTESTS] + ['--with-hg', hg_path]
+            common_args = [RUNTESTS] + ["--with-hg", hg_path]
 
             tests_docker = sorted(t for t in tests if t in docker_tests)
             tests_no_docker = sorted(t for t in tests if t not in docker_tests)
 
             real_version, _pyversion = get_hg_version(hg_path)
 
-            print('Testing with Mercurial %s (resolved to %s)' % (
-                version, real_version))
+            print(
+                "Testing with Mercurial %s (resolved to %s)" % (version, real_version)
+            )
             sys.stdout.flush()
-            os.environ['HGVERSION'] = real_version
+            os.environ["HGVERSION"] = real_version
 
-            print('Running non-Docker Mercurial tests')
-            args = common_args + ['-j', str(no_docker_jobs)] + tests_no_docker
+            print("Running non-Docker Mercurial tests")
+            args = common_args + ["-j", str(no_docker_jobs)] + tests_no_docker
             subprocess.call(args, cwd=HERE)
             sys.stdout.flush()
             sys.stderr.flush()
 
             if have_docker and tests_docker:
-                print('Running Docker Mercurial tests')
+                print("Running Docker Mercurial tests")
                 with docker.auto_clean_orphans(runtests_label):
-                    args = common_args + ['-j', str(docker_jobs)] + tests_docker
+                    args = common_args + ["-j", str(docker_jobs)] + tests_docker
                     subprocess.call(args, cwd=HERE)
                 sys.stdout.flush()
                 sys.stderr.flush()
             elif tests_docker:
-                print('Skipping %d Docker Mercurial tests because Docker not '
-                      'available' % len(tests_docker))
+                print(
+                    "Skipping %d Docker Mercurial tests because Docker not "
+                    "available" % len(tests_docker)
+                )
 
         for version, tests in sorted(versions.items()):
             res2 = run_hg_tests(version, tests)
@@ -395,8 +426,8 @@ if __name__ == '__main__':
         if not options.no_hg_tip:
             all_hg_tests = []
             for m in extensions:
-                all_hg_tests.extend(sorted(m['tests']))
+                all_hg_tests.extend(sorted(m["tests"]))
             all_hg_tests.extend(hg_tests)
-            run_hg_tests('@', all_hg_tests)
+            run_hg_tests("@", all_hg_tests)
 
     sys.exit(res)

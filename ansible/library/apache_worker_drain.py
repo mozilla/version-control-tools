@@ -6,7 +6,7 @@ import requests
 import time
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: apache_worker_drain
 short_description: Waits for Apache workers to drain
@@ -28,14 +28,15 @@ options:
     description:
       - How long to wait for worker count to drain
     default: 300
-'''
+"""
+
 
 def get_busy_workers(url):
     res = requests.get(url, timeout=5)
     for line in res.text.splitlines():
-        k, v = line.split(': ', 1)
+        k, v = line.split(": ", 1)
 
-        if k != 'BusyWorkers':
+        if k != "BusyWorkers":
             continue
 
         return int(v)
@@ -45,17 +46,17 @@ def get_busy_workers(url):
 
 def main():
     module = AnsibleModule(
-        argument_spec = {
-            'url': {'default': 'http://localhost/server-status'},
-            'timeout': {'default': 300},
+        argument_spec={
+            "url": {"default": "http://localhost/server-status"},
+            "timeout": {"default": 300},
         },
     )
 
-    url = module.params['url']
-    timeout = int(module.params['timeout'])
+    url = module.params["url"]
+    timeout = int(module.params["timeout"])
 
-    if not url.endswith('?auto'):
-        url += '?auto'
+    if not url.endswith("?auto"):
+        url += "?auto"
 
     end = time.time() + timeout
     drained = False
@@ -71,13 +72,14 @@ def main():
             time.sleep(1)
 
         except Exception as e:
-            module.fail_json(msg='HTTP request to %s failed: %s' % (url, e))
+            module.fail_json(msg="HTTP request to %s failed: %s" % (url, e))
 
     if drained:
-        module.exit_json(changed=True, state='drained', poll_count=count)
+        module.exit_json(changed=True, state="drained", poll_count=count)
     else:
-        module.fail_json(msg='Timeout when waiting for server to drain')
+        module.fail_json(msg="Timeout when waiting for server to drain")
 
 
 from ansible.module_utils.basic import *
+
 main()

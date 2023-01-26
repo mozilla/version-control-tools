@@ -21,10 +21,10 @@ such files (ie CSS/images/jar.mn).
 
 
 def hook(ui, repo, hooktype, node, source=None, **kwargs):
-    if source in (b'pull', b'strip'):
+    if source in (b"pull", b"strip"):
         return 0
 
-    if b'a=css-image-only' not in repo[b'tip'].description().lower():
+    if b"a=css-image-only" not in repo[b"tip"].description().lower():
         # We only care if the 'css-image-only' approval message was used
         return 0
 
@@ -34,20 +34,25 @@ def hook(ui, repo, hooktype, node, source=None, **kwargs):
         # Loop through each file for the current changeset
         for changed_file in repo[change_id].files():
             # Check they have an expected extension:
-            if not changed_file.endswith((b'.css', b'jar.mn', b'.png', b'.jpg', b'.svg')):
-                errors.append(b'* non-image/css-file (%s) altered in this changeset\n' % changed_file)
+            if not changed_file.endswith(
+                (b".css", b"jar.mn", b".png", b".jpg", b".svg")
+            ):
+                errors.append(
+                    b"* non-image/css-file (%s) altered in this changeset\n"
+                    % changed_file
+                )
 
     if errors:
-        ui.write(b'\n************************** ERROR ****************************\n')
-        ui.write(b'\n'.join(errors))
-        ui.write(b'\n')
-        ui.write(b'You used the a=css-image-only approval message, but your change\n')
+        ui.write(b"\n************************** ERROR ****************************\n")
+        ui.write(b"\n".join(errors))
+        ui.write(b"\n")
+        ui.write(b"You used the a=css-image-only approval message, but your change\n")
         ui.write(b'included non-CSS/image/jar.mn changes. Please get "normal"\n')
-        ui.write(b'approval from release management for your changes.\n')
-        ui.write(b'*************************************************************\n\n')
+        ui.write(b"approval from release management for your changes.\n")
+        ui.write(b"*************************************************************\n\n")
         # Reject changes
         return 1
-    ui.write(b'Thanks for your a=css-image-only push, it\'s the best!\n')
+    ui.write(b"Thanks for your a=css-image-only push, it's the best!\n")
 
     # Otherwise, accept changes
     return 0

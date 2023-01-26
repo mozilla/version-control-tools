@@ -20,24 +20,24 @@ For more information, see https://wiki.mozilla.org/Try.
 def print_banner(ui, level, message):
     width = max(len(l) for l in message.splitlines())
     banner = [
-        (b' %s ' % level.upper()).center(width, b'*'),
+        (b" %s " % level.upper()).center(width, b"*"),
         message.strip(),
-        b'*' * width,
+        b"*" * width,
     ]
-    ui.write(b'\n' + b'\n'.join(banner) + b'\n\n')
+    ui.write(b"\n" + b"\n".join(banner) + b"\n\n")
 
 
 def hook(ui, repo, source=None, **kwargs):
-    if source in (b'pull', b'strip'):
+    if source in (b"pull", b"strip"):
         return 0
 
-    tip = repo[b'tip']
+    tip = repo[b"tip"]
     comment = tip.description()
-    config_found = b'try_task_config.json' in tip.manifest()
-    syntax_found = b'try:' in comment
+    config_found = b"try_task_config.json" in tip.manifest()
+    syntax_found = b"try:" in comment
     if not config_found and not syntax_found:
-        print_banner(ui, b'warning', TRY_SYNTAX_MISSING)
+        print_banner(ui, b"warning", TRY_SYNTAX_MISSING)
     elif syntax_found and b"-p none" in comment and b"-j" not in comment:
-        print_banner(ui, b'error', TRY_JOBS_MISSING)
+        print_banner(ui, b"error", TRY_JOBS_MISSING)
         return 1
     return 0

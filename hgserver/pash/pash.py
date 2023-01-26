@@ -12,7 +12,7 @@ from datetime import datetime
 import hg_helper
 from hgmolib import ldap_helper
 
-NO_HG_ACCESS = '''
+NO_HG_ACCESS = """
 A SSH connection has been established and your account (%s)
 was found in LDAP.
 
@@ -22,9 +22,9 @@ Please follow the instructions at the following URL to gain Mercurial
 access:
 
     https://www.mozilla.org/en-US/about/governance/policies/commit/
-'''.lstrip()
+""".lstrip()
 
-HG_ACCESS_DISABLED = '''
+HG_ACCESS_DISABLED = """
 A SSH connection has been established, your account (%s)
 was found in LDAP, and your account has been configured for Mercurial
 access.
@@ -36,11 +36,11 @@ into hg.mozilla.org every few months to keep your account active).
 To restore Mercurial access, please file a bug on Bugzilla under
 the `mozilla.org :: Repository Account Requests` component and
 request access be restored for %s.
-'''.lstrip()
+""".lstrip()
 
-AUTOLAND_USER = 'bind-autoland@mozilla.com'
-LANDING_WORKER_USER = 'lando_landing_worker@mozilla.com'
-LANDING_WORKER_USER_DEV = 'lando_landing_worker_dev@mozilla.com'
+AUTOLAND_USER = "bind-autoland@mozilla.com"
+LANDING_WORKER_USER = "lando_landing_worker@mozilla.com"
+LANDING_WORKER_USER_DEV = "lando_landing_worker_dev@mozilla.com"
 
 
 def source_environment(path):
@@ -53,20 +53,20 @@ def source_environment(path):
 
     # Open in text mode because environment variables are not bytes in Python
     # 3.
-    with open(path, 'r') as fh:
+    with open(path, "r") as fh:
         for line in fh:
             line = line.strip()
 
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
 
             # Valid formats:
             # key=value
             # key="value"
-            if '=' not in line:
+            if "=" not in line:
                 continue
 
-            key, value = line.split('=', 1)
+            key, value = line.split("=", 1)
 
             key = key.strip()
             value = value.strip()
@@ -81,13 +81,16 @@ def touch_hg_access_date(user):
     # Run ldap access date toucher, silently fail and log if we're unable to write
     try:
         settings = ldap_helper.get_ldap_settings()
-        ldap_helper.update_access_date(user, 'hgAccessDate',
-                                       datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
-                                       settings['url'],
-                                       settings['write_url'])
+        ldap_helper.update_access_date(
+            user,
+            "hgAccessDate",
+            datetime.utcnow().strftime("%Y%m%d%H%M%S.%fZ"),
+            settings["url"],
+            settings["write_url"],
+        )
     except Exception:
-        logging.basicConfig(filename='/var/log/pash.log', level=logging.DEBUG)
-        logging.exception('Failed to update LDAP attributes for %s' % user)
+        logging.basicConfig(filename="/var/log/pash.log", level=logging.DEBUG)
+        logging.exception("Failed to update LDAP attributes for %s" % user)
 
 
 def process_login(user):
@@ -100,7 +103,7 @@ def process_login(user):
         sys.stderr.write(NO_HG_ACCESS % user)
         sys.exit(0)
 
-    with open('/etc/mercurial/pash.json', 'rb') as fh:
+    with open("/etc/mercurial/pash.json", "rb") as fh:
         pash_settings = json.load(fh)
 
     touch_hg_access_date(user)
@@ -108,30 +111,31 @@ def process_login(user):
     # landing_users are both autoland-transplant and Lando landing worker
     # users that push on behalf of other users.
     landing_users = (
-        pash_settings.get('autoland_user', AUTOLAND_USER),
-        pash_settings.get('landing_worker_user', LANDING_WORKER_USER),
-        pash_settings.get('landing_worker_user_dev', LANDING_WORKER_USER_DEV),
+        pash_settings.get("autoland_user", AUTOLAND_USER),
+        pash_settings.get("landing_worker_user", LANDING_WORKER_USER),
+        pash_settings.get("landing_worker_user_dev", LANDING_WORKER_USER_DEV),
     )
 
     # Touch the initiator of the autoland request, if required.
     if user in landing_users:
-        request_user = os.environ.get('AUTOLAND_REQUEST_USER')
+        request_user = os.environ.get("AUTOLAND_REQUEST_USER")
         if request_user:
             touch_hg_access_date(request_user)
     else:
-        if 'AUTOLAND_REQUEST_USER' in os.environ:
-            del os.environ['AUTOLAND_REQUEST_USER']
+        if "AUTOLAND_REQUEST_USER" in os.environ:
+            del os.environ["AUTOLAND_REQUEST_USER"]
 
     hg_helper.serve(
-        cname=pash_settings['hostname'],
-        enable_repo_config=pash_settings.get('repo_config', False),
-        enable_repo_group=pash_settings.get('repo_group', False),
-        enable_user_repos=pash_settings.get('user_repos', False),
-        enable_mozreview_ldap_associate=pash_settings.get('mr_ldap_associate', False))
+        cname=pash_settings["hostname"],
+        enable_repo_config=pash_settings.get("repo_config", False),
+        enable_repo_group=pash_settings.get("repo_group", False),
+        enable_user_repos=pash_settings.get("user_repos", False),
+        enable_mozreview_ldap_associate=pash_settings.get("mr_ldap_associate", False),
+    )
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # /etc/environment contains important environment variables needed for
     # the execution of some functionality (like hooks making HTTP requests
     # and needing to pick up http_proxy and kin). This file is normally sourced
@@ -140,6 +144,6 @@ if __name__ == '__main__':
     # variables by using PAM. But this feels  complicated and requires mucking
     # about with system auth settings. It is relatively easy to source the file
     # from Python. So we do that.
-    source_environment('/etc/environment')
+    source_environment("/etc/environment")
 
-    process_login(os.environ.get('USER'))
+    process_login(os.environ.get("USER"))

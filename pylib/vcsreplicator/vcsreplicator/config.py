@@ -20,16 +20,12 @@ from mercurial import (
 
 # Holds a boolean indicating if a repo was filtered and the
 # name of the rule that allowed/disallowed the filtering
-RepoFilterResult = collections.namedtuple('RepoFilterResult', ('passes_filter', 'rule'))
+RepoFilterResult = collections.namedtuple("RepoFilterResult", ("passes_filter", "rule"))
 
 
 def create_namedgroup(name, rule):
-    '''Returns a regex group with name `name` that must match `rule`
-    '''
-    return '(?P<{name}>{rule})'.format(
-        name=name,
-        rule=rule
-    )
+    """Returns a regex group with name `name` that must match `rule`"""
+    return "(?P<{name}>{rule})".format(name=name, rule=rule)
 
 
 class Config(object):
@@ -38,66 +34,78 @@ class Config(object):
     This is kind of a catch all for functionality related to the current
     configuration.
     """
+
     def __init__(self, filename=None):
         self.c = RawConfigParser()
 
         if filename:
             if not os.path.exists(filename):
-                raise ValueError('config file does not exist: %s' % filename)
+                raise ValueError("config file does not exist: %s" % filename)
 
             self.c.read(filename)
 
-        if self.c.has_section('path_rewrites'):
-            self._path_rewrites = self.c.items('path_rewrites')
+        if self.c.has_section("path_rewrites"):
+            self._path_rewrites = self.c.items("path_rewrites")
         else:
             self._path_rewrites = []
 
-        if self.c.has_section('pull_url_rewrites'):
-            self._pull_url_rewrites = self.c.items('pull_url_rewrites')
+        if self.c.has_section("pull_url_rewrites"):
+            self._pull_url_rewrites = self.c.items("pull_url_rewrites")
         else:
             self._pull_url_rewrites = []
 
-        if self.c.has_section('public_url_rewrites'):
-            self._public_url_rewrites = self.c.items('public_url_rewrites')
+        if self.c.has_section("public_url_rewrites"):
+            self._public_url_rewrites = self.c.items("public_url_rewrites")
         else:
             self._public_url_rewrites = []
 
-        if self.c.has_section('replicationpathrewrites'):
-            self._replication_path_rewrites = self.c.items('replicationpathrewrites')
+        if self.c.has_section("replicationpathrewrites"):
+            self._replication_path_rewrites = self.c.items("replicationpathrewrites")
         else:
             self._replication_path_rewrites = []
 
-        if self.c.has_section('replicationrules'):
+        if self.c.has_section("replicationrules"):
             re_includes, re_excludes = [], []
             self.path_includes, self.path_excludes = {}, {}
-            for key, value in self.c.items('replicationrules'):
-                (behaviour, name), (ruletype, rule) = key.split('.'), value.split(':')
+            for key, value in self.c.items("replicationrules"):
+                (behaviour, name), (ruletype, rule) = key.split("."), value.split(":")
 
-                if ruletype == 're':
+                if ruletype == "re":
                     # Decide which list is correct and append to it
-                    restore = re_includes if behaviour == 'include' else re_excludes
+                    restore = re_includes if behaviour == "include" else re_excludes
                     restore.append((name, rule))
 
-                elif ruletype == 'path':
-                    exstore = self.path_includes if behaviour == 'include' else self.path_excludes
+                elif ruletype == "path":
+                    exstore = (
+                        self.path_includes
+                        if behaviour == "include"
+                        else self.path_excludes
+                    )
                     exstore[rule] = name
                 else:
-                    raise Exception('bad ruletype %s' % ruletype)
+                    raise Exception("bad ruletype %s" % ruletype)
 
             # Create the in/out rules as an `or` of all the rules
-            includes_string = '|'.join(
-                create_namedgroup(name, rule)
-                for name, rule in re_includes
+            includes_string = "|".join(
+                create_namedgroup(name, rule) for name, rule in re_includes
             )
-            excludes_string = '|'.join(
-                create_namedgroup(name, rule)
-                for name, rule in re_excludes
+            excludes_string = "|".join(
+                create_namedgroup(name, rule) for name, rule in re_excludes
             )
 
-            self.include_regex = re.compile(includes_string) if includes_string else None
-            self.exclude_regex = re.compile(excludes_string) if excludes_string else None
+            self.include_regex = (
+                re.compile(includes_string) if includes_string else None
+            )
+            self.exclude_regex = (
+                re.compile(excludes_string) if excludes_string else None
+            )
 
-            self.has_filters = bool(self.path_includes or self.path_excludes or self.include_regex or self.exclude_regex)
+            self.has_filters = bool(
+                self.path_includes
+                or self.path_excludes
+                or self.include_regex
+                or self.exclude_regex
+            )
         else:
             self.has_filters = False
 
@@ -107,18 +115,17 @@ class Config(object):
     @property
     def hg_path(self):
         """Path to a hg executable."""
-        if self.c.has_section('programs') and self.c.has_option('programs', 'hg'):
-            return self.get('programs', 'hg')
+        if self.c.has_section("programs") and self.c.has_option("programs", "hg"):
+            return self.get("programs", "hg")
 
-        return 'hg'
+        return "hg"
 
     def is_backup(self):
         """Return `True` if the consumer is acting as a backup of core repo
         data.
         """
-        return (
-            self.c.has_section('consumer')
-            and self.c.getboolean('consumer', 'backup', fallback=False)
+        return self.c.has_section("consumer") and self.c.getboolean(
+            "consumer", "backup", fallback=False
         )
 
     def parse_wire_repo_path(self, path):
@@ -133,7 +140,7 @@ class Config(object):
         """Parse a local path into a wire path"""
         for source, dest in self._replication_path_rewrites:
             if path.startswith(source):
-                return dest + path[len(source):]
+                return dest + path[len(source) :]
 
         return None
 
@@ -141,7 +148,7 @@ class Config(object):
         """Obtain a URL to be used for pulling from a local repo path."""
         for source, dest in self._pull_url_rewrites:
             if path.startswith(source):
-                return dest + path[len(source):]
+                return dest + path[len(source) :]
 
         return None
 
@@ -149,7 +156,7 @@ class Config(object):
         """Obtain a URL to be used for public advertisement from a wire protocol path."""
         for source, dest in self._public_url_rewrites:
             if path.startswith(source):
-                return dest + path[len(source):]
+                return dest + path[len(source) :]
 
         return None
 
@@ -162,7 +169,7 @@ class Config(object):
         filters defined at all, we pass the filter. This rule is called "nofilter".
         """
         if not self.has_filters:
-            return RepoFilterResult(True, 'nofilter')
+            return RepoFilterResult(True, "nofilter")
 
         if repo in self.path_includes:
             return RepoFilterResult(True, self.path_includes[repo])
@@ -185,7 +192,7 @@ class Config(object):
             return RepoFilterResult(False, next(matchkeys))
 
         # Use "noinclude" if we didn't get a match for an include rule
-        return RepoFilterResult(False, 'noinclude')
+        return RepoFilterResult(False, "noinclude")
 
     def get_client_from_section(self, section, timeout=-1):
         """Obtain a KafkaClient from a config section.
@@ -198,22 +205,21 @@ class Config(object):
         retry. This is useful when attempting to connect to a cluster that may
         still be coming online, for example.
         """
-        hosts = self.get(section, 'hosts')
-        client_id = self.get(section, 'client_id')
+        hosts = self.get(section, "hosts")
+        client_id = self.get(section, "client_id")
         connect_timeout = 60
-        if self.c.has_option(section, 'connect_timeout'):
-            connect_timeout = self.c.getint(section, 'connect_timeout')
+        if self.c.has_option(section, "connect_timeout"):
+            connect_timeout = self.c.getint(section, "connect_timeout")
 
         start = time.time()
         while True:
             try:
-                return SimpleClient(hosts, client_id=client_id,
-                                   timeout=connect_timeout)
+                return SimpleClient(hosts, client_id=client_id, timeout=connect_timeout)
             except KafkaUnavailableError:
                 if timeout == -1:
                     raise
 
             if time.time() - start > timeout:
-                raise Exception('timeout reached trying to connect to Kafka')
+                raise Exception("timeout reached trying to connect to Kafka")
 
             time.sleep(0.1)

@@ -227,7 +227,7 @@ from mercurial import (
     templateutil,
     util,
     pathutil,
-    url
+    url,
 )
 from mercurial.utils import (
     dateutil,
@@ -235,7 +235,7 @@ from mercurial.utils import (
 
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
-with open(os.path.join(OUR_DIR, '..', 'bootstrap.py')) as f:
+with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
 
 from mozhg.util import (
@@ -243,7 +243,7 @@ from mozhg.util import (
     get_backoutbynode,
 )
 
-logcmdutil = import_module('mercurial.logcmdutil')
+logcmdutil = import_module("mercurial.logcmdutil")
 getlogrevs = logcmdutil.getrevs
 
 # Disable demand importing for mozautomation because "requests" doesn't
@@ -271,9 +271,9 @@ with demandimport.deactivated():
         TREE_ALIASES,
     )
 
-testedwith = b'4.7 4.8 4.9 5.0 5.1 5.2'
-minimumhgversion = b'4.7'
-buglink = b'https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext'
+testedwith = b"4.7 4.8 4.9 5.0 5.1 5.2"
+minimumhgversion = b"4.7"
+buglink = b"https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20mozext"
 
 cmdtable = {}
 
@@ -286,38 +286,40 @@ templatefunc = registrar.templatefunc()
 configtable = {}
 configitem = registrar.configitem(configtable)
 
-configitem(b'mozext', b'headless',
-           default=None)
-configitem(b'mozext', b'ircnick',
-           default=None)
-configitem(b'mozext', b'disable_local_database',
-           default=False)
-configitem(b'mozext', b'reject_pushes_with_repo_names',
-           default=False)
-configitem(b'mozext', b'backoutsearchlimit',
-           default=configitems.dynamicdefault)
-configitem(b'reviewers', b'.*',
-           generic=True,
-           default=configitems.dynamicdefault)
+configitem(b"mozext", b"headless", default=None)
+configitem(b"mozext", b"ircnick", default=None)
+configitem(b"mozext", b"disable_local_database", default=False)
+configitem(b"mozext", b"reject_pushes_with_repo_names", default=False)
+configitem(b"mozext", b"backoutsearchlimit", default=configitems.dynamicdefault)
+configitem(b"reviewers", b".*", generic=True, default=configitems.dynamicdefault)
 
 
 colortable = {
-    b'buildstatus.success': b'green',
-    b'buildstatus.failed': b'red',
-    b'buildstatus.testfailed': b'cyan',
+    b"buildstatus.success": b"green",
+    b"buildstatus.failed": b"red",
+    b"buildstatus.testfailed": b"cyan",
 }
 
-backout_re = re.compile(br'[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
-reapply_re = re.compile(br'Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})')
+backout_re = re.compile(
+    rb"[bB]ack(?:ed)?(?: ?out) (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})"
+)
+reapply_re = re.compile(
+    rb"Reapplied (?:(?:changeset|revision|rev) )?([a-fA-F0-9]{8,40})"
+)
 
 
 def get_ircnick(ui):
-    headless = ui.configbool(b'mozext', b'headless')
-    ircnick = ui.config(b'mozext', b'ircnick')
+    headless = ui.configbool(b"mozext", b"headless")
+    ircnick = ui.config(b"mozext", b"ircnick")
     if not ircnick and not headless:
-        raise error.Abort(_(b'Set "[mozext] ircnick" in your hgrc to your '
-            b'Mozilla IRC nickname to enable additional functionality.'))
+        raise error.Abort(
+            _(
+                b'Set "[mozext] ircnick" in your hgrc to your '
+                b"Mozilla IRC nickname to enable additional functionality."
+            )
+        )
     return ircnick
+
 
 def wrapped_peerorrepo(orig, ui, path, *args, **kwargs):
     # Always try the old mechanism first. That way if there is a local
@@ -337,11 +339,11 @@ def wrapped_peerorrepo(orig, ui, path, *args, **kwargs):
 def exchangepullpushlog(orig, pullop):
     res = orig(pullop)
 
-    if not pullop.remote.capable(b'pushlog'):
+    if not pullop.remote.capable(b"pushlog"):
         return res
 
     # stepsdone added in Mercurial 3.2.
-    if util.safehasattr(pullop, 'stepsdone') and b'pushlog' in pullop.stepsdone:
+    if util.safehasattr(pullop, "stepsdone") and b"pushlog" in pullop.stepsdone:
         return res
 
     repo = pullop.repo
@@ -358,26 +360,29 @@ def exchangepullpushlog(orig, pullop):
     # pulls from hg.mozilla.org should be performed via https://, not ssh://.
     # So just bail on pushlog fetching if pulling via ssh://.
     if isinstance(pullop.remote, sshpeer.sshv1peer):
-        pullop.repo.ui.warn(b'cannot fetch pushlog when pulling via ssh://; '
-                            b'you should be pulling via https://\n')
+        pullop.repo.ui.warn(
+            b"cannot fetch pushlog when pulling via ssh://; "
+            b"you should be pulling via https://\n"
+        )
         return res
 
     lastpushid = repo.changetracker.last_push_id(tree)
     fetchfrom = lastpushid + 1 if lastpushid is not None else 0
 
-    lines = pullop.remote._call(b'pushlog', firstpush=str(fetchfrom))
+    lines = pullop.remote._call(b"pushlog", firstpush=str(fetchfrom))
     lines = iter(lines.splitlines())
 
     statusline = next(lines)
-    if statusline[0] == b'0':
-        raise error.Abort(b'remote error fetching pushlog: %s' % next(lines))
-    elif statusline != b'1':
-        raise error.Abort(b'error fetching pushlog: unexpected response: %s\n' %
-            statusline)
+    if statusline[0] == b"0":
+        raise error.Abort(b"remote error fetching pushlog: %s" % next(lines))
+    elif statusline != b"1":
+        raise error.Abort(
+            b"error fetching pushlog: unexpected response: %s\n" % statusline
+        )
 
     pushes = []
     for line in lines:
-        pushid, who, when, nodes = line.split(b' ', 3)
+        pushid, who, when, nodes = line.split(b" ", 3)
         nodes = [bin(n) for n in nodes.split()]
 
         # Warn when incoming changesets are unknown. This can happen when we're
@@ -387,18 +392,21 @@ def exchangepullpushlog(orig, pullop):
             try:
                 repo[node]
             except error.RepoLookupError:
-                repo.ui.warn(b'received pushlog entry for unknown changeset %s; ignoring\n' % (hex(node),))
+                repo.ui.warn(
+                    b"received pushlog entry for unknown changeset %s; ignoring\n"
+                    % (hex(node),)
+                )
 
         pushes.append((int(pushid), who, int(when), nodes))
 
     if pushes:
         repo.changetracker.add_pushes(tree, pushes)
-        repo.ui.status(b'added %d pushes\n' % len(pushes))
+        repo.ui.status(b"added %d pushes\n" % len(pushes))
 
     return res
 
 
-@command(b'treestatus', [], _(b'hg treestatus [TREE] ...'), norepo=True)
+@command(b"treestatus", [], _(b"hg treestatus [TREE] ..."), norepo=True)
 def treestatus(ui, *trees, **opts):
     """Show the status of the Mozilla repositories.
 
@@ -421,20 +429,19 @@ def treestatus(ui, *trees, **opts):
         for k in set(status.keys()) - set(trees):
             del status[k]
     if not status:
-        raise error.Abort(b'No status info found.')
+        raise error.Abort(b"No status info found.")
 
     longest = max(len(s) for s in status)
 
     for tree in sorted(status):
         s = status[tree]
-        if s.status == b'closed':
-            ui.write(b'%s: %s (%s)\n' % (tree.rjust(longest), s.status,
-                s.reason))
+        if s.status == b"closed":
+            ui.write(b"%s: %s (%s)\n" % (tree.rjust(longest), s.status, s.reason))
         else:
-            ui.write(b'%s: %s\n' % (tree.rjust(longest), s.status))
+            ui.write(b"%s: %s\n" % (tree.rjust(longest), s.status))
 
 
-@command(b'treeherder', [], _(b'hg treeherder [TREE] [REV]'))
+@command(b"treeherder", [], _(b"hg treeherder [TREE] [REV]"))
 def treeherder(ui, repo, tree=None, rev=None, **opts):
     """Open Treeherder showing build status for the specified revision.
 
@@ -443,10 +450,10 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
     repositories.
     """
     if not tree:
-        raise error.Abort(b'A tree must be specified.')
+        raise error.Abort(b"A tree must be specified.")
 
     if not rev:
-        raise error.Abort(b'A revision must be specified.')
+        raise error.Abort(b"A revision must be specified.")
 
     tree, repo_url = resolve_trees_to_uris([tree])[0]
     if not repo_url:
@@ -464,12 +471,13 @@ def treeherder(ui, repo, tree=None, rev=None, **opts):
     url = treeherder_url(tree, push_node)
 
     import webbrowser
-    webbrowser.get('firefox').open(url)
+
+    webbrowser.get("firefox").open(url)
 
 
 def print_changeset_pushes(ui, repo, rev, all=False):
     if not repo.changetracker:
-        ui.warn(b'Local database appears to be disabled.')
+        ui.warn(b"Local database appears to be disabled.")
         return 1
 
     ctx = repo[rev]
@@ -478,24 +486,29 @@ def print_changeset_pushes(ui, repo, rev, all=False):
     pushes = repo.changetracker.pushes_for_changeset(node)
     pushes = [p for p in pushes if all or p[0] in RELEASE_TREES]
     if not pushes:
-        ui.warn(b'No pushes recorded for changeset: ', str(ctx), '\n')
+        ui.warn(b"No pushes recorded for changeset: ", str(ctx), "\n")
         return 1
 
     longest_tree = max(len(p[0]) for p in pushes) + 2
     longest_user = max(len(p[3]) for p in pushes) + 2
 
-    ui.write(str(ctx.rev()), b':', str(ctx), b' ', ctx.description(), b'\n')
+    ui.write(str(ctx.rev()), b":", str(ctx), b" ", ctx.description(), b"\n")
 
-    ui.write(b'Release ', b'Tree'.ljust(longest_tree), b'Date'.ljust(20),
-            b'Username'.ljust(longest_user), b'Build Info\n')
+    ui.write(
+        b"Release ",
+        b"Tree".ljust(longest_tree),
+        b"Date".ljust(20),
+        b"Username".ljust(longest_user),
+        b"Build Info\n",
+    )
     for tree, push_id, when, user, head_node in pushes:
         releases = set()
-        release = ''
+        release = ""
         versions = {}
 
-        if tree == b'beta':
+        if tree == b"beta":
             versions = repo._beta_releases()
-        elif tree == b'release':
+        elif tree == b"release":
             versions = repo._release_releases()
 
         for version, e in versions.items():
@@ -508,13 +521,22 @@ def print_changeset_pushes(ui, repo, rev, all=False):
 
         url = treeherder_url(tree, hex(head_node))
         date = datetime.datetime.fromtimestamp(when)
-        ui.write(release.ljust(8), tree.ljust(longest_tree), date.isoformat(),
-            b' ', user.ljust(longest_user), url or b'', b'\n')
+        ui.write(
+            release.ljust(8),
+            tree.ljust(longest_tree),
+            date.isoformat(),
+            b" ",
+            user.ljust(longest_user),
+            url or b"",
+            b"\n",
+        )
 
 
-@command(b'changesetpushes',
-    [(b'a', b'all', False, _(b'Show all trees, not just release trees.'), b'')],
-    _(b'hg changesetpushes REV'))
+@command(
+    b"changesetpushes",
+    [(b"a", b"all", False, _(b"Show all trees, not just release trees."), b"")],
+    _(b"hg changesetpushes REV"),
+)
 def changesetpushes(ui, repo, rev, all=False, **opts):
     """Display pushlog information for a changeset.
 
@@ -524,21 +546,25 @@ def changesetpushes(ui, repo, rev, all=False, **opts):
     print_changeset_pushes(ui, repo, scmutil.revsingle(repo, rev), all=all)
 
 
-@command(b'buginfo', [
-    (b'a', b'all', False, _(b'Show all trees, not just release trees.'), b''),
-    (b'', b'reset', False, _(b'Wipe and repopulate the bug database.'), b''),
-    (b'', b'sync', False, _(b'Synchronize the bug database.'), b''),
-    ], _(b'hg buginfo [BUG] ...'))
+@command(
+    b"buginfo",
+    [
+        (b"a", b"all", False, _(b"Show all trees, not just release trees."), b""),
+        (b"", b"reset", False, _(b"Wipe and repopulate the bug database."), b""),
+        (b"", b"sync", False, _(b"Synchronize the bug database."), b""),
+    ],
+    _(b"hg buginfo [BUG] ..."),
+)
 def buginfo(ui, repo, *bugs, **opts):
     if not repo.changetracker:
-        ui.warning(b'Local database appears to be disabled')
+        ui.warning(b"Local database appears to be disabled")
         return 1
 
-    if opts['sync']:
+    if opts["sync"]:
         repo.sync_bug_database()
         return
 
-    if opts['reset']:
+    if opts["reset"]:
         repo.reset_bug_database()
         return
 
@@ -550,29 +576,33 @@ def buginfo(ui, repo, *bugs, **opts):
 
     # Sorting by topological order would probably be preferred. This is quick
     # and easy.
-    contexts = sorted([repo[node] for node in nodes], key=methodcaller('rev'))
+    contexts = sorted([repo[node] for node in nodes], key=methodcaller("rev"))
 
     for ctx in contexts:
-        print_changeset_pushes(ui, repo, ctx.rev(), all=opts['all'])
-        ui.write(b'\n')
+        print_changeset_pushes(ui, repo, ctx.rev(), all=opts["all"])
+        ui.write(b"\n")
 
 
-def reject_repo_names_hook(ui, repo, namespace=None, key=None, old=None,
-        new=None, **kwargs):
+def reject_repo_names_hook(
+    ui, repo, namespace=None, key=None, old=None, new=None, **kwargs
+):
     """prepushkey hook that prevents changes to reserved names.
 
     Names that begin with the name of a repository identifier are rejected.
     """
     if key.lower().startswith(tuple(REPOS.keys())):
-        ui.warn(b'You are not allowed to push tags or bookmarks that share '
-                b'names with official Mozilla repositories: %s\n' % key)
+        ui.warn(
+            b"You are not allowed to push tags or bookmarks that share "
+            b"names with official Mozilla repositories: %s\n" % key
+        )
         return True
 
     return False
 
+
 def wrappedpull(orig, repo, remote, *args, **kwargs):
     """Wraps exchange.pull to add remote tracking refs."""
-    if not util.safehasattr(repo, 'changetracker'):
+    if not util.safehasattr(repo, "changetracker"):
         return orig(repo, remote, *args, **kwargs)
 
     old_rev = len(repo)
@@ -589,16 +619,16 @@ def wrappedpull(orig, repo, remote, *args, **kwargs):
             ctx = repo[rev]
             bugs = parse_bugs(ctx.description())
             if bugs and repo.changetracker:
-                repo.changetracker.associate_bugs_with_changeset(bugs,
-                    ctx.node())
+                repo.changetracker.associate_bugs_with_changeset(bugs, ctx.node())
 
     finally:
         lock.release()
 
     return res
 
+
 def wrappedpush(orig, repo, remote, *args, **kwargs):
-    if not util.safehasattr(repo, 'changetracker'):
+    if not util.safehasattr(repo, "changetracker"):
         return orig(repo, remote, *args, **kwargs)
 
     res = orig(repo, remote, *args, **kwargs)
@@ -614,6 +644,7 @@ def wrappedpush(orig, repo, remote, *args, **kwargs):
 
     return res
 
+
 class remoterefs(dict):
     """Represents a remote refs file."""
 
@@ -622,7 +653,7 @@ class remoterefs(dict):
         self._repo = repo
 
         try:
-            for line in repo.vfs(b'remoterefs'):
+            for line in repo.vfs(b"remoterefs"):
                 line = line.strip()
                 if not line:
                     continue
@@ -639,16 +670,16 @@ class remoterefs(dict):
                 raise
 
     def write(self):
-        f = self._repo.vfs(b'remoterefs', b'w', atomictemp=True)
+        f = self._repo.vfs(b"remoterefs", b"w", atomictemp=True)
         for ref in sorted(self):
-            f.write(b'%s %s\n' % (hex(self[ref]), encoding.fromlocal(ref)))
+            f.write(b"%s %s\n" % (hex(self[ref]), encoding.fromlocal(ref)))
         f.close()
 
 
-@revsetpredicate(b'bug(N)')
+@revsetpredicate(b"bug(N)")
 def revset_bug(repo, subset, x):
     """Changesets referencing a specified Bugzilla bug. e.g. bug(123456)."""
-    err = _(b'bug() requires an integer argument.')
+    err = _(b"bug() requires an integer argument.")
     bugstring = revset.getstring(x, err)
 
     try:
@@ -665,21 +696,21 @@ def revset_bug(repo, subset, x):
     return subset.filter(fltr)
 
 
-@revsetpredicate(b'dontbuild()')
+@revsetpredicate(b"dontbuild()")
 def revset_dontbuild(repo, subset, x):
     if x:
-        raise ParseError(_(b'dontbuild() does not take any arguments'))
+        raise ParseError(_(b"dontbuild() does not take any arguments"))
 
-    return subset.filter(lambda x: b'DONTBUILD' in repo[x].description())
+    return subset.filter(lambda x: b"DONTBUILD" in repo[x].description())
 
 
-@revsetpredicate(b'me()')
+@revsetpredicate(b"me()")
 def revset_me(repo, subset, x):
     """Changesets that you are involved in."""
     if x:
-        raise ParseError(_(b'me() does not take any arguments'))
+        raise ParseError(_(b"me() does not take any arguments"))
 
-    me = repo.ui.config(b'ui', b'username')
+    me = repo.ui.config(b"ui", b"username")
     if not me:
         raise error.Abort(_(b'"[ui] username" must be set to use me()'))
 
@@ -698,10 +729,10 @@ def revset_me(repo, subset, x):
     return subset.filter(fltr)
 
 
-@revsetpredicate(b'nobug()')
+@revsetpredicate(b"nobug()")
 def revset_nobug(repo, subset, x):
     if x:
-        raise ParseError(_(b'nobug() does not take any arguments'))
+        raise ParseError(_(b"nobug() does not take any arguments"))
 
     return subset.filter(lambda x: not parse_bugs(repo[x].description()))
 
@@ -712,14 +743,14 @@ def revset_tree(repo, subset, x):
 
     A tree is the name of a repository. e.g. ``central``.
     """
-    err = _(b'tree() requires a string argument.')
+    err = _(b"tree() requires a string argument.")
     tree = revset.getstring(x, err)
 
     tree, uri = resolve_trees_to_uris([tree])[0]
     if not uri:
         raise error.Abort(_(b"Don't know about tree: %s") % tree)
 
-    ref = b'%s/default' % tree
+    ref = b"%s/default" % tree
 
     head = repo[ref].rev()
     ancestors = set(repo.changelog.ancestors([head], inclusive=True))
@@ -731,7 +762,7 @@ def revset_firstpushdate(repo, subset, x):
     """``firstpushdate(DATE)``
     Changesets that were initially pushed according to the date spec provided.
     """
-    ds = revset.getstring(x, _(b'firstpushdate() requires a string'))
+    ds = revset.getstring(x, _(b"firstpushdate() requires a string"))
     dm = dateutil.matchdate(ds)
 
     def fltr(x):
@@ -751,15 +782,14 @@ def revset_firstpushtree(repo, subset, x):
     """``firstpushtree(X)``
     Changesets that were initially pushed to tree X.
     """
-    tree = revset.getstring(x, _(b'firstpushtree() requires a string argument.'))
+    tree = revset.getstring(x, _(b"firstpushtree() requires a string argument."))
 
     tree, uri = resolve_trees_to_uris([tree])[0]
     if not uri:
         raise error.Abort(_(b"Don't know about tree: %s") % tree)
 
     def fltr(x):
-        pushes = list(repo.changetracker.pushes_for_changeset(
-            repo[x].node()))
+        pushes = list(repo.changetracker.pushes_for_changeset(repo[x].node()))
 
         if not pushes:
             return False
@@ -775,7 +805,7 @@ def revset_pushdate(repo, subset, x):
 
     All pushes are examined.
     """
-    ds = revset.getstring(x, _(b'pushdate() requires a string'))
+    ds = revset.getstring(x, _(b"pushdate() requires a string"))
     dm = dateutil.matchdate(ds)
 
     def fltr(x):
@@ -808,14 +838,16 @@ def revset_pushhead(repo, subset, x):
     # We have separate code paths because the single tree path uses a single
     # query and is faster.
     if x:
-        tree = revset.getstring(x, _(b'pushhead() requires a string argument.'))
+        tree = revset.getstring(x, _(b"pushhead() requires a string argument."))
         tree, uri = resolve_trees_to_uris([tree])[0]
 
         if not uri:
             raise error.Abort(_(b"Don't know about tree: %s") % tree)
 
         def pushheads():
-            for push_id, head_changeset in repo.changetracker.tree_push_head_changesets(tree):
+            for push_id, head_changeset in repo.changetracker.tree_push_head_changesets(
+                tree
+            ):
                 head_changeset = pycompat.bytestr(head_changeset)
                 try:
                     head = repo[head_changeset].rev()
@@ -828,6 +860,7 @@ def revset_pushhead(repo, subset, x):
         # corresponds to ascending commit order in hg.
         return subset & revset.generatorset(pushheads(), iterasc=True)
     else:
+
         def is_pushhead(r):
             node = repo[r].node()
             for push in repo.changetracker.pushes_for_changeset(node):
@@ -838,65 +871,65 @@ def revset_pushhead(repo, subset, x):
         return subset.filter(is_pushhead)
 
 
-@revsetpredicate(b'reviewer(REVIEWER)')
+@revsetpredicate(b"reviewer(REVIEWER)")
 def revset_reviewer(repo, subset, x):
     """Changesets reviewed by a specific person."""
-    n = revset.getstring(x, _(b'reviewer() requires a string argument.'))
+    n = revset.getstring(x, _(b"reviewer() requires a string argument."))
 
     return subset.filter(lambda x: n in parse_reviewers(repo[x].description()))
 
 
-@revsetpredicate(b'reviewed()')
+@revsetpredicate(b"reviewed()")
 def revset_reviewed(repo, subset, x):
     """Changesets that were reviewed."""
     if x:
-        raise ParseError(_(b'reviewed() does not take an argument'))
+        raise ParseError(_(b"reviewed() does not take an argument"))
 
     return subset.filter(lambda x: list(parse_reviewers(repo[x].description())))
 
 
-@templatekeyword(b'bug', requires={b'ctx'})
+@templatekeyword(b"bug", requires={b"ctx"})
 def template_bug(context, mapping):
     """:bug: String. The bug this changeset is most associated with."""
-    ctx = context.resource(mapping, b'ctx')
+    ctx = context.resource(mapping, b"ctx")
 
     bugs = parse_bugs(ctx.description())
     return bugs[0] if bugs else None
 
 
-@templatekeyword(b'backedoutby', requires={b'repo', b'ctx'})
+@templatekeyword(b"backedoutby", requires={b"repo", b"ctx"})
 def template_backedoutby(context, mapping):
-    repo = context.resource(mapping, b'repo')
-    ctx = context.resource(mapping, b'ctx')
+    repo = context.resource(mapping, b"repo")
+    ctx = context.resource(mapping, b"ctx")
 
-    return get_backoutbynode(b'mozext', repo, ctx)
+    return get_backoutbynode(b"mozext", repo, ctx)
 
 
-@templatekeyword(b'bugs', requires={b'ctx'})
+@templatekeyword(b"bugs", requires={b"ctx"})
 def template_bugs(context, mapping, **args):
     """:bugs: List of ints. The bugs associated with this changeset."""
-    ctx = context.resource(mapping, b'ctx')
+    ctx = context.resource(mapping, b"ctx")
 
     bugs = parse_bugs(ctx.description())
 
-    return templateutil.hybridlist(bugs, b'bugs')
+    return templateutil.hybridlist(bugs, b"bugs")
 
 
-@templatekeyword(b'backsoutnodes', requires={b'ctx'})
+@templatekeyword(b"backsoutnodes", requires={b"ctx"})
 def template_backsoutnodes(context, mapping):
-    ctx = context.resource(mapping, b'ctx')
+    ctx = context.resource(mapping, b"ctx")
 
     description = encoding.fromlocal(ctx.description())
     backouts = parse_backouts(description)
     # return just the nodes, not the bug numbers
     if backouts and backouts[0]:
-        return templateutil.hybridlist(backouts[0], b'backouts')
+        return templateutil.hybridlist(backouts[0], b"backouts")
 
 
-@templatekeyword(b'reviewer', requires={b'ctx'})
+@templatekeyword(b"reviewer", requires={b"ctx"})
 def template_reviewer(context, mapping):
     """:reviewer: String. The first reviewer of this changeset."""
-    ctx = context.resource(mapping, b'ctx')
+    ctx = context.resource(mapping, b"ctx")
     reviewers = parse_reviewers(ctx.description())
     try:
         first_reviewer = next(reviewers)
@@ -905,23 +938,23 @@ def template_reviewer(context, mapping):
         return None
 
 
-@templatekeyword(b'reviewers', requires={b'ctx'})
+@templatekeyword(b"reviewers", requires={b"ctx"})
 def template_reviewers(context, mapping):
     """:reviewers: List of strings. The reviewers associated with tis
     changeset."""
-    ctx = context.resource(mapping, b'ctx')
+    ctx = context.resource(mapping, b"ctx")
 
     reviewers = parse_reviewers(ctx.description())
 
-    return templateutil.hybridlist(reviewers, b'reviewers')
+    return templateutil.hybridlist(reviewers, b"reviewers")
 
 
 def _compute_first_version(repo, ctx, what, cache):
     rev = ctx.rev()
-    cache_key = '%s_ancestors' % what
+    cache_key = "%s_ancestors" % what
 
     if cache_key not in cache:
-        versions = getattr(repo, '_%s_releases' % what)()
+        versions = getattr(repo, "_%s_releases" % what)()
         cache[cache_key] = repo._earliest_version_ancestors(versions)
 
     for version, ancestors in cache[cache_key].items():
@@ -935,22 +968,22 @@ def template_firstrelease(context, mapping):
     """:firstrelease: String. The version of the first release channel
     release with this changeset.
     """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
-    cache = context.resource(mapping, b'cache')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
+    cache = context.resource(mapping, b"cache")
 
-    return _compute_first_version(repo, ctx, 'release', cache)
+    return _compute_first_version(repo, ctx, "release", cache)
 
 
 def template_firstbeta(context, mapping):
     """:firstbeta: String. The version of the first beta release with this
     changeset.
     """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
-    cache = context.resource(mapping, b'cache')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
+    cache = context.resource(mapping, b"cache")
 
-    return _compute_first_version(repo, ctx, 'beta', cache)
+    return _compute_first_version(repo, ctx, "beta", cache)
 
 
 def _calculate_push_milestone(repo, ctx, tree):
@@ -970,10 +1003,10 @@ def template_firstnightly(context, mapping):
     """:firstnightly: String. The version of the first nightly release
     with this changeset.
     """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
-    return _calculate_push_milestone(repo, ctx, b'central')
+    return _calculate_push_milestone(repo, ctx, b"central")
 
 
 def _calculate_next_daily_release(repo, ctx, tree):
@@ -1016,10 +1049,8 @@ def _calculate_next_daily_release(repo, ctx, tree):
                 dst_end = day
                 break
 
-    dst_start = datetime.datetime(dst_start.year, dst_start.month,
-        dst_start.day, 2)
-    dst_end = datetime.datetime(dst_end.year, dst_end.month,
-        dst_end.day, 2)
+    dst_start = datetime.datetime(dst_start.year, dst_start.month, dst_start.day, 2)
+    dst_end = datetime.datetime(dst_end.year, dst_end.month, dst_end.day, 2)
 
     is_dst = dt >= dst_start and dt <= dst_end
     utc_offset = 11 if is_dst else 10
@@ -1034,17 +1065,16 @@ def template_nightlydate(context, mapping):
     """:nightlydate: Date information. The date of the first Nightly this
     changeset was likely first active in as a YYYY-MM-DD value.
     """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
-    return _calculate_next_daily_release(repo, ctx, b'central')
+    return _calculate_next_daily_release(repo, ctx, b"central")
 
 
 def template_firstpushuser(context, mapping):
-    """:firstpushuser: String. The first person who pushed this changeset.
-    """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    """:firstpushuser: String. The first person who pushed this changeset."""
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
 
@@ -1055,10 +1085,9 @@ def template_firstpushuser(context, mapping):
 
 
 def template_firstpushtree(context, mapping):
-    """:firstpushtree: String. The first tree this changeset was pushed to.
-    """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    """:firstpushtree: String. The first tree this changeset was pushed to."""
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
 
@@ -1069,10 +1098,9 @@ def template_firstpushtree(context, mapping):
 
 
 def template_firstpushtreeherder(context, mapping):
-    """:firstpushtreeherder: String. Treeherder URL for the first push of this changeset.
-    """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    """:firstpushtreeherder: String. Treeherder URL for the first push of this changeset."""
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
     if not pushes:
@@ -1087,8 +1115,8 @@ def template_firstpushtreeherder(context, mapping):
 def template_firstpushdate(context, mapping):
     """:firstpushdate: Date information. The date of the first push of this
     changeset."""
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     pushes = list(repo.changetracker.pushes_for_changeset(ctx.node()))
     if not pushes:
@@ -1100,26 +1128,28 @@ def template_firstpushdate(context, mapping):
 def template_pushdates(context, mapping):
     """:pushdates: List of date information. The dates this changeset was
     pushed to various trees."""
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
     pushdates = [dateutil.makedate(p[2]) for p in pushes]
 
-    return templateutil.hybridlist(pushdates, b'pushdates')
+    return templateutil.hybridlist(pushdates, b"pushdates")
 
 
 def template_pushheaddates(context, mapping):
     """:pushheaddates: List of date information. The dates this changeset
     was pushed to various trees as a push head."""
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     node = ctx.node()
     pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushheaddates = [dateutil.makedate(p[2]) for p in pushes if pycompat.bytestr(p[4]) == node]
+    pushheaddates = [
+        dateutil.makedate(p[2]) for p in pushes if pycompat.bytestr(p[4]) == node
+    ]
 
-    return templateutil.hybridlist(pushheaddates, b'pushheaddates')
+    return templateutil.hybridlist(pushheaddates, b"pushheaddates")
 
 
 def _trees(repo, ctx):
@@ -1128,69 +1158,71 @@ def _trees(repo, ctx):
 
 
 def template_trees(context, mapping):
-    """:trees: List of strings. Trees this changeset has landed in.
-    """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    """:trees: List of strings. Trees this changeset has landed in."""
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     trees = _trees(repo, ctx)
 
-    return templateutil.hybridlist(trees, b'trees')
+    return templateutil.hybridlist(trees, b"trees")
 
 
 def template_reltrees(context, mapping):
-    """:reltrees: List of strings. Release trees this changeset has landed in.
-    """
-    ctx = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
+    """:reltrees: List of strings. Release trees this changeset has landed in."""
+    ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     reltrees = [t for t in _trees(repo, ctx) if t in RELEASE_TREES]
 
-    return templateutil.hybridlist(reltrees, b'reltrees')
+    return templateutil.hybridlist(reltrees, b"reltrees")
 
 
 # [gps] This function may not be necessary. However, I was unable to figure out
 # how to do the equivalent with regular template syntax. Yes, I tried the
 # list operator.
-@templatefunc(b'dates(VALUES, [fmt, [sep]])')
+@templatefunc(b"dates(VALUES, [fmt, [sep]])")
 def template_dates(context, mapping, args):
     """Format a list of dates"""
     if not (1 <= len(args) <= 3):
         raise ParseError(_(b"dates expects one, two, or three arguments"))
 
-    fmt = b'%Y-%m-%d'
-    sep = b','
+    fmt = b"%Y-%m-%d"
+    sep = b","
 
     if len(args) > 1:
-        fmt = templatefilters.stringify(args[1][0](context, mapping,
-            args[1][1]))
+        fmt = templatefilters.stringify(args[1][0](context, mapping, args[1][1]))
     if len(args) > 2:
-        sep = templatefilters.stringify(args[2][0](context, mapping,
-            args[2][1]))
+        sep = templatefilters.stringify(args[2][0](context, mapping, args[2][1]))
 
-    return sep.join(util.datestr(d, fmt) for d in args[0][0](context, mapping,
-        args[0][1]))
+    return sep.join(
+        util.datestr(d, fmt) for d in args[0][0](context, mapping, args[0][1])
+    )
 
-def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False, **opts):
-    if not opts.get('force'):
-        ui.status(b'checking for uncommitted changes\n')
+
+def do_backout(
+    ui, repo, rev, handle_change, commit_change, reverse_order=False, **opts
+):
+    if not opts.get("force"):
+        ui.status(b"checking for uncommitted changes\n")
         cmdutil.bailifchanged(repo)
-    backout = not opts.get('apply')
-    desc = {'action': b'backout',
-            'Actioned': b'Backed out',
-            'actioning': b'backing out',
-            'name': b'backout'
-            }
+    backout = not opts.get("apply")
+    desc = {
+        "action": b"backout",
+        "Actioned": b"Backed out",
+        "actioning": b"backing out",
+        "name": b"backout",
+    }
     if not backout:
-        desc = {'action': b'apply',
-                'Actioned': b'Reapplied',
-                'actioning': b'Reapplying',
-                'name': b'patch'
-                }
+        desc = {
+            "action": b"apply",
+            "Actioned": b"Reapplied",
+            "actioning": b"Reapplying",
+            "name": b"patch",
+        }
 
     rev = scmutil.revrange(repo, rev)
     if len(rev) == 0:
-        raise error.Abort(b'at least one revision required')
+        raise error.Abort(b"at least one revision required")
 
     csets = [repo[r] for r in rev]
     csets.sort(reverse=reverse_order, key=lambda cset: cset.rev())
@@ -1199,11 +1231,11 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
 
     def bugs_suffix(bugs):
         if len(bugs) == 0:
-            return b''
+            return b""
         elif len(bugs) == 1:
-            return b' (bug ' + list(bugs)[0] + b')'
+            return b" (bug " + list(bugs)[0] + b")"
         else:
-            return b' (' + b', '.join(map(lambda b: b'bug %s' % b, bugs)) + b')'
+            return b" (" + b", ".join(map(lambda b: b"bug %s" % b, bugs)) + b")"
 
     def parse_bugs(msg):
         bugs = set()
@@ -1215,7 +1247,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
     def apply_change(node, reverse, push_patch=True, name=None):
         p1, p2 = repo.changelog.parents(node)
         if p2 != nullid:
-            raise error.Abort(b'cannot %s a merge changeset' % desc['action'])
+            raise error.Abort(b"cannot %s a merge changeset" % desc["action"])
 
         opts = mdiff.defaultopts
         opts.git = True
@@ -1249,7 +1281,7 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
         orig_desc_cset = None
         orig_author = None
         r = cset
-        while len(csets) == 1 or not opts.get('single'):
+        while len(csets) == 1 or not opts.get("single"):
             ui.debug(b"Parsing message for %s\n" % short(r.node()))
             m = backout_re.match(r.description())
             if m:
@@ -1270,11 +1302,11 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
         allbugs.update(bugs)
         node = cset.node()
         shortnode = short(node)
-        ui.status(b'%s %s\n' % (desc['actioning'], shortnode))
+        ui.status(b"%s %s\n" % (desc["actioning"], shortnode))
 
-        apply_change(node, backout, push_patch=(not opts.get('nopush')))
+        apply_change(node, backout, push_patch=(not opts.get("nopush")))
 
-        msg = (b'%s changeset %s' % (desc['Actioned'], shortnode)) + bugs_suffix(bugs)
+        msg = (b"%s changeset %s" % (desc["Actioned"], shortnode)) + bugs_suffix(bugs)
         user = None
 
         if backout:
@@ -1289,38 +1321,63 @@ def do_backout(ui, repo, rev, handle_change, commit_change, reverse_order=False,
                 user = orig_author
 
         messages.append(msg)
-        if not opts.get('single') and not opts.get('nopush'):
-            new_opts['message'] = messages[-1]
+        if not opts.get("single") and not opts.get("nopush"):
+            new_opts["message"] = messages[-1]
             # Override the user to that of the original patch author in the case of --apply
             if user is not None:
-                new_opts['user'] = user
-            commit_change(ui, repo, desc['name'], node=node, force_name=opts.get('name'), **new_opts)
+                new_opts["user"] = user
+            commit_change(
+                ui,
+                repo,
+                desc["name"],
+                node=node,
+                force_name=opts.get("name"),
+                **new_opts
+            )
 
         # Iterations of this loop appear to leak memory for unknown reasons.
         # Work around it by forcing a gc.
         gc.collect()
 
-    msg = (b'%s %d changesets' % (desc['Actioned'], len(rev))) + bugs_suffix(allbugs) + b'\n'
+    msg = (
+        (b"%s %d changesets" % (desc["Actioned"], len(rev)))
+        + bugs_suffix(allbugs)
+        + b"\n"
+    )
     messages.insert(0, msg)
-    new_opts['message'] = b"\n".join(messages)
-    if opts.get('single'):
+    new_opts["message"] = b"\n".join(messages)
+    if opts.get("single"):
 
-        commit_change(ui, repo, desc['name'], revisions=rev, force_name=opts.get('name'), **new_opts)
+        commit_change(
+            ui,
+            repo,
+            desc["name"],
+            revisions=rev,
+            force_name=opts.get("name"),
+            **new_opts
+        )
 
 
-@command(b'oops', [
-    (b'r', b'rev', [], _(b'revisions to backout')),
-    (b's', b'single', None, _(b'fold all backed out changes into a single changeset')),
-    (b'f', b'force', None, _(b'skip check for outstanding uncommitted changes')),
-    (b'e', b'edit', None, _(b'edit commit messages')),
-    (b'm', b'message', b'', _(b'use text as commit message'), _(b'TEXT')),
-    (b'U', b'currentuser', None, _(b'add "From: <current user>" to patch')),
-    (b'u', b'user', b'',
-     _(b'add "From: <USER>" to patch'), _(b'USER')),
-    (b'D', b'currentdate', None, _(b'add "Date: <current date>" to patch')),
-    (b'd', b'date', b'',
-     _(b'add "Date: <DATE>" to patch'), _(b'DATE'))],
-    _(b'hg oops -r REVS [-f] [commit options]'))
+@command(
+    b"oops",
+    [
+        (b"r", b"rev", [], _(b"revisions to backout")),
+        (
+            b"s",
+            b"single",
+            None,
+            _(b"fold all backed out changes into a single changeset"),
+        ),
+        (b"f", b"force", None, _(b"skip check for outstanding uncommitted changes")),
+        (b"e", b"edit", None, _(b"edit commit messages")),
+        (b"m", b"message", b"", _(b"use text as commit message"), _(b"TEXT")),
+        (b"U", b"currentuser", None, _(b'add "From: <current user>" to patch')),
+        (b"u", b"user", b"", _(b'add "From: <USER>" to patch'), _(b"USER")),
+        (b"D", b"currentdate", None, _(b'add "Date: <current date>" to patch')),
+        (b"d", b"date", b"", _(b'add "Date: <DATE>" to patch'), _(b"DATE")),
+    ],
+    _(b"hg oops -r REVS [-f] [commit options]"),
+)
 def oops(ui, repo, rev, **opts):
     """backout a change or set of changes
 
@@ -1344,49 +1401,78 @@ def oops(ui, repo, rev, **opts):
     See "hg help revisions" and "hg help revsets" for more about specifying
     revisions.
     """
-    def handle_change():
-        commands.import_(ui, repo, b'-',
-                         force=True,
-                         no_commit=True,
-                         strip=1,
-                         base=b'',
-                         prefix=b'',
-                         obsolete=[])
 
-    def commit_change(ui, repo, action, force_name=None, node=None, revisions=None, **opts):
+    def handle_change():
+        commands.import_(
+            ui,
+            repo,
+            b"-",
+            force=True,
+            no_commit=True,
+            strip=1,
+            base=b"",
+            prefix=b"",
+            obsolete=[],
+        )
+
+    def commit_change(
+        ui, repo, action, force_name=None, node=None, revisions=None, **opts
+    ):
         commands.commit(ui, repo, **opts)
 
-    do_backout(ui, repo, rev,
-               handle_change, commit_change, reverse_order=(not opts.get('apply')), **opts)
+    do_backout(
+        ui,
+        repo,
+        rev,
+        handle_change,
+        commit_change,
+        reverse_order=(not opts.get("apply")),
+        **opts
+    )
 
 
 def extsetup(ui):
-    extensions.wrapfunction(exchange, b'pull', wrappedpull)
-    extensions.wrapfunction(exchange, b'push', wrappedpush)
-    extensions.wrapfunction(exchange, b'_pullobsolete', exchangepullpushlog)
-    extensions.wrapfunction(hg, b'_peerorrepo', wrapped_peerorrepo)
+    extensions.wrapfunction(exchange, b"pull", wrappedpull)
+    extensions.wrapfunction(exchange, b"push", wrappedpush)
+    extensions.wrapfunction(exchange, b"_pullobsolete", exchangepullpushlog)
+    extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
 
-    if ui.configbool(b'mozext', b'disable_local_database'):
+    if ui.configbool(b"mozext", b"disable_local_database"):
         return
 
-    revsetpredicate(b'pushhead([TREE])')(revset_pushhead)
-    revsetpredicate(b'tree(X)')(revset_tree)
-    revsetpredicate(b'firstpushdate(DATE)')(revset_firstpushdate)
-    revsetpredicate(b'firstpushtree(X)')(revset_firstpushtree)
-    revsetpredicate(b'pushdate(DATE)')(revset_pushdate)
+    revsetpredicate(b"pushhead([TREE])")(revset_pushhead)
+    revsetpredicate(b"tree(X)")(revset_tree)
+    revsetpredicate(b"firstpushdate(DATE)")(revset_firstpushdate)
+    revsetpredicate(b"firstpushtree(X)")(revset_firstpushtree)
+    revsetpredicate(b"pushdate(DATE)")(revset_pushdate)
 
-    templatekeyword(b'firstrelease', requires={b'ctx', b'repo', b'cache'})(template_firstrelease)
-    templatekeyword(b'firstbeta', requires={b'ctx', b'repo', b'cache'})(template_firstbeta)
-    templatekeyword(b'firstnightly', requires={b'ctx', b'repo'})(template_firstnightly)
-    templatekeyword(b'nightlydate', requires={b'ctx', b'repo'})(template_nightlydate)
-    templatekeyword(b'firstpushuser', requires={b'ctx', b'repo'})(template_firstpushuser)
-    templatekeyword(b'firstpushtree', requires={b'ctx', b'repo'})(template_firstpushtree)
-    templatekeyword(b'firstpushtreeherder', requires={b'ctx', b'repo'})(template_firstpushtreeherder)
-    templatekeyword(b'firstpushdate', requires={b'ctx', b'repo'})(template_firstpushdate)
-    templatekeyword(b'pushdates', requires={b'ctx', b'repo'})(template_pushdates)
-    templatekeyword(b'pushheaddates', requires={b'ctx', b'repo'})(template_pushheaddates)
-    templatekeyword(b'trees', requires={b'ctx', b'repo'})(template_trees)
-    templatekeyword(b'reltrees', requires={b'ctx', b'repo'})(template_reltrees)
+    templatekeyword(b"firstrelease", requires={b"ctx", b"repo", b"cache"})(
+        template_firstrelease
+    )
+    templatekeyword(b"firstbeta", requires={b"ctx", b"repo", b"cache"})(
+        template_firstbeta
+    )
+    templatekeyword(b"firstnightly", requires={b"ctx", b"repo"})(template_firstnightly)
+    templatekeyword(b"nightlydate", requires={b"ctx", b"repo"})(template_nightlydate)
+    templatekeyword(b"firstpushuser", requires={b"ctx", b"repo"})(
+        template_firstpushuser
+    )
+    templatekeyword(b"firstpushtree", requires={b"ctx", b"repo"})(
+        template_firstpushtree
+    )
+    templatekeyword(b"firstpushtreeherder", requires={b"ctx", b"repo"})(
+        template_firstpushtreeherder
+    )
+    templatekeyword(b"firstpushdate", requires={b"ctx", b"repo"})(
+        template_firstpushdate
+    )
+    templatekeyword(b"pushdates", requires={b"ctx", b"repo"})(template_pushdates)
+    templatekeyword(b"pushheaddates", requires={b"ctx", b"repo"})(
+        template_pushheaddates
+    )
+    templatekeyword(b"trees", requires={b"ctx", b"repo"})(template_trees)
+    templatekeyword(b"reltrees", requires={b"ctx", b"repo"})(template_reltrees)
+
 
 def reposetup(ui, repo):
     """Custom repository implementation.
@@ -1402,17 +1488,18 @@ def reposetup(ui, repo):
     orig_lookup = repo.lookup
 
     class remotestrackingrepo(repo.__class__):
-        @repofilecache(b'remoterefs')
+        @repofilecache(b"remoterefs")
         def remoterefs(self):
             return remoterefs(self)
 
         @util.propertycache
         def changetracker(self):
-            if ui.configbool(b'mozext', b'disable_local_database'):
+            if ui.configbool(b"mozext", b"disable_local_database"):
                 return None
             try:
-                return ChangeTracker(self.vfs.join(b'changetracker.db'),
-                                     bytestype=pycompat.bytestr)
+                return ChangeTracker(
+                    self.vfs.join(b"changetracker.db"), bytestype=pycompat.bytestr
+                )
             except Exception as e:
                 raise error.Abort(e.message)
 
@@ -1421,17 +1508,17 @@ def reposetup(ui, repo):
             incoming_refs = set()
 
             for ref in self.remoterefs:
-                if ref.startswith(b'%s/' % tree):
+                if ref.startswith(b"%s/" % tree):
                     existing_refs.add(ref)
 
             for branch, nodes in remote.branchmap().items():
                 # Don't store RELBRANCH refs for non-release trees, as they are
                 # meaningless and cruft from yesteryear.
-                if branch.endswith(b'RELBRANCH'):
-                    if tree not in TREE_ALIASES[b'releases']:
+                if branch.endswith(b"RELBRANCH"):
+                    if tree not in TREE_ALIASES[b"releases"]:
                         continue
 
-                ref = b'%s/%s' % (tree, branch)
+                ref = b"%s/%s" % (tree, branch)
                 incoming_refs.add(ref)
 
                 for node in nodes:
@@ -1449,9 +1536,9 @@ def reposetup(ui, repo):
 
         def _revision_milestone(self, rev):
             """Look up the Gecko milestone of a revision."""
-            fctx = self.filectx(b'config/milestone.txt', changeid=rev)
+            fctx = self.filectx(b"config/milestone.txt", changeid=rev)
             lines = fctx.data().splitlines()
-            lines = [l for l in lines if not l.startswith(b'#') and l.strip()]
+            lines = [l for l in lines if not l.startswith(b"#") and l.strip()]
 
             if not lines:
                 return None
@@ -1460,10 +1547,10 @@ def reposetup(ui, repo):
 
         def _beta_releases(self):
             """Obtain information for each beta release."""
-            return self._release_versions(b'beta/')
+            return self._release_versions(b"beta/")
 
         def _release_releases(self):
-            return self._release_versions(b'release/')
+            return self._release_versions(b"release/")
 
         def _release_versions(self, prefix):
             d = {}
@@ -1472,28 +1559,28 @@ def reposetup(ui, repo):
                 if not key.startswith(prefix):
                     continue
 
-                key = key[len(prefix):]
+                key = key[len(prefix) :]
 
-                if not key.startswith(b'GECKO') or not key.endswith(b'RELBRANCH'):
+                if not key.startswith(b"GECKO") or not key.endswith(b"RELBRANCH"):
                     continue
 
-                version, date, _relbranch = key.split(b'_')
+                version, date, _relbranch = key.split(b"_")
                 version = version[5:]
-                after = b''
-                marker = b''
+                after = b""
+                marker = b""
 
-                if b'b' in version:
-                    marker = b'b'
-                    version, after = version.split(b'b')
+                if b"b" in version:
+                    marker = b"b"
+                    version, after = version.split(b"b")
 
                 if len(version) > 2:
                     major, minor = version[0:2], version[2:]
                 else:
                     major, minor = version
 
-                version = b'%s.%s' % (major, minor)
+                version = b"%s.%s" % (major, minor)
                 if marker:
-                    version += b'%s%s' % (marker, after)
+                    version += b"%s%s" % (marker, after)
 
                 d[version] = (key, node, major, minor, marker or None, after or None)
 
@@ -1516,8 +1603,9 @@ def reposetup(ui, repo):
             seen = set()
             for version, e in sorted(versions.items()):
                 version_rev = self[e[1]].rev()
-                ancestors = set(self.changelog.findmissingrevs(
-                    common=seen, heads=[version_rev]))
+                ancestors = set(
+                    self.changelog.findmissingrevs(common=seen, heads=[version_rev])
+                )
                 d[version] = ancestors
                 seen |= ancestors
 
@@ -1535,21 +1623,18 @@ def reposetup(ui, repo):
                 return
 
             for rev in self:
-                ui.makeprogress(b'changeset', rev, total=len(self))
+                ui.makeprogress(b"changeset", rev, total=len(self))
                 ctx = self[rev]
                 bugs = parse_bugs(ctx.description())
                 if bugs:
-                    self.changetracker.associate_bugs_with_changeset(bugs,
-                        ctx.node())
+                    self.changetracker.associate_bugs_with_changeset(bugs, ctx.node())
 
-            ui.makeprogress(b'changeset', None)
-
+            ui.makeprogress(b"changeset", None)
 
     repo.__class__ = remotestrackingrepo
 
-    if ui.configbool(b'mozext', b'reject_pushes_with_repo_names'):
-        ui.setconfig(b'hooks', b'prepushkey.reject_repo_names',
-            reject_repo_names_hook)
+    if ui.configbool(b"mozext", b"reject_pushes_with_repo_names"):
+        ui.setconfig(b"hooks", b"prepushkey.reject_repo_names", reject_repo_names_hook)
 
 
 class DropoffCounter(object):
@@ -1557,7 +1642,7 @@ class DropoffCounter(object):
     drops off exponentially as "time" passes. This is useful when more recent
     contributions should be weighted higher than older ones."""
 
-    Item = namedtuple('Item', ['name', 'count', 'weight'])
+    Item = namedtuple("Item", ["name", "count", "weight"])
 
     def __init__(self, factor):
         self.factor = factor
@@ -1592,24 +1677,24 @@ def fullpaths(repo, paths):
 
 
 def get_logrevs_for_files(ui, repo, files, opts):
-    limit = opts['limit'] or 1000000
-    wopts = logcmdutil.parseopts(ui, files, {b'follow': True, b'limit': limit})
+    limit = opts["limit"] or 1000000
+    wopts = logcmdutil.parseopts(ui, files, {b"follow": True, b"limit": limit})
     revs = getlogrevs(repo, wopts)[0]
     for rev in revs:
         yield rev
 
 
 def choose_changes(ui, repo, patchfile, opts):
-    if opts.get('file'):
-        changed_files = fullpaths(repo, opts['file'])
-        return (changed_files, b'file', opts['file'])
+    if opts.get("file"):
+        changed_files = fullpaths(repo, opts["file"])
+        return (changed_files, b"file", opts["file"])
 
-    if opts.get('dir'):
-        changed_files = opts['dir']  # For --debug printout only
-        return (changed_files, b'dir', opts['dir'])
+    if opts.get("dir"):
+        changed_files = opts["dir"]  # For --debug printout only
+        return (changed_files, b"dir", opts["dir"])
 
-    if opts.get('rev'):
-        revs = scmutil.revrange(repo, opts['rev'])
+    if opts.get("rev"):
+        revs = scmutil.revrange(repo, opts["rev"])
         if not revs:
             raise error.Abort(b"no changes found")
         files_in_revs = set()
@@ -1617,18 +1702,18 @@ def choose_changes(ui, repo, patchfile, opts):
             for f in repo[rev].files():
                 files_in_revs.add(f)
         changed_files = sorted(files_in_revs)
-        return (changed_files, b'rev', opts['rev'])
+        return (changed_files, b"rev", opts["rev"])
 
     changed_files = None
     if patchfile is not None:
         source = None
-        if util.safehasattr(patchfile, 'getvalue'):
+        if util.safehasattr(patchfile, "getvalue"):
             diff = patchfile.getvalue()
-            source = (b'patchdata', None)
+            source = (b"patchdata", None)
         else:
             try:
                 diff = url.open(ui, patchfile).read()
-                source = (b'patch', patchfile)
+                source = (b"patch", patchfile)
             except IOError:
                 raise error.Abort(b'Could not find patchfile called "%s"' % patchfile)
 
@@ -1641,14 +1726,14 @@ def choose_changes(ui, repo, patchfile, opts):
         diff = ui.popbuffer()
         changed_files = fileRe.findall(diff)
         if len(changed_files) > 0:
-            source = (b'current diff', None)
+            source = (b"current diff", None)
         else:
             changed_files = None
             diff = None
 
         if diff is None:
-            changed_files = sorted(repo[b'.'].files())
-            source = (b'rev', b'.')
+            changed_files = sorted(repo[b"."].files())
+            source = (b"rev", b".")
 
     if changed_files is None:
         changed_files = fileRe.findall(diff)
@@ -1657,7 +1742,7 @@ def choose_changes(ui, repo, patchfile, opts):
 
 
 def patch_changes(ui, repo, patchfile=None, **opts):
-    '''Given a patch, look at what files it changes, and map a function over
+    """Given a patch, look at what files it changes, and map a function over
     the changesets that touch overlapping files.
 
     Scan through the last LIMIT commits to find the relevant changesets
@@ -1667,7 +1752,7 @@ def patch_changes(ui, repo, patchfile=None, **opts):
 
     Alternatively, the -f option may be used to pass in one or more files
     that will be used directly.
-    '''
+    """
     (changedFiles, source, source_info) = choose_changes(ui, repo, patchfile, opts)
     if ui.verbose:
         ui.write(b"Patch source: %s" % source)
@@ -1676,7 +1761,9 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         ui.write(b"\n")
 
     if len(changedFiles) == 0:
-        ui.write(b"Warning: no modified files found in patch. Did you mean to use the -f option?\n")
+        ui.write(
+            b"Warning: no modified files found in patch. Did you mean to use the -f option?\n"
+        )
 
     if ui.verbose:
         ui.write(b"Using files:\n")
@@ -1687,12 +1774,12 @@ def patch_changes(ui, repo, patchfile=None, **opts):
                 ui.write(b"  %s\n" % changedFile)
 
     # Expand files out to their current full paths
-    if opts.get('dir'):
-        exact_files = [b'glob:' + opts['dir'] + b'/**']
+    if opts.get("dir"):
+        exact_files = [b"glob:" + opts["dir"] + b"/**"]
     else:
-        paths = [p + b'/**' if os.path.isdir(p) else p for p in changedFiles]
-        matchfn = scmutil.match(repo[b'.'], paths, default=b'relglob')
-        exact_files = [b'path:' + path for path in repo[b'.'].walk(matchfn)]
+        paths = [p + b"/**" if os.path.isdir(p) else p for p in changedFiles]
+        matchfn = scmutil.match(repo[b"."], paths, default=b"relglob")
+        exact_files = [b"path:" + path for path in repo[b"."].walk(matchfn)]
         if len(exact_files) == 0:
             return
 
@@ -1700,15 +1787,19 @@ def patch_changes(ui, repo, patchfile=None, **opts):
         yield repo[rev]
 
 
-fileRe = re.compile(br"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
-suckerRe = re.compile(br"[^s-]r=(\w+)")
+fileRe = re.compile(rb"^\+\+\+ (?:b/)?([^\s]*)", re.MULTILINE)
+suckerRe = re.compile(rb"[^s-]r=(\w+)")
 
 
-@command(b'reviewers', [
-    (b'f', b'file', [], b'see reviewers for FILE', b'FILE'),
-    (b'r', b'rev', [], b'see reviewers for revisions', b'REVS'),
-    (b'l', b'limit', 200, b'how many revisions back to scan', b'LIMIT')],
-    _(b'hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]'))
+@command(
+    b"reviewers",
+    [
+        (b"f", b"file", [], b"see reviewers for FILE", b"FILE"),
+        (b"r", b"rev", [], b"see reviewers for revisions", b"REVS"),
+        (b"l", b"limit", 200, b"how many revisions back to scan", b"LIMIT"),
+    ],
+    _(b"hg reviewers [-f FILE1 -f FILE2...] [-r REVS] [-l LIMIT] [PATCH]"),
+)
 def reviewers(ui, repo, patchfile=None, **opts):
     """Suggest a reviewer for a patch
 
@@ -1729,7 +1820,7 @@ def reviewers(ui, repo, patchfile=None, **opts):
 
     def canon(reviewer):
         reviewer = reviewer.lower()
-        return ui.config(b'reviewers', reviewer, reviewer)
+        return ui.config(b"reviewers", reviewer, reviewer)
 
     suckers = DropoffCounter(0.95)
     enough_suckers = 100
@@ -1750,8 +1841,12 @@ def reviewers(ui, repo, patchfile=None, **opts):
 
     reviewers = suckers.most_weighted(5)
     ui.write(b'Ranking reviewers by "frecency"...\n')
-    name_column_length = max([len(reviewer.name) for reviewer in reviewers] + [len(b"Reviewer:")])
-    ui.write(b"%-*s    Recently reviewed commits:\n" % (name_column_length, b"Reviewer:"))
+    name_column_length = max(
+        [len(reviewer.name) for reviewer in reviewers] + [len(b"Reviewer:")]
+    )
+    ui.write(
+        b"%-*s    Recently reviewed commits:\n" % (name_column_length, b"Reviewer:")
+    )
     for reviewer in reviewers:
         ui.write(b" %-*s    %d\n" % (name_column_length, reviewer.name, reviewer.count))
     ui.write(b"\n")

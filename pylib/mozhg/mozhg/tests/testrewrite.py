@@ -12,7 +12,7 @@ from mercurial import (
 from mercurial.i18n import _
 
 OUR_DIR = os.path.dirname(__file__)
-with open(os.path.join(OUR_DIR, '..', '..', '..', '..', 'hgext', 'bootstrap.py')) as f:
+with open(os.path.join(OUR_DIR, "..", "..", "..", "..", "hgext", "bootstrap.py")) as f:
     exec(f.read())
 
 from mozhg.rewrite import (
@@ -24,9 +24,11 @@ cmdtable = {}
 command = registrar.command(cmdtable)
 
 
-@command(b'rewritemessage', [
-    (b'', b'unmodified', False, _(b'Do not modify the revision'), b'')
-], b'hg rewrite REVS')
+@command(
+    b"rewritemessage",
+    [(b"", b"unmodified", False, _(b"Do not modify the revision"), b"")],
+    b"hg rewrite REVS",
+)
 def rewritemessage(ui, repo, revs=None, **opts):
     nodes = [repo[rev].node() for rev in repo.revs(revs)]
     offset = [0]
@@ -34,11 +36,18 @@ def rewritemessage(ui, repo, revs=None, **opts):
     def createfn(repo, ctx, revmap, filectxfn):
         parents = newparents(repo, ctx, revmap)
         description = ctx.description()
-        if not opts['unmodified']:
-            description += b'\n%d' % offset[0]
-        memctx = context.memctx(repo, parents, description,
-                                ctx.files(), filectxfn, user=ctx.user(),
-                                date=ctx.date(), extra=ctx.extra())
+        if not opts["unmodified"]:
+            description += b"\n%d" % offset[0]
+        memctx = context.memctx(
+            repo,
+            parents,
+            description,
+            ctx.files(),
+            filectxfn,
+            user=ctx.user(),
+            date=ctx.date(),
+            extra=ctx.extra(),
+        )
         status = ctx.p1().status(ctx)
         # TRACKING hg53 - status is an object instead of a tuple
         if util.versiontuple(n=2) >= (5, 3):
@@ -56,7 +65,7 @@ def rewritemessage(ui, repo, revs=None, **opts):
     replacechangesets(repo, nodes, createfn)
 
 
-@command(b'rewritechangefile', [], b'hg rewrite REVS')
+@command(b"rewritechangefile", [], b"hg rewrite REVS")
 def rewritechangefile(ui, repo, revs=None):
     nodes = [repo[rev].node() for rev in repo.revs(revs)]
 
@@ -65,9 +74,16 @@ def rewritechangefile(ui, repo, revs=None):
 
         files = ctx.files()
         files.pop()
-        memctx = context.memctx(repo, parents, ctx.description(),
-                                files, filectxfn, user=ctx.user(),
-                                date=ctx.date(), extra=ctx.extra())
+        memctx = context.memctx(
+            repo,
+            parents,
+            ctx.description(),
+            files,
+            filectxfn,
+            user=ctx.user(),
+            date=ctx.date(),
+            extra=ctx.extra(),
+        )
 
         return memctx
 

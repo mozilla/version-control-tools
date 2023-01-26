@@ -5,6 +5,7 @@
 
 import sys
 
+
 def aggregate(fh):
     days = {}
 
@@ -24,8 +25,8 @@ def aggregate(fh):
         totals[3] += t_cpu
 
     for date, totals in sorted(days.items()):
-        print('%s\t%d\t%d\t%d\t%d' % (date, totals[0], totals[1], totals[2],
-                                      totals[3]))
+        print("%s\t%d\t%d\t%d\t%d" % (date, totals[0], totals[1], totals[2], totals[3]))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     aggregate(sys.stdin)

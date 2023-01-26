@@ -22,6 +22,7 @@ hashes in requirements.txt, and you're all set.
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 from __future__ import print_function
+
 try:
     xrange = xrange
 except NameError:
@@ -43,6 +44,7 @@ from shutil import rmtree, copy
 from sys import argv, exit
 from tempfile import mkdtemp
 import traceback
+
 try:
     from urllib2 import build_opener, HTTPHandler, HTTPSHandler, HTTPError
 except ImportError:
@@ -69,16 +71,19 @@ def activate(specifier):
         for distro in require(specifier):
             distro.activate()
     except (VersionConflict, DistributionNotFound):
-        raise RuntimeError('The installed version of pip is too old; peep '
-                           'requires ' + specifier)
+        raise RuntimeError(
+            "The installed version of pip is too old; peep " "requires " + specifier
+        )
+
 
 # Before 0.6.2, the log module wasn't there, so some
 # of our monkeypatching fails. It probably wouldn't be
 # much work to support even earlier, though.
-activate('pip>=0.6.2')
+activate("pip>=0.6.2")
 
 import pip
 from pip.commands.install import InstallCommand
+
 try:
     from pip.download import url_to_path  # 1.5.6
 except ImportError:
@@ -88,14 +93,17 @@ except ImportError:
         from pip.util import url_to_filename as url_to_path  # 0.6.2
 from pip.exceptions import InstallationError
 from pip.index import PackageFinder, Link
+
 try:
     from pip.log import logger
 except ImportError:
     from pip import logger  # 6.0
 from pip.req import parse_requirements
+
 try:
     from pip.utils.ui import DownloadProgressBar, DownloadProgressSpinner
 except ImportError:
+
     class NullProgressBar(object):
         def __init__(self, *args, **kwargs):
             pass
@@ -109,13 +117,14 @@ __version__ = 3, 1, 1
 
 try:
     from pip.index import FormatControl  # noqa
-    FORMAT_CONTROL_ARG = 'format_control'
+
+    FORMAT_CONTROL_ARG = "format_control"
 
     # The line-numbering bug will be fixed in pip 8. All 7.x releases had it.
-    PIP_MAJOR_VERSION = int(pip.__version__.split('.')[0])
+    PIP_MAJOR_VERSION = int(pip.__version__.split(".")[0])
     PIP_COUNTS_COMMENTS = PIP_MAJOR_VERSION >= 8
 except ImportError:
-    FORMAT_CONTROL_ARG = 'use_wheel'  # pre-7
+    FORMAT_CONTROL_ARG = "use_wheel"  # pre-7
     PIP_COUNTS_COMMENTS = True
 
 
@@ -125,7 +134,7 @@ SOMETHING_WENT_WRONG = 1
 COMMAND_LINE_ERROR = 2
 UNHANDLED_EXCEPTION = 3
 
-ARCHIVE_EXTENSIONS = ('.tar.bz2', '.tar.gz', '.tgz', '.tar', '.zip')
+ARCHIVE_EXTENSIONS = (".tar.bz2", ".tar.gz", ".tgz", ".tar", ".zip")
 
 MARKER = object()
 
@@ -147,7 +156,7 @@ class DownloadError(Exception):
         self.reason = str(exc)
 
     def __str__(self):
-        return 'Downloading %s failed: %s' % (self.link, self.reason)
+        return "Downloading %s failed: %s" % (self.link, self.reason)
 
 
 def encoded_hash(sha):
@@ -158,7 +167,7 @@ def encoded_hash(sha):
     downloaded archive before unpacking.
 
     """
-    return urlsafe_b64encode(sha.digest()).decode('ascii').rstrip('=')
+    return urlsafe_b64encode(sha.digest()).decode("ascii").rstrip("=")
 
 
 def path_and_line(req):
@@ -166,15 +175,13 @@ def path_and_line(req):
     InstallRequirement came.
 
     """
-    path, line = (re.match(r'-r (.*) \(line (\d+)\)$',
-                           req.comes_from).groups())
+    path, line = re.match(r"-r (.*) \(line (\d+)\)$", req.comes_from).groups()
     return path, int(line)
 
 
 def hashes_above(path, line_number):
-    """Yield hashes from contiguous comment lines before line ``line_number``.
+    """Yield hashes from contiguous comment lines before line ``line_number``."""
 
-    """
     def hash_lists(path):
         """Yield lists of hashes appearing between non-comment lines.
 
@@ -189,7 +196,7 @@ def hashes_above(path, line_number):
             for lineno, line in enumerate(file, 1):
                 match = HASH_COMMENT_RE.match(line)
                 if match:  # Accumulate this hash.
-                    hashes.append(match.groupdict()['hash'])
+                    hashes.append(match.groupdict()["hash"])
                 if not IGNORED_LINE_RE.match(line):
                     yield hashes  # Report hashes seen so far.
                     hashes = []
@@ -216,10 +223,10 @@ def run_pip(initial_args):
 
 def hash_of_file(path):
     """Return the hash of a downloaded file."""
-    with open(path, 'rb') as archive:
+    with open(path, "rb") as archive:
         sha = sha256()
         while True:
-            data = archive.read(2 ** 20)
+            data = archive.read(2**20)
             if not data:
                 break
             sha.update(data)
@@ -241,7 +248,7 @@ def is_git_sha(text):
 def filename_from_url(url):
     parsed = urlparse(url)
     path = parsed.path
-    return path.split('/')[-1]
+    return path.split("/")[-1]
 
 
 def requirement_args(argv, want_paths=False, want_other=False):
@@ -262,14 +269,15 @@ def requirement_args(argv, want_paths=False, want_other=False):
             if want_paths:
                 yield arg
             was_r = False
-        elif arg in ['-r', '--requirement']:
+        elif arg in ["-r", "--requirement"]:
             was_r = True
         else:
             if want_other:
                 yield arg
 
+
 # any line that is a comment or just whitespace
-IGNORED_LINE_RE = re.compile(r'^(\s*#.*)?\s*$')
+IGNORED_LINE_RE = re.compile(r"^(\s*#.*)?\s*$")
 
 HASH_COMMENT_RE = re.compile(
     r"""
@@ -281,7 +289,9 @@ HASH_COMMENT_RE = re.compile(
                                #   comment. Also strip trailing newlines.
     (?:\#(?P<comment>.*))?     # Comments can be anything after a whitespace+#
                                #   and are optional.
-    $""", re.X)
+    $""",
+    re.X,
+)
 
 
 def peep_hash(argv):
@@ -292,14 +302,15 @@ def peep_hash(argv):
 
     """
     parser = OptionParser(
-        usage='usage: %prog hash file [file ...]',
-        description='Print a peep hash line for one or more files: for '
-                    'example, "# sha256: '
-                    'oz42dZy6Gowxw8AelDtO4gRgTW_xPdooH484k7I5EOY".')
+        usage="usage: %prog hash file [file ...]",
+        description="Print a peep hash line for one or more files: for "
+        'example, "# sha256: '
+        'oz42dZy6Gowxw8AelDtO4gRgTW_xPdooH484k7I5EOY".',
+    )
     _, paths = parser.parse_args(args=argv)
     if paths:
         for path in paths:
-            print('# sha256:', hash_of_file(path))
+            print("# sha256:", hash_of_file(path))
         return ITS_FINE_ITS_FINE
     else:
         parser.print_usage()
@@ -313,6 +324,7 @@ class EmptyOptions(object):
     was required. We work around that by passing it a mock object.
 
     """
+
     default_vcs = None
     skip_requirements_regex = None
     isolated_mode = False
@@ -323,13 +335,15 @@ def memoize(func):
     given instance.
 
     """
+
     @wraps(func)
     def memoizer(self):
-        if not hasattr(self, '_cache'):
+        if not hasattr(self, "_cache"):
             self._cache = {}
         if func.__name__ not in self._cache:
             self._cache[func.__name__] = func(self)
         return self._cache[func.__name__]
+
     return memoizer
 
 
@@ -352,6 +366,7 @@ def package_finder(argv):
         # given)" error. In that version, InstallCommand takes a top=level
         # parser passed in from outside.
         from pip.baseparser import create_main_parser
+
         command = InstallCommand(create_main_parser())
     # The downside is that it essentially ruins the InstallCommand class for
     # further use. Calling out to pip.main() within the same interpreter, for
@@ -364,10 +379,10 @@ def package_finder(argv):
     # Carry over PackageFinder kwargs that have [about] the same names as
     # options attr names:
     possible_options = [
-        'find_links',
+        "find_links",
         FORMAT_CONTROL_ARG,
-        ('allow_all_prereleases', 'pre'),
-        'process_dependency_links'
+        ("allow_all_prereleases", "pre"),
+        "process_dependency_links",
     ]
     kwargs = {}
     for option in possible_options:
@@ -380,12 +395,12 @@ def package_finder(argv):
     index_urls = [options.index_url] + options.extra_index_urls
     if options.no_index:
         index_urls = []
-    index_urls += getattr(options, 'mirrors', [])
+    index_urls += getattr(options, "mirrors", [])
 
     # If pip is new enough to have a PipSession, initialize one, since
     # PackageFinder requires it:
-    if hasattr(command, '_build_session'):
-        kwargs['session'] = command._build_session(options)
+    if hasattr(command, "_build_session"):
+        kwargs["session"] = command._build_session(options)
 
     return PackageFinder(index_urls=index_urls, **kwargs)
 
@@ -398,6 +413,7 @@ class DownloadedReq(object):
     expensive things.
 
     """
+
     def __init__(self, req, argv, finder):
         """Download a requirement, compare its hashes, and return a subclass
         of DownloadedReq depending on its state.
@@ -415,7 +431,7 @@ class DownloadedReq(object):
         # don't overwrite each other, leading to a security hole in which the
         # latter is a hash mismatch, the former has already passed the
         # comparison, and the latter gets installed.
-        self._temp_path = mkdtemp(prefix='peep-')
+        self._temp_path = mkdtemp(prefix="peep-")
         # Think of DownloadedReq as a one-shot state machine. It's an abstract
         # class that ratchets forward to being one of its own subclasses,
         # depending on its package status. Then it doesn't move again.
@@ -439,35 +455,38 @@ class DownloadedReq(object):
             # version.
             for ext in ARCHIVE_EXTENSIONS:
                 if filename.endswith(ext):
-                    filename = filename[:-len(ext)]
+                    filename = filename[: -len(ext)]
                     break
             # Handle github sha tarball downloads.
             if is_git_sha(filename):
-                filename = package_name + '-' + filename
-            if not filename.lower().replace('_', '-').startswith(package_name.lower()):
+                filename = package_name + "-" + filename
+            if not filename.lower().replace("_", "-").startswith(package_name.lower()):
                 # TODO: Should we replace runs of [^a-zA-Z0-9.], not just _, with -?
                 give_up(filename, package_name)
-            return filename[len(package_name) + 1:]  # Strip off '-' before version.
+            return filename[len(package_name) + 1 :]  # Strip off '-' before version.
 
         def version_of_wheel(filename, package_name):
             # For Wheel files (http://legacy.python.org/dev/peps/pep-0427/#file-
             # name-convention) we know the format bits are '-' separated.
-            whl_package_name, version, _rest = filename.split('-', 2)
+            whl_package_name, version, _rest = filename.split("-", 2)
             # Do the alteration to package_name from PEP 427:
-            our_package_name = re.sub(r'[^\w\d.]+', '_', package_name, re.UNICODE)
+            our_package_name = re.sub(r"[^\w\d.]+", "_", package_name, re.UNICODE)
             if whl_package_name != our_package_name:
                 give_up(filename, whl_package_name)
             return version
 
         def give_up(filename, package_name):
-            raise RuntimeError("The archive '%s' didn't start with the package name "
-                               "'%s', so I couldn't figure out the version number. "
-                               "My bad; improve me." %
-                               (filename, package_name))
+            raise RuntimeError(
+                "The archive '%s' didn't start with the package name "
+                "'%s', so I couldn't figure out the version number. "
+                "My bad; improve me." % (filename, package_name)
+            )
 
-        get_version = (version_of_wheel
-                       if self._downloaded_filename().endswith('.whl')
-                       else version_of_archive)
+        get_version = (
+            version_of_wheel
+            if self._downloaded_filename().endswith(".whl")
+            else version_of_archive
+        )
         return get_version(self._downloaded_filename(), self._project_name())
 
     def _is_always_unsatisfied(self):
@@ -524,15 +543,15 @@ class DownloadedReq(object):
             ideally with a proper extension.
 
             """
-            content_type = response.info().get('content-type', '')
+            content_type = response.info().get("content-type", "")
             filename = link.filename  # fallback
             # Have a look at the Content-Disposition header for a better guess:
-            content_disposition = response.info().get('content-disposition')
+            content_disposition = response.info().get("content-disposition")
             if content_disposition:
                 type, params = cgi.parse_header(content_disposition)
                 # We use ``or`` here because we don't want to use an "empty" value
                 # from the filename param:
-                filename = params.get('filename') or filename
+                filename = params.get("filename") or filename
             ext = splitext(filename)[1]
             if not ext:
                 ext = mimetypes.guess_extension(content_type)
@@ -556,6 +575,7 @@ class DownloadedReq(object):
                 downloads)
 
             """
+
             def response_chunks(chunk_size):
                 while True:
                     chunk = response.read(chunk_size)
@@ -563,23 +583,27 @@ class DownloadedReq(object):
                         break
                     yield chunk
 
-            print('Downloading %s%s...' % (
-                self._req.req,
-                (' (%sK)' % (size / 1000)) if size > 1000 else ''))
-            progress_indicator = (DownloadProgressBar(max=size).iter if size
-                                  else DownloadProgressSpinner().iter)
-            with open(path, 'wb') as file:
+            print(
+                "Downloading %s%s..."
+                % (self._req.req, (" (%sK)" % (size / 1000)) if size > 1000 else "")
+            )
+            progress_indicator = (
+                DownloadProgressBar(max=size).iter
+                if size
+                else DownloadProgressSpinner().iter
+            )
+            with open(path, "wb") as file:
                 for chunk in progress_indicator(response_chunks(4096), 4096):
                     file.write(chunk)
 
-        url = link.url.split('#', 1)[0]
+        url = link.url.split("#", 1)[0]
         try:
-            response = opener(urlparse(url).scheme != 'http').open(url)
+            response = opener(urlparse(url).scheme != "http").open(url)
         except (HTTPError, IOError) as exc:
             raise DownloadError(link, exc)
         filename = best_filename(link, response)
         try:
-            size = int(response.headers['content-length'])
+            size = int(response.headers["content-length"])
         except (ValueError, KeyError, TypeError):
             size = 0
         pipe_to_file(response, join(self._temp_path, filename), size=size)
@@ -611,18 +635,18 @@ class DownloadedReq(object):
 
         if link:
             lower_scheme = link.scheme.lower()  # pip lower()s it for some reason.
-            if lower_scheme == 'http' or lower_scheme == 'https':
+            if lower_scheme == "http" or lower_scheme == "https":
                 file_path = self._download(link)
                 return basename(file_path)
-            elif lower_scheme == 'file':
+            elif lower_scheme == "file":
                 # The following is inspired by pip's unpack_file_url():
                 link_path = url_to_path(link.url_without_fragment)
                 if isdir(link_path):
                     raise UnsupportedRequirementError(
                         "%s: %s is a directory. So that it can compute "
                         "a hash, peep supports only filesystem paths which "
-                        "point to files" %
-                        (self._req, link.url_without_fragment))
+                        "point to files" % (self._req, link.url_without_fragment)
+                    )
                 else:
                     copy(link_path, self._temp_path)
                     return basename(link_path)
@@ -632,11 +656,13 @@ class DownloadedReq(object):
                     "that can be hashed. Peep supports only == requirements, "
                     "file:// URLs pointing to files (not folders), and "
                     "http:// and https:// URLs pointing to tarballs, zips, "
-                    "etc." % (self._req, link.url))
+                    "etc." % (self._req, link.url)
+                )
         else:
             raise UnsupportedRequirementError(
                 "%s: couldn't determine where to download this requirement from."
-                % (self._req,))
+                % (self._req,)
+            )
 
     def install(self):
         """Install the package I represent, without dependencies.
@@ -649,7 +675,7 @@ class DownloadedReq(object):
         # -U so it installs whether pip deems the requirement "satisfied" or
         # not. This is necessary for GitHub-sourced zips, which change without
         # their version numbers changing.
-        run_pip(['install'] + other_args + ['--no-deps', '-U', archive_path])
+        run_pip(["install"] + other_args + ["--no-deps", "-U", archive_path])
 
     @memoize
     def _actual_hash(self):
@@ -662,10 +688,10 @@ class DownloadedReq(object):
         Raise ValueError if there is no name.
 
         """
-        name = getattr(self._req.req, 'project_name', '')
+        name = getattr(self._req.req, "project_name", "")
         if name:
             return name
-        raise ValueError('Requirement has no project_name.')
+        raise ValueError("Requirement has no project_name.")
 
     def _name(self):
         return self._req.name
@@ -685,8 +711,7 @@ class DownloadedReq(object):
     @memoize  # Avoid re-running expensive check_if_exists().
     def _is_satisfied(self):
         self._req.check_if_exists()
-        return (self._req.satisfied_by and
-                not self._is_always_unsatisfied())
+        return self._req.satisfied_by and not self._is_always_unsatisfied()
 
     def _class(self):
         """Return the class I should be, spanning a continuum of goodness."""
@@ -708,7 +733,7 @@ class DownloadedReq(object):
         classes of my type are printed.
 
         """
-        return ''
+        return ""
 
 
 class MalformedReq(DownloadedReq):
@@ -716,10 +741,10 @@ class MalformedReq(DownloadedReq):
 
     @classmethod
     def head(cls):
-        return 'The following requirements could not be processed:\n'
+        return "The following requirements could not be processed:\n"
 
     def error(self):
-        return '* Unable to determine package name from URL %s; add #egg=' % self._url()
+        return "* Unable to determine package name from URL %s; add #egg=" % self._url()
 
 
 class MissingReq(DownloadedReq):
@@ -727,9 +752,11 @@ class MissingReq(DownloadedReq):
 
     @classmethod
     def head(cls):
-        return ('The following packages had no hashes specified in the requirements file, which\n'
-                'leaves them open to tampering. Vet these packages to your satisfaction, then\n'
-                'add these "sha256" lines like so:\n\n')
+        return (
+            "The following packages had no hashes specified in the requirements file, which\n"
+            "leaves them open to tampering. Vet these packages to your satisfaction, then\n"
+            'add these "sha256" lines like so:\n\n'
+        )
 
     def error(self):
         if self._url():
@@ -737,31 +764,36 @@ class MissingReq(DownloadedReq):
             # MalformedRequest.
             line = self._url()
         else:
-            line = '%s==%s' % (self._name(), self._version())
-        return '# sha256: %s\n%s\n' % (self._actual_hash(), line)
+            line = "%s==%s" % (self._name(), self._version())
+        return "# sha256: %s\n%s\n" % (self._actual_hash(), line)
 
 
 class MismatchedReq(DownloadedReq):
     """A requirement for which the downloaded file didn't match any of my hashes."""
+
     @classmethod
     def head(cls):
-        return ("THE FOLLOWING PACKAGES DIDN'T MATCH THE HASHES SPECIFIED IN THE REQUIREMENTS\n"
-                "FILE. If you have updated the package versions, update the hashes. If not,\n"
-                "freak out, because someone has tampered with the packages.\n\n")
+        return (
+            "THE FOLLOWING PACKAGES DIDN'T MATCH THE HASHES SPECIFIED IN THE REQUIREMENTS\n"
+            "FILE. If you have updated the package versions, update the hashes. If not,\n"
+            "freak out, because someone has tampered with the packages.\n\n"
+        )
 
     def error(self):
-        preamble = '    %s: expected' % self._project_name()
+        preamble = "    %s: expected" % self._project_name()
         if len(self._expected_hashes()) > 1:
-            preamble += ' one of'
-        padding = '\n' + ' ' * (len(preamble) + 1)
-        return '%s %s\n%s got %s' % (preamble,
-                                     padding.join(self._expected_hashes()),
-                                     ' ' * (len(preamble) - 4),
-                                     self._actual_hash())
+            preamble += " one of"
+        padding = "\n" + " " * (len(preamble) + 1)
+        return "%s %s\n%s got %s" % (
+            preamble,
+            padding.join(self._expected_hashes()),
+            " " * (len(preamble) - 4),
+            self._actual_hash(),
+        )
 
     @classmethod
     def foot(cls):
-        return '\n'
+        return "\n"
 
 
 class SatisfiedReq(DownloadedReq):
@@ -769,12 +801,14 @@ class SatisfiedReq(DownloadedReq):
 
     @classmethod
     def head(cls):
-        return ("These packages were already installed, so we didn't need to download or build\n"
-                "them again. If you installed them with peep in the first place, you should be\n"
-                "safe. If not, uninstall them, then re-attempt your install with peep.\n")
+        return (
+            "These packages were already installed, so we didn't need to download or build\n"
+            "them again. If you installed them with peep in the first place, you should be\n"
+            "safe. If not, uninstall them, then re-attempt your install with peep.\n"
+        )
 
     def error(self):
-        return '   %s' % (self._req,)
+        return "   %s" % (self._req,)
 
 
 class InstallableReq(DownloadedReq):
@@ -816,16 +850,19 @@ def _parse_requirements(path, finder):
     try:
         # list() so the generator that is parse_requirements() actually runs
         # far enough to report a TypeError
-        return list(parse_requirements(
-            path, options=EmptyOptions(), finder=finder))
+        return list(parse_requirements(path, options=EmptyOptions(), finder=finder))
     except TypeError:
         # session is a required kwarg as of pip 6.0 and will raise
         # a TypeError if missing. It needs to be a PipSession instance,
         # but in older versions we can't import it from pip.download
         # (nor do we need it at all) so we only import it in this except block
         from pip.download import PipSession
-        return list(parse_requirements(
-            path, options=EmptyOptions(), session=PipSession(), finder=finder))
+
+        return list(
+            parse_requirements(
+                path, options=EmptyOptions(), session=PipSession(), finder=finder
+            )
+        )
 
 
 def downloaded_reqs_from_path(path, argv):
@@ -837,8 +874,9 @@ def downloaded_reqs_from_path(path, argv):
 
     """
     finder = package_finder(argv)
-    return [DownloadedReq(req, argv, finder) for req in
-            _parse_requirements(path, finder)]
+    return [
+        DownloadedReq(req, argv, finder) for req in _parse_requirements(path, finder)
+    ]
 
 
 def peep_install(argv):
@@ -854,30 +892,35 @@ def peep_install(argv):
     try:
         req_paths = list(requirement_args(argv, want_paths=True))
         if not req_paths:
-            out("You have to specify one or more requirements files with the -r option, because\n"
-                "otherwise there's nowhere for peep to look up the hashes.\n")
+            out(
+                "You have to specify one or more requirements files with the -r option, because\n"
+                "otherwise there's nowhere for peep to look up the hashes.\n"
+            )
             return COMMAND_LINE_ERROR
 
         # We're a "peep install" command, and we have some requirement paths.
-        reqs = list(chain.from_iterable(
-            downloaded_reqs_from_path(path, argv)
-            for path in req_paths))
+        reqs = list(
+            chain.from_iterable(
+                downloaded_reqs_from_path(path, argv) for path in req_paths
+            )
+        )
         buckets = bucket(reqs, lambda r: r.__class__)
 
         # Skip a line after pip's "Cleaning up..." so the important stuff
         # stands out:
         if any(buckets[b] for b in ERROR_CLASSES):
-            out('\n')
+            out("\n")
 
-        printers = (lambda r: out(r.head()),
-                    lambda r: out(r.error() + '\n'),
-                    lambda r: out(r.foot()))
+        printers = (
+            lambda r: out(r.head()),
+            lambda r: out(r.error() + "\n"),
+            lambda r: out(r.foot()),
+        )
         for c in ERROR_CLASSES:
             first_every_last(buckets[c], *printers)
 
         if any(buckets[b] for b in ERROR_CLASSES):
-            out('-------------------------------\n'
-                'Not proceeding to installation.\n')
+            out("-------------------------------\n" "Not proceeding to installation.\n")
             return SOMETHING_WENT_WRONG
         else:
             for req in buckets[InstallableReq]:
@@ -892,7 +935,7 @@ def peep_install(argv):
     finally:
         for req in reqs:
             req.dispose()
-        print(''.join(output))
+        print("".join(output))
 
 
 def peep_port(paths):
@@ -903,37 +946,40 @@ def peep_port(paths):
 
     """
     if not paths:
-        print('Please specify one or more requirements files so I have '
-              'something to port.\n')
+        print(
+            "Please specify one or more requirements files so I have "
+            "something to port.\n"
+        )
         return COMMAND_LINE_ERROR
 
     comes_from = None
     for req in chain.from_iterable(
-            _parse_requirements(path, package_finder(argv)) for path in paths):
+        _parse_requirements(path, package_finder(argv)) for path in paths
+    ):
         req_path, req_line = path_and_line(req)
-        hashes = [hexlify(urlsafe_b64decode((hash + '=').encode('ascii'))).decode('ascii')
-                  for hash in hashes_above(req_path, req_line)]
+        hashes = [
+            hexlify(urlsafe_b64decode((hash + "=").encode("ascii"))).decode("ascii")
+            for hash in hashes_above(req_path, req_line)
+        ]
         if req_path != comes_from:
             print()
-            print('# from %s' % req_path)
+            print("# from %s" % req_path)
             print()
             comes_from = req_path
 
         if not hashes:
             print(req.req)
         else:
-            print('%s' % (req.link if getattr(req, 'link', None) else req.req), end='')
+            print("%s" % (req.link if getattr(req, "link", None) else req.req), end="")
             for hash in hashes:
-                print(' \\')
-                print('    --hash=sha256:%s' % hash, end='')
+                print(" \\")
+                print("    --hash=sha256:%s" % hash, end="")
             print()
 
 
 def main():
     """Be the top-level entrypoint. Return a shell status code."""
-    commands = {'hash': peep_hash,
-                'install': peep_install,
-                'port': peep_port}
+    commands = {"hash": peep_hash, "install": peep_install, "port": peep_port}
     try:
         if len(argv) >= 2 and argv[1] in commands:
             return commands[argv[1]](argv[2:])
@@ -945,24 +991,25 @@ def main():
 
 
 def exception_handler(exc_type, exc_value, exc_tb):
-    print('Oh no! Peep had a problem while trying to do stuff. Please write up a bug report')
-    print('with the specifics so we can fix it:')
-    print()
-    print('https://github.com/erikrose/peep/issues/new')
-    print()
-    print('Here are some particulars you can copy and paste into the bug report:')
-    print()
-    print('---')
-    print('peep:', repr(__version__))
-    print('python:', repr(sys.version))
-    print('pip:', repr(getattr(pip, '__version__', 'no __version__ attr')))
-    print('Command line: ', repr(sys.argv))
     print(
-        ''.join(traceback.format_exception(exc_type, exc_value, exc_tb)))
-    print('---')
+        "Oh no! Peep had a problem while trying to do stuff. Please write up a bug report"
+    )
+    print("with the specifics so we can fix it:")
+    print()
+    print("https://github.com/erikrose/peep/issues/new")
+    print()
+    print("Here are some particulars you can copy and paste into the bug report:")
+    print()
+    print("---")
+    print("peep:", repr(__version__))
+    print("python:", repr(sys.version))
+    print("pip:", repr(getattr(pip, "__version__", "no __version__ attr")))
+    print("Command line: ", repr(sys.argv))
+    print("".join(traceback.format_exception(exc_type, exc_value, exc_tb)))
+    print("---")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         exit(main())
     except Exception:

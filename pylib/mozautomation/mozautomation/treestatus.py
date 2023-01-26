@@ -13,9 +13,9 @@ from time import strptime
 class TreeStatus(object):
     """Represents the status of an individual tree."""
 
-    APPROVAL_REQUEST = b'approval required'
-    OPEN = b'open'
-    CLOSED = b'closed'
+    APPROVAL_REQUEST = b"approval required"
+    OPEN = b"open"
+    CLOSED = b"closed"
 
     def __init__(self, d):
         self.status = None
@@ -25,20 +25,20 @@ class TreeStatus(object):
         self.tags = None
 
         for k in d:
-            if k == b'status':
+            if k == b"status":
                 self.status = d[k]
-            elif k == b'message_of_the_day':
+            elif k == b"message_of_the_day":
                 self.motd = d[k]
-            elif k == b'tree':
+            elif k == b"tree":
                 self.tree = d[k]
-            elif k == b'reason':
+            elif k == b"reason":
                 self.reason = d[k]
-            elif k == 'tags':
+            elif k == "tags":
                 self.tags = d[k]
-            elif k in ('log_id',):
+            elif k in ("log_id",):
                 pass
             else:
-                raise Exception('Unknown key in Tree Status response: %s' % k)
+                raise Exception("Unknown key in Tree Status response: %s" % k)
 
     @property
     def open(self):
@@ -55,13 +55,14 @@ class TreeStatus(object):
 
 class TreeLog(object):
     """Represents a change in a tree's status."""
+
     def __init__(self, d):
-        self.reason = d[b'reason'] or None
-        self.tags = set(d[b'tags']) if d[b'tags'] else set()
-        self.tree = d[b'tree']
-        self.who = d[b'who']
+        self.reason = d[b"reason"] or None
+        self.tags = set(d[b"tags"]) if d[b"tags"] else set()
+        self.tree = d[b"tree"]
+        self.who = d[b"who"]
         # FUTURE return a datetime with appropriate timezone info set.
-        self.when = strptime(d[b'when'], b'%Y-%m-%dT%H:%M:%S')
+        self.when = strptime(d[b"when"], b"%Y-%m-%dT%H:%M:%S")
 
 
 class TreeStatusClient(object):
@@ -71,7 +72,7 @@ class TreeStatusClient(object):
     open or closed.
     """
 
-    def __init__(self, base_uri=b'https://treestatus.mozilla-releng.net/', opener=None):
+    def __init__(self, base_uri=b"https://treestatus.mozilla-releng.net/", opener=None):
         self._base_uri = base_uri
 
         if opener is None:
@@ -80,9 +81,9 @@ class TreeStatusClient(object):
         self._opener = opener
 
     def _request(self, path):
-        request = urllib2.Request(b'%s%s' % (self._base_uri, path), None)
+        request = urllib2.Request(b"%s%s" % (self._base_uri, path), None)
         response = self._opener.open(request)
-        return json.load(response)[b'result']
+        return json.load(response)[b"result"]
 
     def all(self):
         """Obtain the status of all trees.
@@ -90,7 +91,7 @@ class TreeStatusClient(object):
         Returns a dict of tree names to TreeStatus instances.
         """
 
-        o = self._request(b'/trees')
+        o = self._request(b"/trees")
         trees = {}
         for k, v in o.items():
             trees[k] = TreeStatus(v)
@@ -102,11 +103,11 @@ class TreeStatusClient(object):
 
         Returns a TreeStatus instance.
         """
-        o = self._request(b'/trees/%s' % tree)
+        o = self._request(b"/trees/%s" % tree)
         return TreeStatus(o)
 
     def tree_logs(self, tree):
-        o = self._request(b'/trees/%s/logs' % tree)
+        o = self._request(b"/trees/%s/logs" % tree)
 
         for d in o:
             yield TreeLog(d)

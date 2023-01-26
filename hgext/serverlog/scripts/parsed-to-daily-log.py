@@ -16,7 +16,7 @@ def write_daily_logs(fh, path):
         date = line[0:10]
         of = ofs.get(date, None)
         if not of:
-            of = open(os.path.join(path, 'parsed.%s' % date), 'wb')
+            of = open(os.path.join(path, "parsed.%s" % date), "wb")
             ofs[date] = of
 
         of.write(line)
@@ -25,5 +25,5 @@ def write_daily_logs(fh, path):
         of.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     write_daily_logs(sys.stdin, sys.argv[1])

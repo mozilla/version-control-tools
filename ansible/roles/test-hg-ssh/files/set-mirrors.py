@@ -5,12 +5,12 @@
 
 import sys
 
-with open('/etc/mercurial/mirrors', 'w') as mirrors:
-    with open('/etc/mercurial/known_hosts', 'w') as kh:
+with open("/etc/mercurial/mirrors", "w") as mirrors:
+    with open("/etc/mercurial/known_hosts", "w") as kh:
         ips = sys.argv[1::2]
         keys = sys.argv[2::2]
         for ip, key in zip(ips, keys):
             mirrors.write(ip)
-            mirrors.write('\n')
+            mirrors.write("\n")
 
-            kh.write('%s %s\n' % (ip, key))
+            kh.write("%s %s\n" % (ip, key))

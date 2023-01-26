@@ -33,9 +33,9 @@ MOCK_SIMPLE_PUSH = """
 """
 
 
-class TestPush():
+class TestPush:
     def test_full_push(self):
-        data = json.loads(MOCK_FULL_PUSH.replace('\n', ''))
+        data = json.loads(MOCK_FULL_PUSH.replace("\n", ""))
         push_id, push_info = data.popitem()
         push = Push(push_id=push_id, push_info=push_info)
         assert push is not None
@@ -45,19 +45,19 @@ class TestPush():
         changesets = push.changesets
         assert len(changesets) == 1
         assert changesets[0].node == "2dc063b51c0eea1b6b026253a2d8d3421716b197"
-        assert changesets[0].desc == push_info["changesets"][0]['desc']
+        assert changesets[0].desc == push_info["changesets"][0]["desc"]
         assert changesets[0].files == ["main.cpp"]
         assert changesets[0].tags == ["test_tags"]
 
     def test_simple_push(self):
-        data = json.loads(MOCK_SIMPLE_PUSH.replace('\n', ''))
+        data = json.loads(MOCK_SIMPLE_PUSH.replace("\n", ""))
         push_id, push_info = data.popitem()
         push = Push(push_id=push_id, push_info=push_info)
         assert push.changesets[0].node == "2dc063b51c0eea1b6b026253a2d8d3421716b197"
 
     def test_raise_exception_short_changeset(self):
-        data = json.loads(MOCK_SIMPLE_PUSH.replace('\n', ''))
+        data = json.loads(MOCK_SIMPLE_PUSH.replace("\n", ""))
         push_id, push_info = data.popitem()
-        push_info['changesets'][0] = "2dc063b51c0e"
+        push_info["changesets"][0] = "2dc063b51c0e"
         with pytest.raises(AssertionError):
             Push(push_id=push_id, push_info=push_info)

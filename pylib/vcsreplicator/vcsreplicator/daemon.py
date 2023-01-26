@@ -25,16 +25,16 @@ def run_in_loop(logger, fn, onetime=False, **kwargs):
     alive = [True]
 
     def signal_exit(signum, frame):
-        logger.warn('received signal %d' % signum)
+        logger.warn("received signal %d" % signum)
         signal_count[0] += 1
         alive[0] = False
 
         if signal_count[0] == 1:
-            logger.warn('exiting gracefully')
+            logger.warn("exiting gracefully")
             return
 
         # If this is a subsequent signal, convert to forceful exit.
-        logger.warn('already received exit signal; forcefully aborting')
+        logger.warn("already received exit signal; forcefully aborting")
         sys.exit(1)
 
     oldint = signal.signal(signal.SIGINT, signal_exit)
@@ -44,14 +44,14 @@ def run_in_loop(logger, fn, onetime=False, **kwargs):
             try:
                 fn(alive=alive, **kwargs)
             except Exception:
-                logger.exception('exception in daemon loop function')
-                logger.warn('executing loop exiting after error')
+                logger.exception("exception in daemon loop function")
+                logger.warn("executing loop exiting after error")
                 return 1
 
             if onetime:
                 break
 
-        logger.warn('executing loop exiting gracefully')
+        logger.warn("executing loop exiting gracefully")
         return 0
     finally:
         signal.signal(signal.SIGINT, oldint)

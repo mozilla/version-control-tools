@@ -6,9 +6,9 @@
 import os
 import pathlib
 
-ROOT = '/repo/hg/mozilla/users'
-WSGI_ROOT = '/repo/hg/webroot_wsgi/users'
-BASE_URL = b'https://hg.mozilla.org/users'
+ROOT = "/repo/hg/mozilla/users"
+WSGI_ROOT = "/repo/hg/webroot_wsgi/users"
+BASE_URL = b"https://hg.mozilla.org/users"
 
 CONFIG_TEMPLATE = """
 [web]
@@ -43,17 +43,17 @@ for f in sorted(os.listdir(ROOT)):
     wsgi_full = pathlib.Path(WSGI_ROOT) / user
     wsgi_full.mkdir(parents=True, exist_ok=True)
 
-    config = wsgi_full / 'hgweb.config'
-    config_tmp = wsgi_full / 'hgweb.config.tmp'
-    wsgi = wsgi_full / 'hgweb.wsgi'
-    wsgi_tmp = wsgi_full / 'hgweb.wsgi.tmp'
+    config = wsgi_full / "hgweb.config"
+    config_tmp = wsgi_full / "hgweb.config.tmp"
+    wsgi = wsgi_full / "hgweb.wsgi"
+    wsgi_tmp = wsgi_full / "hgweb.wsgi.tmp"
 
-    with config_tmp.open('w', encoding='utf-8') as fh:
+    with config_tmp.open("w", encoding="utf-8") as fh:
         fh.write(CONFIG_TEMPLATE.lstrip().format(user=user))
 
     config_tmp.rename(config)
 
-    with wsgi_tmp.open('w', encoding='utf-8') as fh:
+    with wsgi_tmp.open("w", encoding="utf-8") as fh:
         fh.write(WSGI_TEMPLATE.lstrip())
 
     wsgi_tmp.rename(wsgi)

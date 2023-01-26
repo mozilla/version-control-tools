@@ -22,52 +22,61 @@ def find_profiles(find_times=False):
     """
     base = None
 
-    if platform.system() == 'Darwin':
+    if platform.system() == "Darwin":
         from Carbon import Folder, Folders
-        pathref = Folder.FSFindFolder(Folders.kUserDomain,
+
+        pathref = Folder.FSFindFolder(
+            Folders.kUserDomain,
             Folders.kApplicationSupportFolderType,
-            Folders.kDontCreateFolder)
+            Folders.kDontCreateFolder,
+        )
         path = pathref.FSRefMakePath()
-        base = os.path.join(path, 'Firefox')
-    elif platform.system() == 'Windows':
+        base = os.path.join(path, "Firefox")
+    elif platform.system() == "Windows":
         import ctypes
+
         SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-        SHGetFolderPath.argtypes = [ctypes.c_void_p, ctypes.c_int,
-            ctypes.c_void_p, ctypes.c_int32, ctypes.c_wchar_p]
+        SHGetFolderPath.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_int,
+            ctypes.c_void_p,
+            ctypes.c_int32,
+            ctypes.c_wchar_p,
+        ]
         path_buf = ctypes.create_unicode_buffer(1024)
         CSIDL_APPDATA = 26
         if not SHGetFolderPath(0, CSIDL_APPDATA, 0, 0, path_buf):
             path = path_buf.value
-            base = os.path.join(path_buf.value, b'Mozilla', b'Firefox')
+            base = os.path.join(path_buf.value, b"Mozilla", b"Firefox")
     else:
-        base = os.path.expanduser(b'~/.mozilla/firefox')
+        base = os.path.expanduser(b"~/.mozilla/firefox")
 
     if not base:
         return []
 
-    ini_path = os.path.join(base, b'profiles.ini')
+    ini_path = os.path.join(base, b"profiles.ini")
     c = RawConfigParser(allow_no_value=True)
     c.read([ini_path])
 
     paths = []
 
     for section in c.sections():
-        if not c.has_option(section, b'Path'):
+        if not c.has_option(section, b"Path"):
             continue
 
-        profile_path = c.get(section, b'Path')
+        profile_path = c.get(section, b"Path")
         is_relative = True
-        if c.has_option(section, b'IsRelative'):
-            is_relative = c.getboolean(section, b'IsRelative')
+        if c.has_option(section, b"IsRelative"):
+            is_relative = c.getboolean(section, b"IsRelative")
 
         if is_relative:
             profile_path = os.path.join(base, profile_path)
 
         is_default = False
-        if c.has_option(section, b'Default'):
-            is_default = c.getboolean(section, b'Default')
+        if c.has_option(section, b"Default"):
+            is_default = c.getboolean(section, b"Default")
 
-        name = c.get(section, b'Name')
+        name = c.get(section, b"Name")
 
         newest_time = None
         if find_times:
@@ -96,7 +105,7 @@ def sqlite_safe_open(path):
     conn = None
     try:
         basename = os.path.basename(path)
-        destpath = os.path.join(tempdir, '%s.copy.sqlite' % basename)
+        destpath = os.path.join(tempdir, "%s.copy.sqlite" % basename)
 
         shutil.copyfile(path, destpath)
 
@@ -105,9 +114,9 @@ def sqlite_safe_open(path):
         # version is too new. Patch the version number to an older version
         # so we can open it. The version only impacts the journalling, so
         # this should be relatively safe.
-        with open(destpath, 'r+b') as fh:
+        with open(destpath, "r+b") as fh:
             fh.seek(18, 0)
-            fh.write('\x01\x01')
+            fh.write("\x01\x01")
 
         conn = sqlite3.connect(destpath)
         yield conn
@@ -126,13 +135,15 @@ def get_cookies(profile_path, host=None):
     host can be specified as a unicode string or an iterable of hostnames to
     limit results to.
     """
-    with sqlite_safe_open(os.path.join(profile_path, 'cookies.sqlite')) as db:
+    with sqlite_safe_open(os.path.join(profile_path, "cookies.sqlite")) as db:
         if host:
-            host = host.lstrip(b'.')
-            result = db.execute('SELECT * FROM moz_cookies WHERE host=? or host=?',
-                (host, b'.%s' % host))
+            host = host.lstrip(b".")
+            result = db.execute(
+                "SELECT * FROM moz_cookies WHERE host=? or host=?",
+                (host, b".%s" % host),
+            )
         else:
-            result = db.execute('SELECT * FROM moz_cookies')
+            result = db.execute("SELECT * FROM moz_cookies")
 
         for row in result:
             yield {col[0]: row[i] for i, col in enumerate(result.description)}

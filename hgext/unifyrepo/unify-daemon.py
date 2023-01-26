@@ -12,7 +12,7 @@ import sys
 import time
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-UNIFYEXT = os.path.join(HERE, '__init__.py')
+UNIFYEXT = os.path.join(HERE, "__init__.py")
 
 
 def unify_until_error(hg, configs, delay=30, maximum=0):
@@ -20,8 +20,11 @@ def unify_until_error(hg, configs, delay=30, maximum=0):
     while True:
         for config in configs:
             args = [
-                hg, '--config', 'extensions.unifyrepo=%s' % UNIFYEXT,
-                'unifyrepo', config
+                hg,
+                "--config",
+                "extensions.unifyrepo=%s" % UNIFYEXT,
+                "unifyrepo",
+                config,
             ]
             res = subprocess.call(args)
             if res:
@@ -34,16 +37,22 @@ def unify_until_error(hg, configs, delay=30, maximum=0):
             return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('hg', help='path to hg executable to use')
-    parser.add_argument('config', nargs='+', help='unify config files to use')
-    parser.add_argument('--delay', type=int, default=30,
-                        help='Delay in seconds between unify invocations')
-    parser.add_argument('--maximum', type=int, default=0,
-                        help='Maximum number of iterations to process')
+    parser.add_argument("hg", help="path to hg executable to use")
+    parser.add_argument("config", nargs="+", help="unify config files to use")
+    parser.add_argument(
+        "--delay",
+        type=int,
+        default=30,
+        help="Delay in seconds between unify invocations",
+    )
+    parser.add_argument(
+        "--maximum", type=int, default=0, help="Maximum number of iterations to process"
+    )
 
     args = parser.parse_args()
 
-    sys.exit(unify_until_error(args.hg, args.config, delay=args.delay,
-                               maximum=args.maximum))
+    sys.exit(
+        unify_until_error(args.hg, args.config, delay=args.delay, maximum=args.maximum)
+    )

@@ -15,20 +15,22 @@ from collections import namedtuple
 from io import BytesIO
 
 
-BUILD_DATA_PREFIX = 'http://builddata.pub.build.mozilla.org/buildjson/'
-BUILD_DATA_URL = BUILD_DATA_PREFIX + 'builds-%s.js.gz'
+BUILD_DATA_PREFIX = "http://builddata.pub.build.mozilla.org/buildjson/"
+BUILD_DATA_URL = BUILD_DATA_PREFIX + "builds-%s.js.gz"
 
-RE_BUILD_LISTING_ENTRY = re.compile(r'''
+RE_BUILD_LISTING_ENTRY = re.compile(
+    r"""
     ^<a\shref="(?P<path>[^"]+)">[^<]+<\/a>
     \s+
     (?P<date>\d{2}-[^-]+-\d{4}\s\d{2}:\d{2})
     \s+
     (?P<size>[\d-]+)
-    $''', re.VERBOSE)
+    $""",
+    re.VERBOSE,
+)
 
 
-BuilderInfo = namedtuple('BuilderInfo', ('category', 'master_id', 'name',
-    'slave_ids'))
+BuilderInfo = namedtuple("BuilderInfo", ("category", "master_id", "name", "slave_ids"))
 
 
 class BuildInfo(object):
@@ -37,17 +39,17 @@ class BuildInfo(object):
     def __init__(self, o):
         """Create from a JSON object describing the build."""
 
-        self.id = o['id']
-        self.builder_id = o['builder_id']
-        self.build_number = o['buildnumber']
-        self.master_id = o['master_id']
-        self.slave_id = o['slave_id']
-        self.start_time = o['starttime']
-        self.end_time = o['endtime']
-        self.reason = o['reason']
-        self.request_ids = o['request_ids']
-        self.result = o['result']
-        self.properties = dict(o['properties'])
+        self.id = o["id"]
+        self.builder_id = o["builder_id"]
+        self.build_number = o["buildnumber"]
+        self.master_id = o["master_id"]
+        self.slave_id = o["slave_id"]
+        self.start_time = o["starttime"]
+        self.end_time = o["endtime"]
+        self.reason = o["reason"]
+        self.request_ids = o["request_ids"]
+        self.result = o["result"]
+        self.properties = dict(o["properties"])
 
         self.duration = self.end_time - self.start_time
 
@@ -58,7 +60,7 @@ def available_buildbot_dump_files():
     html = urllib2.urlopen(BUILD_DATA_PREFIX).read()
 
     for line in html.splitlines():
-        if not line.startswith('<'):
+        if not line.startswith("<"):
             continue
 
         match = RE_BUILD_LISTING_ENTRY.match(line)
@@ -66,15 +68,15 @@ def available_buildbot_dump_files():
 
         d = match.groupdict()
 
-        if d['path'].endswith('.tmp'):
+        if d["path"].endswith(".tmp"):
             continue
 
-        if d['size'] == '-':
+        if d["size"] == "-":
             continue
 
-        t = datetime.datetime.strptime(d['date'], '%d-%b-%Y %H:%M')
+        t = datetime.datetime.strptime(d["date"], "%d-%b-%Y %H:%M")
 
-        yield d['path'], t, int(d['size'])
+        yield d["path"], t, int(d["size"])
 
 
 class BuildbotDump(object):
@@ -100,7 +102,7 @@ class BuildbotDump(object):
             self.load_time(load_time)
 
     def load_time(self, t):
-        datestring = time.strftime('%Y-%m-%d', time.gmtime(t))
+        datestring = time.strftime("%Y-%m-%d", time.gmtime(t))
         self._load_url(BUILD_DATA_URL % datestring)
 
     def load_date(self, d):
@@ -109,36 +111,36 @@ class BuildbotDump(object):
     def _load_url(self, url):
         raw = urllib2.urlopen(url).read()
 
-        if url.endswith('.gz'):
+        if url.endswith(".gz"):
             raw = BytesIO(raw)
             raw = gzip.GzipFile(fileobj=raw).read()
 
-        obj = json.loads(raw, encoding='utf-8')
+        obj = json.loads(raw, encoding="utf-8")
         self.load_dump(obj)
 
     def load_dump(self, o):
-        for master_id, master in o['masters'].items():
+        for master_id, master in o["masters"].items():
             master_id = int(master_id)
 
-            self._masters[master_id] = (master['name'], master['url'])
+            self._masters[master_id] = (master["name"], master["url"])
 
-        for slave_id, name in o['slaves'].items():
+        for slave_id, name in o["slaves"].items():
             slave_id = int(slave_id)
             self._slaves_by_id[slave_id] = name
             self._slaves_by_name[name] = slave_id
 
-        for builder_id, builder in o['builders'].items():
+        for builder_id, builder in o["builders"].items():
             builder_id = int(builder_id)
-            category = builder['category']
-            master_id = builder['master_id']
-            name = builder['name']
-            slave_ids = set(builder['slaves'])
+            category = builder["category"]
+            master_id = builder["master_id"]
+            name = builder["name"]
+            slave_ids = set(builder["slaves"])
 
             self._builders_by_id[builder_id] = BuilderInfo(
-                category=category, master_id=master_id, name=name,
-                slave_ids=slave_ids)
+                category=category, master_id=master_id, name=name, slave_ids=slave_ids
+            )
 
-        for build in o['builds']:
+        for build in o["builds"]:
             b = BuildInfo(build)
             self._builds_by_id[b.id] = b
             slave_name = self._slaves_by_id[b.slave_id]
@@ -160,7 +162,7 @@ class BuildbotDump(object):
         """
         groups = {}
         for name in sorted(self.slave_names):
-            group = '-'.join(name.split('-')[0:-1])
+            group = "-".join(name.split("-")[0:-1])
 
             groups.setdefault(group, set()).add(name)
 
@@ -208,8 +210,8 @@ class BuildbotDump(object):
         events = []
 
         for build in self._builds_by_id.values():
-            events.append((build.start_time, 'job_start', build))
-            events.append((build.end_time, 'job_end', build))
+            events.append((build.start_time, "job_start", build))
+            events.append((build.end_time, "job_end", build))
 
         return sorted(events)
 
@@ -224,5 +226,5 @@ class BuildbotDump(object):
         for build_id in sorted(build_ids):
             build = self._builds_by_id[build_id]
 
-            yield (build.start_time, 'job_start', build)
-            yield (build.end_time, 'job_end', build)
+            yield (build.start_time, "job_start", build)
+            yield (build.end_time, "job_end", build)

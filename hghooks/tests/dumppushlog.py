@@ -7,15 +7,17 @@ import sqlite3
 import sys
 
 repo = sys.argv[1]
-dbpath = os.path.join(repo, '.hg', 'pushlog2.db')
+dbpath = os.path.join(repo, ".hg", "pushlog2.db")
 
 if not os.path.exists(dbpath):
-    print('pushlog database does not exist: %s' % dbpath)
+    print("pushlog database does not exist: %s" % dbpath)
     sys.exit(1)
 
 conn = sqlite3.connect(dbpath)
-res = conn.execute('SELECT id, user, date, rev, node FROM pushlog '
-    'INNER JOIN changesets on pushlog.id = changesets.pushid ORDER BY id')
+res = conn.execute(
+    "SELECT id, user, date, rev, node FROM pushlog "
+    "INNER JOIN changesets on pushlog.id = changesets.pushid ORDER BY id"
+)
 
 lastdate = None
 for pid, user, date, rev, node in res.fetchall():
@@ -24,5 +26,6 @@ for pid, user, date, rev, node in res.fetchall():
 
     lastdate = date
 
-    print('ID: %d; user: %s; Date: %s; Rev: %d; Node: %s' % (
-        pid, user, date, rev, node))
+    print(
+        "ID: %d; user: %s; Date: %s; Rev: %d; Node: %s" % (pid, user, date, rev, node)
+    )

@@ -18,15 +18,14 @@ https://mozilla-version-control-tools.readthedocs.io/en/latest/hgmozilla/install
 
 
 class AdvertiseUpgradeCheck(ChangeGroupCheck):
-
     @property
     def name(self):
-        return b'advertise_upgrade'
+        return b"advertise_upgrade"
 
     def relevant(self):
         return True
 
     def check(self, **kwargs):
-        if 'bundle2' not in kwargs:
-            print_banner(self.ui, b'warning', OUT_OF_DATE_CLIENT)
+        if "bundle2" not in kwargs:
+            print_banner(self.ui, b"warning", OUT_OF_DATE_CLIENT)
         return True

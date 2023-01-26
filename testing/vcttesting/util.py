@@ -12,26 +12,29 @@ import time
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
-HGCLUSTER_DOCKER_COMPOSE = os.path.join(ROOT, 'testing', 'hgcluster-docker-compose.yml')
+ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
+HGCLUSTER_DOCKER_COMPOSE = os.path.join(ROOT, "testing", "hgcluster-docker-compose.yml")
 
 
 def get_available_port():
     """Obtain a port number available for binding."""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 0))
+    s.bind(("", 0))
     _host, port = s.getsockname()
     s.close()
 
     return port
 
 
-def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
-                  extra_check_fn=None):
+def wait_for_amqp(
+    hostname, port, userid, password, ssl=False, timeout=60, extra_check_fn=None
+):
     # Delay import to facilitate module use in limited virtualenvs.
     import kombu
-    c = kombu.Connection(hostname=hostname, port=port, userid=userid,
-            password=password, ssl=ssl)
+
+    c = kombu.Connection(
+        hostname=hostname, port=port, userid=userid, password=password, ssl=ssl
+    )
 
     start = time.time()
 
@@ -46,7 +49,7 @@ def wait_for_amqp(hostname, port, userid, password, ssl=False, timeout=60,
             extra_check_fn()
 
         if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for AMQP')
+            raise Exception("Timeout reached waiting for AMQP")
 
         time.sleep(0.1)
 
@@ -66,8 +69,9 @@ def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(IgnoreHostKeyPolicy())
         try:
-            client.connect(hostname, port=port, timeout=0.1, allow_agent=False,
-                           look_for_keys=False)
+            client.connect(
+                hostname, port=port, timeout=0.1, allow_agent=False, look_for_keys=False
+            )
             client.close()
             return
         except socket.error:
@@ -82,7 +86,7 @@ def wait_for_ssh(hostname, port, timeout=60, extra_check_fn=None):
             extra_check_fn()
 
         if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for SSH')
+            raise Exception("Timeout reached waiting for SSH")
 
         time.sleep(0.1)
 
@@ -95,13 +99,13 @@ def wait_for_kafka(hostport, timeout=60):
     start = time.time()
     while True:
         try:
-            SimpleClient(hostport, client_id=b'dummy', timeout=1)
+            SimpleClient(hostport, client_id=b"dummy", timeout=1)
             return
         except Exception:
             pass
 
         if time.time() - start > timeout:
-            raise Exception('Timeout reached waiting for Kafka')
+            raise Exception("Timeout reached waiting for Kafka")
 
         time.sleep(0.1)
 
@@ -112,53 +116,54 @@ def wait_for_kafka_topic(hostport, topic, timeout=60):
     from kafka import SimpleClient, TopicPartition
 
     start = time.time()
-    client = SimpleClient(hostport, client_id=b'dummy', timeout=1)
+    client = SimpleClient(hostport, client_id=b"dummy", timeout=1)
     while not client.has_metadata_for_topic(topic):
         if time.time() - start > timeout:
-            raise Exception('timeout reached waiting for topic')
+            raise Exception("timeout reached waiting for topic")
 
         time.sleep(0.1)
         client.load_metadata_for_topics()
 
     # And wait for all partitions in that topic to have a leader.
     while True:
-        tps = [TopicPartition(topic, p)
-               for p in client.topic_partitions.get(topic, [])]
+        tps = [TopicPartition(topic, p) for p in client.topic_partitions.get(topic, [])]
 
         if tps and all(client.topics_to_brokers.get(tp) for tp in tps):
             break
 
         if time.time() - start > timeout:
-            raise Exception('timeout reached waiting for topic brokers')
+            raise Exception("timeout reached waiting for topic brokers")
 
         time.sleep(0.1)
         client.load_metadata_for_topics()
 
 
 def docker_compose_down_background(project_name, show_output=False):
-    '''Run `docker-compose down` for the given project name.
+    """Run `docker-compose down` for the given project name.
 
     Returns the `subprocess.Popen` object for use by the caller.
-    '''
+    """
     docker_compose_down_command = [
-        'docker-compose',
-        '--file', HGCLUSTER_DOCKER_COMPOSE,
-        '--project-name', project_name,
-        'down',
+        "docker-compose",
+        "--file",
+        HGCLUSTER_DOCKER_COMPOSE,
+        "--project-name",
+        project_name,
+        "down",
     ]
 
     kwargs = {}
     if not show_output:
         # TRACKING py3 - once we have full Py3 support in the test environment
         # we can make use of `subprocess.DEVNULL`
-        devnull = open(os.devnull, 'wb')
-        kwargs['stderr'] = devnull
-        kwargs['stdout'] = devnull
+        devnull = open(os.devnull, "wb")
+        kwargs["stderr"] = devnull
+        kwargs["stdout"] = devnull
     return subprocess.Popen(docker_compose_down_command, **kwargs)
 
 
 def normalize_testname(testname):
-    '''Normalize test name for use with `docker-compose`.
+    """Normalize test name for use with `docker-compose`.
 
     `docker-compose` normalizes project names by removing whitespace and other
     punctuation.
@@ -173,14 +178,15 @@ def normalize_testname(testname):
     testname
     >>> normalize_testname(None)
     None
-    '''
+    """
     if not testname:
         return None
 
     # TODO names like "/" will break this
-    testname = testname.split('/')[-1].lower()
+    testname = testname.split("/")[-1].lower()
 
-    return ''.join(
-        char for char in testname
+    return "".join(
+        char
+        for char in testname
         if char not in (set(string.punctuation) | set(string.whitespace))
     )

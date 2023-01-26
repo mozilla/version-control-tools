@@ -31,9 +31,10 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
     for non-user repos. For user repos, it prints a non-fatal warning
     discouraging their use.
     """
+
     @property
     def name(self):
-        return b'prevent_subrepos'
+        return b"prevent_subrepos"
 
     def relevant(self):
         return True
@@ -47,7 +48,7 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
         # whether there is *any* versioned data for these tracked files. If not,
         # we can short circuit the check and avoid manifest lookups.
         seen = False
-        for p in (b'.hgsub', b'.hgsubstate'):
+        for p in (b".hgsub", b".hgsubstate"):
             fl = self.repo.file(p)
             if len(fl):
                 seen = True
@@ -62,14 +63,19 @@ class PreventSubReposCheck(PreTxnChangegroupCheck):
         if self.done:
             return True
 
-        if b'.hgsub' not in ctx and b'.hgsubstate' not in ctx:
+        if b".hgsub" not in ctx and b".hgsubstate" not in ctx:
             return True
 
         self.done = True
 
-        print_banner(self.ui, b'error', SUBREPO_NOT_ALLOWED % {
-            b'node': ctx.hex()[0:12],
-        })
+        print_banner(
+            self.ui,
+            b"error",
+            SUBREPO_NOT_ALLOWED
+            % {
+                b"node": ctx.hex()[0:12],
+            },
+        )
         return False
 
     def post_check(self):

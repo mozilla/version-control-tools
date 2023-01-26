@@ -7,9 +7,7 @@ from mozhghooks.check.check_bug_references import BMOAPIClient
 
 
 class TestBMOAPIClient(unittest.TestCase):
-    @mock.patch(
-        "mozhghooks.check.check_bug_references.urllibcompat.urlreq.urlopen"
-    )
+    @mock.patch("mozhghooks.check.check_bug_references.urllibcompat.urlreq.urlopen")
     def test__get(self, mock_urlopen):
         """
         Tests the client's ._get method, which is used by the client to query
@@ -36,9 +34,7 @@ class TestBMOAPIClient(unittest.TestCase):
         )
 
         # Check that ._get returns the response object of urlopen.
-        self.assertEqual(
-            response, mock_urlopen(mock_path + mock_params_encoded)
-        )
+        self.assertEqual(response, mock_urlopen(mock_path + mock_params_encoded))
 
     @mock.patch("mozhghooks.check.check_bug_references.BMOAPIClient._get")
     @mock.patch("mozhghooks.check.check_bug_references.json")
@@ -62,7 +58,10 @@ class TestBMOAPIClient(unittest.TestCase):
         # client._get.
         self.assertEqual(
             mock__get.call_args[0][1],
-            ((b"id", b"bug-1,bug-2"), (b"include_fields", b"id"),),
+            (
+                (b"id", b"bug-1,bug-2"),
+                (b"include_fields", b"id"),
+            ),
         )
 
         # TODO: improve coverage for this test.

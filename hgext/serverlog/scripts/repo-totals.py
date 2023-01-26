@@ -5,6 +5,7 @@
 
 import sys
 
+
 def repo_totals(fh):
     repos = {}
 
@@ -22,7 +23,8 @@ def repo_totals(fh):
         totals[2] += t_cpu
 
     for repo, totals in sorted(repos.items()):
-        print('%s\t%d\t%d\t%d' % (repo, totals[0], totals[1], totals[2]))
+        print("%s\t%d\t%d\t%d" % (repo, totals[0], totals[1], totals[2]))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     repo_totals(sys.stdin)

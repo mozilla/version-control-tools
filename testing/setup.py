@@ -5,9 +5,9 @@
 from setuptools import setup
 
 setup(
-    name='vcttesting',
-    version='0.0.1',
-    description='Support code to support testing the version-control-tools repo',
-    license='MPL',
-    packages=['vcttesting'],
+    name="vcttesting",
+    version="0.0.1",
+    description="Support code to support testing the version-control-tools repo",
+    license="MPL",
+    packages=["vcttesting"],
 )

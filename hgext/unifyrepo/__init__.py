@@ -81,8 +81,8 @@ from mercurial import (
     registrar,
 )
 
-minimumhgversion = b'4.8'
-testedwith = b'4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.9'
+minimumhgversion = b"4.8"
+testedwith = b"4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.9"
 
 cmdtable = {}
 
@@ -92,19 +92,19 @@ command = registrar.command(cmdtable)
 class unifyconfig(object):
     def __init__(self, path):
         self._c = config.config()
-        with open(path, 'rb') as fh:
+        with open(path, "rb") as fh:
             self._c.read(path, fh)
 
-        if b'GLOBAL' not in self._c:
-            raise error.Abort(b'config file missing GLOBAL section')
+        if b"GLOBAL" not in self._c:
+            raise error.Abort(b"config file missing GLOBAL section")
 
-        self.stagepath = self._c.get(b'GLOBAL', b'stagepath')
+        self.stagepath = self._c.get(b"GLOBAL", b"stagepath")
         if not self.stagepath:
-            raise error.Abort(b'GLOBAL.stagepath not defined in config')
+            raise error.Abort(b"GLOBAL.stagepath not defined in config")
 
-        self.destpath = self._c.get(b'GLOBAL', b'destpath')
+        self.destpath = self._c.get(b"GLOBAL", b"destpath")
         if not self.destpath:
-            raise error.Abort(b'GLOBAL.destpath not defined in config')
+            raise error.Abort(b"GLOBAL.destpath not defined in config")
 
     @property
     def sources(self):
@@ -113,19 +113,19 @@ class unifyconfig(object):
             if name.upper() == name:
                 continue
 
-            bookmark = self._c.get(name, b'bookmark', name)
-            if self._c.hasitem(name, b'nobookmark'):
+            bookmark = self._c.get(name, b"bookmark", name)
+            if self._c.hasitem(name, b"nobookmark"):
                 bookmark = None
 
-            path = self._c.get(name, b'path')
+            path = self._c.get(name, b"path")
             if not path:
                 raise error.Abort(b'section %s missing "path"' % name)
 
             yield {
-                'name': name,
-                'path': path,
-                'pullrevs': self._c.get(name, b'pullrevs', b'0:tip'),
-                'bookmark': bookmark,
+                "name": name,
+                "path": path,
+                "pullrevs": self._c.get(name, b"pullrevs", b"0:tip"),
+                "bookmark": bookmark,
             }
 
 
@@ -223,6 +223,7 @@ def unifypushes(pushtonode):
     if lastsource:
         yield lastsource, lastid, lastwho, lastwhen, nodes
 
+
 def newpushes(repo, unifiedpushes):
     """Obtain push records for the unified destination repo.
 
@@ -246,10 +247,19 @@ def newpushes(repo, unifiedpushes):
         yield lastpushid, who, when, missing
 
 
-@command(b'unifyrepo', [
-    (b'', b'skipreplicate', False, b'Flag to disable `hg replicatesync` on successful unification'),
-], b'unifyrepo settings',
-    norepo=True)
+@command(
+    b"unifyrepo",
+    [
+        (
+            b"",
+            b"skipreplicate",
+            False,
+            b"Flag to disable `hg replicatesync` on successful unification",
+        ),
+    ],
+    b"unifyrepo settings",
+    norepo=True,
+)
 def unifyrepo(ui, settings, **opts):
     """Unify the contents of multiple source repositories using settings.
 
@@ -258,24 +268,25 @@ def unifyrepo(ui, settings, **opts):
     conf = unifyconfig(settings)
 
     # Ensure destrepo is created with generaldelta enabled.
-    ui.setconfig(b'format', b'usegeneraldelta', True)
-    ui.setconfig(b'format', b'generaldelta', True)
+    ui.setconfig(b"format", b"usegeneraldelta", True)
+    ui.setconfig(b"format", b"generaldelta", True)
 
     # Verify all source repos have the same revision 0
     rev0s = set()
     for source in conf.sources:
-        repo = hg.repository(ui, path=source['path'])
+        repo = hg.repository(ui, path=source["path"])
 
         # Verify
         node = repo[0].node()
         if rev0s and node not in rev0s:
-            raise error.Abort(b'repository has different rev 0: %s\n' % source['name'])
+            raise error.Abort(b"repository has different rev 0: %s\n" % source["name"])
 
         # Verify pushlog exists
-        pushlog = getattr(repo, 'pushlog', None)
+        pushlog = getattr(repo, "pushlog", None)
         if not pushlog:
-            raise error.Abort(b'pushlog API not available',
-                              hint=b'is the pushlog extension loaded?')
+            raise error.Abort(
+                b"pushlog API not available", hint=b"is the pushlog extension loaded?"
+            )
 
         rev0s.add(node)
 
@@ -293,9 +304,9 @@ def unifyrepo(ui, settings, **opts):
     # and filter later because we want to be sure we have the earliest known
     # push data for a given node.
     for source in conf.sources:
-        path = source['path']
-        sourcerepo = hg.repository(ui, path=source['path'])
-        pushlog = getattr(sourcerepo, 'pushlog', None)
+        path = source["path"]
+        sourcerepo = hg.repository(ui, path=source["path"])
+        pushlog = getattr(sourcerepo, "pushlog", None)
 
         index = sourcerepo.changelog.index
         revnode = {}
@@ -321,8 +332,10 @@ def unifyrepo(ui, settings, **opts):
                 # obtain nodes and encounter the pushlog. So ignore pushlog
                 # for nodes we don't know about.
                 if bnode not in noderev:
-                    ui.warn(b'pushlog entry for unknown node: %s; '
-                            b'possible race condition?\n' % node)
+                    ui.warn(
+                        b"pushlog entry for unknown node: %s; "
+                        b"possible race condition?\n" % node
+                    )
                     continue
 
                 rev = noderev[bnode]
@@ -334,25 +347,29 @@ def unifyrepo(ui, settings, **opts):
                     if when < currentwhen:
                         nodepushinfo[bnode] = (when, path, rev, who, pushid)
 
-        ui.write(b'obtained pushlog info for %d/%d revisions from %d pushes from %s\n' % (
-                 pushnodecount, len(revnode), localpushcount, source['name']))
+        ui.write(
+            b"obtained pushlog info for %d/%d revisions from %d pushes from %s\n"
+            % (pushnodecount, len(revnode), localpushcount, source["name"])
+        )
 
     # Now verify that every node in the source repos has pushlog data.
     missingpl = allnodes - set(nodepushinfo.keys())
     if missingpl:
-        raise error.Abort(b'missing pushlog info for %d nodes: %s\n' % (
-            len(missingpl), b', '.join(sorted(hex(n) for n in missingpl))))
+        raise error.Abort(
+            b"missing pushlog info for %d nodes: %s\n"
+            % (len(missingpl), b", ".join(sorted(hex(n) for n in missingpl)))
+        )
 
     # Filter out changesets we aren't aggregating.
     # We also use this pass to identify which nodes to bookmark.
     books = {}
     sourcenodes = set()
     for source in conf.sources:
-        sourcerepo = hg.repository(ui, path=source['path'])
+        sourcerepo = hg.repository(ui, path=source["path"])
         cl = sourcerepo.changelog
         index = cl.index
 
-        sourcerevs = sourcerepo.revs(source['pullrevs'])
+        sourcerevs = sourcerepo.revs(source["pullrevs"])
         sourcerevs.sort()
         headrevs = set(cl.headrevs())
         sourceheadrevs = headrevs & set(sourcerevs)
@@ -360,8 +377,10 @@ def unifyrepo(ui, settings, **opts):
         # We /could/ allow multiple heads from each source repo. But for now
         # it is easier to limit to 1 head per source.
         if len(sourceheadrevs) > 1:
-            raise error.Abort(b'%s has %d heads' % (source['name'], len(sourceheadrevs)),
-                              hint=b'define pullrevs to limit what is aggregated')
+            raise error.Abort(
+                b"%s has %d heads" % (source["name"], len(sourceheadrevs)),
+                hint=b"define pullrevs to limit what is aggregated",
+            )
 
         for rev in cl:
             if rev not in sourcerevs:
@@ -369,16 +388,20 @@ def unifyrepo(ui, settings, **opts):
 
             node = index[rev][7]
             sourcenodes.add(node)
-            if source['bookmark']:
-                books[source['bookmark']] = node
+            if source["bookmark"]:
+                books[source["bookmark"]] = node
 
-        ui.write(b'aggregating %d/%d revisions for %d heads from %s\n' % (
-                 len(sourcerevs), len(cl), len(sourceheadrevs), source['name']))
+        ui.write(
+            b"aggregating %d/%d revisions for %d heads from %s\n"
+            % (len(sourcerevs), len(cl), len(sourceheadrevs), source["name"])
+        )
 
     nodepushinfo = {k: v for k, v in nodepushinfo.items() if k in sourcenodes}
 
-    ui.write(b'aggregating %d/%d nodes from %d original pushes\n' % (
-             len(nodepushinfo), len(allnodes), pushcount))
+    ui.write(
+        b"aggregating %d/%d nodes from %d original pushes\n"
+        % (len(nodepushinfo), len(allnodes), pushcount)
+    )
 
     # We now have accounting for every changeset. Because pulling changesets
     # is a bit time consuming, it is worthwhile to minimize the number of pull
@@ -390,15 +413,18 @@ def unifyrepo(ui, settings, **opts):
     inversenodeinfo = {v: k for k, v in nodepushinfo.items()}
 
     destui = ui.copy()
-    destui.setconfig(b'format', b'aggressivemergedeltas', True)
-    destui.setconfig(b'format', b'maxchainlen', 10000)
+    destui.setconfig(b"format", b"aggressivemergedeltas", True)
+    destui.setconfig(b"format", b"maxchainlen", 10000)
 
-    destrepo = hg.repository(destui, path=conf.destpath,
-                             create=not os.path.exists(conf.destpath))
+    destrepo = hg.repository(
+        destui, path=conf.destpath, create=not os.path.exists(conf.destpath)
+    )
     destcl = destrepo.changelog
     pullpushinfo = {k: v for k, v in inversenodeinfo.items() if not destcl.hasnode(v)}
 
-    ui.write(b'%d/%d nodes will be pulled\n' % (len(pullpushinfo), len(inversenodeinfo)))
+    ui.write(
+        b"%d/%d nodes will be pulled\n" % (len(pullpushinfo), len(inversenodeinfo))
+    )
 
     # Enable aggressive merge deltas on the stage repo to minimize manifest delta
     # size. This could make delta chains very long. So we may want to institute a
@@ -406,25 +432,28 @@ def unifyrepo(ui, settings, **opts):
     # has the most efficient/compact representation of deltas. Pulling from this
     # repo will also inherit the optimal delta, so we don't need to enable
     # aggressivemergedeltas on the destination repo.
-    stageui.setconfig(b'format', b'aggressivemergedeltas', True)
+    stageui.setconfig(b"format", b"aggressivemergedeltas", True)
 
-    stagerepo = hg.repository(stageui, path=conf.stagepath,
-                              create=not os.path.exists(conf.stagepath))
+    stagerepo = hg.repository(
+        stageui, path=conf.stagepath, create=not os.path.exists(conf.stagepath)
+    )
 
     for source in conf.sources:
-        path = source['path']
+        path = source["path"]
         sourcepeer = hg.peer(ui, {}, path)
-        ui.write(b'pulling %s into %s\n' % (path, conf.stagepath))
+        ui.write(b"pulling %s into %s\n" % (path, conf.stagepath))
         exchange.pull(stagerepo, sourcepeer)
 
     pullnodes = list(emitfastforwardnodes(stagerepo, pullpushinfo))
     unifiedpushes = list(unifypushes(inversenodeinfo))
 
-    ui.write(b'consolidated into %d pulls from %d unique pushes\n' % (
-             len(pullnodes), len(unifiedpushes)))
+    ui.write(
+        b"consolidated into %d pulls from %d unique pushes\n"
+        % (len(pullnodes), len(unifiedpushes))
+    )
 
     if not pullnodes:
-        ui.write(b'nothing to do; exiting\n')
+        ui.write(b"nothing to do; exiting\n")
         return
 
     stagepeer = hg.peer(ui, {}, conf.stagepath)
@@ -440,15 +469,16 @@ def unifyrepo(ui, settings, **opts):
 
     # Now that we've aggregated all the changesets in the destination repo,
     # define the pushlog entries.
-    pushlog = getattr(destrepo, 'pushlog', None)
+    pushlog = getattr(destrepo, "pushlog", None)
     if not pushlog:
-        raise error.Abort(b'pushlog API not available',
-                          hint=b'is the pushlog extension loaded?')
+        raise error.Abort(
+            b"pushlog API not available", hint=b"is the pushlog extension loaded?"
+        )
 
     with destrepo.lock():
-        with destrepo.transaction(b'pushlog') as tr:
+        with destrepo.transaction(b"pushlog") as tr:
             insertpushes = list(newpushes(destrepo, unifiedpushes))
-            ui.write(b'inserting %d pushlog entries\n' % len(insertpushes))
+            ui.write(b"inserting %d pushlog entries\n" % len(insertpushes))
             pushlog.recordpushes(insertpushes, tr=tr)
 
     # Verify that pushlog time in revision order is always increasing.
@@ -464,34 +494,38 @@ def unifyrepo(ui, settings, **opts):
         pushtime = destnodepushtime[node]
 
         if pushtime < lastpushtime:
-            ui.warn(b'push time for %d is older than %d\n' % (rev, rev - 1))
+            ui.warn(b"push time for %d is older than %d\n" % (rev, rev - 1))
 
         lastpushtime = pushtime
 
     # Write bookmarks.
-    ui.write(b'writing %d bookmarks\n' % len(books))
+    ui.write(b"writing %d bookmarks\n" % len(books))
 
     with destrepo.wlock():
         with destrepo.lock():
-            with destrepo.transaction(b'bookmarks') as tr:
+            with destrepo.transaction(b"bookmarks") as tr:
                 bm = bookmarks.bmstore(destrepo)
-                books.update({
-                    book: None  # delete any bookmarks not found in the update
-                    for book in bm.keys()
-                    if book not in books
-                })
+                books.update(
+                    {
+                        book: None  # delete any bookmarks not found in the update
+                        for book in bm.keys()
+                        if book not in books
+                    }
+                )
                 # Mass replacing may not be the proper strategy. But it works for
                 # our current use case.
                 bm.applychanges(destrepo, tr, books.items())
 
-    if not opts.get('skipreplicate'):
+    if not opts.get("skipreplicate"):
         # This is a bit hacky. Pushlog and bookmarks aren't currently replicated
         # via the normal hooks mechanism because we use the low-level APIs to
         # write them. So, we send a replication message to sync the entire repo.
         try:
-            vcsr = extensions.find(b'vcsreplicator')
+            vcsr = extensions.find(b"vcsreplicator")
         except KeyError:
-            raise error.Abort(b'vcsreplicator extension not installed; '
-                              b'pushlog and bookmarks may not be replicated properly')
+            raise error.Abort(
+                b"vcsreplicator extension not installed; "
+                b"pushlog and bookmarks may not be replicated properly"
+            )
 
         vcsr.replicatecommand(destrepo.ui, destrepo)

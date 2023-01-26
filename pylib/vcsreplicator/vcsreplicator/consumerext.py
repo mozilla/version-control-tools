@@ -10,8 +10,8 @@ from mercurial import (
     extensions,
 )
 
-testedwith = b'4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5'
-minimumhgversion = b'4.3'
+testedwith = b"4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5"
+minimumhgversion = b"4.3"
 
 
 def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):
@@ -38,5 +38,4 @@ def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(bookmod, b'updatefromremote',
-                            bookmarks_updatefromremote)
+    extensions.wrapfunction(bookmod, b"updatefromremote", bookmarks_updatefromremote)

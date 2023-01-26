@@ -10,7 +10,7 @@ import os
 import shutil
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: hgweb_reclone
 short_description: Re-clone repositories on an hgweb mirror
@@ -19,20 +19,20 @@ options:
     description:
       - Relative path of repository to re-clone
     required: true
-'''
+"""
 
 
 def main():
-    module = AnsibleModule(argument_spec={'repo': {'required': True}})
+    module = AnsibleModule(argument_spec={"repo": {"required": True}})
 
-    repo = module.params['repo']
+    repo = module.params["repo"]
 
-    repo_path = os.path.join('/repo/hg/mozilla', repo)
+    repo_path = os.path.join("/repo/hg/mozilla", repo)
 
     if os.path.exists(repo_path):
         shutil.rmtree(repo_path)
 
-    mp = ['/usr/bin/sudo', '-u', 'hg', '/usr/local/bin/mirror-pull']
+    mp = ["/usr/bin/sudo", "-u", "hg", "/usr/local/bin/mirror-pull"]
 
     # Create the empty repo.
     #
@@ -42,20 +42,22 @@ def main():
     # simultaneously. This lock adds little value, as Mercurial itself performs
     # repo-level locking where appropriate. But the lock exists, so work around
     # it.
-    module.run_command(['/usr/bin/sudo', '-u', 'hg', 'hg', 'init', repo_path],
-                       check_rc=True)
+    module.run_command(
+        ["/usr/bin/sudo", "-u", "hg", "hg", "init", repo_path], check_rc=True
+    )
 
     # Pull repo.
     module.run_command(mp + [repo], check_rc=True)
 
     # Restore hgrc
-    module.run_command(mp + ['--hgrc', repo], check_rc=True)
+    module.run_command(mp + ["--hgrc", repo], check_rc=True)
 
     # Pull again in case upstream changed
     module.run_command(mp + [repo], check_rc=True)
 
-    module.exit_json(changed=True, msg='Re-cloned %s' % repo)
+    module.exit_json(changed=True, msg="Re-cloned %s" % repo)
 
 
 from ansible.module_utils.basic import *
+
 main()

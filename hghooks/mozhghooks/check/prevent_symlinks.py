@@ -32,10 +32,10 @@ class PreventSymlinksCheck(PreTxnChangegroupCheck):
 
     @property
     def name(self):
-        return b'prevent_symlinks'
+        return b"prevent_symlinks"
 
     def relevant(self):
-        return not self.repo_metadata[b'user_repo']
+        return not self.repo_metadata[b"user_repo"]
 
     def pre(self, node):
         pass
@@ -48,16 +48,21 @@ class PreventSymlinksCheck(PreTxnChangegroupCheck):
             if f not in manifest:
                 continue
 
-            if manifest.flags(f) == b'l':
+            if manifest.flags(f) == b"l":
                 links.append(f)
 
         if not links:
             return True
 
-        print_banner(self.ui, b'error', SYMLINK_FOUND % {
-            b'node': ctx.hex()[0:12],
-            b'symlinks': b'\n  '.join(links),
-        })
+        print_banner(
+            self.ui,
+            b"error",
+            SYMLINK_FOUND
+            % {
+                b"node": ctx.hex()[0:12],
+                b"symlinks": b"\n  ".join(links),
+            },
+        )
         return False
 
     def post_check(self):

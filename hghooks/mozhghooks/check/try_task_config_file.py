@@ -24,21 +24,22 @@ class TryConfigCheck(PreTxnChangegroupCheck):
     in the repository. We don't want to allow this file to exist in the main
     Firefox repositories.
     """
+
     @property
     def name(self):
-        return b'try_task_config'
+        return b"try_task_config"
 
     def relevant(self):
-        return self.repo_metadata[b'firefox_releasing']
+        return self.repo_metadata[b"firefox_releasing"]
 
     def pre(self, node):
         pass
 
     def check(self, ctx):
-        if b'try_task_config.json' not in ctx.files():
+        if b"try_task_config.json" not in ctx.files():
             return True
 
-        print_banner(self.ui, b'error', TRY_CONFIG_FOUND)
+        print_banner(self.ui, b"error", TRY_CONFIG_FOUND)
         return False
 
     def post_check(self):
