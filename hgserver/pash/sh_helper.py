@@ -9,18 +9,15 @@ import subprocess
 import sys
 
 
-def run_command(command_string, input=None, verbose=False):
+def run_command(command_string, input=None):
     subcommand = None
     output_lines = []
     fixed_command_string = command_string.lstrip().rstrip()
     line_cnt = 0
-    if verbose:
-        # Don't do any redirection of stdout/stderr
-        out_fd = None
-        print("EXEC [%s]" % fixed_command_string)
-    else:
-        # all output goes to /dev/null
-        out_fd = open("/dev/null", "w")
+
+    # all output goes to /dev/null
+    out_fd = open("/dev/null", "w")
+
     command_end = fixed_command_string.find("|")
     if command_end > 0:
         subcommand = subprocess.Popen(
@@ -42,14 +39,9 @@ def run_command(command_string, input=None, verbose=False):
     while True:
         l = subcommand.stdout.readline()
         if not l:
-            if verbose:
-                print("Breaking after reading %i lines from subprocess" % line_cnt)
             break
-        if verbose:
-            print(l)
-            output_lines.append(l.rstrip())
-    if not verbose:
-        out_fd.close()
+
+    out_fd.close()
     return output_lines
 
 
