@@ -130,7 +130,6 @@ def process_login(user):
         enable_repo_config=pash_settings.get("repo_config", False),
         enable_repo_group=pash_settings.get("repo_group", False),
         enable_user_repos=pash_settings.get("user_repos", False),
-        enable_mozreview_ldap_associate=pash_settings.get("mr_ldap_associate", False),
     )
     sys.exit(0)
 
