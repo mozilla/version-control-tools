@@ -282,14 +282,18 @@ class Docker(object):
                 try:
                     container.remove(force=True, v=True)
                 except docker.errors.APIError as err:
-                    print("Failed to cleanup containers and networks.", file=sys.stderr)
+                    print(f"Failed to cleanup container: {str(container)}", file=sys.stderr)
                     print(err, file=sys.stderr)
+            print("Finished cleaning containers.")
+
             for network in orphan_networks:
                 try:
                     network.remove()
                 except docker.errors.APIError as err:
-                    print("Failed to cleanup containers and networks.", file=sys.stderr)
+                    print(f"Failed to cleanup network: {str(network)}.", file=sys.stderr)
                     print(err, file=sys.stderr)
+            print("Finished cleaning networks.")
+
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False, detach=False):
         """Execute a command on a container.
