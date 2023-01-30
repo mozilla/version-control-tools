@@ -9,13 +9,13 @@ import subprocess
 import sys
 
 
-def run_command(command_string, input=None):
+def run_command(command_string):
     fixed_command_string = command_string.lstrip().rstrip()
 
     # Sent output to `/dev/null`.
     subcommand = subprocess.Popen(
         shlex.split(fixed_command_string),
-        stdin=input,
+        stdin=None,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
     )
