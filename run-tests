@@ -249,10 +249,10 @@ if __name__ == "__main__":
 
     # Enable tests to interact with our Docker controlling script.
     have_docker = False
+    docker_state = os.path.join(HERE, ".dockerstate")
+    docker_url, docker_tls = vctdocker.params_from_env(os.environ)
+    docker = vctdocker.Docker(docker_url, tls=docker_tls)
     if not options.no_docker:
-        docker_state = os.path.join(HERE, ".dockerstate")
-        docker_url, docker_tls = vctdocker.params_from_env(os.environ)
-        docker = vctdocker.Docker(docker_url, tls=docker_tls)
         hgcluster = vcthgmo.HgCluster(docker)
 
         if docker.is_alive():
