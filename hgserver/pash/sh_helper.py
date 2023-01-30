@@ -11,7 +11,6 @@ import sys
 
 def run_command(command_string, input=None):
     subcommand = None
-    output_lines = []
     fixed_command_string = command_string.lstrip().rstrip()
 
     # all output goes to /dev/null
@@ -41,7 +40,6 @@ def run_command(command_string, input=None):
             break
 
     out_fd.close()
-    return output_lines
 
 
 def prompt_user(prompt_string, options, period=True):
