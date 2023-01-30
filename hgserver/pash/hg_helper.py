@@ -248,15 +248,16 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
         sys.exit(1)
 
     if not os.path.exists(userdir):
-        run_command("mkdir %s" % userdir)
-    print("Please wait.  Cloning /%s to %s" % (source_repo_path, dest_url))
+        run_command(f"mkdir {userdir}")
+    print(f"Please wait.  Cloning /{source_repo_path} to {dest_url}")
+
     run_command(
-        "nohup %s --config format.usegeneraldelta=true init %s" % (HG, dest_dir)
+        f"nohup {HG} --config format.usegeneraldelta=true init {dest_dir}"
     )
     run_command(
-        "nohup %s -R %s pull %s/%s" % (HG, dest_dir, DOC_ROOT, source_repo_path)
+        f"nohup {HG} -R {dest_dir} pull {DOC_ROOT}/{source_repo_path}"
     )
-    run_command("nohup %s -R %s replicatesync" % (HG, dest_dir))
+    run_command(f"nohup {HG} -R {dest_dir} replicatesync")
     # TODO ensure user WSGI files are in place on hgweb machine.
     # (even better don't rely on per-use WSGI files)
     print("Clone complete.")
@@ -302,8 +303,8 @@ def fix_user_repo_perms(repo_name):
     print("Fixing permissions, don't interrupt.")
     try:
         run_command(
-            "/var/hg/version-control-tools/scripts/repo-permissions %s/users/%s/%s %s scm_level_1 wwr"
-            % (DOC_ROOT, user_repo_dir, repo_name, user)
+            f"/var/hg/version-control-tools/scripts/repo-permissions "
+            f"{DOC_ROOT}/users/{user_repo_dir}/{repo_name} {user} scm_level_1 wwr"
         )
     except Exception as e:
         print("Exception %s" % (e))
@@ -372,14 +373,14 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
         if response == "yes":
             if not os.path.exists("%s/users/%s" % (DOC_ROOT, user_repo_dir)):
                 try:
-                    exec_command = "/bin/mkdir %s/users/%s" % (DOC_ROOT, user_repo_dir)
+                    exec_command = f"/bin/mkdir {DOC_ROOT}/users/{user_repo_dir}"
                     run_command(exec_command)
                 except Exception as e:
                     print("Exception %s" % (e))
 
             run_command(
-                "/usr/bin/nohup %s --config format.usegeneraldelta=true init %s/users/%s/%s"
-                % (HG, DOC_ROOT, user_repo_dir, repo_name)
+                f"/usr/bin/nohup {HG} --config format.usegeneraldelta=true "
+                f"init {DOC_ROOT}/users/{user_repo_dir}/{repo_name}"
             )
     fix_user_repo_perms(repo_name)
     # New user repositories are non-publishing by default.
@@ -406,10 +407,10 @@ def get_user_repo_config(repo_dir):
     If the hgrc file doesn't exist, it will be created automatically.
     """
     user = os.getenv("USER")
-    path = "%s/.hg/hgrc" % repo_dir
+    path = f"{repo_dir}/.hg/hgrc" % repo_dir
     if not os.path.isfile(path):
-        run_command("touch %s" % path)
-        run_command("chown %s:scm_level_1 %s" % (user, path))
+        run_command(f"touch {path}")
+        run_command(f"chown {user}:scm_level_1 {path}")
 
     config = RawConfigParser()
     if not config.read(path):
@@ -454,7 +455,7 @@ def edit_repo_description(repo_name):
     with open(config_path, "w+") as fh:
         config.write(fh)
 
-    run_command("%s -R %s replicatehgrc" % (HG, repo_path))
+    run_command(f"{HG} -R {repo_path} replicatehgrc")
 
 
 def set_repo_publishing(repo_name, publish):
@@ -479,7 +480,7 @@ def set_repo_publishing(repo_name, publish):
     with open(config_path, "w") as fh:
         config.write(fh)
 
-    run_command("%s -R %s replicatehgrc" % (HG, repo_path))
+    run_command(f"{HG} -R {repo_path} replicatehgrc")
 
     if publish:
         sys.stderr.write(
@@ -509,7 +510,7 @@ def set_repo_obsolescence(repo_name, enabled):
     with open(config_path, "w") as fh:
         config.write(fh)
 
-    run_command("%s -R %s replicatehgrc" % (HG, repo_path))
+    run_command(f"{HG} -R {repo_path} replicatehgrc")
 
     if enabled:
         print(OBSOLESCENCE_ENABLED)
@@ -518,8 +519,8 @@ def set_repo_obsolescence(repo_name, enabled):
 
 
 def do_delete(repo_dir, repo_name):
-    repo_path = "%s/users/%s/%s" % (DOC_ROOT, repo_dir, repo_name)
-    run_command("nohup %s -R %s replicatedelete" % (HG, repo_path))
+    repo_path = f"{DOC_ROOT}/users/{repo_dir}/{repo_name}"
+    run_command(f"nohup {HG} -R {repo_path} replicatedelete")
     purge_log = open("/tmp/pushlog_purge.%s" % os.getpid(), "a")
     purge_log.write("echo users/%s/%s\n" % (repo_dir, repo_name))
     purge_log.close()
