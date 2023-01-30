@@ -12,13 +12,11 @@ import sys
 def run_command(command_string, input=None):
     fixed_command_string = command_string.lstrip().rstrip()
 
-    # all output goes to /dev/null
-    out_fd = open("/dev/null", "w")
-
+    # Sent output to `/dev/null`.
     subcommand = subprocess.Popen(
         shlex.split(fixed_command_string),
         stdin=input,
-        stderr=out_fd,
+        stderr=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
     )
 
