@@ -278,22 +278,38 @@ class Docker(object):
                 return
 
             # Remove leftover containers
+            success, failure = 0, 0
             for container in orphan_containers:
                 try:
                     container.remove(force=True, v=True)
+                    success += 1
                 except docker.errors.APIError as err:
-                    print(f"Failed to cleanup container: {str(container)}", file=sys.stderr)
+                    print(
+                        f"Failed to cleanup container: {str(container)}",
+                        file=sys.stderr,
+                    )
                     print(err, file=sys.stderr)
-            print("Finished cleaning containers.")
+                    failure += 1
+            print(
+                f"Finished cleaning {success} containers"
+                f"{f' ({failure} failed)' if failure else ''}."
+            )
 
+            success, failure = 0, 0
             for network in orphan_networks:
                 try:
                     network.remove()
+                    success += 1
                 except docker.errors.APIError as err:
-                    print(f"Failed to cleanup network: {str(network)}.", file=sys.stderr)
+                    print(
+                        f"Failed to cleanup network: {str(network)}.", file=sys.stderr
+                    )
                     print(err, file=sys.stderr)
-            print("Finished cleaning networks.")
-
+                    failure += 1
+            print(
+                f"Finished cleaning {success} networks"
+                f"{f' ({failure} failed)' if failure else ''}."
+            )
 
     def execute(self, cid, cmd, stdout=False, stderr=False, stream=False, detach=False):
         """Execute a command on a container.
