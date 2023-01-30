@@ -33,7 +33,7 @@ def prompt_user(prompt_string, options, period=True):
     print("0) Exit.")
 
     for index, option in enumerate(options, start=1):
-        s = "%s) %s" % (index, option)
+        s = f"{index}) {option}"
         if period:
             s += "."
         print(s)
