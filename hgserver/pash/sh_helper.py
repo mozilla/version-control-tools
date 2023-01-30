@@ -13,7 +13,6 @@ def run_command(command_string, input=None):
     subcommand = None
     output_lines = []
     fixed_command_string = command_string.lstrip().rstrip()
-    line_cnt = 0
 
     # all output goes to /dev/null
     out_fd = open("/dev/null", "w")
