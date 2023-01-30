@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 import hg_helper
 from hgmolib import ldap_helper
@@ -42,18 +43,20 @@ AUTOLAND_USER = "bind-autoland@mozilla.com"
 LANDING_WORKER_USER = "lando_landing_worker@mozilla.com"
 LANDING_WORKER_USER_DEV = "lando_landing_worker_dev@mozilla.com"
 
+PASH_JSON = Path("/etc/mercurial/pash.json")
 
-def source_environment(path):
+
+def source_environment(path: Path):
     """Source a file with environment variables.
 
     Parsed environment variables are added to ``os.environ`` as a side-effect.
     """
-    if not os.path.isfile(path):
+    if not path.is_file():
         return
 
     # Open in text mode because environment variables are not bytes in Python
     # 3.
-    with open(path, "r") as fh:
+    with path.open("r") as fh:
         for line in fh:
             line = line.strip()
 
@@ -103,7 +106,7 @@ def process_login(user):
         sys.stderr.write(NO_HG_ACCESS % user)
         sys.exit(0)
 
-    with open("/etc/mercurial/pash.json", "rb") as fh:
+    with PASH_JSON.open("rb") as fh:
         pash_settings = json.load(fh)
 
     touch_hg_access_date(user)
@@ -143,6 +146,6 @@ if __name__ == "__main__":
     # variables by using PAM. But this feels  complicated and requires mucking
     # about with system auth settings. It is relatively easy to source the file
     # from Python. So we do that.
-    source_environment("/etc/environment")
+    source_environment(Path("/etc/environment"))
 
     process_login(os.environ.get("USER"))

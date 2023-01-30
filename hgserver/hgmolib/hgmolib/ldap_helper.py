@@ -8,12 +8,15 @@ import json
 import sys
 import datetime
 
+from pathlib import Path
+
 import ldap
 
+LDAP_JSON = Path("/etc/mercurial/ldap.json")
 
 def get_ldap_settings():
     """Read LDAP settings from a file."""
-    with open("/etc/mercurial/ldap.json", "rb") as fh:
+    with LDAP_JSON.open("rb") as fh:
         return json.load(fh)
 
 

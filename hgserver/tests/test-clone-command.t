@@ -118,8 +118,7 @@ Cloning a public repo will show a list of existing repos
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the repo_list
-  List of available public repos
+  Source repository: List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -154,8 +153,7 @@ Selecting a repo will result in a prompt
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the repo_list
-  List of available public repos
+  Source repository: We have the List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -198,8 +196,7 @@ Saying "no" is handled properly
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the repo_list
-  List of available public repos
+  Source repository: We have the List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -242,8 +239,7 @@ Saying "yes" to clone the repo will clone it.
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the repo_list
-  List of available public repos
+  Source repository: We have the List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -365,7 +361,7 @@ We can create a new empty repo
 
   $ standarduserssh $SSH_SERVER clone empty-1 << EOF
   > 1
-  > 3
+  > 2
   > 1
   > EOF
   Making repo empty-1 for user@example.com.

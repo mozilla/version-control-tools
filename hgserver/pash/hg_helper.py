@@ -6,10 +6,15 @@ import os
 import sys
 import re
 import shlex
+import shutil
 import subprocess
 
 from configparser import RawConfigParser
 from html import escape
+from pathlib import Path
+from typing import (
+    Tuple,
+)
 
 from hgmolib.ldap_helper import (
     get_ldap_attribute,
@@ -26,7 +31,6 @@ from sh_helper import (
 Popen = subprocess.Popen
 PIPE = subprocess.PIPE
 
-HG = "/var/hg/venv_pash/bin/hg"
 
 SUCCESSFUL_AUTH = """
 A SSH connection has been successfully established.
@@ -89,13 +93,6 @@ bug at
 https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%%20Services&component=Mercurial%%3A%%20hg.mozilla.org
 """.strip()
 
-HGWEB_ERROR = """
-Problem opening hgweb.wsgi file.
-
-Please file a Developer Services :: hg.mozilla.org bug at
-https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
-""".strip()
-
 MAKING_REPO = """
 Making repo {repo} for {user}.
 
@@ -114,7 +111,6 @@ and file a Developer Services :: hg.mozilla.org bug at
 https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20hg.mozilla.org
 """.strip()
 
-DOC_ROOT = "/repo/hg/mozilla"
 
 OBSOLESCENCE_ENABLED = """
 Obsolescence is now enabled for this repository.
@@ -124,6 +120,22 @@ time. Your obsolescence data may be lost at any time. You have been warned.
 
 Enjoy living on the edge.
 """.strip()
+
+DOC_ROOT = Path("/repo/hg/mozilla")
+USER_REPO_ROOT = DOC_ROOT / "users"
+HG = Path("/var/hg/venv_pash/bin/hg")
+REPO_PERMISSIONS = Path("/var/hg/version-control-tools/scripts/repo-permissions")
+
+
+# TRACKING py39 - Backport of `Path.is_relative_to`.
+def is_relative_to(path: Path, relative: Path) -> bool:
+    """Return `True` if `path` is relative to `relative`."""
+    try:
+        path.relative_to(relative)
+    except ValueError:
+        return False
+
+    return True
 
 
 def is_valid_user(mail):
@@ -234,29 +246,27 @@ def assert_valid_repo_name(repo_name):
 
 
 def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
-    userdir = "%s/users/%s" % (DOC_ROOT, user_repo_dir)
-    dest_dir = "%s/%s" % (userdir, repo_name)
-    dest_url = "/users/%s/%s" % (user_repo_dir, repo_name)
+    userdir = USER_REPO_ROOT / user_repo_dir
+    dest_dir = userdir / repo_name
 
-    if os.path.exists(dest_dir):
+    if dest_dir.exists():
         print(USER_REPO_EXISTS % repo_name)
         sys.exit(1)
 
     assert_valid_repo_name(source_repo_path)
-    if not os.path.exists("%s/%s" % (DOC_ROOT, source_repo_path)):
+    source_repo = DOC_ROOT / source_repo_path
+    if not source_repo.exists():
         print(NO_SOURCE_REPO % source_repo_path)
         sys.exit(1)
 
-    if not os.path.exists(userdir):
-        run_command(f"mkdir {userdir}")
-    print(f"Please wait.  Cloning /{source_repo_path} to {dest_url}")
+    if not userdir.exists():
+        userdir.mkdir()
 
-    run_command(
-        f"nohup {HG} --config format.usegeneraldelta=true init {dest_dir}"
-    )
-    run_command(
-        f"nohup {HG} -R {dest_dir} pull {DOC_ROOT}/{source_repo_path}"
-    )
+    dest_hgmo_path = str(dest_dir.relative_to(DOC_ROOT))
+    print(f"Please wait.  Cloning /{source_repo_path} to /{dest_hgmo_path}")
+
+    run_command(f"nohup {HG} --config format.usegeneraldelta=true init {dest_dir}")
+    run_command(f"nohup {HG} -R {dest_dir} pull {source_repo}")
     run_command(f"nohup {HG} -R {dest_dir} replicatesync")
     # TODO ensure user WSGI files are in place on hgweb machine.
     # (even better don't rely on per-use WSGI files)
@@ -264,53 +274,46 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
 
 
 def make_wsgi_dir(cname, user_repo_dir):
-    wsgi_dir = "/repo/hg/webroot_wsgi/users/%s" % user_repo_dir
+    wsgi_dir = Path("/repo/hg/webroot_wsgi/users") / user_repo_dir
     # Create user's webroot_wsgi folder if it doesn't already exist
-    if not os.path.isdir(wsgi_dir):
-        os.mkdir(wsgi_dir)
+    if not wsgi_dir.is_dir():
+        wsgi_dir.mkdir()
 
     print("Creating hgweb.config file")
     # Create hgweb.config file if it doesn't already exist
-    if not os.path.isfile("%s/hgweb.config" % wsgi_dir):
-        hgconfig = open("%s/hgweb.config" % wsgi_dir, "w")
-        hgconfig.write("[web]\n")
-        hgconfig.write("baseurl = http://%s/users/%s\n" % (cname, user_repo_dir))
-        hgconfig.write("[paths]\n")
-        hgconfig.write("/ = %s/users/%s/*\n" % (DOC_ROOT, user_repo_dir))
-        hgconfig.close()
+    hgconfig = wsgi_dir / "hgweb.config"
+    if not hgconfig.is_file():
+        with hgconfig.open("w") as f:
+            f.write("[web]\n")
+            f.write("baseurl = http://%s/users/%s\n" % (cname, user_repo_dir))
+            f.write("[paths]\n")
+            f.write("/ = %s/users/%s/*\n" % (DOC_ROOT, user_repo_dir))
 
     # Create hgweb.wsgi file if it doesn't already exist
-    if not os.path.isfile("%s/hgweb.wsgi" % wsgi_dir):
-        try:
-            hgwsgi = open("%s/hgweb.wsgi" % wsgi_dir, "w")
-        except Exception:
-            print(HGWEB_ERROR)
-            sys.exit(1)
-
-        hgwsgi.write("#!/usr/bin/env python\n")
-        hgwsgi.write("config = '%s/hgweb.config'\n" % wsgi_dir)
-        hgwsgi.write("from mercurial import demandimport; demandimport.enable()\n")
-        hgwsgi.write("from mercurial.hgweb import hgweb\n")
-        hgwsgi.write("import os\n")
-        hgwsgi.write("os.environ['HGENCODING'] = 'UTF-8'\n")
-        hgwsgi.write("application = hgweb(config)\n")
-        hgwsgi.close()
+    hgwsgi = wsgi_dir / "hgweb.wsgi"
+    if not hgwsgi.is_file():
+        with hgwsgi.open("w") as f:
+            hgwsgi.write("#!/usr/bin/env python\n")
+            hgwsgi.write("config = '%s/hgweb.config'\n" % wsgi_dir)
+            hgwsgi.write("from mercurial import demandimport; demandimport.enable()\n")
+            hgwsgi.write("from mercurial.hgweb import hgweb\n")
+            hgwsgi.write("import os\n")
+            hgwsgi.write("os.environ['HGENCODING'] = 'UTF-8'\n")
+            hgwsgi.write("application = hgweb(config)\n")
 
 
 def fix_user_repo_perms(repo_name):
     user = os.getenv("USER")
     user_repo_dir = user.replace("@", "_")
     print("Fixing permissions, don't interrupt.")
+    repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
     try:
-        run_command(
-            f"/var/hg/version-control-tools/scripts/repo-permissions "
-            f"{DOC_ROOT}/users/{user_repo_dir}/{repo_name} {user} scm_level_1 wwr"
-        )
+        run_command(f"{REPO_PERMISSIONS} {repo_path} {user} scm_level_1 wwr")
     except Exception as e:
         print("Exception %s" % (e))
 
 
-def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
+def make_repo_clone(cname, repo_name, quick_src):
     user = os.getenv("USER")
     user_repo_dir = user.replace("@", "_")
     source_repo = ""
@@ -336,20 +339,14 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
         ["Clone a public repository", "Create an empty repository"],
     )
     if selection == "Clone a public repository":
-        exec_command = (
-            "/usr/bin/find " + DOC_ROOT + " -maxdepth 3 -mindepth 2 -type d -name .hg"
+        print("List of available public repos")
+        repo_list = sorted(
+            repo_path.parent.relative_to(DOC_ROOT)
+            for repo_path in DOC_ROOT.glob("**/.hg")
+            if not is_relative_to(repo_path, USER_REPO_ROOT)
         )
-        args = shlex.split(exec_command)
-        with open(os.devnull, "wb") as devnull:
-            p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=devnull)
-            repo_list = p.communicate()[0].decode("utf-8").split("\n")
-        if repo_list:
-            print("We have the repo_list")
-            repo_list = map(lambda x: x.replace(DOC_ROOT + "/", ""), repo_list)
-            repo_list = map(lambda x: x.replace("/.hg", ""), repo_list)
-            repo_list = [x.strip() for x in sorted(repo_list) if x.strip()]
-            print("List of available public repos")
-            source_repo = prompt_user("Pick a source repo:", repo_list, period=False)
+        source_repo = prompt_user("Pick a source repo:", repo_list, period=False)
+
     elif selection == "Create an empty repository":
         source_repo = ""
     else:
@@ -363,7 +360,7 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
         response = prompt_user("Proceed?", ["yes", "no"])
         if response == "yes":
             print("Please do not interrupt this operation.")
-            run_hg_clone(user_repo_dir, repo_name, source_repo)
+            run_hg_clone(user_repo_dir, repo_name, str(source_repo))
     else:
         print(
             "About to create an empty repository at /users/%s/%s"
@@ -371,16 +368,17 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
         )
         response = prompt_user("Proceed?", ["yes", "no"])
         if response == "yes":
-            if not os.path.exists("%s/users/%s" % (DOC_ROOT, user_repo_dir)):
+            user_repo_dir_path = DOC_ROOT / "users" / user_repo_dir
+            if not user_repo_dir_path.exists():
                 try:
-                    exec_command = f"/bin/mkdir {DOC_ROOT}/users/{user_repo_dir}"
-                    run_command(exec_command)
+                    user_repo_dir_path.mkdir()
                 except Exception as e:
                     print("Exception %s" % (e))
 
+            repo_name_path = DOC_ROOT / "users" / user_repo_dir / repo_name
             run_command(
                 f"/usr/bin/nohup {HG} --config format.usegeneraldelta=true "
-                f"init {DOC_ROOT}/users/{user_repo_dir}/{repo_name}"
+                f"init {repo_name_path}"
             )
     fix_user_repo_perms(repo_name)
     # New user repositories are non-publishing by default.
@@ -388,29 +386,30 @@ def make_repo_clone(cname, repo_name, quick_src, source_repo=""):
     sys.exit(0)
 
 
-def get_and_validate_user_repo(repo_name):
+def get_and_validate_user_repo(repo_name) -> Path:
     user = os.getenv("USER")
     user_repo_dir = user.replace("@", "_")
     rel_path = "/users/%s/%s" % (user_repo_dir, repo_name)
-    fs_path = "%s%s" % (DOC_ROOT, rel_path)
 
-    if not os.path.exists(fs_path):
-        sys.stderr.write("Could not find repository at %s.\n" % rel_path)
+    fs_path = DOC_ROOT / "users" / user_repo_dir / repo_name
+
+    if not fs_path.exists():
+        sys.stderr.write(f"Could not find repository at {rel_path}.\n")
         sys.exit(1)
 
     return fs_path
 
 
-def get_user_repo_config(repo_dir):
+def get_user_repo_config(repo_dir: Path) -> Tuple[Path, RawConfigParser]:
     """Obtain a ConfigParser for a repository.
 
     If the hgrc file doesn't exist, it will be created automatically.
     """
     user = os.getenv("USER")
-    path = f"{repo_dir}/.hg/hgrc" % repo_dir
-    if not os.path.isfile(path):
-        run_command(f"touch {path}")
-        run_command(f"chown {user}:scm_level_1 {path}")
+    path = repo_dir / ".hg" / "hgrc"
+    if not path.is_file():
+        path.touch()
+        shutil.chown(path, user=user, group="scm_level_1")
 
     config = RawConfigParser()
     if not config.read(path):
@@ -421,7 +420,7 @@ def get_user_repo_config(repo_dir):
     return path, config
 
 
-def edit_repo_description(repo_name):
+def edit_repo_description(repo_name: str):
     user = os.getenv("USER")
     user_repo_dir = user.replace("@", "_")
     print(EDIT_DESCRIPTION.format(user_dir=user_repo_dir, repo=repo_name))
@@ -452,7 +451,7 @@ def edit_repo_description(repo_name):
 
     config.set("web", "description", repo_description)
 
-    with open(config_path, "w+") as fh:
+    with config_path.open("w+") as fh:
         config.write(fh)
 
     run_command(f"{HG} -R {repo_path} replicatehgrc")
@@ -477,7 +476,7 @@ def set_repo_publishing(repo_name, publish):
 
     config.set("phases", "publish", value)
 
-    with open(config_path, "w") as fh:
+    with config_path.open("w") as fh:
         config.write(fh)
 
     run_command(f"{HG} -R {repo_path} replicatehgrc")
@@ -507,7 +506,7 @@ def set_repo_obsolescence(repo_name, enabled):
     else:
         config.remove_option("experimental", "evolution")
 
-    with open(config_path, "w") as fh:
+    with config_path.open("w") as fh:
         config.write(fh)
 
     run_command(f"{HG} -R {repo_path} replicatehgrc")
@@ -529,7 +528,8 @@ def do_delete(repo_dir, repo_name):
 def delete_repo(cname, repo_name, do_quick_delete):
     user = os.getenv("USER")
     user_repo_dir = user.replace("@", "_")
-    if os.path.exists("%s/users/%s/%s" % (DOC_ROOT, user_repo_dir, repo_name)):
+    delete_repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
+    if delete_repo_path.exists():
         if do_quick_delete:
             do_delete(user_repo_dir, repo_name)
         else:
@@ -583,6 +583,21 @@ def edit_repo(cname, repo_name, do_quick_delete):
     return
 
 
+def clone_command(cname, args):
+    """Run the `clone` command."""
+    if len(args) == 1:
+        sys.stderr.write("clone usage: ssh hg.mozilla.org clone newrepo [srcrepo]\n")
+        sys.exit(1)
+
+    assert_valid_repo_name(args[1])
+
+    if len(args) == 2:
+        make_repo_clone(cname, args[1], None)
+    elif len(args) == 3:
+        make_repo_clone(cname, args[1], args[2])
+    sys.exit(0)
+
+
 def serve(
     cname, enable_repo_config=False, enable_repo_group=False, enable_user_repos=False
 ):
@@ -616,9 +631,11 @@ def serve(
         # This will ensure the repo path is essentially alphanumeric. So we
         # don't have to worry about ``..``, Unicode, spaces, etc.
         assert_valid_repo_name(repo_path)
-        full_repo_path = "%s/%s" % (DOC_ROOT, repo_path)
 
-        if not os.path.isdir("%s/.hg" % full_repo_path):
+        full_repo_path = DOC_ROOT / repo_path
+        full_repo_path_hg = full_repo_path / ".hg"
+
+        if not full_repo_path_hg.is_dir():
             sys.stderr.write("requested repo %s does not exist\n" % repo_path)
             sys.exit(1)
 
@@ -628,18 +645,7 @@ def serve(
         if not enable_user_repos:
             print("user repository management is not enabled")
             sys.exit(1)
-
-        if len(args) == 1:
-            sys.stderr.write(
-                "clone usage: ssh hg.mozilla.org clone newrepo " "[srcrepo]\n"
-            )
-            sys.exit(1)
-        assert_valid_repo_name(args[1])
-        if len(args) == 2:
-            make_repo_clone(cname, args[1], None)
-        elif len(args) == 3:
-            make_repo_clone(cname, args[1], args[2])
-        sys.exit(0)
+        clone_command(cname, args)
     elif args[0] == "edit":
         if not enable_user_repos:
             print("user repository management is not enabled")
@@ -672,9 +678,9 @@ def serve(
 
         repo = args[1]
         assert_valid_repo_name(repo)
-        hgrc = "/repo/hg/mozilla/%s/.hg/hgrc" % repo
-        if os.path.exists(hgrc):
-            with open(hgrc, "r", encoding="utf-8") as fh:
+        hgrc = DOC_ROOT / repo / ".hg" / "hgrc"
+        if hgrc.exists():
+            with hgrc.open("r", encoding="utf-8") as fh:
                 sys.stdout.write(fh.read())
     else:
         sys.stderr.write(SUCCESSFUL_AUTH % os.environ["USER"])
