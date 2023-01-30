@@ -29,11 +29,10 @@ def run_command(command_string):
 
 
 def prompt_user(prompt_string, options, period=True):
-    index = 0
     print("")
     print("0) Exit.")
-    for option in options:
-        index += 1
+
+    for index, option in enumerate(options, start=1):
         s = "%s) %s" % (index, option)
         if period:
             s += "."
@@ -44,7 +43,7 @@ def prompt_user(prompt_string, options, period=True):
         selection = int(selection)
         if selection == 0:
             sys.exit(0)
-        if selection > 0 and selection <= index:
+        if selection > 0 and selection <= len(options):
             return options[selection - 1]
         else:
             sys.stderr.write("Please select one of the presented options\n")
