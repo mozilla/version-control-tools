@@ -250,9 +250,7 @@ class Docker(object):
 
     @contextmanager
     def auto_clean_orphans(self, runtests_label):
-        """Ensure all Docker containers with the special `runtests_label`
-        are cleaned up after test execution.
-        """
+        """Ensure all containers with the special `runtests_label` are cleaned."""
         if not runtests_label or not self.is_alive():
             yield
             return
