@@ -10,30 +10,18 @@ import sys
 
 
 def run_command(command_string, input=None):
-    subcommand = None
     fixed_command_string = command_string.lstrip().rstrip()
 
     # all output goes to /dev/null
     out_fd = open("/dev/null", "w")
 
-    command_end = fixed_command_string.find("|")
-    if command_end > 0:
-        subcommand = subprocess.Popen(
-            shlex.split(fixed_command_string[:command_end]),
-            stdin=input,
-            stderr=out_fd,
-            stdout=subprocess.PIPE,
-        )
-        return run_command(
-            fixed_command_string[command_end + 1 :], input=subcommand.stdout
-        )
-    else:
-        subcommand = subprocess.Popen(
-            shlex.split(fixed_command_string),
-            stdin=input,
-            stderr=out_fd,
-            stdout=subprocess.PIPE,
-        )
+    subcommand = subprocess.Popen(
+        shlex.split(fixed_command_string),
+        stdin=input,
+        stderr=out_fd,
+        stdout=subprocess.PIPE,
+    )
+
     while True:
         l = subcommand.stdout.readline()
         if not l:
