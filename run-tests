@@ -301,25 +301,25 @@ if __name__ == "__main__":
         # non-Docker tests. We perform multiple invocations. First without
         # Docker. Then with.
 
-        print("Running non-Docker Mercurial tests")
-        args = hg_harness_args + ["-j", str(no_docker_jobs)] + run_hg_tests_no_docker
-        res = subprocess.call(args, cwd=HERE)
+        with docker.auto_clean_orphans(runtests_label):
+            print("Running non-Docker Mercurial tests")
+            args = hg_harness_args + ["-j", str(no_docker_jobs)] + run_hg_tests_no_docker
+            res = subprocess.call(args, cwd=HERE)
 
-        if have_docker and run_hg_tests_docker:
-            # We should ideally not leak containers and images. But until
-            # the Mercurial test harness allows tests to register cleanup
-            # actions, there is only so much we can do.
-            print("Running Docker Mercurial tests")
-            with docker.auto_clean_orphans(runtests_label):
+            if have_docker and run_hg_tests_docker:
+                # We should ideally not leak containers and images. But until
+                # the Mercurial test harness allows tests to register cleanup
+                # actions, there is only so much we can do.
+                print("Running Docker Mercurial tests")
                 args = hg_harness_args + ["-j", str(docker_jobs)] + run_hg_tests_docker
                 res2 = subprocess.call(args, cwd=HERE)
                 if res2:
                     res = res2
-        elif run_hg_tests_docker:
-            print(
-                "Skipping %d Docker Mercurial tests because Docker not "
-                "available" % len(run_hg_tests_docker)
-            )
+            elif run_hg_tests_docker:
+                print(
+                    "Skipping %d Docker Mercurial tests because Docker not "
+                    "available" % len(run_hg_tests_docker)
+                )
 
     if run_unit_tests:
         nose_res = 0
