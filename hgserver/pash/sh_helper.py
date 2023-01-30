@@ -39,15 +39,19 @@ def prompt_user(prompt_string, options, period=True):
         print(option_display)
 
     print("")
-    selection = input(prompt_string + " ")
-    if selection.isdigit():
-        selection = int(selection)
-        if selection == 0:
-            sys.exit(0)
-        if selection > 0 and selection <= len(options):
-            return options[selection - 1]
-        else:
-            sys.stderr.write("Please select one of the presented options\n")
-    else:
+
+    selection = input(f"{prompt_string} ")
+
+    if not selection.isdigit():
         sys.stderr.write("Please select the number corresponding to the option\n")
+        return prompt_user(prompt_string, options)
+
+    selection = int(selection)
+    if selection == 0:
+        sys.exit(0)
+
+    if selection > 0 and selection <= len(options):
+        return options[selection - 1]
+
+    sys.stderr.write("Please select one of the presented options\n")
     return prompt_user(prompt_string, options)
