@@ -33,10 +33,11 @@ def prompt_user(prompt_string, options, period=True):
     print("0) Exit.")
 
     for index, option in enumerate(options, start=1):
-        s = f"{index}) {option}"
+        option_display = f"{index}) {option}"
         if period:
-            s += "."
-        print(s)
+            option_display += "."
+        print(option_display)
+
     print("")
     selection = input(prompt_string + " ")
     if selection.isdigit():
