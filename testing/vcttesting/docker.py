@@ -261,7 +261,7 @@ class Docker(object):
             # Get all containers with a matching shutdown label
             try:
                 filters = {
-                    "label": "hgcluster.run-tests={}".format(runtests_label),
+                    "label": f"hgcluster.run-tests={runtests_label}",
                 }
                 orphan_containers = self.client.containers.list(
                     filters=filters,
