@@ -18,12 +18,7 @@ def run_command(command_string):
         stdout=subprocess.PIPE,
     )
 
-    while True:
-        l = subcommand.stdout.readline()
-        if not l:
-            break
-
-    out_fd.close()
+    subcommand.wait()
 
 
 def prompt_user(prompt_string, options, period=True):
