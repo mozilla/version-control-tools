@@ -13,31 +13,6 @@ from pathlib import Path
 import hg_helper
 from hgmolib import ldap_helper
 
-NO_HG_ACCESS = """
-A SSH connection has been established and your account (%s)
-was found in LDAP.
-
-However, Mercurial access is not currently enabled on your LDAP account.
-
-Please follow the instructions at the following URL to gain Mercurial
-access:
-
-    https://www.mozilla.org/en-US/about/governance/policies/commit/
-""".lstrip()
-
-HG_ACCESS_DISABLED = """
-A SSH connection has been established, your account (%s)
-was found in LDAP, and your account has been configured for Mercurial
-access.
-
-However, Mercurial access is currently disabled on your account.
-This commonly occurs due to account inactivity (you need to SSH
-into hg.mozilla.org every few months to keep your account active).
-
-To restore Mercurial access, please file a bug on Bugzilla under
-the `mozilla.org :: Repository Account Requests` component and
-request access be restored for %s.
-""".lstrip()
 
 AUTOLAND_USER = "bind-autoland@mozilla.com"
 LANDING_WORKER_USER = "lando_landing_worker@mozilla.com"
@@ -97,13 +72,11 @@ def touch_hg_access_date(user):
 
 
 def process_login(user):
-    user_status = hg_helper.is_valid_user(user)
-    if user_status == 2:
-        sys.stderr.write(HG_ACCESS_DISABLED % (user, user))
-        sys.exit(0)
-
-    elif user_status != 1:
-        sys.stderr.write(NO_HG_ACCESS % user)
+    try:
+        # Validate user input.
+        hg_helper.is_valid_user(user)
+    except ValueError as err:
+        sys.stderr.write(str(err))
         sys.exit(0)
 
     with PASH_JSON.open("rb") as fh:

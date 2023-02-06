@@ -121,6 +121,35 @@ time. Your obsolescence data may be lost at any time. You have been warned.
 Enjoy living on the edge.
 """.strip()
 
+
+HG_ACCESS_DISABLED = """
+A SSH connection has been established, your account ({mail})
+was found in LDAP, and your account has been configured for Mercurial
+access.
+
+However, Mercurial access is currently disabled on your account.
+This commonly occurs due to account inactivity (you need to SSH
+into hg.mozilla.org every few months to keep your account active).
+
+To restore Mercurial access, please file a bug on Bugzilla under
+the `mozilla.org :: Repository Account Requests` component and
+request access be restored for {mail}.
+""".lstrip()
+
+
+NO_HG_ACCESS = """
+A SSH connection has been established and your account ({mail})
+was found in LDAP.
+
+However, Mercurial access is not currently enabled on your LDAP account.
+
+Please follow the instructions at the following URL to gain Mercurial
+access:
+
+    https://www.mozilla.org/en-US/about/governance/policies/commit/
+""".lstrip()
+
+
 DOC_ROOT = Path("/repo/hg/mozilla")
 USER_REPO_ROOT = DOC_ROOT / "users"
 HG = Path("/var/hg/venv_pash/bin/hg")
@@ -139,6 +168,12 @@ def is_relative_to(path: Path, relative: Path) -> bool:
 
 
 def is_valid_user(mail):
+    """Assert `mail` is a valid email address of an LDAP user.
+
+    Check that `mail` is an email address of a user in LDAP. If the user
+    does not exist, or their hg access has been disabled due to inactivity,
+    raise a `ValueError`.
+    """
     url = get_ldap_settings()["url"]
 
     mail = mail.strip()
@@ -152,12 +187,14 @@ def is_valid_user(mail):
     for search, replace in replacements.items():
         mail = mail.replace(search, replace)
     account_status = get_ldap_attribute(mail, "hgAccountEnabled", url)
-    if account_status == "TRUE":
-        return 1
-    elif account_status == "FALSE":
-        return 2
-    else:
-        return 0
+
+    if account_status == "FALSE":
+        # hg access is disabled.
+        raise ValueError(HG_ACCESS_DISABLED.format(mail=mail))
+
+    if not account_status or account_status != "TRUE":
+        # User does not have hg access.
+        raise ValueError(NO_HG_ACCESS.format(mail=mail))
 
 
 GROUP_REPOS = {
