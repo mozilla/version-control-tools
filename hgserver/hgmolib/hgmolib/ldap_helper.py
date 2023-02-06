@@ -31,7 +31,7 @@ def ldap_connect(ldap_url):
         ldap_conn.simple_bind_s(settings["username"], settings["password"])
         return ldap_conn
     except Exception:
-        print("Could not connect to the LDAP server at %s" % ldap_url, file=sys.stderr)
+        print(f"Could not connect to the LDAP server at {ldap_url}", file=sys.stderr)
         return None
 
 
@@ -43,7 +43,7 @@ def get_ldap_attribute(mail, attr, conn_string):
         sys.exit(1)
 
     result = ldap_conn.search_s(
-        "dc=mozilla", ldap.SCOPE_SUBTREE, "(mail=" + mail + ")", [attr]
+        "dc=mozilla", ldap.SCOPE_SUBTREE, f"(mail={mail})", [attr]
     )
     if len(result) > 1:
         print("More than one match found", file=sys.stderr)
@@ -66,7 +66,7 @@ def get_ldap_attribute(mail, attr, conn_string):
 def update_access_date(mail, attr, value, conn_string_ro, conn_string_write):
     ldap_conn_ro = ldap_connect(conn_string_ro)
     ldap_conn_write = ldap_connect(conn_string_write)
-    entry_filter = "(&(mail=" + mail + ")(hgAccountEnabled=TRUE))"
+    entry_filter = f"(&(mail={mail})(hgAccountEnabled=TRUE))"
 
     if not ldap_conn_ro or not ldap_conn_write:
         return
@@ -108,7 +108,7 @@ def update_access_date(mail, attr, value, conn_string_ro, conn_string_write):
 def get_user_dn_by_mail(conn, ldap_basedn, email):
     try:
         user_obj = conn.search_s(
-            ldap_basedn, ldap.SCOPE_SUBTREE, "(mail=%s)" % email, attrlist=["mail"]
+            ldap_basedn, ldap.SCOPE_SUBTREE, f"(mail={email})", attrlist=["mail"]
         )
         return user_obj[0][0]
     except (IndexError, ldap.NO_SUCH_OBJECT):
@@ -122,7 +122,7 @@ def get_scm_groups(mail):
     if not conn:
         return None
 
-    fltr = "(&(cn=scm_*)(memberUid=%s))" % mail
+    fltr = f"(&(cn=scm_*)(memberUid={mail}))"
 
     result = conn.search_s("ou=groups,dc=mozilla", ldap.SCOPE_ONELEVEL, fltr, ["cn"])
 
