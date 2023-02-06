@@ -448,6 +448,14 @@ def get_user_repo_config(user: str, repo_dir: Path) -> Tuple[Path, RawConfigPars
     return path, config
 
 
+def clean_repo_description(description: str) -> str:
+    """Ensure the repo description contains valid characters and escape unsafe html."""
+    if not description.isprintable():
+        raise ValueError("Description must contain only printable characters.")
+
+    return escape(description)
+
+
 def edit_repo_description(repo_name: str, user: str, user_repo_dir: str):
     print(EDIT_DESCRIPTION.format(user_dir=user_repo_dir, repo=repo_name))
     selection = prompt_user("Proceed?", ["yes", "no"])
@@ -468,7 +476,11 @@ def edit_repo_description(repo_name: str, user: str, user_repo_dir: str):
     if repo_description == "":
         return
 
-    repo_description = escape(repo_description)
+    try:
+        repo_description = clean_repo_description(repo_description)
+    except ValueError as err:
+        sys.stderr.write(f"\n{str(err)}")
+        sys.exit(1)
 
     config_path, config = get_user_repo_config(user, repo_path)
 
