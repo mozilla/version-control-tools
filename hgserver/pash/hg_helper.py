@@ -253,7 +253,6 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
         print(USER_REPO_EXISTS % repo_name)
         sys.exit(1)
 
-    assert_valid_repo_name(source_repo_path)
     source_repo = DOC_ROOT / source_repo_path
     if not source_repo.exists():
         print(NO_SOURCE_REPO % source_repo_path)
@@ -583,19 +582,60 @@ def edit_repo(cname, repo_name, do_quick_delete):
     return
 
 
-def clone_command(cname, args):
+def clone_command(cname, repo_name, args):
     """Run the `clone` command."""
     if len(args) == 1:
         sys.stderr.write("clone usage: ssh hg.mozilla.org clone newrepo [srcrepo]\n")
         sys.exit(1)
 
-    assert_valid_repo_name(args[1])
-
     if len(args) == 2:
-        make_repo_clone(cname, args[1], None)
+        make_repo_clone(cname, repo_name, None)
     elif len(args) == 3:
-        make_repo_clone(cname, args[1], args[2])
+        make_repo_clone(cname, repo_name, args[2])
     sys.exit(0)
+
+
+def edit_command(cname, repo_name, args):
+    if len(args) == 2:
+        edit_repo(cname, repo_name, False)
+    elif len(args) == 4 and args[2] == "delete" and args[3] == "YES":
+        edit_repo(cname, repo_name, True)
+    else:
+        sys.stderr.write(
+            "edit usage: ssh hg.mozilla.org edit "
+            "[userrepo delete] - WARNING: will not "
+            "prompt!\n"
+        )
+        sys.exit(1)
+
+
+def hg_command(args):
+    # SECURITY it is critical that invoked commands be limited to
+    # `hg -R <path> serve --stdio`. If a user manages to pass arguments
+    # to coerce Mercurial into say opening a debugger, that is effectively
+    # giving them a remote shell. We require that command arguments match
+    # an exact pattern and that the repo name is sanitized.
+    if args[1] != "-R" or args[3:] != ["serve", "--stdio"]:
+        sys.stderr.write("invalid `hg` command executed; can only run serve --stdio\n")
+        sys.exit(1)
+
+    # At this point, the only argument not validated to match exact bytes
+    # is the value for -R. We sanitize that through our repo name validator
+    # *and* verify it exists on disk.
+
+    repo_path = args[2]
+    # This will ensure the repo path is essentially alphanumeric. So we
+    # don't have to worry about ``..``, Unicode, spaces, etc.
+    assert_valid_repo_name(repo_path)
+
+    full_repo_path = DOC_ROOT / repo_path
+    full_repo_path_hg = full_repo_path / ".hg"
+
+    if not full_repo_path_hg.is_dir():
+        sys.stderr.write("requested repo %s does not exist\n" % repo_path)
+        sys.exit(1)
+
+    os.execv(HG, [HG, "-R", full_repo_path, "serve", "--stdio"])
 
 
 def serve(
@@ -611,74 +651,35 @@ def serve(
 
     args = shlex.split(ssh_command)
 
+    # Run Mercurial ssh commands.
     if args[0] == "hg":
-        # SECURITY it is critical that invoked commands be limited to
-        # `hg -R <path> serve --stdio`. If a user manages to pass arguments
-        # to coerce Mercurial into say opening a debugger, that is effectively
-        # giving them a remote shell. We require that command arguments match
-        # an exact pattern and that the repo name is sanitized.
-        if args[1] != "-R" or args[3:] != ["serve", "--stdio"]:
-            sys.stderr.write(
-                "invalid `hg` command executed; can only run " "serve --stdio\n"
-            )
-            sys.exit(1)
+        return hg_command(args)
 
-        # At this point, the only argument not validated to match exact bytes
-        # is the value for -R. We sanitize that through our repo name validator
-        # *and* verify it exists on disk.
+    repo_name = args[1]
+    assert_valid_repo_name(repo_name)
 
-        repo_path = args[2]
-        # This will ensure the repo path is essentially alphanumeric. So we
-        # don't have to worry about ``..``, Unicode, spaces, etc.
-        assert_valid_repo_name(repo_path)
-
-        full_repo_path = DOC_ROOT / repo_path
-        full_repo_path_hg = full_repo_path / ".hg"
-
-        if not full_repo_path_hg.is_dir():
-            sys.stderr.write("requested repo %s does not exist\n" % repo_path)
-            sys.exit(1)
-
-        os.execv(HG, [HG, "-R", full_repo_path, "serve", "--stdio"])
-
-    elif args[0] == "clone":
+    if args[0] == "clone":
         if not enable_user_repos:
             print("user repository management is not enabled")
             sys.exit(1)
-        clone_command(cname, args)
+        clone_command(cname, repo_name, args)
     elif args[0] == "edit":
         if not enable_user_repos:
             print("user repository management is not enabled")
             sys.exit(1)
-
-        if len(args) == 2:
-            assert_valid_repo_name(args[1])
-            edit_repo(cname, args[1], False)
-        elif len(args) == 4 and args[2] == "delete" and args[3] == "YES":
-            assert_valid_repo_name(args[1])
-            edit_repo(cname, args[1], True)
-        else:
-            sys.stderr.write(
-                "edit usage: ssh hg.mozilla.org edit "
-                "[userrepo delete] - WARNING: will not "
-                "prompt!\n"
-            )
-            sys.exit(1)
+        edit_command(cname, repo_name, args)
     elif args[0] == "repo-group":
         if not enable_repo_group:
             print("repo-group command not available")
             sys.exit(1)
 
-        assert_valid_repo_name(args[1])
-        print(repo_group.repo_owner(args[1]))
+        print(repo_group.repo_owner(repo_name))
     elif args[0] == "repo-config":
         if not enable_repo_config:
             print("repo-config command not available")
             sys.exit(1)
 
-        repo = args[1]
-        assert_valid_repo_name(repo)
-        hgrc = DOC_ROOT / repo / ".hg" / "hgrc"
+        hgrc = DOC_ROOT / repo_name / ".hg" / "hgrc"
         if hgrc.exists():
             with hgrc.open("r", encoding="utf-8") as fh:
                 sys.stdout.write(fh.read())
