@@ -4,6 +4,7 @@
 
 from __future__ import print_function
 
+import functools
 import json
 import sys
 import datetime
@@ -14,12 +15,39 @@ import ldap
 
 LDAP_JSON = Path("/etc/mercurial/ldap.json")
 
+
 def get_ldap_settings():
     """Read LDAP settings from a file."""
     with LDAP_JSON.open("rb") as fh:
         return json.load(fh)
 
 
+def assert_ldap_arg_valid(value):
+    """Assert values coming into LDAP are valid."""
+    if "\\" in value:
+        raise ValueError("Backslash characters found in LDAP query.")
+
+    if not value.isprintable():
+        raise ValueError("Non-printable characters found in LDAP query.")
+
+
+def validate_ldap_inputs(func):
+    """Decorator function to check LDAP inputs are valid."""
+
+    @functools.wraps(func)
+    def validate(*args, **kwargs):
+        for arg in args:
+            assert_ldap_arg_valid(arg)
+
+        for kwarg in kwargs.values():
+            assert_ldap_arg_valid(kwarg)
+
+        return func(*args, **kwargs)
+
+    return validate
+
+
+@validate_ldap_inputs
 def ldap_connect(ldap_url):
     try:
         settings = get_ldap_settings()
@@ -35,6 +63,7 @@ def ldap_connect(ldap_url):
         return None
 
 
+@validate_ldap_inputs
 def get_ldap_attribute(mail, attr, conn_string):
     ldap_conn = ldap_connect(conn_string)
     if not ldap_conn:
@@ -62,6 +91,7 @@ def get_ldap_attribute(mail, attr, conn_string):
     return attr_val.decode("ascii")
 
 
+@validate_ldap_inputs
 def update_access_date(mail, attr, value, conn_string_ro, conn_string_write):
     ldap_conn_ro = ldap_connect(conn_string_ro)
     ldap_conn_write = ldap_connect(conn_string_write)
@@ -104,6 +134,7 @@ def update_access_date(mail, attr, value, conn_string_ro, conn_string_write):
         ldap_conn_write.modify_s(dn, [(ldap.MOD_REPLACE, attr, value.encode("ascii"))])
 
 
+@validate_ldap_inputs
 def get_user_dn_by_mail(conn, ldap_basedn, email):
     try:
         user_obj = conn.search_s(
@@ -114,6 +145,7 @@ def get_user_dn_by_mail(conn, ldap_basedn, email):
         return None
 
 
+@validate_ldap_inputs
 def get_scm_groups(mail):
     """Obtain SCM LDAP group membership for a specified user."""
     settings = get_ldap_settings()
