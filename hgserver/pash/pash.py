@@ -130,6 +130,7 @@ def process_login(user):
 
     hg_helper.serve(
         cname=pash_settings["hostname"],
+        user=user,
         enable_repo_config=pash_settings.get("repo_config", False),
         enable_repo_group=pash_settings.get("repo_group", False),
         enable_user_repos=pash_settings.get("user_repos", False),

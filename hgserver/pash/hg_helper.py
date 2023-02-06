@@ -301,9 +301,7 @@ def make_wsgi_dir(cname, user_repo_dir):
             hgwsgi.write("application = hgweb(config)\n")
 
 
-def fix_user_repo_perms(repo_name):
-    user = os.getenv("USER")
-    user_repo_dir = user.replace("@", "_")
+def fix_user_repo_perms(user, user_repo_dir, repo_name):
     print("Fixing permissions, don't interrupt.")
     repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
     try:
@@ -312,15 +310,13 @@ def fix_user_repo_perms(repo_name):
         print("Exception %s" % (e))
 
 
-def make_repo_clone(cname, repo_name, quick_src):
-    user = os.getenv("USER")
-    user_repo_dir = user.replace("@", "_")
+def make_repo_clone(cname, user, user_repo_dir, repo_name, quick_src):
     source_repo = ""
     if quick_src:
         run_hg_clone(user_repo_dir, repo_name, quick_src)
-        fix_user_repo_perms(repo_name)
+        fix_user_repo_perms(user, user_repo_dir, repo_name)
         # New user repositories are non-publishing by default.
-        set_repo_publishing(repo_name, False)
+        set_repo_publishing(repo_name, user, user_repo_dir, False)
         sys.exit(0)
 
     print(
@@ -379,32 +375,28 @@ def make_repo_clone(cname, repo_name, quick_src):
                 f"/usr/bin/nohup {HG} --config format.usegeneraldelta=true "
                 f"init {repo_name_path}"
             )
-    fix_user_repo_perms(repo_name)
+    fix_user_repo_perms(user, user_repo_dir, repo_name)
     # New user repositories are non-publishing by default.
-    set_repo_publishing(repo_name, False)
+    set_repo_publishing(repo_name, user, user_repo_dir, False)
     sys.exit(0)
 
 
-def get_and_validate_user_repo(repo_name) -> Path:
-    user = os.getenv("USER")
-    user_repo_dir = user.replace("@", "_")
-    rel_path = "/users/%s/%s" % (user_repo_dir, repo_name)
-
+def get_and_validate_user_repo(user_repo_dir, repo_name) -> Path:
     fs_path = DOC_ROOT / "users" / user_repo_dir / repo_name
 
     if not fs_path.exists():
+        rel_path = fs_path.relative_to(DOC_ROOT)
         sys.stderr.write(f"Could not find repository at {rel_path}.\n")
         sys.exit(1)
 
     return fs_path
 
 
-def get_user_repo_config(repo_dir: Path) -> Tuple[Path, RawConfigParser]:
+def get_user_repo_config(user: str, repo_dir: Path) -> Tuple[Path, RawConfigParser]:
     """Obtain a ConfigParser for a repository.
 
     If the hgrc file doesn't exist, it will be created automatically.
     """
-    user = os.getenv("USER")
     path = repo_dir / ".hg" / "hgrc"
     if not path.is_file():
         path.touch()
@@ -419,15 +411,13 @@ def get_user_repo_config(repo_dir: Path) -> Tuple[Path, RawConfigParser]:
     return path, config
 
 
-def edit_repo_description(repo_name: str):
-    user = os.getenv("USER")
-    user_repo_dir = user.replace("@", "_")
+def edit_repo_description(repo_name: str, user: str, user_repo_dir: str):
     print(EDIT_DESCRIPTION.format(user_dir=user_repo_dir, repo=repo_name))
     selection = prompt_user("Proceed?", ["yes", "no"])
     if selection != "yes":
         return
 
-    repo_path = get_and_validate_user_repo(repo_name)
+    repo_path = get_and_validate_user_repo(user_repo_dir, repo_name)
 
     repo_description = input("Enter a one line descripton for the repository: ")
     if not repo_description:
@@ -443,7 +433,7 @@ def edit_repo_description(repo_name: str):
 
     repo_description = escape(repo_description)
 
-    config_path, config = get_user_repo_config(repo_path)
+    config_path, config = get_user_repo_config(user, repo_path)
 
     if not config.has_section("web"):
         config.add_section("web")
@@ -456,7 +446,7 @@ def edit_repo_description(repo_name: str):
     run_command(f"{HG} -R {repo_path} replicatehgrc")
 
 
-def set_repo_publishing(repo_name, publish):
+def set_repo_publishing(repo_name, user, user_repo_dir, publish):
     """Set the publishing flag on a repository.
 
     A publishing repository turns its pushed commits into public
@@ -465,8 +455,8 @@ def set_repo_publishing(repo_name, publish):
     Non-publishing repositories have their commits stay in the draft phase
     when pushed.
     """
-    repo_path = get_and_validate_user_repo(repo_name)
-    config_path, config = get_user_repo_config(repo_path)
+    repo_path = get_and_validate_user_repo(user_repo_dir, repo_name)
+    config_path, config = get_user_repo_config(user, repo_path)
 
     if not config.has_section("phases"):
         config.add_section("phases")
@@ -492,10 +482,10 @@ def set_repo_publishing(repo_name, publish):
         )
 
 
-def set_repo_obsolescence(repo_name, enabled):
+def set_repo_obsolescence(repo_name, user, enabled):
     """Enable or disable obsolescence support on a repository."""
-    repo_path = get_and_validate_user_repo(repo_name)
-    config_path, config = get_user_repo_config(repo_path)
+    repo_path = get_and_validate_user_repo(user_repo_dir, repo_name)
+    config_path, config = get_user_repo_config(user, repo_path)
 
     if not config.has_section("experimental"):
         config.add_section("experimental")
@@ -524,9 +514,7 @@ def do_delete(repo_dir, repo_name):
     purge_log.close()
 
 
-def delete_repo(cname, repo_name, do_quick_delete):
-    user = os.getenv("USER")
-    user_repo_dir = user.replace("@", "_")
+def delete_repo(cname, user_repo_dir, repo_name, do_quick_delete):
     delete_repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
     if delete_repo_path.exists():
         if do_quick_delete:
@@ -552,9 +540,9 @@ def delete_repo(cname, repo_name, do_quick_delete):
     sys.exit(0)
 
 
-def edit_repo(cname, repo_name, do_quick_delete):
+def edit_repo(cname, user, user_repo_dir, repo_name, do_quick_delete):
     if do_quick_delete:
-        delete_repo(cname, repo_name, do_quick_delete)
+        delete_repo(cname, user_repo_dir, repo_name, do_quick_delete)
     else:
         action = prompt_user(
             "What would you like to do?",
@@ -568,38 +556,38 @@ def edit_repo(cname, repo_name, do_quick_delete):
             ],
         )
         if action == "Edit the description":
-            edit_repo_description(repo_name)
+            edit_repo_description(repo_name, user, user_repo_dir)
         elif action == "Delete the repository":
-            delete_repo(cname, repo_name, False)
+            delete_repo(cname, user_repo_dir, repo_name, False)
         elif action == "Mark repository as non-publishing":
-            set_repo_publishing(repo_name, False)
+            set_repo_publishing(repo_name, user, user_repo_dir, False)
         elif action == "Mark repository as publishing":
-            set_repo_publishing(repo_name, True)
+            set_repo_publishing(repo_name, user, user_repo_dir, True)
         elif action == "Enable obsolescence support (experimental)":
-            set_repo_obsolescence(repo_name, True)
+            set_repo_obsolescence(repo_name, user, True)
         elif action == "Disable obsolescence support":
-            set_repo_obsolescence(repo_name, False)
+            set_repo_obsolescence(repo_name, user, False)
     return
 
 
-def clone_command(cname, repo_name, args):
+def clone_command(cname, user, user_repo_dir, repo_name, args):
     """Run the `clone` command."""
     if len(args) == 1:
         sys.stderr.write("clone usage: ssh hg.mozilla.org clone newrepo [srcrepo]\n")
         sys.exit(1)
 
     if len(args) == 2:
-        make_repo_clone(cname, repo_name, None)
+        make_repo_clone(cname, user, user_repo_dir, repo_name, None)
     elif len(args) == 3:
-        make_repo_clone(cname, repo_name, args[2])
+        make_repo_clone(cname, user, user_repo_dir, repo_name, args[2])
     sys.exit(0)
 
 
-def edit_command(cname, repo_name, args):
+def edit_command(cname, user, user_repo_dir, repo_name, args):
     if len(args) == 2:
-        edit_repo(cname, repo_name, False)
+        edit_repo(cname, user, user_repo_dir, repo_name, False)
     elif len(args) == 4 and args[2] == "delete" and args[3] == "YES":
-        edit_repo(cname, repo_name, True)
+        edit_repo(cname, user, user_repo_dir, repo_name, True)
     else:
         sys.stderr.write(
             "edit usage: ssh hg.mozilla.org edit "
@@ -638,13 +626,22 @@ def hg_command(args):
     os.execv(HG, [HG, "-R", full_repo_path, "serve", "--stdio"])
 
 
+def convert_username_to_repo_dir(user: str) -> str:
+    """Convert a given username to the repo dir."""
+    return user.replace("@", "_")
+
+
 def serve(
-    cname, enable_repo_config=False, enable_repo_group=False, enable_user_repos=False
+    cname,
+    enable_repo_config=False,
+    enable_repo_group=False,
+    enable_user_repos=False,
+    user=None,
 ):
     ssh_command = os.getenv("SSH_ORIGINAL_COMMAND")
     if not ssh_command:
-        sys.stderr.write(SUCCESSFUL_AUTH % os.environ["USER"])
-        sys.stderr.write(group_membership_message(os.environ["USER"]))
+        sys.stderr.write(SUCCESSFUL_AUTH % user)
+        sys.stderr.write(group_membership_message(user))
         sys.stderr.write("\n")
         sys.stderr.write(NO_SSH_COMMAND)
         sys.exit(1)
@@ -658,16 +655,18 @@ def serve(
     repo_name = args[1]
     assert_valid_repo_name(repo_name)
 
+    user_repo_dir = convert_username_to_repo_dir(user)
+
     if args[0] == "clone":
         if not enable_user_repos:
             print("user repository management is not enabled")
             sys.exit(1)
-        clone_command(cname, repo_name, args)
+        clone_command(cname, user, user_repo_dir, repo_name, args)
     elif args[0] == "edit":
         if not enable_user_repos:
             print("user repository management is not enabled")
             sys.exit(1)
-        edit_command(cname, repo_name, args)
+        edit_command(cname, user, user_repo_dir, repo_name, args)
     elif args[0] == "repo-group":
         if not enable_repo_group:
             print("repo-group command not available")
@@ -684,6 +683,6 @@ def serve(
             with hgrc.open("r", encoding="utf-8") as fh:
                 sys.stdout.write(fh.read())
     else:
-        sys.stderr.write(SUCCESSFUL_AUTH % os.environ["USER"])
+        sys.stderr.write(SUCCESSFUL_AUTH % user)
         sys.stderr.write(INVALID_SSH_COMMAND)
         sys.exit(1)
