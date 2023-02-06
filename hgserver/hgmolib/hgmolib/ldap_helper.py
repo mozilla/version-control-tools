@@ -47,18 +47,19 @@ def get_ldap_attribute(mail, attr, conn_string):
     )
     ldap_conn.unbind_s()
 
+    if not result or len(result) == 0:
+        print("No matches found", file=sys.stderr)
+        return False
+
     if len(result) > 1:
         print("More than one match found", file=sys.stderr)
         return False
-    elif len(result) == 0:
-        print("No matches found", file=sys.stderr)
+
+    if attr not in result[0][1]:
         return False
-    else:
-        if attr in result[0][1]:
-            attr_val = result[0][1][attr][0]
-            return attr_val.decode("ascii")
-        else:
-            return False
+
+    attr_val = result[0][1][attr][0]
+    return attr_val.decode("ascii")
 
 
 def update_access_date(mail, attr, value, conn_string_ro, conn_string_write):
