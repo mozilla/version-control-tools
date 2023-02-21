@@ -160,7 +160,7 @@ repository operations.
 
 To check whether your existing Firefox clone is using generaldelta::
 
-   $ grep generaldelta .hg/requires
+   $ grep generaldelta .hg/store/requires
 
 If there is no ``generaldelta`` entry in that file, you will need to
 create a new repo that has generaldelta enabled. **Adding
