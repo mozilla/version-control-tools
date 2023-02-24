@@ -309,35 +309,6 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     print("Clone complete.")
 
 
-def make_wsgi_dir(cname, user_repo_dir):
-    wsgi_dir = Path("/repo/hg/webroot_wsgi/users") / user_repo_dir
-    # Create user's webroot_wsgi folder if it doesn't already exist
-    if not wsgi_dir.is_dir():
-        wsgi_dir.mkdir()
-
-    print("Creating hgweb.config file")
-    # Create hgweb.config file if it doesn't already exist
-    hgconfig = wsgi_dir / "hgweb.config"
-    if not hgconfig.is_file():
-        with hgconfig.open("w") as f:
-            f.write("[web]\n")
-            f.write("baseurl = http://%s/users/%s\n" % (cname, user_repo_dir))
-            f.write("[paths]\n")
-            f.write("/ = %s/users/%s/*\n" % (DOC_ROOT, user_repo_dir))
-
-    # Create hgweb.wsgi file if it doesn't already exist
-    hgwsgi = wsgi_dir / "hgweb.wsgi"
-    if not hgwsgi.is_file():
-        with hgwsgi.open("w") as f:
-            hgwsgi.write("#!/usr/bin/env python\n")
-            hgwsgi.write("config = '%s/hgweb.config'\n" % wsgi_dir)
-            hgwsgi.write("from mercurial import demandimport; demandimport.enable()\n")
-            hgwsgi.write("from mercurial.hgweb import hgweb\n")
-            hgwsgi.write("import os\n")
-            hgwsgi.write("os.environ['HGENCODING'] = 'UTF-8'\n")
-            hgwsgi.write("application = hgweb(config)\n")
-
-
 def fix_user_repo_perms(user, user_repo_dir, repo_name):
     print("Fixing permissions, don't interrupt.")
     repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
