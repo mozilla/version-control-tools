@@ -604,6 +604,8 @@ def clone_command(cname, user, user_repo_dir, repo_name, args):
 
 
 def edit_command(cname, user, user_repo_dir, repo_name, args):
+    print(f"Editing repo https://{cname}/{user_repo_dir}/{repo_name}")
+
     if len(args) == 2:
         edit_repo(cname, user, user_repo_dir, repo_name, False)
     elif len(args) == 4 and args[2] == "delete" and args[3] == "YES":
