@@ -8,10 +8,6 @@ install_requires = [
     "python-hglib",
 ]
 
-# Only install `futures` backport on Python 2
-if sys.version_info[0] == 2:
-    install_requires.append("futures")
-
 setup(
     name="vcsreplicator",
     version="0.1",
