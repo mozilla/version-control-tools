@@ -100,6 +100,15 @@ following:
 6. Put the host back in service in Zeus.
 7. Repeat 3 to 6 until done with all hosts.
 
+Dealing with high memory on hgweb
+---------------------------------
+
+Sometimes memory usage on hgweb can spike to very high levels as a result of
+too many connections coming in at once, and the memory usage may not decrease
+without manual intervention. If memory usage has spiked as a result of increased
+number of connections, administrators can run ``sudo apachectl graceful`` to
+gracefully restart httpd.
+
 Forcing a hgweb Repository Re-clone
 ===================================
 
