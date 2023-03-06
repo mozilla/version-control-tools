@@ -7,6 +7,10 @@
 - hosts: localhost
   gather_facts: no
   tasks:
+    - name: Reminder
+      debug:
+        msg: "Please ping the sheriffs to inform them of the reset."
+
     - name: Set source_repo fact
       set_fact:
         source_repo: "{{ source | default('mozilla-central') }}"
@@ -109,3 +113,9 @@
             state=absent
       when: old_st.stat.exists
       tags: cleanup
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Reminder
+      debug:
+        msg: "Please don't forget to ping the sheriffs to inform them of the reset."
