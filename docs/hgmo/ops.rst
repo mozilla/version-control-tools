@@ -109,6 +109,22 @@ without manual intervention. If memory usage has spiked as a result of increased
 number of connections, administrators can run ``sudo apachectl graceful`` to
 gracefully restart httpd.
 
+Zeus Rate Limiting
+------------------
+
+Zeus has some rate limiting rules defined for hgweb.
+
+- Rates are defined in the "Rates" section in Zeus.
+    - Catalogs > Rates > "hg-rate"
+    - A value of 0 for a rate means "do not use this rate".
+- Rates are used in "Rules".
+    - Services > hg.mozilla.org-https > Rules > Edit > hgweb-rate-rule
+    - There you can see the content of the rule, which references the rate.
+- Rules are applied to the virtual server.
+    - Use the "Enable"/"Disabled" checkbox to activate/deactivate the rule.
+- Viewing the effect of the rate limiting rule is possible from the activity view.
+    - Activity > Current Activity > Chart data > "Rate Limit Queue HG" > Plot
+
 Forcing a hgweb Repository Re-clone
 ===================================
 
