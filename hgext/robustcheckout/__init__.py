@@ -177,6 +177,8 @@ def robustcheckout(
     # worker.backgroundclose only makes things faster if running anti-virus,
     # which our automation doesn't. Disable it.
     ui.setconfig(b"worker", b"backgroundclose", False)
+    # Don't wait forever if the connection hangs
+    ui.setconfig(b"http", b"timeout", 600)
 
     # By default the progress bar starts after 3s and updates every 0.1s. We
     # change this so it shows and updates every 1.0s.
