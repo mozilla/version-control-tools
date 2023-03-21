@@ -7,7 +7,3 @@ dependencies:
       kafka_broker_id: "{{ zk_servers[inventory_hostname] }}",
       when: inventory_hostname in zk_servers,
     }
-  - {
-      role: docker,
-      when: is_testing is not defined,
-    }
