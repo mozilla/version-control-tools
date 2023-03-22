@@ -509,6 +509,10 @@ def _docheckout(
                         pycompat.bytestr(str(e.reason)),
                     )
                 )
+        elif isinstance(e, socket.timeout):
+            ui.warn(b"socket timeout\n")
+            handlenetworkfailure()
+            return True
         else:
             ui.warn(
                 b"unhandled exception during network operation; type: %s; "
@@ -529,7 +533,12 @@ def _docheckout(
         rootnode = peerlookup(clonepeer, b"0")
     except error.RepoLookupError:
         raise error.Abort(b"unable to resolve root revision from clone " b"source")
-    except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
+    except (
+        error.Abort,
+        ssl.SSLError,
+        urllibcompat.urlerr.urlerror,
+        socket.timeout,
+    ) as e:
         if handlepullerror(e):
             return callself()
         raise
@@ -622,7 +631,12 @@ def _docheckout(
                     shareopts=shareopts,
                     stream=True,
                 )
-        except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
+        except (
+            error.Abort,
+            ssl.SSLError,
+            urllibcompat.urlerr.urlerror,
+            socket.timeout,
+        ) as e:
             if handlepullerror(e):
                 return callself()
             raise
@@ -690,7 +704,12 @@ def _docheckout(
                     pullop = exchange.pull(repo, remote, heads=pullrevs)
                     if not pullop.rheads:
                         raise error.Abort(b"unable to pull requested revision")
-        except (error.Abort, ssl.SSLError, urllibcompat.urlerr.urlerror) as e:
+        except (
+            error.Abort,
+            ssl.SSLError,
+            urllibcompat.urlerr.urlerror,
+            socket.timeout,
+        ) as e:
             if handlepullerror(e):
                 return callself()
             raise
