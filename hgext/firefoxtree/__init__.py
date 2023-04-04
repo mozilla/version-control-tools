@@ -172,8 +172,8 @@ def isfirefoxrepo(repo):
     return repo.vfs.exists(b"IS_FIREFOX_REPO")
 
 
-# Wrap repo lookup to automagically resolve tree names to URIs.
-def peerorrepo(orig, ui, path, *args, **kwargs):
+def wrapped_peerorrepo(orig, ui, path, *args, **kwargs):
+    """Wrap repo lookup to automagically resolve tree names to URIs."""
     try:
         return orig(ui, path, *args, **kwargs)
     except RepoError:
@@ -182,6 +182,18 @@ def peerorrepo(orig, ui, path, *args, **kwargs):
             raise
 
         return orig(ui, uri, *args, **kwargs)
+
+
+def wrapped_peer(orig, uiorrepo, opts, path, **kwargs):
+    """Wrap `hg.peer` to return peer repos for known tree names (autoland, central etc)."""
+    try:
+        return orig(uiorrepo, opts, path, **kwargs)
+    except RepoError:
+        tree, uri = resolve_trees_to_uris([path.rawloc])[0]
+        if not uri:
+            raise
+
+        return orig(uiorrepo, opts, uri, **kwargs)
 
 
 def share(orig, ui, source, *args, **kwargs):
@@ -702,7 +714,11 @@ def template_fxheads(context, mapping):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(hg, b"_peerorrepo", peerorrepo)
+    # TRACKING hg64 - `_peerorrepo` is removed, wrap `hg.peer` directly.
+    if util.versiontuple() >= (6, 4):
+        extensions.wrapfunction(hg, b"peer", wrapped_peer)
+    else:
+        extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
     extensions.wrapfunction(hg, b"share", share)
     extensions.wrapfunction(exchange, b"push", push)
     extensions.wrapfunction(exchange, b"_pullobsolete", wrappedpullobsolete)
