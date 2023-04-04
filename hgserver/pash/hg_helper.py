@@ -345,7 +345,9 @@ def make_repo_clone(cname, user, user_repo_dir, repo_name, quick_src):
         print("List of available public repos")
         repo_list = sorted(
             repo_path.parent.relative_to(DOC_ROOT)
-            for repo_path in DOC_ROOT.glob("**/.hg")
+            # Search for repos 1-2 levels deep.
+            for pattern in ("*/.hg", "*/*/.hg")
+            for repo_path in DOC_ROOT.glob(pattern)
             if not is_relative_to(repo_path, USER_REPO_ROOT)
         )
         source_repo = prompt_user("Pick a source repo:", repo_list, period=False)
