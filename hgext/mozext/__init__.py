@@ -321,6 +321,18 @@ def get_ircnick(ui):
     return ircnick
 
 
+def wrapped_peer(orig, uiorrepo, opts, path, **kwargs):
+    """Wrap `hg.peer` to return peer repos for known tree names (autoland, central etc)."""
+    try:
+        return orig(uiorrepo, opts, path, **kwargs)
+    except RepoError:
+        tree, uri = resolve_trees_to_uris([path.rawloc])[0]
+        if not uri:
+            raise
+
+        return orig(uiorrepo, opts, uri, **kwargs)
+
+
 def wrapped_peerorrepo(orig, ui, path, *args, **kwargs):
     # Always try the old mechanism first. That way if there is a local
     # path that shares the name of a magic remote the local path is accessible.
@@ -1435,7 +1447,12 @@ def extsetup(ui):
     extensions.wrapfunction(exchange, b"pull", wrappedpull)
     extensions.wrapfunction(exchange, b"push", wrappedpush)
     extensions.wrapfunction(exchange, b"_pullobsolete", exchangepullpushlog)
-    extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
+
+    # TRACKING hg64 - `_peerorrepo` is removed, wrap `hg.peer` directly.
+    if util.versiontuple() >= (6, 4):
+        extensions.wrapfunction(hg, b"peer", wrapped_peer)
+    else:
+        extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
 
     if ui.configbool(b"mozext", b"disable_local_database"):
         return
