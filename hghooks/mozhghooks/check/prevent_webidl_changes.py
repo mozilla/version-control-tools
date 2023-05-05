@@ -62,6 +62,7 @@ DOM_PEERS = [
         "nick": [b"peterv"],
         "email": [b"peterv@propagandism.org"],
     },
+    {"name": b"Sean Feng", "nick": [b"sefeng"], "email": [b"sefeng@mozilla.com"]},
 ]
 
 # The root directory for WebIDL files which contain only ChromeOnly

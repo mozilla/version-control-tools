@@ -50,6 +50,7 @@ Editing a .webidl file without any review should fail
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
     - Peter Van der Beken (:peterv)
+    - Sean Feng (:sefeng)
   *********************************************************************
   
   transaction abort!
@@ -85,6 +86,7 @@ Editing a .webidl file without /DOM/ peer review should fail
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
     - Peter Van der Beken (:peterv)
+    - Sean Feng (:sefeng)
   *********************************************************************
   
   transaction abort!
@@ -134,6 +136,7 @@ Editing a .webidl file without /DOM/ peer review in the same push as a commit wi
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
     - Peter Van der Beken (:peterv)
+    - Sean Feng (:sefeng)
   *********************************************************************
   
   transaction abort!
@@ -188,6 +191,7 @@ WebIDL change after release uplift fails
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
     - Peter Van der Beken (:peterv)
+    - Sean Feng (:sefeng)
   *********************************************************************
   
   transaction abort!
@@ -368,6 +372,7 @@ Editing multiple .webidl files without review should fail
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
     - Peter Van der Beken (:peterv)
+    - Sean Feng (:sefeng)
   *********************************************************************
   
   transaction abort!
