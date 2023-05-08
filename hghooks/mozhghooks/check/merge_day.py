@@ -25,7 +25,7 @@ ALLOWED_FILES = {
         b"build/defines.sh",
         b"build/mozconfig.common",
         b"config/milestone.txt",
-        b"services/sync/modules/constants.js",
+        b"services/sync/modules/constants.sys.js",
         b"xpcom/components/Module.h",
     ),
     b"thunderbird": (
