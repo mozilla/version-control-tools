@@ -50,7 +50,7 @@ ffxbld-merge user cannot push non-merge day changes
   build/defines.sh
   build/mozconfig.common
   config/milestone.txt
-  services/sync/modules/constants.sys.js
+  services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
   Illegal paths found:
@@ -86,7 +86,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   build/defines.sh
   build/mozconfig.common
   config/milestone.txt
-  services/sync/modules/constants.sys.js
+  services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
   Illegal paths found:
