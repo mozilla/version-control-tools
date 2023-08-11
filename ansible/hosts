@@ -7,20 +7,6 @@ hgssh[1:2].dmz.mdc1.mozilla.com ansible_become=yes
 [hgssh-prod-master]
 hgssh1.dmz.mdc1.mozilla.com ansible_become=yes
 
-[ci-uw2]
-ci-uw2-a-1 ansible_host=10.191.5.126
-ci-uw2-b-1 ansible_host=10.191.5.137
-ci-uw2-b-2 ansible_host=10.191.5.143
-
-[ci-uw1]
-ci-uw1-a-1 ansible_host=10.191.11.121
-ci-uw1-b-1 ansible_host=10.191.11.157
-
-[ci-ue1]
-ci-ue1-a-1 ansible_host=10.191.12.125
-ci-ue1-b-1 ansible_host=10.191.12.152
-ci-ue1-b-2 ansible_host=10.191.12.134
-
 [backup-node]
 hgweb-backup-uw2 ansible_host=10.191.5.147
 
@@ -29,9 +15,6 @@ ansible_sudo=yes
 ansible_become=yes
 
 [hgweb-mirrors:children]
-ci-uw1
-ci-uw2
-ci-ue1
 backup-node
 
 [hgweb-mirrors:vars]
