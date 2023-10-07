@@ -17,7 +17,24 @@ RUN apt-get update && apt-get install -yq \
     python3-venv \
     python3-wheel \
     rsync \
-    sqlite3
+    sqlite3 \
+    make \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    curl \
+    llvm \
+    libncurses5-dev \
+    xz-utils \
+    tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libffi-dev \
+    liblzma-dev
 
 ARG USER_ID
 ARG GROUP_ID
@@ -37,10 +54,21 @@ RUN addgroup --gid ${GROUP_ID} vct \
 RUN mkdir /app
 RUN chown -R vct:vct /app
 
+# Required to ensure built Python uses utf-8.
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
 # For testing older versions of Mercurial against Python 3
 # TODO remove once Mercurial 5.1 is not supported
 ENV HGPYTHON3=1
+
+# Install pyenv.
+ENV HOME="/vct"
+RUN git clone --depth=1 https://github.com/pyenv/pyenv.git $HOME/.pyenv
+ENV PYENV_ROOT="$HOME/.pyenv"
+ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+RUN pyenv install 3.7.17
+RUN pyenv global 3.7.17
 
 # Create Python 3 venv
 # Set `VIRTUAL_ENV` and `PATH` to replicate `source venv/bin/activate`
