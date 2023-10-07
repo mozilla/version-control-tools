@@ -252,6 +252,7 @@ if __name__ == "__main__":
     docker_state = os.path.join(HERE, ".dockerstate")
     docker_url, docker_tls = vctdocker.params_from_env(os.environ)
     docker = vctdocker.Docker(docker_url, tls=docker_tls)
+    runtests_label = str(uuid.uuid4())
     if not options.no_docker:
         hgcluster = vcthgmo.HgCluster(docker)
 
@@ -263,7 +264,6 @@ if __name__ == "__main__":
             # shutdown after the test run is complete. This should permeate
             # to the environment of the `docker-compose` process created
             # by `hgmo start`.
-            runtests_label = str(uuid.uuid4())
             os.environ["RUNTESTS_LABEL"] = runtests_label
 
             # We build the base docker images in the test runner because doing it
