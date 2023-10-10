@@ -243,7 +243,7 @@ class fileobjectproxy(object):
         return setattr(object.__getattribute__(self, "_fp"), name, value)
 
 
-def wrappeddispatch(orig, repo, proto, command):
+def wrappeddispatch(orig, repo, proto, command, *args, **kwargs):
     """Wraps wireprotov1server.dispatch() to record command requests."""
     # TRACKING hg46
     # For historical reasons, SSH and HTTP use different log events. With
@@ -272,7 +272,7 @@ def wrappeddispatch(orig, repo, proto, command):
     # If the return type is a `pushres`, `_sshv1respondbytes` will be called twice.
     # We only want to log a completed SSH event on the second call, so flip the
     # `ignorecall` flag here.
-    res = orig(repo, proto, command)
+    res = orig(repo, proto, command, *args, **kwargs)
     if isinstance(res, wireprototypes.pushres):
         repo._serverlog["ignorecall"] = True
 

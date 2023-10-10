@@ -619,7 +619,7 @@ def debugbase85obsmarkers(ui, markers, **opts):
             fm.condwrite(parents, b"parents", b"parents: %s\n", parents)
 
 
-def wireprotodispatch(orig, repo, proto, command):
+def wireprotodispatch(orig, repo, proto, command, **kwargs):
     """Wraps wireprotov1server.dispatch() to allow operations on unfiltered repo.
 
     Replication consumers need full access to the source repo. The
@@ -633,7 +633,7 @@ def wireprotodispatch(orig, repo, proto, command):
     """
     unfiltereduser = repo.ui.config(b"replication", b"unfiltereduser")
     if not unfiltereduser or unfiltereduser != repo.ui.environ.get(b"USER"):
-        return orig(repo, proto, command)
+        return orig(repo, proto, command, **kwargs)
 
     # We operate on the repo.unfiltered() instance because attempting
     # to adjust the class on a repoview class can result in infinite recursion.
@@ -648,21 +648,21 @@ def wireprotodispatch(orig, repo, proto, command):
 
     try:
         urepo.__class__ = unfilteroncerepo
-        return orig(repo, proto, command)
+        return orig(repo, proto, command, **kwargs)
     finally:
         urepo.__class__ = origclass
 
 
-def wrapped_getdispatchrepo(orig, repo, proto, command):
+def wrapped_getdispatchrepo(orig, repo, proto, command, **kwargs):
     """Wraps `wireprotov1server.getdispatchrepo` to serve the unfiltered repository"""
     unfiltereduser = repo.ui.config(b"replication", b"unfiltereduser")
     if not unfiltereduser or unfiltereduser != repo.ui.environ.get(b"USER"):
-        return orig(repo, proto, command)
+        return orig(repo, proto, command, **kwargs)
 
     permission = wireprotov1server.commands[command].permission
     if permission == b"pull":
         return repo.unfiltered()
-    return orig(repo, proto, command)
+    return orig(repo, proto, command, **kwargs)
 
 
 def extsetup(ui):
