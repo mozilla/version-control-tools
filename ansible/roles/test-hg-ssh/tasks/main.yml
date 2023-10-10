@@ -60,7 +60,8 @@
   copy: src=entrypoint.py dest=/entrypoint.py mode=0755
 
 - name: virtualenv to run test-specific processes
-  include: ../../../tasks/virtualenv.yml
+  include: ../../../tasks/virtualenv3.yml
+           python=/usr/bin/python3.6
            venv=/var/hg/venv_testing
            requirements=../roles/test-hg-ssh/files/requirements-testing.txt
 
