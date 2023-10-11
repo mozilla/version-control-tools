@@ -8,7 +8,7 @@
 import unittest
 
 from hgmolib.ldap_helper import (
-    assert_ldap_args_valid,
+    assert_ldap_arg_valid,
     validate_ldap_inputs,
 )
 
@@ -36,10 +36,10 @@ class TestRepoNameValidation(unittest.TestCase):
         # Valid arguments should not raise.
         self.assertTrue(testfunc("a", "a", kwarg1="a", kwarg2="a"))
 
-    def test_assert_ldap_args_valid(self):
+    def test_assert_ldap_arg_valid(self):
         # Valid arguments.
         for arg in ("hello", "cosheehan@mozilla.com", "hgAccountEnabled"):
-            self.assertTrue(assert_ldap_args_valid(arg) is None)
+            self.assertTrue(assert_ldap_arg_valid(arg) is None)
 
         # Invalid arguments.
         for arg in (
@@ -48,7 +48,7 @@ class TestRepoNameValidation(unittest.TestCase):
             "cosheehan@mozilla.com\\blah",
         ):
             with self.assertRaises(ValueError):
-                assert_ldap_args_valid(arg)
+                assert_ldap_arg_valid(arg)
 
 
 if __name__ == "__main__":
