@@ -338,7 +338,13 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     with open(os.path.join(repo_full, ".hg", "requires"), "rb") as fh:
         generaldelta = b"generaldelta\n" in fh.readlines()
 
-    if not generaldelta:
+    debugformat_json = json.loads(
+        subprocess.check_output([HG, "-R", repo_full, "debugformat", "-T", "json"])
+    )
+    if not any(
+        format["name"] == "generaldelta" and format["repo"] is True
+        for format in debugformat_json
+    ):
         raise Exception("non-generaldelta repo not supported: %s" % repo_full)
 
     # Verify the fncache is correct
