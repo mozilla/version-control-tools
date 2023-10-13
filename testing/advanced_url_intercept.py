@@ -48,7 +48,7 @@ class AdvancedURLInterceptor(object):
     def __init__(self, ui):
         self.ui = ui
 
-    def open(self, req, data=None):
+    def open(self, req, data=None, *args, **kwargs):
         """
         Args:
             req (Request)

@@ -31,7 +31,7 @@ class URLInterceptor(object):
     def __init__(self, ui):
         self.ui = ui
 
-    def open(self, url, data=None, timeout=None):
+    def open(self, url, data=None, timeout=None, **kwargs):
         path = self.ui.config(b"urlintercept", b"path")
         if not path:
             raise error.Abort(b"no urlintercept path defined!")
