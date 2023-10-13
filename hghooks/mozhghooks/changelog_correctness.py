@@ -1,10 +1,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import io
+
 from mercurial.node import short
-from mercurial import (
-    pycompat,
-)
 
 """
 Mercurial changeset objects store a list of changed paths. This allows
@@ -59,8 +58,8 @@ def get_changed_files(repo, cs1, cs2):
         manifest1 = repo.manifest.revision(cs1.manifestnode())
         manifest2 = repo.manifest.revision(cs2.manifestnode())
 
-    lines1 = iter(pycompat.stringio(manifest1))
-    lines2 = iter(pycompat.stringio(manifest2))
+    lines1 = iter(io.StringIO(manifest1.decode("utf-8")))
+    lines2 = iter(io.StringIO(manifest2.decode("utf-8")))
 
     def get_next(lines):
         try:
