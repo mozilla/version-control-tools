@@ -57,7 +57,7 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
    }'
  graphentry = '\{
    "node": {node|json},
-@@ -59,12 +93,17 @@ changeset = '\{
+@@ -59,13 +93,18 @@ changeset = '\{
    "node": {node|json},
    "date": {date|json},
    "desc": {desc|utf8|json},
@@ -67,6 +67,7 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
    "tags": [{join(changesettag, ", ")}],
    "user": {author|utf8|json},
    "parents": [{join(parent%changesetparent, ", ")}],
+   "children": [{join(child%changesetparent, ", ")}],
    "files": [{join(files, ", ")}],
    "diff": [{join(diff, ", ")}],
 -  "phase": {phase|json}

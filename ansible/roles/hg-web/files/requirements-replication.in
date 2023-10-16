@@ -8,7 +8,7 @@ cbor2==4.1.2
 boto3
 
 kafka-python==1.4.6
-mercurial==5.9.1
+mercurial==6.5.2
 pygments
 python-hglib
 PyYAML
