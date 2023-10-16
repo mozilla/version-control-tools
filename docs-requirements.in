@@ -10,7 +10,7 @@ docker<2.6
 coverage
 futures
 mach==0.5.1
-mercurial==5.0.1
+mercurial==6.5.2
 PyYAML
 
 # blockdiag has a dependency on setuptools, which pip-compile doesn't

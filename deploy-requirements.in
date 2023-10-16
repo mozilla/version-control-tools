@@ -4,4 +4,4 @@
 
 boto3
 mach==1.0.0
-mercurial==5.9.3
+mercurial==6.5.2
