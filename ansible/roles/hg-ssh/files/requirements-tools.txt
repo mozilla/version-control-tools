@@ -51,26 +51,18 @@ kombu==5.1.0 \
     --hash=sha256:01481d99f4606f6939cdc9b637264ed353ee9e3e4f62cfb582324142c41a572d \
     --hash=sha256:e2dedd8a86c9077c350555153825a31e456a0dc20c15d5751f00137ec9c75f0a
     # via -r ansible/roles/hg-ssh/files/../../../../pylib/vcsreplicator/requirements.in
-mercurial==5.9.1 \
-    --hash=sha256:1bd3d60e2b3f90f338fd96c32032f3bebb1ad4cee781f157de47a1388408272e \
-    --hash=sha256:22564856bcfefe8f8bb22221821564db03f0b00b9011ae174860672bd87e3853 \
-    --hash=sha256:32eff9433c62d781dc93e5a6103327264d897ad2bbce3ecb5d2d78a93cf49f27 \
-    --hash=sha256:371b41adad5198be4c3f0bb4c5cb8878129109c35b25e3a0836402ac8bf94f25 \
-    --hash=sha256:4ab8145182103b4eccdacfe1f655bd9f077723df36f7d1502e6c2ef4268de2ba \
-    --hash=sha256:4b9d0594c367311f05687fdcdc1dae4a0de41ec5e6128d3986f525546e4ad1e5 \
-    --hash=sha256:7f1fb74f1fa26ab9209cf65d9ac8a8e12a72a6a39f6331762c941c1446c70e1f \
-    --hash=sha256:9cb37c3496023929000c10af79bfe8c85b3b931e053f8de65fe829c9c30db8dd \
-    --hash=sha256:bd0e31562107db0b8f5b363da5b3940d03ffca84aee8e24be543465eb126338b
+mercurial==6.5.2 \
+    --hash=sha256:afc39d7067976593c8332b8e97a12afd393b55037c5fb9c3cab1a42c7560f60a
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-pyasn1==0.4.8 \
-    --hash=sha256:39c7e2ec30515947ff4e87fb6f456dfc6e84857d34be479c9d4a4ba4bf46aa5d \
-    --hash=sha256:aef77c9fb94a3ac588e87841208bdec464471d9871bd5050a287cc9a475cd0ba
+pyasn1==0.5.0 \
+    --hash=sha256:87a2121042a1ac9358cabcaf1d07680ff97ee6404333bacca15f76aa8ad01a57 \
+    --hash=sha256:97b7290ca68e62a832558ec3976f15cbf911bf5d7c7039d8b861c2a0ece69fde
     # via
     #   pyasn1-modules
     #   python-ldap
-pyasn1-modules==0.2.8 \
-    --hash=sha256:905f84c712230b2c592c19470d3ca8d552de726050d1d1716282a1f6146be65e \
-    --hash=sha256:a50b808ffeb97cb3601dd25981f6b016cbb3d31fbf57a8b8a87428e6158d0c74
+pyasn1-modules==0.3.0 \
+    --hash=sha256:5bd01446b736eb9d31512a30d46c1ac3395d676c6f3cafa4c03eb54b9925631c \
+    --hash=sha256:d3ccd6ed470d9ffbc716be08bd90efbd44d0734bc9303818f7336070984a162d
     # via python-ldap
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
@@ -81,8 +73,8 @@ python-hglib==2.6.2 \
     # via
     #   -r ansible/roles/hg-ssh/files/../../../../pylib/vcsreplicator/requirements.in
     #   -r ansible/roles/hg-ssh/files/requirements-tools.in
-python-ldap==3.4.2 \
-    --hash=sha256:b16470a0983aaf09a00ffb8f40b69a2446f3d0be639a229256bce381fcb268f7
+python-ldap==3.4.3 \
+    --hash=sha256:ab26c519a0ef2a443a2a10391fa3c5cb52d7871323399db949ebfaa9f25ee2a0
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
 s3transfer==0.5.2 \
     --hash=sha256:7a6f4c4d1fdb9a2b640244008e142cbc2cd3ae34b386584ef044dd0f27101971 \
@@ -100,9 +92,9 @@ typing-extensions==4.1.1 \
     --hash=sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42 \
     --hash=sha256:21c85e0fe4b9a155d0799430b0ad741cdce7e359660ccbd8b530613e8df88ce2
     # via importlib-metadata
-urllib3==1.26.11 \
-    --hash=sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc \
-    --hash=sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a
+urllib3==1.26.17 \
+    --hash=sha256:24d6a242c28d29af46c3fae832c36db3bbebcc533dd1bb549172cd739c82df21 \
+    --hash=sha256:94a757d178c9be92ef5539b8840d48dc9cf1b2709c9d6b588232a055c524458b
     # via botocore
 vine==5.0.0 \
     --hash=sha256:4c9dceab6f76ed92105027c49c823800dd33cacce13bdedc5b914e3514b7fb30 \
