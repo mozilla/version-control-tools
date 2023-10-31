@@ -38,7 +38,7 @@ ffxbld-merge user cannot push non-merge day changes
   adding manifests
   adding file changes
   
-  *************** ERROR ***************
+  **************** ERROR ****************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -50,13 +50,14 @@ ffxbld-merge user cannot push non-merge day changes
   build/defines.sh
   build/mozconfig.common
   config/milestone.txt
+  mobile/android/version.txt
   services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  *************************************
+  ***************************************
   
   transaction abort!
   rollback completed
@@ -74,7 +75,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   adding manifests
   adding file changes
   
-  *************** ERROR ***************
+  **************** ERROR ****************
   ffxbld-merge can only push changes to
   the following paths:
   .hgtags
@@ -86,13 +87,14 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   build/defines.sh
   build/mozconfig.common
   config/milestone.txt
+  mobile/android/version.txt
   services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
   Illegal paths found:
   file0a
   other/file1a
-  *************************************
+  ***************************************
   
   transaction abort!
   rollback completed
