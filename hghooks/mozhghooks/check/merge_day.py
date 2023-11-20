@@ -50,7 +50,7 @@ ALL_MERGE_USERS = {FF_MERGE_USER, FF_STAGE_USER, TB_MERGE_USER, TB_STAGE_USER}
 
 UNIFIED_REPOS = {
     b"firefox": b"mozilla-unified",
-    b"thunderbird": b"comm-central",
+    b"thunderbird": b"comm-unified",
 }
 
 

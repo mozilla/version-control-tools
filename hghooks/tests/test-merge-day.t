@@ -251,7 +251,7 @@ Test tbbld-merge user
   $ cd ..
   $ rm -rf client
   $ rm -rf non-firefox-repo
-  $ hg init comm-central
+  $ hg init comm-unified
   $ hg init releases/comm-beta
   $ configurehooks releases/comm-beta
   $ touch releases/comm-beta/.hg/IS_THUNDERBIRD_REPO
@@ -329,10 +329,10 @@ tbbld-merge user cannot push non-merge day changes, multiple
   [255]
 
 
-tbbld-merge can push changes that have been pushed to comm-central
+tbbld-merge can push changes that have been pushed to comm-unified
 
-  $ USER=someone@example.com hg push $TESTTMP/comm-central
-  pushing to $TESTTMP/comm-central
+  $ USER=someone@example.com hg push $TESTTMP/comm-unified
+  pushing to $TESTTMP/comm-unified
   searching for changes
   adding changesets
   adding manifests
