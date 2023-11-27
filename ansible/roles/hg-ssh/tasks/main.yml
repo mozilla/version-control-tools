@@ -240,6 +240,7 @@
         mode=0644
   with_items:
     - unify-mozilla-unified.ini
+    - unify-comm-unified.ini
 
 - name: sysconfig file for unify repo daemon
   copy: src=sysconfig-unifyrepo
