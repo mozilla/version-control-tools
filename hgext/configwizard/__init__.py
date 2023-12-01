@@ -836,7 +836,13 @@ def update_evolve(ui):
         # Pull the latest stable, update to latest tag/release
         # TRACKING hg58 `source` param is now set via positional args
         if util.versiontuple() >= (5, 8):
-            hgpull(ui, local_evolve_repo, REMOTE_EVOLVE_PATH, branch=(b"stable",))
+            hgpull(
+                ui,
+                local_evolve_repo,
+                REMOTE_EVOLVE_PATH,
+                branch=(b"stable",),
+                remote_hidden=False,
+            )
         else:
             hgpull(
                 ui, local_evolve_repo, source=REMOTE_EVOLVE_PATH, branch=(b"stable",)
