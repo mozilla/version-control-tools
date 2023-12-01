@@ -118,12 +118,6 @@ and checking the "tweakdefaults" section.
 Would you like to enable these features (Yn)? $$ &Yes $$ &No
 """.strip()
 
-EVOLVE_INCOMPATIBLE = b"""
-Evolve requires Mercurial 4.3+. Your Mercurial is too old to run evolve.
-
-Please upgrade Mercurial to use evolve.
-""".lstrip()
-
 WATCHMAN_NOT_FOUND = b"""
 The "watchman" filesystem watching tool could not be found or isn't
 working.
@@ -493,7 +487,7 @@ def configwizard(ui, repo, statedir=None, **opts):
         _checkhistoryediting(ui, cw, hgversion)
 
     if b"evolve" in runsteps:
-        _checkevolve(ui, cw, hgversion)
+        _checkevolve(ui, cw)
 
     if b"fsmonitor" in runsteps:
         _checkfsmonitor(ui, cw, hgversion)
@@ -856,11 +850,7 @@ def update_evolve(ui):
         ui.write(EVOLVE_CLONE_ERROR)
 
 
-def _checkevolve(ui, cw, hg_version):
-    if hg_version < (4, 3, 0):
-        ui.warn(EVOLVE_INCOMPATIBLE)
-        return
-
+def _checkevolve(ui, cw):
     local_evolve_path = get_local_evolve_path(ui)
     evolve_config_value = os.path.normcase(
         os.path.normpath(

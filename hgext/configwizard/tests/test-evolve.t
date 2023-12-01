@@ -3,25 +3,6 @@
   $ mkdir $TESTTMP/evolve_test_dir
   $ export EVOLVETMP=$TESTTMP/evolve_test_dir
 
-  $ cat > fakeversion.py << EOF
-  > from mercurial import util
-  > util.version = lambda: b'4.2.3'
-  > EOF
-
-Warning printed if Mercurial < 4.3
-
-  $ hg --config extensions.fakeversion=fakeversion.py --config configwizard.steps=evolve,configchange configwizard
-  This wizard will guide you through configuring Mercurial for an optimal
-  experience contributing to Mozilla projects.
-  
-  The wizard makes no changes without your permission.
-  
-  To begin, press the enter/return key.
-   <RETURN>
-  Evolve requires Mercurial 4.3+. Your Mercurial is too old to run evolve.
-  
-  Please upgrade Mercurial to use evolve.
-
 Rejecting evolve extension doesn't install and download
 
   $ hg --config ui.interactive=true --config configwizard.steps=evolve,configchange configwizard << EOF
