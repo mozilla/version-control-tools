@@ -126,6 +126,7 @@ def install_mercurials(venv, hg="hg"):
         "6.3.2",
         "6.4.3",
         "6.5.2",
+        "6.6",
         "@",
     ]
 
