@@ -36,9 +36,9 @@ buglink = b"https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox%20Build%2
 
 
 def find_python():
-    for python_variant in (b"py", b"python3", b"python"):
+    for python_variant in ("py", "python3", "python"):
         if shutil.which(python_variant):
-            return python_variant
+            return python_variant.encode("utf-8")
 
     raise error.Abort(b"Could not find a suitable Python to run `mach`!")
 
