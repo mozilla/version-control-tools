@@ -123,7 +123,7 @@ Do not pull if evolve enabled, in sibling directory to v-c-t (managed by wizard)
   > <RETURN>
   > n
   > EOF
-  pulling from https://www.mercurial-scm.org/repo/evolve/
+  pulling from https://repo.mercurial-scm.org/evolve/
   no changes found
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   Evolve was updated successfully.
@@ -144,7 +144,7 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   saved backup bundle to * (glob)
 
   $ hg --config mozilla.mozbuild_state_path="$EVOLVETMP" --config extensions.evolve=$EVOLVETMP/evolve/hgext3rd/evolve --config configwizard.steps=evolve,configchange configwizard
-  pulling from https://www.mercurial-scm.org/repo/evolve/
+  pulling from https://repo.mercurial-scm.org/evolve/
   searching for changes
   adding changesets
   adding manifests

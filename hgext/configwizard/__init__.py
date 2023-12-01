@@ -266,7 +266,7 @@ rebase
 Would you like to enable these history editing extensions (Yn)? $$ &Yes $$ &No
 """.strip()
 
-REMOTE_EVOLVE_PATH = b"https://www.mercurial-scm.org/repo/evolve/"
+REMOTE_EVOLVE_PATH = b"https://repo.mercurial-scm.org/evolve/"
 
 EVOLVE_INFO_WARNING = b"""
 The evolve extension is a Mercurial extension for faster and
