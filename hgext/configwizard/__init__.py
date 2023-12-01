@@ -409,7 +409,7 @@ def _vcthome():  # Returns the directory where the vct clone is located
     return pycompat.bytestr(vcthome_dir)
 
 
-if registrar and util.safehasattr(registrar, b"configitem"):
+if registrar and util.safehasattr(registrar, "configitem"):
     configtable = {}
     configitem = registrar.configitem(configtable)
 
