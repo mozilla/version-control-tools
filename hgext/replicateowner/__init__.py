@@ -62,7 +62,7 @@ def exchange_pull_owner(orig, pullop):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireprotov1server, b"_capabilities", _capabilities)
-    extensions.wrapfunction(exchange, b"_pullobsolete", exchange_pull_owner)
+    extensions.wrapfunction(wireprotov1server, "_capabilities", _capabilities)
+    extensions.wrapfunction(exchange, "_pullobsolete", exchange_pull_owner)
 
     sshpeer.sshv1peer = sshv1peer

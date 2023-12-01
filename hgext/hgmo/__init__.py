@@ -855,11 +855,11 @@ def hgwebfastannotate(orig, req, fctx, ui):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(exchange, b"pull", pull)
-    extensions.wrapfunction(webutil, b"changesetentry", changesetentry)
-    extensions.wrapfunction(webutil, b"changelistentry", changelistentry)
-    extensions.wrapfunction(bookmarks, b"updatefromremote", bmupdatefromremote)
-    extensions.wrapfunction(webcommands, b"filelog", filelog)
+    extensions.wrapfunction(exchange, "pull", pull)
+    extensions.wrapfunction(webutil, "changesetentry", changesetentry)
+    extensions.wrapfunction(webutil, "changelistentry", changelistentry)
+    extensions.wrapfunction(bookmarks, "updatefromremote", bmupdatefromremote)
+    extensions.wrapfunction(webcommands, "filelog", filelog)
 
     # Install IP filtering for bundle URLs.
 
@@ -898,7 +898,7 @@ def reposetup(ui, repo):
     # fastannotate in Mercurial 4.8 has buggy hgweb support. We always remove
     # its monkeypatch if present.
     try:
-        extensions.unwrapfunction(webutil, b"annotate", fasupport._hgwebannotate)
+        extensions.unwrapfunction(webutil, "annotate", fasupport._hgwebannotate)
     except ValueError:
         pass
 
@@ -911,8 +911,8 @@ def reposetup(ui, repo):
     if fastannotate and b"hgweb" in ui.configlist(b"fastannotate", b"modes"):
         # Guard against recursive chaining, since we're in reposetup().
         try:
-            extensions.unwrapfunction(webutil, b"annotate", hgwebfastannotate)
+            extensions.unwrapfunction(webutil, "annotate", hgwebfastannotate)
         except ValueError:
             pass
 
-        extensions.wrapfunction(webutil, b"annotate", hgwebfastannotate)
+        extensions.wrapfunction(webutil, "annotate", hgwebfastannotate)

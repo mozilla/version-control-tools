@@ -506,20 +506,20 @@ class sshserverwrapped(wireprotoserver.sshserver):
 
 def extsetup(ui):
     if wireprotov1server:
-        extensions.wrapfunction(wireprotov1server, b"dispatch", wrappeddispatch)
+        extensions.wrapfunction(wireprotov1server, "dispatch", wrappeddispatch)
 
     if wireprotoserver:
         extensions.wrapfunction(
-            wireprotoserver.sshv1protocolhandler, b"getpayload", wrapped_getpayload
+            wireprotoserver.sshv1protocolhandler, "getpayload", wrapped_getpayload
         )
         extensions.wrapfunction(
-            wireprotoserver, b"_sshv1respondbytes", wrappedsshv1respondbytes
+            wireprotoserver, "_sshv1respondbytes", wrappedsshv1respondbytes
         )
         extensions.wrapfunction(
-            wireprotoserver, b"_sshv1respondstream", wrappedsshv1respondstream
+            wireprotoserver, "_sshv1respondstream", wrappedsshv1respondstream
         )
         extensions.wrapfunction(
-            wireprotoserver, b"_sshv1respondooberror", wrappedsshv1respondooberror
+            wireprotoserver, "_sshv1respondooberror", wrappedsshv1respondooberror
         )
 
     if ui.configbool(b"serverlog", b"hgweb"):

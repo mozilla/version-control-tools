@@ -716,14 +716,14 @@ def template_fxheads(context, mapping):
 def extsetup(ui):
     # TRACKING hg64 - `_peerorrepo` is removed, wrap `hg.peer` directly.
     if util.versiontuple() >= (6, 4):
-        extensions.wrapfunction(hg, b"peer", wrapped_peer)
+        extensions.wrapfunction(hg, "peer", wrapped_peer)
     else:
-        extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
-    extensions.wrapfunction(hg, b"share", share)
-    extensions.wrapfunction(exchange, b"push", push)
-    extensions.wrapfunction(exchange, b"_pullobsolete", wrappedpullobsolete)
-    extensions.wrapfunction(exchange, b"_pullbookmarks", wrappedpullbookmarks)
-    extensions.wrapfunction(wireprotov1server, b"_capabilities", capabilities)
+        extensions.wrapfunction(hg, "_peerorrepo", wrapped_peerorrepo)
+    extensions.wrapfunction(hg, "share", share)
+    extensions.wrapfunction(exchange, "push", push)
+    extensions.wrapfunction(exchange, "_pullobsolete", wrappedpullobsolete)
+    extensions.wrapfunction(exchange, "_pullbookmarks", wrappedpullbookmarks)
+    extensions.wrapfunction(wireprotov1server, "_capabilities", capabilities)
     # TRACKING hg58 - pull function has a different signature
     if util.versiontuple() >= (5, 8):
         extensions.wrapcommand(commands.table, b"outgoing", outgoingcommand)

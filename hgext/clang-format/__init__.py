@@ -129,5 +129,5 @@ def reposetup(ui, repo):
     if not repo.local() or "MOZPHAB" in os.environ or not is_firefox_repo(repo):
         return
 
-    extensions.wrapfunction(localrepo.localrepository, b"commit", wrappedcommit)
-    extensions.wrapfunction(cmdutil, b"amend", wrappedamend)
+    extensions.wrapfunction(localrepo.localrepository, "commit", wrappedcommit)
+    extensions.wrapfunction(cmdutil, "amend", wrappedamend)

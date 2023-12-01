@@ -38,4 +38,4 @@ def bookmarks_updatefromremote(orig, ui, repo, remotemarks, *args, **kwargs):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(bookmod, b"updatefromremote", bookmarks_updatefromremote)
+    extensions.wrapfunction(bookmod, "updatefromremote", bookmarks_updatefromremote)

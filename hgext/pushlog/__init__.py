@@ -1190,10 +1190,10 @@ def verifypushlog(ui, repo):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireproto, b"_capabilities", capabilities)
-    extensions.wrapfunction(exchange, b"_pullobsolete", exchangepullpushlog)
+    extensions.wrapfunction(wireproto, "_capabilities", capabilities)
+    extensions.wrapfunction(exchange, "_pullobsolete", exchangepullpushlog)
 
-    extensions.wrapfunction(webutil, b"commonentry", commonentry)
+    extensions.wrapfunction(webutil, "commonentry", commonentry)
 
 
 def reposetup(ui, repo):

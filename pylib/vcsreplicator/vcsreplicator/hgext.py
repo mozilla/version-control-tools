@@ -666,10 +666,10 @@ def wrapped_getdispatchrepo(orig, repo, proto, command, **kwargs):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(wireprotov1server, b"dispatch", wireprotodispatch)
+    extensions.wrapfunction(wireprotov1server, "dispatch", wireprotodispatch)
     extensions.wrapcommand(commands.table, b"init", initcommand)
     extensions.wrapfunction(
-        wireprotov1server, b"getdispatchrepo", wrapped_getdispatchrepo
+        wireprotov1server, "getdispatchrepo", wrapped_getdispatchrepo
     )
 
     if _ORIG_PHASE_HEADS_HANDLER:

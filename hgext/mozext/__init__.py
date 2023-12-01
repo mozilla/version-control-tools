@@ -1444,15 +1444,15 @@ def oops(ui, repo, rev, **opts):
 
 
 def extsetup(ui):
-    extensions.wrapfunction(exchange, b"pull", wrappedpull)
-    extensions.wrapfunction(exchange, b"push", wrappedpush)
-    extensions.wrapfunction(exchange, b"_pullobsolete", exchangepullpushlog)
+    extensions.wrapfunction(exchange, "pull", wrappedpull)
+    extensions.wrapfunction(exchange, "push", wrappedpush)
+    extensions.wrapfunction(exchange, "_pullobsolete", exchangepullpushlog)
 
     # TRACKING hg64 - `_peerorrepo` is removed, wrap `hg.peer` directly.
     if util.versiontuple() >= (6, 4):
-        extensions.wrapfunction(hg, b"peer", wrapped_peer)
+        extensions.wrapfunction(hg, "peer", wrapped_peer)
     else:
-        extensions.wrapfunction(hg, b"_peerorrepo", wrapped_peerorrepo)
+        extensions.wrapfunction(hg, "_peerorrepo", wrapped_peerorrepo)
 
     if ui.configbool(b"mozext", b"disable_local_database"):
         return
