@@ -416,7 +416,6 @@ wizardsteps = set(
         b"username",
         b"tweakdefaults",
         b"diff",
-        b"color",
         b"historyediting",
         b"evolve",
         b"fsmonitor",
@@ -496,9 +495,6 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     if b"diff" in runsteps:
         _checkdiffsettings(ui, cw)
-
-    if b"color" in runsteps:
-        _checkcolor(ui, cw, hgversion)
 
     if b"historyediting" in runsteps:
         _checkhistoryediting(ui, cw, hgversion)
@@ -779,26 +775,6 @@ def _promptvctextension(ui, cw, ext, msg):
         return
 
     _enableext(cw, pycompat.sysstr(ext), ext_path)
-
-
-def _checkcolor(ui, cw, hg_version):
-    # Mercurial 4.2 has color built-in and enabled by default. We only enable
-    # the extension on old versions. And we remove the extension on modern
-    # versions.
-    color_builtin = hg_version >= (4, 2, 0)
-
-    if color_builtin:
-        ext = cw.c.get("extensions", {})
-        if "color" in ext:
-            ui.write(
-                b"Removing extensions.color because color is enabled "
-                b"by default in Mercurial 4.2+\n"
-            )
-            del ext["color"]
-    else:
-        _promptnativeextension(
-            ui, cw, b"color", b"Enable color output to your terminal"
-        )
 
 
 def _try_curses_import():
