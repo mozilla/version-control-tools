@@ -191,13 +191,6 @@ is in.)
 Would you like to install the `hg show` extension and `hg wip` alias (Yn)? $$ &Yes $$ &No
 """.lstrip()
 
-WIP_UPDATED_EXPRESSION = b"""
-It appears you are on a new version of Mercurial (4.6+) but you are using the old `hg wip` alias.
-In new versions of Mercurial, the revset expression `unstable` has been renamed to `orphan`.
-
-We will update the alias for you so it uses the new keyword.
-""".lstrip()
-
 SMARTANNOTATE_INFO = b"""
 The ``hg smart-annotate`` command provides experimental support for
 viewing the annotate information while skipping certain changesets,
@@ -950,19 +943,8 @@ def _checkfsmonitor(ui, cw, hgversion):
 
 def _checkwip(ui, cw):
     havewip_alias = ui.hasconfig(b"alias", b"wip")
-    havewip_revset = ui.hasconfig(b"revsetalias", b"wip")
 
-    hg_version = util.versiontuple(n=2)
-
-    # If the user has the `wip` revset alias, they are on hg46+ and have the old alias
-    # (ie with `orphan` expression instead of `unstable`), we upgrade with a notice
-    if (
-        havewip_revset
-        and hg_version >= (4, 6)
-        and b"unstable" in ui.config(b"revsetalias", b"wip")
-    ):
-        ui.write(WIP_UPDATED_EXPRESSION)
-    elif not havewip_alias and uipromptchoice(ui, WIP_INFO):
+    if not havewip_alias and uipromptchoice(ui, WIP_INFO):
         return
 
     # The wip configuration changes over time. Ensure it is up to date.
@@ -974,20 +956,15 @@ def _checkwip(ui, cw):
     cw.c["extensions"]["show"] = ""
     cw.c["alias"]["wip"] = "log --graph --rev=wip --template=wip"
 
-    if hg_version < (4, 6):
-        unstable = "unstable"
-    else:
-        unstable = "orphan"
-
     wiprevset = (
         "("
         "parents(not public()) "
         "or not public() "
         "or . "
         "or (head() and branch(default))"
-        ") and (not obsolete() or %s()^) "
+        ") and (not obsolete() or orphan()^) "
         "and not closed()"
-    ) % unstable
+    )
 
     if ui.hasconfig(b"extensions", b"firefoxtree") or "firefoxtree" in cw.c.get(
         "extensions", {}
