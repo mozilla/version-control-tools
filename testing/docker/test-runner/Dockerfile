@@ -97,7 +97,7 @@ RUN chown -R vct:vct /app
 
 USER vct
 
-# Install editable requirements py2/py3
+# Install editable requirements.
 RUN pip install -e vct/pylib/Bugsy
 RUN pip install -e vct/pylib/mozansible
 RUN pip install -e vct/pylib/mozhg

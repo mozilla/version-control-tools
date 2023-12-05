@@ -296,16 +296,9 @@ def create_global():
     )
 
     # No `name` parameter since this will be the top-level venv
-    venv_py2 = create_virtualenv(python="python2")
     venv_py3 = create_virtualenv(name="py3", python="python3")
 
-    venvs = (
-        venv_py2,
-        venv_py3,
-    )
-
     # Install third-party dependencies
-    process_pip_requirements(venv_py2, "test-requirements.txt")
     process_pip_requirements(venv_py3, "test-requirements-3.txt")
 
     # Install editable packages
@@ -320,14 +313,12 @@ def create_global():
         "hghooks",
         "testing",
     }
-    for venv in venvs:
-        for package in editables:
-            install_editable(venv, package)
+    for package in editables:
+        install_editable(venv_py3, package)
 
-    install_mercurials(venv_py2)
     install_mercurials(venv_py3)
 
-    cinnabar_dest = os.path.join(venv_py2["path"], "git-cinnabar")
+    cinnabar_dest = os.path.join(venv_py3["path"], "git-cinnabar")
     install_cinnabar(dest=cinnabar_dest)
 
     if os.getenv("NO_DOCKER"):
@@ -353,8 +344,7 @@ def create_global():
             )
             sys.exit(1)
 
-    # Return info about Py2 venv since we still require that to run tests
-    return venv_py2
+    return venv_py3
 
 
 if __name__ == "__main__":
