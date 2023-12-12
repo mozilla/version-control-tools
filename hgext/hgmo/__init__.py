@@ -690,8 +690,8 @@ def cloud_region_specifier(instance_data):
     }
 
 
-def processbundlesmanifest(orig, repo, proto):
-    """Wraps wireproto.clonebundles.
+def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
+    """Wraps `wireprotov1server.clonebundles` and `wireprotov1server.clonebundles_2`.
 
     We examine source IP addresses and advertise URLs for the same
     AWS region if the source is in AWS.
@@ -701,7 +701,7 @@ def processbundlesmanifest(orig, repo, proto):
     import ipaddress
 
     # Call original fxn wireproto.clonebundles
-    manifest = orig(repo, proto)
+    manifest = orig(repo, proto, *args)
 
     if not isinstance(proto, webproto):
         return manifest
@@ -866,6 +866,9 @@ def extsetup(ui):
     # Build-in command from core Mercurial.
     extensions.wrapcommand(
         wireprotov1server.commands, b"clonebundles", processbundlesmanifest
+    )
+    extensions.wrapcommand(
+        wireprotov1server.commands, b"clonebundles_manifest", processbundlesmanifest
     )
 
     entry = extensions.wrapcommand(commands.table, b"serve", servehgmo)
