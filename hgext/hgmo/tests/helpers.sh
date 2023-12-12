@@ -9,6 +9,11 @@ hgmo = $TESTDIR/hgext/hgmo
 [web]
 push_ssl = False
 allow_push = *
+
+[hgmo]
+awsippath = $TESTDIR/ansible/roles/test-hg-web/files/aws-ip-ranges.json
+gcpippath = $TESTDIR/ansible/roles/test-hg-web/files/gcp-ip-ranges.json
+mozippath = $TESTDIR/ansible/roles/test-hg-web/files/moz-ip-ranges.txt
 EOF
 
   hg serve -d -p $HGPORT --pid-file hg.pid --hgmo -E error.log
