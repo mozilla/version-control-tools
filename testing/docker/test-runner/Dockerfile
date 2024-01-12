@@ -58,10 +58,6 @@ RUN chown -R vct:vct /app
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-# For testing older versions of Mercurial against Python 3
-# TODO remove once Mercurial 5.1 is not supported
-ENV HGPYTHON3=1
-
 # Install pyenv.
 ENV HOME="/vct"
 RUN git clone --depth=1 https://github.com/pyenv/pyenv.git $HOME/.pyenv

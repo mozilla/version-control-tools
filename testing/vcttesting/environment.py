@@ -94,11 +94,7 @@ def process_pip_requirements(venv, requirements):
         "-r",
         os.path.join(ROOT, requirements),
     ]
-
-    hg_env = os.environ.copy()
-    hg_env["HGPYTHON3"] = "1"
-
-    subprocess.check_call(args, env=hg_env)
+    subprocess.check_call(args)
 
 
 def install_editable(venv, relpath, extra_env=None):
@@ -136,7 +132,6 @@ def install_mercurials(venv, hg="hg"):
     # vanilla Mercurial.
     hg_env = dict(os.environ)
     hg_env["HGRCPATH"] = ""
-    hg_env["HGPYTHON3"] = "1"
 
     # Ensure a Mercurial clone is present and up to date.
     if not os.path.isdir(hg_dir):

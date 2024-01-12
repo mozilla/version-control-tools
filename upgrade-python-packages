@@ -19,7 +19,6 @@ def process_input_file(
 
     env = dict(os.environ)
     env["CUSTOM_COMPILE_COMMAND"] = sys.argv[0]
-    env["HGPYTHON3"] = "1"
 
     try:
         subprocess.run(
