@@ -43,22 +43,22 @@ RE_ARCHIVE_FILENAMES = re.compile(
 )
 
 NIGHTLY_JSON_FILES = {
-    b"linux32": re.compile(b"^firefox-.*\.linux-i686\.json$"),
-    b"linux64": re.compile(b"^firefox-.*\.linux-x86_64\.json$"),
-    b"linux64-asan": re.compile(b"^firefox-.*\.linux-x86_64-asan\.json$"),
-    b"mac": re.compile(b"^firefox-.*\.mac(64)?\.json$"),
-    b"win32": re.compile(b"^firefox-.*\.win32\.json$"),
-    b"win64": re.compile(b"^firefox-.*\.win64(-x86_64)?\.json$"),
+    b"linux32": re.compile(rb"^firefox-.*\.linux-i686\.json$"),
+    b"linux64": re.compile(rb"^firefox-.*\.linux-x86_64\.json$"),
+    b"linux64-asan": re.compile(rb"^firefox-.*\.linux-x86_64-asan\.json$"),
+    b"mac": re.compile(rb"^firefox-.*\.mac(64)?\.json$"),
+    b"win32": re.compile(rb"^firefox-.*\.win32\.json$"),
+    b"win64": re.compile(rb"^firefox-.*\.win64(-x86_64)?\.json$"),
 }
 
 NIGHTLY_TEXT_FILES = {
-    b"linux32": re.compile(b"^firefox-.*\.linux-i686\.txt$"),
-    b"linux64": re.compile(b"^firefox-.*\.linux-x86_64\.txt$"),
-    b"linux64-asan": re.compile(b"^firefox-.*-x86_64-asan\.txt$"),
-    b"mac": re.compile(b"^firefox-.*\.mac(64)?\.txt$"),
-    b"mac-shark": re.compile(b"^firefox-.*\.mac-shark\.txt$"),
-    b"win32": re.compile(b"^firefox-.*\.win32\.txt$"),
-    b"win64": re.compile(b"^firefox-.*\.win64(-x86_64)?\.txt$"),
+    b"linux32": re.compile(rb"^firefox-.*\.linux-i686\.txt$"),
+    b"linux64": re.compile(rb"^firefox-.*\.linux-x86_64\.txt$"),
+    b"linux64-asan": re.compile(rb"^firefox-.*-x86_64-asan\.txt$"),
+    b"mac": re.compile(rb"^firefox-.*\.mac(64)?\.txt$"),
+    b"mac-shark": re.compile(rb"^firefox-.*\.mac-shark\.txt$"),
+    b"win32": re.compile(rb"^firefox-.*\.win32\.txt$"),
+    b"win64": re.compile(rb"^firefox-.*\.win64(-x86_64)?\.txt$"),
 }
 
 # Keys from above dicts that should be filtered out.
@@ -67,7 +67,7 @@ NIGHTLY_IGNORE_PLATFORMS = {
     b"mac-shark",
 }
 
-RE_APP_VERSION = re.compile("^firefox-(?P<version>.+)\.en-US\.")
+RE_APP_VERSION = re.compile(r"^firefox-(?P<version>.+)\.en-US\.")
 
 # URLs where we're unable to find builds due to valid reasons.
 INVALID_NIGHTLY_URLS = {
@@ -99,7 +99,7 @@ MISSING_RELEASES = {
     b"40.0.1",
 }
 
-RE_TAG = re.compile(b"^FIREFOX_(?P<version>.*)_RELEASE$")
+RE_TAG = re.compile(rb"^FIREFOX_(?P<version>.*)_RELEASE$")
 
 
 def get_session():

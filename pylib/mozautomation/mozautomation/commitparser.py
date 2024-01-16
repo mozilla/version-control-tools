@@ -94,13 +94,13 @@ BACKOUT_MULTI_ONELINE_RE = re.compile(
     re.I,
 )
 
-SHORT_RE = re.compile(b"^[0-9a-f]{12}$", re.I)
+SHORT_RE = re.compile(rb"^[0-9a-f]{12}$", re.I)
 
-DIGIT_RE = re.compile(b"#?\d+")
+DIGIT_RE = re.compile(rb"#?\d+")
 
 # Strip out a white-list of metadata prefixes.
 # Currently just MozReview-Commit-ID
-METADATA_RE = re.compile(b"^MozReview-Commit-ID: ")
+METADATA_RE = re.compile(rb"^MozReview-Commit-ID: ")
 
 DIFFERENTIAL_REVISION_RE = re.compile(
     rb"(?P<phaburl>https://phabricator.services.mozilla.com/D\d+)"
@@ -297,19 +297,19 @@ def parse_commit_id(s):
 
     Returns None if the commit ID is not found.
     """
-    m = re.search(b"^MozReview-Commit-ID: ([a-zA-Z0-9]+)$", s, re.MULTILINE)
+    m = re.search(rb"^MozReview-Commit-ID: ([a-zA-Z0-9]+)$", s, re.MULTILINE)
     if not m:
         return None
 
     return m.group(1)
 
 
-RE_SOURCE_REPO = re.compile(b"^Source-Repo: (https?:\/\/.*)$", re.MULTILINE)
-RE_SOURCE_REVISION = re.compile(b"^Source-Revision: (.*)$", re.MULTILINE)
+RE_SOURCE_REPO = re.compile(rb"^Source-Repo: (https?:\/\/.*)$", re.MULTILINE)
+RE_SOURCE_REVISION = re.compile(rb"^Source-Revision: (.*)$", re.MULTILINE)
 
 RE_XCHANNEL_REVISION = re.compile(
-    b"^X-Channel-Repo: (?P<repo>[a-zA-Z0-9/\-._]+?)\n"
-    b"X-Channel-Converted-Revision: (?P<revision>[a-fA-F0-9]{12,40}?)$",
+    rb"^X-Channel-Repo: (?P<repo>[a-zA-Z0-9/\-._]+?)\n"
+    rb"X-Channel-Converted-Revision: (?P<revision>[a-fA-F0-9]{12,40}?)$",
     re.MULTILINE,
 )
 
