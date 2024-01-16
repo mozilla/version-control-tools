@@ -11,7 +11,7 @@ from ..checks import (
     print_banner,
 )
 
-allowed_paths = re.compile(b"testing/web-platform/(?:moz\.build|meta/.*|tests/.*)$")
+allowed_paths = re.compile(rb"testing/web-platform/(?:moz\.build|meta/.*|tests/.*)$")
 
 INVALID_PATH_FOUND = b"""
 wptsync@mozilla.com can only make changes to
