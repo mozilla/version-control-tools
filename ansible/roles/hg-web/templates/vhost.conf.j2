@@ -33,6 +33,10 @@ LimitRequestFields 1000
     RewriteEngine on
     RewriteRule ^/(.*)index.cgi/?(.*) https://hg.mozilla.org/$1$2
 
+    # Redirect requests for Geckodriver's Cargo.toml to Github.
+    # See bug 1876226.
+    RewriteRule ^mozilla-central/raw-file/tip/testing/geckodriver/Cargo\.toml$ https://raw.githubusercontent.com/mozilla/geckodriver/release/Cargo.toml
+
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
 
