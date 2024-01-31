@@ -190,11 +190,11 @@
 #
 # The replicateowner extension doesn't work with https:// remotes, so it is disabled.
 - name: clone version-control-tools repo (server only)
-  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true clone -U /repo/hg/mozilla/version-control-tools /var/hg/version-control-tools creates=/var/hg/version-control-tools
   when: is_testing is not defined
 
 - name: pull version-control-tools (server only)
-  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
+  command: /var/hg/venv_hgweb/bin/hg --config extensions.replicateowner=! --config hooks.precommit.prevent_changes=true --config hooks.pretxnchangegroup.prevent_changes=true -R /var/hg/version-control-tools pull /repo/hg/mozilla/hgcustom/version-control-tools
   when: is_testing is not defined
 
 - name: update version-control-tools revision (server only)

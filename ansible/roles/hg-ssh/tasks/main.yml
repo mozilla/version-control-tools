@@ -148,11 +148,11 @@
   register: vct_clone
 
 - name: create v-c-t clone (server only)
-  command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! clone https://hg.mozilla.org/hgcustom/version-control-tools /var/hg/version-control-tools
+  command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! clone /repo/hg/mozilla/hgcustom/version-control-tools /var/hg/version-control-tools
   when: is_testing is not defined and vct_clone.stat.exists == False
 
 - name: pull version-control-tools repo (server only)
-  command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config extensions.mozhooks=! -R /var/hg/version-control-tools pull https://hg.mozilla.org/hgcustom/version-control-tools
+  command: /var/hg/venv_tools/bin/hg --config extensions.replicateowner=! --config extensions.vcsreplicator=! --config extensions.readonly=! --config extensions.mozhooks=! -R /var/hg/version-control-tools pull /repo/hg/mozilla/hgcustom/version-control-tools
   when: is_testing is not defined
 
 - name: update version-control-tools repo (server only)
