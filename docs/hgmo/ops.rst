@@ -109,6 +109,36 @@ without manual intervention. If memory usage has spiked as a result of increased
 number of connections, administrators can run ``sudo apachectl graceful`` to
 gracefully restart httpd.
 
+Dealing with Spam and Service Abuse
+-----------------------------------
+
+hg.mozilla.org is frequently the target of spam and service abuse. Dealing with
+these issues involves identifying the IP addresses the abuse is originating from
+and banning them. First, we want to be able to view the active connections to
+the service.
+
+1. Log in to the Zeus load balancer at https://zlb1.external.ops.mdc1.mozilla.com:9090
+2. Click ``Activity`` in the top manu bar, then ``Connections`` in the menu bar for the
+   updated view.
+3. In the ``Connection Filters`` section, add a ``Virtual Server`` filter for ``equals``
+   ``hg.mozilla.org-https``.
+4. You are now presented with a view of every active connection to the server.
+5. Click on the "From" column to sort the requests by the originating IP address.
+6. Look through the active connections for traffic that appears abusive. For example,
+   a single IP address sending many requests to low-traffic repositories, an excess
+   of requests coming from a subnet of IP addresses, or IPs sending requests that
+   are clearly not legitimate (XSS scans, etc). Typically traffic in the 34.x.x.x
+   IP space is from GCP and is mostly legitimate, and non-legitimate traffic originates
+   from outside that range.
+7. Once you have found the source IP of the spam, click the IP address and copy it.
+8. Open a new tab with the ``Catalogs`` view from the top-level menu bar.
+9. Click ``Protection`` in the Catalogs sub-menu bar.
+10. Click ``hg``, and open the ``Access Restrictions`` view.
+11. Paste the IP address in the ``Add banned IP`` input box. Make sure to remove the
+    port from the copied value. You can also add subnets if the IP was coming from
+    more than one IP address.
+12. Click ``Update`` under the ``Apply Changes`` section to add the IP to the banlist.
+
 Zeus Rate Limiting
 ------------------
 
