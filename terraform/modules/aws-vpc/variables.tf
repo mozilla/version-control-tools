@@ -29,10 +29,6 @@ variable "mirror_ami" {
   description = "AMI ID for mirror instances"
 }
 
-variable "route53_zone_id" {
-  description = "Route53 private hosted zone ID"
-}
-
 variable "taskcluster_vpc_cidr" {
   description = "CIDR block of the Taskcluster VPC in the same AWS region"
 }
