@@ -92,6 +92,12 @@ resource "aws_s3_bucket" "metadata-bucket" {
 # Set up valid users within this environment
 resource "aws_iam_user" "user-cosheehan" {
   name = "cosheehan"
+  tags          = {
+    "AKIA2GHRPQZBOYHYVYMW" = "hgaws access key - Terraform"
+  }
+  tags_all      = {
+    "AKIA2GHRPQZBOYHYVYMW" = "hgaws access key - Terraform"
+  }
 }
 
 # This user is used to upload to S3.
