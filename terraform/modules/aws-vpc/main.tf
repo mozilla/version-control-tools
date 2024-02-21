@@ -372,44 +372,27 @@ resource "aws_network_acl" "hgci-networkacl" {
     module.pubsubnet-b.subnet_id,
   ]
 
-  # Allow SSH in from the world
-  ingress {
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 22
-    protocol   = "tcp"
-    rule_no    = 10
-    to_port    = 22
-  }
-
-  # Allow outgoing https
-  egress {
-    cidr_block = var.cidr_block
-    action     = "allow"
-    from_port  = 443
-    protocol   = "tcp"
-    rule_no    = 20
-    to_port    = 443
+  ingress {                                                                                                                                                                                 
+      action          = "allow"                                                                                                                                                     
+      cidr_block      = "0.0.0.0/0"                                                  
+      from_port       = 0                                                                                                                                                           
+      icmp_code       = 0                                                            
+      icmp_type       = 0                                                            
+      protocol        = "-1"                                                         
+      rule_no         = 100                                                                                                                                                         
+      to_port         = 0                                                            
   }
 
   # Allow outgoing SSH
   egress {
-    cidr_block = var.cidr_block
-    action     = "allow"
-    from_port  = 22
-    protocol   = "tcp"
-    rule_no    = 30
-    to_port    = 22
-  }
-
-  # Deny everything else
-  ingress {
-    action     = "deny"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    protocol   = "-1"
-    rule_no    = 100
-    to_port    = 0
+      action          = "allow"                                                                                                                                                     
+      cidr_block      = "0.0.0.0/0"                                                                                                                                                 
+      from_port       = 0                                                                                                                                                           
+      icmp_code       = 0                                                                                                                                                           
+      icmp_type       = 0                                                                                                                                                           
+      protocol        = "-1"                                                                                                                                                        
+      rule_no         = 100                                                                                                                                                         
+      to_port         = 0
   }
 
   tags = {
