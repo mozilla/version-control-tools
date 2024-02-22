@@ -81,6 +81,7 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
     """Validates that the set of all required GCP regions is a subset
     of all the regions in the iterable of IP networks"""
     required_regions = {
+        "northamerica-northeast1",
         "us-central1",
         "us-west1",
     }
