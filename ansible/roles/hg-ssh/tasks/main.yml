@@ -290,6 +290,8 @@
     - unifyrepo.service
     - hg-master-monitor.service
     - hg-master-monitor.timer
+    - try-replicatesync.service
+    - try-replicatesync.timer
 
 - name: systemd services are enabled (server only)
   service: name={{ item }}
@@ -304,6 +306,7 @@
     - snsnotifier.service
     - unifyrepo.service
     - hg-master-monitor.timer
+    - try-replicatesync.timer
 
 - name: ensure hg-master-monitor.timer is started (server only)
   service: name=hg-master-monitor.timer
