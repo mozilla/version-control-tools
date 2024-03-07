@@ -11,6 +11,7 @@ import os
 import sqlite3
 import stat
 import time
+from typing import Iterator
 
 from mercurial.node import bin, hex
 from mercurial import (
@@ -120,6 +121,34 @@ def pushlogwireproto(repo, proto, firstpush):
         return b"\n".join([b"0", pycompat.bytestr(e)])
 
 
+def retry_pull_pushlog(repo, pullop, fetchfrom) -> Iterator[bytes]:
+    """Pull down pushlog entries with retries."""
+    for attempt in range(1, 4):
+        lines = pullop.remote._call(b"pushlog", firstpush=pycompat.bytestr(fetchfrom))
+        lines = iter(lines.splitlines())
+
+        statusline = pycompat.bytestr(next(lines))
+        if statusline[0] == b"1":
+            # This is our success condition, when we get a response with a `1` as the
+            # first line.
+            return lines
+
+        if statusline[0] != b"0":
+            # Raise here since we should never get a response that has any value
+            # except `0` or `1` as the first line.
+            raise Abort(
+                b"error fetching pushlog: unexpected response: %s\n" % statusline
+            )
+
+        repo.ui.warn(
+            b"remote error fetching pushlog on attempt %s: %s" % (attempt, next(lines))
+        )
+
+        time.sleep(1.5 * attempt)
+
+    raise error.Abort(b"remote error fetching pushlog: %s" % next(lines))
+
+
 def exchangepullpushlog(orig, pullop):
     """This is called during pull to fetch pushlog data.
 
@@ -138,14 +167,8 @@ def exchangepullpushlog(orig, pullop):
     repo = pullop.repo
     urepo = repo.unfiltered()
     fetchfrom = repo.pushlog.lastpushid() + 1
-    lines = pullop.remote._call(b"pushlog", firstpush=pycompat.bytestr(fetchfrom))
-    lines = iter(lines.splitlines())
 
-    statusline = pycompat.bytestr(next(lines))
-    if statusline[0] == b"0":
-        raise Abort(b"remote error fetching pushlog: %s" % next(lines))
-    elif statusline != b"1":
-        raise Abort(b"error fetching pushlog: unexpected response: %s\n" % statusline)
+    lines = retry_pull_pushlog(repo, pullop, fetchfrom)
 
     pushes = []
     for line in lines:
