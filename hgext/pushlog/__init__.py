@@ -141,7 +141,7 @@ def retry_pull_pushlog(repo, pullop, fetchfrom) -> Iterator[bytes]:
             )
 
         repo.ui.warn(
-            b"remote error fetching pushlog on attempt %d: %s" % (attempt, next(lines))
+            b"remote error fetching pushlog on attempt %d: %s\n" % (attempt, next(lines))
         )
 
         time.sleep(1.5 * attempt)
