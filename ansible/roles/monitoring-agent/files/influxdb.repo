@@ -1,6 +1,6 @@
 [influxdb]
-name = InfluxData Repository - Stable
-baseurl = https://repos.influxdata.com/stable/\$basearch/main
+name = InfluxDB Repository - RHEL 
+baseurl = https://repos.influxdata.com/rhel/8/x86_64/stable/
 enabled = 1
-gpgcheck = 1
-gpgkey = https://repos.influxdata.com/influxdata-archive_compat.key
+gpgcheck = 0
+gpgkey = https://repos.influxdata.com/influxdb.key
