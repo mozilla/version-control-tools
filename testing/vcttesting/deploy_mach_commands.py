@@ -36,6 +36,9 @@ class DeployCommands(object):
         "--skip-mirrors", action="store_true", help="Skip mirrors deployment if present"
     )
     @CommandArgument(
+        "--skip-kafka", action="store_true", help="Skip Kafka cluster deployment if present"
+    )
+    @CommandArgument(
         "--clean-wdir",
         action="store_true",
         help="Clean working directory of encrypted secrets " "after deploy",
@@ -46,6 +49,7 @@ class DeployCommands(object):
         skip_hgssh=False,
         skip_hgweb=False,
         skip_mirrors=False,
+        skip_kafka=False,
         clean_wdir=False,
         verbosity=None,
     ):
@@ -56,6 +60,7 @@ class DeployCommands(object):
             skip_mirrors=skip_mirrors,
             skip_hgssh=skip_hgssh,
             skip_hgweb=skip_hgweb,
+            skip_kafka=skip_kafka,
             verbosity=verbosity,
         )
 

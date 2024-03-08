@@ -28,6 +28,10 @@ zk_servers: {
   #"hgweb5.dmz.mdc1.mozilla.com": 18,
   #"hgweb6.dmz.mdc1.mozilla.com": 19,
   "hgssh1.dmz.mdc1.mozilla.com": 20,
+  # Dedicated Kafka hosts, see bug 1883090.
+  "kafka1.dmz.mdc1.mozilla.com": 21,
+  "kafka2.dmz.mdc1.mozilla.com": 22,
+  "kafka3.dmz.mdc1.mozilla.com": 23,
 }
 # The string used by zookeeper.connect is used both to connect to
 # Zookeeper *and* as a primary key of sorts to store data. If

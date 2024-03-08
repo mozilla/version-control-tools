@@ -30,6 +30,9 @@
       local_action: command hg --cwd {{ vct }} log -r {{ hostvars[groups['hgssh-prod-master'][0]].previous_vct_node.content | b64decode }}::{{ lookup('file', '../.vctnode') }} -T '{node|short} {desc|firstline}\n'
       register: vct_changes
 
+- import_playbook: deploy-kafka.yml
+  when: skip_kafka == False
+
 - import_playbook: deploy-hgweb.yml
   when: skip_hgweb == False
 

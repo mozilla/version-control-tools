@@ -1,0 +1,15 @@
+---
+- hosts: kafka-prod
+  tasks:
+  - name: apply kafka-broker role
+    include_role:
+      name: kafka-broker
+    vars:
+      kafka_host_name: "{{ inventory_hostname }}"
+      kafka_broker_id: "{{ zk_servers[inventory_hostname] }}"
+
+  - name: apply monitoring-agent role
+    include_role:
+      name: monitoring-agent
+    vars:
+      hosttype: kafka-broker

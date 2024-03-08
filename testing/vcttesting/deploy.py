@@ -54,6 +54,7 @@ def deploy_hgmo(
     skip_hgssh=False,
     skip_hgweb=False,
     skip_mirrors=False,
+    skip_kafka=False,
     clean_wdir=False,
     verbosity=0,
 ):
@@ -61,6 +62,7 @@ def deploy_hgmo(
     decrypt_sops_files()
 
     extra = {
+        "skip_kafka": skip_kafka,
         "skip_mirrors": skip_mirrors,
         "skip_hgssh": skip_hgssh,
         "skip_hgweb": skip_hgweb,
