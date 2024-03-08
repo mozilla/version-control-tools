@@ -24,6 +24,10 @@ ansible_become=yes
 [kafka-prod]
 kafka[1:3].dmz.mdc1.mozilla.com
 
+[kafka-prod:vars]
+ansible_sudo=yes
+ansible_become=yes
+
 [hgmo:children]
 hgssh-prod
 hgweb-prod
