@@ -32,6 +32,7 @@ ansible_become=yes
 hgssh-prod
 hgweb-prod
 hgweb-mirrors
+kafka-prod
 bootstrap
 
 # Add hosts to this group to run the bootstrap procedure
