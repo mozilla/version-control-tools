@@ -8,6 +8,21 @@
       kafka_host_name: "{{ inventory_hostname }}"
       kafka_broker_id: "{{ zk_servers[inventory_hostname] }}"
 
+  - name: discover kafka topics
+    command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --list
+    register: kafka_topics
+    when: ansible_hostname == 'kafka1'
+
+  - name: create kafka topics
+    command: /opt/kafka/bin/kafka-topics.sh --zookeeper {{ kafka_zookeeper_connect }} --create --topic {{ item.topic }} --partitions {{ item.partitions }} --replication-factor {{ kafka_replication_factor }} --config min.insync.replicas={{ kafka_min_insync_replicas }} --config unclean.leader.election.enable=false --config max.message.bytes=104857600
+    when: ansible_hostname == 'kafka1' and item.topic not in kafka_topics.stdout_lines
+    with_items:
+      - { topic: pushdata, partitions: 8 }
+      - { topic: pushlog, partitions: 1 }
+      # copy of messages from "pushdata" once they are acknowledged by mirrors
+      - { topic: replicatedpushdatapending, partitions: 1 }
+      - { topic: replicatedpushdata, partitions: 1 }
+
   - name: apply monitoring-agent role
     include_role:
       name: monitoring-agent

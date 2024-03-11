@@ -1,9 +1,3 @@
 ---
 dependencies:
   - hg-ssh-server
-  - {
-      role: kafka-broker,
-      kafka_host_name: "{{ inventory_hostname }}",
-      kafka_broker_id: "{{ zk_servers[inventory_hostname] }}",
-      when: inventory_hostname in zk_servers,
-    }
