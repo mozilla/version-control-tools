@@ -18,7 +18,6 @@
     when: ansible_hostname == 'kafka1' and item.topic not in kafka_topics.stdout_lines
     with_items:
       - { topic: pushdata, partitions: 8 }
-      - { topic: pushlog, partitions: 1 }
       # copy of messages from "pushdata" once they are acknowledged by mirrors
       - { topic: replicatedpushdatapending, partitions: 1 }
       - { topic: replicatedpushdata, partitions: 1 }
