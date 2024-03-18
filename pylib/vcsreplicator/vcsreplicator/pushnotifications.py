@@ -311,6 +311,9 @@ def run_cli(config_section, cb, validate_config=None):
         action="store_true",
         help="Skip the consuming of the next message then exit",
     )
+    parser.add_argument(
+        "--start-from", type=int, help="Start N records from the beginning"
+    )
     args = parser.parse_args()
 
     config = Config(filename=args.config)
@@ -335,6 +338,12 @@ def run_cli(config_section, cb, validate_config=None):
     client = config.get_client_from_section(config_section, timeout=5)
 
     with Consumer(client, group, topic, partitions=None) as consumer:
+        if args.start_from:
+            # Set the offset to the given value. `whence=None` means we want to
+            # use the absolute offset value, and not modify the value based on
+            # a relative position (beginning, end, current position etc).
+            consumer.seek(args.start_from, whence=None)
+
         if args.skip:
             r = consumer.get_message()
             if not r:
