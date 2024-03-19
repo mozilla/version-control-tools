@@ -41,15 +41,11 @@ class PreventSymlinksCheck(PreTxnChangegroupCheck):
         pass
 
     def check(self, ctx):
-        manifest = ctx.manifest()
         links = []
 
-        for f in ctx.files():
-            if f not in manifest:
-                continue
-
-            if manifest.flags(f) == b"l":
-                links.append(f)
+        for changed_file in ctx.files():
+            if b"l" in ctx.flags(changed_file):
+                links.append(changed_file)
 
         if not links:
             return True
