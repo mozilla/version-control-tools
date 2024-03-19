@@ -41,6 +41,8 @@ CREATES = [
         [
             "--config",
             "experimental.bundlecomplevel=20",
+            "--config",
+            "experimental.bundlecompthreads=4",
             "bundle",
             "-a",
             "-t",
