@@ -122,7 +122,6 @@ def install_mercurials(venv, hg="hg"):
         "6.5.2",
         "6.6.3",
         "6.7",
-        "@",
     ]
 
     hg_dir = os.path.join("/app", "venv", "hg")
@@ -162,10 +161,6 @@ def install_mercurials(venv, hg="hg"):
 
     for v in VERSIONS:
         dest = os.path.join(mercurials, v)
-
-        # Always reinstall @ because it isn't a static tag.
-        if v == "@" and os.path.exists(dest):
-            shutil.rmtree(dest)
 
         if os.path.exists(dest):
             continue
