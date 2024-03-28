@@ -94,6 +94,11 @@ LimitRequestFields 1000
         Header set Cache-Control "max-age=31536000, immutable"
     </Location>
 
+    # `raw-file` requests to specific revisions are immutable, and can be cached by supported clients.
+    <LocationMatch "/raw-file/[0-9a-f]{40}/">
+        Header always set Cache-Control "public, max-age=604800, immutable"
+    </LocationMatch>
+
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
     ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
