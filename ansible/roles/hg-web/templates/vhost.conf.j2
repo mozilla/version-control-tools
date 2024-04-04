@@ -96,12 +96,12 @@ LimitRequestFields 1000
 
     # `raw-file` requests to specific revisions are immutable, and can be cached by supported clients.
     <LocationMatch "/raw-file/[0-9a-f]{40}/">
-        Header always set Cache-Control "public, max-age=604800, immutable"
+        Header onsuccess set Cache-Control "public, max-age=604800, immutable"
     </LocationMatch>
 
     # `json-pushes` responses are guaranteed to be immutable, and can be cached by supported clients.
     <LocationMatch "/json-pushes$">
-        Header always set Cache-Control "public, max-age=604800, immutable"
+        Header onsuccess set Cache-Control "public, max-age=604800, immutable"
     </LocationMatch>
 
     #LogLevel debug
