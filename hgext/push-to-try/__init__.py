@@ -101,8 +101,8 @@ def push_to_try(ui, repo, server, message=None):
     def filtered_warn(*msgs, **opts):
         if msgs:
             filtered = [m for m in msgs if m not in filtered_phrases]
-        if filtered:
-            ui.warn(*filtered, **opts)
+            if filtered:
+                ui.warn(*filtered, **opts)
 
     lock = tr = None
     try:
