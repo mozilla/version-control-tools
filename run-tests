@@ -16,6 +16,7 @@ import subprocess
 import sys
 import time
 import uuid
+from pathlib import Path
 
 # Mercurial's run-tests.py isn't meant to be loaded as a module. We do it
 # anyway.
@@ -30,12 +31,20 @@ def try_find_hg(with_hg):
     Args:
       with_hg (str): a Mercurial version string. Example: `5.3.2`
     """
-    hg = os.path.join("/app", "venv", "mercurials", with_hg, "bin", "hg")
+    mercurials = Path("/app/venv/mercurials")
+    hg = mercurials / with_hg / "bin" / "hg"
 
-    if not os.path.exists(hg):
-        raise ValueError("Couldn't find hg version {} at a known path".format(with_hg))
+    if not hg.exists():
+        valid_versions = "\n    - ".join(
+            str(path.name) for path in mercurials.iterdir()
+        )
+        error = (
+            f"Couldn't find hg version {with_hg} at a known path.\n\n"
+            f"Valid versions: \n\n    - {valid_versions}"
+        )
+        raise ValueError(error)
 
-    return hg
+    return str(hg)
 
 
 def int_floor(number):
@@ -191,12 +200,8 @@ if __name__ == "__main__":
         # Try and parse the Mercurial version as a convenience string
         try:
             hg = try_find_hg(options.with_hg)
-        except ValueError:
-            sys.exit(
-                "{} is not a Mercurial version number or path to `hg`".format(
-                    options.with_hg
-                )
-            )
+        except ValueError as e:
+            sys.exit(str(e))
 
         hg_harness_args.extend((["--with-hg", hg]))
     elif options.with_hg:
@@ -303,7 +308,9 @@ if __name__ == "__main__":
 
         with docker.auto_clean_orphans(runtests_label):
             print("Running non-Docker Mercurial tests")
-            args = hg_harness_args + ["-j", str(no_docker_jobs)] + run_hg_tests_no_docker
+            args = (
+                hg_harness_args + ["-j", str(no_docker_jobs)] + run_hg_tests_no_docker
+            )
             res = subprocess.call(args, cwd=HERE)
 
             if have_docker and run_hg_tests_docker:
