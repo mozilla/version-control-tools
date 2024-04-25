@@ -505,6 +505,44 @@ Adds `backouts=1` query string parameter to show backout information
       "visible": true
   }
 
+
+Web command for exposing just the changed files in a push works.
+
+  $ echo a > a
+  $ hg add a
+  $ hg commit -m "add a"
+  $ echo b > b
+  $ hg add b
+  $ hg commit -m "add b"
+  $ echo c > c
+  $ hg add c
+  $ echo d > d
+  $ hg add d
+  $ hg commit -m "add c and d"
+  $ hg push
+  pushing to http://$LOCALHOST:$HGPORT/
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: recorded push in pushlog
+  remote: added 3 changesets with 4 changes to 4 files
+
+  $ http http://localhost:$HGPORT/json-pushchangedfiles/tip --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "files": [
+          "a",
+          "b",
+          "c",
+          "d"
+      ]
+  }
+
+
 Confirm no errors in log
 
   $ cd ../server

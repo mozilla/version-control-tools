@@ -435,6 +435,42 @@ def automationrelevancewebcommand(web):
     return web.sendtemplate(b"automationrelevance", **pycompat.strkwargs(data))
 
 
+def push_changed_files_webcommand(web):
+    """Retrieve the list of files modified in a push."""
+    req = web.req
+
+    if b"node" not in req.qsparams:
+        return web.sendtemplate(b"error", error=b"missing parameter 'node'")
+
+    repo = web.repo
+
+    # Query an unfiltered repo because sometimes automation wants to run against
+    # changesets that have since become hidden. The response exposes whether the
+    # requested node is visible, so consumers can make intelligent decisions
+    # about what to do if the changeset isn't visible.
+    urepo = repo.unfiltered()
+
+    revs = list(urepo.revs(b"automationrelevant(%r)", req.qsparams[b"node"]))
+
+    # The pushlog extensions wraps webutil.commonentry and the way it is called
+    # means pushlog opens a SQLite connection on every call. This is inefficient.
+    # So we pre load and cache data for pushlog entries we care about.
+    cl = urepo.changelog
+    nodes = [cl.node(rev) for rev in revs]
+
+    files = []
+    with repo.unfiltered().pushlog.cache_data_for_nodes(nodes):
+        for rev in revs:
+            ctx = urepo[rev]
+
+            files.extend(ctx.files())
+
+    # De-duplicate and sort the files.
+    files = sorted(list(set(files)))
+
+    return web.sendtemplate(b"pushchangedfiles", files=files)
+
+
 def isancestorwebcommand(web):
     """Determine whether a changeset is an ancestor of another."""
     req = web.req
@@ -884,6 +920,9 @@ def extsetup(ui):
 
     setattr(webcommands, "automationrelevance", automationrelevancewebcommand)
     webcommands.__all__.append(b"automationrelevance")
+
+    setattr(webcommands, "pushchangedfiles", push_changed_files_webcommand)
+    webcommands.__all__.append(b"pushchangedfiles")
 
     setattr(webcommands, "isancestor", isancestorwebcommand)
     webcommands.__all__.append(b"isancestor")

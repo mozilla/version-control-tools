@@ -305,6 +305,9 @@ automationrelevance = '\{
   "changesets": {changesets|json},
   "visible": {visible|json}
   }'
+pushchangedfiles = '\{
+  "files": {files|json}
+  }'
 error = '\{
   "error": {error|utf8|json}
   }'
