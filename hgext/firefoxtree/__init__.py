@@ -573,6 +573,8 @@ def outgoingcommand(orig, ui, repo, *dests, **opts):
     for tree, uri in resolve_trees_to_uris(dests):
         if uri:
             expanded_dests.append(uri)
+        else:
+            expanded_dests.append(tree)
 
     return orig(ui, repo, *expanded_dests, **opts)
 
