@@ -46,7 +46,6 @@ from mercurial import (
     scmutil,
     templatefilters,
     templateutil,
-    util,
     wireprotov1server,
 )
 from mercurial.hgweb import (
