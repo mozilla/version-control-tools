@@ -28,7 +28,6 @@ from mercurial import (
 )
 
 magicwords = b"CLOSED TREE"
-treestatus_base_url = b"https://treestatus.mozilla-releng.net/trees/%s"
 
 
 def printError(ui, message):
@@ -38,6 +37,11 @@ def printError(ui, message):
 
 
 def isPushAllowed(ui, repo, name):
+    treestatus_base_url = ui.config(
+        b"mozilla",
+        b"treestatus_base_url",
+        b"https://treestatus.mozilla-releng.net/trees/%s",
+    )
     url = treestatus_base_url % (name,)
     try:
         request = urllibcompat.urlreq.request(pycompat.sysstr(url))

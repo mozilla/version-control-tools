@@ -83,6 +83,7 @@ configtable = {}
 configitem = registrar.configitem(configtable)
 
 configitem(b"mozilla", b"treeherder_repo", default=configitems.dynamicdefault)
+configitem(b"mozilla", b"treestatus_base_url", default=configitems.dynamicdefault)
 configitem(
     b"hgmo", b"automationrelevantdraftancestors", default=configitems.dynamicdefault
 )
