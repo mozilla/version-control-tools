@@ -137,7 +137,7 @@ def install_mercurials(venv, hg="hg"):
     if not os.path.isdir(hg_dir):
         print("cloning Mercurial repository to %s" % hg_dir)
         subprocess.check_call(
-            [hg, "clone", "https://www.mercurial-scm.org/repo/hg-committed", hg_dir],
+            [hg, "clone", "https://repo.mercurial-scm.org/hg", hg_dir],
             cwd="/",
             env=hg_env,
         )
