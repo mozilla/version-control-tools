@@ -2,6 +2,7 @@
 # optionally, add:
 #   -e source=<relative_path_to_repo>
 #   -e revision=<hash>
+#   -e scm_level=<scm level, example: scm_level_3>
 # e.g. -e source=hgcustom/version-control-tools -e a92571001fda
 ---
 - hosts: localhost
@@ -14,6 +15,11 @@
     - name: Set source_repo fact
       set_fact:
         source_repo: "{{ source | default('mozilla-central') }}"
+      tags: always
+
+    - name: Set repo_scm_level fact
+      set_fact:
+        repo_scm_level: "{{ scm_level | default('scm_level_2') }}"
       tags: always
 
 - hosts: hgssh-prod-master
@@ -70,7 +76,7 @@
   gather_facts: no
   tasks:
     - name: Set permissions
-      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg scm_level_2 wwr
+      command: /var/hg/version-control-tools/scripts/repo-permissions /repo/hg/mozilla/projects/{{ twig }} hg {{ hostvars['localhost'].repo_scm_level }} wwr
       tags: reset
 
     - name: Create hgrc
@@ -80,7 +86,7 @@
                 option={{ item.option }}
                 value={{ item.value }}
                 owner=hg
-                group=scm_level_2
+                group={{ hostvars['localhost'].repo_scm_level }}
       with_items:
         - { section: paths, option: default, value: "/repo/hg/mozilla/{{ hostvars['localhost'].source_repo }}" }
         - { section: hooks, option: pretxnchangegroup.a_treeclosure, value: "python:mozhghooks.treeclosure.hook" }
