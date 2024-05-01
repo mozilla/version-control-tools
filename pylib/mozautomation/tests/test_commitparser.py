@@ -12,9 +12,6 @@ HERE = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append(os.path.split(HERE)[0])
 
 
-from cgi import escape
-
-
 from mozautomation.commitparser import (
     add_hyperlinks,
     htmlescape,
