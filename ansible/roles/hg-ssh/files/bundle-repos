@@ -16,6 +16,7 @@ comm-central zstd_max
 projects/ash
 projects/birch
 projects/cedar
+projects/cypress
 projects/toolchains copyfrom=mozilla-central
 projects/elm
 projects/holly
