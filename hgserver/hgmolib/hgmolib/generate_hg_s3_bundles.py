@@ -170,42 +170,11 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
             b = c.Bucket(bucket_name)
             key = b.Object(remote_path)
 
-            # Surprisingly there is no .exists() method. Internet sleuthing
-            # revealed this convoluted dance to determine if an object exists.
-            try:
-                key.load()
-                exists = True
-            except botocore.exceptions.ClientError as e:
-                if e.response["Error"]["Code"] != "404":
-                    raise
-
-                exists = False
-
-            # There is a lifecycle policy on the buckets that expires objects
-            # after a few days. If we did nothing here and a repository
-            # didn't change for a few days, the bundle objects may become
-            # expired and made unavailable.
-            #
-            # Copying the object resets the modification time to current and
-            # prevents unwanted early expiration.
-            if exists:
-                print(
-                    "copying %s:%s to reset expiration time"
-                    % (bucket_name, remote_path)
-                )
-                key.copy_from(
-                    CopySource={"Bucket": bucket_name, "Key": remote_path},
-                    # This magic is needed to prevent S3 from complaining that
-                    # metadata wasn't updated as part of the copy.
-                    MetadataDirective="REPLACE",
-                )
-                print("copying %s:%s completed" % (bucket_name, remote_path))
-            else:
-                print(
-                    "uploading %s:%s from %s" % (bucket_name, remote_path, local_path)
-                )
-                key.upload_file(local_path)
-                print("uploading %s:%s completed" % (bucket_name, remote_path))
+            print(
+                "uploading %s:%s from %s" % (bucket_name, remote_path, local_path)
+            )
+            key.upload_file(local_path)
+            print("uploading %s:%s completed" % (bucket_name, remote_path))
 
             return
         except socket.error as e:
