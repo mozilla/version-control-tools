@@ -63,13 +63,7 @@ def is_ip_address_network(value: str) -> bool:
 def all_required_aws_regions_exist(prefixes: list) -> bool:
     """Validates that the set of all required AWS regions is a subset
     of all the regions in the iterable of IP networks"""
-    required_regions = {
-        "us-west-2",
-        "us-west-1",
-        "us-east-2",
-        "us-east-1",
-        "eu-central-1",
-    }
+    required_regions = {"us-west-2"}
 
     prefixes_in_new_document = {prefix_object["region"] for prefix_object in prefixes}
 

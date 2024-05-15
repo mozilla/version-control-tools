@@ -64,15 +64,7 @@ CLONEBUNDLES_ORDER = [
 ]
 
 # Defines S3 hostname and bucket where uploads should go.
-S3_HOSTS = (
-    # We list Oregon (us-west-2) before N. California (us-west-1) because it is
-    # cheaper.
-    ("s3-us-west-2.amazonaws.com", "moz-hg-bundles-us-west-2", "us-west-2"),
-    ("s3-us-west-1.amazonaws.com", "moz-hg-bundles-us-west-1", "us-west-1"),
-    ("s3-us-east-2.amazonaws.com", "moz-hg-bundles-us-east-2", "us-east-2"),
-    ("s3-external-1.amazonaws.com", "moz-hg-bundles-us-east-1", "us-east-1"),
-    ("s3-eu-central-1.amazonaws.com", "moz-hg-bundles-eu-central-1", "eu-central-1"),
-)
+S3_HOSTS = (("s3-us-west-2.amazonaws.com", "moz-hg-bundles-us-west-2", "us-west-2"),)
 
 # Defines GCP bucket name and region where uploads should go.
 # GCP buckets all use the same prefix, unlike AWS
