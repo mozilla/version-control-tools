@@ -72,6 +72,14 @@ def script_find_hg_repos():
 
                 requirements = set()
 
+            if "share-safe" in requirements:
+                try:
+                    with open(os.path.join(path, ".hg", "store", "requires"), "r") as fh:
+                        requirements |= set(fh.read().splitlines())
+                except IOError as e:
+                    if e.errno != errno.ENOENT:
+                        raise
+
             if args.requirement and args.requirement not in requirements:
                 return False
 

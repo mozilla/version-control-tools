@@ -10,11 +10,12 @@ Create some repositories
   $ mkdir upgradebackup/.hg/upgradebackup.asdfasdf/
 
   $ hg init no_requirement
-  >>> with open('no_requirement/.hg/requires', 'r') as f:
-  ...     reqs = f.read().splitlines()
-  >>> reqs.remove('store')
-  >>> with open('no_requirement/.hg/requires', 'w') as f:
-  ...     _ = f.write('\n'.join(reqs))
+  $ requires=$(grep -v '^store$' < no_requirement/.hg/requires)
+  $ echo "$requires" > no_requirement/.hg/requires
+  $ if [ -f no_requirement/.hg/store/requires ]; then
+  >   requires=$(grep -v '^store$' < no_requirement/.hg/store/requires)
+  >   echo "$requires" > no_requirement/.hg/store/requires
+  > fi
 
   $ hg init has_obsstore
   $ touch has_obsstore/.hg/store/obsstore
