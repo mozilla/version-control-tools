@@ -19,9 +19,9 @@ import logging
 
 import requests
 
-from push import Push
 from redo import retry
 
+from .push import Push
 
 LOG = logging.getLogger("pushlog_client")
 JSON_PUSHES = "%(repo_url)s/json-pushes"
