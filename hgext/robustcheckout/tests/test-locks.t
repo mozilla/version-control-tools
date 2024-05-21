@@ -10,12 +10,14 @@
   > @command(b'acquirewlock')
   > def acquirewlock(ui, repo):
   >     lockmod.lock._host = b'dummyhost'
+  >     lockmod.lock.__del__ = lambda self: None
   >     wlock = repo.wlock()
   >     setattr(wlock, 'release', lambda: None)
   > @command(b'acquirestorelock')
   > def acquirestorelock(ui, repo):
   >     lockmod.lock._host = b'dummyhost'
-  >     wlock = repo.wlock()
+  >     lockmod.lock.__del__ = lambda self: None
+  >     lock = repo.wlock()
   >     lock = repo.lock()
   >     setattr(lock, 'release', lambda: None)
   > EOF
