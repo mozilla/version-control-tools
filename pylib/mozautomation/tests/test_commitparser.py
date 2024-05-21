@@ -1133,10 +1133,10 @@ class TestAddHyperlinks(unittest.TestCase):
         )
 
     def test_link_bugzilla(self):
-        # Aggressive bug detection works normally.
+        # Conservative bug detection works normally.
         self.assertEqual(
             add_hyperlinks(b" 1234567\nfoo\n"),
-            b' <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1234567">1234567</a>\nfoo\n',
+            b' 1234567\nfoo\n',
         )
         self.assertEqual(
             add_hyperlinks(b"bug 1\n"),
@@ -1148,11 +1148,11 @@ class TestAddHyperlinks(unittest.TestCase):
         )
         self.assertEqual(
             add_hyperlinks(b"12345 is a bug\n"),
-            b'<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=12345">12345</a> is a bug\n',
+            b'12345 is a bug\n',
         )
         self.assertEqual(
             add_hyperlinks(b"foo #123456\n"),
-            b'foo #<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=123456">123456</a>\n',
+            b'foo #123456\n',
         )
 
         # When GitHub is in play, bare numbers are not hyperlinked and #\d is
