@@ -26,10 +26,17 @@ Blow out content of .hg directory to simulate a rolled back repo or something
 
 Shared store should be a modern repo
 
+  $ requires=share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+#if hg61
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+  share-safe
+  $ requires=share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/store/requires
+#endif
+  $ cat $requires
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd (?)
   revlogv1
   sparserevlog (hg49 !)
   store
@@ -53,10 +60,15 @@ Test a variation where the local repo still exists
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
+#if hg61
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+  share-safe
+#endif
+  $ cat $requires
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd (?)
   revlogv1
   sparserevlog (hg49 !)
   store
@@ -69,10 +81,15 @@ Test behavior when fncache is missing
   (using Mercurial *) (glob)
   ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at requires-existing
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
+#if hg61
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+  share-safe
+#endif
+  $ cat $requires
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd (?)
   revlogv1
   sparserevlog (hg49 !)
   store
@@ -90,10 +107,15 @@ Test behavior when fncache is missing
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
+#if hg61
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+  share-safe
+#endif
+  $ cat $requires
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd (?)
   revlogv1
   sparserevlog (hg49 !)
   store
@@ -110,10 +132,15 @@ Test behavior when fncache is missing
   (shared store missing requirements: dotencode, fncache; deleting store and destination to ensure optimal behavior)
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
 
+#if hg61
   $ cat share/b8b78f0253d822e33ba652fd3d80a5c0837cfdf3/.hg/requires
+  share-safe
+#endif
+  $ cat $requires
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd (?)
   revlogv1
   sparserevlog (hg49 !)
   store
