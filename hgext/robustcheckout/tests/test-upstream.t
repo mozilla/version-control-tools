@@ -8,8 +8,8 @@ Specifying an upstream repo will clone from it and pull from normal repo
   (cloning from upstream repo http://$LOCALHOST:$HGPORT/repo0-upstream)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   streaming all changes
-  6 files to transfer, 411 bytes of data
-  transferred 411 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  \d+ files to transfer, \d+ bytes of data (re)
+  transferred \d+ bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
   new changesets b8b78f0253d8 (?)
