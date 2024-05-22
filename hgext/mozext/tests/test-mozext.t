@@ -11,7 +11,7 @@
   > writeuri = ssh://user@dummy/$TESTTMP/
   > EOF
 
-  $ export PUSHLOGHG=/app/venv/mercurials/5.9.3/bin/hg
+  $ export PUSHLOGHG=/app/venv/mercurials/6.7.2/bin/hg
 
   $ export USER=hguser
   $ hg init mozilla-central
@@ -62,8 +62,8 @@ Set up a repository
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 5 changesets with 4 changes to 3 files
   remote: recorded push in pushlog
+  remote: added 5 changesets with 4 changes to 3 files
   exporting bookmark central
   $ cd ..
 
@@ -74,8 +74,8 @@ Pull via http:// will fetch pushlog
   adding changesets
   adding manifests
   adding file changes
-  added 5 changesets with 4 changes to 3 files
   added 1 pushes
+  added 5 changesets with 4 changes to 3 files
   new changesets 28d014a3f251:d6d34e5ea05c
 
 Pull via ssh:// will not fetch pushlog
@@ -89,8 +89,8 @@ processes using HTTP
   adding changesets
   adding manifests
   adding file changes
-  added 5 changesets with 4 changes to 3 files
   cannot fetch pushlog when pulling via ssh://; you should be pulling via https://
+  added 5 changesets with 4 changes to 3 files
   new changesets 28d014a3f251:d6d34e5ea05c
 #endif
 
