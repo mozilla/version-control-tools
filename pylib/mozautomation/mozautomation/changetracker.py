@@ -214,7 +214,7 @@ class ChangeTracker(object):
         """Obtain all pushes on a given tree.
 
         Returns pairs (push_id, head_changeset) like
-        `(1, 'a\x00y\x06\xa1\xf8\xad\\0;\x08\x15\xacN\x98!\x16\x8d97')`.
+        `(1, b'a\x00y\x06\xa1\xf8\xad\\0;\x08\x15\xacN\x98!\x16\x8d97')`.
 
         Use binascii.hexlify to convert to a hexadecimal hash.
         """
@@ -228,7 +228,7 @@ class ChangeTracker(object):
             "ORDER BY push_id ASC",
             [tree_id],
         ):
-            yield push_id, str(head)
+            yield push_id, head
 
     def associate_bugs_with_changeset(self, bugs, changeset):
         """Associate a numeric bug number with a changeset.
