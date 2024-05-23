@@ -55,23 +55,14 @@ def preservefilectx(oldctx):
         try:
             fctx = oldctx.filectx(path)
 
-            # This wonky pattern is copied from memctx.__init__.
-            copied = fctx.renamed()
-            if copied:
-                copied = copied[0]
-
-            # isexec and islink didn't exist until Mercurial 3.2.
-            islink = b"l" in fctx.flags()
-            isexec = b"x" in fctx.flags()
-
             return context.memfilectx(
                 repo,
                 memctx,
                 path,
                 fctx.data(),
-                islink=islink,
-                isexec=isexec,
-                copysource=copied,
+                islink=fctx.islink(),
+                isexec=fctx.isexec(),
+                copysource=fctx.copysource(),
             )
         except KeyError:
             return None
