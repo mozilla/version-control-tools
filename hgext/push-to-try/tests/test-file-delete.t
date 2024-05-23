@@ -49,6 +49,7 @@ Test pushing with outstanding changes that delete a file works.
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (hg64 !)
   checked 1 changesets with 2 changes to 2 files
 
   $ hg diff

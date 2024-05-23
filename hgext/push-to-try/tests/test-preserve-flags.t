@@ -51,6 +51,7 @@ Test pushing an outstanding change preserves executable bits.
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (hg64 !)
   checked 1 changesets with 1 changes to 1 files
 
 Test the uncommited changes made it to our remote (with the right bits set).

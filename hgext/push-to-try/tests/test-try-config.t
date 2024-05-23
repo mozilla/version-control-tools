@@ -46,6 +46,7 @@ Second test push should succeed
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (hg64 !)
   checked 1 changesets with 1 changes to 1 files
 
 Test try commit made it to our remote
