@@ -1,8 +1,10 @@
   $ . $TESTDIR/hgext/robustcheckout/tests/helpers.sh
 
   $ cat > testlock.py << EOF
+  > import warnings
   > from mercurial import cmdutil, commands, lock as lockmod, registrar, util
   > cmdtable = {}
+  > warnings.filterwarnings("ignore", "use lock.release instead of del lock", DeprecationWarning)
   > if util.safehasattr(registrar, 'command'):
   >     command = registrar.command(cmdtable)
   > else:
@@ -10,14 +12,12 @@
   > @command(b'acquirewlock')
   > def acquirewlock(ui, repo):
   >     lockmod.lock._host = b'dummyhost'
-  >     lockmod.lock.__del__ = lambda self: None
   >     wlock = repo.wlock()
   >     setattr(wlock, 'release', lambda: None)
   > @command(b'acquirestorelock')
   > def acquirestorelock(ui, repo):
   >     lockmod.lock._host = b'dummyhost'
-  >     lockmod.lock.__del__ = lambda self: None
-  >     lock = repo.wlock()
+  >     wlock = repo.wlock()
   >     lock = repo.lock()
   >     setattr(lock, 'release', lambda: None)
   > EOF
