@@ -13,6 +13,7 @@ from mercurial import (
     error,
     hg,
     lock as lockmod,
+    merge as mergemod,
     obsolete,
     phases,
     pycompat,
@@ -310,7 +311,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
         # Move the working directory to the new node, if applicable.
         wdirrev = repo[b"."].rev()
         if wdirrev in revmap:
-            hg.updaterepo(repo, repo[revmap[wdirrev]].node(), True)
+            mergemod.clean_update(repo[revmap[wdirrev]])
 
         # The active bookmark is tracked by its symbolic name, not its
         # changeset. Since we didn't do anything that should change the
