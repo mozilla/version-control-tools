@@ -47,7 +47,7 @@ Create some obsolete changesets
 
   $ hg rebase -s 11743f808184 -d 96ee1d7354c4
   rebasing 3:11743f808184 "file1 1"
-  rebasing 4:3208166ea109 "file1 2" (tip)
+  rebasing 4:3208166ea109 tip "file1 2"
   $ hg push -f
   pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
@@ -64,7 +64,7 @@ Create some obsolete changesets
 Local revset evaluation against hidden changeset renders hidden message
 
   $ hg log -r 'automationrelevant(3208166ea109)'
-  abort: hidden revision '3208166ea109' was rewritten as: 22296b97e5de!
+  abort: hidden revision '3208166ea109' was rewritten as: 22296b97e5de
   (use --hidden to access hidden revisions)
   [255]
 
