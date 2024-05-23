@@ -96,7 +96,6 @@ Evolve repo cloned and enabled if requested
   adding file changes
   added \d+ changesets with \d+ changes to \d+ files (re)
   new changesets *:* (glob) (?)
-  updating to branch stable
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   Evolve was downloaded successfully.
   Your config file needs updating.

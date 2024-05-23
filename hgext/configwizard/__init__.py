@@ -886,7 +886,7 @@ def _checkevolve(ui, cw):
         try:
             # Clone the evolve extension and enable
             hg.clone(
-                ui, {}, REMOTE_EVOLVE_PATH, branch=(b"stable",), dest=local_evolve_path
+                ui, {}, REMOTE_EVOLVE_PATH, branch=(b"stable",), dest=local_evolve_path, update=False
             )
             local_evolve_repo = hg.repository(ui, local_evolve_path)
             hgupdate(ui, local_evolve_repo, rev=b"last(tag())")
