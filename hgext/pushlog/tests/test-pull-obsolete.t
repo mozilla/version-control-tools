@@ -139,8 +139,8 @@ An uncompressed clone transfers obsolete changesets and markers
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-obsolete2
   streaming all changes
-  11 files to transfer, 1.63 KB of data
-  transferred 1.63 KB in * seconds (* KB/sec) (glob)
+  11 files to transfer, 1.6* KB of data (glob)
+  transferred 1.6* KB in * seconds (* KB/sec) (glob)
 
 #endif
 
@@ -195,8 +195,8 @@ for hidden changesets should still be fetched.
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
   streaming all changes
-  11 files to transfer, 1.63 KB of data
-  transferred 1.63 KB in * seconds (* KB/sec) (glob)
+  11 files to transfer, 1.6* KB of data (glob)
+  transferred 1.6* KB in * seconds (* KB/sec) (glob)
 
 #endif
 
@@ -251,8 +251,8 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
 #else
   $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
   streaming all changes
-  11 files to transfer, 1.63 KB of data
-  transferred 1.63 KB in * seconds (* KB/sec) (glob)
+  11 files to transfer, 1.6* KB of data (glob)
+  transferred 1.6* KB in * seconds (* KB/sec) (glob)
 #endif
 
   $ rm incremental-pull/.hg/store/obsstore

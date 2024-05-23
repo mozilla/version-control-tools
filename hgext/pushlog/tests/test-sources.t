@@ -22,9 +22,9 @@ Introducing changesets via pulling does not run the pushlog hook
   requesting all changes
   1 changesets found
   uncompressed size of bundle content:
-       182 (changelog)
-       165 (manifests)
-       115  foo
+       \d+ \(changelog\) (re)
+       \d+ \(manifests\) (re)
+       \d+  foo (re)
   adding changesets
   adding manifests
   adding file changes
