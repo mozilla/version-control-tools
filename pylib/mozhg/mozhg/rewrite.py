@@ -22,19 +22,6 @@ from mercurial import (
 )
 
 
-# Mercurial 3.5 renamed bookmarks.readcurrent to bookmarks.readactive.
-# Mercurial 3.7 renamed bookmarks.readactive to bookmarks._readactive.
-# localrepository._activebookmark is the easiest way to access the
-# active bookmark since it already has a bookmarks instance loaded.
-def activebookmark(repo):
-    if hasattr(repo, "_activebookmark"):
-        return repo._activebookmark
-    elif hasattr(bookmarks, "readactive"):
-        return bookmarks.readactive(repo)
-    else:
-        return bookmarks.readcurrent(repo)
-
-
 def newparents(repo, ctx, revmap):
     """Obtain the parent nodes of a potentially rewritten changeset.
 
@@ -280,7 +267,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
 
         # Move bookmarks to new nodes.
         bmchanges = []
-        oldactivebookmark = activebookmark(repo)
+        oldactivebookmark = repo._activebookmark
 
         for oldrev, newrev in revmap.items():
             oldnode = repo[oldrev].node()
@@ -316,7 +303,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
         # The active bookmark is tracked by its symbolic name, not its
         # changeset. Since we didn't do anything that should change the
         # active bookmark, we shouldn't need to adjust it.
-        if activebookmark(repo) != oldactivebookmark:
+        if repo._activebookmark != oldactivebookmark:
             raise error.Abort(
                 b"active bookmark changed; this should not occur!",
                 hint=b"please file a bug",
