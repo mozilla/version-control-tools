@@ -42,7 +42,7 @@ Rejecting evolve extension doesn't install and download
 No prompt if extension enabled but not managed by the wizard
 
   $ hg --config configwizard.steps=evolve --config extensions.evolve="" configwizard
-  *** failed to import extension evolve: No module named *evolve* (glob) (?)
+  *** failed to import extension *evolve*: No module named *evolve* (glob) (?)
   This wizard will guide you through configuring Mercurial for an optimal
   experience contributing to Mozilla projects.
   
