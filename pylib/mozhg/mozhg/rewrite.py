@@ -158,13 +158,8 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
         obsenabled = obsolete._enabled
 
     def adjustphase(repo, tr, phase, node):
-        # transaction argument added in Mercurial 3.2.
-        try:
-            phases.advanceboundary(repo, tr, phase, [node])
-            phases.retractboundary(repo, tr, phase, [node])
-        except TypeError:
-            phases.advanceboundary(repo, phase, [node])
-            phases.retractboundary(repo, phase, [node])
+        phases.advanceboundary(repo, tr, phase, [node])
+        phases.retractboundary(repo, tr, phase, [node])
 
     nodemap = {}
     wlock, lock, tr = None, None, None
@@ -230,15 +225,9 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
             )
             status = oldctx.p1().status(oldctx)
 
-            # TRACKING hg53 - status is an object instead of a tuple
-            if util.versiontuple(n=2) >= (5, 3):
-                mctx.modified = lambda: status.modified
-                mctx.added = lambda: status.added
-                mctx.removed = lambda: status.removed
-            else:
-                mctx.modified = lambda: status[0]
-                mctx.added = lambda: status[1]
-                mctx.removed = lambda: status[2]
+            mctx.modified = lambda: status.modified
+            mctx.added = lambda: status.added
+            mctx.removed = lambda: status.removed
             newnode = mctx.commit()
             revmap[rev] = repo[newnode].rev()
             nodemap[oldctx.node()] = newnode
@@ -267,15 +256,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
                     bmchanges.append((mark, repo[newrev].node()))
 
         if bmchanges:
-            # TODO unconditionally call applychanges() when support for
-            # Mercurial 4.1 is dropped.
-            if util.safehasattr(repo._bookmarks, b"applychanges"):
-                repo._bookmarks.applychanges(repo, tr, bmchanges)
-            else:
-                for mark, newnode in bmchanges:
-                    repo._bookmarks[mark] = newnode
-
-                repo._bookmarks.recordchange(tr)
+            repo._bookmarks.applychanges(repo, tr, bmchanges)
 
         # If obsolescence is enabled, obsolete the old changesets.
         if obsenabled:
