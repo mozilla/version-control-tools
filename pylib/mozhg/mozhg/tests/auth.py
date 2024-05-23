@@ -45,7 +45,7 @@ def bzauth(ui, require=False, fakegetpass=None, ffprofile=None):
     if fakegetpass:
 
         def newgetpass(arg):
-            return fakegetpass
+            return fakegetpass.decode("utf-8")
 
         getpass.getpass = newgetpass
 
