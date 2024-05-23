@@ -149,7 +149,6 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   adding manifests
   adding file changes
   \d+ new obsolescence markers (re) (?)
-  updating bookmark @
   added \d+ changesets with \d+ changes to \d+ files (re)
   new changesets *:* (glob)
   (run 'hg update' to get a working copy)
