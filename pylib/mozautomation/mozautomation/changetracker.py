@@ -71,7 +71,7 @@ class ChangeTracker(object):
             )
 
             self._db.execute(
-                "CREATE INDEX IF NOT EXISTS i_pushes_push_id " "ON pushes (push_id)"
+                "CREATE INDEX IF NOT EXISTS i_pushes_push_id ON pushes (push_id)"
             )
 
             self._db.execute(
@@ -167,7 +167,7 @@ class ChangeTracker(object):
                     for c in push["changesets"]
                 ]
                 self._db.executemany(
-                    "INSERT INTO changeset_pushes VALUES " "(?, ?, ?, ?)", params
+                    "INSERT INTO changeset_pushes VALUES (?, ?, ?, ?)", params
                 )
 
     def add_pushes(self, tree, pushes):
@@ -241,13 +241,13 @@ class ChangeTracker(object):
 
         with self._db:
             self._db.executemany(
-                "INSERT OR REPLACE INTO bug_changesets " "VALUES (?, ?)",
+                "INSERT OR REPLACE INTO bug_changesets VALUES (?, ?)",
                 [(bug, buffer(changeset)) for bug in bugs],
             )
 
     def changesets_with_bug(self, bug):
         for row in self._db.execute(
-            "SELECT changeset FROM bug_changesets WHERE " "bug = ?", [bug]
+            "SELECT changeset FROM bug_changesets WHERE bug = ?", [bug]
         ):
             yield str(row[0])
 

@@ -708,16 +708,16 @@ def uisetup(ui):
 
     if not havepartitionmap():
         raise error.Abort(
-            b"replicationproducer.partitionmap.* config options " b"not set"
+            b"replicationproducer.partitionmap.* config options not set"
         )
 
     reqacks = ui.configint(b"replicationproducer", b"reqacks", default=999)
     if reqacks not in (-1, 0, 1):
-        raise error.Abort(b"replicationproducer.reqacks must be set to -1, 0, " b"or 1")
+        raise error.Abort(b"replicationproducer.reqacks must be set to -1, 0, or 1")
 
     acktimeout = ui.configint(b"replicationproducer", b"acktimeout")
     if not acktimeout:
-        raise error.Abort(b"replicationproducer.acktimeout config option not " b"set")
+        raise error.Abort(b"replicationproducer.acktimeout config option not set")
 
     # TRACKING py3
     hosts = list(map(lambda x: pycompat.sysstr(x), hosts))

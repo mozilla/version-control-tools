@@ -64,7 +64,7 @@ def check_consumer_lag():
         "--warning-lag-count",
         default=150,
         type=int,
-        help="Number of messages behind after which a warning will be " "issued",
+        help="Number of messages behind after which a warning will be issued",
     )
     parser.add_argument(
         "--warning-lag-time",
@@ -76,7 +76,7 @@ def check_consumer_lag():
         "--critical-lag-count",
         default=600,
         type=int,
-        help="Number of messages behind after which an error will be " "issued",
+        help="Number of messages behind after which an error will be issued",
     )
     parser.add_argument(
         "--critical-lag-time",
@@ -145,7 +145,7 @@ def check_consumer_lag():
 
         if lag_time is None:
             output.append(
-                "WARNING - could not determine lag time for " "partition %d" % partition
+                "WARNING - could not determine lag time for partition %d" % partition
             )
             # TODO raise warning for inability to determine lag time if persistent.
             # exitcode = max(exitcode, 1)
@@ -207,7 +207,7 @@ def check_aggregator_lag():
         "--warning-count",
         default=40,
         type=int,
-        help="Total number of messages behind after which a " "warning will be issued",
+        help="Total number of messages behind after which a warning will be issued",
     )
     parser.add_argument(
         "--critical-count",

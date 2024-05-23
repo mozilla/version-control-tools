@@ -191,7 +191,7 @@ def autorecover(message_handler):
                 res, out, err = run_command(c, args)
                 if res:
                     logger.warn(
-                        "`hg recover` failed to automatically resolve the " "problem"
+                        "`hg recover` failed to automatically resolve the problem"
                     )
                     raise err
 
@@ -672,7 +672,7 @@ def print_offsets():
     parser.add_argument(
         "group",
         nargs="?",
-        help="Comma delimited list of consumer groups to print offsets " "for",
+        help="Comma delimited list of consumer groups to print offsets for",
     )
 
     args = parser.parse_args()

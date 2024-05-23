@@ -59,7 +59,7 @@ LDAP_USER_FAILURE_MESSAGE = (
 ) % SUBMIT_BUGZILLA_URL
 
 LDAP_USER_EXCEPTION_FAILURE_MESSAGE = (
-    b"%s" b"Please include this information in your bug submission:\n%%s"
+    b"%sPlease include this information in your bug submission:\n%%s"
 ) % LDAP_USER_FAILURE_MESSAGE
 
 INSUFFICIENT_PRIVILEGE_FAILURE_MESSAGE = (

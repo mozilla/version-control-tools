@@ -155,7 +155,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
 
     if intrans:
         raise error.Abort(
-            b"cannot call replacechangesets when a transaction " b"is active"
+            b"cannot call replacechangesets when a transaction is active"
         )
 
     # The revisions impacted by the current operation. This is essentially
@@ -317,7 +317,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
         # active bookmark, we shouldn't need to adjust it.
         if activebookmark(repo) != oldactivebookmark:
             raise error.Abort(
-                b"active bookmark changed; " b"this should not occur!",
+                b"active bookmark changed; this should not occur!",
                 hint=b"please file a bug",
             )
 

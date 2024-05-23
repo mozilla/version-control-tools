@@ -41,7 +41,7 @@ class DeployCommands(object):
     @CommandArgument(
         "--clean-wdir",
         action="store_true",
-        help="Clean working directory of encrypted secrets " "after deploy",
+        help="Clean working directory of encrypted secrets after deploy",
     )
     @CommandArgument("--verbosity", type=int, help="How verbose to be with output")
     def hgmo(

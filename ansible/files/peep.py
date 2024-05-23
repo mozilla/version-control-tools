@@ -72,7 +72,7 @@ def activate(specifier):
             distro.activate()
     except (VersionConflict, DistributionNotFound):
         raise RuntimeError(
-            "The installed version of pip is too old; peep " "requires " + specifier
+            "The installed version of pip is too old; peep requires " + specifier
         )
 
 
@@ -920,7 +920,7 @@ def peep_install(argv):
             first_every_last(buckets[c], *printers)
 
         if any(buckets[b] for b in ERROR_CLASSES):
-            out("-------------------------------\n" "Not proceeding to installation.\n")
+            out("-------------------------------\nNot proceeding to installation.\n")
             return SOMETHING_WENT_WRONG
         else:
             for req in buckets[InstallableReq]:

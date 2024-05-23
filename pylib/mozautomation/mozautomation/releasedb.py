@@ -74,7 +74,7 @@ class FirefoxReleaseDatabase(object):
     def _create_schema(self, existing):
         if existing > 1:
             raise Exception(
-                "unknown schema version detected; did you " "downgrade code?"
+                "unknown schema version detected; did you downgrade code?"
             )
 
         with self._db:
@@ -93,7 +93,7 @@ class FirefoxReleaseDatabase(object):
             )
 
             self._db.execute(
-                "CREATE INDEX IF NOT EXISTS i_builds_revision " "ON builds (revision)"
+                "CREATE INDEX IF NOT EXISTS i_builds_revision ON builds (revision)"
             )
 
             self._db.execute(
@@ -125,7 +125,7 @@ class FirefoxReleaseDatabase(object):
         ts = ts.total_seconds()
 
         self._db.execute(
-            "INSERT OR REPLACE INTO builds " "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ",
+            "INSERT OR REPLACE INTO builds VALUES (?, ?, ?, ?, ?, ?, ?, ?) ",
             (
                 insertion_key,
                 build[b"channel"],
@@ -297,7 +297,7 @@ class FirefoxReleaseDatabase(object):
                 self._db.execute("DELETE FROM builds WHERE insertion_key=?", (k,))
 
             self._db.executemany(
-                "INSERT OR REPLACE INTO builds " "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR REPLACE INTO builds VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 builds,
             )
 

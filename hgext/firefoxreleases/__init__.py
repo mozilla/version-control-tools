@@ -340,7 +340,7 @@ def revset_firefoxrelease(repo, subset, x):
     if b"platform" in args:
         platforms = set(
             revset.getstring(
-                args[b"platform"], _(b"platform requires a " b"string")
+                args[b"platform"], _(b"platform requires a string")
             ).split()
         )
 

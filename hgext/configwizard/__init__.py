@@ -583,7 +583,7 @@ def _checkhgversion(ui, hgversion):
         )
     else:
         ui.warn(
-            b"Please run `mach bootstrap` to upgrade your Mercurial " b"install.\n\n"
+            b"Please run `mach bootstrap` to upgrade your Mercurial install.\n\n"
         )
 
     if not uipromptchoice(
@@ -636,7 +636,7 @@ def _checkusername(ui, cw):
 
         ui.write(b"setting ui.username=%s\n\n" % username)
     else:
-        ui.warn(b"Unable to set username; You will be unable to author " b"commits\n\n")
+        ui.warn(b"Unable to set username; You will be unable to author commits\n\n")
 
 
 def _checkdiffsettings(ui, cw):
@@ -1029,7 +1029,7 @@ def _checksmartannotate(ui, cw):
     ] = 'desc("ignore-this-changeset") or extdata(get_ignored_changesets)'
 
     cw.c["extdata"]["get_ignored_changesets"] = (
-        "shell:cat " "`hg root`/.hg-annotate-ignore-revs " "2> /dev/null || true"
+        "shell:cat `hg root`/.hg-annotate-ignore-revs 2> /dev/null || true"
     )
 
 
@@ -1216,7 +1216,7 @@ class configobjwrapper(object):
 
                     if line.startswith(b";"):
                         raise error.Abort(
-                            b"semicolon (;) comments in config " b"files not supported",
+                            b"semicolon (;) comments in config files not supported",
                             hint=b"use # for comments",
                         )
 

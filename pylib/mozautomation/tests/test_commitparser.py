@@ -892,7 +892,7 @@ Desc: Bug 960081 - Make use of shared mock Notification in Dialer call log tests
 
         # backout not on first line
         self.assertIsNone(
-            parse_backouts(b"Bug 123 - Blah blah; r=gps\n" b"Backout ffffffffffff")
+            parse_backouts(b"Bug 123 - Blah blah; r=gps\nBackout ffffffffffff")
         )
 
     def test_backout_single(self):
@@ -1106,7 +1106,7 @@ class TestAddHyperlinks(unittest.TestCase):
         # to GitHub issues.
         self.assertEqual(
             add_hyperlinks(
-                b"Merge #5\n\n" b"Source-Repo: https://github.com/mozilla/foo\n"
+                b"Merge #5\n\nSource-Repo: https://github.com/mozilla/foo\n"
             ),
             b'Merge <a href="https://github.com/mozilla/foo/issues/5">#5</a>\n\n'
             b'Source-Repo: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>\n',
@@ -1126,7 +1126,7 @@ class TestAddHyperlinks(unittest.TestCase):
         # "#string" isn't linked.
         self.assertEqual(
             add_hyperlinks(
-                b"Merge #foo\n\n" b"Source-Repo: https://github.com/mozilla/foo\n"
+                b"Merge #foo\n\nSource-Repo: https://github.com/mozilla/foo\n"
             ),
             b"Merge #foo\n\n"
             b'Source-Repo: <a href="https://github.com/mozilla/foo">https://github.com/mozilla/foo</a>\n',

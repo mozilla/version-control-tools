@@ -55,7 +55,7 @@ class Producer(KafkaProducer):
 
         except KafkaError:
             logger.exception(
-                "error sending message to Kafka; " "reinitializing client to retry"
+                "error sending message to Kafka; reinitializing client to retry"
             )
             self.client.reinit()
 

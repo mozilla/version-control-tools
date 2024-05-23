@@ -32,12 +32,12 @@ def script_find_hg_repos():
     parser.add_argument(
         "--upgrade-backup",
         action="store_true",
-        help="Find repositories that have a backup repo from " "an upgrade",
+        help="Find repositories that have a backup repo from an upgrade",
     )
     parser.add_argument(
         "--obsstore",
         action="store_true",
-        help="Find repositories that have an obsolescence " "store",
+        help="Find repositories that have an obsolescence store",
     )
     parser.add_argument("paths", nargs="+")
 

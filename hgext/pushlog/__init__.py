@@ -446,7 +446,7 @@ class pushlog(object):
             node = ctx.hex()
 
             c.execute(
-                "INSERT INTO changesets (pushid, rev, node) " "VALUES (?, ?, ?)",
+                "INSERT INTO changesets (pushid, rev, node) VALUES (?, ?, ?)",
                 (pushid, rev, pycompat.sysstr(node)),
             )
 
@@ -485,7 +485,7 @@ class pushlog(object):
                 node = ctx.hex()
 
                 c.execute(
-                    "INSERT INTO changesets (pushid, rev, node) " "VALUES (?, ?, ?)",
+                    "INSERT INTO changesets (pushid, rev, node) VALUES (?, ?, ?)",
                     (pushid, rev, pycompat.sysstr(node)),
                 )
 
@@ -625,7 +625,7 @@ class pushlog(object):
             # That's because LIMIT and OFFSET apply to the SELECT as a whole.
             # Since we're doing a LEFT JOIN, LIMIT and OFFSET would count nodes,
             # not pushes.
-            inner_q = "SELECT id, user, date FROM pushlog " "WHERE id %s ? " % op
+            inner_q = "SELECT id, user, date FROM pushlog WHERE id %s ? " % op
             args = [start_id]
 
             if end_id is not None:
@@ -877,7 +877,7 @@ class pushlog(object):
                 return
 
             res = c.execute(
-                "SELECT pushid, rev, node FROM changesets " "ORDER BY pushid, rev ASC"
+                "SELECT pushid, rev, node FROM changesets ORDER BY pushid, rev ASC"
             )
 
             deletes = []
@@ -890,13 +890,13 @@ class pushlog(object):
                     if ctx.rev() != rev:
                         revupdates.append((node, ctx.rev()))
                         repo.ui.warn(
-                            b"changeset rev will be updated in " b"pushlog: %s\n" % node
+                            b"changeset rev will be updated in pushlog: %s\n" % node
                         )
                 except RepoLookupError:
                     # The changeset was stripped. Remove it from the pushlog.
                     deletes.append(node)
                     repo.ui.warn(
-                        b"changeset will be deleted from " b"pushlog: %s\n" % node
+                        b"changeset will be deleted from pushlog: %s\n" % node
                     )
 
             for node in deletes:
@@ -952,7 +952,7 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
     remoteuser = ui.environ.get(b"REMOTE_USER", encoding.environ.get(b"REMOTE_USER"))
     user = encoding.environ.get(b"USER")
     if not remoteuser and not user:
-        ui.write(b"authenticated user not found; " b"refusing to write into pushlog\n")
+        ui.write(b"authenticated user not found; refusing to write into pushlog\n")
         return 1
 
     # If the push user is in landing_users, we check the AUTOLAND_REQUEST_USER

@@ -421,7 +421,7 @@ def getparser():
         '--bisect-repo',
         metavar='bisect_repo',
         help=(
-            "Path of a repo to bisect. Use together with " "--known-good-rev"
+            "Path of a repo to bisect. Use together with --known-good-rev"
         ),
     )
     harness.add_argument(
@@ -725,12 +725,12 @@ def parseargs(args, parser):
     if options.anycoverage and options.local:
         # this needs some path mangling somewhere, I guess
         parser.error(
-            "sorry, coverage options do not work when --local " "is specified"
+            "sorry, coverage options do not work when --local is specified"
         )
 
     if options.anycoverage and options.with_hg:
         parser.error(
-            "sorry, coverage options do not work when --with-hg " "is specified"
+            "sorry, coverage options do not work when --with-hg is specified"
         )
 
     global verbose

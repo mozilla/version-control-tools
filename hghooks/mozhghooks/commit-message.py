@@ -116,7 +116,7 @@ def is_good_message(ui, c):
             return True
         else:
             message(
-                b"Rev %(rev)s claims to be a merge, but it has only one " b"parent."
+                b"Rev %(rev)s claims to be a merge, but it has only one parent."
             )
             return False
 
