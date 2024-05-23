@@ -124,6 +124,7 @@ Do not pull if evolve enabled, in sibling directory to v-c-t (managed by wizard)
   > EOF
   pulling from https://repo.mercurial-scm.org/evolve/
   no changes found
+  \d+ new obsolescence markers (re) (?)
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   Evolve was updated successfully.
   This wizard will guide you through configuring Mercurial for an optimal
@@ -138,7 +139,7 @@ Do not pull if evolve enabled, in sibling directory to v-c-t (managed by wizard)
 Pull latest revision if evolve enabled, in sibling directory to v-c-t (managed by wizard) and confirmed prompt
 Before doing so, strip a revision off the evolve directory to ensure a change is pulled.
 
-  $ hg -R $EVOLVETMP/evolve --config extensions.strip= strip .
+  $ hg -R $EVOLVETMP/evolve --config extensions.strip= --config extensions.evolve=$EVOLVETMP/evolve/hgext3rd/evolve strip .
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
   saved backup bundle to * (glob)
 
