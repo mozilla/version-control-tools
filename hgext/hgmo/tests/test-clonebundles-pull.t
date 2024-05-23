@@ -29,11 +29,9 @@ clonebundles.manifest should not be transferred by default
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Even if enabled and the server doesn't have a clonebundles.manifest
@@ -50,11 +48,9 @@ Even if enabled and the server doesn't have a clonebundles.manifest
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Sanity check that clone bundles manifest is served properly
@@ -69,7 +65,7 @@ Sanity check that clone bundles manifest is served properly
   
   https://hg.cdn.mozilla.net/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  
+
 
 clonebundles.manifest should not be transferred by default
 
@@ -89,11 +85,9 @@ clonebundles.manifest should not be transferred by default
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 enabling config option pulls the manifest
 
@@ -124,11 +118,9 @@ A missing manifest results in the local file being deleted
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Confirm no errors in log

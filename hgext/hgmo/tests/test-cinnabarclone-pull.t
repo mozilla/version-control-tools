@@ -30,11 +30,9 @@ cinnabar.manifest should not be transferred by default
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Even if enabled and the server doesn't have a cinnabar.manifest
@@ -51,11 +49,9 @@ Even if enabled and the server doesn't have a cinnabar.manifest
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Sanity check that clone bundles manifest is served properly
@@ -88,11 +84,9 @@ cinnabar.manifest should not be transferred by default
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 enabling config option pulls the manifest
 
@@ -122,11 +116,9 @@ A missing manifest results in the local file being deleted
   hgrc
   requires
   store
-  undo.bookmarks
-  undo.branch
+  undo.backup.branch.bck
   undo.desc
-  undo.dirstate
-  wcache (hg49 !)
+  wcache
 
 
 Confirm no errors in log
