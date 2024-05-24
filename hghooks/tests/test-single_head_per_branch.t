@@ -146,7 +146,7 @@ Hidden changesets should not impact head detection.
   $ cd client3
   $ echo non-hidden > file.txt
   $ hg commit -m 'commit after hidden'
-  $ hg push
+  $ hg push -f
   pushing to $TESTTMP/mozilla-central
   searching for changes
   adding changesets
