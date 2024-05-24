@@ -18,3 +18,6 @@ test-cluster-unavailable.t
 
 # currently fails
 test-template-sync.t
+
+# corrupted data created by changelog_correctness_helper.py is now caught by hg at commit time
+test-changelog_correctness.t
