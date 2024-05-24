@@ -6,6 +6,7 @@
   > 
   > [extensions]
   > urlintercept = $TESTDIR/testing/url-intercept.py
+  > hgmo = $TESTDIR/hgext/hgmo
   > 
   > [urlintercept]
   > path = $TESTTMP/url
