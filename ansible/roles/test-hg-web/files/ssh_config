@@ -5,3 +5,4 @@ Host hgssh
     ServerAliveInterval 5
     ConnectionAttempts 3
     ConnectTimeout 15
+    StrictHostKeyChecking no
