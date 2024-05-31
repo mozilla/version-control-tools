@@ -86,7 +86,7 @@ Choosing "yes" will prompt us how to create the new repo
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
@@ -113,7 +113,7 @@ Cloning a public repo will show a list of existing repos
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
@@ -148,7 +148,7 @@ Selecting a repo will result in a prompt
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
@@ -191,7 +191,7 @@ Saying "no" is handled properly
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
@@ -234,7 +234,7 @@ Saying "yes" to clone the repo will clone it.
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
@@ -377,7 +377,7 @@ We can create a new empty repo
   1) yes.
   2) no.
   
-  You can clone an existing public repo or create an empty repo.
+  Proceed? You can clone an existing public repo or create an empty repo.
   
   0) Exit.
   1) Clone a public repository.
