@@ -29,4 +29,4 @@ RUN mkdir /etc/ansible && echo -e '[local]\nlocalhost\n' > /etc/ansible/hosts
 
 WORKDIR /vct/ansible
 RUN ansible-playbook -c local test-hgmaster.yml
-
+WORKDIR /vct
