@@ -221,23 +221,23 @@ ssh as autoland, tagging user2 as the originator of the request
 ssh as lando_landing_worker user, tagging user2 as the originator of the request
   $ AUTOLAND_REQUEST_USER=user2@example.com ssh -T -F ssh_config -i keyB -l lando_landing_worker@mozilla.com -p $HGPORT $SSH_SERVER -o SendEnv=AUTOLAND_REQUEST_USER
   A SSH connection has been successfully established.
-
+  
   Your account (lando_landing_worker@mozilla.com) has privileges to access Mercurial over
   SSH.
-
+  
   You are a member of the following LDAP groups that govern source control
   access:
-
+  
      scm_autoland
-
+  
   This will give you write access to the following repos:
-
+  
      Autoland (integration/autoland)
-
+  
   You will NOT have write access to the following repos:
-
+  
      Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
-
+  
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
   are being disconnected.
@@ -246,23 +246,23 @@ ssh as lando_landing_worker user, tagging user2 as the originator of the request
 ssh as lando_landing_worker user (dev), tagging user2 as the originator of the request
   $ AUTOLAND_REQUEST_USER=user2@example.com ssh -T -F ssh_config -i keyC -l lando_landing_worker_dev@mozilla.com -p $HGPORT $SSH_SERVER -o SendEnv=AUTOLAND_REQUEST_USER
   A SSH connection has been successfully established.
-
+  
   Your account (lando_landing_worker_dev@mozilla.com) has privileges to access Mercurial over
   SSH.
-
+  
   You are a member of the following LDAP groups that govern source control
   access:
-
+  
      scm_autoland
-
+  
   This will give you write access to the following repos:
-
+  
      Autoland (integration/autoland)
-
+  
   You will NOT have write access to the following repos:
-
+  
      Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
-
+  
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
   are being disconnected.
