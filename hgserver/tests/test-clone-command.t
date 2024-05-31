@@ -154,7 +154,7 @@ Selecting a repo will result in a prompt
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the List of available public repos
+  Source repository: List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -197,7 +197,7 @@ Saying "no" is handled properly
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the List of available public repos
+  Source repository: List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
@@ -240,7 +240,7 @@ Saying "yes" to clone the repo will clone it.
   1) Clone a public repository.
   2) Create an empty repository.
   
-  Source repository: We have the List of available public repos
+  Source repository: List of available public repos
   
   0) Exit.
   1) hgcustom/version-control-tools
