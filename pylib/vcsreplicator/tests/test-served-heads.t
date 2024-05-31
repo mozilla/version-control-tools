@@ -248,6 +248,35 @@ Re-enabling consumer will result in heads replication and changeset being visibl
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": ["4b11352745a6b3eb429ca8cd486dfdc221a4bc62"],
+  "children": [],
+  "files": [{
+  "file": "foo",
+  "status": "modified"
+  }],
+  "diff": [{
+  "blockno": 1,
+  "lines": [{
+  "t": "-",
+  "n": 1,
+  "l": "--- a/foo\n"
+  }, {
+  "t": "+",
+  "n": 2,
+  "l": "+++ b/foo\n"
+  }, {
+  "t": "@",
+  "n": 3,
+  "l": "@@ -1,1 +1,1 @@\n"
+  }, {
+  "t": "-",
+  "n": 4,
+  "l": "-h2_c2\n"
+  }, {
+  "t": "+",
+  "n": 5,
+  "l": "+h2_c3\n"
+  }]
+  }],
   "phase": "public",
   "pushid": 3,
   "pushdate": [*, 0], (glob)
