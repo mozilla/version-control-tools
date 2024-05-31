@@ -259,7 +259,7 @@ Saying "yes" to clone the repo will clone it.
   Fixing permissions, don't interrupt.
   Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
 
-  $ hgmo exec hgssh grep generaldelta /repo/hg/mozilla/users/user_example.com/repo-1/.hg/requires
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugrequirements | grep generaldelta
   generaldelta
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -268,7 +268,7 @@ Saying "yes" to clone the repo will clone it.
   publish = False
   
 
-  $ hgmo exec hgweb0 grep generaldelta /repo/hg/mozilla/users/user_example.com/repo-1/.hg/requires
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/repo-1 debugrequirements | grep generaldelta
   generaldelta
 
 TODO build user WSGI file generation into replication system
@@ -392,7 +392,7 @@ We can create a new empty repo
   Proceed? Fixing permissions, don't interrupt.
   Repository marked as non-publishing: draft changesets will remain in the draft phase when pushed.
 
-  $ hgmo exec hgssh grep generaldelta /repo/hg/mozilla/users/user_example.com/empty-1/.hg/requires
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/users/user_example.com/empty-1 debugrequirements | grep generaldelta
   generaldelta
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -401,7 +401,7 @@ We can create a new empty repo
   publish = False
   
 
-  $ hgmo exec hgweb0 grep generaldelta /repo/hg/mozilla/users/user_example.com/empty-1/.hg/requires
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/users/user_example.com/empty-1 debugrequirements | grep generaldelta
   generaldelta
 
 Cleanup
