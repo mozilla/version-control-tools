@@ -76,6 +76,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-prechangegroup: hgext_readonly.prechangegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.prevent_subrepos took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.prevent_symlinks took * seconds (glob)
+  * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.repolocked_check took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.single_root took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_mozhooks.pretxnchangegroup finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_pushlog.pretxnchangegrouphook finished in * seconds (glob)
@@ -83,6 +84,7 @@ Blackbox logging recorded appropriate entries
   * user1@example.com @0000000000000000000000000000000000000000 (*)> writing .hg/cache/tags2-served with 0 tags (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> writing .hg/cache/tags2 with 0 tags (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnclose: mozhghooks.populate_caches.hook finished in * seconds (glob)
+  * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnclose: hgext_mozhooks.pretxnclose finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnclose: hgext_vcsreplicator.pretxnclosehook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> updated branch cache (base) in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> wrote branch cache (base) with 1 labels and 1 nodes (glob)
@@ -115,6 +117,19 @@ It got replicated to mirrors
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
+  "children": [],
+  "files": [{
+  "file": "foo",
+  "status": "added"
+  }],
+  "diff": [{
+  "blockno": 1,
+  "lines": [{
+  "t": "",
+  "n": 1,
+  "l": "new file mode 100644\n"
+  }]
+  }],
   "phase": "public",
   "pushid": 1,
   "pushdate": [*, 0], (glob)
@@ -136,6 +151,19 @@ It got replicated to mirrors
   "tags": ["tip"],
   "user": "Test User \u003csomeone@example.com\u003e",
   "parents": [],
+  "children": [],
+  "files": [{
+  "file": "foo",
+  "status": "added"
+  }],
+  "diff": [{
+  "blockno": 1,
+  "lines": [{
+  "t": "",
+  "n": 1,
+  "l": "new file mode 100644\n"
+  }]
+  }],
   "phase": "public",
   "pushid": 1,
   "pushdate": [*, 0], (glob)
