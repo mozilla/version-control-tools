@@ -96,10 +96,10 @@ We send the output to a file for use in the hgweb bootstrap procedure
   * * vcsreplicator.bootstrap called `replicatesync --bootstrap` on /repo/hg/mozilla/mozilla-central successfully (glob)
   * * vcsreplicator.bootstrap called `replicatesync --bootstrap` on /repo/hg/mozilla/testrepo successfully (glob)
   * * vcsreplicator.bootstrap gathered final Kafka offsets (glob)
-  {"repositories": ["{moz}/deleterepo", "{moz}/filterrepo", "{moz}/mozilla-central", "{moz}/testrepo"], "offsets": {"0": [6, 8], "1": [0, 0], "2": [10, 12], "3": [0, 0], "4": [0, 0], "5": [0, 0], "6": [0, 0], "7": [0, 0]}}
+  {"offsets": {"0": [6, 8], "1": [0, 0], "2": [10, 12], "3": [0, 0], "4": [0, 0], "5": [0, 0], "6": [0, 0], "7": [0, 0]}, "repositories": ["{moz}/deleterepo", "{moz}/filterrepo", "{moz}/mozilla-central", "{moz}/testrepo"]}
   * * vcsreplicator.bootstrap hgssh bootstrap process complete! (glob)
   * * vcsreplicator.bootstrap writing output to /home/hg/hgssh.json (glob)
-  $ hgmo exec hgssh sudo -u hg -g hg cat /home/hg/hgssh.json | python -m json.tool
+  $ hgmo exec hgssh sudo -u hg -g hg cat /home/hg/hgssh.json | python -m json.tool --sort-keys
   {
       "offsets": {
           "0": [
@@ -513,7 +513,7 @@ Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons a
 
 Ensure the audit output is in the correct format
 
-  $ hgmo exec hgweb0 cat /repo/hg/hgweb_bootstrap_out.json | python -m json.tool
+  $ hgmo exec hgweb0 cat /repo/hg/hgweb_bootstrap_out.json | python -m json.tool --sort-keys
   {
       "{moz}/deleterepo": [
           "error triggering replication of Mercurial repo {moz}/deleterepo: (255, b'pulling from ssh://hgssh/deleterepo\\nremote: requested repo deleterepo does not exist', b'abort: no suitable response from remote hg')"

@@ -186,7 +186,7 @@ def hgssh():
         ),
     }
 
-    print(json.dumps(output))
+    print(json.dumps(output, sort_keys=True))
     logger.info("hgssh bootstrap process complete!")
 
     # Send output to a file if requested
