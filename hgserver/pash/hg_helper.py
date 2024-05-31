@@ -676,6 +676,10 @@ def serve(
     if args[0] == "hg":
         return hg_command(args)
 
+    if len(args) < 2:
+        sys.stderr.write(SUCCESSFUL_AUTH % user)
+        sys.stderr.write(INVALID_SSH_COMMAND)
+        sys.exit(1)
     repo_name = args[1]
     assert_valid_repo_name(repo_name)
 
