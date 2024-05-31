@@ -68,7 +68,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
-  vcsreplicator.consumer   > abort: abandoned transaction found!
+  vcsreplicator.consumer   > abort: abandoned transaction found
   vcsreplicator.consumer   > (run 'hg recover' to clean up transaction)
   vcsreplicator.consumer   [255]
   vcsreplicator.consumer attempting to autorecover from abandoned transaction
