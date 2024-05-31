@@ -211,7 +211,7 @@ Saying "no" is handled properly
   2) no.
   
   Proceed? Fixing permissions, don't interrupt.
-  Could not find repository at /users/user_example.com/repo-1.
+  Could not find repository at users/user_example.com/repo-1.
   [1]
 
 Saying "yes" to clone the repo will clone it.
