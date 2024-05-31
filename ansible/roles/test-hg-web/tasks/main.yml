@@ -61,3 +61,10 @@
     dest: /home/hg/.ssh/config
     owner: hg
     group: hg
+
+- name: trust hgrc files owned by root
+  ini_file:
+    dest: /etc/mercurial/hgrc
+    section: trusted
+    option: users
+    value: hg, root
