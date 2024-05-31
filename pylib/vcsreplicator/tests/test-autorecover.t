@@ -44,7 +44,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 1
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72']) from partition 2 offset 3
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be']) from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
@@ -59,10 +59,10 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4bec5f7aac58a7ceca2da0e38e90a72'], last_push_id: 1) from partition 2 offset 4
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be'], last_push_id: 1) from partition 2 offset 4
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 5
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 6
-  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['3eccb566e774a5d3920e86a1963a5e5935dd792b']) from partition 2 offset 7
+  vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['3eccb566e774']) from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (3eccb566e774a5d3920e86a1963a5e5935dd792b) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
@@ -88,7 +88,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer   > (run 'hg update' to get a working copy)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulled 1 changesets into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['3eccb566e774a5d3920e86a1963a5e5935dd792b'], last_push_id: 2) from partition 2 offset 8
+  vcsreplicator.consumer processing hg-heads-1: (repo: {moz}/mozilla-central, heads: ['3eccb566e774'], last_push_id: 2) from partition 2 offset 8
 
 Cleanup
 
