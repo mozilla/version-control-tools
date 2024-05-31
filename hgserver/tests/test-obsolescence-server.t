@@ -13,6 +13,7 @@ Mark repo as non-publishing
   $ standarduserssh $SSH_SERVER edit repo-1 << EOF
   > 3
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
@@ -29,6 +30,7 @@ Enable obsolescence on the repo
   $ standarduserssh $SSH_SERVER edit repo-1 << EOF
   > 5
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
