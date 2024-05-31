@@ -216,6 +216,7 @@ Edit the JSON object to include the new messages
   >>> d['offsets']['2'] = (10, 16)  # change (10, 12) -> (10, 16)
   >>> with open(tmpdir + '/hgssh_edited.json', 'w') as f:
   ...     f.write(json.dumps(d))
+  220
 
 A side effect of the bootstrap process is that re-activating the vcsreplicator
 systemd units (or in the tests, supervisord) should start them at a safe location
