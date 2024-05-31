@@ -83,21 +83,21 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
-      load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')()
+      sys.exit(load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')())
     File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       run_cli(handle_message_main)
     File "*/vcsreplicator/consumer.py", line *, in run_cli (glob)
-      timeout=poll_timeout)
+      timeout=poll_timeout,
     File "*/vcsreplicator/consumer.py", line *, in consume (glob)
       message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in filterwrapper (glob)
       return message_handler(config, payload)
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 174, in autorecoverwrapper
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 184, in autorecoverwrapper
       raise err
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 170, in autorecoverwrapper
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 180, in autorecoverwrapper
       return message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
-      payload['heads'])
+      payload["heads"],
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
       raise hglib.error.CommandError(args, res, out, err)
   hglib.error.CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
@@ -137,17 +137,21 @@ We should get the same failure if we try again
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
-      load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')()
+      sys.exit(load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')())
     File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       run_cli(handle_message_main)
     File "*/vcsreplicator/consumer.py", line *, in run_cli (glob)
-      timeout=poll_timeout)
+      timeout=poll_timeout,
     File "*/vcsreplicator/consumer.py", line *, in consume (glob)
       message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in filterwrapper (glob)
       return message_handler(config, payload)
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 184, in autorecoverwrapper
+      raise err
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 180, in autorecoverwrapper
+      return message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
-      payload['heads'])
+      payload["heads"],
     File "*/vcsreplicator/consumer.py", line *, in process_hg_changegroup (glob)
       raise hglib.error.CommandError(args, res, out, err)
   hglib.error.CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
