@@ -47,8 +47,8 @@ Fill the repos with some commits to replicate
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/testrepo/rev/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
@@ -63,8 +63,8 @@ Fill the repos with some commits to replicate
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/7a58fdf00b0fe1fa87fa052d9f78a8f28e1239e0
@@ -188,8 +188,8 @@ publish some extra commits and add them to the range of bootstrap messages.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/89e594ce6b790e64021edfe272c70db75e7304ab
@@ -230,8 +230,8 @@ once the vcsreplicator daemons restart.
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
-  remote: added 1 changesets with 1 changes to 1 files
   remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
   remote: 
   remote: View your change here:
   remote:   https://hg.mozilla.org/mozilla-central/rev/ba17b5c8e955a5e7f57c478cdd75bc999c5460a1
