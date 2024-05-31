@@ -504,7 +504,7 @@ def set_repo_publishing(repo_name, user, user_repo_dir, publish):
         )
 
 
-def set_repo_obsolescence(repo_name, user, enabled):
+def set_repo_obsolescence(user_repo_dir, repo_name, user, enabled):
     """Enable or disable obsolescence support on a repository."""
     repo_path = get_and_validate_user_repo(user_repo_dir, repo_name)
     config_path, config = get_user_repo_config(user, repo_path)
@@ -586,9 +586,9 @@ def edit_repo(cname, user, user_repo_dir, repo_name, do_quick_delete):
         elif action == "Mark repository as publishing":
             set_repo_publishing(repo_name, user, user_repo_dir, True)
         elif action == "Enable obsolescence support (experimental)":
-            set_repo_obsolescence(repo_name, user, True)
+            set_repo_obsolescence(user_repo_dir, repo_name, user, True)
         elif action == "Disable obsolescence support":
-            set_repo_obsolescence(repo_name, user, False)
+            set_repo_obsolescence(user_repo_dir, repo_name, user, False)
     return
 
 
