@@ -164,8 +164,8 @@ Confirm offsets returned by the bootstrap procedure match offsets from a dump
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
-  topic     group           partition    offset    available    lag (s)
-  --------  ------------  -----------  --------  -----------  ---------
+  topic * group * partition * offset * available * lag \(s\) (re)
+  ----* * ----* * --------* * -----* * --------* * --------* (re)
   pushdata  *            0         8            8          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        12           12          0 (glob)
@@ -197,8 +197,8 @@ publish some extra commits and add them to the range of bootstrap messages.
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
-  topic     group           partition    offset    available    lag (s)
-  --------  ------------  -----------  --------  -----------  ---------
+  topic * group * partition * offset * available * lag \(s\) (re)
+  ----* * ----* * --------* * -----* * --------* * --------* (re)
   pushdata  *            0         8            8          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        16           16          0 (glob)
@@ -242,8 +242,8 @@ Print offsets on hgweb1 host
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
-  topic     group           partition    offset    available    lag (s)
-  --------  ------------  -----------  --------  -----------  ---------
+  topic * group * partition * offset * available * lag \(s\) (re)
+  ----* * ----* * --------* * -----* * --------* * --------* (re)
   pushdata  *            0         8            8          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        20           20          0 (glob)
@@ -343,8 +343,8 @@ Confirm hgrc replicated to hgweb host
 Confirm anticipated offsets on hgweb0
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
-  topic     group           partition    offset    available    lag (s)
-  --------  ------------  -----------  --------  -----------  ---------
+  topic * group * partition * offset * available * lag \(s\) (re)
+  ----* * ----* * --------* * -----* * --------* * --------* (re)
   pushdata  *            0         8            8    * (glob)
   pushdata  *            1         0            0    * (glob)
   pushdata  *            2        16           20    * (glob)
@@ -500,8 +500,8 @@ Print offsets for vcsreplicator after full bootstrap and vcsreplicator daemons a
 
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-consumer /etc/mercurial/vcsreplicator.ini --wait-for-no-lag
   $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-print-offsets /etc/mercurial/vcsreplicator.ini
-  topic     group           partition    offset    available    lag (s)
-  --------  ------------  -----------  --------  -----------  ---------
+  topic * group * partition * offset * available * lag \(s\) (re)
+  ----* * ----* * --------* * -----* * --------* * --------* (re)
   pushdata  *            0         8            8          0 (glob)
   pushdata  *            1         0            0          0 (glob)
   pushdata  *            2        20           20          0 (glob)
