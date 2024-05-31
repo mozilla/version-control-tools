@@ -10,12 +10,14 @@ Creating a repository should record an event saying so
   $ hgmo create-repo mozilla-central scm_level_3
   (recorded repository creation in replication log)
 
-  $ hgmo exec hgssh cat /repo/hg/mozilla/mozilla-central/.hg/requires
+  $ hgmo exec hgssh /var/hg/venv_pash/bin/hg -R /repo/hg/mozilla/mozilla-central debugrequirements
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd
   revlogv1
-  sparserevlog (hg49 !)
+  share-safe
+  sparserevlog
   store
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -44,12 +46,14 @@ Creating a repository should record an event saying so
   $ hgmo exec hgweb0 ls /repo/hg/mozilla
   mozilla-central
 
-  $ hgmo exec hgweb0 cat /repo/hg/mozilla/mozilla-central/.hg/requires
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/hg -R /repo/hg/mozilla/mozilla-central debugrequirements
   dotencode
   fncache
   generaldelta
+  revlog-compression-zstd
   revlogv1
-  sparserevlog (hg49 !)
+  share-safe
+  sparserevlog
   store
 
 Cleanup
