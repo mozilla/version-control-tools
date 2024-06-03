@@ -885,7 +885,7 @@ def filelog(orig, web):
 def hgwebfastannotate(orig, req, fctx, ui):
     import hgext.fastannotate.support as fasupport
 
-    diffopts = webutil.difffeatureopts(req, ui, "annotate")
+    diffopts = webutil.difffeatureopts(req, ui, b"annotate")
 
     return fasupport._doannotate(fctx, diffopts=diffopts)
 
