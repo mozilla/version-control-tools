@@ -149,8 +149,8 @@ Before doing so, strip a revision off the evolve directory to ensure a change is
   adding changesets
   adding manifests
   adding file changes
-  \d+ new obsolescence markers (re) (?)
   added \d+ changesets with \d+ changes to \d+ files (re)
+  \d+ new obsolescence markers (re) (?)
   new changesets *:* (glob)
   (run 'hg update' to get a working copy)
   \d+ files updated, \d+ files merged, \d+ files removed, \d+ files unresolved (re)
