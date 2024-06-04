@@ -89,7 +89,8 @@ Pushing the initial commit will result in replication messages
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
-  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
+  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob) (?)
+  vcsreplicator.consumer   > remote: Warning: Permanently added 'hgssh,*' (ED25519) to the list of known hosts. (glob) (?)
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
@@ -180,7 +181,8 @@ Pushing multiple commits results in sane behavior
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
-  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
+  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob) (?)
+  vcsreplicator.consumer   > remote: Warning: Permanently added 'hgssh,*' (ED25519) to the list of known hosts. (glob) (?)
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
@@ -300,7 +302,8 @@ Pushing multiple heads results in appropriate behavior
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
-  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
+  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob) (?)
+  vcsreplicator.consumer   > remote: Warning: Permanently added 'hgssh,*' (ED25519) to the list of known hosts. (glob) (?)
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
