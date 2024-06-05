@@ -59,13 +59,13 @@ Run `replicatedelete` on hgssh for mozilla-central
 Confirm the repos are deleted
 
   $ hgmo exec hgssh ls -la /repo/hg/mozilla/mozilla-central
-  ls: cannot access /repo/hg/mozilla/mozilla-central: No such file or directory
+  ls: cannot access */repo/hg/mozilla/mozilla-central*: No such file or directory (glob)
   [2]
   $ hgmo exec hgweb0 ls -la /repo/hg/mozilla/mozilla-central
-  ls: cannot access /repo/hg/mozilla/mozilla-central: No such file or directory
+  ls: cannot access */repo/hg/mozilla/mozilla-central*: No such file or directory (glob)
   [2]
   $ hgmo exec hgweb1 ls -la /repo/hg/mozilla/mozilla-central
-  ls: cannot access /repo/hg/mozilla/mozilla-central: No such file or directory
+  ls: cannot access */repo/hg/mozilla/mozilla-central*: No such file or directory (glob)
   [2]
 
 Set `consumer.backup=true` on a node and re-create the repos to test deletion on a backup node
