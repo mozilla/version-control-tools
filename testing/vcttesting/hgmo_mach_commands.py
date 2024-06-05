@@ -151,8 +151,8 @@ class HgmoCommands(object):
     @CommandArgument("key", help="SSH public key string")
     def add_ssh_key(self, email, key):
         if key == "-":
-            key = sys.stdin.read().strip().encode("utf-8")
-        self.c.ldap.add_ssh_key(email, key)
+            key = sys.stdin.read().strip()
+        self.c.ldap.add_ssh_key(email, key.encode("utf-8"))
 
     @Command(
         "add-user-to-group", category="hgmo", description="Add a user to an LDAP group"
