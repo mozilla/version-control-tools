@@ -43,16 +43,6 @@ if not os.path.exists("/etc/ssh/ssh_host_rsa_key"):
         ]
     )
 
-# Grab SSH host key from master. We'll get a prompt to accept the host key on
-# first connection unless we do this (since strict host key checking is on).
-p = subprocess.Popen(["/usr/bin/ssh-keyscan", "-H", "hgssh"], stdout=subprocess.PIPE)
-out = p.communicate()[0]
-if p.wait():
-    raise Exception("ssh-keyscan errored")
-
-with open("/home/hg/.ssh/known_hosts", "wb") as fh:
-    fh.write(out)
-
 # Setup consumer group names
 consumer_groupname = "hgweb%d" % (int(os.environ["BROKER_ID"]) - 1)
 files = {
