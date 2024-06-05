@@ -11,6 +11,7 @@
   > 1
   > This is my repo!
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
@@ -62,6 +63,7 @@ Check that multi-line inputs are handled correctly.
   > 1
   > $BADDESCRIPTION
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
@@ -101,6 +103,7 @@ Check that disallowed characters are handled correctly.
   > 1
   > $BADDESCRIPTION
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
@@ -133,6 +136,7 @@ Check that HTML characters are escaped correctly.
   > 1
   > $BADDESCRIPTION
   > EOF
+  Editing repo https://hg.mozilla.org/user_example.com/repo-1
   
   0) Exit.
   1) Delete the repository.
