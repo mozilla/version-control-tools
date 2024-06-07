@@ -62,7 +62,7 @@ Various hg command invocations aren't allowed
   invalid `hg` command executed; can only run serve --stdio
   [1]
 
-  $ hgssh ${SSH_SERVER} foohg -R repo1 serve --stdio
+  $ hgssh ${SSH_SERVER} foohg repo1
   A SSH connection has been successfully established.
   
   Your account (user@example.com) has privileges to access Mercurial over
