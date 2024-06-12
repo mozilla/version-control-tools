@@ -228,6 +228,8 @@ RELEASE_TREES = set(
         b"esr78",
         b"esr91",
         b"esr102",
+        b"esr115",
+        b"esr128",
         b"b2g32",
         b"b2g34",
         b"b2g37",
