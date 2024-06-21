@@ -101,11 +101,11 @@ LimitRequestFields 1000
 
     # Various automation wants to fetch certdata.txt (Mozilla Root Store)
     # ... from mozilla-* repos
-    <LocationMatch "/raw-file/default/security/nss/lib/ckfw/builtins/certdata\.txt$">
+    <LocationMatch "/raw-file/(tip|default)/security/nss/lib/ckfw/builtins/certdata\.txt$">
         Header onsuccess set Cache-Control "public, max-age=3600"
     </LocationMatch>
     # ... from nss itself
-    <LocationMatch "^/projects/nss/raw-file/default/lib/ckfw/builtins/certdata\.txt$">
+    <LocationMatch "^/projects/nss/raw-file/(tip|default)/lib/ckfw/builtins/certdata\.txt$">
         Header onsuccess set Cache-Control "public, max-age=3600"
     </LocationMatch>
 
