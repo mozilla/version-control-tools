@@ -26,6 +26,7 @@ ALLOWED_FILES = {
         b"build/mozconfig.common",
         b"config/milestone.txt",
         b"mobile/android/version.txt",
+        b"mobile/locales/l10n-changesets.json",
         b"services/sync/modules/constants.sys.mjs",
         b"xpcom/components/Module.h",
     ),
