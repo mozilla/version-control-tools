@@ -51,6 +51,7 @@ ffxbld-merge user cannot push non-merge day changes
   build/mozconfig.common
   config/milestone.txt
   mobile/android/version.txt
+  mobile/locales/l10n-changesets.json
   services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
@@ -88,6 +89,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   build/mozconfig.common
   config/milestone.txt
   mobile/android/version.txt
+  mobile/locales/l10n-changesets.json
   services/sync/modules/constants.sys.mjs
   xpcom/components/Module.h
   
