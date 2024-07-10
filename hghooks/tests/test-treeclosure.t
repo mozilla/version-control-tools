@@ -19,7 +19,7 @@
 Pushing to an open tree should succeed
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla-releng.net/trees/mozilla-central
+  > https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/mozilla-central
   > {"result": {"status": "open", "reason": ""}}
   > EOF
 
@@ -38,7 +38,7 @@ Pushing to an open tree should succeed
 Pushing to a closed tree should fail
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla-releng.net/trees/mozilla-central
+  > https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/mozilla-central
   > {"result": {"status": "closed", "reason": "splines won't reticulate"}}
   > EOF
 
@@ -101,7 +101,7 @@ is on the tip commit
 Pushing to an approval required tree should fail
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla-releng.net/trees/mozilla-central
+  > https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/mozilla-central
   > {"result": {"status": "approval required", "reason": "be verrrry careful"}}
   > EOF
 
@@ -196,7 +196,7 @@ Hook should not run when stripping
   > EOF
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla-releng.net/trees/striptest
+  > https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/striptest
   > {"result": {"status": "approval required", "reason": "it does not matter"}}
   > EOF
 

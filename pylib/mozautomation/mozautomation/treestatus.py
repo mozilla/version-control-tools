@@ -72,7 +72,11 @@ class TreeStatusClient(object):
     open or closed.
     """
 
-    def __init__(self, base_uri=b"https://treestatus.mozilla-releng.net/", opener=None):
+    def __init__(
+        self,
+        base_uri=b"https://treestatus.prod.lando.prod.cloudops.mozgcp.net/",
+        opener=None,
+    ):
         self._base_uri = base_uri
 
         if opener is None:

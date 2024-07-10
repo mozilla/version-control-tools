@@ -15,7 +15,7 @@
 Mark the tree here as approval-required
 
   $ cat > $TESTTMP/url << EOF
-  > https://treestatus.mozilla-releng.net/trees/server
+  > https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/server
   > {"result": {"status": "approval required", "reason": "be verrrry careful"}}
   > EOF
 

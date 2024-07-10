@@ -40,7 +40,7 @@ def isPushAllowed(ui, repo, name):
     treestatus_base_url = ui.config(
         b"mozilla",
         b"treestatus_base_url",
-        b"https://treestatus.mozilla-releng.net/trees/%s",
+        b"https://treestatus.prod.lando.prod.cloudops.mozgcp.net/trees/%s",
     )
     url = treestatus_base_url % (name,)
     try:
