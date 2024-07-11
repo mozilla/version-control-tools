@@ -68,10 +68,7 @@ if __name__ == "__main__":
         sys.executable = os.path.join(HERE, "venv", "bin", "python")
         os.environ["VIRTUAL_ENV"] = os.path.join(HERE, "venv")
 
-    try:
-        import vcttesting.docker as vctdocker
-    except ImportError:
-        vctdocker = None
+    import vcttesting.docker as vctdocker
 
     import vcttesting.hgmo as vcthgmo
 
@@ -123,10 +120,6 @@ if __name__ == "__main__":
     )
 
     options, extra = parser.parse_known_args(sys.argv)
-
-    if not vctdocker:
-        print("vctdocker libraries not found; deactivating Docker tests")
-        options.no_docker = True
 
     # This is somewhat arbitrary. It makes version management logic a bit
     # more complicated and isn't worth supporting.
