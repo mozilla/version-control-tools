@@ -11,7 +11,8 @@ Checking out to an existing repo that isn't shared will blow it away
   (destination is not shared; deleting)
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   streaming all changes
-  6 files to transfer, 1.08 KB of data
+  7 files to transfer, 1.08 KB of data (hg67 !)
+  6 files to transfer, 1.08 KB of data (no-hg67 !)
   transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found

@@ -5,7 +5,8 @@
   ensuring http://$LOCALHOST:$HGPORT/repo0@5d6cdc75a09b is available at dest
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   streaming all changes
-  6 files to transfer, 1.08 KB of data
+  7 files to transfer, 1.08 KB of data (hg67 !)
+  6 files to transfer, 1.08 KB of data (no-hg67 !)
   transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   new changesets b8b78f0253d8:aada1b3e573f (?)

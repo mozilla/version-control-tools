@@ -101,7 +101,8 @@ to be acquired.
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
   streaming all changes
-  6 files to transfer, 717 bytes of data
+  7 files to transfer, 717 bytes of data (hg67 !)
+  6 files to transfer, 717 bytes of data (no-hg67 !)
   transferred 717 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
@@ -135,7 +136,8 @@ Simulate a held lock on the store for a pull plus working directory update.
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
   streaming all changes
-  7 files to transfer, 1.02 KB of data
+  8 files to transfer, 1.02 KB of data (hg67 !)
+  7 files to transfer, 1.02 KB of data (no-hg67 !)
   transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found
@@ -155,7 +157,8 @@ Simulate a held lock on the store without a working directory
   (shared store has an active lock; assuming it is left over from a previous process and that the store is corrupt; deleting store and destination just to be sure)
   (sharing from new pooled repository 65cd4e3b46a3f22a08ec4162871e67f57c322f6a)
   streaming all changes
-  7 files to transfer, 1.02 KB of data
+  8 files to transfer, 1.02 KB of data (hg67 !)
+  7 files to transfer, 1.02 KB of data (no-hg67 !)
   transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   no changes found

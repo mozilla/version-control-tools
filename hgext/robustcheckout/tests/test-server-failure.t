@@ -7,7 +7,8 @@ Extension works with default config
   ensuring http://$LOCALHOST:$HGPORT/bad-server@94086d65796f is available at good-clone
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   searching for changes
   new changesets 96ee1d7354c4:94086d65796f (?)
@@ -51,21 +52,24 @@ Server abort part way through response results in retries
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   stream ended unexpectedly  (got 244 bytes, expected 816)
   (retrying after network failure on attempt 1 of 3)
   (waiting *s before retry) (glob)
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   stream ended unexpectedly  (got 244 bytes, expected 816)
   (retrying after network failure on attempt 2 of 3)
   (waiting *s before retry) (glob)
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   \r (no-eol) (esc)
   clone [                                                               ]   0/723\r (no-eol) (esc)
                                                                                   \r (no-eol) (esc)
@@ -81,14 +85,16 @@ Adjusting the network limit works
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   stream ended unexpectedly  (got 244 bytes, expected 816)
   (retrying after network failure on attempt 1 of 2)
   (waiting *s before retry) (glob)
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   stream ended unexpectedly  (got 244 bytes, expected 816)
   abort: reached maximum number of network attempts; giving up
   
@@ -103,14 +109,16 @@ Recovering server will result in good clone
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   stream ended unexpectedly  (got 244 bytes, expected 816)
   (retrying after network failure on attempt 1 of 3)
   (waiting *s before retry) (glob)
   ensuring http://$LOCALHOST:$HGPORT/bad-server-bytelimit@94086d65796f is available at byte-limit
   (sharing from new pooled repository 96ee1d7354c4ad7372047672c36a1f561e3a6a4c)
   streaming all changes
-  6 files to transfer, 723 bytes of data
+  7 files to transfer, 723 bytes of data (hg67 !)
+  6 files to transfer, 723 bytes of data (no-hg67 !)
   transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
   new changesets 96ee1d7354c4:94086d65796f (?)
   searching for changes
