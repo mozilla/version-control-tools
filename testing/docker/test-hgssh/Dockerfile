@@ -4,6 +4,8 @@
 
 FROM centos:centos7
 
+RUN sed -i 's/^mirrorlist/#&/;s,^#baseurl=http://mirror.centos.org,baseurl=http://vault.centos.org,' /etc/yum.repos.d/CentOS-Base.repo
+
 RUN yum update -y && \
     yum install -y \
         gcc \
