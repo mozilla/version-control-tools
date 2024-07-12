@@ -467,8 +467,6 @@ class sshserverwrapped(wireprotoserver.sshserver):
         # methods.
         repo._serverlog = serverlog
 
-        self._fout = fileobjectproxy(self._fout, serverlog)
-
         logevent(
             repo.ui,
             serverlog,
@@ -504,6 +502,11 @@ class sshserverwrapped(wireprotoserver.sshserver):
             self._serverlog = None
 
 
+def wrapped_runsshserver(orig, ui, repo, fin, fout, ev, *args, **kwargs):
+    fout = fileobjectproxy(fout, repo._serverlog)
+    return orig(ui, repo, fin, fout, ev, *args, **kwargs)
+
+
 def extsetup(ui):
     if wireprotov1server:
         extensions.wrapfunction(wireprotov1server, "dispatch", wrappeddispatch)
@@ -520,6 +523,9 @@ def extsetup(ui):
         )
         extensions.wrapfunction(
             wireprotoserver, "_sshv1respondooberror", wrappedsshv1respondooberror
+        )
+        extensions.wrapfunction(
+            wireprotoserver, "_runsshserver", wrapped_runsshserver
         )
 
     if ui.configbool(b"serverlog", b"hgweb"):
