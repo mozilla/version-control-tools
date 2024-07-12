@@ -11,7 +11,7 @@
   > writeuri = ssh://user@dummy/$TESTTMP/
   > EOF
 
-  $ export PUSHLOGHG=/app/venv/mercurials/6.7.2/bin/hg
+  $ export PUSHLOGHG=/app/venv/mercurials/6.7.4/bin/hg
 
   $ export USER=hguser
   $ hg init mozilla-central
