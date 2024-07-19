@@ -31,6 +31,7 @@
     state: present
     name:
       # Needed to build python-ldap package for virtualenv.
+      - gcc
       - openldap-devel
       - python-devel
       - python
