@@ -1,6 +1,0 @@
----
-- include: journald.yml
-- include: yum_epel_update.yml
-
-- name: set hostname
-  hostname: name={{ inventory_hostname }}
