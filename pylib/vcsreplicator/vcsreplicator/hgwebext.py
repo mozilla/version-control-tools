@@ -120,7 +120,7 @@ def extsetup(ui):
     # request time. We add ``.hg/replicated-data`` to this list to ensure
     # that changes to the file are reflected on the next request and that
     # old cached state of this file/attribute aren't used.
-    REFRESH_ENTRY = (b"path", b"replicated-data")
+    REFRESH_ENTRY = ("path", b"replicated-data")
 
     if REFRESH_ENTRY not in hg.foi:
         hg.foi.append(REFRESH_ENTRY)
