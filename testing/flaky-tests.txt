@@ -16,8 +16,5 @@ test-sns-notifier.t
 # test, but succeeds later down the line.
 test-cluster-unavailable.t
 
-# currently fails
-test-template-sync.t
-
 # corrupted data created by changelog_correctness_helper.py is now caught by hg at commit time
 test-changelog_correctness.t

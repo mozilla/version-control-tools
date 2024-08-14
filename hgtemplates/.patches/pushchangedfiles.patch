@@ -1,0 +1,28 @@
+# HG changeset patch
+# User Connor Sheehan <sheehan@mozilla.com>
+# Date 1714065722 0
+#      Thu Apr 25 17:22:02 2024 +0000
+# Node ID ad2496c5f6d1d4fc0f80331cb5a9ecc6c93e2438
+# Parent  2c0516faa86cc312f6bec8605fdf1cbb44ff9fe6
+hgmo: add a `pushchangedfiles` webcommand (Bug 1892039) r=ahal
+
+Differential Revision: https://phabricator.services.mozilla.com/D208521
+
+diff --git a/hgtemplates/json/map b/hgtemplates/json/map
+--- a/hgtemplates/json/map
++++ b/hgtemplates/json/map
+@@ -300,11 +300,14 @@ firefoxreleasebuild = '\{
+   }'
+ repoinfo = '\{
+   "group_owner": {groupowner|json}
+   }'
+ automationrelevance = '\{
+   "changesets": {changesets|json},
+   "visible": {visible|json}
+   }'
++pushchangedfiles = '\{
++  "files": {files|json}
++  }'
+ error = '\{
+   "error": {error|utf8|json}
+   }'

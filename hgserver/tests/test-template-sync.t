@@ -256,6 +256,8 @@ Always test against the version of Mercurial we have deployed to hg.mo
   applying patch from stdin
   applying patch opengraph.patch
   applying patch from stdin
+  applying patch pushchangedfiles.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.
