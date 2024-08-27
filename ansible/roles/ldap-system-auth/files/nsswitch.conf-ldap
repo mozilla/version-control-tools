@@ -1,0 +1,7 @@
+passwd:     {if "with-files-domain":ldap files|files ldap} systemd   {exclude if "with-custom-passwd"}
+group:      {if "with-files-domain":ldap files|files ldap} systemd   {exclude if "with-custom-group"}
+netgroup:   ldap files           {exclude if "with-custom-netgroup"}
+automount:  ldap files           {exclude if "with-custom-automount"}
+services:   ldap files           {exclude if "with-custom-services"}
+sudoers:    files ldap           {include if "with-sudo"}
+subid:      ldap {include if "with-subid"}
