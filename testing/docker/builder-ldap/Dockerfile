@@ -4,10 +4,9 @@
 
 # This is a Docker container for running a Mozilla flavored LDAP server.
 
-FROM centos:centos7
+FROM rockylinux:8
 
-RUN sed -i 's/^mirrorlist/#&/;s,^#baseurl=http://mirror.centos.org,baseurl=http://vault.centos.org,' /etc/yum.repos.d/CentOS-Base.repo
-RUN yum update -y && yum install -y openldap-servers sudo && yum clean all
+RUN yum update -y && yum install --enablerepo=powertools -y openldap-servers sudo && yum clean all
 
 RUN rm -rf /etc/openldapldap/slapd.d
 
