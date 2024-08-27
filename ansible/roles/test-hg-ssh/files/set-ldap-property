@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,10 +16,10 @@ real = 'ldap://ldap:389/'
 if value == 'real':
     value = real
 
-with open('/etc/mercurial/ldap.json', 'rb') as fh:
+with open('/etc/mercurial/ldap.json', 'r') as fh:
     d = json.load(fh)
 
 d[what] = value
 
-with open('/etc/mercurial/ldap.json', 'wb') as fh:
+with open('/etc/mercurial/ldap.json', 'w') as fh:
     json.dump(d, fh)
