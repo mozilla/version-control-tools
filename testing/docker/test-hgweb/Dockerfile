@@ -2,18 +2,16 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-FROM centos:centos7
-
-RUN sed -i 's/^mirrorlist/#&/;s,^#baseurl=http://mirror.centos.org,baseurl=http://vault.centos.org,' /etc/yum.repos.d/CentOS-Base.repo
+FROM rockylinux:8
 
 RUN yum update -y && \
-    yum install -y \
+    yum install --enablerepo=powertools -y \
         gcc \
         libffi-devel \
         libyaml-devel \
         make \
         openssl-devel \
-        python-devel \
+        python3-devel \
         python3 \
         python3-pip \
         rsync \
