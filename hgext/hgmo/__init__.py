@@ -876,8 +876,7 @@ def filelog(orig, web):
             tmpl.__class__ = tmplwrapper
 
         web.tmpl = tmpl
-        for r in orig(web):
-            yield r
+        return orig(web)
     finally:
         tmpl.__class__ = orig_class
 
