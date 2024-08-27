@@ -2,7 +2,6 @@
 dependencies:
   - test-supervisor
   - test-kafkabroker
-  - test-python-coverage
   # hgweb_hosts is used to populate SSH host keys. We don't know these
   # until Docker containers have started, so make it empty.
   # Something similar applies to ZooKeeper and Kafka settings.
