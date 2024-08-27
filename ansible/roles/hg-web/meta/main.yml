@@ -1,6 +1,5 @@
 ---
 dependencies:
-  - mercurial-yum
   - {
       role: kafka-broker,
       kafka_host_name: "{{ inventory_hostname }}",

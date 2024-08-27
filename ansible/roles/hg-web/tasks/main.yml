@@ -252,6 +252,13 @@
 # purge old revisions. But since the size of static content is small and there
 # is little harm to keeping the files around, it doesn't seem justified.
 
+- name: directory for mercurial config
+  file: path=/etc/mercurial
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
 # Settings from this file are inherited by every hg command run on the
 # system.
 - name: install global hgrc
