@@ -1,0 +1,10 @@
+[Unit]
+Description=Cleanup kafka/zookeeper log files
+Wants=kafka-logs-cleanup.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /var/log/zookeeper /var/log/kafka -mtime +90 -delete
+
+[Install]
+WantedBy=multi-user.target

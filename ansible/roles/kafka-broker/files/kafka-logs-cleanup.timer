@@ -1,0 +1,9 @@
+[Unit]
+Description=Cleanup kafka/zookeeper log files
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
