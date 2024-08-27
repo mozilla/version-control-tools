@@ -9,6 +9,7 @@
       - httpd
       # To build mod_wsgi from source so it can be placed in virtualenvs.
       - httpd-devel
+      - redhat-rpm-config
       # Provides `setcap` utility.
       - libcap
       # We use logrotate to control log files
