@@ -1,4 +1,5 @@
 pash_hostname: hg.mozilla.org
+python_version: "python{% if ansible_distribution_major_version | int <= 8 %}3.6{% else %}3.9{% endif %}"
 sentry_dsn_encrypted: ENC[AES256_GCM,data:1ScBXbkTEVJo5qd8uFz28w6zQTD+TCuXox4W7tY8BSnTQ8amGH16II7Tq4RouomgpTsQO42rYCi+4I6B1B1NLj+68g==,iv:B3jcbapkh/ZOuNwD+R/artiX1b5MaUf0BDdxOPz1GLA=,tag:j0XHT9ymJRb9LwQukboWPQ==,type:str]
 sops:
     kms: []

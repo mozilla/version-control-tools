@@ -61,7 +61,7 @@
 
 - name: virtualenv to run test-specific processes
   include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/python3.6
+           python=/usr/bin/{{ python_version }}
            venv=/var/hg/venv_testing
            requirements=../roles/test-hg-ssh/files/requirements-testing.txt
 

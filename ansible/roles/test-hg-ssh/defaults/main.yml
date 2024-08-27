@@ -1,0 +1,2 @@
+---
+python_version: "python{% if ansible_distribution_major_version | int <= 8 %}3.6{% else %}3.9{% endif %}"

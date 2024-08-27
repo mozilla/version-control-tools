@@ -49,7 +49,11 @@ LoadModule substitute_module modules/mod_substitute.so
 LoadModule rewrite_module modules/mod_rewrite.so
 LoadModule version_module modules/mod_version.so
 
+{% if python_version == "python3.6" %}
 LoadModule wsgi_module /var/hg/venv_hgweb/lib/python3.6/site-packages/mod_wsgi/server/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so
+{% else %}
+LoadModule wsgi_module /var/hg/venv_hgweb/lib/python3.9/site-packages/mod_wsgi/server/mod_wsgi-py39.cpython-39-x86_64-linux-gnu.so
+{% endif %}
 
 LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
 LoadModule systemd_module modules/mod_systemd.so

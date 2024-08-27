@@ -94,13 +94,13 @@
 
 - name: create virtualenv for tools
   include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/python3.6
+           python=/usr/bin/{{ python_version }}
            venv=/var/hg/venv_tools
            requirements=../roles/hg-ssh/files/requirements-tools.txt
 
 - name: create virtualenv for bundle generation
   include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/python3.6
+           python=/usr/bin/{{ python_version }}
            venv=/var/hg/venv_bundles
            requirements=../roles/hg-ssh/files/requirements-bundles.txt
 
@@ -112,7 +112,7 @@
 # The vcsreplicator Python package contains support code for managing
 # replication. Also add it to the virtualenv.
 - name: add packages to Python 3 virtualenvs
-  copy: dest=/var/hg/{{ item.venv }}/lib64/python3.6/site-packages/{{ item.pth }}.pth
+  copy: dest=/var/hg/{{ item.venv }}/lib64/{{ python_version }}/site-packages/{{ item.pth }}.pth
         content=/var/hg/version-control-tools/{{ item.path }}
         owner=root
         group=root

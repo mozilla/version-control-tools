@@ -29,3 +29,5 @@ bloxtool_url: https://bloxtool
 
 # Flag used to turn on/off replication filters on a host, default off
 replication_filters: null
+
+python_version: "python{% if ansible_distribution_major_version | int <= 8 %}3.6{% else %}3.9{% endif %}"
