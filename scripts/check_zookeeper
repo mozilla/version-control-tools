@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,7 +17,7 @@ def parse_zoocfg(p):
     """Parse a zoo.cfg into a dict of key-value pairs."""
     attrs = {}
 
-    with open(p, 'rb') as fh:
+    with open(p, 'r', encoding='utf-8') as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith('#'):
@@ -62,8 +62,8 @@ def send_zk_command(host, port, command):
     finally:
         s.close()
 
-    res = ''.join(result)
-    if res.startswith('This ZooKeeper instance is not currently'):
+    res = b''.join(result)
+    if res.startswith(b'This ZooKeeper instance is not currently'):
         raise ZookeeperUnavailable()
 
     return res
@@ -71,13 +71,13 @@ def send_zk_command(host, port, command):
 
 def send_monitor_command(host, port):
     """Send and parse the "mntr" command to a host:port."""
-    res = send_zk_command(host, port, 'mntr').rstrip()
+    res = send_zk_command(host, port, b'mntr').rstrip()
 
     attrs = {}
     for line in res.splitlines():
-        k, v = line.split('\t')
+        k, v = line.split(b'\t')
 
-        if k not in ('zk_version', 'zk_server_state'):
+        if k not in (b'zk_version', b'zk_server_state'):
             v = int(v)
 
         attrs[k] = v
@@ -112,28 +112,28 @@ if __name__ == '__main__':
 
         # First verify "ruok" says node is healthy.
         try:
-            res = send_zk_command(host, port, 'ruok').strip()
-            if res != 'imok':
+            res = send_zk_command(host, port, b'ruok').strip()
+            if res != b'imok':
                 print('NODE CRITICAL - not responding "imok": %s' % res)
                 exit = 2
 
-            res = send_zk_command(host, port, 'isro').strip()
-            if res != 'rw':
+            res = send_zk_command(host, port, b'isro').strip()
+            if res != b'rw':
                 print('NODE CRITICAL - not in read/write mode: %s' % res)
                 exit = 2
 
             state = send_monitor_command(host, port)
-            if state['zk_avg_latency'] >= args.max_average_latency:
+            if state[b'zk_avg_latency'] >= args.max_average_latency:
                 print('NODE WARNING - average latency higher than expected: '
-                      '%d > %d' % (state['zk_avg_latency'],
+                      '%d > %d' % (state[b'zk_avg_latency'],
                                    args.max_average_latency))
                 exit = max(exit, 1)
 
-            fd_percent = (float(state['zk_open_file_descriptor_count']) /
-                          float(state['zk_max_file_descriptor_count']))
+            fd_percent = (float(state[b'zk_open_file_descriptor_count']) /
+                          float(state[b'zk_max_file_descriptor_count']))
             if fd_percent >= args.max_file_descriptor_percentage:
                 print('NODE WARNING - open file descriptors above percentage '
-                      'limit: %d' % state['zk_open_file_descriptor_count'])
+                      'limit: %d' % state[b'zk_open_file_descriptor_count'])
                 exit = max(exit, 1)
         except socket.error as e:
             print('socket error connecting to %s: %s' % (host, e))
@@ -155,20 +155,20 @@ if __name__ == '__main__':
         # We should be able to reach every server.
         for server_id, hostname in sorted(servers.items()):
             try:
-                res = send_zk_command(hostname, port, 'ruok').strip()
-                if res != 'imok':
+                res = send_zk_command(hostname, port, b'ruok').strip()
+                if res != b'imok':
                     warnings.append('ENSEMBLE WARNING - node (%s) not OK: '
                                     '%s' % (hostname, res))
                     exit = max(exit, 1)
                     continue
 
                 state = send_monitor_command(hostname, port)
-                if state['zk_server_state'] == 'leader':
+                if state[b'zk_server_state'] == b'leader':
                     leader_state = state
-                elif state['zk_server_state'] != 'follower':
+                elif state[b'zk_server_state'] != b'follower':
                     # This should never occur - I think.
                     warnings.append('invalid server state on %s: %s' % (
-                                    hostname, state['zk_server_state']))
+                                    hostname, state[b'zk_server_state']))
                     exit = max(exit, 1)
             except socket.error as e:
                 notices.append('ENSEMBLE WARNING - socket error connecting to '
@@ -185,17 +185,17 @@ if __name__ == '__main__':
             exit = 2
         else:
             expected_followers = len(servers) - 1
-            if leader_state['zk_followers'] != expected_followers:
+            if leader_state[b'zk_followers'] != expected_followers:
                 warnings.append('ENSEMBLE WARNING - only have %d/%d expected '
-                                'followers' % (leader_state['zk_followers'],
+                                'followers' % (leader_state[b'zk_followers'],
                                                expected_followers))
                 exit = max(exit, 1)
 
-            if leader_state['zk_followers'] != leader_state['zk_synced_followers']:
+            if leader_state[b'zk_followers'] != leader_state[b'zk_synced_followers']:
                 warnings.append('ENSEMBLE WARNING - only have %d/%d in sync '
                                 'followers' % (
-                                    leader_state['zk_synced_followers'],
-                                    leader_state['zk_followers']))
+                                    leader_state[b'zk_synced_followers'],
+                                    leader_state[b'zk_followers']))
                 exit = max(exit, 1)
 
     # Reset stats.
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     if args.host:
         host, port = args.host.split(':')
         try:
-            send_zk_command(host, port, 'srst')
+            send_zk_command(host, port, b'srst')
         except socket.error:
             pass
 
