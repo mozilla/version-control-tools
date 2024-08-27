@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-FROM rockylinux:8
+FROM rockylinux:9
 
 RUN yum update -y && \
-    yum install --enablerepo=powertools -y \
+    yum install --enablerepo=crb -y \
         gcc \
         libffi-devel \
         libyaml-devel \
@@ -18,7 +18,7 @@ RUN yum update -y && \
         tar && \
     yum clean all
 
-ENV LC_ALL=en_US.UTF-8
+ENV LC_ALL=C.UTF-8
 
 RUN pip3 install --upgrade pip setuptools
 
