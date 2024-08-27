@@ -912,23 +912,18 @@ def extsetup(ui):
         (b"", b"hgmo", False, b"Run a server configured like hg.mozilla.org")
     )
 
-    setattr(webcommands, "info", infowebcommand)
-    webcommands.__all__.append(b"info")
-
-    setattr(webcommands, "headdivergence", headdivergencewebcommand)
-    webcommands.__all__.append(b"headdivergence")
-
-    setattr(webcommands, "automationrelevance", automationrelevancewebcommand)
-    webcommands.__all__.append(b"automationrelevance")
-
-    setattr(webcommands, "pushchangedfiles", push_changed_files_webcommand)
-    webcommands.__all__.append(b"pushchangedfiles")
-
-    setattr(webcommands, "isancestor", isancestorwebcommand)
-    webcommands.__all__.append(b"isancestor")
-
-    setattr(webcommands, "repoinfo", repoinfowebcommand)
-    webcommands.__all__.append(b"repoinfo")
+    webcommands.info = webcommands.webcommand(b"info")(infowebcommand)
+    webcommands.headdivergence = webcommands.webcommand(b"headdivergence")(
+        headdivergencewebcommand
+    )
+    webcommands.automationrelevance = webcommands.webcommand(b"automationrelevance")(
+        automationrelevancewebcommand
+    )
+    webcommands.pushchangedfiles = webcommands.webcommand(b"pushchangedfiles")(
+        push_changed_files_webcommand
+    )
+    webcommands.isancestor = webcommands.webcommand(b"isancestor")(isancestorwebcommand)
+    webcommands.repoinfo = webcommands.webcommand(b"repoinfo")(repoinfowebcommand)
 
 
 def reposetup(ui, repo):

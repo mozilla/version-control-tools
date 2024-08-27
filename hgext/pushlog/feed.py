@@ -38,13 +38,6 @@ minimumhgversion = b"4.8"
 cal = pdt.Calendar()
 PUSHES_PER_PAGE = 10
 
-
-def addwebcommand(f, name):
-    """Adds `f` as a webcommand named `name`."""
-    setattr(hgwebcommands, name, f)
-    hgwebcommands.__all__.append(pycompat.bytestr(name))
-
-
 ATOM_MIMETYPE = b"application/atom+xml"
 
 
@@ -634,6 +627,6 @@ def pushes(web):
     return web.sendtemplate(template, **pycompat.strkwargs(data))
 
 
-addwebcommand(pushlog_feed, "pushlog")
-addwebcommand(pushlog_html, "pushloghtml")
-addwebcommand(pushes, "pushes")
+hgwebcommands.pushlog = hgwebcommands.webcommand(b"pushlog")(pushlog_feed)
+hgwebcommands.pushloghtml = hgwebcommands.webcommand(b"pushloghtml")(pushlog_feed)
+hgwebcommands.pushes = hgwebcommands.webcommand(b"pushes")(pushlog_feed)

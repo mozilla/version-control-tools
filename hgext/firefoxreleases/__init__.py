@@ -52,8 +52,9 @@ revsetpredicate = registrar.revsetpredicate()
 def extsetup(ui):
     extensions.wrapfunction(webutil, "changesetentry", changesetentry)
 
-    setattr(webcommands, "firefoxreleases", firefox_releases_web_command)
-    webcommands.__all__.append(b"firefoxreleases")
+    webcommands.firefoxreleases = webcommands.webcommand(b"firefoxreleases")(
+        firefox_releases_web_command
+    )
 
 
 def db_for_repo(repo):
