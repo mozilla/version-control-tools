@@ -124,7 +124,7 @@
         owner=root
         group=root
         mode=0644
-  notify: systemd reload daemon
+  notify: systemd daemon reload
   when: is_testing is not defined
   with_items:
     - kafka-logs-cleanup.service
