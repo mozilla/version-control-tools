@@ -41,6 +41,7 @@ ffxbld-merge user cannot push non-merge day changes
   **************** ERROR ****************
   ffxbld-merge can only push changes to
   the following paths:
+  .arcconfig
   .hgtags
   CLOBBER
   browser/config/mozconfigs/
@@ -79,6 +80,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   **************** ERROR ****************
   ffxbld-merge can only push changes to
   the following paths:
+  .arcconfig
   .hgtags
   CLOBBER
   browser/config/mozconfigs/

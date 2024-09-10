@@ -16,6 +16,7 @@ Merge day push contains unexpected changes.
 
 ALLOWED_FILES = {
     b"firefox": (
+        b".arcconfig",
         b".hgtags",
         b"CLOBBER",
         b"browser/config/mozconfigs/",
