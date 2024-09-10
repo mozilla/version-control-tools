@@ -628,5 +628,5 @@ def pushes(web):
 
 
 hgwebcommands.pushlog = hgwebcommands.webcommand(b"pushlog")(pushlog_feed)
-hgwebcommands.pushloghtml = hgwebcommands.webcommand(b"pushloghtml")(pushlog_feed)
-hgwebcommands.pushes = hgwebcommands.webcommand(b"pushes")(pushlog_feed)
+hgwebcommands.pushloghtml = hgwebcommands.webcommand(b"pushloghtml")(pushlog_html)
+hgwebcommands.pushes = hgwebcommands.webcommand(b"pushes")(pushes)
