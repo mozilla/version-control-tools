@@ -118,6 +118,23 @@
     - zookeeper
   when: is_testing is not defined
 
+- name: install Kafka log cleanup systemd unit files
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  notify: systemd reload daemon
+  when: is_testing is not defined
+  with_items:
+    - kafka-logs-cleanup.service
+    - kafka-logs-cleanup.timer
+
+- name: enable Kafka log cleanup systemd timer unit
+  service: name=kafka-logs-cleanup.timer
+           enabled=yes
+  when: is_testing is not defined
+
 # We DON'T set state=started because starting kafka and zookeeper can be
 # dangerous since it may introduce nodes into a cluster at an unwanted
 # time.
