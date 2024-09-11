@@ -14,8 +14,8 @@ num.partitions={{ kafka_num_partitions | default(1) }}
 # We want to be explicit about what topics are created.
 auto.create.topics.enable=false
 
-# Retain logs for 7 days by default.
-log.retention.hours={{ kafka_log_retention_hours | default(168) }}
+# Retain logs for 3 days by default.
+log.retention.hours={{ kafka_log_retention_hours | default(72) }}
 log.segment.bytes={{ kafka_log_segment_bytes | default(536870912) }}
 log.retention.check.interval.ms={{ kafka_log_retention_check_interval | default(60000) }}
 log.cleaner.enable={{ kafka_log_cleaner_enable | default("false") }}
