@@ -454,6 +454,11 @@ def configwizard(ui, repo, statedir=None, **opts):
 
     update_evolve(ui)
 
+    if not runsteps:
+        # Don't prompt if we're asked to not do anything beyond the version
+        # check and evolve update.
+        return 0
+
     uiprompt(ui, INITIAL_MESSAGE, default=b"<RETURN>")
 
     with demandimport.deactivated():
