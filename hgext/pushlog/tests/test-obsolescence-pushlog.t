@@ -427,7 +427,7 @@ Hidden changesets dropped in feed
    <updated>*Z</updated> (glob)
    <entry>
     <title>Changeset d129109168f0ed985e51b0f86df256acdcfcfe45</title>
-    <id>http://www.selenic.com/mercurial/#changeset-d129109168f0ed985e51b0f86df256acdcfcfe45</id>
+    <id>http://*:$HGPORT/server/#changeset-d129109168f0ed985e51b0f86df256acdcfcfe45</id> (glob)
     <link href="http://*:$HGPORT/server/rev/d129109168f0ed985e51b0f86df256acdcfcfe45"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
@@ -441,7 +441,7 @@ Hidden changesets dropped in feed
    </entry>
    <entry>
     <title>Changeset 418a63f508062fb2eb9130065c5ddc7908dd5949</title>
-    <id>http://www.selenic.com/mercurial/#changeset-418a63f508062fb2eb9130065c5ddc7908dd5949</id>
+    <id>http://*:$HGPORT/server/#changeset-418a63f508062fb2eb9130065c5ddc7908dd5949</id> (glob)
     <link href="http://*:$HGPORT/server/rev/418a63f508062fb2eb9130065c5ddc7908dd5949"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
@@ -455,7 +455,7 @@ Hidden changesets dropped in feed
    </entry>
    <entry>
     <title>Changeset 62eebb2f0f00195f9d965f718090c678c4fa414d</title>
-    <id>http://www.selenic.com/mercurial/#changeset-62eebb2f0f00195f9d965f718090c678c4fa414d</id>
+    <id>http://*:$HGPORT/server/#changeset-62eebb2f0f00195f9d965f718090c678c4fa414d</id> (glob)
     <link href="http://*:$HGPORT/server/rev/62eebb2f0f00195f9d965f718090c678c4fa414d"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
@@ -469,7 +469,7 @@ Hidden changesets dropped in feed
    </entry>
    <entry>
     <title>Changeset b3641753ee63b166fad7c5f10060b0cbbc8a86b0</title>
-    <id>http://www.selenic.com/mercurial/#changeset-b3641753ee63b166fad7c5f10060b0cbbc8a86b0</id>
+    <id>http://*:$HGPORT/server/#changeset-b3641753ee63b166fad7c5f10060b0cbbc8a86b0</id> (glob)
     <link href="http://*:$HGPORT/server/rev/b3641753ee63b166fad7c5f10060b0cbbc8a86b0"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
@@ -483,7 +483,7 @@ Hidden changesets dropped in feed
    </entry>
    <entry>
     <title>Changeset 96ee1d7354c4ad7372047672c36a1f561e3a6a4c</title>
-    <id>http://www.selenic.com/mercurial/#changeset-96ee1d7354c4ad7372047672c36a1f561e3a6a4c</id>
+    <id>http://*:$HGPORT/server/#changeset-96ee1d7354c4ad7372047672c36a1f561e3a6a4c</id> (glob)
     <link href="*:$HGPORT/server/rev/96ee1d7354c4ad7372047672c36a1f561e3a6a4c"/> (glob)
     <updated>*Z</updated> (glob)
     <author>
