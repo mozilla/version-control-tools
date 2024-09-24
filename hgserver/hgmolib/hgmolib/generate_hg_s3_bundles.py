@@ -287,10 +287,6 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
 
     repo_full = os.path.join("/repo/hg/mozilla", repo)
 
-    hg_stat = os.stat(os.path.join(repo_full, ".hg"))
-    uid = hg_stat.st_uid
-    gid = hg_stat.st_gid
-
     # Bundle files are named after the tip revision in the repository at
     # the time the bundle was created. This is the easiest way to name
     # bundle files.
@@ -476,11 +472,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     with open(clonebundles_path, "w") as fh:
         fh.write("\n".join(clonebundles_manifest))
 
-    # Ensure manifest is owned by same user who owns repo and has sane
-    # permissions.
-    # TODO we can't do this yet since the "hg" user isn't a member of the
-    # scm_* groups.
-    # os.chown(clonebundles_path, uid, gid)
+    # Normalize permissions on the manifest file.
     os.chmod(clonebundles_path, 0o664)
 
     # Replicate manifest to mirrors.
