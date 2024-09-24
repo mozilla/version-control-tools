@@ -299,9 +299,6 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     ).decode("latin-1")
     print("tip is %s" % tip)
 
-    with open(os.path.join(repo_full, ".hg", "requires"), "rb") as fh:
-        generaldelta = b"generaldelta\n" in fh.readlines()
-
     debugformat_json = json.loads(
         subprocess.check_output([HG, "-R", repo_full, "debugformat", "-T", "json"])
     )
