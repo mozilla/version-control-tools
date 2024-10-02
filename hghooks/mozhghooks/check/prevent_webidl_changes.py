@@ -10,6 +10,7 @@ from mozautomation.commitparser import (
     parse_requal_reviewers,
     is_backout,
 )
+from mozhg.util import repo_owner
 
 from ..checks import (
     PreTxnChangegroupCheck,
@@ -92,7 +93,10 @@ class WebIDLCheck(PreTxnChangegroupCheck):
         return b"webidl_check"
 
     def relevant(self):
-        return self.repo_metadata[b"firefox_releasing"]
+        return (
+            self.repo_metadata[b"firefox_releasing"]
+            and repo_owner(self.repo) != b"scm_allow_direct_push"
+        )
 
     def pre(self, node):
         # Accept the entire push for code uplifts

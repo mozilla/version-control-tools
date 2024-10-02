@@ -71,9 +71,22 @@ Editing the sync-messages.ini file without /IPC/ peer review should fail
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
 
+Editing the `sync-message.ini` file without IPC peer but with `scm_allow_direct_push`
+ownership should pass.
+
+  $ echo "scm_allow_direct_push" > $TESTTMP/server/.hg/moz-owner
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
 Editing the sync-messages.ini file with /IPC/ peer review should pass
 
-  $ hg -q commit --amend -m 'Bug 123 - Add Bar; r=jld'
+  $ echo "bar" > ipc/ipdl/sync-messages.ini
+  $ hg -q commit -m 'Bug 123 - Add Bar; r=jld'
   $ hg push
   pushing to $TESTTMP/server
   searching for changes

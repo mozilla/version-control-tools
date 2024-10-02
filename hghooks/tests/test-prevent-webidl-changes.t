@@ -380,3 +380,15 @@ Editing multiple .webidl files without review should fail
   abort: pretxnchangegroup.mozhooks hook failed
   [255]
  
+Editing multiple .webidl files without review on but with `scm_allow_direct_push`
+ownership should pass.
+
+  $ echo "scm_allow_direct_push" > $TESTTMP/server/.hg/moz-owner
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 2 changes to 2 files
+
