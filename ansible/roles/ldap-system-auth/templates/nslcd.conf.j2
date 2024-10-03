@@ -2,6 +2,8 @@ uri {{ ldap_uri | mandatory }}
 
 {% if ldap_starttls | mandatory -%}
 ssl start_tls
+{%- else -%}
+ssl no
 {%- endif %}
 
 base {{ basedn | mandatory }}
@@ -17,6 +19,7 @@ map passwd homeDirectory {{ home_attribute | mandatory }}
 
 uid nslcd
 gid ldap
-ssl no
+{% if ansible_distribution_major_version == '7' -%}
 tls_cacertdir /etc/openldap/cacerts
 tls_cacertfile /etc/openldap/cacerts/mozilla.crt
+{%- endif %}
