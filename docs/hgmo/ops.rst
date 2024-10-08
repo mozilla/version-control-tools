@@ -118,7 +118,7 @@ and banning them. First, we want to be able to view the active connections to
 the service.
 
 1. Log in to the Zeus load balancer at https://zlb1.external.ops.mdc1.mozilla.com:9090
-2. Click ``Activity`` in the top manu bar, then ``Connections`` in the menu bar for the
+2. Click ``Activity`` in the top menu bar, then ``Connections`` in the menu bar for the
    updated view.
 3. In the ``Connection Filters`` section, add a ``Virtual Server`` filter for ``equals``
    ``hg.mozilla.org-https``.
