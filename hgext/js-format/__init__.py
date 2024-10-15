@@ -45,7 +45,7 @@ def find_python():
 
 def call_js_format(repo, changed_files):
     """Call `./mach eslint --fix` on the changed files"""
-    extensions = (b".js", b".jsx", b".jsm")
+    extensions = (b".js", b".jsx", b".jsm", b".mjs", b".sjs", b".html", b".xhtml")
     path_list = []
     for filename in sorted(changed_files):
         # Ignore files unsupported in eslint and prettier
