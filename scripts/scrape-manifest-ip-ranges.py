@@ -84,32 +84,36 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
 
     return required_regions <= prefixes_in_new_document
 
+
 @truth
 def all_required_azure_regions_exist(values: list) -> bool:
     """Checks if all required Azure regions (in lowercase) are present in the
     'properties.region' field for entries where the 'name' field starts with 'Storage.'."""
-    
+
     # Define the required Azure regions in lowercase
     required_regions = {
         "canadacentral",
-        "centralindia", 
-        "centralus", 
-        "eastus", 
+        "centralindia",
+        "centralus",
+        "eastus",
         "eastus2",
         "northcentralus",
-        "northeurope", 
+        "northeurope",
         "southindia",
-        "westus", 
-        "westus2", 
-        "westus3", 
+        "westus",
+        "westus2",
+        "westus3",
     }
 
     # Extract the regions from the 'name' field where the region appears after "Storage."
-    regions_in_new_document = {value["properties"]["region"].lower() for value in values if value["name"].startswith("Storage.")}
+    regions_in_new_document = {
+        value["properties"]["region"].lower()
+        for value in values
+        if value["name"].startswith("Storage.")
+    }
 
     # Validate that all required regions are present
     return required_regions <= regions_in_new_document
-
 
 
 def get_mozilla_office_ips():
@@ -436,7 +440,9 @@ def get_azure_ips():
                                 "regionId": int,
                                 "platform": str,
                                 "systemService": str,
-                                "addressPrefixes": [is_ip_address_network],  # Validate each IP network
+                                "addressPrefixes": [
+                                    is_ip_address_network
+                                ],  # Validate each IP network
                                 "networkFeatures": list,
                             },
                         }
@@ -493,6 +499,7 @@ def get_azure_ips():
         logger.exception("Error path: %s" % vi.path)
         logger.exception("Exception message: %s" % vi.error_message)
         sys.exit(1)
+
 
 # Register possible commands
 COMMANDS = {
