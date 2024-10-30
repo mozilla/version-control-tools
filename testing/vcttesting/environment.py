@@ -122,7 +122,8 @@ def install_mercurials(venv, hg="hg"):
         "6.5.2",
         "6.6.3",
         "6.7.4",
-        "6.8",
+        "6.8.2",
+        "6.9rc0",
     ]
 
     hg_dir = os.path.join("/app", "venv", "hg")
