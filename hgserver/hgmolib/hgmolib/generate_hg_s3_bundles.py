@@ -603,7 +603,7 @@ def main():
     try:
         for repo, opts in repos:
             paths[repo] = generate_bundles(repo, upload=upload, **opts)
-    except (botocore.exceptions.NoCredentialsError, OSError) as e:
+    except (botocore.exceptions.NoCredentialsError, subprocess.CalledProcessError) as e:
         print("%s: %s" % (e.__class__.__name__, e))
         return 1
 

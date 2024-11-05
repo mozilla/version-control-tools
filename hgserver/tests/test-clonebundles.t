@@ -19,7 +19,8 @@ Create and seed repository
 Ensure bundle creation script raises during bundle generation
 
   $ hgmo exec hgssh sudo -u hg /var/hg/venv_bundles/bin/generate-hg-s3-bundles missing
-  FileNotFoundError: [Errno 2] No such file or directory: '/repo/hg/mozilla/missing/.hg'
+  abort: repository /repo/hg/mozilla/missing not found
+  CalledProcessError: Command '['/var/hg/venv_bundles/bin/hg', '-R', '/repo/hg/mozilla/missing', 'log', '-r', 'tip', '-T', '{node}']' returned non-zero exit status 255.
   [1]
 
 And raises during upload since we don't have credentials in the test env
