@@ -161,9 +161,7 @@ def upload_to_s3(region_name, bucket_name, local_path, remote_path):
             b = c.Bucket(bucket_name)
             key = b.Object(remote_path)
 
-            print(
-                "uploading %s:%s from %s" % (bucket_name, remote_path, local_path)
-            )
+            print("uploading %s:%s from %s" % (bucket_name, remote_path, local_path))
             key.upload_file(local_path)
             print("uploading %s:%s completed" % (bucket_name, remote_path))
 
