@@ -29,13 +29,13 @@ HG = "/var/hg/venv_bundles/bin/hg"
 #
 # Define in order bundles should be listed in manifest.
 CREATES = [
-    ("gzip-v2", ["bundle", "-a", "-t", "gzip-v2"], {}),
+    ("gzip-v2", ["bundle", "-a", "-t", "gzip-v2"]),
     # ``zstd`` uses default compression settings and is reasonably fast.
     # ``zstd-max`` uses the highest available compression settings and is
     # absurdly slow. But it produces significantly smaller bundles. Level 20
     # (and not higher) is used because it is the largest level supported
     # by the zstd library in 32-bit processes.
-    ("zstd", ["bundle", "-a", "-t", "zstd-v2"], {}),
+    ("zstd", ["bundle", "-a", "-t", "zstd-v2"]),
     (
         "zstd-max",
         [
@@ -48,9 +48,8 @@ CREATES = [
             "-t",
             "zstd-v2",
         ],
-        {},
     ),
-    ("stream-v2", ["bundle", "-a", "-t", "none-v2;stream=v2"], {}),
+    ("stream-v2", ["bundle", "-a", "-t", "none-v2;stream=v2"]),
 ]
 
 CLONEBUNDLES_ORDER = [
@@ -349,7 +348,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     bundles = []
     fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
-        for t, args, opts in CREATES:
+        for t, args in CREATES:
             # Only generate 1 of zstd or zstd-max since they are redundant.
             if t == "zstd" and zstd_max:
                 continue
