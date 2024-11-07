@@ -348,19 +348,21 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     bundles = []
     fs = []
     with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
-        for t, args in CREATES:
+        for bundle_format, args in CREATES:
             # Only generate 1 of zstd or zstd-max since they are redundant.
-            if t == "zstd" and zstd_max:
+            if bundle_format == "zstd" and zstd_max:
                 continue
 
-            if t == "zstd-max" and not zstd_max:
+            if bundle_format == "zstd-max" and not zstd_max:
                 continue
 
-            final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+            final_path, remote_path = bundle_paths(
+                bundle_path, repo, tip, bundle_format
+            )
             temp_path = "%s.tmp" % final_path
 
             # Record that this bundle is relevant.
-            bundles.append((t, final_path, remote_path))
+            bundles.append((bundle_format, final_path, remote_path))
 
             if os.path.exists(final_path):
                 print("bundle already exists, skipping: %s" % final_path)
@@ -397,14 +399,19 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         fs = []
         with futures.ThreadPoolExecutor(CONCURRENT_THREADS) as e:
             for host, bucket, name in S3_HOSTS:
-                for t, bundle_path, remote_path in bundles:
+                for bundle_format, bundle_path, remote_path in bundles:
                     print("uploading to %s/%s/%s" % (host, bucket, remote_path))
                     fs.append(
                         e.submit(upload_to_s3, name, bucket, bundle_path, remote_path)
                     )
 
             for bucket, region in GCP_HOSTS:
-                for t, bundle_path, remote_path in bundles:
+                for bundle_format, bundle_path, remote_path in bundles:
+                    # Only upload stream clone bundles for GCP since we never serve
+                    # the other bundle formats there.
+                    if bundle_format != "stream-v2":
+                        continue
+
                     print("uploading to %s/%s/%s" % (GCS_ENDPOINT, bucket, remote_path))
                     fs.append(
                         e.submit(
@@ -424,17 +431,17 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
 
     # Now assemble a manifest listing each bundle.
     paths = {}
-    for t, final_path, remote_path in bundles:
-        paths[t] = (remote_path, os.path.getsize(final_path))
+    for bundle_format, final_path, remote_path in bundles:
+        paths[bundle_format] = (remote_path, os.path.getsize(final_path))
 
     bundle_types = set(t[0] for t in bundles)
 
     clonebundles_manifest = []
-    for t, params in CLONEBUNDLES_ORDER:
-        if t not in bundle_types:
+    for bundle_format, params in CLONEBUNDLES_ORDER:
+        if bundle_format not in bundle_types:
             continue
 
-        final_path, remote_path = bundle_paths(bundle_path, repo, tip, t)
+        final_path, remote_path = bundle_paths(bundle_path, repo, tip, bundle_format)
         clonebundles_manifest.append(
             "%s/%s %s REQUIRESNI=true cdn=true" % (CDN, remote_path, params)
         )
@@ -451,15 +458,17 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
             )
             clonebundles_manifest.append(entry)
 
-        for bucket, name in GCP_HOSTS:
-            entry = "%s/%s/%s %s gceregion=%s" % (
-                GCS_ENDPOINT,
-                bucket,
-                remote_path,
-                params,
-                name,
-            )
-            clonebundles_manifest.append(entry)
+        # Only add `stream-v2` bundles for GCP.
+        if bundle_format == "stream-v2":
+            for bucket, name in GCP_HOSTS:
+                entry = "%s/%s/%s %s gceregion=%s" % (
+                    GCS_ENDPOINT,
+                    bucket,
+                    remote_path,
+                    params,
+                    name,
+                )
+                clonebundles_manifest.append(entry)
 
     backup_path = os.path.join(repo_full, ".hg", "clonebundles.manifest.old")
     clonebundles_path = os.path.join(repo_full, ".hg", "clonebundles.manifest")
