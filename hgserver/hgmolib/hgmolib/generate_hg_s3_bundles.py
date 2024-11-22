@@ -16,6 +16,11 @@ import sys
 import time
 import traceback
 
+from azure.identity import EnvironmentCredential
+from azure.storage.blob import (
+    BlobClient,
+    ImmutabilityPolicy,
+)
 import boto3
 import botocore.exceptions
 import concurrent.futures as futures
@@ -71,6 +76,20 @@ GCP_HOSTS = (
     ("moz-hg-bundles-gcp-us-central1", "us-central1"),
     ("moz-hg-bundles-gcp-us-west1", "us-west1"),
     ("moz-hg-bundles-gcp-na-ne1", "northamerica-northeast1"),
+)
+
+AZURE_HOSTS = (
+    ("https://mozhgcanadacentral.blob.core.windows.net", "canadacentral", "hgbundle"),
+    ("https://mozhgcentralindia.blob.core.windows.net", "centralindia", "hgbundle"),
+    ("https://mozhgcentralus.blob.core.windows.net", "centralus", "hgbundle"),
+    ("https://mozhgeastus.blob.core.windows.net", "eastus", "hgbundle"),
+    ("https://mozhgeastus2.blob.core.windows.net", "eastus2", "hgbundle"),
+    ("https://mozhgnorthcentralus.blob.core.windows.net", "northcentralus", "hgbundle"),
+    ("https://mozhgnortheurope.blob.core.windows.net", "northeurope", "hgbundle"),
+    ("https://mozhgsouthindia.blob.core.windows.net", "southindia", "hgbundle"),
+    ("https://mozhgwestus.blob.core.windows.net", "westus", "hgbundle"),
+    ("https://mozhgwestus2.blob.core.windows.net", "westus2", "hgbundle"),
+    ("https://mozhgwestus3.blob.core.windows.net", "westus3", "hgbundle"),
 )
 
 GCS_ENDPOINT = "https://storage.googleapis.com"
@@ -219,6 +238,61 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
         raise Exception(
             "GCP cloud storage upload of %s:%s not successful after"
             "3 attempts, giving up" % (bucket_name, remote_path)
+        )
+
+
+def upload_to_azure_storage(
+    account_url: str, container: str, local_path: str, remote_path: str
+):
+    """Uploads a bundle to an Azure storage bucket."""
+    credential = EnvironmentCredential()
+
+    blob_client = BlobClient(
+        account_url=account_url,
+        container_name=container,
+        blob_name=remote_path,
+        credential=credential,
+    )
+
+    for _attempt in range(3):
+        try:
+            if blob_client.exists():
+                print("resetting expiration time for %s:%s" % (container, remote_path))
+
+                seven_days_from_now = datetime.datetime.now() + datetime.timedelta(
+                    days=7
+                )
+                immutability_policy = ImmutabilityPolicy(
+                    expiry_time=seven_days_from_now
+                )
+                blob_client.set_immutability_policy(immutability_policy)
+
+                print("expiration time reset for %s:%s" % (container, remote_path))
+            else:
+                print("uploading %s:%s from %s" % (container, remote_path, local_path))
+
+                with open(local_path, mode="rb") as f:
+                    file_length = os.fstat(f.fileno()).st_size
+                    blob_client.upload_blob(
+                        data=f,
+                        # The docs for `upload_blob` recommend setting `length`
+                        # for optimal performance.
+                        length=file_length,
+                    )
+
+                print("uploading %s:%s completed" % (container, remote_path))
+
+            return
+
+        except socket.error as e:
+            print("%s:%s failed: %s" % (container, remote_path, e))
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback)
+            time.sleep(15)
+    else:
+        raise Exception(
+            f"Azure blob storage upload of {container}:{remote_path} to {account_url} "
+            "not successful after 3 attempts, giving up"
         )
 
 
@@ -421,6 +495,26 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                         )
                     )
 
+            for account_url, region, container in AZURE_HOSTS:
+                for bundle_format, bundle_path, remote_path in bundles:
+                    # Only upload stream clone bundles for Azure since we never serve
+                    # the other bundle formats there.
+                    if bundle_format != "stream-v2":
+                        continue
+
+                    print(
+                        "uploading to %s/%s/%s" % (account_url, container, remote_path)
+                    )
+                    fs.append(
+                        e.submit(
+                            upload_to_azure_storage,
+                            account_url,
+                            container,
+                            bundle_path,
+                            remote_path,
+                        )
+                    )
+
         # Future.result() will raise if a future raised. This will
         # abort script execution, which is fine since failure should
         # be rare given how reliable S3 is.
@@ -456,7 +550,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
             )
             clonebundles_manifest.append(entry)
 
-        # Only add `stream-v2` bundles for GCP.
+        # Only add `stream-v2` bundles for GCP and Azure.
         if bundle_format == "stream-v2":
             for bucket, name in GCP_HOSTS:
                 entry = "%s/%s/%s %s gceregion=%s" % (
@@ -466,6 +560,10 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                     params,
                     name,
                 )
+                clonebundles_manifest.append(entry)
+
+            for account_url, region, container_name in AZURE_HOSTS:
+                entry = f"{account_url}/{container_name}/{remote_path} {params} azureregion={region}"
                 clonebundles_manifest.append(entry)
 
     backup_path = os.path.join(repo_full, ".hg", "clonebundles.manifest.old")
