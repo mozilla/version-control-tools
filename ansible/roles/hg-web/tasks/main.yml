@@ -506,6 +506,30 @@
            state=started
   when: is_testing is not defined
 
+- name: systemd service files for Azure IP scraper
+  copy: src={{ item }}
+        dest=/etc/systemd/system/{{ item }}
+        owner=root
+        group=root
+        mode=0644
+  with_items:
+    - azure-ip-scraper.service
+    - azure-ip-scraper.timer
+  notify: systemd daemon reload
+  when: is_testing is not defined
+
+- name: Azure IP scraper service enabled (server only)
+  service: name=azure-ip-scraper.timer
+           enabled=yes
+           state=started
+  when: is_testing is not defined
+
+- name: Run Azure IP scrape to get latest (server only)
+  service: name=azure-ip-scraper.service
+           enabled=yes
+           state=started
+  when: is_testing is not defined
+
 - name: install vcsreplicator config
   template: src="{{ item }}.j2"
             dest=/etc/mercurial/{{ item }}
