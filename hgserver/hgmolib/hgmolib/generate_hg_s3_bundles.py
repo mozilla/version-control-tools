@@ -16,7 +16,9 @@ import sys
 import time
 import traceback
 
-from azure.identity import EnvironmentCredential
+from pathlib import Path
+
+from azure.identity import ClientSecretCredential
 from azure.storage.blob import (
     BlobClient,
     ImmutabilityPolicy,
@@ -241,11 +243,27 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
         )
 
 
+def get_azure_credentials() -> dict[str, str]:
+    """Return the contents of the Azure credentials JSON file."""
+    credentials_path = Path(os.environ["AZURE_CREDENTIALS_PATH"])
+
+    with credentials_path.open() as f:
+        return json.load(f)
+
+
 def upload_to_azure_storage(
-    account_url: str, container: str, local_path: str, remote_path: str
+    azure_credentials: dict,
+    account_url: str,
+    container: str,
+    local_path: str,
+    remote_path: str,
 ):
     """Uploads a bundle to an Azure storage bucket."""
-    credential = EnvironmentCredential()
+    credential = ClientSecretCredential(
+        tenant_id=azure_credentials["tenant_id"],
+        client_id=azure_credentials["client_id"],
+        client_secret=azure_credentials["client_secret"],
+    )
 
     blob_client = BlobClient(
         account_url=account_url,
@@ -495,6 +513,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                         )
                     )
 
+            azure_credentials = get_azure_credentials()
             for account_url, region, container in AZURE_HOSTS:
                 for bundle_format, bundle_path, remote_path in bundles:
                     # Only upload stream clone bundles for Azure since we never serve
@@ -508,6 +527,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                     fs.append(
                         e.submit(
                             upload_to_azure_storage,
+                            azure_credentials,
                             account_url,
                             container,
                             bundle_path,
