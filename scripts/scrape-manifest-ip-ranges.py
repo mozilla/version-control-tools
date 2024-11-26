@@ -19,6 +19,7 @@ import requests
 from datadiff import diff
 from voluptuous import (
     All,
+    Any,
     In,
     Invalid as VoluptuousInvalid,
     Optional,
@@ -443,7 +444,7 @@ def get_azure_ips():
                                 "addressPrefixes": [
                                     is_ip_address_network
                                 ],  # Validate each IP network
-                                "networkFeatures": list,
+                                "networkFeatures": Any(list, None),
                             },
                         }
                     ],
