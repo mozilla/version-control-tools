@@ -14,6 +14,7 @@ allow_push = *
 awsippath = $TESTDIR/ansible/roles/test-hg-web/files/aws-ip-ranges.json
 gcpippath = $TESTDIR/ansible/roles/test-hg-web/files/gcp-ip-ranges.json
 mozippath = $TESTDIR/ansible/roles/test-hg-web/files/moz-ip-ranges.txt
+azureippath = $TESTDIR/ansible/roles/test-hg-web/files/azure-ip-ranges.json
 EOF
 
   hg serve -d -p $HGPORT --pid-file hg.pid --hgmo -E error.log

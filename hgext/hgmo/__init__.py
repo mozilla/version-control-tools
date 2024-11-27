@@ -21,9 +21,12 @@ hgmo.convertsource
 """
 
 import copy
+import ipaddress
 import json
 import os
 import types
+
+from typing import Optional
 
 from mercurial.i18n import _
 from mercurial.node import bin
@@ -93,6 +96,7 @@ configitem(b"hgmo", b"headdivergencemaxnodes", default=configitems.dynamicdefaul
 configitem(b"hgmo", b"mozippath", default=None)
 configitem(b"hgmo", b"awsippath", default=None)
 configitem(b"hgmo", b"gcpippath", default=None)
+configitem(b"hgmo", b"azureippath", default=None)
 configitem(b"hgmo", b"pullclonebundlesmanifest", default=configitems.dynamicdefault)
 configitem(b"hgmo", b"replacebookmarks", default=configitems.dynamicdefault)
 configitem(b"hgmo", b"instance-data-path", default=None)
@@ -726,15 +730,39 @@ def cloud_region_specifier(instance_data):
     }
 
 
+def get_current_azure_region(
+    azure_ip_path: bytes, source_ip: ipaddress.IPv4Address
+) -> Optional[str]:
+    """Return the current Azure region if one can be found from the source IP address."""
+    with open(azure_ip_path, "rb") as f:
+        azure_ips = json.load(f)
+
+    for service in azure_ips["values"]:
+        properties = service["properties"]
+
+        # If we can't determine the region for this Azure service, skip it.
+        if "region" not in properties or not properties["region"]:
+            continue
+
+        for subnet in properties["addressPrefixes"]:
+            network = ipaddress.ip_network(subnet)
+
+            # Skip IPv6 networks.
+            if network.version != 4:
+                continue
+
+            if source_ip in network:
+                return properties["region"]
+
+    return None
+
+
 def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     """Wraps `wireprotov1server.clonebundles` and `wireprotov1server.clonebundles_2`.
 
     We examine source IP addresses and advertise URLs for the same
     AWS region if the source is in AWS.
     """
-    # Delay import because this extension can be run on local
-    # developer machines.
-    import ipaddress
 
     # Call original fxn wireproto.clonebundles
     manifest = orig(repo, proto, *args)
@@ -746,7 +774,8 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     mozpath = repo.ui.config(b"hgmo", b"mozippath")
     awspath = repo.ui.config(b"hgmo", b"awsippath")
     gcppath = repo.ui.config(b"hgmo", b"gcpippath")
-    if not awspath and not mozpath and not gcppath:
+    azureippath = repo.ui.config(b"hgmo", b"azureippath")
+    if not awspath and not mozpath and not gcppath and not azureippath:
         return manifest
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
@@ -825,6 +854,18 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
 
         except Exception as e:
             repo.ui.log(b"hgmo", b"exception filtering GCP bundle source IPs: %s\n", e)
+
+    if azureippath and b"azureregion=" in manifest.data:
+        try:
+            azure_region = get_current_azure_region(azureippath, sourceip)
+            if azure_region:
+                return filter_manifest_for_region(
+                    manifest, b"azureregion=%s" % pycompat.bytestr(azure_region)
+                )
+        except Exception as e:
+            repo.ui.log(
+                b"hgmo", b"exception filtering Azure bundle source IPs: %s\n", e
+            )
 
     # Determine if source IP is in a Mozilla network, as we stream results to those addresses
     if mozpath:
