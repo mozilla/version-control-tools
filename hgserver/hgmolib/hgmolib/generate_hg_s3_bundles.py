@@ -272,10 +272,12 @@ def upload_to_azure_storage(
         credential=credential,
     )
 
+    bundle_url = f"{account_url}/{container}/{remote_path}"
+
     for _attempt in range(3):
         try:
             if blob_client.exists():
-                print("resetting expiration time for %s:%s" % (container, remote_path))
+                print(f"resetting expiration time for {bundle_url}")
 
                 seven_days_from_now = datetime.datetime.now() + datetime.timedelta(
                     days=7
@@ -285,9 +287,9 @@ def upload_to_azure_storage(
                 )
                 blob_client.set_immutability_policy(immutability_policy)
 
-                print("expiration time reset for %s:%s" % (container, remote_path))
+                print(f"expiration time reset for {bundle_url}")
             else:
-                print("uploading %s:%s from %s" % (container, remote_path, local_path))
+                print(f"uploading to {bundle_url} from {local_path}")
 
                 with open(local_path, mode="rb") as f:
                     file_length = os.fstat(f.fileno()).st_size
@@ -298,7 +300,7 @@ def upload_to_azure_storage(
                         length=file_length,
                     )
 
-                print("uploading %s:%s completed" % (container, remote_path))
+                print(f"uploading {bundle_url} completed")
 
             return
 
@@ -309,7 +311,7 @@ def upload_to_azure_storage(
             time.sleep(15)
     else:
         raise Exception(
-            f"Azure blob storage upload of {container}:{remote_path} to {account_url} "
+            f"Azure blob storage upload of {bundle_url} from {local_path} "
             "not successful after 3 attempts, giving up"
         )
 
