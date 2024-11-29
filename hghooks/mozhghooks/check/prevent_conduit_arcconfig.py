@@ -25,6 +25,8 @@ ARCCONFIG_PATH = b".arcconfig"
 DEV_PHAB_URL = "https://phabricator-dev.allizom.org/"
 STAGE_PHAB_URL = "https://phabricator.allizom.org/"
 
+HOOK_OVERRIDE_FLAG = b"ARCCONFIG_OVERRIDE"
+
 
 class PreventConduitArcconfig(PreTxnChangegroupCheck):
     """Prevent `.arcconfig` updates for `conduit-testing` repos."""
@@ -38,8 +40,13 @@ class PreventConduitArcconfig(PreTxnChangegroupCheck):
 
     def pre(self, _node):
         self.latest_arcconfig_contents = ""
+        self.hook_override = False
 
     def check(self, ctx) -> bool:
+        if self.hook_override or HOOK_OVERRIDE_FLAG in ctx.description():
+            self.hook_override = True
+            return True
+
         if ARCCONFIG_PATH in ctx.files():
             fctx = ctx[ARCCONFIG_PATH]
             self.latest_arcconfig_contents = fctx.data().decode("utf-8")
@@ -47,6 +54,10 @@ class PreventConduitArcconfig(PreTxnChangegroupCheck):
         return True
 
     def post_check(self) -> bool:
+        if self.hook_override:
+            # Hook should be skipped if the magic override flag was found.
+            return True
+
         if not self.latest_arcconfig_contents:
             # No updates to `.arcconfig`.
             return True
