@@ -118,6 +118,11 @@ LimitRequestFields 1000
         </If>
     </LocationMatch>
 
+    # Cache the root repo listing for a minute
+    <Location />
+        Header set Cache-Control "public, max-age=60"
+    </Location>
+
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
     ErrorLog "/var/log/httpd/hg.mozilla.org/error_log"
