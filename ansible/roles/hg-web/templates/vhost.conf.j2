@@ -109,10 +109,14 @@ LimitRequestFields 1000
         Header onsuccess set Cache-Control "public, max-age=3600"
     </LocationMatch>
 
-    # # `json-pushes` responses are guaranteed to be immutable, and can be cached by supported clients.
-    # <LocationMatch "/json-pushes$">
-    #     Header onsuccess set Cache-Control "public, max-age=604800, immutable"
-    # </LocationMatch>
+    # `json-pushes` responses are guaranteed to be immutable, and can be cached by supported clients.
+    <LocationMatch "/json-pushes$">
+        <If "%{QUERY_STRING} =~ /changeset=[a-z0-9]{40}/">
+            # Cache for 10 minutes initially
+            Header onsuccess set Cache-Control "public, max-age=600"
+            # Header onsuccess set Cache-Control "public, max-age=604800, immutable"
+        </If>
+    </LocationMatch>
 
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
