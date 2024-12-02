@@ -279,7 +279,7 @@ def upload_to_azure_storage(
             if blob_client.exists():
                 print(f"resetting expiration time for {bundle_url}")
 
-                seven_days_from_now = datetime.datetime.now() + datetime.timedelta(
+                seven_days_from_now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
                     days=7
                 )
                 immutability_policy = ImmutabilityPolicy(
