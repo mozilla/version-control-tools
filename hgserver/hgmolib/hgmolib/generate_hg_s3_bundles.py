@@ -81,17 +81,17 @@ GCP_HOSTS = (
 )
 
 AZURE_HOSTS = (
-    ("https://mozhgcanadacentral.blob.core.windows.net", "canadacentral", "hgbundle"),
-    ("https://mozhgcentralindia.blob.core.windows.net", "centralindia", "hgbundle"),
-    ("https://mozhgcentralus.blob.core.windows.net", "centralus", "hgbundle"),
-    ("https://mozhgeastus.blob.core.windows.net", "eastus", "hgbundle"),
-    ("https://mozhgeastus2.blob.core.windows.net", "eastus2", "hgbundle"),
-    ("https://mozhgnorthcentralus.blob.core.windows.net", "northcentralus", "hgbundle"),
-    ("https://mozhgnortheurope.blob.core.windows.net", "northeurope", "hgbundle"),
-    ("https://mozhgsouthindia.blob.core.windows.net", "southindia", "hgbundle"),
-    ("https://mozhgwestus.blob.core.windows.net", "westus", "hgbundle"),
-    ("https://mozhgwestus2.blob.core.windows.net", "westus2", "hgbundle"),
-    ("https://mozhgwestus3.blob.core.windows.net", "westus3", "hgbundle"),
+#     ("https://mozhgcanadacentral.blob.core.windows.net", "canadacentral", "hgbundle"),
+#     ("https://mozhgcentralindia.blob.core.windows.net", "centralindia", "hgbundle"),
+#     ("https://mozhgcentralus.blob.core.windows.net", "centralus", "hgbundle"),
+#     ("https://mozhgeastus.blob.core.windows.net", "eastus", "hgbundle"),
+#     ("https://mozhgeastus2.blob.core.windows.net", "eastus2", "hgbundle"),
+#     ("https://mozhgnorthcentralus.blob.core.windows.net", "northcentralus", "hgbundle"),
+#     ("https://mozhgnortheurope.blob.core.windows.net", "northeurope", "hgbundle"),
+#     ("https://mozhgsouthindia.blob.core.windows.net", "southindia", "hgbundle"),
+#     ("https://mozhgwestus.blob.core.windows.net", "westus", "hgbundle"),
+#     ("https://mozhgwestus2.blob.core.windows.net", "westus2", "hgbundle"),
+#     ("https://mozhgwestus3.blob.core.windows.net", "westus3", "hgbundle"),
 )
 
 GCS_ENDPOINT = "https://storage.googleapis.com"
