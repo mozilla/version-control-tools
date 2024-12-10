@@ -119,9 +119,9 @@ LimitRequestFields 1000
     </LocationMatch>
 
     # Cache the root repo listing for a minute
-    <Location />
+    <LocationMatch "^/$">
         Header set Cache-Control "public, max-age=60"
-    </Location>
+    </LocationMatch>
 
     #LogLevel debug
     LogFormat "%h %v %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\""
