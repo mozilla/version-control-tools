@@ -9,8 +9,6 @@ releases/mozilla-esr102
 releases/mozilla-esr115
 releases/mozilla-esr128
 mozilla-unified zstd_max
-build/tools
-build/mozharness
 hgcustom/version-control-tools
 comm-central zstd_max
 projects/ash
@@ -21,7 +19,6 @@ projects/toolchains copyfrom=mozilla-central
 projects/elm
 projects/holly
 projects/jamun
-projects/kaios
 projects/larch
 projects/maple
 projects/oak
