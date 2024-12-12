@@ -2,7 +2,7 @@
 hgweb[1:4].dmz.mdc1.mozilla.com ansible_become=yes
 
 [hgssh-prod]
-hgssh[1:3].dmz.mdc1.mozilla.com ansible_become=yes
+hgssh3.dmz.mdc1.mozilla.com ansible_become=yes
 
 [hgssh-prod-master]
 hgssh3.dmz.mdc1.mozilla.com ansible_become=yes
@@ -23,6 +23,7 @@ ansible_become=yes
 
 [kafka-prod]
 kafka[1:3].dmz.mdc1.mozilla.com
+hgssh1.dmz.mdc1.mozilla.com
 
 [kafka-prod:vars]
 ansible_sudo=yes

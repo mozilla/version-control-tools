@@ -1,6 +1,6 @@
 #!/bin/bash
 # script to pull list of repos from hg-push.log and compare revisions between
-# hgssh1 and hgweb*
+# hgssh3 and hgweb*
 
 usage() {
     echo "Usage: $0 <string>" 1>&2
