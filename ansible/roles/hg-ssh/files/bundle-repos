@@ -1,5 +1,4 @@
 mozilla-central zstd_max
-integration/autoland copyfrom=mozilla-central
 integration/mozilla-inbound
 releases/mozilla-release
 releases/mozilla-beta
