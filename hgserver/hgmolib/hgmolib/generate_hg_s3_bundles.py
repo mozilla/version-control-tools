@@ -251,13 +251,6 @@ def get_azure_credentials() -> dict[str, str]:
         return json.load(f)
 
 
-def set_blob_immutability_policy(blob_client: BlobClient, now: datetime.datetime):
-    """Reset the immutability policy for the `blob_client` to 7 days from `now`."""
-    seven_days_from_now = now + datetime.timedelta(days=7)
-    immutability_policy = ImmutabilityPolicy(expiry_time=seven_days_from_now)
-    blob_client.set_immutability_policy(immutability_policy)
-
-
 def reset_blob_metadata(blob_client: BlobClient, now: datetime.datetime):
     """Reset the metadata for the `blob_client` to update last modified timestamp."""
     # Get existing metadata fields for the blob.
@@ -299,7 +292,6 @@ def upload_to_azure_storage(
 
                 now = datetime.datetime.now(datetime.timezone.utc)
 
-                set_blob_immutability_policy(blob_client, now)
                 reset_blob_metadata(blob_client, now)
 
                 print(f"expiration time reset for {bundle_url}")
