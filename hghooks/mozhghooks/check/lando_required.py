@@ -30,6 +30,7 @@ SCM_ALLOW_DIRECT_PUSH = b"scm_allow_direct_push"
 
 AUTOLAND_USER = b"bind-autoland@mozilla.com"
 LANDING_WORKER_USER = b"lando_landing_worker@mozilla.com"
+LANDING_WORKER_USER_2 = b"lando_landing_worker_2@mozilla.com"
 LANDING_WORKER_USER_DEV = b"lando_landing_worker_dev@mozilla.com"
 
 SENTRY_LOG_MESSAGE = (
@@ -138,6 +139,7 @@ class LandoRequiredCheck(PreTxnChangegroupCheck):
         self.landing_users = (
             self.ui.config(b"pushlog", b"autolanduser", AUTOLAND_USER),
             self.ui.config(b"pushlog", b"landingworkeruser", LANDING_WORKER_USER),
+            self.ui.config(b"pushlog", b"landingworkeruser2", LANDING_WORKER_USER_2),
             self.ui.config(
                 b"pushlog", b"landingworkeruserdev", LANDING_WORKER_USER_DEV
             ),

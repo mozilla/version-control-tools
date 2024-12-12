@@ -34,6 +34,9 @@ configitem(
     b"pushlog", b"landingworkeruser", default=b"lando_landing_worker@mozilla.com"
 )
 configitem(
+    b"pushlog", b"landingworkeruser2", default=b"lando_landing_worker_2@mozilla.com"
+)
+configitem(
     b"pushlog", b"landingworkeruserdev", default=b"lando_landing_worker_dev@mozilla.com"
 )
 
