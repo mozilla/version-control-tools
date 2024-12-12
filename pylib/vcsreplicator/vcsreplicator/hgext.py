@@ -191,7 +191,7 @@ def phase_heads_handler(op, inpart):
     # check that the source repo doesn't have any secret, etc phase roots.
     seen_phases = set(
         phase
-        for phase, roots in op.repo.unfiltered()._phasecache.phaseroots.items()
+        for phase, roots in op.repo.unfiltered()._phasecache._phaseroots.items()
         if roots
     )
     supported_phases = {phases.public, phases.draft}
@@ -213,7 +213,7 @@ def phase_heads_handler(op, inpart):
         return orig(repo, tr, targetphase, nodes)
 
     with extensions.wrappedfunction(
-        phases, b"advanceboundary", wrapped_advanceboundary
+        phases, "advanceboundary", wrapped_advanceboundary
     ):
         _ORIG_PHASE_HEADS_HANDLER(op, inpart)
 

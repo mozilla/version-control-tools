@@ -18,13 +18,13 @@ azure-storage-blob==12.24.0 \
     --hash=sha256:4f0bb4592ea79a2d986063696514c781c9e62be240f09f6397986e01755bc071 \
     --hash=sha256:eaaaa1507c8c363d6e1d1342bd549938fdf1adec9b1ada8658c8f5bf3aea844e
     # via -r ansible/roles/hg-ssh/files/requirements-bundles.in
-boto3==1.35.74 \
-    --hash=sha256:88370c6845ba71a4dae7f6b357099df29b3965da584be040c8e72c9902bc9492 \
-    --hash=sha256:dab5bddbbe57dc707b6f6a1f25dc2823b8e234b6fe99fafef7fc406ab73031b9
+boto3==1.35.79 \
+    --hash=sha256:1fa26217cd33ded82e55aed4460cd55f7223fa647916aa0d3c5d6828e6ec7135 \
+    --hash=sha256:a673b0b6378c9ccbf045a31a43195b175e12aa5c37fb7635fcbfc8f48fb857b3
     # via -r ansible/roles/hg-ssh/files/requirements-bundles.in
-botocore==1.35.74 \
-    --hash=sha256:9ac9d33d84dd9f05b35085de081552342a2c9ae22e3c4ee105723c9e92c07bd9 \
-    --hash=sha256:de5c4fa9a24cef3a758974857b5c5820a12fad345ebf33c052a5988e88f33634
+botocore==1.35.79 \
+    --hash=sha256:245bfdda1b1508539ddd1819c67a8a2cc81780adf0715d3de418d64c4247f346 \
+    --hash=sha256:e6b10bb9a357e3f5ca2e60f6dd15a85d311b9a476eb21b3c0c2a3b364a2897c8
     # via
     #   boto3
     #   s3transfer
@@ -218,7 +218,6 @@ cryptography==44.0.0 \
     --hash=sha256:3c672a53c0fb4725a29c303be906d3c1fa99c32f58abe008a82705f9ee96f40b \
     --hash=sha256:404fdc66ee5f83a1388be54300ae978b2efd538018de18556dde92575e05defc \
     --hash=sha256:4ac4c9f37eba52cb6fbeaf5b59c152ea976726b865bd4cf87883a7e7006cc543 \
-    --hash=sha256:60eb32934076fa07e4316b7b2742fa52cbb190b42c2df2863dbc4230a0a9b385 \
     --hash=sha256:62901fb618f74d7d81bf408c8719e9ec14d863086efe4185afd07c352aee1d2c \
     --hash=sha256:660cb7312a08bc38be15b696462fa7cc7cd85c3ed9c576e81f4dc4d8b2b31591 \
     --hash=sha256:708ee5f1bafe76d041b53a4f95eb28cdeb8d18da17e597d46d7833ee59b97ede \
@@ -226,7 +225,6 @@ cryptography==44.0.0 \
     --hash=sha256:831c3c4d0774e488fdc83a1923b49b9957d33287de923d58ebd3cec47a0ae43f \
     --hash=sha256:84111ad4ff3f6253820e6d3e58be2cc2a00adb29335d4cacb5ab4d4d34f2a123 \
     --hash=sha256:8b3e6eae66cf54701ee7d9c83c30ac0a1e3fa17be486033000f2a73a12ab507c \
-    --hash=sha256:9abcc2e083cbe8dde89124a47e5e53ec38751f0d7dfd36801008f316a127d7ba \
     --hash=sha256:9e6fc8a08e116fb7c7dd1f040074c9d7b51d74a8ea40d4df2fc7aa08b76b9e6c \
     --hash=sha256:a01956ddfa0a6790d594f5b34fc1bfa6098aca434696a03cfdbe469b8ed79285 \
     --hash=sha256:abc998e0c0eee3c8a1904221d3f67dcfa76422b23620173e28c11d3e626c21bd \
@@ -292,16 +290,8 @@ kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b
     # via -r ansible/roles/hg-ssh/files/requirements-bundles.in
-mercurial==5.9.3 \
-    --hash=sha256:0c92705a546dadfecb185afc5a0b92a5d35a26787340f36f4389c8230086ba18 \
-    --hash=sha256:1690c0184b011a0969dc39a94f8328b218502f27d94866a62f618bf302be2ca5 \
-    --hash=sha256:291d23401c8235aa471115204231ac1c684ac9451cd0af02d62d884fb19570ef \
-    --hash=sha256:3b43f68977ad0fa75aa7f1e5c8f0a83ba935621ab2396129abb498e56d1be08e \
-    --hash=sha256:791ae8e1658bd021230923176b4db3fd36be68ac918280fc6015dd9327dfb429 \
-    --hash=sha256:7c12d7c786317ecf4178f3d7b99eb843b7ba14498905cb0754ab6d0573171afa \
-    --hash=sha256:8370af1cc28e2dafddacd52a3594e7c27ec44cb5291e7712faaf8a23adcaf508 \
-    --hash=sha256:ce66f9aab72693127fc594eda0e8bf35c397f72cf44d9ead382334c9d1bc64a6 \
-    --hash=sha256:fd1085dc5584ae98e203a31d9ccd779aacf7058c57580e4f060602b507db09dc
+mercurial==6.8.2 \
+    --hash=sha256:aac618106768ad1ed976c3fe7c8659fec99e6f0b5337ea6ea554fae8490c4f4e
     # via -r ansible/roles/hg-ssh/files/requirements-bundles.in
 msal==1.31.1 \
     --hash=sha256:11b5e6a3f802ffd3a72107203e20c4eac6ef53401961b880af2835b723d80578 \
@@ -372,9 +362,9 @@ s3transfer==0.10.4 \
     --hash=sha256:244a76a24355363a68164241438de1b72f8781664920260c48465896b712a41e \
     --hash=sha256:29edc09801743c21eb5ecbc617a152df41d3c287f67b615f73e5f750583666a7
     # via boto3
-six==1.16.0 \
-    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
-    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
+    --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via
     #   azure-core
     #   google-auth

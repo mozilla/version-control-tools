@@ -15,8 +15,8 @@ kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-mercurial==6.5.2 \
-    --hash=sha256:afc39d7067976593c8332b8e97a12afd393b55037c5fb9c3cab1a42c7560f60a
+mercurial==6.8.2 \
+    --hash=sha256:aac618106768ad1ed976c3fe7c8659fec99e6f0b5337ea6ea554fae8490c4f4e
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
 pyasn1==0.6.1 \
     --hash=sha256:0d632f46f2ba09143da3a8afe9e33fb6f92fa2320ab7e886e2d0f7672af84629 \
@@ -35,9 +35,9 @@ sentry-sdk==0.7.14 \
     --hash=sha256:5818289868755cfea74e61e532b4b0d11d523901041338d473277db91d4d8173 \
     --hash=sha256:b50948bbb553eef11ba650db858e31f5bb7c8d821a9d7338a01d01487d964e8c
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
-six==1.16.0 \
-    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
-    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
+    --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via -r ansible/roles/hg-ssh-server/files/requirements-pash.in
 urllib3==2.2.3 \
     --hash=sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac \

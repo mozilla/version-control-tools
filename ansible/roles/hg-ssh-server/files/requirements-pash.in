@@ -5,7 +5,7 @@
 # It isn't needed on a standalone hg server. But installing it doesn't really
 # hurt.
 kafka-python==1.4.6
-mercurial==6.5.2
+mercurial==6.8.2
 python-ldap
 sentry-sdk==0.7.14
 six
