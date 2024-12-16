@@ -1,17 +1,2 @@
 pash_hostname: hg.mozilla.org
 python_version: python{% if ansible_distribution_major_version | int <= 8 %}3.6{% else %}3.9{% endif %}
-sentry_dsn_encrypted: ENC[AES256_GCM,data:1ScBXbkTEVJo5qd8uFz28w6zQTD+TCuXox4W7tY8BSnTQ8amGH16II7Tq4RouomgpTsQO42rYCi+4I6B1B1NLj+68g==,iv:B3jcbapkh/ZOuNwD+R/artiX1b5MaUf0BDdxOPz1GLA=,tag:j0XHT9ymJRb9LwQukboWPQ==,type:str]
-sops:
-    kms: []
-    gcp_kms:
-        - resource_id: projects/hgmo-236019/locations/global/keyRings/hgmo-keyring/cryptoKeys/version-control-tools-secrets
-          created_at: "2019-06-13T17:23:00Z"
-          enc: CiQAyBR+bLY25E29denC2eTvD68ez5vBqdUFV5wQ0PLMLWVCrCUSSQBaj+bcGKUb2d4InvImknC75KdiwvoN0xXpXdaVdVHn6zl5rEtpgb4FjjnZLRQW+N2zrPtrhhh85ioBPaDXBBM3KrwzUvGty6k=
-    azure_kv: []
-    hc_vault: []
-    age: []
-    lastmodified: "2024-08-28T07:55:26Z"
-    mac: ENC[AES256_GCM,data:tI+HDVQLFHw9Qrc6TaFyBMfMt17IE2wWW6k/6VpOEvZ8AsEusd7RtE8FrLJX3pZglSlFb9k8MMGzIh7JDPHpmARRVy8krkE7sjwbeHT0ryV89eUyjfc/gkURV8yBVEEXKNcuxMNEC+kNM9M6c+eBr1EPgiSfTkRdkN4lbVZqC7Y=,iv:nnCphVaHEjfKxLzQ7/Ema++DS5tGaFrl2PjvNfhRSGo=,tag:RizcviAqq3sz6CTAmZCcqw==,type:str]
-    pgp: []
-    encrypted_suffix: _encrypted
-    version: 3.7.3

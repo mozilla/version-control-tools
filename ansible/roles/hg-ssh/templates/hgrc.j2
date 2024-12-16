@@ -88,11 +88,6 @@ partitionmap.2main = 0,1,2,3:.*
 9949429068caa6bb8827a8ceeaa7c605d722f47f = b67a4d8cf24cc0e8378582fa1f12560c0e614936
 
 [mozilla]
-lando_required_repo_list = integration/autoland,ci/ci-admin,ci/ci-configuration
-direct_push_disabled_repo_list = ci/ci-admin,ci/ci-configuration
-# empty sentry_dsn means don't use sentry
-sentry_dsn = {{ sentry_dsn_encrypted }}
-
 # Repos to check when validating bug IDs referenced in commit messages.
 # Leave empty to disable this check, or add comma or space separated
 # values of repos to check.

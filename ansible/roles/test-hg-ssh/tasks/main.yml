@@ -92,21 +92,3 @@
     owner: root
     group: root
     mode: 0644
-
-- name: set privileged push hook repos to dummy values
-  ini_file:
-    dest: /etc/mercurial/hgrc
-    section: mozilla
-    option: lando_required_repo_list
-    value: not-mozilla-central
-    owner: hg
-    group: hg
-
-- name: set sentry_dns to empty value
-  ini_file:
-    dest: /etc/mercurial/hgrc
-    section: mozilla
-    option: sentry_dsn
-    value: ""
-    owner: hg
-    group: hg

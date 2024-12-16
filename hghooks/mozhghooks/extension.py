@@ -25,9 +25,6 @@ configitem(b"allowedroots", b".*", generic=True)
 configitem(b"mozilla", b"check.*", generic=True)
 configitem(b"mozilla", b"repo_root", default=configitems.dynamicdefault)
 configitem(b"mozilla", b"treeherder_repo", default=None)
-configitem(b"mozilla", b"lando_required_repo_list", default=b"")
-configitem(b"mozilla", b"direct_push_disabled_repo_list", default=b"")
-configitem(b"mozilla", b"sentry_dsn", default=b"")
 configitem(b"mozilla", b"check_bug_references_repos", default=None)
 configitem(b"pushlog", b"autolanduser", default=b"bind-autoland@mozilla.com")
 configitem(
@@ -56,7 +53,6 @@ def get_check_classes(hook):
         prevent_sync_ipc_changes,
         prevent_webidl_changes,
         prevent_wptsync_changes,
-        lando_required,
         single_root,
         try_task_config_file,
     )
@@ -73,7 +69,6 @@ def get_check_classes(hook):
             prevent_sync_ipc_changes.SyncIPCCheck,
             prevent_webidl_changes.WebIDLCheck,
             prevent_wptsync_changes.WPTSyncCheck,
-            lando_required.LandoRequiredCheck,
             single_root.SingleRootCheck,
             try_task_config_file.TryConfigCheck,
         )
