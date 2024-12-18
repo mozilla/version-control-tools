@@ -29,8 +29,14 @@ And raises during upload since we don't have credentials in the test env
   tip of mozilla-central is 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   verifying or rebuilding fncache
   fncache for mozilla-central: fncache already up to date
+  running "/var/hg/venv_bundles/bin/hg --config 'extensions.vcsreplicator=!' -R /repo/hg/mozilla/mozilla-central bundle -a -t gzip-v2 /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg.tmp"
   1 changesets found
+  bundle generated: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg (in *s) (glob)
+  running "/var/hg/venv_bundles/bin/hg --config 'extensions.vcsreplicator=!' -R /repo/hg/mozilla/mozilla-central bundle -a -t zstd-v2 /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg.tmp"
   1 changesets found
+  bundle generated: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg (in *s) (glob)
+  running "/var/hg/venv_bundles/bin/hg --config 'extensions.vcsreplicator=!' -R /repo/hg/mozilla/mozilla-central bundle -a -t 'none-v2;stream=v2' /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-v2.hg.tmp"
+  bundle generated: /repo/hg/bundles/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-v2.hg (in *s) (glob)
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.gzip-v2.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.zstd.hg
   uploading to s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-central/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72.stream-v2.hg

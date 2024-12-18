@@ -9,6 +9,7 @@ import datetime
 import errno
 import json
 import os
+import shlex
 import shutil
 import socket
 import subprocess
@@ -341,8 +342,12 @@ def generate_bundle(repo, temp_path, final_path, extra_args):
         + extra_args
         + [temp_path]
     )
+    print(f'running "{shlex.join(args)}"')
+    start = time.time()
     subprocess.check_call(args)
     os.rename(temp_path, final_path)
+    end = time.time()
+    print(f"bundle generated: {final_path} (in {end - start:.2f}s)")
 
 
 def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
