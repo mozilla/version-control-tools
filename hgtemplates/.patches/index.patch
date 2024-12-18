@@ -1,5 +1,16 @@
---- hgtemplates/gitweb_mozilla/index.tmpl	2024-12-05 00:59:16
-+++ hgtemplates/gitweb_mozilla/index.tmpl	2024-12-05 01:18:28
+# HG changeset patch
+# User Gregory Szorc <gps@mozilla.com>
+# Date 1532548171 25200
+#      Wed Jul 25 12:49:31 2018 -0700
+# Node ID be2dae870e083c6aa9723dff4758dc6d739dd818
+# Parent  6cc127c38c45762ad47401558ad73fba8995f607
+hgtemplates: index page changes
+
+We've changed the index page in various ways.
+
+diff --git a/hgtemplates/gitweb_mozilla/index.tmpl b/hgtemplates/gitweb_mozilla/index.tmpl
+--- a/hgtemplates/gitweb_mozilla/index.tmpl	2024-12-05 00:59:16
++++ b/hgtemplates/gitweb_mozilla/index.tmpl	2024-12-05 01:18:28
 @@ -21,13 +21,56 @@
      <tr>
          <td><a href="?sort={sort_name}">Name</a></td>
