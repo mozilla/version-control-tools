@@ -390,7 +390,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     tip = subprocess.check_output(
         [HG, "-R", repo_full, "log", "-r", "tip", "-T", "{node}"]
     ).decode("latin-1")
-    print("tip is %s" % tip)
+    print("tip of %s is %s" % (repo, tip))
 
     debugformat_json = json.loads(
         subprocess.check_output([HG, "-R", repo_full, "debugformat", "-T", "json"])
