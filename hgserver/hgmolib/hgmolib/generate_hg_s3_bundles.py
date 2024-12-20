@@ -245,7 +245,12 @@ def upload_to_gcpstorage(region_name, bucket_name, local_path, remote_path):
 
 def get_azure_credentials() -> dict[str, str]:
     """Return the contents of the Azure credentials JSON file."""
-    credentials_path = Path(os.environ["AZURE_CREDENTIALS_PATH"])
+    try:
+        credentials_path = Path(os.environ["AZURE_CREDENTIALS_PATH"])
+    except KeyError:
+        # Even though this is azure, we raise the AWS exception here to trigger
+        # the specific handling for it in `main`
+        raise botocore.exceptions.NoCredentialsError()
 
     with credentials_path.open() as f:
         return json.load(f)
