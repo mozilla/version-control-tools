@@ -146,7 +146,7 @@
         name: telegraf.service
         state: started
 
-- hosts: hg-ssh-prod-master
+- hosts: hgssh-prod-master
   gather_facts: no
   tasks:
     - name: run `hg replicatehgrc` on try repos
