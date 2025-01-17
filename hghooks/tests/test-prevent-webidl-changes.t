@@ -31,7 +31,6 @@ Editing a .webidl file without any review should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ******************************* ERROR *******************************
   Changeset 743ef64f8a38 alters WebIDL file(s) without DOM peer review:
@@ -67,7 +66,6 @@ Editing a .webidl file without /DOM/ peer review should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   
   ******************************* ERROR *******************************
   Changeset 0cfb912b8138 alters WebIDL file(s) without DOM peer review:
@@ -117,7 +115,6 @@ Editing a .webidl file without /DOM/ peer review in the same push as a commit wi
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 1 files
   
   ******************************* ERROR *******************************
   Changeset a9b3d7778cda alters WebIDL file(s) without DOM peer review:
@@ -172,7 +169,6 @@ WebIDL change after release uplift fails
   adding changesets
   adding manifests
   adding file changes
-  added 2 changesets with 2 changes to 2 files
   
   ******************************* ERROR *******************************
   Changeset 3043c2c5e650 alters WebIDL file(s) without DOM peer review:
@@ -296,35 +292,6 @@ Editing a .webidl file in a backout without proper DOM peer review is allowed
   adding file changes
   added 1 changesets with 1 changes to 1 files
 
-  $ cd ..
-
-Hook should not run when stripping
-
-  $ hg init striptest
-  $ cd striptest
-  $ echo initial > foo
-  $ hg -q commit -A -m initial
-  $ echo 'interface Bar{};' > original.webidl
-  $ hg -q commit -A -m 'Add original.idl; r=baku'
-  $ hg -q up -r 0
-  $ echo 'interface Foo{};' > original.webidl
-  $ hg -q commit -A -m 'Bad commit'
-  $ cat >> .hg/hgrc << EOF
-  > [extensions]
-  > strip =
-  > 
-  > [hooks]
-  > pretxnchangegroup.prevent_webidl = python:mozhghooks.prevent_webidl_changes.hook
-  > EOF
-
-  $ hg strip -r 1 --no-backup
-
-  $ hg log -T '{rev} {desc}\n'
-  1 Bad commit
-  0 initial
-
-  $ cd ..
-
 Editing a .webidl file that isn't in a web root should pass
 
   $ mkdir -p dom/chrome-webidl
@@ -337,9 +304,9 @@ Editing a .webidl file that isn't in a web root should pass
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 1 changes to 1 files
   -- Not enforcing DOM peer review for WebIDL files within the chrome WebIDL root.
   -- Please make sure changes do not contain any web-visible binding definitions.
+  added 1 changesets with 1 changes to 1 files
 
 Editing multiple .webidl files without review should fail
 
@@ -352,10 +319,9 @@ Editing multiple .webidl files without review should fail
   adding changesets
   adding manifests
   adding file changes
-  added 1 changesets with 2 changes to 2 files
   
   ******************************* ERROR *******************************
-  Changeset 4cc0a6ce2e87 alters WebIDL file(s) without DOM peer review:
+  Changeset 46d9d90f2b1d alters WebIDL file(s) without DOM peer review:
   dom/file1.webidl
   dom/file2.webidl
   

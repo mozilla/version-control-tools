@@ -3,9 +3,6 @@
 # robustcheckout test fails on post-4.7 Mercurial due to changes in hgweb
 test-server-failure.t
 
-# hghooks test fails when attempting to `hg strip`. Mostly unrelated to actual test
-test-prevent-webidl-changes.t
-
 # hgserver test shows bookmark as not-replicated, despite being replicated in later output
 test-bookmarks-replication.t
 
