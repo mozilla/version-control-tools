@@ -18,7 +18,7 @@ Run script to apply our templates changes.
 Always test against the version of Mercurial we have deployed to hg.mo
 
   $ HG=`which hg` $TESTDIR/hgtemplates/.patches/mozify-templates.py \
-  >   /app/venv/mercurials/6.5.2/lib/python3.7/site-packages/mercurial/templates \
+  >   /app/venv/mercurials/6.8.2/lib/python3.7/site-packages/mercurial/templates \
   >   $TESTDIR/hgtemplates \
   >   `pwd`/hgtemplates
   adding __init__.py
