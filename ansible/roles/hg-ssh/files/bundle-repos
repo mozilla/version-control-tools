@@ -11,6 +11,7 @@ releases/mozilla-esr128
 mozilla-unified zstd_max
 hgcustom/version-control-tools
 comm-central zstd_max
+comm-unified zstd_max
 projects/ash
 projects/birch
 projects/cedar
@@ -24,6 +25,8 @@ projects/maple
 projects/oak
 projects/pine
 projects/pine-stable
+projects/nspr
+projects/nss
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
 conduit-testing/m-c
