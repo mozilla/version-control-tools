@@ -91,7 +91,7 @@ AZURE_HOSTS = (
     # ("https://mozhgsouthindia.blob.core.windows.net", "southindia", "hgbundle"),
     # ("https://mozhgwestus.blob.core.windows.net", "westus", "hgbundle"),
     # ("https://mozhgwestus2.blob.core.windows.net", "westus2", "hgbundle"),
-    # ("https://mozhgwestus3.blob.core.windows.net", "westus3", "hgbundle"),
+    ("https://mozhgwestus3.blob.core.windows.net", "westus3", "hgbundle"),
 )
 
 GCS_ENDPOINT = "https://storage.googleapis.com"
