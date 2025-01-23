@@ -411,15 +411,6 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     ):
         raise Exception("non-generaldelta repo not supported: %s" % repo_full)
 
-    # Verify the fncache is correct
-    print("verifying or rebuilding fncache")
-    out = subprocess.check_output(
-        [HG, "-R", repo_full, "debugrebuildfncache"], encoding="latin-1"
-    )
-
-    for line in out.splitlines():
-        print("fncache for %s: %s" % (repo, line))
-
     bundle_path = os.path.join(BUNDLE_ROOT, repo)
 
     # Create directory to hold bundle files.
