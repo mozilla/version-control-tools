@@ -65,7 +65,7 @@ BUNDLESPEC
    This defines the type of bundle.
 
    We currently generate bundles with the following specifications:
-   ``zstd-v2``, ``gzip-v1``, ``gzip-v2``, ``none-packed1``.
+   ``zstd-v2``, ``gzip-v2``, ``none-v2``.
 
 REQUIRESNI
    Indicates whether the URL requires SNI (a TLS extension). This is set
@@ -73,9 +73,8 @@ REQUIRESNI
    same IP and SNI is required. It is undefined if SNI is not required.
 
 ec2region
-   The EC2 region the bundle file should be served from. We support
-   ``us-west-1``, ``us-west-2``, ``us-east-1``, ``eu-central-``.
-   You should prefer the region that is closest to you.
+   The EC2 region the bundle file should be served from. We only support
+   ``us-west-2``.
 
 gceregion
    The GCE region the bundle file should be served from. We support
@@ -84,28 +83,23 @@ gceregion
 cdn
    Indicates whether the URL is on a CDN. Value is ``true`` to indicate
    the URL is a CDN. All other values or undefined values are to be
-   interpretted as not a CDN.
+   interpreted as not a CDN.
 
 Example Manifests
 -----------------
 
 Here is an example *clone bundles* manifest::
 
-   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-1
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-east-1
-   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=eu-central-1
-   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
-   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-1
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-east-1
-   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=eu-central-1
-   https://hg.cdn.mozilla.net/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 REQUIRESNI=true cdn=true
-   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-2
-   https://s3-us-west-1.amazonaws.com/moz-hg-bundles-us-west-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-west-1
-   https://s3-external-1.amazonaws.com/moz-hg-bundles-us-east-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=us-east-1
-   https://s3-eu-central-1.amazonaws.com/moz-hg-bundles-eu-central-1/mozilla-unified/82c75fd3a2de796351296592c459ab4aa4cd0baf.packed1-gd.hg BUNDLESPEC=none-packed1;requirements%3Dgeneraldelta%2Crevlogv1 ec2region=eu-central-1
+  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
+  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
+  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore ec2region=us-west-2
+  https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=us-central1
+  https://storage.googleapis.com/moz-hg-bundles-gcp-us-west1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=us-west1
+  https://storage.googleapis.com/moz-hg-bundles-gcp-na-ne1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=northamerica-northeast1
+  https://mozhgwestus3.blob.core.windows.net/hgbundle/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore azureregion=westus3
 
 As you can see, listed bundle URLs vary by bundle type (compression and
 format) and location. For each repository we generate bundles for, we
@@ -116,13 +110,11 @@ generate:
 2. A gzip bundle (the default compression format)
 3. A *streaming* bundle file (larger but faster)
 
-For each of these bundles, we upload them to the following locations:
+All of those bundles are uploaded to S3 in the us-west-2 region and the
+CloudFront CDN.
 
-1. CloudFront CDN
-2. S3 in us-west-2 region
-3. S3 in us-west-1 region
-4. S3 in us-east-1 region
-5. S3 in eu-central-1 region
+The streaming bundles are also uploaded to google cloud storage and
+azure storage in a number of regions.
 
 Which Bundles to Prefer
 -----------------------
@@ -135,42 +127,43 @@ the ideal bundle to use.
 
 .. note::
 
-   Mercurial 4.1 is required to use zstd bundles. If an older Mercurial
-   client is used, larger, non-zstd bundles will be used.
+   Mercurial 4.1 or newer is required to use zstd bundles. If an older
+   Mercurial client is used, larger, non-zstd bundles will be used.
 
 If you have a super fast internet connection, you can prefer the
-*packed*/*streaming* bundles. This will transfer 30-40% more data on
-average, but will require almost no CPU to apply. If you can fetch from
-S3 or CloudFront at 1 Gbps speeds, you should be able to clone Firefox
-in under 60s.::
+*streaming* bundles. This will transfer 30-40% more data on average, but
+will require almost no CPU to apply. If you can fetch from S3 or
+CloudFront at 1 Gbps speeds, you should be able to clone Firefox in
+under 60s.::
 
-   # HG 3.7+
    [ui]
-   clonebundleprefers = VERSION=packed1
+   clonebundleprefers = COMPRESSION=none
 
-   # HG 3.6
-   [experimental]
-   clonebundleprefers = VERSION=packed1
+.. note::
 
-Manifest Advertisement to AWS Clients
--------------------------------------
+   Mercurial 4.7 or newer is required to use streaming bundles.
 
-If a client in Amazon Web Services (e.g. EC2) is requesting a bundle
-manifest and that client is in an AWS region where bundles are hosted
-in S3, the advertised manifest will only show S3 URLs for the same AWS
-region. In addition, stream clone bundles are the highest priority bundle.
 
-This behavior ensures that AWS transfer are intra-region (which means
-they are fast and don't result in a billable AWS event) and that ``hg
-clone`` completes as fast as possible (stream clone bundles are faster
+Manifest Advertisement to Cloud Clients
+---------------------------------------
+
+If a client in Amazon Web Services, Google Cloud or Azure is requesting
+a bundle manifest and that client is in a region where bundles are
+hosted in cloud storage, the advertised manifest will only show URLs for
+the same cloud region. In addition, stream clone bundles are the highest
+priority bundle.
+
+This behavior ensures that transfers are intra-region (which means they
+are fast and don't result in a billable event) and that ``hg clone``
+completes as fast as possible (stream clone bundles are faster
 than gzip bundles).
 
 .. important::
 
-   If you have machinery in an AWS region where we don't host bundles,
+   If you have machinery in a region where we don't host bundles,
    please let us know. There's a good chance that establishing bundles
    in your region is cheaper than paying the cross-region transfer costs
-   (intra-region transfer is free).
+   (intra-region transfer is usually free).
 
 Manifest Advertisements to Mozilla Offices
 ------------------------------------------
@@ -193,4 +186,4 @@ bundles is available at https://hg.cdn.mozilla.net/bundles.json.
 If you think bundles should be made available for a particular
 repository, let a server operator know by filing a
 ``Developer Services :: hg.mozilla.org`` bug or by asking in #vcs
-on irc.mozilla.org.
+on chat.mozilla.org.
