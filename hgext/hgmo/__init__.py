@@ -686,16 +686,20 @@ def filter_manifest_for_region(manifest, region):
     """Filter a clonebundles manifest by region
 
     The returned manifest will be sorted to prioritize clone bundles
-    for the specified AWS region.
+    for the specified cloud region.
     """
     filtered = [l for l in manifest.data.splitlines() if region in l]
     # No manifest entries for this region.
     if not filtered:
         return manifest
 
-    # We prioritize stream clone bundles to AWS clients because they are
+    # We prioritize stream clone bundles to cloud clients because they are
     # the fastest way to clone and we want our automation to be fast.
     filtered = sorted(filtered, key=stream_clone_key)
+
+    # include cdn urls as a fallback (cloud bucket may only have stream bundles)
+    cdn = [l for l in manifest.data.splitlines() if b"cdn=true" in l]
+    filtered.extend(cdn)
 
     # We got a match. Write out the filtered manifest (with a trailing newline).
     filtered.append(b"")
