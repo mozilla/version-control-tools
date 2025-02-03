@@ -70,6 +70,9 @@ DOM_PEERS = [
 # interfaces, and do not require DOM peer review.
 CHROME_WEBIDL_ROOT = b"dom/chrome-webidl/"
 
+# Bug 1941617 - typescript config doesn't require DOM peer review
+TS_WEBIDL_ROOT = b"tools/ts/config/"
+
 MISSING_REVIEW = b"""
 Changeset %s alters WebIDL file(s) without DOM peer review:
 %s
@@ -130,11 +133,13 @@ class WebIDLCheck(PreTxnChangegroupCheck):
             file_counts["total"] += 1
             if f.startswith(CHROME_WEBIDL_ROOT):
                 file_counts["chrome"] += 1
+            elif f.startswith(TS_WEBIDL_ROOT):
+                file_counts["ts"] += 1
             else:
                 review_required_files.append(f)
 
         # Allow chrome-only changes
-        if file_counts["chrome"] == file_counts["total"]:
+        if not review_required_files:
             if file_counts["chrome"]:
                 print_notice(self.ui, CHROME_ONLY)
             return True

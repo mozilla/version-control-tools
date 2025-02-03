@@ -308,6 +308,20 @@ Editing a .webidl file that isn't in a web root should pass
   -- Please make sure changes do not contain any web-visible binding definitions.
   added 1 changesets with 1 changes to 1 files
 
+Editing a .webidl file in ts config should pass
+
+  $ mkdir -p tools/ts/config
+  $ echo "interface MozFoo{};" > tools/ts/config/builtin.webidl
+  $ hg add tools/ts/config/builtin.webidl
+  $ hg commit -m 'Bug 123 - Add MozFoo'
+  $ hg push
+  pushing to $TESTTMP/server
+  searching for changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 1 changesets with 1 changes to 1 files
+
 Editing multiple .webidl files without review should fail
 
   $ echo "interface Foo{};" >> dom/file1.webidl
@@ -321,7 +335,7 @@ Editing multiple .webidl files without review should fail
   adding file changes
   
   ******************************* ERROR *******************************
-  Changeset 46d9d90f2b1d alters WebIDL file(s) without DOM peer review:
+  Changeset 8ab9ecc2b518 alters WebIDL file(s) without DOM peer review:
   dom/file1.webidl
   dom/file2.webidl
   
