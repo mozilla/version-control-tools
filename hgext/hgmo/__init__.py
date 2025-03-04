@@ -783,9 +783,14 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
         return manifest
 
     # Mozilla's load balancers add a X-Cluster-Client-IP header to identify the
-    # actual source IP, so prefer it.
+    # actual source IP, so prefer it.  And if the request comes through Fastly,
+    # prefer the Fastly-Client-IP header it adds so we take into account the
+    # actual client.
     sourceip = proto._req.headers.get(
-        b"X-CLUSTER-CLIENT-IP", proto._req.rawenv.get(b"REMOTE_ADDR")
+        b"Fastly-Client-IP",
+        proto._req.headers.get(
+            b"X-CLUSTER-CLIENT-IP", proto._req.rawenv.get(b"REMOTE_ADDR")
+        ),
     )
 
     if not sourceip:
