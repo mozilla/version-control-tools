@@ -48,7 +48,6 @@ Editing a .webidl file without any review should fail
     - Kagami Rosylight (:saschanaz)
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
-    - Peter Van der Beken (:peterv)
     - Sean Feng (:sefeng)
   *********************************************************************
   
@@ -83,7 +82,6 @@ Editing a .webidl file without /DOM/ peer review should fail
     - Kagami Rosylight (:saschanaz)
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
-    - Peter Van der Beken (:peterv)
     - Sean Feng (:sefeng)
   *********************************************************************
   
@@ -132,7 +130,6 @@ Editing a .webidl file without /DOM/ peer review in the same push as a commit wi
     - Kagami Rosylight (:saschanaz)
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
-    - Peter Van der Beken (:peterv)
     - Sean Feng (:sefeng)
   *********************************************************************
   
@@ -186,7 +183,6 @@ WebIDL change after release uplift fails
     - Kagami Rosylight (:saschanaz)
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
-    - Peter Van der Beken (:peterv)
     - Sean Feng (:sefeng)
   *********************************************************************
   
@@ -351,7 +347,6 @@ Editing multiple .webidl files without review should fail
     - Kagami Rosylight (:saschanaz)
     - Nika Layzell (:mystor)
     - Olli Pettay (:smaug)
-    - Peter Van der Beken (:peterv)
     - Sean Feng (:sefeng)
   *********************************************************************
   

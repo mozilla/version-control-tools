@@ -58,11 +58,6 @@ DOM_PEERS = [
         "nick": [b"smaug"],
         "email": [b"olli.pettay@helsinki.fi", b"bugs@pettay.fi"],
     },
-    {
-        "name": b"Peter Van der Beken",
-        "nick": [b"peterv"],
-        "email": [b"peterv@propagandism.org"],
-    },
     {"name": b"Sean Feng", "nick": [b"sefeng"], "email": [b"sefeng@mozilla.com"]},
 ]
 
