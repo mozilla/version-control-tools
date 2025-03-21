@@ -33,9 +33,9 @@ guessmime = True
 # URL in production.
 
 {% if is_testing is not defined %}
-csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src https://hg.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 {% else %}
-csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 {% endif %}
 
 # We don't allow pushes over HTTP. But if this isn't set, pushing to https://

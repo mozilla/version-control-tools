@@ -11,7 +11,7 @@
 CSP header should be present on normal HTTP requests
 
   $ http ${HGWEB_0_URL}mozilla-central/shortlog --header content-security-policy | grep script
-  content-security-policy: default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ 'nonce-*'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https: (glob)
+  content-security-policy: default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-AxXWSYk7TGuFBzjcc6vr6g'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
   <script type="text/javascript" src="/static/DOCKER/mercurial.js"></script>
   <script type="text/javascript" nonce="*"> (glob)
   </script>

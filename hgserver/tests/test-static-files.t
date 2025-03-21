@@ -49,7 +49,7 @@
 Repositories reference /static/ for static URLs
 
   $ http ${HGWEB_0_URL}mozilla-central | grep static
-  content-security-policy: default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ 'nonce-*'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https: (glob)
+  content-security-policy: default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-RK1CU1MBTiGXLgghkB8jWA'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
   <link rel="icon" href="/static/DOCKER/hgicon.png" type="image/png" />
   <link rel="stylesheet" href="/static/DOCKER/style-gitweb.css" type="text/css" />
   <script type="text/javascript" src="/static/DOCKER/mercurial.js"></script>
