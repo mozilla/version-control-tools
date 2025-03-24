@@ -22,6 +22,7 @@ ALLOWED_FILES = {
         b"browser/config/mozconfigs/",
         b"browser/config/version.txt",
         b"browser/config/version_display.txt",
+        b"browser/extensions/webcompat/manifest.json",
         b"browser/locales/l10n-changesets.json",
         b"build/defines.sh",
         b"build/mozconfig.common",
