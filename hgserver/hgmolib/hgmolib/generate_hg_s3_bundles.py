@@ -60,12 +60,15 @@ CREATES = [
 ]
 
 CLONEBUNDLES_ORDER = [
-    ("zstd-max", "BUNDLESPEC=zstd-v2"),
-    ("zstd", "BUNDLESPEC=zstd-v2"),
-    ("gzip-v2", "BUNDLESPEC=gzip-v2"),
+    ("zstd-max", ["zstd-v2"]),
+    ("zstd", ["zstd-v2"]),
+    ("gzip-v2", ["gzip-v2"]),
     (
         "stream-v2",
-        "BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore",
+        [
+            "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog",
+            "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlog-compression-zstd%2Crevlogv1%2Csparserevlog",
+        ],
     ),
 ]
 
@@ -558,23 +561,37 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     bundle_types = set(t[0] for t in bundles)
 
     clonebundles_manifest = []
-    for bundle_format, params in CLONEBUNDLES_ORDER:
+    for bundle_format, expected_specs in CLONEBUNDLES_ORDER:
         if bundle_format not in bundle_types:
             continue
 
         final_path, remote_path = bundle_paths(bundle_path, repo, tip, bundle_format)
+        bundle_spec = (
+            subprocess.run(
+                [HG, "debugbundle", "--spec", final_path],
+                check=True,
+                stdout=subprocess.PIPE,
+            )
+            .stdout.decode("ascii")
+            .strip()
+        )
+        if bundle_spec not in expected_specs:
+            raise Exception(
+                f"unexpected bundle spec for {final_path}: actual {bundle_spec}, expected {expected_specs}"
+            )
         clonebundles_manifest.append(
-            "%s/%s %s REQUIRESNI=true cdn=true" % (CDN, remote_path, params)
+            "%s/%s BUNDLESPEC=%s REQUIRESNI=true cdn=true"
+            % (CDN, remote_path, bundle_spec)
         )
 
         # Prefer S3 buckets over GCP buckets for the time being,
         # so add them first
         for host, bucket, name in S3_HOSTS:
-            entry = "https://%s/%s/%s %s ec2region=%s" % (
+            entry = "https://%s/%s/%s BUNDLESPEC=%s ec2region=%s" % (
                 host,
                 bucket,
                 remote_path,
-                params,
+                bundle_spec,
                 name,
             )
             clonebundles_manifest.append(entry)
@@ -582,17 +599,17 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         # Only add `stream-v2` bundles for GCP and Azure.
         if bundle_format == "stream-v2":
             for bucket, name in GCP_HOSTS:
-                entry = "%s/%s/%s %s gceregion=%s" % (
+                entry = "%s/%s/%s BUNDLESPEC=%s gceregion=%s" % (
                     GCS_ENDPOINT,
                     bucket,
                     remote_path,
-                    params,
+                    bundle_spec,
                     name,
                 )
                 clonebundles_manifest.append(entry)
 
             for account_url, region, container_name in AZURE_HOSTS:
-                entry = f"{account_url}/{container_name}/{remote_path} {params} azureregion={region}"
+                entry = f"{account_url}/{container_name}/{remote_path} BUNDLESPEC={bundle_spec} azureregion={region}"
                 clonebundles_manifest.append(entry)
 
     backup_path = os.path.join(repo_full, ".hg", "clonebundles.manifest.old")

@@ -94,12 +94,12 @@ Here is an example *clone bundles* manifest::
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
   https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
-  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore REQUIRESNI=true cdn=true
-  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore ec2region=us-west-2
-  https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=us-central1
-  https://storage.googleapis.com/moz-hg-bundles-gcp-us-west1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=us-west1
-  https://storage.googleapis.com/moz-hg-bundles-gcp-na-ne1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore gceregion=northamerica-northeast1
-  https://mozhgwestus3.blob.core.windows.net/hgbundle/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Ddotencode%2Cfncache%2Cgeneraldelta%2Crevlogv1%2Csparserevlog%2Cstore azureregion=westus3
+  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog REQUIRESNI=true cdn=true
+  https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog ec2region=us-west-2
+  https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-central1
+  https://storage.googleapis.com/moz-hg-bundles-gcp-us-west1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-west1
+  https://storage.googleapis.com/moz-hg-bundles-gcp-na-ne1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=northamerica-northeast1
+  https://mozhgwestus3.blob.core.windows.net/hgbundle/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog azureregion=westus3
 
 As you can see, listed bundle URLs vary by bundle type (compression and
 format) and location. For each repository we generate bundles for, we
@@ -141,7 +141,7 @@ under 60s.::
 
 .. note::
 
-   Mercurial 4.7 or newer is required to use streaming bundles.
+   Mercurial 5.0 or newer is required to use streaming bundles.
 
 
 Manifest Advertisement to Cloud Clients
