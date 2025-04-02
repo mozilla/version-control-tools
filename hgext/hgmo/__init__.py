@@ -26,7 +26,7 @@ import json
 import os
 import types
 
-from typing import Optional
+from typing import Optional, Union
 
 from mercurial.i18n import _
 from mercurial.node import bin
@@ -735,7 +735,7 @@ def cloud_region_specifier(instance_data):
 
 
 def get_current_azure_region(
-    azure_ip_path: bytes, source_ip: ipaddress.IPv4Address
+    azure_ip_path: bytes, source_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]
 ) -> Optional[str]:
     """Return the current Azure region if one can be found from the source IP address."""
     with open(azure_ip_path, "rb") as f:
@@ -750,10 +750,6 @@ def get_current_azure_region(
 
         for subnet in properties["addressPrefixes"]:
             network = ipaddress.ip_network(subnet)
-
-            # Skip IPv6 networks.
-            if network.version != 4:
-                continue
 
             if source_ip in network:
                 return properties["region"]
@@ -796,7 +792,11 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     if not sourceip:
         return manifest
     else:
-        sourceip = ipaddress.IPv4Address(pycompat.unicode(pycompat.sysstr(sourceip)))
+        try:
+            sourceip = ipaddress.ip_address(pycompat.unicode(pycompat.sysstr(sourceip)))
+        except ValueError:
+            # XXX return 400?
+            return manifest
 
     # If the request originates from a private IP address, and we are running on
     # a cloud instance, we should be serving traffic to private instances in CI.
@@ -845,12 +845,10 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
                 gcpdata = json.load(f)
 
             for ipentry in gcpdata["prefixes"]:
-                # Each entry either has `ipv4Prefix` or `ipv6Prefix`, but we only
-                # care about `ipv4Prefix`.
-                if "ipv4Prefix" not in ipentry:
-                    continue
-
-                network = ipaddress.IPv4Network(ipentry["ipv4Prefix"])
+                if "ipv4Prefix" in ipentry:
+                    network = ipaddress.IPv4Network(ipentry["ipv4Prefix"])
+                elif "ipv6Prefix" in ipentry:
+                    network = ipaddress.IPv6Network(ipentry["ipv6Prefix"])
 
                 if sourceip not in network:
                     continue

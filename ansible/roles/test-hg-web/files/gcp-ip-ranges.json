@@ -17,5 +17,9 @@
     "ipv4Prefix": "8.34.212.0/22",
     "service": "Google Cloud",
     "scope": "us-central1"
+  }, {
+    "ipv6Prefix": "2600:1900:4000::/44",
+    "service": "Google Cloud",
+    "scope": "us-central1"
   }]
 }
