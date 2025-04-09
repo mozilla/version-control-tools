@@ -109,15 +109,6 @@ LimitRequestFields 1000
         Header onsuccess set Cache-Control "public, max-age=3600"
     </LocationMatch>
 
-    # `json-pushes` responses are guaranteed to be immutable, and can be cached by supported clients.
-    <LocationMatch "/json-pushes$">
-        <If "%{QUERY_STRING} =~ /changeset=[a-z0-9]{40}/">
-            # Cache for 10 minutes initially
-            Header onsuccess set Cache-Control "public, max-age=600"
-            # Header onsuccess set Cache-Control "public, max-age=604800, immutable"
-        </If>
-    </LocationMatch>
-
     # Cache the root repo listing for a minute
     <LocationMatch "^/$">
         Header set Cache-Control "public, max-age=60"
