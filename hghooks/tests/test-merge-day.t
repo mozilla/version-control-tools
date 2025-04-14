@@ -38,7 +38,7 @@ ffxbld-merge user cannot push non-merge day changes
   adding manifests
   adding file changes
   
-  **************** ERROR ****************
+  ***************** ERROR ******************
   ffxbld-merge can only push changes to
   the following paths:
   .arcconfig
@@ -47,6 +47,8 @@ ffxbld-merge user cannot push non-merge day changes
   browser/config/mozconfigs/
   browser/config/version.txt
   browser/config/version_display.txt
+  browser/extensions/newtab/manifest.json
+  browser/extensions/webcompat/manifest.json
   browser/locales/l10n-changesets.json
   build/defines.sh
   build/mozconfig.common
@@ -59,7 +61,7 @@ ffxbld-merge user cannot push non-merge day changes
   Illegal paths found:
   file0a
   other/file1a
-  ***************************************
+  ******************************************
   
   transaction abort!
   rollback completed
@@ -77,7 +79,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   adding manifests
   adding file changes
   
-  **************** ERROR ****************
+  ***************** ERROR ******************
   ffxbld-merge can only push changes to
   the following paths:
   .arcconfig
@@ -86,6 +88,8 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   browser/config/mozconfigs/
   browser/config/version.txt
   browser/config/version_display.txt
+  browser/extensions/newtab/manifest.json
+  browser/extensions/webcompat/manifest.json
   browser/locales/l10n-changesets.json
   build/defines.sh
   build/mozconfig.common
@@ -98,7 +102,7 @@ ffxbld-merge user cannot push non-merge day changes, multiple
   Illegal paths found:
   file0a
   other/file1a
-  ***************************************
+  ******************************************
   
   transaction abort!
   rollback completed
