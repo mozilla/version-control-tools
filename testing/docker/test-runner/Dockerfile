@@ -54,6 +54,8 @@ RUN addgroup --gid ${GROUP_ID} vct \
 RUN mkdir /app
 RUN chown -R vct:vct /app
 
+USER vct
+
 # Required to ensure built Python uses utf-8.
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -88,10 +90,7 @@ RUN pip install \
     -r /requirements.txt
 
 
-ADD ./ /app/vct/
-RUN chown -R vct:vct /app
-
-USER vct
+ADD --chown=vct ./ /app/vct/
 
 # Install editable requirements.
 RUN pip install -e vct/pylib/Bugsy
