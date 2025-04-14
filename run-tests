@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--no-hg-tip",
         action="store_true",
-        help="Do not run tests against the @ bookmark of hg",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument(
         "--no-unit", action="store_true", help="Do not run Python unit tests"
@@ -358,7 +358,7 @@ if __name__ == "__main__":
         # against all X.Y and X.Y.Z releases seen on disk.
         versions = {}
         for dirver in os.listdir(mercurials_dir):
-            if dirver.startswith(".") or dirver == "@":
+            if dirver.startswith("."):
                 continue
 
             normdirver = ".".join(dirver.split(".")[0:2])
@@ -420,14 +420,5 @@ if __name__ == "__main__":
             res2 = run_hg_tests(version, tests)
             if res2:
                 res = res2
-
-        # Run all tests against @ because we always want to be compatible
-        # with the bleeding edge of development.
-        if not options.no_hg_tip:
-            all_hg_tests = []
-            for m in extensions:
-                all_hg_tests.extend(sorted(m["tests"]))
-            all_hg_tests.extend(hg_tests)
-            run_hg_tests("@", all_hg_tests)
 
     sys.exit(res)
