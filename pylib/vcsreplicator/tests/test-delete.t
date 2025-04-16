@@ -108,7 +108,7 @@ Confirm the repos are only deleted on the non-backup nodes
 
 Output of consumer logs:
 
-  $ hgmo exec hgweb0 tail -n 49 /var/log/vcsreplicator/consumer.log
+  $ hgmo exec hgweb0 tail -n 48 /var/log/vcsreplicator/consumer.log
   vcsreplicator.consumer processing heartbeat-1 from partition 0 offset 0
   vcsreplicator.consumer processing hg-repo-init-2: (repo: {moz}/mozilla-central) from partition 2 offset 0
   vcsreplicator.consumer created Mercurial repository: /repo/hg/mozilla/mozilla-central
@@ -118,7 +118,6 @@ Output of consumer logs:
   vcsreplicator.consumer pulling 1 heads (2d30fb72c11e311c32234b1c6b05a916a30aafcc) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
   vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r2d30fb72c11e311c32234b1c6b05a916a30aafcc -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
-  vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob)
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
   vcsreplicator.consumer   > adding file changes
