@@ -10,12 +10,10 @@
 No config with extension installed should cause immediate abort
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.hosts config option not set') (glob) (?)
-  *Abort: replicationproducer.hosts config option not set (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.hosts config option not set")
   *Abort: replicationproducer.hosts config option not set (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.hosts config option not set
@@ -28,12 +26,10 @@ Missing clientid
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.clientid config option not set') (glob) (?)
-  *Abort: replicationproducer.clientid config option not set (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.clientid config option not set")
   *Abort: replicationproducer.clientid config option not set (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.clientid config option not set
@@ -45,12 +41,10 @@ Missing topic
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.topic config option not set') (glob) (?)
-  *Abort: replicationproducer.topic config option not set (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.topic config option not set")
   *Abort: replicationproducer.topic config option not set (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.topic config option not set
@@ -62,14 +56,13 @@ No partition map
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.partitionmap.* (glob) (?)
-  *Abort: replicationproducer.partitionmap.* config options not set (glob) (?)
-      b"replicationproducer.partitionmap.* config options not set"
-  *Abort: replicationproducer.partitionmap.* config options not set (glob)
+  Traceback (most recent call last):
+    File "*/mercurial/extensions.py", line *, in * (glob)
+      uisetup(ui)
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/hgext.py", line *, in uisetup (glob)
+      b"replicationproducer.partitionmap.* config options not set" (?)
+      raise *.Abort( (glob) (?)
+  mercurial.error.Abort: replicationproducer.partitionmap.* config options not set
   *** failed to set up extension vcsreplicator: replicationproducer.partitionmap.* config options not set
 
 No reqacks
@@ -79,12 +72,10 @@ No reqacks
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
-  *Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.reqacks must be set to -1, 0, or 1")
   *Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
@@ -96,12 +87,10 @@ Bad reqacks value
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.reqacks must be set to -1,* (glob) (?)
-  *Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.reqacks must be set to -1, 0, or 1")
   *Abort: replicationproducer.reqacks must be set to -1, 0, or 1 (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.reqacks must be set to -1, 0, or 1
@@ -113,12 +102,10 @@ No acktimeout
   > EOF
 
   $ hg st
-  Traceback (most recent call last): (?)
-    File "* (glob) (?)
-      uisetup(ui) (?)
-    File "* (glob) (?)
-      raise *.Abort('replicationproducer.acktimeout config option* (glob) (?)
-  *Abort: replicationproducer.acktimeout config option not set (glob) (?)
+  Traceback (most recent call last):
+    File "* (glob)
+      uisetup(ui)
+    File "* (glob)
       raise error.Abort(b"replicationproducer.acktimeout config option not set")
   *Abort: replicationproducer.acktimeout config option not set (glob)
   *** failed to set up extension vcsreplicator: replicationproducer.acktimeout config option not set
