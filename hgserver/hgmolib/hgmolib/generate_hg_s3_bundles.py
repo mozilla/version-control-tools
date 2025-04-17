@@ -414,22 +414,18 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
     ):
         raise Exception("non-generaldelta repo not supported: %s" % repo_full)
 
-    bundle_path = os.path.join(BUNDLE_ROOT, repo)
+    bundle_dir = os.path.join(BUNDLE_ROOT, repo)
 
     # Create directory to hold bundle files.
-    try:
-        os.makedirs(bundle_path, 0o755)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    os.makedirs(bundle_dir, 0o755, exist_ok=True)
 
     # We keep the last bundle files around so we can reuse them if necessary.
     # Prune irrelevant files.
-    for p in os.listdir(bundle_path):
+    for p in os.listdir(bundle_dir):
         if p.startswith(".") or p.startswith(tip):
             continue
 
-        full = os.path.join(bundle_path, p)
+        full = os.path.join(bundle_dir, p)
         print("removing old bundle file: %s" % full)
         os.unlink(full)
 
@@ -459,7 +455,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
                 continue
 
             final_path, remote_path = bundle_paths(
-                bundle_path, repo, tip, bundle_format
+                bundle_dir, repo, tip, bundle_format
             )
             temp_path = "%s.tmp" % final_path
 
@@ -565,7 +561,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
         if bundle_format not in bundle_types:
             continue
 
-        final_path, remote_path = bundle_paths(bundle_path, repo, tip, bundle_format)
+        final_path, remote_path = bundle_paths(bundle_dir, repo, tip, bundle_format)
         bundle_spec = (
             subprocess.run(
                 [HG, "debugbundle", "--spec", final_path],
