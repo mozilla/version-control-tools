@@ -65,8 +65,8 @@ ENV HOME="/vct"
 RUN git clone --depth=1 https://github.com/pyenv/pyenv.git $HOME/.pyenv
 ENV PYENV_ROOT="$HOME/.pyenv"
 ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
-RUN pyenv install 3.7.17
-RUN pyenv global 3.7.17
+RUN pyenv install 3.9.13
+RUN pyenv global 3.9.13
 
 # Create Python 3 venv
 # Set `VIRTUAL_ENV` and `PATH` to replicate `source venv/bin/activate`
