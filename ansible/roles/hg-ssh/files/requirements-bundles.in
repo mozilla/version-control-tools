@@ -3,5 +3,5 @@ azure-identity
 boto3
 google-cloud-storage==1.20.0
 kafka-python==1.4.6
-mercurial==6.8.2
+mercurial==6.9.5
 python-hglib==2.6.1

@@ -15,13 +15,13 @@ boto==2.49.0 \
     --hash=sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8 \
     --hash=sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-boto3==1.35.79 \
-    --hash=sha256:1fa26217cd33ded82e55aed4460cd55f7223fa647916aa0d3c5d6828e6ec7135 \
-    --hash=sha256:a673b0b6378c9ccbf045a31a43195b175e12aa5c37fb7635fcbfc8f48fb857b3
+boto3==1.37.34 \
+    --hash=sha256:586bfa72a00601c04067f9adcbb08ecaf63b05b7d731103f33cb2ce0d6950b1b \
+    --hash=sha256:94ca07328474db3fa605eb99b011512caa73f7161740d365a1f00cfebfb6dd90
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-botocore==1.35.79 \
-    --hash=sha256:245bfdda1b1508539ddd1819c67a8a2cc81780adf0715d3de418d64c4247f346 \
-    --hash=sha256:e6b10bb9a357e3f5ca2e60f6dd15a85d311b9a476eb21b3c0c2a3b364a2897c8
+botocore==1.37.34 \
+    --hash=sha256:2909b6dbf9c90347c71a6fa0364acee522d6a7664f13d6f7996c9dd1b1f46fac \
+    --hash=sha256:bd9af0db1097befd2028ba8525e32cacc04f26ccb9dbd5d48d6ecd05bc16c27a
     # via
     #   boto3
     #   s3transfer
@@ -39,12 +39,51 @@ kafka-python==1.4.6 \
     --hash=sha256:08f83d8e0af2e64d25f94314d4bef6785b34e3b0df0effe9eebf76b98de66eeb \
     --hash=sha256:3f55bb3e125764a37da550e9fa3d10a85fa09f8af8f8a40f223d2ec8486c2a5b
     # via -r ansible/roles/hg-ssh/files/../../../../pylib/vcsreplicator/requirements.in
-kombu==5.4.2 \
-    --hash=sha256:14212f5ccf022fc0a70453bb025a1dcc32782a588c49ea866884047d66e14763 \
-    --hash=sha256:eef572dd2fd9fc614b37580e3caeafdd5af46c1eff31e7fba89138cdb406f2cf
+kombu==5.5.3 \
+    --hash=sha256:021a0e11fcfcd9b0260ef1fb64088c0e92beb976eb59c1dfca7ddd4ad4562ea2 \
+    --hash=sha256:5b0dbceb4edee50aa464f59469d34b97864be09111338cfb224a10b6a163909b
     # via -r ansible/roles/hg-ssh/files/../../../../pylib/vcsreplicator/requirements.in
-mercurial==6.8.2 \
-    --hash=sha256:aac618106768ad1ed976c3fe7c8659fec99e6f0b5337ea6ea554fae8490c4f4e
+mercurial==6.9.5 \
+    --hash=sha256:1654b20d58edab79b83a804725690f7f198bd1bc312b1bcc4d4f9d219a9626c6 \
+    --hash=sha256:1791314ac1bd16ac07ca98ede04653e424a9b992311d564b6469b9493341a63d \
+    --hash=sha256:21ab4ca9260a9a06326f39fb1aeb78fdb357edd1fffaa61bf4df38f5dd524e0b \
+    --hash=sha256:28286972409ece32af1b074817a13ce639cb5d41b2e79b4aa3449c1a3c9e596f \
+    --hash=sha256:2c9ca3143d993e7272e1031f58f8f4c9ad57cd478601e56972c90a1b48d39b81 \
+    --hash=sha256:38f7b6f66d086574ee80a54b731363229fb1ab43c01c2f45d27ef641ce2d3d91 \
+    --hash=sha256:3add7db52c9870223d522876d9bffd94d5da6768a3c9afa5d3234bc050c2b260 \
+    --hash=sha256:425e56fb10ace0ea0ac4d705bec08864c6c5b53eb8dd35779a4eea7a20000202 \
+    --hash=sha256:441bcff5e1aee0ef36c6aa08b94ae98777d954c4454eb04a3bee1b8bd75451e2 \
+    --hash=sha256:4b746519574f5938b1e405bec63cadaea465bdd8d362c87a7f9de5fe8d21375c \
+    --hash=sha256:4d434805a5a79f1e89ef4954bf355e678d44c42d28cedbab8fa9f320cff6655b \
+    --hash=sha256:5134448d438c30a6af738be550202613be7c8298fc5d0dfd65c074689747e255 \
+    --hash=sha256:633cf780ae2263fb95a624546f80f3692767225386fb2539c9649fc42594aea3 \
+    --hash=sha256:66b1ae893b3b95ffedbdd4c1e1da31ad177ad24b99c90b3b482bd0823f2de58f \
+    --hash=sha256:67475ac711d5c98f0f09085df95ba9373a34f1c6a5164f080c723c849eb5f478 \
+    --hash=sha256:6f01c3477f1a98413f3f41689989ecae473b2d3eab6f5427c6efe07524c6ab4c \
+    --hash=sha256:79853821f48ad50c3dc0e8c643f3054c7d86ceb8ecf725e784bc81b0159e266d \
+    --hash=sha256:80d47bf09d33735188046b5cf2f807800827752aba8efbab689a55e9297f12fb \
+    --hash=sha256:832a488377e3652c430aedc4dda6328fb33369585bb4f96f273b76214e914590 \
+    --hash=sha256:99dd1f8f76a6bf652ae9f5733ae4909d233b9e3294a3099323832740e4b92acc \
+    --hash=sha256:a0878e303f7c1882120fb83262f0fc5197fea2da87ac654a2b48d09c56a9fd1d \
+    --hash=sha256:aaa48f04f603b1bf846e28afccb1db4e7d2fa15df4003e5c406a41785b264bb7 \
+    --hash=sha256:b067b180ac99c87858e5a831117817a4a2d19a0174c995fc31f73edc453e7b53 \
+    --hash=sha256:b74a6207b353d8a07edbebd8d6e0d96bc9b04f58682cfb4c7e9cc1bb2837cf82 \
+    --hash=sha256:ba981afc30017689ab1196de6462e92bfc9edd9fb86e3858f07aee5b08e4f9b3 \
+    --hash=sha256:c2d0f745a27a425a9912cf2c7a7659d31b93d67c0c9d4c48a60a151901c1ef5d \
+    --hash=sha256:d05fd2fc066e89b5caa9cbc4e9f3141a7eb2731fde9d679b7f0138cee2ee0dbe \
+    --hash=sha256:d337c5e54e7c1496ece562b2d3b0144c44dbfba584fc26aa07fb91796f73ee12 \
+    --hash=sha256:d35d4f53c93ee49e778d409b03dc6066f5f70d3c760907031e059026a672cf9f \
+    --hash=sha256:d3f22aeef9e9dcd6e562132950226c2c955d35271bd00a01481efca2b1cc65fd \
+    --hash=sha256:d52ace4d9e787e90a7f377e3f311f309181da5b9045e6725720e0e2bcf0b0369 \
+    --hash=sha256:d53c896566744b22857fc245fbeea7b07529b80770072c025da84a715375c6d6 \
+    --hash=sha256:d77fa05544d24c1ede0f1ef07a428dea4e791b6bc5179af9c8a52cf87dcac260 \
+    --hash=sha256:d7e072854b9834fed6d67a3500e0d4aed45b72118b5a961bc38bddf5808e73e4 \
+    --hash=sha256:d948c055be3c32ed48f79bd5af846b1ff62c4f67510c7b08a91cc4c44ed12dc3 \
+    --hash=sha256:dab7595fd77c86f6b1b12f42ea11707a1710a53b761945b44b629c46ef022907 \
+    --hash=sha256:df672c4d37eef689252b24a086043d8b9b6fb2f6d1435ab4f0d44524987cdbb8 \
+    --hash=sha256:e16eeff9d248422697e4ac099ccd4ab271ea0e573933be1b1259e19de410af54 \
+    --hash=sha256:eae33c0c5cb3138f56a19ac2e97466f7ddb406545e6581c3deb24b9c50c510af \
+    --hash=sha256:fa4f25fda6a3e64e80cd6653ac97ec9211b1e111568077544087a8ec661c575f
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
 pyasn1==0.6.1 \
     --hash=sha256:0d632f46f2ba09143da3a8afe9e33fb6f92fa2320ab7e886e2d0f7672af84629 \
@@ -52,9 +91,9 @@ pyasn1==0.6.1 \
     # via
     #   pyasn1-modules
     #   python-ldap
-pyasn1-modules==0.4.1 \
-    --hash=sha256:49bfa96b45a292b711e986f222502c1c9a5e1f4e568fc30e2574a6c7d07838fd \
-    --hash=sha256:c28e2dbf9c06ad61c71a075c7e0f9fd0f1b0bb2d2ad4377f240d33ac2ab60a7c
+pyasn1-modules==0.4.2 \
+    --hash=sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a \
+    --hash=sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6
     # via python-ldap
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
@@ -68,9 +107,9 @@ python-hglib==2.6.2 \
 python-ldap==3.4.4 \
     --hash=sha256:7edb0accec4e037797705f3a05cbf36a9fde50d08c8f67f2aef99a2628fab828
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-s3transfer==0.10.4 \
-    --hash=sha256:244a76a24355363a68164241438de1b72f8781664920260c48465896b712a41e \
-    --hash=sha256:29edc09801743c21eb5ecbc617a152df41d3c287f67b615f73e5f750583666a7
+s3transfer==0.11.4 \
+    --hash=sha256:559f161658e1cf0a911f45940552c696735f5c74e64362e515f333ebed87d679 \
+    --hash=sha256:ac265fa68318763a03bf2dc4f39d5cbd6a9e178d81cc9483ad27da33637e320d
     # via boto3
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
@@ -80,13 +119,9 @@ tabulate==0.9.0 \
     --hash=sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c \
     --hash=sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f
     # via -r ansible/roles/hg-ssh/files/requirements-tools.in
-typing-extensions==4.12.2 \
-    --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
-    --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
-    # via kombu
-tzdata==2024.2 \
-    --hash=sha256:7d85cc416e9382e69095b7bdf4afd9e3880418a2413feec7069d533d6b4e31cc \
-    --hash=sha256:a48093786cdcde33cad18c2555e8532f34422074448fbc874186f0abd79565cd
+tzdata==2025.2 \
+    --hash=sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8 \
+    --hash=sha256:b60a638fcc0daffadf82fe0f57e53d06bdec2f36c4df66280ae79bce6bd6f2b9
     # via kombu
 urllib3==1.26.20 \
     --hash=sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e \
