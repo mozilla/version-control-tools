@@ -66,7 +66,9 @@ CLONEBUNDLES_ORDER = [
     (
         "stream-v2",
         [
+            "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1",
             "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog",
+            "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlog-compression-zstd%2Crevlogv1",
             "none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlog-compression-zstd%2Crevlogv1%2Csparserevlog",
         ],
     ),
