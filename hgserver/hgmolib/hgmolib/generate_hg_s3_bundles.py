@@ -597,7 +597,7 @@ def generate_bundles(repo, upload=True, copyfrom=None, zstd_max=False):
             .stdout.decode("ascii")
             .strip()
         )
-        validate_spec(bundle_spec)
+        validate_spec(bundle_spec, final_path)
         clonebundles_manifest.append(
             "%s/%s BUNDLESPEC=%s REQUIRESNI=true cdn=true"
             % (CDN, remote_path, bundle_spec)
