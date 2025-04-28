@@ -281,7 +281,8 @@ Re-enabling consumer will result in heads replication and changeset being visibl
   "pushid": 3,
   "pushdate": [*, 0], (glob)
   "pushuser": "user@example.com",
-  "landingsystem": null
+  "landingsystem": null,
+  "git_commit": null
   }
 
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-pushes?version=2 --body-file body > /dev/null

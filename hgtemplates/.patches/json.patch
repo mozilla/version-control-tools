@@ -57,7 +57,7 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
    }'
  graphentry = '\{
    "node": {node|json},
-@@ -59,13 +93,18 @@ changeset = '\{
+@@ -59,13 +93,19 @@ changeset = '\{
    "node": {node|json},
    "date": {date|json},
    "desc": {desc|utf8|json},
@@ -75,11 +75,12 @@ diff --git a/hgtemplates/json/map b/hgtemplates/json/map
 +  "pushid": {pushid|json},
 +  "pushdate": {pushdate|json},
 +  "pushuser": {pushuser|json},
-+  "landingsystem": {if(landingsystem, landingsystem|json, "null")}
++  "landingsystem": {if(landingsystem, landingsystem|json, "null")},
++  "git_commit": {if(git_commit, git_commit|json, "null")}
    }'
  changesetbranch = '{name|utf8|json}'
  changesetbookmark = '{bookmark|utf8|json}'
-@@ -240,3 +279,22 @@ indexentry = '\{
+@@ -240,3 +280,22 @@ indexentry = '\{
    "lastchange": {lastchange|json},
    "labels": {labels|json}
    }'

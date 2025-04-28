@@ -194,6 +194,10 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     if landingsystem:
         d[b"landingsystem"] = landingsystem
 
+    git_commit = ctx.extra().get(b"git_commit")
+    if git_commit:
+        d[b"git_commit"] = git_commit
+
     if onlycheap:
         return
 

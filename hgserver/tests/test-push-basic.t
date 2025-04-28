@@ -134,7 +134,8 @@ It got replicated to mirrors
   "pushid": 1,
   "pushdate": [*, 0], (glob)
   "pushuser": "user1@example.com",
-  "landingsystem": null
+  "landingsystem": null,
+  "git_commit": null
   }
 
   $ hgmo exec hgweb1 /var/hg/venv_replication/bin/vcsreplicator-consumer --wait-for-no-lag /etc/mercurial/vcsreplicator.ini
@@ -168,7 +169,8 @@ It got replicated to mirrors
   "pushid": 1,
   "pushdate": [*, 0], (glob)
   "pushuser": "user1@example.com",
-  "landingsystem": null
+  "landingsystem": null,
+  "git_commit": null
   }
 
 Pushlog should be replicated

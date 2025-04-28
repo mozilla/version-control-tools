@@ -107,7 +107,8 @@ changeset = '\{
   "pushid": {pushid|json},
   "pushdate": {pushdate|json},
   "pushuser": {pushuser|json},
-  "landingsystem": {if(landingsystem, landingsystem|json, "null")}
+  "landingsystem": {if(landingsystem, landingsystem|json, "null")},
+  "git_commit": {if(git_commit, git_commit|json, "null")}
   }'
 changesetbranch = '{name|utf8|json}'
 changesetbookmark = '{bookmark|utf8|json}'

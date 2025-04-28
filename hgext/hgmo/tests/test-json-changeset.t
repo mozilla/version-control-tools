@@ -77,6 +77,7 @@ Last changeset
               "status": "modified"
           }
       ],
+      "git_commit": null,
       "landingsystem": null,
       "node": "c761ad6d27c96f72f7e4637789e967c3f9730255",
       "parents": [

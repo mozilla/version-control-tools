@@ -95,6 +95,7 @@ Check the last changeset
               "status": "modified"
           }
       ],
+      "git_commit": null,
       "landingsystem": "wobble",
       "node": "40e31a84e3dcf059c2e33d5a266edc6bad3b81ed",
       "parents": [
