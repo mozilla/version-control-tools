@@ -87,6 +87,7 @@ configitem = registrar.configitem(configtable)
 
 configitem(b"mozilla", b"treeherder_repo", default=configitems.dynamicdefault)
 configitem(b"mozilla", b"treestatus_base_url", default=configitems.dynamicdefault)
+configitem(b"mozilla", b"git_repo_url", default=configitems.dynamicdefault)
 configitem(
     b"hgmo", b"automationrelevantdraftancestors", default=configitems.dynamicdefault
 )
@@ -197,6 +198,14 @@ def addmetadata(repo, ctx, d, onlycheap=False):
     git_commit = ctx.extra().get(b"git_commit")
     if git_commit:
         d[b"git_commit"] = git_commit
+
+        git_repo_url = repo.ui.config(
+            b"mozilla",
+            b"git_repo_url",
+            b"https://github.com/mozilla-firefox/firefox",
+        )
+        if git_repo_url:
+            d[b"git_repo_url"] = git_repo_url
 
     if onlycheap:
         return
