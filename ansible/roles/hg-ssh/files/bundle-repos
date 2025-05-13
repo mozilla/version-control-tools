@@ -30,3 +30,6 @@ projects/nss
 try copyfrom=mozilla-central
 integration/autoland copyfrom=mozilla-central
 conduit-testing/m-c
+conduit-testing/ff-test-dev copyfrom=mozilla-unified
+conduit-testing/ff-test-stage copyfrom=mozilla-unified
+conduit-testing/infra-testing copyfrom=mozilla-unified
