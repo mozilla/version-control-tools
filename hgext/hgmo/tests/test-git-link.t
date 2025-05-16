@@ -16,6 +16,13 @@
   $ hg add git_blah
   $ hg -q commit -m 'test adding git commit' --extra "git_commit=bee43b04ef40b15ae222c9d935a76388a4d5b0a3"
   $ GIT_COMMIT=$(hg log -r . -T "{node}")
+  $ hg up -q null
+  $ hg branch -q tags-beta
+  $ hg tag -m 'adding tag' -r "$GIT_COMMIT" --extra "git_commit=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" tag
+  $ TAG_COMMIT=$(hg log -r . -T "{node}")
+  $ hg log -r . -T "{join(extras, '\n')}\n"
+  branch=tags-beta
+  git_commit=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
   $ hg -q push
 
@@ -29,7 +36,13 @@ Introduction of commit with `git_commit` extra should show URL.
 
   $ http http://localhost:$HGPORT/rev/$GIT_COMMIT --body-file body > /dev/null
   $ grep '<td>git commit' body
-  <tr><td>git commit</td><td>><a href="https://github.com/mozilla-firefox/firefox/commit/bee43b04ef40b15ae222c9d935a76388a4d5b0a3" target="_blank">bee43b04ef40b15ae222c9d935a76388a4d5b0a3</a></td></tr>
+  <tr><td>git commit</td><td><a href="https://github.com/mozilla-firefox/firefox/commit/bee43b04ef40b15ae222c9d935a76388a4d5b0a3" target="_blank">bee43b04ef40b15ae222c9d935a76388a4d5b0a3</a></td></tr>
+
+No git URL for changesets on tags-* branch
+
+  $ http http://localhost:$HGPORT/rev/$TAG_COMMIT --body-file body >/dev/null
+  $ grep '<td>git commit' body
+  [1]
 
 Confirm no errors in log
 
