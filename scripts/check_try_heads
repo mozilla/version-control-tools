@@ -1,0 +1,39 @@
+#!/bin/sh
+
+set -e
+
+hg="/var/hg/venv_tools/bin/hg"
+repo="/repo/hg/mozilla/try"
+warn=40000
+crit=50000
+
+while getopts w:c:r:h: opt; do
+    case $opt in
+        w)
+            warn="$OPTARG"
+            ;;
+        c)
+            crit="$OPTARG"
+            ;;
+        r)
+            repo="$OPTARG"
+            ;;
+        h)
+            hg="$OPTARG"
+            ;;
+        *)
+            echo "$0: unknown option" >&2
+            exit 1
+            ;;
+    esac
+done
+
+heads=$($hg -R "$repo" log -r 0 -T '{revset("head()")|count}')
+if [ $heads -ge $crit ]; then
+    label=CRITICAL
+elif [ $heads -ge $warn ]; then
+    label=WARNING
+else
+    label=OK
+fi
+echo "$label - $repo has $heads heads"
