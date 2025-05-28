@@ -254,6 +254,16 @@ changesets
    The array may be empty. This can occur if changesets from this push
    are now hidden/obsolete.
 
+git_changesets
+   An array of Git changeset entries.
+
+   For each Mercurial changeset in the ``changesets`` field, a corresponding
+   Git SHA is present in this field. The Git changeset is the Git commit that
+   was used to mirror the upstream Git repo into this Mercurial repo. If the
+   commit was not mirrored from an upstream Git commit, ``null`` is
+   found instead.
+
+
 obsoletechangesets
    (optional) An array of 40 character changeset SHA-1s of now obsolete
    changesets included in the push.
@@ -290,6 +300,13 @@ parents
    An array of 1 or 2 elements containing the 40 byte hex SHA-1 of the
    parent changesets. Merges have 2 entries. Root changesets have the
    value ``0000000000000000000000000000000000000000``.
+
+git_parents
+   An array of 1 or 2 elements containing the 40 byte hex SHA of the
+   parent Git changesets. Merges have 2 entries. Root changesets have
+   the value ``0000000000000000000000000000000000000000``. If the
+   commit was not mirrored from an upstream Git commit, ``null`` is
+   found instead.
 
 author
    The author string from the changeset.
@@ -331,8 +348,12 @@ Here's an example::
        "other-licenses/android/res_init.c"
      ],
      "node": "ee4fe2ec168e719e822dabcdd797c0cff9ce2407",
+     "git_node": "549e49a29919c3787375b7c395310988f1a2f5aa",
      "parents": [
        "803bc910c45a875d9d76dc689c45dd91a1e02e23"
+     ],
+     "git_parents": [
+       "cd755c2995aeaa83469a9f64371bc67ac26517f8"
      ],
      "precursors": [
        "d313a202a85e114000f669c2fcb49ad42376ac04"

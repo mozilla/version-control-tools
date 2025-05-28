@@ -25,6 +25,9 @@ Get all JSON data
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "10": {
@@ -33,6 +36,10 @@ Get all JSON data
               "4d0d5182c524fa92348319583ae7bf28c2b1b296"
           ],
           "date": 1228146600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "11": {
@@ -41,6 +48,10 @@ Get all JSON data
               "2e7c07446def93a7afb63517d9d6f2879b08653c"
           ],
           "date": 1228233000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "12": {
@@ -49,6 +60,10 @@ Get all JSON data
               "8a354cb74bae0bcc04550e5335612bbf922ef364"
           ],
           "date": 1228319400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "13": {
@@ -57,6 +72,10 @@ Get all JSON data
               "93f74182971010ac8a9a5726fb976f1d2e593ea5"
           ],
           "date": 1228405800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "14": {
@@ -65,6 +84,10 @@ Get all JSON data
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "15": {
@@ -73,6 +96,10 @@ Get all JSON data
               "0e59804eb117f10112f6d0a8212002d7eab80de9"
           ],
           "date": 1228578600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "16": {
@@ -81,6 +108,10 @@ Get all JSON data
               "7dc0e50f2e77447cd0f9de9c0fc51eadb2320ba7"
           ],
           "date": 1228751400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "17": {
@@ -89,6 +120,10 @@ Get all JSON data
               "db44477aa15b0ac3ac403c0419140416697c3b92"
           ],
           "date": 1228837800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "18": {
@@ -97,6 +132,10 @@ Get all JSON data
               "e77d8a7d36c5707317dbad494a9947261a34d618"
           ],
           "date": 1228924200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "19": {
@@ -105,6 +144,10 @@ Get all JSON data
               "069b8cf8dcac61e0771c795e8ffe8fcab2608233"
           ],
           "date": 1229010600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "2": {
@@ -113,6 +156,10 @@ Get all JSON data
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "20": {
@@ -121,6 +168,10 @@ Get all JSON data
               "ac4a8b83057888133e9dab79d0d327a70e6a7f2a"
           ],
           "date": 1229097000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "21": {
@@ -129,6 +180,10 @@ Get all JSON data
               "5af266358ee895496337d0c6f9646954c607d189"
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "22": {
@@ -137,6 +192,10 @@ Get all JSON data
               "f4835d42999840c490559b5f933036ee8f2ed6af"
           ],
           "date": 1229183400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "23": {
@@ -145,6 +204,10 @@ Get all JSON data
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "24": {
@@ -153,6 +216,10 @@ Get all JSON data
               "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "25": {
@@ -161,6 +228,10 @@ Get all JSON data
               "e706af4df5a146039c05ecaffade019b325b9abe"
           ],
           "date": 1229442600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "26": {
@@ -169,6 +240,10 @@ Get all JSON data
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "27": {
@@ -177,6 +252,10 @@ Get all JSON data
               "badb82dde54097638883b824baa0009f4258d9f5"
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "28": {
@@ -185,6 +264,10 @@ Get all JSON data
               "bf9bdfe181e896c08c4f7332be751004b96e26f8"
           ],
           "date": 1229701800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "29": {
@@ -193,6 +276,10 @@ Get all JSON data
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -201,6 +288,10 @@ Get all JSON data
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "30": {
@@ -209,6 +300,10 @@ Get all JSON data
               "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "31": {
@@ -217,6 +312,10 @@ Get all JSON data
               "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
           ],
           "date": 1229961000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "32": {
@@ -224,6 +323,9 @@ Get all JSON data
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "4": {
@@ -232,6 +334,10 @@ Get all JSON data
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "5": {
@@ -240,6 +346,10 @@ Get all JSON data
               "0341cfc3072ffd468facf73e47f8624079616bfc"
           ],
           "date": 1227714600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "6": {
@@ -248,6 +358,10 @@ Get all JSON data
               "96ec854d523c3e43bf5e015f68fccfcb632525a6"
           ],
           "date": 1227801000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "7": {
@@ -256,6 +370,10 @@ Get all JSON data
               "716b98766200cea4f925caa2952bd16252358376"
           ],
           "date": 1227887400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "8": {
@@ -264,6 +382,10 @@ Get all JSON data
               "d4b458f1c3351dd7500839e028f5bb1e2b2ff109"
           ],
           "date": 1227973800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "9": {
@@ -272,6 +394,10 @@ Get all JSON data
               "5fda1cecd054f1939b9d091768b335823ee04fc2"
           ],
           "date": 1228060200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -294,6 +420,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "8c687ea0e27cd77b4fa5025327a41906800cfcd5",
                   "parents": [
                       "0000000000000000000000000000000000000000"
@@ -302,6 +432,9 @@ Get all JSON data with details
               }
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "10": {
@@ -312,6 +445,10 @@ Get all JSON data with details
                   "desc": "checkin 18",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "6a9848d7dc42eb0fd7dab35b06b366db93698e24",
                   "parents": [
@@ -326,6 +463,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "4d0d5182c524fa92348319583ae7bf28c2b1b296",
                   "parents": [
                       "6a9848d7dc42eb0fd7dab35b06b366db93698e24"
@@ -334,6 +475,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228146600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "11": {
@@ -344,6 +489,10 @@ Get all JSON data with details
                   "desc": "checkin 20",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "53e89e4e6258eed12b0dc67380015de479ce496e",
                   "parents": [
@@ -358,6 +507,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "2e7c07446def93a7afb63517d9d6f2879b08653c",
                   "parents": [
                       "53e89e4e6258eed12b0dc67380015de479ce496e"
@@ -366,6 +519,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228233000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "12": {
@@ -376,6 +533,10 @@ Get all JSON data with details
                   "desc": "checkin 22",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "1980d3e0c05f3f3785168ea4dbe8da33a9de42ca",
                   "parents": [
@@ -390,6 +551,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "8a354cb74bae0bcc04550e5335612bbf922ef364",
                   "parents": [
                       "1980d3e0c05f3f3785168ea4dbe8da33a9de42ca"
@@ -398,6 +563,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228319400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "13": {
@@ -408,6 +577,10 @@ Get all JSON data with details
                   "desc": "checkin 24",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "53e334794d36467b2083d3b94fb1dc3f061d1cd9",
                   "parents": [
@@ -422,6 +595,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "93f74182971010ac8a9a5726fb976f1d2e593ea5",
                   "parents": [
                       "53e334794d36467b2083d3b94fb1dc3f061d1cd9"
@@ -430,6 +607,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228405800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "14": {
@@ -440,6 +621,10 @@ Get all JSON data with details
                   "desc": "checkin 26",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "3580f0821c4d0bb6d013d2973f8629541704ecd2",
                   "parents": [
@@ -454,6 +639,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "4df5711a25e9daceb4d35fd566d3f22e8e024345",
                   "parents": [
                       "3580f0821c4d0bb6d013d2973f8629541704ecd2"
@@ -462,6 +651,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "15": {
@@ -472,6 +665,10 @@ Get all JSON data with details
                   "desc": "checkin 28",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "26bb8677e78db04f4bca2ea2f79985707fbb0b2a",
                   "parents": [
@@ -486,6 +683,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "0e59804eb117f10112f6d0a8212002d7eab80de9",
                   "parents": [
                       "26bb8677e78db04f4bca2ea2f79985707fbb0b2a"
@@ -494,6 +695,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228578600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "16": {
@@ -504,6 +709,10 @@ Get all JSON data with details
                   "desc": "checkin 30",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "6fa979d08156ccfe22632af72d8408468e1e8ace",
                   "parents": [
@@ -518,6 +727,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "7dc0e50f2e77447cd0f9de9c0fc51eadb2320ba7",
                   "parents": [
                       "6fa979d08156ccfe22632af72d8408468e1e8ace"
@@ -526,6 +739,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228751400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "17": {
@@ -536,6 +753,10 @@ Get all JSON data with details
                   "desc": "checkin 32",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "9c9217ca80ce3cf8c140c1af4e254d817e9945f7",
                   "parents": [
@@ -550,6 +771,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "db44477aa15b0ac3ac403c0419140416697c3b92",
                   "parents": [
                       "9c9217ca80ce3cf8c140c1af4e254d817e9945f7"
@@ -558,6 +783,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228837800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "18": {
@@ -568,6 +797,10 @@ Get all JSON data with details
                   "desc": "checkin 34",
                   "files": [
                       "testfile8"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "23dd64640c05568ff7aee57d3a4e7641795d667a",
                   "parents": [
@@ -582,6 +815,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "e77d8a7d36c5707317dbad494a9947261a34d618",
                   "parents": [
                       "23dd64640c05568ff7aee57d3a4e7641795d667a"
@@ -590,6 +827,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228924200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "19": {
@@ -600,6 +841,10 @@ Get all JSON data with details
                   "desc": "checkin 36",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "868ec41cad32bb84115253e226c88605b8f9f354",
                   "parents": [
@@ -614,6 +859,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "069b8cf8dcac61e0771c795e8ffe8fcab2608233",
                   "parents": [
                       "868ec41cad32bb84115253e226c88605b8f9f354"
@@ -622,6 +871,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229010600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "2": {
@@ -632,6 +885,10 @@ Get all JSON data with details
                   "desc": "checkin 2",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "90a0919e134179630db1a9cfea3476793e68230c",
                   "parents": [
@@ -646,6 +903,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "ea44848ca8aa9fa60c10936fdf8300f8868e9340",
                   "parents": [
                       "90a0919e134179630db1a9cfea3476793e68230c"
@@ -654,6 +915,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "20": {
@@ -664,6 +929,10 @@ Get all JSON data with details
                   "desc": "checkin 38",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "7b26724b897ca32275c3c83f770ef3761ed1be84",
                   "parents": [
@@ -678,6 +947,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "ac4a8b83057888133e9dab79d0d327a70e6a7f2a",
                   "parents": [
                       "7b26724b897ca32275c3c83f770ef3761ed1be84"
@@ -686,6 +959,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229097000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "21": {
@@ -696,6 +973,10 @@ Get all JSON data with details
                   "desc": "checkin 40",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "e752ca2d37f753b617382d8def58c090e2cb8ca6",
                   "parents": [
@@ -710,6 +991,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "5af266358ee895496337d0c6f9646954c607d189",
                   "parents": [
                       "e752ca2d37f753b617382d8def58c090e2cb8ca6"
@@ -718,6 +1003,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "22": {
@@ -728,6 +1017,10 @@ Get all JSON data with details
                   "desc": "checkin 42",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "59b7f60b3a3464abb7fd3ea2bf1798960136a7fe",
                   "parents": [
@@ -742,6 +1035,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "f4835d42999840c490559b5f933036ee8f2ed6af",
                   "parents": [
                       "59b7f60b3a3464abb7fd3ea2bf1798960136a7fe"
@@ -750,6 +1047,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229183400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "23": {
@@ -760,6 +1061,10 @@ Get all JSON data with details
                   "desc": "checkin 44",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "773195adc944c860ad0fbb278921a6e2d27f4405",
                   "parents": [
@@ -774,6 +1079,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "306b6389a9ad743bc619d5e62ea6a75bb842d09e",
                   "parents": [
                       "773195adc944c860ad0fbb278921a6e2d27f4405"
@@ -782,6 +1091,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "24": {
@@ -792,6 +1105,10 @@ Get all JSON data with details
                   "desc": "checkin 46",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "4b533377ba86200b561e423625ce0a7f17d1f9e3",
                   "parents": [
@@ -806,6 +1123,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f",
                   "parents": [
                       "4b533377ba86200b561e423625ce0a7f17d1f9e3"
@@ -814,6 +1135,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "25": {
@@ -824,6 +1149,10 @@ Get all JSON data with details
                   "desc": "checkin 48",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "57eaea907fcce462398e1fed38eb9b75fd2f4724",
                   "parents": [
@@ -838,6 +1167,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "e706af4df5a146039c05ecaffade019b325b9abe",
                   "parents": [
                       "57eaea907fcce462398e1fed38eb9b75fd2f4724"
@@ -846,6 +1179,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229442600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "26": {
@@ -856,6 +1193,10 @@ Get all JSON data with details
                   "desc": "checkin 50",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "2274c682144a166997ed94a3a092a7df04ecebbb",
                   "parents": [
@@ -870,6 +1211,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "f2b859fb39c4378a084edf14efd76ea5bd5dc70f",
                   "parents": [
                       "2274c682144a166997ed94a3a092a7df04ecebbb"
@@ -878,6 +1223,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "27": {
@@ -888,6 +1237,10 @@ Get all JSON data with details
                   "desc": "checkin 52",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "2be12c9ad0c8a4dd783a639cb7512d64a96e7b93",
                   "parents": [
@@ -902,6 +1255,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "badb82dde54097638883b824baa0009f4258d9f5",
                   "parents": [
                       "2be12c9ad0c8a4dd783a639cb7512d64a96e7b93"
@@ -910,6 +1267,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "28": {
@@ -920,6 +1281,10 @@ Get all JSON data with details
                   "desc": "checkin 54",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "e494a4d71f1905d661f88dd8865283dcb6b42be3",
                   "parents": [
@@ -934,6 +1299,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "bf9bdfe181e896c08c4f7332be751004b96e26f8",
                   "parents": [
                       "e494a4d71f1905d661f88dd8865283dcb6b42be3"
@@ -942,6 +1311,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229701800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "29": {
@@ -952,6 +1325,10 @@ Get all JSON data with details
                   "desc": "checkin 56",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "2012c9f3b92d8153fd36f7388802a5e59527bf57",
                   "parents": [
@@ -966,6 +1343,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "9fef10362adc35e72dfb3f38d6e540ef2bde785e",
                   "parents": [
                       "2012c9f3b92d8153fd36f7388802a5e59527bf57"
@@ -974,6 +1355,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -984,6 +1369,10 @@ Get all JSON data with details
                   "desc": "checkin 4",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "564169828a86df44c499a737a3e40489598a9387",
                   "parents": [
@@ -998,6 +1387,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "0137424351053e5108ce5b8cf14d69a5bd44b568",
                   "parents": [
                       "564169828a86df44c499a737a3e40489598a9387"
@@ -1006,6 +1399,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "30": {
@@ -1016,6 +1413,10 @@ Get all JSON data with details
                   "desc": "checkin 58",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "354174f3ddf9b07f9dd0670b698c97b59dfa78ea",
                   "parents": [
@@ -1030,6 +1431,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc",
                   "parents": [
                       "354174f3ddf9b07f9dd0670b698c97b59dfa78ea"
@@ -1038,6 +1443,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "31": {
@@ -1048,6 +1457,10 @@ Get all JSON data with details
                   "desc": "checkin 60",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "7127e784b4ba3a5cf792b433b19d527e2bd0b44a",
                   "parents": [
@@ -1062,6 +1475,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550",
                   "parents": [
                       "7127e784b4ba3a5cf792b433b19d527e2bd0b44a"
@@ -1070,6 +1487,10 @@ Get all JSON data with details
               }
           ],
           "date": 1229961000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "32": {
@@ -1081,6 +1502,10 @@ Get all JSON data with details
                   "files": [
                       "testfile&hello"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "7d352806437fb407ffaa87bcb7d2d79488801c10",
                   "parents": [
                       "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
@@ -1091,6 +1516,9 @@ Get all JSON data with details
               }
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "4": {
@@ -1101,6 +1529,10 @@ Get all JSON data with details
                   "desc": "checkin 6",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "52d3fce08d691a87d01c8f4397a8b34d98427271",
                   "parents": [
@@ -1115,6 +1547,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "12799c959e3ad5465a98d333408ae8a5296d90a6",
                   "parents": [
                       "52d3fce08d691a87d01c8f4397a8b34d98427271"
@@ -1123,6 +1559,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "5": {
@@ -1133,6 +1573,10 @@ Get all JSON data with details
                   "desc": "checkin 8",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "f1af4004fca66aaf0938f50daffa9d24bbbe3f07",
                   "parents": [
@@ -1147,6 +1591,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "0341cfc3072ffd468facf73e47f8624079616bfc",
                   "parents": [
                       "f1af4004fca66aaf0938f50daffa9d24bbbe3f07"
@@ -1155,6 +1603,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227714600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "6": {
@@ -1165,6 +1617,10 @@ Get all JSON data with details
                   "desc": "checkin 10",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "07386661f41722a95cdf640ee610ae759bb36168",
                   "parents": [
@@ -1179,6 +1635,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "96ec854d523c3e43bf5e015f68fccfcb632525a6",
                   "parents": [
                       "07386661f41722a95cdf640ee610ae759bb36168"
@@ -1187,6 +1647,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227801000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "7": {
@@ -1197,6 +1661,10 @@ Get all JSON data with details
                   "desc": "checkin 12",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "745197626166e61f2a5cc9834ecc1b55cd987f5f",
                   "parents": [
@@ -1211,6 +1679,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "716b98766200cea4f925caa2952bd16252358376",
                   "parents": [
                       "745197626166e61f2a5cc9834ecc1b55cd987f5f"
@@ -1219,6 +1691,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227887400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "8": {
@@ -1229,6 +1705,10 @@ Get all JSON data with details
                   "desc": "checkin 14",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "7f9d2db01c2345f7d19964c01f997ab0e49de9d3",
                   "parents": [
@@ -1243,6 +1723,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "d4b458f1c3351dd7500839e028f5bb1e2b2ff109",
                   "parents": [
                       "7f9d2db01c2345f7d19964c01f997ab0e49de9d3"
@@ -1251,6 +1735,10 @@ Get all JSON data with details
               }
           ],
           "date": 1227973800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "9": {
@@ -1261,6 +1749,10 @@ Get all JSON data with details
                   "desc": "checkin 16",
                   "files": [
                       "testfile"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "16d0fba6c77efcb0499a87fe91fd179b84888c5e",
                   "parents": [
@@ -1275,6 +1767,10 @@ Get all JSON data with details
                   "files": [
                       "testfile"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "5fda1cecd054f1939b9d091768b335823ee04fc2",
                   "parents": [
                       "16d0fba6c77efcb0499a87fe91fd179b84888c5e"
@@ -1283,6 +1779,10 @@ Get all JSON data with details
               }
           ],
           "date": 1228060200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -1302,6 +1802,10 @@ Query with fromchange and an endID
               "93f74182971010ac8a9a5726fb976f1d2e593ea5"
           ],
           "date": 1228405800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "14": {
@@ -1310,6 +1814,10 @@ Query with fromchange and an endID
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "15": {
@@ -1318,6 +1826,10 @@ Query with fromchange and an endID
               "0e59804eb117f10112f6d0a8212002d7eab80de9"
           ],
           "date": 1228578600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -1337,6 +1849,10 @@ Query with a startID and tochange
               "4d0d5182c524fa92348319583ae7bf28c2b1b296"
           ],
           "date": 1228146600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1357,6 +1873,10 @@ Query for two changesets at once
               "7dc0e50f2e77447cd0f9de9c0fc51eadb2320ba7"
           ],
           "date": 1228751400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "19": {
@@ -1365,6 +1885,10 @@ Query for two changesets at once
               "069b8cf8dcac61e0771c795e8ffe8fcab2608233"
           ],
           "date": 1229010600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1396,6 +1920,10 @@ Test paging
                   "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
               ],
               "date": 1229269800,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "24": {
@@ -1404,6 +1932,10 @@ Test paging
                   "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
               ],
               "date": 1229356200,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "25": {
@@ -1412,6 +1944,10 @@ Test paging
                   "e706af4df5a146039c05ecaffade019b325b9abe"
               ],
               "date": 1229442600,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "26": {
@@ -1420,6 +1956,10 @@ Test paging
                   "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
               ],
               "date": 1229529000,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "27": {
@@ -1428,6 +1968,10 @@ Test paging
                   "badb82dde54097638883b824baa0009f4258d9f5"
               ],
               "date": 1229615400,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "28": {
@@ -1436,6 +1980,10 @@ Test paging
                   "bf9bdfe181e896c08c4f7332be751004b96e26f8"
               ],
               "date": 1229701800,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "29": {
@@ -1444,6 +1992,10 @@ Test paging
                   "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
               ],
               "date": 1229788200,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "30": {
@@ -1452,6 +2004,10 @@ Test paging
                   "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
               ],
               "date": 1229874600,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "31": {
@@ -1460,6 +2016,10 @@ Test paging
                   "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
               ],
               "date": 1229961000,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "32": {
@@ -1467,6 +2027,9 @@ Test paging
                   "7d352806437fb407ffaa87bcb7d2d79488801c10"
               ],
               "date": 1229970000,
+              "git_changesets": [
+                  null
+              ],
               "user": "luser"
           }
       }
@@ -1486,6 +2049,10 @@ Test paging
                   "93f74182971010ac8a9a5726fb976f1d2e593ea5"
               ],
               "date": 1228405800,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "14": {
@@ -1494,6 +2061,10 @@ Test paging
                   "4df5711a25e9daceb4d35fd566d3f22e8e024345"
               ],
               "date": 1228492200,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "15": {
@@ -1502,6 +2073,10 @@ Test paging
                   "0e59804eb117f10112f6d0a8212002d7eab80de9"
               ],
               "date": 1228578600,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "16": {
@@ -1510,6 +2085,10 @@ Test paging
                   "7dc0e50f2e77447cd0f9de9c0fc51eadb2320ba7"
               ],
               "date": 1228751400,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "17": {
@@ -1518,6 +2097,10 @@ Test paging
                   "db44477aa15b0ac3ac403c0419140416697c3b92"
               ],
               "date": 1228837800,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "18": {
@@ -1526,6 +2109,10 @@ Test paging
                   "e77d8a7d36c5707317dbad494a9947261a34d618"
               ],
               "date": 1228924200,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "19": {
@@ -1534,6 +2121,10 @@ Test paging
                   "069b8cf8dcac61e0771c795e8ffe8fcab2608233"
               ],
               "date": 1229010600,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           },
           "20": {
@@ -1542,6 +2133,10 @@ Test paging
                   "ac4a8b83057888133e9dab79d0d327a70e6a7f2a"
               ],
               "date": 1229097000,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "luser"
           },
           "21": {
@@ -1550,6 +2145,10 @@ Test paging
                   "5af266358ee895496337d0c6f9646954c607d189"
               ],
               "date": 1229140200,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "someone"
           },
           "22": {
@@ -1558,6 +2157,10 @@ Test paging
                   "f4835d42999840c490559b5f933036ee8f2ed6af"
               ],
               "date": 1229183400,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           }
       }
@@ -1577,6 +2180,10 @@ Format version 1 works
               "069b8cf8dcac61e0771c795e8ffe8fcab2608233"
           ],
           "date": 1229010600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1608,6 +2215,10 @@ Format version 2 has pushes in a child object and a last push id
                   "069b8cf8dcac61e0771c795e8ffe8fcab2608233"
               ],
               "date": 1229010600,
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "johndoe"
           }
       }
@@ -1628,6 +2239,10 @@ Query with a startID and an enddate
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1636,6 +2251,10 @@ Query with a startID and an enddate
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "4": {
@@ -1644,6 +2263,10 @@ Query with a startID and an enddate
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1661,6 +2284,9 @@ Query with a startdate and an endID
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -1669,6 +2295,10 @@ Query with a startdate and an endID
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1677,6 +2307,10 @@ Query with a startdate and an endID
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -1696,6 +2330,10 @@ Query with fromchange and an enddate
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1704,6 +2342,10 @@ Query with fromchange and an enddate
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "4": {
@@ -1712,6 +2354,10 @@ Query with fromchange and an enddate
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1730,6 +2376,9 @@ Query with a startdate and tochange
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -1738,6 +2387,10 @@ Query with a startdate and tochange
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }
@@ -1758,6 +2411,9 @@ Test that we can parse partial dates, missing seconds
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -1766,6 +2422,10 @@ Test that we can parse partial dates, missing seconds
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1774,6 +2434,10 @@ Test that we can parse partial dates, missing seconds
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "4": {
@@ -1782,6 +2446,10 @@ Test that we can parse partial dates, missing seconds
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1802,6 +2470,9 @@ Test that we can parse partial dates, missing seconds and minutes
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -1810,6 +2481,10 @@ Test that we can parse partial dates, missing seconds and minutes
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1818,6 +2493,10 @@ Test that we can parse partial dates, missing seconds and minutes
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "4": {
@@ -1826,6 +2505,10 @@ Test that we can parse partial dates, missing seconds and minutes
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }
@@ -1847,6 +2530,9 @@ Test that we can parse partial dates, missing seconds, minutes and hours
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -1855,6 +2541,10 @@ Test that we can parse partial dates, missing seconds, minutes and hours
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -1863,6 +2553,10 @@ Test that we can parse partial dates, missing seconds, minutes and hours
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "4": {
@@ -1871,6 +2565,10 @@ Test that we can parse partial dates, missing seconds, minutes and hours
               "12799c959e3ad5465a98d333408ae8a5296d90a6"
           ],
           "date": 1227541800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       }
   }

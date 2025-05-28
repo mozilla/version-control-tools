@@ -197,6 +197,7 @@ And the pushlog doesn't expose it
                   "77538e1ce4bec5f7aac58a7ceca2da0e38e90a72"
               ],
               "date": \d+, (re)
+              "git_changesets": [null],
               "user": "user@example.com"
           },
           "2": {
@@ -210,6 +211,15 @@ And the pushlog doesn't expose it
                   "4b11352745a6b3eb429ca8cd486dfdc221a4bc62"
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           }
       }
@@ -295,6 +305,7 @@ Re-enabling consumer will result in heads replication and changeset being visibl
                   "77538e1ce4bec5f7aac58a7ceca2da0e38e90a72"
               ],
               "date": \d+, (re)
+              "git_changesets": [null],
               "user": "user@example.com"
           },
           "2": {
@@ -308,6 +319,15 @@ Re-enabling consumer will result in heads replication and changeset being visibl
                   "4b11352745a6b3eb429ca8cd486dfdc221a4bc62"
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           },
           "3": {
@@ -315,6 +335,7 @@ Re-enabling consumer will result in heads replication and changeset being visibl
                   "36638cc83b4d9084a2a38f41f345da73390ad05b"
               ],
               "date": \d+, (re)
+              "git_changesets": [null],
               "user": "user@example.com"
           }
       }

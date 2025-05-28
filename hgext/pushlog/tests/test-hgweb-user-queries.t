@@ -13,6 +13,9 @@ Query for an individual user's pushes
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "11": {
@@ -21,6 +24,10 @@ Query for an individual user's pushes
               "2e7c07446def93a7afb63517d9d6f2879b08653c"
           ],
           "date": 1228233000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "14": {
@@ -29,6 +36,10 @@ Query for an individual user's pushes
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "17": {
@@ -37,6 +48,10 @@ Query for an individual user's pushes
               "db44477aa15b0ac3ac403c0419140416697c3b92"
           ],
           "date": 1228837800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -45,6 +60,10 @@ Query for an individual user's pushes
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "20": {
@@ -53,6 +72,10 @@ Query for an individual user's pushes
               "ac4a8b83057888133e9dab79d0d327a70e6a7f2a"
           ],
           "date": 1229097000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "23": {
@@ -61,6 +84,10 @@ Query for an individual user's pushes
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "26": {
@@ -69,6 +96,10 @@ Query for an individual user's pushes
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "29": {
@@ -77,6 +108,10 @@ Query for an individual user's pushes
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "32": {
@@ -84,6 +119,9 @@ Query for an individual user's pushes
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "5": {
@@ -92,6 +130,10 @@ Query for an individual user's pushes
               "0341cfc3072ffd468facf73e47f8624079616bfc"
           ],
           "date": 1227714600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "8": {
@@ -100,6 +142,10 @@ Query for an individual user's pushes
               "d4b458f1c3351dd7500839e028f5bb1e2b2ff109"
           ],
           "date": 1227973800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }
@@ -117,6 +163,10 @@ Query for an individual user's pushes
               "8a354cb74bae0bcc04550e5335612bbf922ef364"
           ],
           "date": 1228319400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "15": {
@@ -125,6 +175,10 @@ Query for an individual user's pushes
               "0e59804eb117f10112f6d0a8212002d7eab80de9"
           ],
           "date": 1228578600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "18": {
@@ -133,6 +187,10 @@ Query for an individual user's pushes
               "e77d8a7d36c5707317dbad494a9947261a34d618"
           ],
           "date": 1228924200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "21": {
@@ -141,6 +199,10 @@ Query for an individual user's pushes
               "5af266358ee895496337d0c6f9646954c607d189"
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "24": {
@@ -149,6 +211,10 @@ Query for an individual user's pushes
               "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "27": {
@@ -157,6 +223,10 @@ Query for an individual user's pushes
               "badb82dde54097638883b824baa0009f4258d9f5"
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "3": {
@@ -165,6 +235,10 @@ Query for an individual user's pushes
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "30": {
@@ -173,6 +247,10 @@ Query for an individual user's pushes
               "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "6": {
@@ -181,6 +259,10 @@ Query for an individual user's pushes
               "96ec854d523c3e43bf5e015f68fccfcb632525a6"
           ],
           "date": 1227801000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "9": {
@@ -189,6 +271,10 @@ Query for an individual user's pushes
               "5fda1cecd054f1939b9d091768b335823ee04fc2"
           ],
           "date": 1228060200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -206,6 +292,9 @@ Query for two users' pushes
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "11": {
@@ -214,6 +303,10 @@ Query for two users' pushes
               "2e7c07446def93a7afb63517d9d6f2879b08653c"
           ],
           "date": 1228233000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "12": {
@@ -222,6 +315,10 @@ Query for two users' pushes
               "8a354cb74bae0bcc04550e5335612bbf922ef364"
           ],
           "date": 1228319400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "14": {
@@ -230,6 +327,10 @@ Query for two users' pushes
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "15": {
@@ -238,6 +339,10 @@ Query for two users' pushes
               "0e59804eb117f10112f6d0a8212002d7eab80de9"
           ],
           "date": 1228578600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "17": {
@@ -246,6 +351,10 @@ Query for two users' pushes
               "db44477aa15b0ac3ac403c0419140416697c3b92"
           ],
           "date": 1228837800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "18": {
@@ -254,6 +363,10 @@ Query for two users' pushes
               "e77d8a7d36c5707317dbad494a9947261a34d618"
           ],
           "date": 1228924200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "2": {
@@ -262,6 +375,10 @@ Query for two users' pushes
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "20": {
@@ -270,6 +387,10 @@ Query for two users' pushes
               "ac4a8b83057888133e9dab79d0d327a70e6a7f2a"
           ],
           "date": 1229097000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "21": {
@@ -278,6 +399,10 @@ Query for two users' pushes
               "5af266358ee895496337d0c6f9646954c607d189"
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "23": {
@@ -286,6 +411,10 @@ Query for two users' pushes
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "24": {
@@ -294,6 +423,10 @@ Query for two users' pushes
               "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "26": {
@@ -302,6 +435,10 @@ Query for two users' pushes
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "27": {
@@ -310,6 +447,10 @@ Query for two users' pushes
               "badb82dde54097638883b824baa0009f4258d9f5"
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "29": {
@@ -318,6 +459,10 @@ Query for two users' pushes
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "3": {
@@ -326,6 +471,10 @@ Query for two users' pushes
               "0137424351053e5108ce5b8cf14d69a5bd44b568"
           ],
           "date": 1227455400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "30": {
@@ -334,6 +483,10 @@ Query for two users' pushes
               "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "32": {
@@ -341,6 +494,9 @@ Query for two users' pushes
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "5": {
@@ -349,6 +505,10 @@ Query for two users' pushes
               "0341cfc3072ffd468facf73e47f8624079616bfc"
           ],
           "date": 1227714600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "6": {
@@ -357,6 +517,10 @@ Query for two users' pushes
               "96ec854d523c3e43bf5e015f68fccfcb632525a6"
           ],
           "date": 1227801000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "8": {
@@ -365,6 +529,10 @@ Query for two users' pushes
               "d4b458f1c3351dd7500839e028f5bb1e2b2ff109"
           ],
           "date": 1227973800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "9": {
@@ -373,6 +541,10 @@ Query for two users' pushes
               "5fda1cecd054f1939b9d091768b335823ee04fc2"
           ],
           "date": 1228060200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       }
   }
@@ -391,6 +563,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "5af266358ee895496337d0c6f9646954c607d189"
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "22": {
@@ -399,6 +575,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f4835d42999840c490559b5f933036ee8f2ed6af"
           ],
           "date": 1229183400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "23": {
@@ -407,6 +587,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "24": {
@@ -415,6 +599,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "25": {
@@ -423,6 +611,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "e706af4df5a146039c05ecaffade019b325b9abe"
           ],
           "date": 1229442600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "26": {
@@ -431,6 +623,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "27": {
@@ -439,6 +635,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "badb82dde54097638883b824baa0009f4258d9f5"
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "28": {
@@ -447,6 +647,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "bf9bdfe181e896c08c4f7332be751004b96e26f8"
           ],
           "date": 1229701800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "29": {
@@ -455,6 +659,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "30": {
@@ -463,6 +671,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "31": {
@@ -471,6 +683,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
           ],
           "date": 1229961000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "32": {
@@ -478,6 +694,9 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       }
   }
@@ -495,6 +714,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "5af266358ee895496337d0c6f9646954c607d189"
           ],
           "date": 1229140200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "22": {
@@ -503,6 +726,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f4835d42999840c490559b5f933036ee8f2ed6af"
           ],
           "date": 1229183400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "23": {
@@ -511,6 +738,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "24": {
@@ -519,6 +750,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "e7a863a267bf3f59cdf5f38fc4d02b360bf4f25f"
           ],
           "date": 1229356200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "25": {
@@ -527,6 +762,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "e706af4df5a146039c05ecaffade019b325b9abe"
           ],
           "date": 1229442600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "26": {
@@ -535,6 +774,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "27": {
@@ -543,6 +786,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "badb82dde54097638883b824baa0009f4258d9f5"
           ],
           "date": 1229615400,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "28": {
@@ -551,6 +798,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "bf9bdfe181e896c08c4f7332be751004b96e26f8"
           ],
           "date": 1229701800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "29": {
@@ -559,6 +810,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "30": {
@@ -567,6 +822,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "f3fbe77f4d47e4cc9c1f0ccb32257adaa84f96cc"
           ],
           "date": 1229874600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "someone"
       },
       "31": {
@@ -575,6 +834,10 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "054cf6e47bbe2fb7a3e4061ded6763bed4fd4550"
           ],
           "date": 1229961000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "johndoe"
       },
       "32": {
@@ -582,6 +845,9 @@ Querying for all users' pushes + a startID should be equivalent to just querying
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       }
   }
@@ -600,6 +866,10 @@ Query for a user and a startdate
               "2e7c07446def93a7afb63517d9d6f2879b08653c"
           ],
           "date": 1228233000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "14": {
@@ -608,6 +878,10 @@ Query for a user and a startdate
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "17": {
@@ -616,6 +890,10 @@ Query for a user and a startdate
               "db44477aa15b0ac3ac403c0419140416697c3b92"
           ],
           "date": 1228837800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "20": {
@@ -624,6 +902,10 @@ Query for a user and a startdate
               "ac4a8b83057888133e9dab79d0d327a70e6a7f2a"
           ],
           "date": 1229097000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "23": {
@@ -632,6 +914,10 @@ Query for a user and a startdate
               "306b6389a9ad743bc619d5e62ea6a75bb842d09e"
           ],
           "date": 1229269800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "26": {
@@ -640,6 +926,10 @@ Query for a user and a startdate
               "f2b859fb39c4378a084edf14efd76ea5bd5dc70f"
           ],
           "date": 1229529000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "29": {
@@ -648,6 +938,10 @@ Query for a user and a startdate
               "9fef10362adc35e72dfb3f38d6e540ef2bde785e"
           ],
           "date": 1229788200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "32": {
@@ -655,6 +949,9 @@ Query for a user and a startdate
               "7d352806437fb407ffaa87bcb7d2d79488801c10"
           ],
           "date": 1229970000,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "5": {
@@ -663,6 +960,10 @@ Query for a user and a startdate
               "0341cfc3072ffd468facf73e47f8624079616bfc"
           ],
           "date": 1227714600,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       },
       "8": {
@@ -671,6 +972,10 @@ Query for a user and a startdate
               "d4b458f1c3351dd7500839e028f5bb1e2b2ff109"
           ],
           "date": 1227973800,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }
@@ -688,6 +993,9 @@ Query for a user with a startdate and an enddate
               "8c687ea0e27cd77b4fa5025327a41906800cfcd5"
           ],
           "date": 1227282600,
+          "git_changesets": [
+              null
+          ],
           "user": "luser"
       },
       "2": {
@@ -696,6 +1004,10 @@ Query for a user with a startdate and an enddate
               "ea44848ca8aa9fa60c10936fdf8300f8868e9340"
           ],
           "date": 1227369000,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }
@@ -717,6 +1029,10 @@ as only one changeset was pushed by this user
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }
@@ -734,6 +1050,10 @@ as only one changeset was pushed by this user
               "4df5711a25e9daceb4d35fd566d3f22e8e024345"
           ],
           "date": 1228492200,
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "luser"
       }
   }

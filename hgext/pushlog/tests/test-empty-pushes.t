@@ -43,6 +43,9 @@ JSON output should render empty changeset array
               "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "*" (glob)
       },
       "3": {
@@ -50,6 +53,9 @@ JSON output should render empty changeset array
               "059b473c43d7e25d6b6f5070dfb1c468b0e9518c"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "*" (glob)
       }
   }
@@ -71,6 +77,10 @@ Full output should do the same
                   "files": [
                       "foo"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
                   "parents": [
                       "0000000000000000000000000000000000000000"
@@ -79,6 +89,9 @@ Full output should do the same
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "*" (glob)
       },
       "3": {
@@ -90,6 +103,10 @@ Full output should do the same
                   "files": [
                       "foo"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "059b473c43d7e25d6b6f5070dfb1c468b0e9518c",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -100,6 +117,9 @@ Full output should do the same
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "*" (glob)
       }
   }

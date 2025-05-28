@@ -77,6 +77,9 @@ Hidden changesets exposed as list under obsoletechangesets in version 1
               "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "user@example.com"
       },
       "2": {
@@ -94,6 +97,10 @@ Hidden changesets exposed as list under obsoletechangesets in version 1
               "62eebb2f0f00195f9d965f718090c678c4fa414d"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       },
       "4": {
@@ -102,6 +109,10 @@ Hidden changesets exposed as list under obsoletechangesets in version 1
               "d129109168f0ed985e51b0f86df256acdcfcfe45"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       }
   }
@@ -120,6 +131,10 @@ obsolete changeset metadata exposed under full with version 1
                   "files": [
                       "foo"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
                   "parents": [
                       "0000000000000000000000000000000000000000"
@@ -128,6 +143,9 @@ obsolete changeset metadata exposed under full with version 1
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null
+          ],
           "user": "user@example.com"
       },
       "2": {
@@ -141,6 +159,10 @@ obsolete changeset metadata exposed under full with version 1
                   "files": [
                       "file0"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -153,6 +175,10 @@ obsolete changeset metadata exposed under full with version 1
                   "desc": "file1",
                   "files": [
                       "file1"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
                   "parents": [
@@ -172,6 +198,10 @@ obsolete changeset metadata exposed under full with version 1
                   "files": [
                       "file2"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -185,6 +215,10 @@ obsolete changeset metadata exposed under full with version 1
                   "files": [
                       "file3"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
                   "parents": [
                       "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
@@ -193,6 +227,10 @@ obsolete changeset metadata exposed under full with version 1
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       },
       "4": {
@@ -203,6 +241,10 @@ obsolete changeset metadata exposed under full with version 1
                   "desc": "file0",
                   "files": [
                       "file0"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
                   "parents": [
@@ -220,6 +262,10 @@ obsolete changeset metadata exposed under full with version 1
                   "files": [
                       "file1"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
                   "parents": [
                       "418a63f508062fb2eb9130065c5ddc7908dd5949"
@@ -233,6 +279,10 @@ obsolete changeset metadata exposed under full with version 1
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       }
   }
@@ -249,6 +299,9 @@ Hidden changesets exposed as list with version 2
                   "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null
+              ],
               "user": "user@example.com"
           },
           "2": {
@@ -266,6 +319,10 @@ Hidden changesets exposed as list with version 2
                   "62eebb2f0f00195f9d965f718090c678c4fa414d"
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           },
           "4": {
@@ -274,6 +331,10 @@ Hidden changesets exposed as list with version 2
                   "d129109168f0ed985e51b0f86df256acdcfcfe45"
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           }
       }
@@ -295,6 +356,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "files": [
                           "foo"
                       ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
+                      ],
                       "node": "96ee1d7354c4ad7372047672c36a1f561e3a6a4c",
                       "parents": [
                           "0000000000000000000000000000000000000000"
@@ -303,6 +368,9 @@ Hidden changeset metadata exposed under version 2 with full
                   }
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null
+              ],
               "user": "user@example.com"
           },
           "2": {
@@ -316,6 +384,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "files": [
                           "file0"
                       ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
+                      ],
                       "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
                       "parents": [
                           "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -328,6 +400,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "desc": "file1",
                       "files": [
                           "file1"
+                      ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
                       ],
                       "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
                       "parents": [
@@ -347,6 +423,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "files": [
                           "file2"
                       ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
+                      ],
                       "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
                       "parents": [
                           "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -360,6 +440,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "files": [
                           "file3"
                       ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
+                      ],
                       "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
                       "parents": [
                           "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
@@ -368,6 +452,10 @@ Hidden changeset metadata exposed under version 2 with full
                   }
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           },
           "4": {
@@ -378,6 +466,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "desc": "file0",
                       "files": [
                           "file0"
+                      ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
                       ],
                       "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
                       "parents": [
@@ -395,6 +487,10 @@ Hidden changeset metadata exposed under version 2 with full
                       "files": [
                           "file1"
                       ],
+                      "git_node": null,
+                      "git_parents": [
+                          null
+                      ],
                       "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
                       "parents": [
                           "418a63f508062fb2eb9130065c5ddc7908dd5949"
@@ -408,6 +504,10 @@ Hidden changeset metadata exposed under version 2 with full
                   }
               ],
               "date": \d+, (re)
+              "git_changesets": [
+                  null,
+                  null
+              ],
               "user": "user@example.com"
           }
       }
@@ -510,6 +610,10 @@ Specifying a fromchange with a hidden changeset works
               "62eebb2f0f00195f9d965f718090c678c4fa414d"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       },
       "4": {
@@ -518,6 +622,10 @@ Specifying a fromchange with a hidden changeset works
               "d129109168f0ed985e51b0f86df256acdcfcfe45"
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       }
   }
@@ -534,6 +642,10 @@ Specifying a fromchange with a hidden changeset works
                   "files": [
                       "file2"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "b3641753ee63b166fad7c5f10060b0cbbc8a86b0",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -547,6 +659,10 @@ Specifying a fromchange with a hidden changeset works
                   "files": [
                       "file3"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "62eebb2f0f00195f9d965f718090c678c4fa414d",
                   "parents": [
                       "b3641753ee63b166fad7c5f10060b0cbbc8a86b0"
@@ -555,6 +671,10 @@ Specifying a fromchange with a hidden changeset works
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       },
       "4": {
@@ -565,6 +685,10 @@ Specifying a fromchange with a hidden changeset works
                   "desc": "file0",
                   "files": [
                       "file0"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "418a63f508062fb2eb9130065c5ddc7908dd5949",
                   "parents": [
@@ -582,6 +706,10 @@ Specifying a fromchange with a hidden changeset works
                   "files": [
                       "file1"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "d129109168f0ed985e51b0f86df256acdcfcfe45",
                   "parents": [
                       "418a63f508062fb2eb9130065c5ddc7908dd5949"
@@ -595,6 +723,10 @@ Specifying a fromchange with a hidden changeset works
               }
           ],
           "date": \d+, (re)
+          "git_changesets": [
+              null,
+              null
+          ],
           "user": "user@example.com"
       }
   }
@@ -629,6 +761,10 @@ Specifying a tochange with a hidden changeset works
                   "files": [
                       "file0"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -641,6 +777,10 @@ Specifying a tochange with a hidden changeset works
                   "desc": "file1",
                   "files": [
                       "file1"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
                   "parents": [
@@ -683,6 +823,10 @@ Specifying a hidden changeset works
                   "files": [
                       "file0"
                   ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
+                  ],
                   "node": "ae13d9da6966307c98b60987fb4fedc2e2f29736",
                   "parents": [
                       "96ee1d7354c4ad7372047672c36a1f561e3a6a4c"
@@ -695,6 +839,10 @@ Specifying a hidden changeset works
                   "desc": "file1",
                   "files": [
                       "file1"
+                  ],
+                  "git_node": null,
+                  "git_parents": [
+                      null
                   ],
                   "node": "d313a202a85e114000f669c2fcb49ad42376ac04",
                   "parents": [

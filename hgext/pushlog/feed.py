@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from math import ceil
+from typing import Optional
 import collections
 import os
 import re
@@ -576,6 +577,12 @@ def pushes_worker(query, repo, full):
         try:
             ctx = repo[node]
             nodekey = b"changesets"
+
+            # Add to `git_changesets` here since commits with a Git mapping
+            # will never be obsolete.
+            pushes[pushid].setdefault(b"git_changesets", []).insert(
+                0, git_sha_for_commit(ctx)
+            )
         # Changeset is hidden
         except error.FilteredRepoLookupError:
             # Try to find the hidden changeset so its metadata can be used.
@@ -589,10 +596,14 @@ def pushes_worker(query, repo, full):
         if full:
             node = {
                 b"node": ctx.hex(),
+                b"git_node": git_sha_for_commit(ctx),
                 b"author": ctx.user(),
                 b"desc": ctx.description(),
                 b"branch": ctx.branch(),
                 b"parents": [c.hex() for c in ctx.parents()],
+                b"git_parents": [
+                    git_sha_for_commit(parent) for parent in ctx.parents()
+                ],
                 b"tags": ctx.tags(),
                 b"files": ctx.files(),
             }
@@ -608,6 +619,11 @@ def pushes_worker(query, repo, full):
         pushes[pushid].setdefault(nodekey, []).insert(0, node)
 
     return {b"pushes": pushes, b"lastpushid": query.lastpushid}
+
+
+def git_sha_for_commit(ctx) -> Optional[bytes]:
+    """Return the `git_commit` extra for the given commit."""
+    return ctx.extra().get(b"git_commit")
 
 
 def pushes(web):

@@ -48,7 +48,7 @@ Pushlog should be replicated
   $ http --no-headers ${HGWEB_0_URL}mozilla-central/json-pushes
   200
   
-  {"1": {"changesets": ["77538e1ce4bec5f7aac58a7ceca2da0e38e90a72"], "date": *, "user": "autolandrequester@example.com"}} (glob)
+  {"1": {"changesets": ["77538e1ce4bec5f7aac58a7ceca2da0e38e90a72"], "date": *, "git_changesets": [null], "user": "autolandrequester@example.com"}} (glob)
 
 Cleanup
 
