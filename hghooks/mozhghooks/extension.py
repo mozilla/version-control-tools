@@ -53,6 +53,7 @@ def get_check_classes(hook):
         prevent_sync_ipc_changes,
         prevent_webidl_changes,
         prevent_wptsync_changes,
+        single_branch_per_push,
         single_root,
         try_task_config_file,
     )
@@ -70,6 +71,7 @@ def get_check_classes(hook):
             prevent_webidl_changes.WebIDLCheck,
             prevent_wptsync_changes.WPTSyncCheck,
             single_root.SingleRootCheck,
+            single_branch_per_push.SingleBranchCheck,
             try_task_config_file.TryConfigCheck,
         )
 
