@@ -19,6 +19,7 @@ from mozautomation.commitparser import (
     parse_bugs,
     parse_commit_id,
     parse_requal_reviewers,
+    parse_reverts,
     parse_reviewers,
     parse_rquestion_reviewers,
     replace_reviewers,
@@ -998,6 +999,82 @@ Desc: Bug 960081 - Make use of shared mock Notification in Dialer call log tests
                 b"Backed out changeset ab9fdee3a6a4 (bug 1360992)"
             ),
             ([b"ab9fdee3a6a4"], [1360992]),
+        )
+
+    def test_revert_partial(self):
+        # bug without commit
+        self.assertIsNone(parse_reverts(b"Bug 1 - More stuff; r=romulus"))
+
+        # commit without bug
+        self.assertEqual(
+            parse_reverts(
+                b'Revert "Using TransformStyle::Preserve3D (from kvark:preserve3d); r=glennw,emilio"\nThis reverts commit f484160e0a089b2ac77529dd5f42ea2a5047da47 for causing slow heat death of the universe'
+            ),
+            ([b"f484160e0a089b2ac77529dd5f42ea2a5047da47"], []),
+        )
+
+        # revert not on first line
+        self.assertIsNone(
+            parse_reverts(b'Bug 123 - Blah blah; r=gps\nRevert "lorem ipsum"')
+        )
+
+    def test_revert(self):
+        # single changeset
+        self.assertEqual(
+            parse_reverts(
+                b"""Revert "Bug 1965907 - Re-enable `test_vendor.py` r=ahal" for causing build bustages
+
+This reverts commit 62784c133207337c2676e49b1c394c6c08359ad9.
+"""
+            ),
+            ([b"62784c133207337c2676e49b1c394c6c08359ad9"], [1965907]),
+        )
+
+        # more than two
+        self.assertEqual(
+            parse_reverts(
+                b"""\
+Revert Bug 1962485 for causing pip related build bustages & py3 failures
+
+This reverts commit b26130c25b1e605258b3638e672ee706650b5771.
+
+Revert "Bug 1962485 - Add `jj` toolchain to `mozversioncontrol` Python source test r=firefox-build-system-reviewers,nalexander"
+
+This reverts commit 6d09de11be6bedbf70e6d42fdf6bd68ed36f3b0f.
+
+Revert "Bug 1962485 - Add `jj` toolchain tasks r=firefox-build-system-reviewers,nalexander"
+
+This reverts commit 8c01c67a49f95b0420b818167e1c9803d9f36451.
+
+Revert "Bug 1967634 - Bump vendored `pyyaml` version to `6.0.2` to match mozharness and grizzly r=ahal,mach-reviewers"
+
+This reverts commit 76796be466f5c8100421c1482c7ac9477372f0f7.
+
+Revert "Bug 1967634 - Apply fixes from `python-sites` lint r=ahal,mach-reviewers"
+
+This reverts commit 9a334d44bd5aed36b04a653dde0ea7db8dfc16f0.
+
+Revert "Bug 1967634 - Add `python-sites` lint to facilitate adding rules specific to `python/sites/` r=ahal"
+
+This reverts commit 14dfd6cba9ecd38417c24ad89eefeb0c12c92505.
+
+Revert "Bug 1965907 - Re-enable `test_vendor.py` r=ahal"
+
+This reverts commit 62784c133207337c2676e49b1c394c6c08359ad9.
+"""
+            ),
+            (
+                [
+                    b"b26130c25b1e605258b3638e672ee706650b5771",
+                    b"6d09de11be6bedbf70e6d42fdf6bd68ed36f3b0f",
+                    b"8c01c67a49f95b0420b818167e1c9803d9f36451",
+                    b"76796be466f5c8100421c1482c7ac9477372f0f7",
+                    b"9a334d44bd5aed36b04a653dde0ea7db8dfc16f0",
+                    b"14dfd6cba9ecd38417c24ad89eefeb0c12c92505",
+                    b"62784c133207337c2676e49b1c394c6c08359ad9",
+                ],
+                [1962485, 1967634, 1965907],
+            ),
         )
 
     def test_strip_commit_metadata(self):

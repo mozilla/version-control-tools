@@ -94,6 +94,9 @@ BACKOUT_MULTI_ONELINE_RE = re.compile(
     re.I,
 )
 
+REVERT_SUMMARY_RE = re.compile(rb"^Revert \"?(?P<summary>.*)\"?")
+REVERT_RE = re.compile(rb"^This reverts commit (?P<commit>[0-9a-f]{40})\b")
+
 SHORT_RE = re.compile(rb"^[0-9a-f]{12}$", re.I)
 
 DIGIT_RE = re.compile(rb"#?\d+")
@@ -274,6 +277,35 @@ def parse_backouts(commit_desc, strict=False):
         return SHORT_NODE_RE.findall(m.group("nodes")), parse_bugs(first_line)
 
     return None
+
+
+def parse_reverts(commit_desc):
+    """Look for revert annotations in a string.
+
+    Returns a 2-tuple of (nodes, bugs) where each entry is an iterable of
+    git commit identifiers and bug numbers that were reverted, respectively.
+    Or return None if no revert info is available.
+    """
+    if not commit_desc:
+        return None
+
+    lines = commit_desc.splitlines()
+    first_line = lines[0]
+
+    m = REVERT_SUMMARY_RE.match(first_line)
+    if not m:
+        return None
+
+    bugs = parse_bugs(m.group("summary"))
+    nodes = []
+    for line in lines[1:]:
+        summary_m = REVERT_SUMMARY_RE.match(line)
+        if summary_m:
+            bugs += [bug for bug in parse_bugs(summary_m.group("summary")) if bug not in bugs]
+        node_m = REVERT_RE.match(line)
+        if node_m:
+            nodes.append(node_m.group("commit"))
+    return nodes, bugs
 
 
 def strip_commit_metadata(s):
