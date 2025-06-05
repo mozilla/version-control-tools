@@ -15,6 +15,11 @@
   remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
 
+  $ cat >> $HGRCPATH << EOF
+  > [extensions]
+  > commitextra = $TESTDIR/hgext/hgmo/tests/commitextra.py
+  > EOF
+
   $ echo p1_1 > foo
   $ hg commit -m 'push 1 commit 1'
   $ echo p1_2 > foo
@@ -24,7 +29,7 @@
   $ echo p2_1 > foo
   $ hg commit -m 'push 2 commit 1'
   $ echo p2_2 > foo
-  $ hg commit -m 'push 2 commit 2'
+  $ hg commit -m 'push 2 commit 2' --extra "git_commit=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   $ echo p2_3 > foo
   $ hg commit -m 'push 2 commit 3'
   $ hg -q push
@@ -168,7 +173,7 @@ web command for exposing automation relevance works
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 3,
@@ -184,12 +189,15 @@ web command for exposing automation relevance works
               ],
               "desc": "push 2 commit 2",
               "extra": {
-                  "branch": "default"
+                  "branch": "default",
+                  "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
               },
               "files": [
                   "foo"
               ],
-              "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+              "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "git_repo_url": "https://github.com/mozilla-firefox/firefox",
+              "node": "61613b60aa5dd21e5332d10a06643446896d96fe",
               "parents": [
                   "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
               ],
@@ -198,7 +206,7 @@ web command for exposing automation relevance works
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 4,
@@ -219,16 +227,16 @@ web command for exposing automation relevance works
               "files": [
                   "foo"
               ],
-              "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "node": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "parents": [
-                  "66a66c6c6ae312ec88240754300468a6cea8f71d"
+                  "61613b60aa5dd21e5332d10a06643446896d96fe"
               ],
               "phase": "draft",
               "pushdate": [
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 5,
@@ -243,7 +251,7 @@ Backout a node
   $ cd ../client
   $ hg backout -r 5
   reverting foo
-  changeset 6:2acc8e431833 backs out changeset 5:5d04c4fd236c
+  changeset 6:3e99eef45431 backs out changeset 5:c0026f6c6502
   $ hg push
   pushing to http://$LOCALHOST:$HGPORT/
   searching for changes
@@ -253,7 +261,7 @@ Backout a node
   remote: recorded push in pushlog
   remote: added 1 changesets with 1 changes to 1 files
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/2acc8e431833 --header content-type --body-file body
+  $ http http://localhost:$HGPORT/json-automationrelevance/3e99eef45431 --header content-type --body-file body
   200
   content-type: application/json
 
@@ -264,7 +272,7 @@ Backout a node
               "author": "test",
               "backsoutnodes": [
                   {
-                      "node": "5d04c4fd236c19e241d1587e120b39840344eee8"
+                      "node": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761"
                   }
               ],
               "bugs": [],
@@ -272,23 +280,23 @@ Backout a node
                   0.0,
                   0
               ],
-              "desc": "Backed out changeset 5d04c4fd236c",
+              "desc": "Backed out changeset c0026f6c6502",
               "extra": {
                   "branch": "default"
               },
               "files": [
                   "foo"
               ],
-              "node": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "node": "3e99eef454310155a6e77abb52c80b9e754bb521",
               "parents": [
-                  "5d04c4fd236c19e241d1587e120b39840344eee8"
+                  "c0026f6c6502b2c7ba02438b01f5419d5b3cc761"
               ],
               "phase": "public",
               "pushdate": [
                   \d+, (re)
                   0
               ],
-              "pushhead": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "pushhead": "3e99eef454310155a6e77abb52c80b9e754bb521",
               "pushid": 4,
               "pushuser": "testuser",
               "rev": 6,
@@ -300,7 +308,7 @@ Backout a node
 
 Backedoutby information not displayed without `backouts=1`
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/5d04c4fd236c --header content-type --body-file body
+  $ http http://localhost:$HGPORT/json-automationrelevance/c0026f6c6502 --header content-type --body-file body
   200
   content-type: application/json
 
@@ -331,7 +339,7 @@ Backedoutby information not displayed without `backouts=1`
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 3,
@@ -347,12 +355,15 @@ Backedoutby information not displayed without `backouts=1`
               ],
               "desc": "push 2 commit 2",
               "extra": {
-                  "branch": "default"
+                  "branch": "default",
+                  "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
               },
               "files": [
                   "foo"
               ],
-              "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+              "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "git_repo_url": "https://github.com/mozilla-firefox/firefox",
+              "node": "61613b60aa5dd21e5332d10a06643446896d96fe",
               "parents": [
                   "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
               ],
@@ -361,7 +372,7 @@ Backedoutby information not displayed without `backouts=1`
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 4,
@@ -382,16 +393,16 @@ Backedoutby information not displayed without `backouts=1`
               "files": [
                   "foo"
               ],
-              "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "node": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "parents": [
-                  "66a66c6c6ae312ec88240754300468a6cea8f71d"
+                  "61613b60aa5dd21e5332d10a06643446896d96fe"
               ],
               "phase": "public",
               "pushdate": [
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 5,
@@ -403,7 +414,7 @@ Backedoutby information not displayed without `backouts=1`
 
 Adds `backouts=1` query string parameter to show backout information
 
-  $ http http://localhost:$HGPORT/json-automationrelevance/5d04c4fd236c?backouts=1 --header content-type --body-file body
+  $ http http://localhost:$HGPORT/json-automationrelevance/c0026f6c6502?backouts=1 --header content-type --body-file body
   200
   content-type: application/json
 
@@ -434,7 +445,7 @@ Adds `backouts=1` query string parameter to show backout information
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 3,
@@ -450,12 +461,15 @@ Adds `backouts=1` query string parameter to show backout information
               ],
               "desc": "push 2 commit 2",
               "extra": {
-                  "branch": "default"
+                  "branch": "default",
+                  "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
               },
               "files": [
                   "foo"
               ],
-              "node": "66a66c6c6ae312ec88240754300468a6cea8f71d",
+              "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "git_repo_url": "https://github.com/mozilla-firefox/firefox",
+              "node": "61613b60aa5dd21e5332d10a06643446896d96fe",
               "parents": [
                   "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
               ],
@@ -464,7 +478,7 @@ Adds `backouts=1` query string parameter to show backout information
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 4,
@@ -472,7 +486,7 @@ Adds `backouts=1` query string parameter to show backout information
           },
           {
               "author": "test",
-              "backedoutby": "2acc8e431833b77a59c5aa14ca11e2cab01c3b9f",
+              "backedoutby": "3e99eef454310155a6e77abb52c80b9e754bb521",
               "backsoutnodes": [],
               "bugs": [],
               "date": [
@@ -486,19 +500,234 @@ Adds `backouts=1` query string parameter to show backout information
               "files": [
                   "foo"
               ],
-              "node": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "node": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "parents": [
-                  "66a66c6c6ae312ec88240754300468a6cea8f71d"
+                  "61613b60aa5dd21e5332d10a06643446896d96fe"
               ],
               "phase": "public",
               "pushdate": [
                   \d+, (re)
                   0
               ],
-              "pushhead": "5d04c4fd236c19e241d1587e120b39840344eee8",
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
               "pushid": 3,
               "pushuser": "testuser",
               "rev": 5,
+              "reviewers": []
+          }
+      ],
+      "visible": true
+  }
+
+Revert a commit
+
+  $ hg backout -r 4 -m 'Revert "push 2 commit 2"
+  > 
+  > This reverts commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.'
+  merging foo
+  0 files updated, 1 files merged, 0 files removed, 0 files unresolved
+  changeset 7:14edbee910b3 backs out changeset 4:61613b60aa5d
+  $ hg push
+  pushing to http://$LOCALHOST:$HGPORT/
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: recorded push in pushlog
+  remote: added 1 changesets with 1 changes to 1 files
+
+  $ http http://localhost:$HGPORT/json-automationrelevance/14edbee910b3 --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [
+                  {
+                      "node": "61613b60aa5dd21e5332d10a06643446896d96fe"
+                  }
+              ],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "Revert \"push 2 commit 2\"\n\nThis reverts commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "14edbee910b375ae3bff29976f2feb24c61e4673",
+              "parents": [
+                  "3e99eef454310155a6e77abb52c80b9e754bb521"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "14edbee910b375ae3bff29976f2feb24c61e4673",
+              "pushid": 5,
+              "pushuser": "testuser",
+              "rev": 7,
+              "reviewers": []
+          }
+      ],
+      "visible": true
+  }
+
+Backedoutby information not displayed without `backouts=1`
+
+  $ http http://localhost:$HGPORT/json-automationrelevance/61613b60aa5d --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 1",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+              "parents": [
+                  "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 3,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 2",
+              "extra": {
+                  "branch": "default",
+                  "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "files": [
+                  "foo"
+              ],
+              "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "git_repo_url": "https://github.com/mozilla-firefox/firefox",
+              "node": "61613b60aa5dd21e5332d10a06643446896d96fe",
+              "parents": [
+                  "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 4,
+              "reviewers": []
+          }
+      ],
+      "visible": true
+  }
+
+Adds `backouts=1` query string parameter to show backout information
+
+  $ http http://localhost:$HGPORT/json-automationrelevance/61613b60aa5d?backouts=1 --header content-type --body-file body
+  200
+  content-type: application/json
+
+  $ ppjson < body
+  {
+      "changesets": [
+          {
+              "author": "test",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 1",
+              "extra": {
+                  "branch": "default"
+              },
+              "files": [
+                  "foo"
+              ],
+              "node": "13855aae8fb3291c663ff46a8510c0e3fa673a4c",
+              "parents": [
+                  "cb5c79007e91b09a4ba7ebe9210311491d09e96e"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 3,
+              "reviewers": []
+          },
+          {
+              "author": "test",
+              "backedoutby": "14edbee910b375ae3bff29976f2feb24c61e4673",
+              "backsoutnodes": [],
+              "bugs": [],
+              "date": [
+                  0.0,
+                  0
+              ],
+              "desc": "push 2 commit 2",
+              "extra": {
+                  "branch": "default",
+                  "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "files": [
+                  "foo"
+              ],
+              "git_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "git_repo_url": "https://github.com/mozilla-firefox/firefox",
+              "node": "61613b60aa5dd21e5332d10a06643446896d96fe",
+              "parents": [
+                  "13855aae8fb3291c663ff46a8510c0e3fa673a4c"
+              ],
+              "phase": "public",
+              "pushdate": [
+                  \d+, (re)
+                  0
+              ],
+              "pushhead": "c0026f6c6502b2c7ba02438b01f5419d5b3cc761",
+              "pushid": 3,
+              "pushuser": "testuser",
+              "rev": 4,
               "reviewers": []
           }
       ],

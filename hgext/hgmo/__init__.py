@@ -46,6 +46,7 @@ from mercurial import (
     pycompat,
     registrar,
     revset,
+    revsetlang,
     scmutil,
     templatefilters,
     templateutil,
@@ -140,6 +141,18 @@ def addmetadata(repo, ctx, d, onlycheap=False):
                     yield {b"node": bctx.hex()}
                 except error.RepoLookupError:
                     pass
+
+        reverts = commitparser.parse_reverts(description)
+        if reverts:
+            searchlimit = repo.ui.configint(b"hgmo", b"backoutsearchlimit", 100)
+            for node in reverts[0]:
+                try:
+                    # looking up extra data is expensive, so limit to ctx's recent ancestors
+                    spec = revsetlang.formatspec(b"last(::%s, %s) and extra('git_commit', %s)", ctx.hex(), searchlimit, node)
+                    bctx = scmutil.revsingle(repo, spec)
+                    yield {b"node": bctx.hex()}
+                except error.RepoLookupError:
+                    continue
 
     d[b"reviewers"] = templateutil.mappinggenerator(reviewersgen)
     d[b"bugs"] = templateutil.mappinggenerator(bugsgen)
