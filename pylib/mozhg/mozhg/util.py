@@ -146,6 +146,7 @@ def get_backoutbynode(ext_name, repo, ctx):
     # backed out. This finds most backouts because backouts typically happen
     # shortly after a bad commit is introduced.
     thisshort = short(ctx.node())
+    thisgit = ctx.extra().get(b"git_commit")
     count = 0
     searchlimit = repo.ui.configint(ext_name, b"backoutsearchlimit", 100)
     for bctx in repo.set(b"%ld::", [ctx.rev()]):
@@ -153,9 +154,14 @@ def get_backoutbynode(ext_name, repo, ctx):
         if count >= searchlimit:
             break
 
-        backouts = commitparser.parse_backouts(encoding.fromlocal(bctx.description()))
+        commit_desc = encoding.fromlocal(bctx.description())
+        backouts = commitparser.parse_backouts(commit_desc)
         if backouts and thisshort in backouts[0]:
             return bctx.hex()
+        if thisgit:
+            reverts = commitparser.parse_reverts(commit_desc)
+            if reverts and thisgit in reverts[0]:
+                return bctx.hex()
     return None
 
 
