@@ -257,6 +257,7 @@ with demandimport.deactivated():
         BUG_CONSERVATIVE_RE,
         parse_backouts,
         parse_bugs,
+        parse_reverts,
         parse_reviewers,
     )
 
@@ -927,15 +928,26 @@ def template_bugs(context, mapping, **args):
     return templateutil.hybridlist(bugs, b"bugs")
 
 
-@templatekeyword(b"backsoutnodes", requires={b"ctx"})
+@templatekeyword(b"backsoutnodes", requires={b"repo", b"ctx"})
 def template_backsoutnodes(context, mapping):
     ctx = context.resource(mapping, b"ctx")
+    repo = context.resource(mapping, b"repo")
 
     description = encoding.fromlocal(ctx.description())
     backouts = parse_backouts(description)
     # return just the nodes, not the bug numbers
     if backouts and backouts[0]:
         return templateutil.hybridlist(backouts[0], b"backouts")
+
+    reverts = parse_reverts(description)
+    if reverts and reverts[0]:
+        searchlimit = repo.ui.configint(b"mozext", b"backoutsearchlimit", 100)
+        backouts = []
+        for bctx in repo.set(b"last(::%d, %s)", ctx.rev(), searchlimit):
+            git_commit = bctx.extra().get(b"git_commit")
+            if git_commit and git_commit in reverts[0]:
+                backouts.append(short(bctx.node()))
+        return templateutil.hybridlist(backouts, b"backouts")
 
 
 @templatekeyword(b"reviewer", requires={b"ctx"})

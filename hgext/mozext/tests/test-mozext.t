@@ -37,6 +37,10 @@ Set up a repository
 
   $ hg init client
   $ cd client
+  $ cat > .hg/hgrc << EOF
+  > [extensions]
+  > commitextra = $TESTDIR/hgext/hgmo/tests/commitextra.py
+  > EOF
   $ touch baz
   $ hg -q commit -A -m "initial DONTBUILD"
   $ mkdir config
@@ -55,6 +59,13 @@ Set up a repository
   $ echo foo > bar
   $ hg commit -A -m 'Bug 1234567,9101112: print a commit on the command line r?glob,smacleod,hguser'
   adding bar
+  $ hg rm baz
+  $ hg commit -m "Remove baz" --extra git_commit=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  $ hg backout -r tip -m 'Revert "Remove baz"
+  > 
+  > This reverts commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.'
+  adding baz
+  changeset 6:4e8e0d8c820b backs out changeset 5:e2ed94a7a5d1
   $ hg bookmark -r tip central
   $ hg push http://localhost:$HGPORT/mozilla-central -B central
   pushing to http://$LOCALHOST:$HGPORT/mozilla-central
@@ -63,7 +74,7 @@ Set up a repository
   remote: adding manifests
   remote: adding file changes
   remote: recorded push in pushlog
-  remote: added 5 changesets with 4 changes to 3 files
+  remote: added 7 changesets with 4 changes to 3 files
   exporting bookmark central
   $ cd ..
 
@@ -75,8 +86,8 @@ Pull via http:// will fetch pushlog
   adding manifests
   adding file changes
   added 1 pushes
-  added 5 changesets with 4 changes to 3 files
-  new changesets 28d014a3f251:d6d34e5ea05c
+  added 7 changesets with 4 changes to 3 files
+  new changesets 28d014a3f251:4e8e0d8c820b
 
 Pull via ssh:// will not fetch pushlog
 Fails on Mercurials pre-4.8 due to Pushlog extension incompatible versions.
@@ -90,8 +101,8 @@ processes using HTTP
   adding manifests
   adding file changes
   cannot fetch pushlog when pulling via ssh://; you should be pulling via https://
-  added 5 changesets with 4 changes to 3 files
-  new changesets 28d014a3f251:d6d34e5ea05c
+  added 7 changesets with 4 changes to 3 files
+  new changesets 28d014a3f251:4e8e0d8c820b
 #endif
 
 Show the dag
@@ -99,9 +110,19 @@ Show the dag
   $ cd clonehttp
 
   $ hg log -G
-  o  changeset:   4:d6d34e5ea05c
+  o  changeset:   6:4e8e0d8c820b
   |  bookmark:    central
   |  tag:         tip
+  |  user:        test
+  |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  summary:     Revert "Remove baz"
+  |
+  o  changeset:   5:e2ed94a7a5d1
+  |  user:        test
+  |  date:        Thu Jan 01 00:00:00 1970 +0000
+  |  summary:     Remove baz
+  |
+  o  changeset:   4:d6d34e5ea05c
   |  user:        test
   |  date:        Thu Jan 01 00:00:00 1970 +0000
   |  summary:     Bug 1234567,9101112: print a commit on the command line r?glob,smacleod,hguser
@@ -162,14 +183,16 @@ Show the dag
   a16e73662286ca2da14258dc8896eaafcf481c8e
   98175e4fd343bc8e1e36d62982c9d5504c7f6419
   ac2b8cb4ecf54cae779009fe21f5fab7fce71ce4
+  e2ed94a7a5d1d1119577c48ff70f3d7a151fcc33
+  4e8e0d8c820b390d542a9fd9ffcae058514809c2
 
 `pushhead()` gets all heads for all trees, or a given tree
 
   $ hg log -r'pushhead()' -T '{node}\n'
-  d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
+  4e8e0d8c820b390d542a9fd9ffcae058514809c2
 
   $ hg log -r'pushhead(central)' -T '{node}\n'
-  d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
+  4e8e0d8c820b390d542a9fd9ffcae058514809c2
 
 `reviewer(name)` gets changes reviewed by "name"
 
@@ -189,6 +212,8 @@ Show the dag
   98175e4fd343bc8e1e36d62982c9d5504c7f6419
   ac2b8cb4ecf54cae779009fe21f5fab7fce71ce4
   d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
+  e2ed94a7a5d1d1119577c48ff70f3d7a151fcc33
+  4e8e0d8c820b390d542a9fd9ffcae058514809c2
 
 `firstpushdate()` should return no revisions for very recent date and all for very old date
 
@@ -199,6 +224,8 @@ Show the dag
   Bar
   Backed out changeset 98175e4fd343
   Bug 1234567,9101112: print a commit on the command line r?glob,smacleod,hguser
+  Remove baz
+  Revert "Remove baz"
 
 `pushdate()` returns the same as above
 {firstpushdate} yields a date that can be parsed by a template filter
@@ -211,16 +238,24 @@ Show the dag
   2 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
   3 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
   4 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
+  5 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
+  6 [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
 
 {backedoutby} template works
 
   $ hg log -r 98175e4fd343 --template '{backedoutby}\n'
   ac2b8cb4ecf54cae779009fe21f5fab7fce71ce4
 
+  $ hg log -r e2ed94a7a5d1 --template '{backedoutby}\n'
+  4e8e0d8c820b390d542a9fd9ffcae058514809c2
+
 {backsoutnodes} template works
 
   $ hg log -r ac2b8cb4ecf5 --template '{join(backsoutnodes, " ")}\n'
   98175e4fd343
+
+  $ hg log -r 4e8e0d8c820b --template '{join(backsoutnodes, " ")}\n'
+  e2ed94a7a5d1
 
 {bug} template returns first bug in commit message
 
@@ -273,7 +308,7 @@ Show the dag
 {firstpushtreeherder} template works
 
   $ hg log -r 4 --template '{firstpushtreeherder}\n'
-  https://treeherder.mozilla.org/jobs?repo=mozilla-central&revision=d6d34e5ea05c48d5ae40f6f3d73beae8babe509c
+  https://treeherder.mozilla.org/jobs?repo=mozilla-central&revision=4e8e0d8c820b390d542a9fd9ffcae058514809c2
 
 {pushdates} template works
 
@@ -282,7 +317,7 @@ Show the dag
 
 {pushheaddates} template works
 
-  $ hg log -r 4 --template '{pushheaddates % "{date|shortdate}"}\n'
+  $ hg log -r 6 --template '{pushheaddates % "{date|shortdate}"}\n'
   1970-01-01
 
 {trees} template works
