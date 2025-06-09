@@ -8,6 +8,7 @@ releases/mozilla-esr91
 releases/mozilla-esr102
 releases/mozilla-esr115
 releases/mozilla-esr128
+releases/mozilla-esr140
 mozilla-unified zstd_max
 hgcustom/version-control-tools
 comm-central zstd_max
