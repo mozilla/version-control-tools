@@ -119,6 +119,7 @@ REPOS = {
     b"esr102": b"releases/mozilla-esr102",
     b"esr115": b"releases/mozilla-esr115",
     b"esr128": b"releases/mozilla-esr128",
+    b"esr140": b"releases/mozilla-esr140",
     b"b2g18": b"releases/mozilla-b2g18",
     b"b2g26": b"releases/mozilla-b2g26_v1_2",
     b"b2g28": b"releases/mozilla-b2g28_v1_3",
@@ -205,6 +206,7 @@ OFFICIAL_MAP = {
     b"esr102": b"mozilla-esr102",
     b"esr115": b"mozilla-esr115",
     b"esr128": b"mozilla-esr128",
+    b"esr140": b"mozilla-esr140",
 }
 
 RELEASE_TREES = set(
@@ -230,6 +232,7 @@ RELEASE_TREES = set(
         b"esr102",
         b"esr115",
         b"esr128",
+        b"esr140",
         b"b2g32",
         b"b2g34",
         b"b2g37",
