@@ -52,6 +52,24 @@ Reference a backed out node that doesn't exist (bug 1257152)
   $ grep 'backs out' body
   [1]
 
+Reference a reverted git commit that doesn't exist (or is too far in the past) (bug 1971592)
+
+  $ hg -q up -r 0
+  $ echo badnode > foo
+  $ hg commit -m 'Revert "Bug 1971085 - Automate generation of android system headers r=ahochheiden" for causing breaks in arm Android builds.
+  > 
+  > This reverts commit ee59c068e58939077157c7a8422ab68e0d12c874.'
+  created new head
+  $ hg -q push -f
+
+  $ http http://localhost:$HGPORT/rev/c6d588b897a9 --body-file body >/dev/null
+  $ grep 'unknown revision' body
+  [1]
+
+  $ grep 'backs out' body
+  [1]
+
+
 Confirm no errors in log
 
   $ cat ../server/error.log

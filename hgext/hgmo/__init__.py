@@ -151,7 +151,7 @@ def addmetadata(repo, ctx, d, onlycheap=False):
                     spec = revsetlang.formatspec(b"last(::%s, %s) and extra('git_commit', %s)", ctx.hex(), searchlimit, node)
                     bctx = scmutil.revsingle(repo, spec)
                     yield {b"node": bctx.hex()}
-                except error.RepoLookupError:
+                except (error.RepoLookupError, error.InputError):
                     continue
 
     d[b"reviewers"] = templateutil.mappinggenerator(reviewersgen)
