@@ -177,6 +177,7 @@ REPOS = {
     b"comm-esr102": b"releases/comm-esr102",
     b"comm-esr115": b"releases/comm-esr115",
     b"comm-esr128": b"releases/comm-esr128",
+    b"comm-esr140": b"releases/comm-esr140",
     # Misc
     b"try": b"try",
     b"try-comm": b"try-comm-central",
