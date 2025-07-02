@@ -462,11 +462,15 @@ def configwizard(ui, repo, statedir=None, **opts):
     uiprompt(ui, INITIAL_MESSAGE, default=b"<RETURN>")
 
     with demandimport.deactivated():
-        # Mercurial 4.2 moved function from scmutil to rcutil.
+        # Mercurial 7.0 moved rcutil to mercurial.configuration
         try:
-            from mercurial.rcutil import userrcpath
+            from mercurial.configuration.rcutil import userrcpath
         except ImportError:
-            from mercurial.scmutil import userrcpath
+            # Mercurial 4.2 moved function from scmutil to rcutil.
+            try:
+                from mercurial.rcutil import userrcpath
+            except ImportError:
+                from mercurial.scmutil import userrcpath
 
     configpaths = [p for p in userrcpath() if os.path.exists(p)]
     path = configpaths[0] if configpaths else userrcpath()[0]
