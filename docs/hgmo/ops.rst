@@ -89,7 +89,7 @@ Restarting httpd/wsgi Processes
 If a restart of the ``httpd`` and WSGI process tree is needed, perform the
 following:
 
-1. Log in to the Zeus load balancer at https://zlb1.external.ops.mdc1.mozilla.com:9090
+1. Log in to the Zeus load balancer at https://zlb-management.external.ops.mdc1.mozilla.com:9090/
 2. Find the ``hgweb-http`` pool.
 3. Mark as host as ``draining`` then click ``Update``.
 4. Poll the *draining* host for active connections by SSHing into the host
@@ -117,7 +117,7 @@ these issues involves identifying the IP addresses the abuse is originating from
 and banning them. First, we want to be able to view the active connections to
 the service.
 
-1. Log in to the Zeus load balancer at https://zlb1.external.ops.mdc1.mozilla.com:9090
+1. Log in to the Zeus load balancer at https://zlb-management.external.ops.mdc1.mozilla.com:9090/
 2. Click ``Activity`` in the top menu bar, then ``Connections`` in the menu bar for the
    updated view.
 3. In the ``Connection Filters`` section, add a ``Virtual Server`` filter for ``equals``
