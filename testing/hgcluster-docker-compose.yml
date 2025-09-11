@@ -26,6 +26,8 @@ services:
       - BROKER_ID=0
     labels:
       hgcluster.run-tests: "${RUNTESTS_LABEL}"
+    ulimits:
+      nofile: 1024
 
   hgweb0:
     command: /usr/bin/supervisord -n
