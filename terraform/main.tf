@@ -325,3 +325,39 @@ resource "google_storage_bucket_iam_member" "public-bundle-rule-na-ne1" {
 
   member = "allUsers"
 }
+
+resource "google_storage_bucket" "gcp-bundles-us-east1" {
+  name          = "moz-hg-bundles-gcp-us-east1"
+  location      = "us-east1"
+  storage_class = "STANDARD"
+
+  # Delete after 1 week inactive
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age        = 7
+      with_state = "ANY"
+    }
+  }
+
+  # Ensure bundles are around for 1 week minimum
+  retention_policy {
+    is_locked        = false
+    retention_period = 604800
+  }
+}
+
+resource "google_storage_bucket_iam_member" "hgbundler-access-us-east1" {
+  bucket = google_storage_bucket.gcp-bundles-us-east1.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.gcp-hgbundler.email}"
+}
+
+resource "google_storage_bucket_iam_member" "public-bundle-rule-us-east1" {
+  bucket = google_storage_bucket.gcp-bundles-us-east1.name
+  role   = "roles/storage.objectViewer"
+
+  member = "allUsers"
+}
