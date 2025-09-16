@@ -78,6 +78,7 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
     required_regions = {
         "northamerica-northeast1",
         "us-central1",
+        "us-east1",
         "us-west1",
     }
 
