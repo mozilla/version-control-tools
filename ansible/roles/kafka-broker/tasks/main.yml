@@ -133,6 +133,7 @@
 - name: enable Kafka log cleanup systemd timer unit
   service: name=kafka-logs-cleanup.timer
            enabled=yes
+           state=started
   when: is_testing is not defined
 
 # We DON'T set state=started because starting kafka and zookeeper can be
