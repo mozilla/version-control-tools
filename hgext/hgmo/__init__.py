@@ -167,29 +167,6 @@ def addmetadata(repo, ctx, d, onlycheap=False):
         )
         d[b"treeherderrepo"] = treeherder
 
-        push = repo.pushlog.pushfromchangeset(ctx)
-        # Don't print Perfherder link on non-publishing repos (like Try)
-        # because the previous push likely has nothing to do with this
-        # push.
-        # Changeset on autoland are in the phase 'draft' until they get merged
-        # to mozilla-central.
-        if (
-            push
-            and push.nodes
-            and (
-                repo.ui.configbool(b"phases", b"publish", True)
-                or treeherder == b"autoland"
-            )
-        ):
-            lastpushhead = repo[push.nodes[0]].hex()
-            d[b"perfherderurl"] = (
-                b"https://treeherder.mozilla.org/perf.html#/compare?"
-                b"originalProject=%s&"
-                b"originalRevision=%s&"
-                b"newProject=%s&"
-                b"newRevision=%s"
-            ) % (treeherder, push.nodes[-1], treeherder, lastpushhead)
-
     # If this changeset was converted from another one and we know which repo
     # it came from, add that metadata.
     convertrevision = ctx.extra().get(b"convert_revision")

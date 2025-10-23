@@ -68,47 +68,6 @@ Pushing a changeset to Try prints Treeherder URLs
   added 1 changesets with 1 changes to 1 files
 
 
-Pushing a changeset to Try with talos jobs prints a link to perfherder...
-
-  $ echo '1' > foo
-  $ hg commit -m 'try: -t all'
-  $ hg push ../try
-  pushing to ../try
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  
-  View your change here:
-    https://hg.mozilla.org/try/rev/083142255559ec6a2b4f78157c1ea522e6fd9722
-  
-  Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/jobs?repo=try&revision=083142255559ec6a2b4f78157c1ea522e6fd9722
-  
-  It looks like this try push has talos jobs. Compare performance against a baseline revision:
-    https://treeherder.mozilla.org/perf.html#/comparechooser?newProject=try&newRevision=083142255559ec6a2b4f78157c1ea522e6fd9722
-  added 1 changesets with 1 changes to 1 files
-
-
-and doesn't when it doesn't
-
-  $ echo '2' > foo
-  $ hg commit -m 'try: -t none'
-  $ hg push ../try
-  pushing to ../try
-  searching for changes
-  adding changesets
-  adding manifests
-  adding file changes
-  
-  View your change here:
-    https://hg.mozilla.org/try/rev/7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
-  
-  Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/jobs?repo=try&revision=7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
-  added 1 changesets with 1 changes to 1 files
-
-
 try-comm-central is also special
 
   $ hg push ../try-comm-central
@@ -118,14 +77,12 @@ try-comm-central is also special
   adding manifests
   adding file changes
   
-  View your changes here:
+  View your change here:
     https://hg.mozilla.org/try-comm-central/rev/3d7d3272d708dbf56dab75764495a40032014e3c
-    https://hg.mozilla.org/try-comm-central/rev/083142255559ec6a2b4f78157c1ea522e6fd9722
-    https://hg.mozilla.org/try-comm-central/rev/7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/jobs?repo=try-comm-central&revision=7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
-  added 3 changesets with 3 changes to 1 files
+    https://treeherder.mozilla.org/jobs?repo=try-comm-central&revision=3d7d3272d708dbf56dab75764495a40032014e3c
+  added 1 changesets with 1 changes to 1 files
 
 Push multiple changesets to a non-try repo
 
@@ -141,14 +98,12 @@ Push multiple changesets to a non-try repo
   adding file changes
   
   View your changes here:
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/083142255559ec6a2b4f78157c1ea522e6fd9722
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/7d0edcba6d851680f3cc8730ca2e32f5fb8177a7
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/fef473558e05d4b3b6dfc7019b483a2654a7ef83
-    https://hg.mozilla.org/integration/mozilla-inbound/rev/b404b501615bd72a0bfbb905e636c2f1fcf110da
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/3129f8f30e8030fb70e98e1e1f5012fa766aa76d
+    https://hg.mozilla.org/integration/mozilla-inbound/rev/e046d8987087573fa34c3191458d06981631f630
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/jobs?repo=mozilla-inbound&revision=b404b501615bd72a0bfbb905e636c2f1fcf110da
-  added 4 changesets with 4 changes to 1 files
+    https://treeherder.mozilla.org/jobs?repo=mozilla-inbound&revision=e046d8987087573fa34c3191458d06981631f630
+  added 2 changesets with 2 changes to 1 files
 
 Push a lot of changesets to a non-try repo
 
@@ -161,9 +116,9 @@ Push a lot of changesets to a non-try repo
   adding file changes
   
   View the pushlog for these changes here:
-    https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=78d884a7fbe7948375d29b261a92a948dea508db
+    https://hg.mozilla.org/integration/mozilla-inbound/pushloghtml?changeset=77380cff16a1957231435f85bad42f0e5da0719f
   
   Follow the progress of your build on Treeherder:
-    https://treeherder.mozilla.org/jobs?repo=mozilla-inbound&revision=78d884a7fbe7948375d29b261a92a948dea508db
+    https://treeherder.mozilla.org/jobs?repo=mozilla-inbound&revision=77380cff16a1957231435f85bad42f0e5da0719f
   added 21 changesets with 21 changes to 1 files
 

@@ -43,22 +43,4 @@ def hook(ui, repo, node, hooktype, source=None, **kwargs):
             b"  %s/jobs?repo=%s&revision=%s\n"
             % (treeherder_base_url, treeherder_repo, tip_node)
         )
-        # if specifying a try build and talos jobs are enabled, suggest that
-        # user use compareperf
-        if treeherder_repo == b"try":
-            msg = repo[b"tip"].description()
-            if (
-                (b" -t " in msg or b" --talos " in msg)
-                and b"-t none" not in msg
-                and b"--talos none" not in msg
-            ):
-                ui.write(
-                    b"\nIt looks like this try push has talos jobs. Compare "
-                    b"performance against a baseline revision:\n"
-                )
-                ui.write(
-                    b"  %s/perf.html#/comparechooser"
-                    b"?newProject=try&newRevision=%s\n"
-                    % (treeherder_base_url, tip_node)
-                )
     return 0

@@ -22,10 +22,8 @@ No Treeherder link unless the repository defines its Treeherder repo
   $ http http://localhost:$HGPORT/rev/be788785547b --body-file body > /dev/null
   $ grep '>treeherder' body
   [1]
-  $ grep perfherder body
-  [1]
 
-Treeherder link but no perfherder link if non-publishing phase and not autoland (e.g. Try)
+Treeherder link if non-publishing phase and not autoland (e.g. Try)
 
   $ cd server
   $ cat > .hg/hgrc << EOF
@@ -47,10 +45,7 @@ Treeherder link but no perfherder link if non-publishing phase and not autoland 
   $ grep '>treeherder' body
   <tr><td>treeherder</td><td>try@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/jobs?repo=try&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/jobs?repo=try&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
 
-  $ grep perfherder body
-  [1]
-
-Treeherder link and perfherder link if non-publishing phase and autoland
+Treeherder link if non-publishing phase and autoland
 
   $ cd server
   $ cat > .hg/hgrc << EOF
@@ -72,10 +67,7 @@ Treeherder link and perfherder link if non-publishing phase and autoland
   $ grep '>treeherder' body
   <tr><td>treeherder</td><td>autoland@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/jobs?repo=autoland&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
 
-  $ grep perfherder body
-  <tr><td>perfherder</td><td>[<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=1" target="_blank">talos</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=2" target="_blank">build metrics</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=autoland&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=autoland&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>
-
-Treeherder link and perfherder link if publishing phase
+Treeherder link if publishing phase
 
   $ cd server
   $ cat > .hg/hgrc << EOF
@@ -96,9 +88,6 @@ Treeherder link and perfherder link if publishing phase
   $ http http://localhost:$HGPORT4/rev/be788785547b --body-file body > /dev/null
   $ grep '>treeherder' body
   <tr><td>treeherder</td><td>mozilla-central@0a37bfb47d98 [<a href="https://treeherder.mozilla.org/jobs?repo=mozilla-central&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e">default view</a>] [<a href="https://treeherder.mozilla.org/jobs?repo=mozilla-central&revision=0a37bfb47d9849cceb609070a69c0715a176dd3e&filter-resultStatus=testfailed&filter-resultStatus=busted&filter-resultStatus=exception">failures only]</td></tr>
-
-  $ grep perfherder body
-  <tr><td>perfherder</td><td>[<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=1" target="_blank">talos</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=2" target="_blank">build metrics</a>] [<a href="https://treeherder.mozilla.org/perf.html#/compare?originalProject=mozilla-central&originalRevision=0a37bfb47d9849cceb609070a69c0715a176dd3e&newProject=mozilla-central&newRevision=be788785547b64e986e9f219500f5f6d31de39b5&framework=6" target="_blank">platform microbench</a>] (compared to previous push)</td></tr>
 
 Confirm no errors in logs
 
