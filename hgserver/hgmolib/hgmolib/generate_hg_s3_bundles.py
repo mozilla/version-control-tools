@@ -109,6 +109,7 @@ GCP_HOSTS = (
     ("moz-hg-bundles-gcp-us-central1", "us-central1"),
     ("moz-hg-bundles-gcp-us-west1", "us-west1"),
     ("moz-hg-bundles-gcp-na-ne1", "northamerica-northeast1"),
+    ("moz-hg-bundles-gcp-us-east1", "us-east1"),
 )
 
 AZURE_HOSTS = (
