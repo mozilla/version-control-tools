@@ -12,6 +12,7 @@ Type=oneshot
 User=hg
 Group=hg
 Nice=10
+OOMScoreAdjust=500
 
 # Needed for HTTPS_PROXY in some environments.
 # Disabled because of TCP slowness.
