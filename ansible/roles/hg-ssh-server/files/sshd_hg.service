@@ -9,6 +9,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 Restart=on-failure
 RestartSec=42s
+OOMScoreAdjust=-500
 
 [Install]
 WantedBy=multi-user.target
