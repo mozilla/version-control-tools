@@ -11,10 +11,11 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 def main(args):
     if "VIRTUAL_ENV" not in os.environ:
-        activate = os.path.join(HERE, "venv", "bin", "activate_this.py")
-        with open(activate) as f:
-            exec(f.read(), dict(__file__=activate))
-        sys.executable = os.path.join(HERE, "venv", "bin", "python")
+        print(
+            "WARNING: no VIRTUAL_ENV detected."
+            + " You may want to run this in a Python 3.9 virtualenv."
+            + " Continuing anyway ..."
+        )
 
     from mach.main import Mach
 

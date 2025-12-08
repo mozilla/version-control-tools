@@ -24,10 +24,10 @@ def main(args):
 
 if __name__ == "__main__":
     if "VIRTUAL_ENV" not in os.environ:
-        activate = os.path.join(HERE, "venv", "bin", "activate_this.py")
-        with open(activate) as f:
-            exec(f.read(), dict(__file__=activate))
-        sys.executable = os.path.join(HERE, "venv", "bin", "python")
-        os.environ["VIRTUAL_ENV"] = os.path.join(HERE, "venv")
+        print(
+            "WARNING: no VIRTUAL_ENV detected."
+            + " You may want to run this in a Python 3.9 virtualenv."
+            + " Continuing anyway ..."
+        )
 
     sys.exit(main(sys.argv[1:]))

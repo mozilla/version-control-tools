@@ -62,7 +62,7 @@ def create_virtualenv(name=None, python="python"):
         "pip": pip,
         "python": python,
         "activate": activate,
-        "activate_this": os.path.join(bin_dir, "activate_this.py"),
+        "activate": os.path.join(bin_dir, "activate"),
     }
 
     env["ROOT"] = ROOT
@@ -81,8 +81,8 @@ def create_virtualenv(name=None, python="python"):
 
 def activate_virtualenv(venv):
     """Activate a virtualenv in the current Python process."""
-    with open(venv["activate_this"]) as f:
-        exec(f.read(), dict(__file__=venv["activate_this"]))
+    with open(venv["activate"]) as f:
+        exec(f.read(), dict(__file__=venv["activate"]))
 
 
 def process_pip_requirements(venv, requirements):
