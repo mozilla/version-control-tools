@@ -29,11 +29,15 @@ while getopts w:c:r:h: opt; do
 done
 
 heads=$($hg -R "$repo" log -r 0 -T '{revset("head()")|count}')
-if [ $heads -ge $crit ]; then
+if [ "$heads" -ge "$crit" ]; then
     label=CRITICAL
-elif [ $heads -ge $warn ]; then
+    retval=2
+elif [ "$heads" -ge "$warn" ]; then
     label=WARNING
+    retval=1
 else
     label=OK
+    retval=0
 fi
 echo "$label - $repo has $heads heads"
+exit $retval
