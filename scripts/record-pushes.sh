@@ -5,5 +5,8 @@
 
 # This script just echoes push information and author out to a log file
 
+# use consistent date formatting
+export LC_ALL=C
+
 echo -n "$(date) - $LOGNAME - " >> /var/log/hg-push.log
 echo ${PWD/\/repo\/hg\/mozilla\/} >> /var/log/hg-push.log
