@@ -290,11 +290,6 @@ Show the dag
   $ hg log -r 4 --template '{firstnightly}\n'
   14.0
 
-{nightlydate} template works
-
-  $ hg log -r 4 --template '{nightlydate}\n'
-  [0-9]{4}-[0-9]{2}-[0-9]{2} (re)
-
 {firstpushuser} template works
 
   $ hg log -r 4 --template '{firstpushuser}\n'

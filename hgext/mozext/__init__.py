@@ -106,9 +106,6 @@ firstnightly
    The version number of the first nightly channel release a changeset was
    present in.
 
-nightlydate
-   The date of the first Nightly a changeset was likely present in.
-
 firstpushuser
    The username of the first person who pushed this changeset.
 
@@ -1033,68 +1030,6 @@ def template_firstnightly(context, mapping):
     return _calculate_push_milestone(repo, ctx, b"central")
 
 
-def _calculate_next_daily_release(repo, ctx, tree):
-    pushes = repo.changetracker.pushes_for_changeset(ctx.node())
-    pushes = [p for p in pushes if p[0] == tree]
-
-    if not pushes:
-        return None
-
-    push = pushes[0]
-    when = push[2]
-
-    dt = datetime.datetime.utcfromtimestamp(when)
-
-    # Daily builds kick off at 3 AM in Mountain View. This is -7 hours
-    # from UTC during daylight savings and -8 during regular.
-    # Mercurial nor core Python have timezone info built-in, so we
-    # hack this calculation together here. This calculation is wrong
-    # for date before 2007, when the DST start/end days changed. It
-    # may not always be correct in the future. We should use a real
-    # timezone database.
-    dst_start = None
-    dst_end = None
-
-    c = calendar.Calendar(calendar.SUNDAY)
-    sunday_count = 0
-    for day in c.itermonthdates(dt.year, 3):
-        if day.month != 3:
-            continue
-
-        if day.weekday() == 6:
-            sunday_count += 1
-            if sunday_count == 2:
-                dst_start = day
-                break
-
-    for day in c.itermonthdates(dt.year, 11):
-        if day.month != 11:
-            if day.weekday() == 6:
-                dst_end = day
-                break
-
-    dst_start = datetime.datetime(dst_start.year, dst_start.month, dst_start.day, 2)
-    dst_end = datetime.datetime(dst_end.year, dst_end.month, dst_end.day, 2)
-
-    is_dst = dt >= dst_start and dt <= dst_end
-    utc_offset = 11 if is_dst else 10
-
-    if dt.hour > 3 + utc_offset:
-        dt += datetime.timedelta(days=1)
-
-    return pycompat.bytestr(dt.date().isoformat())
-
-
-def template_nightlydate(context, mapping):
-    """:nightlydate: Date information. The date of the first Nightly this
-    changeset was likely first active in as a YYYY-MM-DD value.
-    """
-    ctx = context.resource(mapping, b"ctx")
-    repo = context.resource(mapping, b"repo")
-
-    return _calculate_next_daily_release(repo, ctx, b"central")
-
-
 def template_firstpushuser(context, mapping):
     """:firstpushuser: String. The first person who pushed this changeset."""
     ctx = context.resource(mapping, b"ctx")
@@ -1482,7 +1417,6 @@ def extsetup(ui):
         template_firstbeta
     )
     templatekeyword(b"firstnightly", requires={b"ctx", b"repo"})(template_firstnightly)
-    templatekeyword(b"nightlydate", requires={b"ctx", b"repo"})(template_nightlydate)
     templatekeyword(b"firstpushuser", requires={b"ctx", b"repo"})(
         template_firstpushuser
     )
