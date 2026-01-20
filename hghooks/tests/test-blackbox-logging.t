@@ -22,6 +22,7 @@ Blackbox log should contain times for each of our hooks
   *> mozhooks.pretxnchangegroup.prevent_subrepos took * seconds (glob)
   *> mozhooks.pretxnchangegroup.prevent_symlinks took * seconds (glob)
   *> mozhooks.pretxnchangegroup.repolocked_check took * seconds (glob)
+  *> mozhooks.pretxnchangegroup.single_branch took * seconds (glob)
   *> mozhooks.pretxnchangegroup.single_root took * seconds (glob)
   *> pythonhook-pretxnchangegroup: hgext_mozhooks.pretxnchangegroup finished in * seconds (glob)
   *> pythonhook-pretxnclose: hgext_mozhooks.pretxnclose finished in * seconds (glob)
