@@ -100,7 +100,6 @@ Here is an example *clone bundles* manifest::
   https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-central1
   https://storage.googleapis.com/moz-hg-bundles-gcp-us-west1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-west1
   https://storage.googleapis.com/moz-hg-bundles-gcp-na-ne1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=northamerica-northeast1
-  https://mozhgwestus3.blob.core.windows.net/hgbundle/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog azureregion=westus3
 
 As you can see, listed bundle URLs vary by bundle type (compression and
 format) and location. For each repository we generate bundles for, we
@@ -114,8 +113,7 @@ generate:
 All of those bundles are uploaded to S3 in the us-west-2 region and the
 CloudFront CDN.
 
-The streaming bundles are also uploaded to google cloud storage and
-azure storage in a number of regions.
+The streaming bundles are also uploaded to google cloud storage in a number of regions.
 
 Which Bundles to Prefer
 -----------------------
@@ -148,7 +146,7 @@ under 60s.::
 Manifest Advertisement to Cloud Clients
 ---------------------------------------
 
-If a client in Amazon Web Services, Google Cloud or Azure is requesting
+If a client in Amazon Web Services or Google Cloud is requesting
 a bundle manifest and that client is in a region where bundles are
 hosted in cloud storage, the advertised manifest will only show URLs for
 the same cloud region. In addition, stream clone bundles are the highest

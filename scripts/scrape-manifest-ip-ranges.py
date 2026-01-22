@@ -19,7 +19,6 @@ import requests
 from datadiff import diff
 from voluptuous import (
     All,
-    Any,
     In,
     Invalid as VoluptuousInvalid,
     Optional,
@@ -85,37 +84,6 @@ def all_required_gcp_regions_exist(prefixes: list) -> bool:
     prefixes_in_new_document = {prefix_object["scope"] for prefix_object in prefixes}
 
     return required_regions <= prefixes_in_new_document
-
-
-@truth
-def all_required_azure_regions_exist(values: list) -> bool:
-    """Checks if all required Azure regions (in lowercase) are present in the
-    'properties.region' field for entries where the 'name' field starts with 'Storage.'."""
-
-    # Define the required Azure regions in lowercase
-    required_regions = {
-        "canadacentral",
-        "centralindia",
-        "centralus",
-        "eastus",
-        "eastus2",
-        "northcentralus",
-        "northeurope",
-        "southindia",
-        "westus",
-        "westus2",
-        "westus3",
-    }
-
-    # Extract the regions from the 'name' field where the region appears after "Storage."
-    regions_in_new_document = {
-        value["properties"]["region"].lower()
-        for value in values
-        if value["name"].startswith("Storage.")
-    }
-
-    # Validate that all required regions are present
-    return required_regions <= regions_in_new_document
 
 
 def get_mozilla_office_ips():
@@ -399,114 +367,9 @@ def get_gcp_ips():
         sys.exit(1)
 
 
-def get_azure_ips():
-    """Entry point for the Azure IP address scraper.
-
-    Downloads the Azure IP ranges JSON document and verifies against a
-    known schema. Atomically rewrites a file with the CIDR representations of
-    Azure IP address spaces.
-    """
-    try:
-        # Define the file path for storing Azure IP ranges
-        azure_ip_ranges_file = Path("/var/hg/azure-ip-ranges.json")
-
-        # Fetch the latest Azure IP ranges from the URL
-        ip_ranges_response = requests.get(
-            "https://raw.githubusercontent.com/mozilla-platform-ops/azure-public-ip-ranges/refs/heads/main/az_ips.json"
-        )
-
-        # Ensure the HTTP response is successful
-        if ip_ranges_response.status_code != 200:
-            sys.exit("HTTP response from Azure IP ranges was not 200 OK")
-
-        # Sanity check: ensure the file is not unexpectedly small
-        if len(ip_ranges_response.content) < 8000:
-            sys.exit(
-                "The retrieved Azure JSON document is smaller than the minimum allowable file size"
-            )
-
-        # Define the schema for validating the Azure IP ranges document
-        azure_json_schema = Schema(
-            {
-                "changeNumber": int,
-                "cloud": str,
-                "values": All(
-                    all_required_azure_regions_exist,  # Validate required Azure regions
-                    [
-                        {
-                            "name": str,  # Ensure this contains "Storage.$REGION"
-                            "id": str,
-                            "properties": {
-                                "changeNumber": int,
-                                "region": str,
-                                "regionId": int,
-                                "platform": str,
-                                "systemService": str,
-                                "addressPrefixes": [
-                                    is_ip_address_network
-                                ],  # Validate each IP network
-                                "networkFeatures": Any(list, None),
-                            },
-                        }
-                    ],
-                ),
-            },
-            extra=False,
-            required=True,
-        )
-
-        # Parse the Azure IP ranges JSON data
-        output_as_dict = ip_ranges_response.json()
-
-        # Validate the parsed data against the schema
-        validate_with_humanized_errors(output_as_dict, azure_json_schema)
-
-        # Sanity check: if the file exists, ensure there's a change in content
-        if azure_ip_ranges_file.is_file():
-            existing_file_bytes = azure_ip_ranges_file.read_bytes()
-            existing_document_as_dict = json.loads(existing_file_bytes)
-
-            file_diff = diff(existing_document_as_dict, output_as_dict, context=0)
-
-            # Exit if the file contents are unchanged
-            if not file_diff:
-                sys.exit()
-
-        # If no existing file, everything is considered new
-        else:
-            existing_document_as_dict = {}
-            file_diff = diff(existing_document_as_dict, output_as_dict, context=0)
-
-        # Write the new data to the file atomically
-        write_to_file_atomically(azure_ip_ranges_file, json.dumps(output_as_dict))
-
-        # Log the changes to the systemd unit output
-        logger.info("Azure IP ranges document has been updated")
-        logger.info(file_diff)
-
-    except requests.exceptions.RequestException as re:
-        logger.exception(f"An error occurred while retrieving Azure IP ranges: {re}")
-        sys.exit(1)
-
-    except json.JSONDecodeError as jde:
-        logger.exception(
-            "An error occurred parsing the data retrieved from Azure as JSON: %s"
-            % jde.msg
-        )
-        sys.exit(1)
-
-    except VoluptuousInvalid as vi:
-        logger.exception("The JSON data from Azure does not match the required schema.")
-        logger.exception("Error message: %s" % vi.msg)
-        logger.exception("Error path: %s" % vi.path)
-        logger.exception("Exception message: %s" % vi.error_message)
-        sys.exit(1)
-
-
 # Register possible commands
 COMMANDS = {
     "aws": get_aws_ips,
-    "azure": get_azure_ips,
     "gcloud": get_gcp_ips,
     "moz-offices": get_mozilla_office_ips,
 }
