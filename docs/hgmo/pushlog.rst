@@ -361,6 +361,12 @@ Here's an example::
      "tags": []
    }
 
+Troubleshooting
+===============
+
+See :ref:`pushlog_unique_constraint` in the Operational Guide for
+troubleshooting pushlog errors.
+
 Writing Agents that Consume Pushlog Data
 ========================================
 

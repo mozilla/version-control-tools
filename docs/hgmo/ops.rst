@@ -401,6 +401,76 @@ case, it effectively no-ops. If you are paranoid. make a backup copy of
    Under no circumstances should ``.hg/store/fncache`` be removed or
    altered by hand. Doing so may result in further repository damage.
 
+.. _pushlog_unique_constraint:
+
+Pushlog UNIQUE Constraint Failure
+=================================
+
+If pushes to a repository fail with an error like the following::
+
+   remote: error recording into pushlog (UNIQUE constraint failed: changesets.rev); please retry your push
+   remote: transaction abort!
+   remote: rolling back pushlog
+   remote: rollback completed
+   remote: pretxnchangegroup.pushlog hook failed
+   abort: push failed on remote
+
+This means the pushlog's SQLite database contains stale entries due to a
+race condition where the pushlog commits before the Mercurial transaction
+commits. In the case of a failed push, the changesets are rolled back from
+the repository but the corresponding entries remain in the pushlog's
+``changesets`` table. Mercurial's local revision numbers (``rev``) are then
+reused by subsequent pushes, but the old entries still reference those
+revision numbers via a ``UNIQUE`` index, causing the constraint to fail.
+
+To fix this, identify and remove the stale entries from the pushlog database
+on the master push server:
+
+1. Back up and open the pushlog database (typically at
+   ``<repo>/.hg/pushlog2.db``)::
+
+      sudo -u hg cp .hg/pushlog2.db .hg/pushlog2.db.bak
+      sudo -u hg sqlite3 .hg/pushlog2.db
+
+2. Query for recent entries at the high end of the revision range:
+
+   .. code-block:: sql
+
+      SELECT rev, node FROM changesets ORDER BY rev DESC LIMIT 50;
+
+3. For each node, check whether it still exists in the Mercurial repo
+   (in a separate shell)::
+
+      hg log -r <node>
+
+   Nodes that produce an error are stale and should be removed.
+
+4. Delete the stale entries by node:
+
+   .. code-block:: sql
+
+      DELETE FROM changesets WHERE node IN (
+        '<stale_node_1>',
+        '<stale_node_2>',
+        ...
+      );
+
+   Deleting by ``node`` is safer than deleting by ``rev``, as it targets
+   exactly the stale rows without risk of removing a valid entry that has
+   reused the same revision number.
+
+5. Verify the stale entries are gone:
+
+   .. code-block:: sql
+
+      SELECT COUNT(*) FROM changesets WHERE rev BETWEEN <low_rev> AND <high_rev>;
+
+.. note::
+
+   The ``sqlite3`` shell must be run as the ``hg`` user (via
+   ``sudo -u hg``) rather than plain ``sudo``, to avoid creating journal
+   files with incorrect ownership.
+
 Mirrors in ``pushdataaggregator_groups`` File
 =============================================
 
