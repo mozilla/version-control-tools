@@ -206,17 +206,21 @@ GROUP_REPOS = {
         "Project Repos (projects/)",
     },
     "scm_level_3": {
-        "Firefox Repos via Lando",
+        "Firefox and Thunderbird Repos via Lando",
     },
     "scm_allow_direct_push": {
         "Firefox Repos via direct push",
     },
-    "scm_autoland": {
-        "Autoland (integration/autoland)",
+    "scm_conduit": {
+        "Test repos in conduit-testing/",
+    },
+    "scm_lando": {
+        "Lando-managed repos",
     },
     "scm_l10n": {
         "Localization Repos (releases/l10n/*, others)",
     },
+    "scm_nss": { "NSS and NSPR projects", },
     "scm_versioncontrol": {"Version Control Tools (hgcustom/version-control-tools)"},
 }
 
