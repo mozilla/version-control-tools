@@ -6,7 +6,7 @@ FROM buildpack-deps:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -yq \
-    docker \
+    docker.io \
     docker-compose \
     libldap2-dev \
     libsasl2-dev \
