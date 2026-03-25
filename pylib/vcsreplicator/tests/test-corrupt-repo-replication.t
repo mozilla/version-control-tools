@@ -83,7 +83,7 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
-      sys.exit(load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')())
+      sys.exit(*()) (glob)
     File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       run_cli(handle_message_main)
     File "*/vcsreplicator/consumer.py", line *, in run_cli (glob)
@@ -139,7 +139,7 @@ We should get the same failure if we try again
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
-      sys.exit(load_entry_point('vcsreplicator', 'console_scripts', 'vcsreplicator-consumer')())
+      sys.exit(*()) (glob)
     File "*/vcsreplicator/consumer.py", line *, in consumer_cli (glob)
       run_cli(handle_message_main)
     File "*/vcsreplicator/consumer.py", line *, in run_cli (glob)
