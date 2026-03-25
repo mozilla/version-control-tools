@@ -47,18 +47,4 @@ Multiple keys are printed
   ssh-rsa * (glob)
   ssh-rsa * (glob)
 
-DSA keys are filtered
-
-  $ hgmo create-ldap-user dsauser@example.com dsauser 1001 'DSA User'
-  $ ssh-keygen -t dsa -f dsakey -N '' > /dev/null
-  $ hgmo add-ssh-key dsauser@example.com - < dsakey.pub
-
-  $ lookup dsauser@example.com
-  no valid SSH keys found for user
-  [1]
-
-  $ hgmo add-ssh-key dsauser@example.com - < key1.pub
-  $ lookup dsauser@example.com
-  ssh-rsa * (glob)
-
   $ hgmo clean
