@@ -68,6 +68,7 @@ COMMANDS = {
         "run",
         "-e",
         "TESTNAME=test",
+        "--rm",
         "test-runner",
         "/app/vct/hgmo",
     ),
