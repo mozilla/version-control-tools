@@ -146,15 +146,18 @@ class HgCluster(object):
             HGCLUSTER_DOCKER_COMPOSE,
             "build",
             "--parallel",
-            # Specify which images to avoid building hgweb twice
-            "hgweb0",
-            "hgssh",
-            "pulse",
-            "ldap",
         ]
 
         if image:
             docker_compose_build_command.append(image)
+        else:
+            # Specify which images to avoid building hgweb twice
+            docker_compose_build_command.extend([
+                "hgweb0",
+                "hgssh",
+                "pulse",
+                "ldap",
+            ])
 
         subprocess.run(
             docker_compose_build_command,
