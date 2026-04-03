@@ -267,10 +267,6 @@ def unifyrepo(ui, settings, **opts):
     """
     conf = unifyconfig(settings)
 
-    # Ensure destrepo is created with generaldelta enabled.
-    ui.setconfig(b"format", b"usegeneraldelta", True)
-    ui.setconfig(b"format", b"generaldelta", True)
-
     # Verify all source repos have the same revision 0
     rev0s = set()
     for source in conf.sources:
@@ -413,8 +409,6 @@ def unifyrepo(ui, settings, **opts):
     inversenodeinfo = {v: k for k, v in nodepushinfo.items()}
 
     destui = ui.copy()
-    destui.setconfig(b"format", b"aggressivemergedeltas", True)
-    destui.setconfig(b"format", b"maxchainlen", 10000)
 
     destrepo = hg.repository(
         destui, path=conf.destpath, create=not os.path.exists(conf.destpath)
@@ -425,14 +419,6 @@ def unifyrepo(ui, settings, **opts):
     ui.write(
         b"%d/%d nodes will be pulled\n" % (len(pullpushinfo), len(inversenodeinfo))
     )
-
-    # Enable aggressive merge deltas on the stage repo to minimize manifest delta
-    # size. This could make delta chains very long. So we may want to institute a
-    # delta chain cap on the destination repo. But this will ensure the stage repo
-    # has the most efficient/compact representation of deltas. Pulling from this
-    # repo will also inherit the optimal delta, so we don't need to enable
-    # aggressivemergedeltas on the destination repo.
-    stageui.setconfig(b"format", b"aggressivemergedeltas", True)
 
     stagerepo = hg.repository(
         stageui, path=conf.stagepath, create=not os.path.exists(conf.stagepath)
