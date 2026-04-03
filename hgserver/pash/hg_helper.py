@@ -305,7 +305,7 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     dest_hgmo_path = str(dest_dir.relative_to(DOC_ROOT))
     print(f"Please wait.  Cloning /{source_repo_path} to /{dest_hgmo_path}")
 
-    run_command(f"nohup {HG} --config format.usegeneraldelta=true init {dest_dir}")
+    run_command(f"nohup {HG} init {dest_dir}")
     run_command(f"nohup {HG} -R {dest_dir} pull {source_repo}")
     run_command(f"nohup {HG} -R {dest_dir} replicatesync")
     # TODO ensure user WSGI files are in place on hgweb machine.
@@ -386,8 +386,7 @@ def make_repo_clone(cname, user, user_repo_dir, repo_name, quick_src):
 
             repo_name_path = DOC_ROOT / "users" / user_repo_dir / repo_name
             run_command(
-                f"/usr/bin/nohup {HG} --config format.usegeneraldelta=true "
-                f"init {repo_name_path}"
+                f"/usr/bin/nohup {HG} init {repo_name_path}"
             )
     fix_user_repo_perms(user, user_repo_dir, repo_name)
     # New user repositories are non-publishing by default.
