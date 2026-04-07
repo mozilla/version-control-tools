@@ -111,11 +111,11 @@ SCM LDAP group membership is printed with no-op login.
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+     Project Repos (projects/), Try, User Repos (users/)
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Test repos in conduit-testing/, Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -207,11 +207,11 @@ ssh as autoland, tagging user2 as the originator of the request
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland)
+     Unknown
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Project Repos (projects/), Test repos in conduit-testing/, Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -232,11 +232,11 @@ ssh as lando_landing_worker user, tagging user2 as the originator of the request
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland)
+     Unknown
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Project Repos (projects/), Test repos in conduit-testing/, Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -257,11 +257,11 @@ ssh as lando_landing_worker user (dev), tagging user2 as the originator of the r
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland)
+     Unknown
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Project Repos (projects/), Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Project Repos (projects/), Test repos in conduit-testing/, Try, User Repos (users/), Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -350,11 +350,11 @@ Do another login to verify no pash errors are present
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+     Project Repos (projects/), Try, User Repos (users/)
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Test repos in conduit-testing/, Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
@@ -456,11 +456,11 @@ Failure to connect to LDAP master server is not fatal
   
   This will give you write access to the following repos:
   
-     Autoland (integration/autoland), Project Repos (projects/), Try, User Repos (users/)
+     Project Repos (projects/), Try, User Repos (users/)
   
   You will NOT have write access to the following repos:
   
-     Firefox Repos via Lando, Firefox Repos via direct push, Localization Repos (releases/l10n/*, others), Version Control Tools (hgcustom/version-control-tools)
+     Firefox Repos via direct push, Firefox and Thunderbird Repos via Lando, Lando-managed repos, Localization Repos (releases/l10n/*, others), NSS and NSPR projects, Test repos in conduit-testing/, Version Control Tools (hgcustom/version-control-tools)
   
   You did not specify a command to run on the server. This server only
   supports running specific commands. Since there is nothing to do, you
