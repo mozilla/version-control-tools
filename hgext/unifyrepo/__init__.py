@@ -300,9 +300,17 @@ def unifyrepo(ui, settings, **opts):
     # Obtain pushlog data from each source repo. We obtain data for every node
     # and filter later because we want to be sure we have the earliest known
     # push data for a given node.
+    #
+    # We keep the repo objects open and reuse them in the second pass below so
+    # that both passes see the same changelog snapshot. Re-opening repos in the
+    # second pass would risk seeing new commits that arrived in between,
+    # causing bookmarks to reference nodes that were never pulled into the
+    # destination.
+    sourcerepos = {}
     for source in conf.sources:
         path = source["path"]
         sourcerepo = hg.repository(ui, path=source["path"])
+        sourcerepos[path] = sourcerepo
         pushlog = getattr(sourcerepo, "pushlog", None)
 
         index = sourcerepo.changelog.index
@@ -366,7 +374,7 @@ def unifyrepo(ui, settings, **opts):
     books = {}
     sourcenodes = set()
     for source in conf.sources:
-        sourcerepo = hg.repository(ui, path=source["path"])
+        sourcerepo = sourcerepos[source["path"]]
         cl = sourcerepo.changelog
         index = cl.index
 
