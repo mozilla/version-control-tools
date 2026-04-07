@@ -78,6 +78,7 @@ from mercurial import (
     exchange,
     extensions,
     hg,
+    hook,
     registrar,
 )
 
@@ -355,6 +356,10 @@ def unifyrepo(ui, settings, **opts):
             b"missing pushlog info for %d nodes: %s\n"
             % (len(missingpl), b", ".join(sorted(hex(n) for n in missingpl)))
         )
+
+    # Allow hooks to run between the pushlog scan and the source changelog scan.
+    # Used by tests to simulate new commits arriving between the two passes.
+    hook.hook(ui, None, b"unifyrepo-source-scan-done", throw=True)
 
     # Filter out changesets we aren't aggregating.
     # We also use this pass to identify which nodes to bookmark.

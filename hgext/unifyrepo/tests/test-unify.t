@@ -285,6 +285,70 @@ as it is an unsupported use case.
   
   [255]
 
+Test that bookmarks reference nodes present in the destination even when
+a new commit arrives in a source repo between the pushlog scan and the
+source changelog scan (bug 2029158).
+
+  $ cd $TESTTMP
+  $ hg init servers/bmsource
+  $ hg init clients/bmsource
+  $ cd clients/bmsource
+  $ echo init > init
+  $ hg -q addremove
+  $ hg -q commit -m "BM INIT"
+  $ hg -q push ../../servers/bmsource
+  recorded push in pushlog
+  $ echo commit1 >> init
+  $ hg -q commit -m "BM COMMIT1"
+  $ hg -q push ../../servers/bmsource
+  recorded push in pushlog
+
+  $ cd $TESTTMP
+  $ cat > bmfixconfig << EOF
+  > [GLOBAL]
+  > stagepath = $TESTTMP/servers/bmstage
+  > destpath = $TESTTMP/servers/bmdest
+  > [bmsource]
+  > path = $TESTTMP/servers/bmsource
+  > bookmark = bm_test
+  > EOF
+
+Run unifyrepo with a hook that pushes a new commit to the source after
+the pushlog scan but before the source changelog scan. The bookmark
+should point to the last commit actually pulled (BM COMMIT1), not the
+extra one that arrived too late (BM EXTRA).
+
+  $ hg unifyrepo bmfixconfig --skipreplicate \
+  >   "--config=hooks.unifyrepo-source-scan-done=cd $TESTTMP/clients/bmsource && echo extra >> init && hg -q commit -m 'BM EXTRA' && hg push -q ../../servers/bmsource > /dev/null 2>&1"
+  obtained pushlog info for 2/2 revisions from 2 pushes from bmsource
+  aggregating 2/2 revisions for 1 heads from bmsource
+  aggregating 2/2 nodes from 2 original pushes
+  2/2 nodes will be pulled
+  pulling $TESTTMP/servers/bmsource into $TESTTMP/servers/bmstage
+  requesting all changes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 3 changesets with 3 changes to 1 files
+  new changesets ????????????:???????????? (glob)
+  consolidated into 1 pulls from 2 unique pushes
+  adding changesets
+  adding manifests
+  adding file changes
+  added 2 changesets with 2 changes to 1 files
+  new changesets ????????????:???????????? (glob)
+  inserting 2 pushlog entries
+  writing 1 bookmarks
+
+The source has BM EXTRA at tip but the destination only has BM COMMIT1.
+The bookmark must point to BM COMMIT1 (the last node actually in dest).
+
+  $ hg -R servers/bmdest log -T '{desc}\n' -r bm_test
+  BM COMMIT1
+
+  $ hg -R servers/bmsource log -T '{desc}\n' -r tip
+  BM EXTRA
+
 Confirm no output in logs
 
   $ cat error_log.log
