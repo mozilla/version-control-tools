@@ -46,7 +46,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['77538e1ce4be']) from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > remote: Warning: Permanently added 'hgssh,*' (ED25519) to the list of known hosts. (glob) (?)
   vcsreplicator.consumer   > remote: Warning: Permanently added the RSA host key for IP address '*' to the list of known hosts. (glob) (?)
@@ -65,7 +65,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 6
   vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['3eccb566e774']) from partition 2 offset 7
   vcsreplicator.consumer pulling 1 heads (3eccb566e774a5d3920e86a1963a5e5935dd792b) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > abort: abandoned transaction found
@@ -77,7 +77,7 @@ Check the logs to show that the abandoned transaction was resolved
   vcsreplicator.consumer   > (verify step skipped, run `hg verify` to check your repository content)
   vcsreplicator.consumer   [0]
   vcsreplicator.consumer pulling 1 heads (3eccb566e774a5d3920e86a1963a5e5935dd792b) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r3eccb566e774a5d3920e86a1963a5e5935dd792b --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > searching for changes
   vcsreplicator.consumer   > adding changesets

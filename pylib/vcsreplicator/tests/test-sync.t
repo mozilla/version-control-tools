@@ -56,7 +56,7 @@
   vcsreplicator.consumer processing hg-repo-sync-2: (repo: {moz}/mozilla-central, heads: ['000000000000'], bootstrap: False) from partition 2 offset 1
   vcsreplicator.consumer writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   vcsreplicator.consumer pulling 1 heads into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > no changes found
   vcsreplicator.consumer   > added 0 pushes

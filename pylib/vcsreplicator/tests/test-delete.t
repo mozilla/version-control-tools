@@ -116,7 +116,7 @@ Output of consumer logs:
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 2
   vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['2d30fb72c11e']) from partition 2 offset 3
   vcsreplicator.consumer pulling 1 heads (2d30fb72c11e311c32234b1c6b05a916a30aafcc) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r2d30fb72c11e311c32234b1c6b05a916a30aafcc -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r2d30fb72c11e311c32234b1c6b05a916a30aafcc --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests
@@ -142,7 +142,7 @@ Output of consumer logs:
   vcsreplicator.consumer processing heartbeat-1 from partition 2 offset 8
   vcsreplicator.consumer processing hg-changegroup-2: (repo: {moz}/mozilla-central, heads: ['2d30fb72c11e']) from partition 2 offset 9
   vcsreplicator.consumer pulling 1 heads (2d30fb72c11e311c32234b1c6b05a916a30aafcc) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r2d30fb72c11e311c32234b1c6b05a916a30aafcc -- ssh://hgssh/mozilla-central
+  vcsreplicator.consumer   $ /var/hg/venv_replication/bin/hg pull -r2d30fb72c11e311c32234b1c6b05a916a30aafcc --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > pulling from ssh://hgssh/mozilla-central
   vcsreplicator.consumer   > adding changesets
   vcsreplicator.consumer   > adding manifests

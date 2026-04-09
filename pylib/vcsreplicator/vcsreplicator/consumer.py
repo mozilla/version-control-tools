@@ -341,7 +341,12 @@ def process_hg_changegroup(config, path, source, node_count, heads):
             % (len(heads), ", ".join(heads), node_count, url, local_path)
         )
 
-        args = hglib.util.cmdbuilder("pull", url or "default", r=heads)
+        args = hglib.util.cmdbuilder(
+            "pull",
+            url or "default",
+            r=heads,
+            config=b"firefoxtree.replication=true",
+        )
         res, out, err = run_command(c, args)
         if res:
             raise hglib.error.CommandError(args, res, out, err)
@@ -418,7 +423,12 @@ def process_hg_sync(config, path, requirements, hgrc, heads, create=False):
         oldtip = int(c.log("tip")[0].rev)
 
         logger.warn("pulling %d heads into %s" % (len(heads), local_path))
-        args = hglib.util.cmdbuilder("pull", url or "default", r=heads)
+        args = hglib.util.cmdbuilder(
+            "pull",
+            url or "default",
+            r=heads,
+            config=b"firefoxtree.replication=true",
+        )
         res, out, err = run_command(c, args)
         if res not in (0, 1):
             raise hglib.error.CommandError(args, res, out, err)

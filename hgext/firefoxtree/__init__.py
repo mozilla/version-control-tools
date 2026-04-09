@@ -136,6 +136,7 @@ configitem(b"firefoxtree", b"servetags", default=configitems.dynamicdefault)
 configitem(
     b"firefoxtree", b"servetagsfrombookmarks", default=configitems.dynamicdefault
 )
+configitem(b"firefoxtree", b"replication", default=False)
 
 
 shorttemplate = b"".join(
@@ -392,7 +393,9 @@ def wrappedpullobsolete(orig, pullop):
     if not isfirefoxrepo(repo):
         return res
 
-    if remote.capable(b"firefoxtrees"):
+    if remote.capable(b"firefoxtrees") and not repo.ui.configbool(
+        b"firefoxtree", b"replication", False
+    ):
         bmstore = bookmarks.bmstore(repo)
         # remote.local() returns a localrepository or None. If local,
         # just pass it into the wire protocol command/function to simulate
@@ -466,10 +469,17 @@ def wrappedpullbookmarks(orig, pullop):
     This is meant for the special unified repo that advertises heads as
     bookmarks. By filtering out the bookmarks to clients running this extension,
     they'll never pull down the bookmarks version of the tags.
+
+    Set ``firefoxtree.replication = true`` to skip this filtering (e.g. when
+    performing replication pulls that must preserve all bookmarks).
     """
     repo = pullop.repo
 
-    if isfirefoxrepo(repo) and pullop.remote.capable(b"firefoxtrees"):
+    if (
+        isfirefoxrepo(repo)
+        and pullop.remote.capable(b"firefoxtrees")
+        and not repo.ui.configbool(b"firefoxtree", b"replication", False)
+    ):
         pullop.remotebookmarks = {
             k: v
             for k, v in pullop.remotebookmarks.items()

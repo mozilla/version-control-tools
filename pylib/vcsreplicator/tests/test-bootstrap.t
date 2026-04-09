@@ -393,7 +393,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   stream clone of ssh://hgssh/deleterepo failed - using pull instead
   created Mercurial repository: /repo/hg/mozilla/deleterepo
   pulling 1 heads into /repo/hg/mozilla/deleterepo
-    $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 -- ssh://hgssh/deleterepo
+    $ /var/hg/venv_replication/bin/hg pull -r0000000000000000000000000000000000000000 --config=firefoxtree.replication=true -- ssh://hgssh/deleterepo
     > pulling from ssh://hgssh/deleterepo
     > remote: requested repo deleterepo does not exist
     > abort: no suitable response from remote hg
@@ -404,7 +404,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   created Mercurial repository: /repo/hg/mozilla/mozilla-central
   writing hgrc: /repo/hg/mozilla/mozilla-central/.hg/hgrc
   pulling 1 heads into /repo/hg/mozilla/mozilla-central
-    $ /var/hg/venv_replication/bin/hg pull -r7a58fdf00b0fe1fa87fa052d9f78a8f28e1239e0 -- ssh://hgssh/mozilla-central
+    $ /var/hg/venv_replication/bin/hg pull -r7a58fdf00b0fe1fa87fa052d9f78a8f28e1239e0 --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
     > pulling from ssh://hgssh/mozilla-central
     > adding changesets
     > adding manifests
@@ -423,7 +423,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
   created Mercurial repository: /repo/hg/mozilla/testrepo
   writing hgrc: /repo/hg/mozilla/testrepo/.hg/hgrc
   pulling 1 heads into /repo/hg/mozilla/testrepo
-    $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 -- ssh://hgssh/testrepo
+    $ /var/hg/venv_replication/bin/hg pull -r77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 --config=firefoxtree.replication=true -- ssh://hgssh/testrepo
     > pulling from ssh://hgssh/testrepo
     > adding changesets
     > adding manifests
@@ -436,7 +436,7 @@ Verify consumer log output. The indicated initial offsets should start at 13, no
     [0]
   pulled 1 changesets into /repo/hg/mozilla/testrepo
   pulling 1 heads (89e594ce6b790e64021edfe272c70db75e7304ab) and 1 nodes from ssh://hgssh/mozilla-central into /repo/hg/mozilla/mozilla-central
-    $ /var/hg/venv_replication/bin/hg pull -r89e594ce6b790e64021edfe272c70db75e7304ab -- ssh://hgssh/mozilla-central
+    $ /var/hg/venv_replication/bin/hg pull -r89e594ce6b790e64021edfe272c70db75e7304ab --config=firefoxtree.replication=true -- ssh://hgssh/mozilla-central
     > pulling from ssh://hgssh/mozilla-central
     > searching for changes
     > adding changesets
