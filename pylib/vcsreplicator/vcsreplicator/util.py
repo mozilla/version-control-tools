@@ -10,6 +10,7 @@ import time
 
 from kafka.common import OffsetRequestPayload as OffsetRequest
 from kafka.consumer.base import Consumer
+from kafka.errors import UnknownTopicOrPartitionError
 
 PAYLOAD_LOGS = {
     "hg-repo-init-1": "repo: {path}",
@@ -59,14 +60,28 @@ def wait_for_topic(client, topic, timeout=-1):
     a topic to exist before proceeding.
     """
     start = time.time()
-    while not client.has_metadata_for_topic(topic):
+    while True:
         if timeout > 0 and time.time() - start > timeout:
             raise Exception("timeout reached waiting for topic")
 
-        time.sleep(0.1)
-
         # Don't pass topic name to function or it will attempt to create it.
         client.load_metadata_for_topics()
+
+        if not client.has_metadata_for_topic(topic):
+            time.sleep(0.1)
+            continue
+
+        # Verify that the topic is also accessible via a targeted fetch, which
+        # is what Consumer.__init__ will do. There is a brief window where the
+        # full refresh reports success but the targeted fetch still raises
+        # UnknownTopicOrPartitionError (e.g. during leader election on newer
+        # Kafka versions).
+        try:
+            client.load_metadata_for_topics(topic, ignore_leadernotavailable=True)
+            break
+        except UnknownTopicOrPartitionError:
+            time.sleep(0.1)
+            continue
 
 
 def fetch_partition_offsets(client, topic):
