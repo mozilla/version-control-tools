@@ -18,6 +18,7 @@ import random
 import re
 import socket
 import ssl
+import stat
 import time
 
 from mercurial.i18n import _
@@ -65,6 +66,57 @@ def getsparse():
 def peerlookup(remote, v):
     with remote.commandexecutor() as e:
         return e.callcommand(b"lookup", {b"key": v}).result()
+
+
+def remove_dangling_links(ui, path):
+    """On Windows, remove dangling symlinks and junctions under ``path``.
+
+    npm's ``file:`` protocol dependencies create directory junctions in
+    ``node_modules/`` with absolute targets.  When a Taskcluster cache
+    is restored to a different task directory those targets no longer
+    exist, and Mercurial's purge crashes in ``vfs.listdir()`` with
+    ``FileNotFoundError``.  Removing them first lets purge proceed.
+    """
+    if os.name != "nt":
+        return
+
+    ui.write(b"windows detected, removing dangling links\n")
+
+    stack = [path]
+    while stack:
+        dirpath = stack.pop()
+        try:
+            entries = os.scandir(dirpath)
+        except OSError:
+            continue
+
+        with entries:
+            for entry in entries:
+                p = entry.path
+                try:
+                    attrs = entry.stat(follow_symlinks=False).st_file_attributes
+                except OSError:
+                    continue
+
+                if attrs & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+                    if not os.path.exists(p):
+                        ui.write(
+                            b"(removing dangling link %s)\n"
+                            % os.fsencode(os.path.relpath(p, path))
+                        )
+                        try:
+                            os.rmdir(p)
+                        except OSError:
+                            os.remove(p)
+                    continue
+
+                try:
+                    is_dir = entry.is_dir(follow_symlinks=False)
+                except OSError:
+                    continue
+
+                if is_dir:
+                    stack.append(p)
 
 
 @command(
@@ -741,6 +793,10 @@ def _docheckout(
     # guaranteed to not have conflicts on `hg update`.
     if purge and not created:
         ui.write(b"(purging working directory)\n")
+
+        with timeit("purge", "dangling_link_remove"):
+            remove_dangling_links(ui, dest)
+
         purge = getattr(commands, "purge", None)
         if not purge:
             purge = extensions.find(b"purge").purge
