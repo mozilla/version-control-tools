@@ -15,6 +15,11 @@ import subprocess
 import sys
 import time
 import traceback
+import warnings
+
+# Ignore annoying warnings from Google code (https://github.com/googleapis/google-cloud-python/issues/13974).
+# TODO: Remove this filter when that Google Python SDK issue is resolved.
+warnings.filterwarnings("ignore", "pkg_resources is deprecated as an API")
 
 import boto3
 import botocore.exceptions
