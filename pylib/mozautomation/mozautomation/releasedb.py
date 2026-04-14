@@ -324,7 +324,7 @@ class FirefoxReleaseDatabase(object):
         """Caches data when the context manager is active."""
         monkey_patched = False
 
-        if b"builds" not in self.__dict__:
+        if "builds" not in self.__dict__:
             builds = list(self.builds())
 
             # Monkeypatch self.builds() with a function that returns a cached copy.
@@ -332,9 +332,10 @@ class FirefoxReleaseDatabase(object):
                 return iter(builds)
 
             self.builds = cachedbuilds
+            monkey_patched = True
 
         try:
             yield
         finally:
             if monkey_patched:
-                del self.__dict__[b"builds"]
+                del self.__dict__["builds"]
