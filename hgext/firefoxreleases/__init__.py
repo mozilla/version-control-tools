@@ -83,6 +83,28 @@ def db_for_repo(repo):
     )
 
 
+# Cache of (mtime, by_rev, configs) keyed by db path. Invalidated when the
+# db file's mtime changes (i.e. when new release data is imported).
+_release_data_cache = {}
+
+
+def _get_release_data(db, dbpath, repo):
+    """Return (by_rev, configs) for the given db, using a process-level cache."""
+    try:
+        mtime = os.path.getmtime(dbpath)
+    except OSError:
+        mtime = None
+
+    cached = _release_data_cache.get(dbpath)
+    if cached is not None and cached[0] == mtime:
+        return cached[1], cached[2]
+
+    by_rev = release_builds_by_revision(db, repo)
+    configs = release_configurations(db, repo)
+    _release_data_cache[dbpath] = (mtime, by_rev, configs)
+    return by_rev, configs
+
+
 def release_builds(db, repo, filter_unknown_revision=True):
     """Obtain Firefox release builds.
 
@@ -236,9 +258,7 @@ def release_info_for_changeset(db, repo, ctx):
     """Given a changeset, obtain relevant release info."""
     # Find the previous release before this changeset. We walk ancestors
     # and store the first seen build entry for each release configuration.
-    with db.cache_builds():
-        revisions = release_builds_by_revision(db, repo)
-        configs = release_configurations(db, repo)
+    revisions, configs = _get_release_data(db, db.path, repo)
 
     previous_releases = {}
     cl = repo.changelog
