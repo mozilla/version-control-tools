@@ -734,6 +734,49 @@ def cloud_region_specifier(instance_data):
     }
 
 
+# Cache of parsed IP network lists, keyed by file path. Loaded once per process
+# on first use. These files change rarely so there is no invalidation.
+_ip_networks_cache = {}
+
+
+def _load_aws_networks(path):
+    if path not in _ip_networks_cache:
+        with open(path, "rb") as fh:
+            data = json.load(fh)
+        _ip_networks_cache[path] = [
+            (ipaddress.IPv4Network(e["ip_prefix"]), e["region"])
+            for e in data["prefixes"]
+            if "ip_prefix" in e
+        ]
+    return _ip_networks_cache[path]
+
+
+def _load_gcp_networks(path):
+    if path not in _ip_networks_cache:
+        with open(path, "rb") as fh:
+            data = json.load(fh)
+        networks = []
+        for e in data["prefixes"]:
+            if "ipv4Prefix" in e:
+                networks.append((ipaddress.IPv4Network(e["ipv4Prefix"]), e["scope"]))
+            elif "ipv6Prefix" in e:
+                networks.append((ipaddress.IPv6Network(e["ipv6Prefix"]), e["scope"]))
+        _ip_networks_cache[path] = networks
+    return _ip_networks_cache[path]
+
+
+def _load_moz_networks(path):
+    if path not in _ip_networks_cache:
+        with open(path, "r") as fh:
+            lines = fh.read().splitlines()
+        _ip_networks_cache[path] = [
+            ipaddress.IPv4Network(pycompat.unicode(pycompat.sysstr(e)))
+            for e in lines
+            if e
+        ]
+    return _ip_networks_cache[path]
+
+
 def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     """Wraps `wireprotov1server.clonebundles` and `wireprotov1server.clonebundles_2`.
 
@@ -795,20 +838,11 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     # we will check if the request came from AWS to server optimized bundles.
     if awspath and b"ec2region=" in manifest.data:
         try:
-            with open(awspath, "rb") as fh:
-                awsdata = json.load(fh)
-
-            for ipentry in awsdata["prefixes"]:
-                network = ipaddress.IPv4Network(ipentry["ip_prefix"])
-
-                if sourceip not in network:
-                    continue
-
-                region = ipentry["region"]
-
-                return filter_manifest_for_region(
-                    manifest, b"ec2region=%s" % pycompat.bytestr(region)
-                )
+            for network, region in _load_aws_networks(awspath):
+                if sourceip in network:
+                    return filter_manifest_for_region(
+                        manifest, b"ec2region=%s" % pycompat.bytestr(region)
+                    )
 
         except Exception as e:
             repo.ui.log(b"hgmo", b"exception filtering AWS bundle source IPs: %s\n", e)
@@ -817,23 +851,11 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     # we will check if the request came from GCP to serve optimized bundles
     if gcppath and b"gceregion=" in manifest.data:
         try:
-            with open(gcppath, "rb") as f:
-                gcpdata = json.load(f)
-
-            for ipentry in gcpdata["prefixes"]:
-                if "ipv4Prefix" in ipentry:
-                    network = ipaddress.IPv4Network(ipentry["ipv4Prefix"])
-                elif "ipv6Prefix" in ipentry:
-                    network = ipaddress.IPv6Network(ipentry["ipv6Prefix"])
-
-                if sourceip not in network:
-                    continue
-
-                region = ipentry["scope"]
-
-                return filter_manifest_for_region(
-                    manifest, b"gceregion=%s" % pycompat.bytestr(region)
-                )
+            for network, region in _load_gcp_networks(gcppath):
+                if sourceip in network:
+                    return filter_manifest_for_region(
+                        manifest, b"gceregion=%s" % pycompat.bytestr(region)
+                    )
 
         except Exception as e:
             repo.ui.log(b"hgmo", b"exception filtering GCP bundle source IPs: %s\n", e)
@@ -841,14 +863,7 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     # Determine if source IP is in a Mozilla network, as we stream results to those addresses
     if mozpath:
         try:
-            with open(mozpath, "r") as fh:
-                mozdata = fh.read().splitlines()
-
-            for ipentry in mozdata:
-                network = ipaddress.IPv4Network(
-                    pycompat.unicode(pycompat.sysstr(ipentry))
-                )
-
+            for network in _load_moz_networks(mozpath):
                 # If the source IP is from a Mozilla network, prioritize stream bundles
                 if sourceip in network:
                     origlines = sorted(manifest.data.splitlines(), key=stream_clone_key)
