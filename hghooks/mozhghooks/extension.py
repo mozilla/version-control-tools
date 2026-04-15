@@ -36,6 +36,30 @@ configitem(
 configitem(
     b"pushlog", b"landingworkeruserdev", default=b"lando_landing_worker_dev@mozilla.com"
 )
+configitem(
+    b"pushlog", b"landingworkertry", default="lando_landing_worker_try@mozilla.com"
+)
+configitem(
+    b"pushlog",
+    b"landingworkertrydev",
+    default="lando_landing_worker_try_dev@mozilla.com",
+)
+configitem(
+    b"pushlog",
+    b"landingworkertrystage",
+    default="lando_landing_worker_try_stage@mozilla.com",
+)
+configitem(b"pushlog", b"githgsyncworker", default="githgsync_worker@mozilla.com")
+configitem(
+    b"pushlog",
+    b"githgsyncworkerfirefox",
+    default="githgsync_worker_thunderbird@mozilla.com",
+)
+configitem(
+    b"pushlog",
+    b"githgsyncworkerthunderbird",
+    default="githgsync_worker_firefox@mozilla.com",
+)
 
 
 def get_check_classes(hook):

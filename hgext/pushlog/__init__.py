@@ -57,6 +57,14 @@ configitem(b"pushlog", b"autolanduser", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"landingworkeruser", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"landingworkeruser2", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"landingworkeruserdev", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"landingworkertry", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"landingworkertrydev", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"landingworkertrystage", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"githgsyncworker", default=configitems.dynamicdefault)
+configitem(b"pushlog", b"githgsyncworkerfirefox", default=configitems.dynamicdefault)
+configitem(
+    b"pushlog", b"githgsyncworkerthunderbird", default=configitems.dynamicdefault
+)
 configitem(b"pushlog", b"remoteuserprefix", default=None)
 configitem(b"pushlog", b"timeoutro", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"timeoutrw", default=configitems.dynamicdefault)
@@ -79,6 +87,12 @@ AUTOLAND_USER = b"bind-autoland@mozilla.com"
 LANDING_WORKER_USER = b"lando_landing_worker@mozilla.com"
 LANDING_WORKER_USER_2 = b"lando_landing_worker_2@mozilla.com"
 LANDING_WORKER_USER_DEV = b"lando_landing_worker_dev@mozilla.com"
+LANDING_WORKER_TRY = b"lando_landing_worker_try@mozilla.com"
+LANDING_WORKER_TRY_DEV = b"lando_landing_worker_try_dev@mozilla.com"
+LANDING_WORKER_TRY_STAGE = b"lando_landing_worker_try_stage@mozilla.com"
+GITHGSYNC_WORKER = b"githgsync_worker@mozilla.com"
+GITHGSYNC_WORKER_FIREFOX = b"githgsync_worker_firefox@mozilla.com"
+GITHGSYNC_WORKER_THUNDERBIRD = b"githgsync_worker_thunderbird@mozilla.com"
 
 
 # Wraps capabilities wireproto command to advertise pushlog availability.
@@ -143,7 +157,8 @@ def retry_pull_pushlog(repo, pullop, fetchfrom) -> Iterator[bytes]:
             )
 
         repo.ui.warn(
-            b"remote error fetching pushlog on attempt %d: %s\n" % (attempt, next(lines))
+            b"remote error fetching pushlog on attempt %d: %s\n"
+            % (attempt, next(lines))
         )
 
         time.sleep(1.5 * attempt)
@@ -897,9 +912,7 @@ class pushlog(object):
                 except RepoLookupError:
                     # The changeset was stripped. Remove it from the pushlog.
                     deletes.append(node)
-                    repo.ui.warn(
-                        b"changeset will be deleted from pushlog: %s\n" % node
-                    )
+                    repo.ui.warn(b"changeset will be deleted from pushlog: %s\n" % node)
 
             for node in deletes:
                 c.execute(
@@ -966,6 +979,14 @@ def pretxnchangegrouphook(ui, repo, node=None, source=None, **kwargs):
         ui.config(b"pushlog", b"landingworkeruser", LANDING_WORKER_USER),
         ui.config(b"pushlog", b"landingworkeruser2", LANDING_WORKER_USER_2),
         ui.config(b"pushlog", b"landingworkeruserdev", LANDING_WORKER_USER_DEV),
+        ui.config(b"pushlog", b"landingworkertry", LANDING_WORKER_TRY),
+        ui.config(b"pushlog", b"landingworkertrydev", LANDING_WORKER_TRY_DEV),
+        ui.config(b"pushlog", b"landingworkertrystage", LANDING_WORKER_TRY_STAGE),
+        ui.config(b"pushlog", b"githgsyncworker", GITHGSYNC_WORKER),
+        ui.config(b"pushlog", b"githgsyncworkerfirefox", GITHGSYNC_WORKER_FIREFOX),
+        ui.config(
+            b"pushlog", b"githgsyncworkerthunderbird", GITHGSYNC_WORKER_THUNDERBIRD
+        ),
     )
 
     if user in landing_users:

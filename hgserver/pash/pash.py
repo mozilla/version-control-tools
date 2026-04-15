@@ -18,6 +18,12 @@ AUTOLAND_USER = "bind-autoland@mozilla.com"
 LANDING_WORKER_USER = "lando_landing_worker@mozilla.com"
 LANDING_WORKER_USER_2 = "lando_landing_worker_2@mozilla.com"
 LANDING_WORKER_USER_DEV = "lando_landing_worker_dev@mozilla.com"
+LANDING_WORKER_TRY = "lando_landing_worker_try@mozilla.com"
+LANDING_WORKER_TRY_DEV = "lando_landing_worker_try_dev@mozilla.com"
+LANDING_WORKER_TRY_STAGE = "lando_landing_worker_try_stage@mozilla.com"
+GITHGSYNC_WORKER = "githgsync_worker@mozilla.com"
+GITHGSYNC_WORKER_FIREFOX = "githgsync_worker_firefox@mozilla.com"
+GITHGSYNC_WORKER_THUNDERBIRD = "githgsync_worker_thunderbird@mozilla.com"
 
 PASH_JSON = Path("/etc/mercurial/pash.json")
 
@@ -85,13 +91,18 @@ def process_login(user):
 
     touch_hg_access_date(user)
 
-    # landing_users are both autoland-transplant and Lando landing worker
-    # users that push on behalf of other users.
+    # landing_users are automation and bot users that push on behalf of other users.
     landing_users = (
         pash_settings.get("autoland_user", AUTOLAND_USER),
         pash_settings.get("landing_worker_user", LANDING_WORKER_USER),
         pash_settings.get("landing_worker_user_2", LANDING_WORKER_USER_2),
         pash_settings.get("landing_worker_user_dev", LANDING_WORKER_USER_DEV),
+        pash_settings.get("landing_worker_try", LANDING_WORKER_TRY),
+        pash_settings.get("landing_worker_try_dev", LANDING_WORKER_TRY_DEV),
+        pash_settings.get("landing_worker_try_stage", LANDING_WORKER_TRY_STAGE),
+        pash_settings.get("githgsync_worker", GITHGSYNC_WORKER),
+        pash_settings.get("githgsync_worker_firefox", GITHGSYNC_WORKER_FIREFOX),
+        pash_settings.get("githgsync_worker_thunderbird", GITHGSYNC_WORKER_THUNDERBIRD),
     )
 
     # Touch the initiator of the autoland request, if required.
