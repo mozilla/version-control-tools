@@ -76,7 +76,6 @@ Blackbox logging recorded appropriate entries
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-prechangegroup: hgext_readonly.prechangegrouphook finished in * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.prevent_subrepos took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.prevent_symlinks took * seconds (glob)
-  * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.repolocked_check took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.single_branch took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> mozhooks.pretxnchangegroup.single_root took * seconds (glob)
   * user1@example.com @0000000000000000000000000000000000000000 (*)> pythonhook-pretxnchangegroup: hgext_mozhooks.pretxnchangegroup finished in * seconds (glob)
