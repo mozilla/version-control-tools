@@ -27,6 +27,7 @@ from mercurial import (
     revset,
     templateutil,
     util,
+    wireprototypes,
     wireprotov1server as wireproto,
 )
 from mercurial.hgweb import (
@@ -67,6 +68,7 @@ configitem(
     b"pushlog", b"githgsyncworkerthunderbird", default=configitems.dynamicdefault
 )
 configitem(b"pushlog", b"remoteuserprefix", default=None)
+configitem(b"pushlog", b"retrydelayms", default=1500)
 configitem(b"pushlog", b"timeoutro", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"timeoutrw", default=configitems.dynamicdefault)
 configitem(b"pushlog", b"userprefix", default=None)
@@ -100,6 +102,7 @@ GITHGSYNC_WORKER_THUNDERBIRD = b"githgsync_worker_thunderbird@mozilla.com"
 def capabilities(orig, repo, proto):
     caps = orig(repo, proto)
     caps.append(b"pushlog")
+    caps.append(b"pushlog-stream")
     return caps
 
 
@@ -138,60 +141,59 @@ def pushlogwireproto(repo, proto, firstpush):
         return b"\n".join([b"0", pycompat.bytestr(e)])
 
 
-def retry_pull_pushlog(repo, pullop, fetchfrom) -> Iterator[bytes]:
-    """Pull down pushlog entries with retries."""
-    for attempt in range(1, 4):
-        lines = pullop.remote._call(b"pushlog", firstpush=pycompat.bytestr(fetchfrom))
-        lines = iter(lines.splitlines())
+@wireproto.wireprotocommand(b"pushlog-stream", b"firstpush", permission=b"pull")
+def pushlogstreamwireproto(repo, proto, firstpush):
+    """Stream pushlog rows to the client, terminated by `ok` or `error <msg>`."""
+    def generate():
+        try:
+            firstpush_int = int(firstpush)
+        except (ValueError, TypeError) as exc:
+            message = pycompat.bytestr(exc).replace(b"\n", b" ")
+            yield b"error %s\n" % message
+            return
 
-        statusline = pycompat.bytestr(next(lines))
-        if statusline[0] == b"1":
-            # This is our success condition, when we get a response with a `1` as the
-            # first line.
-            return lines
+        try:
+            for pushid, who, when, nodes in repo.pushlog.pushes(
+                start_id=firstpush_int
+            ):
+                yield b"%d %s %d %s\n" % (
+                    pushid,
+                    who,
+                    when,
+                    b" ".join(nodes),
+                )
+            yield b"ok\n"
+        except sqlite3.Error as exc:
+            message = pycompat.bytestr(exc).replace(b"\n", b" ")
+            yield b"error %s\n" % message
 
-        if statusline[0] != b"0":
-            # Raise here since we should never get a response that has any value
-            # except `0` or `1` as the first line.
-            raise Abort(
-                b"error fetching pushlog: unexpected response: %s\n" % statusline
-            )
-
-        repo.ui.warn(
-            b"remote error fetching pushlog on attempt %d: %s\n"
-            % (attempt, next(lines))
-        )
-
-        time.sleep(1.5 * attempt)
-
-    raise error.Abort(b"remote error fetching pushlog: %s" % next(lines))
+    # `streamreslegacy` (not `streamres`): compressed `streamres`
+    # wraps the client stream in a reader without `readline`.
+    return wireprototypes.streamreslegacy(gen=generate())
 
 
-def exchangepullpushlog(orig, pullop):
-    """This is called during pull to fetch pushlog data.
+class PushlogRemoteError(Exception):
+    """Retryable server-side error while streaming `pushlog-stream`."""
 
-    The goal of this function is to replicate the entire pushlog. This is
-    in contrast to replicating only the pushlog data for changesets the
-    client has pulled. Put another way, this attempts complete replication
-    as opposed to partial, hole-y replication.
-    """
-    # check stepsdone for future compatibility with bundle2 pushlog exchange.
-    res = orig(pullop)
 
-    if b"pushlog" in pullop.stepsdone or not pullop.remote.capable(b"pushlog"):
-        return res
+def apply_pushlog_stream(repo, pullop, fetchfrom, conn, urepo):
+    """Stream pushes from `pushlog-stream`, insert via `conn`, return count applied."""
+    stream = pullop.remote._callstream(
+        b"pushlog-stream", firstpush=pycompat.bytestr(fetchfrom)
+    )
 
-    pullop.stepsdone.add(b"pushlog")
-    repo = pullop.repo
-    urepo = repo.unfiltered()
-    fetchfrom = repo.pushlog.lastpushid() + 1
+    applied = 0
+    for raw_line in iter(stream.readline, b""):
+        line = raw_line.rstrip(b"\n")
+        if not line:
+            continue
+        if line == b"ok":
+            return applied
+        if line.startswith(b"error "):
+            raise PushlogRemoteError(line[len(b"error "):])
 
-    lines = retry_pull_pushlog(repo, pullop, fetchfrom)
-
-    pushes = []
-    for line in lines:
-        pushid, who, when, nodes = line.split(b" ", 3)
-        nodes = [bin(n) for n in nodes.split()]
+        pushid_bytes, user, when_bytes, nodes_bytes = line.split(b" ", 3)
+        nodes = [bin(node) for node in nodes_bytes.split()]
 
         # We stop processing if there is a reference to an unknown changeset.
         # This can happen in a few scenarios.
@@ -219,14 +221,85 @@ def exchangepullpushlog(orig, pullop):
                 b"received pushlog entry for unknown changeset %s; "
                 b"ignoring\n" % b", ".join(missing)
             )
-            break
+            return applied
 
-        pushes.append((int(pushid), who, int(when), nodes))
+        pushid = int(pushid_bytes)
+        when = int(when_bytes)
+        conn.execute(
+            "INSERT INTO pushlog (id, user, date) VALUES (?, ?, ?)",
+            (pushid, pycompat.sysstr(user), when),
+        )
+        for node in nodes:
+            ctx = urepo[node]
+            conn.execute(
+                "INSERT INTO changesets (pushid, rev, node) VALUES (?, ?, ?)",
+                (pushid, ctx.rev(), pycompat.sysstr(ctx.hex())),
+            )
+        applied += 1
 
-    repo.pushlog.recordpushes(pushes, tr=pullop.trmanager.transaction())
-    repo.ui.status(b"added %d pushes\n" % len(pushes))
+    # Falling out of the loop means the server closed the stream
+    # without an `ok` or `error` trailer.
+    raise PushlogRemoteError(b"stream ended without trailer")
 
-    return res
+
+def exchangepullpushlog(orig, pullop):
+    """This is called during pull to fetch pushlog data.
+
+    The goal of this function is to replicate the entire pushlog. This is
+    in contrast to replicating only the pushlog data for changesets the
+    client has pulled. Put another way, this attempts complete replication
+    as opposed to partial, hole-y replication.
+    """
+    # check stepsdone for future compatibility with bundle2 pushlog exchange.
+    res = orig(pullop)
+
+    if b"pushlog" in pullop.stepsdone or not pullop.remote.capable(
+        b"pushlog-stream"
+    ):
+        return res
+
+    pullop.stepsdone.add(b"pushlog")
+    repo = pullop.repo
+    urepo = repo.unfiltered()
+    fetchfrom = repo.pushlog.lastpushid() + 1
+
+    tr = pullop.trmanager.transaction()
+    # Call `_getconn(tr=tr)` exactly once: it registers finalize/abort
+    # hooks on `tr` keyed by the category `pushlog`, and a second call
+    # would overwrite those hooks and orphan the first connection.
+    conn = repo.pushlog._getconn(tr=tr)
+    if not conn:
+        raise error.Abort(
+            b"could not open sqlite pushlog connection while pulling"
+        )
+
+    retry_delay_ms = repo.ui.configint(b"pushlog", b"retrydelayms")
+    max_attempts = 3
+    for attempt in range(1, max_attempts + 1):
+        try:
+            applied = apply_pushlog_stream(
+                repo, pullop, fetchfrom, conn, urepo
+            )
+        except PushlogRemoteError as exc:
+            # Undo this attempt's inserts so the retry starts from a
+            # clean slate. The Mercurial transaction is still alive, so
+            # subsequent inserts attach to a fresh implicit transaction
+            # and commit when the pull finalizes.
+            conn.rollback()
+            repo.ui.warn(
+                b"remote error fetching pushlog on attempt %d: %s\n"
+                % (attempt, exc.args[0])
+            )
+            if attempt < max_attempts:
+                time.sleep(retry_delay_ms * attempt / 1000.0)
+            continue
+
+        repo.ui.status(b"added %d pushes\n" % applied)
+        return res
+
+    raise error.Abort(
+        b"remote error fetching pushlog after %d attempts" % max_attempts
+    )
 
 
 def addpushmetadata(repo, ctx, d):
