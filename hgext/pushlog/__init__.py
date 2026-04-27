@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import collections
 import contextlib
+import itertools
 import os
 import sqlite3
 import stat
@@ -249,6 +250,11 @@ def commonentry(orig, repo, ctx):
 
 
 Push = collections.namedtuple("Push", ("pushid", "user", "when", "nodes"))
+
+# One row from the pushlog + changesets join used by `pushes()`.
+PushlogRow = collections.namedtuple(
+    "PushlogRow", ("pushid", "user", "when", "rev", "node")
+)
 
 
 def make_finalize(repo, conn):
@@ -713,32 +719,56 @@ class pushlog(object):
                 "LEFT JOIN changesets on id=pushid " % inner_q
             )
 
-            if reverse:
-                q += "ORDER BY id DESC, rev DESC "
-            else:
-                q += "ORDER BY id ASC, rev ASC "
-
-            res = c.execute(q, args)
-
-            lastid = None
-            current = None
-            for pushid, who, when, rev, node in res:
-                # Only yield pushes for our specified branch.
-                if branch and self.repo[node].branch() != branch:
-                    continue
-
-                if pushid != lastid:
-                    if current:
-                        yield current
-                    lastid = pushid
-                    current = Push(pushid, who, when, [])
-                    if node:
-                        current.nodes.append(node)
+            # An outer `ORDER BY` forces `USE TEMP B-TREE FOR ORDER BY`,
+            # which is too slow on try's pushlog. Skip it on the
+            # unbounded streaming path (wireproto) and sort rev in
+            # Python. Bounded callers (`limit`/`offset`/`reverse`) need
+            # SQL ordering, and the temp B-tree is cheap there.
+            needs_outer_order = (
+                limit is not None or offset is not None or reverse
+            )
+            if needs_outer_order:
+                if reverse:
+                    q += "ORDER BY id DESC, rev DESC "
                 else:
-                    current.nodes.append(node)
+                    q += "ORDER BY id ASC, rev ASC "
 
-            if current:
-                yield current
+            rows = (PushlogRow(*raw) for raw in c.execute(q, args))
+
+            for pushid, group in itertools.groupby(
+                rows, key=lambda row: row.pushid
+            ):
+                rows_for_push = list(group)
+
+                # Only yield pushes for our specified branch.
+                if branch:
+                    rows_for_push = [
+                        row for row in rows_for_push
+                        if self.repo[row.node].branch() == branch
+                    ]
+                    if not rows_for_push:
+                        continue
+
+                # All rows in a group share `(pushid, user, when)`; they
+                # differ only in `(rev, node)`. Take metadata from the
+                # first row.
+                first = rows_for_push[0]
+
+                nodes_by_rev = sorted(
+                    (
+                        (row.rev, row.node)
+                        for row in rows_for_push
+                        if row.node is not None
+                    ),
+                    reverse=reverse,
+                )
+
+                yield Push(
+                    pushid,
+                    first.user,
+                    first.when,
+                    [node for _rev, node in nodes_by_rev],
+                )
 
     def push_count(self):
         """Obtain the number of pushes in the database."""
