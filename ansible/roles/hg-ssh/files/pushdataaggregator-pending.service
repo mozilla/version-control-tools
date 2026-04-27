@@ -8,6 +8,11 @@ OnFailure=mail-unit-output@%n.service
 # current hostname in it indicating that we are the master.
 AssertPathExists=/repo/hg/master.%H
 
+# Transient errors are absorbed by `retry_on_failure`; the burst limit
+# below trips `failed` state (and `OnFailure=`) on rapid crash loops.
+StartLimitIntervalSec=300
+StartLimitBurst=20
+
 [Service]
 WorkingDirectory=/
 User=hg-notifier
@@ -19,17 +24,7 @@ PrivateTmp=true
 ExecStart=/var/hg/venv_tools/bin/vcsreplicator-aggregator --max-polls 1800 /etc/mercurial/pushdataaggregator-pending.ini
 
 Restart=always
-
-# Wait more than default of 100ms to restart. This gives bad Kafka state a
-# little bit more time to recover in case a failure in it is responsible for
-# process exiting.
 RestartSec=3
-
-# Allow service to bounce more than normal due to intermittent
-# Kafka availability. We take StartLimitBurst and RestartSec into account
-# to effectively allow bouncing for up to N seconds.
-StartLimitInterval=300
-StartLimitBurst=20
 
 TimeoutStopSec=60
 

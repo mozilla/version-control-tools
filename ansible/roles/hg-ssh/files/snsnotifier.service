@@ -8,6 +8,11 @@ OnFailure=mail-unit-output@%n.service
 # current hostname in it indicating that we are the master.
 AssertPathExists=/repo/hg/master.%H
 
+# Transient errors are absorbed by `retry_on_failure`; the burst limit
+# below trips `failed` state (and `OnFailure=`) on rapid crash loops.
+StartLimitIntervalSec=300
+StartLimitBurst=20
+
 [Service]
 WorkingDirectory=/
 User=hg-notifier
@@ -15,7 +20,9 @@ Group=hg-notifier
 PrivateTmp=true
 
 ExecStart=/var/hg/venv_tools/bin/vcsreplicator-sns-notifier /etc/mercurial/notifications.ini
+
 Restart=always
+RestartSec=3
 TimeoutStopSec=60
 
 # Needed for HTTPS_PROXY in some environments.

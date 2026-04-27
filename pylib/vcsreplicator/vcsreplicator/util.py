@@ -5,12 +5,112 @@
 from __future__ import absolute_import, unicode_literals
 
 import copy
+import functools
+import logging
+import os
 import time
 
 
 from kafka.common import OffsetRequestPayload as OffsetRequest
 from kafka.consumer.base import Consumer
 from kafka.errors import UnknownTopicOrPartitionError
+
+
+# Retry policy used by `retry_on_failure`. Values may be overridden at
+# process startup via environment variables; tests set
+# `VCSREPLICATOR_RETRY_MAX_RETRIES=0` so failure-path assertions don't
+# incur the production retry sleep (2+4+8+16+32 = 62s per failed message).
+RETRY_MAX_RETRIES = int(os.environ.get("VCSREPLICATOR_RETRY_MAX_RETRIES", 5))
+RETRY_BASE_DELAY = int(os.environ.get("VCSREPLICATOR_RETRY_BASE_DELAY", 2))
+
+# Exceptions that retry cannot fix — programming errors and malformed
+# payloads. These bypass retry so poison messages exit the daemon
+# quickly (where the systemd burst limiter can trip `failed` state)
+# instead of burning the full retry budget on every redelivery.
+NON_RETRYABLE_EXCEPTIONS = (
+    ValueError,
+    KeyError,
+    TypeError,
+    AssertionError,
+)
+
+
+class ShutDownException(Exception):
+    """Raised to unwind a Kafka consume loop in response to SIGINT/SIGTERM.
+
+    Lives at module scope so the ``retry_on_failure`` decorator can
+    re-raise it without treating it as a retryable failure.
+    """
+
+
+def retry_on_failure(fn):
+    """Retry a Kafka message-handler call on transient exceptions with exponential backoff.
+
+    On a transient exception from ``fn``, the call is retried up to
+    ``RETRY_MAX_RETRIES`` additional times. The delay before the n-th
+    retry (0-indexed) is ``RETRY_BASE_DELAY * 2**n`` seconds. After
+    retries are exhausted the exception propagates, which (in the
+    typical consumer topology) leaves the Kafka offset uncommitted and
+    exits the daemon, so systemd will restart it and re-deliver the
+    same message.
+
+    Exceptions in ``NON_RETRYABLE_EXCEPTIONS`` (programming errors,
+    malformed payloads) are re-raised immediately so poison messages
+    exit the daemon quickly rather than spinning in-process.
+
+    ``ShutDownException`` is re-raised without retry so signal-driven
+    shutdown during a retry sleep terminates the daemon cleanly.
+    """
+    module_logger = logging.getLogger(fn.__module__)
+
+    @functools.wraps(fn)
+    def retrywrapper(*args, **kwargs):
+        for attempt in range(RETRY_MAX_RETRIES + 1):
+            try:
+                return fn(*args, **kwargs)
+            except ShutDownException:
+                raise
+            except NON_RETRYABLE_EXCEPTIONS as exc:
+                module_logger.error(
+                    "%s failed with non-retryable exception: %s: %s"
+                    % (fn.__name__, type(exc).__name__, exc)
+                )
+                raise
+            except Exception as exc:
+                if attempt >= RETRY_MAX_RETRIES:
+                    if RETRY_MAX_RETRIES == 0:
+                        module_logger.error(
+                            "%s failed (retries disabled): %s: %s"
+                            % (fn.__name__, type(exc).__name__, exc)
+                        )
+                    else:
+                        module_logger.error(
+                            "%s failed after %d attempts: %s: %s"
+                            % (
+                                fn.__name__,
+                                attempt + 1,
+                                type(exc).__name__,
+                                exc,
+                            )
+                        )
+                    raise
+
+                delay = RETRY_BASE_DELAY * (2 ** attempt)
+                module_logger.warning(
+                    "%s failed (%s: %s); retrying in %ds "
+                    "(attempt %d of %d)"
+                    % (
+                        fn.__name__,
+                        type(exc).__name__,
+                        exc,
+                        delay,
+                        attempt + 1,
+                        RETRY_MAX_RETRIES,
+                    )
+                )
+                time.sleep(delay)
+
+    return retrywrapper
 
 PAYLOAD_LOGS = {
     "hg-repo-init-1": "repo: {path}",

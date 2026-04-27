@@ -4,6 +4,11 @@
 
 . $TESTDIR/hgserver/tests/helpers.sh
 
+# Disable the `retry_on_failure` sleep-and-retry behaviour when running
+# tests. Production defaults would add ~62s per deliberately-failing
+# message assertion (e.g. `test-corrupt-repo-replication.t`).
+export VCSREPLICATOR_RETRY_MAX_RETRIES=0
+
 vcsrenv() {
   hgmoenv
 

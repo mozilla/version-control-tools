@@ -29,6 +29,8 @@ from .config import Config
 from .util import (
     consumer_offsets,
     payload_log_display,
+    retry_on_failure,
+    ShutDownException,
     wait_for_topic,
 )
 
@@ -110,12 +112,13 @@ def consume(config, consumer, message_handler, timeout=0.1, onetime=False):
     This loop runs forever until asked to exit via a SIGINT or SIGTERM.
 
     ``message_handler`` is a callable that will receive the ``(config,
-    payload)`` of the message to process.
+    payload)`` of the message to process. Transient retry is expected to
+    be handled by the handler itself (typically via the
+    ``retry_on_failure`` decorator); if the handler ultimately raises,
+    the offset is not committed and the daemon exits, letting systemd
+    restart and re-deliver the message.
     """
     count = [0]
-
-    class ShutDownException(Exception):
-        pass
 
     def signal_exit(signum, frame):
         logger.warn("received signal %d" % signum)
@@ -201,6 +204,7 @@ def autorecover(message_handler):
 
 
 @repofilter
+@retry_on_failure
 @autorecover
 def handle_message_main(config, payload):
     """Process a decoded event message.
@@ -278,6 +282,7 @@ def handle_message_main(config, payload):
 
 
 @repofilter
+@retry_on_failure
 def handle_message_heads(config, payload):
     """Process a decoded event message.
 

@@ -22,6 +22,7 @@ from .producer import Producer
 from .util import (
     consumer_offsets,
     payload_log_display,
+    retry_on_failure,
 )
 
 
@@ -39,6 +40,7 @@ def read_consumer_groups(path):
     return consumer_groups
 
 
+@retry_on_failure
 def _run_aggregation(
     client,
     consumer_topic,

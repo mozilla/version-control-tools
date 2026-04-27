@@ -13,7 +13,13 @@ Group=hg
 # 022 prevents this.
 UMask=002
 
+# Transient errors are absorbed by `retry_on_failure`; the burst limit
+# below trips `failed` state on rapid crash loops. `StartLimitInterval`
+# (legacy alias) is required for systemd 219 / RHEL 7.
+StartLimitInterval=300
+StartLimitBurst=20
 Restart=always
+RestartSec=3
 TimeoutStopSec=60
 
 SyslogIdentifier=vcsreplicator

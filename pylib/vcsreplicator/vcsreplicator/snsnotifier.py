@@ -15,11 +15,13 @@ import boto3
 from .pushnotifications import (
     run_cli,
 )
+from .util import retry_on_failure
 
 
 logger = logging.getLogger("vcsreplicator.snsnotifier")
 
 
+@retry_on_failure
 def on_event(config, message_type, partition, message, created, data):
     """Called when a replication message should be handled."""
     repo_url = data["repo_url"]
