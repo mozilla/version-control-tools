@@ -221,6 +221,16 @@ def apply_pushlog_stream(repo, pullop, fetchfrom, conn, urepo):
                 b"received pushlog entry for unknown changeset %s; "
                 b"ignoring\n" % b", ".join(missing)
             )
+            # Drain the rest of the response up to the trailer so the
+            # wireproto channel isn't left with unread bytes. SSH peers
+            # share a single persistent channel across calls, and HTTP
+            # peers reuse keep-alive connections, so leftover bytes
+            # would be read as the response to the next wireproto call
+            # and abort the pull with `unexpected response`.
+            for raw_trailing in iter(stream.readline, b""):
+                trailing = raw_trailing.rstrip(b"\n")
+                if trailing == b"ok" or trailing.startswith(b"error "):
+                    break
             return applied
 
         pushid = int(pushid_bytes)
