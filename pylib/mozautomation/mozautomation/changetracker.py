@@ -7,11 +7,6 @@ from __future__ import unicode_literals
 import binascii
 import os
 import sqlite3
-import sys
-
-# TRACKING py3
-if sys.version_info[0] >= 3:
-    buffer = memoryview
 
 from .repository import (
     MercurialRepository,
@@ -160,10 +155,10 @@ class ChangeTracker(object):
                     [push_id, tree_id, push["date"], push["user"]],
                 )
 
-                head = buffer(binascii.unhexlify(push["changesets"][-1]))
+                head = memoryview(binascii.unhexlify(push["changesets"][-1]))
 
                 params = [
-                    (buffer(binascii.unhexlify(c)), head, push_id, tree_id)
+                    (memoryview(binascii.unhexlify(c)), head, push_id, tree_id)
                     for c in push["changesets"]
                 ]
                 self._db.executemany(
@@ -188,8 +183,8 @@ class ChangeTracker(object):
                     [push_id, tree_id, who, when],
                 )
                 if nodes:
-                    head = buffer(nodes[-1])
-                    params = [(buffer(c), head, push_id, tree_id) for c in nodes]
+                    head = memoryview(nodes[-1])
+                    params = [(memoryview(c), head, push_id, tree_id) for c in nodes]
                     self._db.executemany(
                         "INSERT INTO changeset_pushes "
                         "(changeset, head_changeset, push_id, tree_id) "
@@ -206,7 +201,7 @@ class ChangeTracker(object):
             "pushes.tree_id = changeset_pushes.tree_id AND "
             "trees.id = pushes.tree_id AND changeset_pushes.changeset=? "
             "ORDER BY pushes.time ASC",
-            [buffer(changeset)],
+            [memoryview(changeset)],
         ):
             yield row
 
@@ -242,7 +237,7 @@ class ChangeTracker(object):
         with self._db:
             self._db.executemany(
                 "INSERT OR REPLACE INTO bug_changesets VALUES (?, ?)",
-                [(bug, buffer(changeset)) for bug in bugs],
+                [(bug, memoryview(changeset)) for bug in bugs],
             )
 
     def changesets_with_bug(self, bug):

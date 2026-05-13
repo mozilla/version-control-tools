@@ -40,7 +40,6 @@ class URLInterceptor(object):
             expected = fh.readline().rstrip()
             response = fh.read()
 
-        # TRACKING py3 - we require a Request object
         if isinstance(url, urllibcompat.urlreq.request):
             url = pycompat.bytestr(url.get_full_url())
 

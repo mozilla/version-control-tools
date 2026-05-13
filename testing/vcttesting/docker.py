@@ -18,11 +18,7 @@ import sys
 import tarfile
 import warnings
 
-# TRACKING py3
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    import urlparse
+import urllib.parse as urlparse
 
 from docker.errors import (
     DockerException,

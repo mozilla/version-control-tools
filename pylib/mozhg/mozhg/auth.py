@@ -217,31 +217,8 @@ def get_profiles(profilesdir):
 
         profiles.append(p)
 
-    def compare(a, b):
-        """Sort profile by default first, file mtime second."""
-        if a[b"default"]:
-            return -1
-
-        if a[b"mtime"] > b[b"mtime"]:
-            return -1
-        elif a[b"mtime"] < b[b"mtime"]:
-            return 1
-
-        return 0
-
-    # TRACKING py3 - sorted takes a `key`
-    if pycompat.ispy3:
-        import functools
-
-        sorted_kwargs = {
-            "key": functools.cmp_to_key(compare),
-        }
-    else:
-        sorted_kwargs = {
-            "cmp": compare,
-        }
-
-    return sorted(profiles, **sorted_kwargs)
+    # default profile first, then most recently modified
+    return sorted(profiles, key=lambda p: (not p[b"default"], -p[b"mtime"]))
 
 
 def win_get_folder_path(folder):

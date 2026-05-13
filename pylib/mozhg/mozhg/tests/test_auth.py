@@ -8,11 +8,7 @@ import tempfile
 import time
 import unittest
 
-# TRACKING py3
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    import urlparse
+import urllib.parse as urlparse
 
 import mozhg.auth as auth
 

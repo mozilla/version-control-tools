@@ -154,11 +154,8 @@ def docker_compose_down_background(project_name, show_output=False):
 
     kwargs = {}
     if not show_output:
-        # TRACKING py3 - once we have full Py3 support in the test environment
-        # we can make use of `subprocess.DEVNULL`
-        devnull = open(os.devnull, "wb")
-        kwargs["stderr"] = devnull
-        kwargs["stdout"] = devnull
+        kwargs["stderr"] = subprocess.DEVNULL
+        kwargs["stdout"] = subprocess.DEVNULL
     return subprocess.Popen(docker_compose_down_command, **kwargs)
 
 

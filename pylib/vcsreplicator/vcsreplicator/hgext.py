@@ -719,8 +719,7 @@ def uisetup(ui):
     if not acktimeout:
         raise error.Abort(b"replicationproducer.acktimeout config option not set")
 
-    # TRACKING py3
-    hosts = list(map(lambda x: pycompat.sysstr(x), hosts))
+    hosts = [pycompat.sysstr(x) for x in hosts]
     clientid = pycompat.sysstr(clientid)
     topic = pycompat.sysstr(topic)
 
