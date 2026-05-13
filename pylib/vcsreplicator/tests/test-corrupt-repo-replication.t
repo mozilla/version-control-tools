@@ -80,6 +80,7 @@ Pulling into corrupt repo should result in abort
   vcsreplicator.consumer   > rollback completed
   vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest
   vcsreplicator.consumer   [255]
+  vcsreplicator.consumer handle_message_main failed (retries disabled): CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
@@ -93,9 +94,11 @@ Pulling into corrupt repo should result in abort
       message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in filterwrapper (glob)
       return message_handler(config, payload)
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 184, in autorecoverwrapper
+    File "*/vcsreplicator/vcsreplicator/util.py", line *, in retrywrapper (glob)
+      return fn(*args, **kwargs)
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 187, in autorecoverwrapper
       raise err
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 180, in autorecoverwrapper
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 183, in autorecoverwrapper
       return message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
       payload["heads"], (?)
@@ -136,6 +139,7 @@ We should get the same failure if we try again
   vcsreplicator.consumer   > rollback completed
   vcsreplicator.consumer   > abort: unknown version (29298) in revlog 00manifest
   vcsreplicator.consumer   [255]
+  vcsreplicator.consumer handle_message_main failed (retries disabled): CommandError: (255, b'pulling from ssh://$DOCKER_HOSTNAME:$HGPORT/mozilla-central\nsearching for changes\nadding changesets\nadding manifests', b'transaction abort!\nrollback completed\nabort: unknown version (29298) in revlog 00manifest')
   vcsreplicator.consumer exiting main consume loop with error
   Traceback (most recent call last):
     File "*/bin/vcsreplicator-consumer", line *, in <module> (glob)
@@ -149,9 +153,11 @@ We should get the same failure if we try again
       message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in filterwrapper (glob)
       return message_handler(config, payload)
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 184, in autorecoverwrapper
+    File "*/vcsreplicator/vcsreplicator/util.py", line *, in retrywrapper (glob)
+      return fn(*args, **kwargs)
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 187, in autorecoverwrapper
       raise err
-    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 180, in autorecoverwrapper
+    File "/app/vct/pylib/vcsreplicator/vcsreplicator/consumer.py", line 183, in autorecoverwrapper
       return message_handler(config, payload)
     File "*/vcsreplicator/consumer.py", line *, in handle_message_main (glob)
       payload["heads"], (?)
