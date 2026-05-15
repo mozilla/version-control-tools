@@ -336,7 +336,7 @@ a ``BUNDLESPEC`` containing ``none-packed`` could be removed.
 .. important::
 
    If modifying a ``.hg/clonebundles.manifest`` file, remember to run
-   ``/repo/hg/venv_tools/bin/hg replicatesync`` to trigger the replication
+   ``/var/hg/venv_tools/bin/hg replicatesync`` to trigger the replication
    of that file to hgweb mirrors. Otherwise clients won't see the changes!
 
 Corrupted fncache File
