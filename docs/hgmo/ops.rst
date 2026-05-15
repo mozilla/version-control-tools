@@ -44,34 +44,6 @@ possible shuold be scheduled to occur during North American off-peak periods:
 before 9am US/Eastern, over lunch (noon US/Eastern or US/Pacific), or after
 5pm US/Pacific.
 
-Operational Secrets
--------------------
-
-Secrets can be checked in to version-control-tools by encrypting and decrypting
-them with ``sops``. To encrypt/decrypt variables checked in to this repo, you
-will need to:
-
-1. Have your Auth0 email be given permission to access the version-control-tools
-   secrets key. Ask about this in #vcs, or file a bug under hg.mozilla.org.
-2. `Install the GCP SDK`_.
-3. `Install sops and go through the GCP setup steps`_.
-
-With `sops` installed, you can encrypt and decrypt files with::
-
-    $ sops --decrypt path/to/file/configfile.yaml
-    $ sops --encrypt path/to/file/configfile.yaml
-
-After running these commands, only keys in the configuration that are suffixed
-with *"_encrypted"* will have their values encrypted. All other values are left
-as cleartext.
-
-`sops` will automatically use the correct key configuration using the `.sops.yaml`
-file in the root of the repository. When you run `./deploy hgmo`, all configuration
-files containing secrets will be decrypted automatically.
-
-.. _Install the GCP SDK: https://cloud.google.com/sdk/docs/downloads-apt-get
-.. _Install sops and go through the GCP setup steps: https://github.com/mozilla/sops#encrypting-using-gcp-kms
-
 Deployment Gotchas
 ------------------
 

@@ -16,10 +16,7 @@ import zipfile
 
 import boto3
 
-from .vctutil import (
-    decrypt_sops_files,
-    get_and_write_vct_node,
-)
+from .vctutil import get_and_write_vct_node
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
@@ -55,12 +52,9 @@ def deploy_hgmo(
     skip_hgweb=False,
     skip_mirrors=False,
     skip_kafka=False,
-    clean_wdir=False,
     verbosity=0,
 ):
     """Deploy to hg.mozilla.org."""
-    decrypt_sops_files()
-
     extra = {
         "skip_kafka": skip_kafka,
         "skip_mirrors": skip_mirrors,
@@ -69,13 +63,7 @@ def deploy_hgmo(
         "vct": ROOT,
     }
 
-    res = run_playbook("deploy-hgmo", extra_vars=extra, verbosity=verbosity)
-
-    if clean_wdir:
-        # Wipe away encrypted secrets
-        subprocess.check_output(["hg", "-R", ROOT, "update", "--clean", "-r", "."])
-
-    return res
+    return run_playbook("deploy-hgmo", extra_vars=extra, verbosity=verbosity)
 
 
 def hgmo_strip(repo, rev, verbosity=0):

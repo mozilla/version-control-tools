@@ -38,11 +38,6 @@ class DeployCommands(object):
     @CommandArgument(
         "--skip-kafka", action="store_true", help="Skip Kafka cluster deployment if present"
     )
-    @CommandArgument(
-        "--clean-wdir",
-        action="store_true",
-        help="Clean working directory of encrypted secrets after deploy",
-    )
     @CommandArgument("--verbosity", type=int, help="How verbose to be with output")
     def hgmo(
         self,
@@ -50,13 +45,11 @@ class DeployCommands(object):
         skip_hgweb=False,
         skip_mirrors=False,
         skip_kafka=False,
-        clean_wdir=False,
         verbosity=None,
     ):
         from vcttesting.deploy import deploy_hgmo as deploy
 
         return deploy(
-            clean_wdir=clean_wdir,
             skip_mirrors=skip_mirrors,
             skip_hgssh=skip_hgssh,
             skip_hgweb=skip_hgweb,
@@ -121,9 +114,6 @@ class DeployCommands(object):
         self, instance=None, hgweb_workers=None, hgssh_workers=None, verbosity=None
     ):
         from vcttesting.deploy import run_playbook
-        from vcttesting.vctutil import decrypt_sops_files
-
-        decrypt_sops_files()
 
         # Create extra_vars dict using only non-`None` values
         # Ansible defaults only work if the value is undefined
