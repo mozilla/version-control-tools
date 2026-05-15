@@ -20,10 +20,3 @@
       mirror_ips: ["63.245.215.25", "63.245.215.102"]
       vct_node: "{{ lookup('file', '../.vctnode') }}"
       replication_filters: mirror
-
-  - name: apply monitoring-agent role
-    include_role:
-      name: monitoring-agent
-    vars:
-      hosttype: hgweb
-
