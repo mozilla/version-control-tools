@@ -36,27 +36,8 @@ Obsolescence markers are turned into pulse events
   $ hg -q commit -A -m file1
   $ hg -q push
 
-Wait for the notifier to process both pushes (including their hg-heads-1
-messages) before stopping it, to ensure the buffer is flushed and notifications
-carry source: serve from the changegroup payload.
-
-  $ paconsumer --wait-for-n 11
-  got a heartbeat-1 message
-  got a hg-repo-init-2: (repo: {moz}/obs) message
-  got a hg-hgrc-update-1: (repo: {moz}/obs) message
-  got a heartbeat-1 message
-  got a heartbeat-1 message
-  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['77538e1ce4be']) message
-  got a hg-heads-1: (repo: {moz}/obs, heads: ['77538e1ce4be'], last_push_id: 1) message
-  got a heartbeat-1 message
-  got a heartbeat-1 message
-  got a hg-changegroup-2: (repo: {moz}/obs, heads: ['4da703b7f59b']) message
-  got a hg-heads-1: (repo: {moz}/obs, heads: ['4da703b7f59b'], last_push_id: 2) message
-  $ pulseconsumer --wait-for-no-lag
-
-There is still a race between push 3 and later events and the pulse consumer
-processing them. So disable the pulse consumer until all repo changes have been
-made.
+There is a race between multiple repo events and the pulse consumer processing
+them. So disable the pulse consumer until all repo changes have been made.
 
   $ hgmo exec hgssh supervisorctl stop pulsenotifier
   pulsenotifier: stopped
@@ -241,6 +222,21 @@ Commit message with multiple lines works
       exchange: exchange/hgpushes/v2
       routing_key: obs
     data:
+      heads:
+      - 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=2&endID=3
+        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=2&endID=3
+        pushid: 3
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/obs
+      source: serve
+    type: changegroup.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
       markers:
       - precursor:
           desc: file1
@@ -272,21 +268,6 @@ Commit message with multiple lines works
       exchange: exchange/hgpushes/v2
       routing_key: obs
     data:
-      heads:
-      - 7d683ce4e5618b7a0a7033b4d27f6c28b2c0f7c2
-      pushlog_pushes:
-      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=2&endID=3
-        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=2&endID=3
-        pushid: 3
-        time: \d+ (re)
-        user: user@example.com
-      repo_url: https://hg.mozilla.org/obs
-      source: serve
-    type: changegroup.1
-  - _meta:
-      exchange: exchange/hgpushes/v2
-      routing_key: obs
-    data:
       markers:
       - precursor:
           desc: file1
@@ -304,6 +285,21 @@ Commit message with multiple lines works
         user: root@* (glob)
       repo_url: https://hg.mozilla.org/obs
     type: obsolete.1
+  - _meta:
+      exchange: exchange/hgpushes/v2
+      routing_key: obs
+    data:
+      heads:
+      - 7066e27cce8ca811f9f80da78e330c72af5a49f8
+      pushlog_pushes:
+      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=3&endID=4
+        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=3&endID=4
+        pushid: 4
+        time: \d+ (re)
+        user: user@example.com
+      repo_url: https://hg.mozilla.org/obs
+      source: serve
+    type: changegroup.1
   - _meta:
       exchange: exchange/hgpushes/v2
       routing_key: obs
@@ -349,11 +345,11 @@ Commit message with multiple lines works
       routing_key: obs
     data:
       heads:
-      - 7066e27cce8ca811f9f80da78e330c72af5a49f8
+      - 821cb8db71235562a3ee752f0b67502e93835a9f
       pushlog_pushes:
-      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=3&endID=4
-        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=3&endID=4
-        pushid: 4
+      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=4&endID=5
+        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=4&endID=5
+        pushid: 5
         time: \d+ (re)
         user: user@example.com
       repo_url: https://hg.mozilla.org/obs
@@ -393,21 +389,6 @@ Commit message with multiple lines works
         user: Test User <someone@example.com>
       repo_url: https://hg.mozilla.org/obs
     type: obsolete.1
-  - _meta:
-      exchange: exchange/hgpushes/v2
-      routing_key: obs
-    data:
-      heads:
-      - 821cb8db71235562a3ee752f0b67502e93835a9f
-      pushlog_pushes:
-      - push_full_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&full=1&startID=4&endID=5
-        push_json_url: https://hg.mozilla.org/obs/json-pushes?version=2&startID=4&endID=5
-        pushid: 5
-        time: \d+ (re)
-        user: user@example.com
-      repo_url: https://hg.mozilla.org/obs
-      source: serve
-    type: changegroup.1
 
   $ cd ..
 

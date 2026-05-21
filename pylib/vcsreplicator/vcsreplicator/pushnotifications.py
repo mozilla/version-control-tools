@@ -27,18 +27,12 @@ from .daemon import (
 logger = logging.getLogger("vcsreplicator.pushnotifications")
 
 
-def consume_one(
-    config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None,
-    pending_changegroups=None,
-):
+def consume_one(config, consumer, cb, timeout=0.1, alive=None, cbkwargs=None):
     """Consume at most a single message and notify the callback if necessary.
 
     The callback will receive arguments describing the push along with any
     other arguments from ``cbkwargs`` that are specified.
     """
-    if pending_changegroups is None:
-        pending_changegroups = {}
-
     r = consumer.get_message(timeout=timeout)
     if not r:
         return
@@ -81,42 +75,12 @@ def consume_one(
 
     cbargs = dict(cbkwargs or {})
     firecb = True
-    created = payload["_original_created"]
 
     if name in ("hg-changegroup-1", "hg-changegroup-2"):
-        # Buffer the changegroup data and wait for the corresponding hg-heads-1
-        # message before notifying. hg-heads-1 guarantees that the replicated
-        # set on hgweb has been updated, so consumers will be able to fetch the
-        # new changesets when the notification arrives.
-        #
-        # Note: hg-heads-1 is only produced when served heads change. If a push
-        # adds commits that are immediately obsoleted, hg-changegroup-2 is
-        # produced but hg-heads-1 is not, leaving this buffer entry orphaned.
-        # This is acceptable: no served heads changed, so there is nothing for
-        # hgweb consumers to act on.
-        pending_changegroups[path] = (
-            _get_changegroup_payload(
-                local_path, public_url, payload["heads"], payload["source"]
-            ),
-            created,
-        )
-        firecb = False
-    elif name == "hg-heads-1":
         message_type = "changegroup.1"
-        if path in pending_changegroups:
-            cbargs["data"], created = pending_changegroups.pop(path)
-        else:
-            # No buffered changegroup — the process likely restarted after
-            # another message on the same partition committed the offset past
-            # the changegroup. Fall back to the hg-heads-1 data; hgweb is
-            # already up to date at this point.
-            logger.warn(
-                "hg-heads-1 with no pending changegroup for %s; "
-                "falling back to heads-1 data" % path
-            )
-            cbargs["data"] = _get_changegroup_payload(
-                local_path, public_url, payload["heads"], "serve"
-            )
+        cbargs["data"] = _get_changegroup_payload(
+            local_path, public_url, payload["heads"], payload["source"]
+        )
     elif name in ("hg-repo-init-1", "hg-repo-init-2"):
         message_type = "newrepo.1"
         cbargs["data"] = {
@@ -147,7 +111,7 @@ def consume_one(
             message_type=message_type,
             partition=partition,
             message=message,
-            created=created,
+            created=payload["_original_created"],
             **cbargs
         )
 
@@ -404,8 +368,6 @@ def run_cli(config_section, cb, validate_config=None):
             "config": config,
         }
 
-        pending_changegroups = {}
-
         res = run_in_loop(
             logger,
             consume_one,
@@ -413,7 +375,6 @@ def run_cli(config_section, cb, validate_config=None):
             consumer=consumer,
             cb=cb,
             cbkwargs=cbkwargs,
-            pending_changegroups=pending_changegroups,
         )
 
     logger.warn("process exiting code %s" % res)
