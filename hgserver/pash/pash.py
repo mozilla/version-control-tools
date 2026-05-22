@@ -74,7 +74,11 @@ def touch_hg_access_date(user):
             settings["write_url"],
         )
     except Exception:
-        logging.basicConfig(filename="/var/log/pash.log", level=logging.DEBUG)
+        logging.basicConfig(
+            filename="/var/log/pash.log",
+            level=logging.DEBUG,
+            format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        )
         logging.exception("Failed to update LDAP attributes for %s" % user)
 
 
