@@ -2,17 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import shlex
 import subprocess
 import sys
 
 
-def run_command(command_string):
-    fixed_command_string = command_string.lstrip().rstrip()
-
-    # Sent output to `/dev/null`.
+def run_command(args):
     subcommand = subprocess.Popen(
-        shlex.split(fixed_command_string),
+        args,
         stdin=None,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.PIPE,

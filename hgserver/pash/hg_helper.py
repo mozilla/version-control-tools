@@ -294,6 +294,7 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
         print(USER_REPO_EXISTS % repo_name)
         sys.exit(1)
 
+    assert_valid_repo_name(source_repo_path)
     source_repo = DOC_ROOT / source_repo_path
     if not source_repo.exists():
         print(NO_SOURCE_REPO % source_repo_path)
@@ -305,9 +306,9 @@ def run_hg_clone(user_repo_dir, repo_name, source_repo_path):
     dest_hgmo_path = str(dest_dir.relative_to(DOC_ROOT))
     print(f"Please wait.  Cloning /{source_repo_path} to /{dest_hgmo_path}")
 
-    run_command(f"nohup {HG} init {dest_dir}")
-    run_command(f"nohup {HG} -R {dest_dir} pull {source_repo}")
-    run_command(f"nohup {HG} -R {dest_dir} replicatesync")
+    run_command(["nohup", str(HG), "init", str(dest_dir)])
+    run_command(["nohup", str(HG), "-R", str(dest_dir), "pull", str(source_repo)])
+    run_command(["nohup", str(HG), "-R", str(dest_dir), "replicatesync"])
     # TODO ensure user WSGI files are in place on hgweb machine.
     # (even better don't rely on per-use WSGI files)
     print("Clone complete.")
@@ -317,7 +318,7 @@ def fix_user_repo_perms(user, user_repo_dir, repo_name):
     print("Fixing permissions, don't interrupt.")
     repo_path = DOC_ROOT / "users" / user_repo_dir / repo_name
     try:
-        run_command(f"{REPO_PERMISSIONS} {repo_path} {user} scm_level_1 wwr")
+        run_command([str(REPO_PERMISSIONS), str(repo_path), user, "scm_level_1", "wwr"])
     except Exception as e:
         print("Exception %s" % (e))
 
@@ -385,9 +386,7 @@ def make_repo_clone(cname, user, user_repo_dir, repo_name, quick_src):
                     print("Exception %s" % (e))
 
             repo_name_path = DOC_ROOT / "users" / user_repo_dir / repo_name
-            run_command(
-                f"/usr/bin/nohup {HG} init {repo_name_path}"
-            )
+            run_command(["/usr/bin/nohup", str(HG), "init", str(repo_name_path)])
     fix_user_repo_perms(user, user_repo_dir, repo_name)
     # New user repositories are non-publishing by default.
     set_repo_publishing(repo_name, user, user_repo_dir, False)
@@ -468,7 +467,7 @@ def edit_repo_description(repo_name: str, user: str, user_repo_dir: str):
     with config_path.open("w+") as fh:
         config.write(fh)
 
-    run_command(f"{HG} -R {repo_path} replicatehgrc")
+    run_command([str(HG), "-R", str(repo_path), "replicatehgrc"])
 
 
 def set_repo_publishing(repo_name, user, user_repo_dir, publish):
@@ -493,7 +492,7 @@ def set_repo_publishing(repo_name, user, user_repo_dir, publish):
     with config_path.open("w") as fh:
         config.write(fh)
 
-    run_command(f"{HG} -R {repo_path} replicatehgrc")
+    run_command([str(HG), "-R", str(repo_path), "replicatehgrc"])
 
     if publish:
         sys.stderr.write(
@@ -523,7 +522,7 @@ def set_repo_obsolescence(user_repo_dir, repo_name, user, enabled):
     with config_path.open("w") as fh:
         config.write(fh)
 
-    run_command(f"{HG} -R {repo_path} replicatehgrc")
+    run_command([str(HG), "-R", str(repo_path), "replicatehgrc"])
 
     if enabled:
         print(OBSOLESCENCE_ENABLED)
@@ -533,7 +532,7 @@ def set_repo_obsolescence(user_repo_dir, repo_name, user, enabled):
 
 def do_delete(repo_dir, repo_name):
     repo_path = f"{DOC_ROOT}/users/{repo_dir}/{repo_name}"
-    run_command(f"nohup {HG} -R {repo_path} replicatedelete")
+    run_command(["nohup", str(HG), "-R", repo_path, "replicatedelete"])
     purge_log = open("/tmp/pushlog_purge.%s" % os.getpid(), "a")
     purge_log.write("echo users/%s/%s\n" % (repo_dir, repo_name))
     purge_log.close()
