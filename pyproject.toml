@@ -37,7 +37,7 @@ deploy = [
     "vcttesting",
 ]
 
-test = [
+test-deps = [
     { include-group = "deploy-deps" },
     { include-group = "vcsreplicator-deps" },
     "backports.lzma",
@@ -57,6 +57,11 @@ test = [
     "responses",
     "sentry-sdk",
 ]
+
+# `test` is a thin alias over `test-deps` so `dev` can pull in the same
+# deps without `include-group`'ing `test` directly (which `[tool.uv]
+# conflicts` forbids, since `test` and `dev` are listed as conflicting).
+test = [{ include-group = "test-deps" }]
 
 docs = [
     "sphinxcontrib-blockdiag",
@@ -159,9 +164,28 @@ hgdev = [
     "PyYAML",
 ]
 
+# Local editable packages shared across dev environments.
+local-common = [
+    "mozilla-hg-hooks",
+    "bugsy",
+    "mozhg",
+    "pushlog-client",
+    "mozautomation",
+    "vcttesting",
+]
+
+# Additional local packages only needed for the full test environment.
+local-test = [
+    { include-group = "local-common" },
+    "hgmolib",
+    "mozansible",
+    "vcsreplicator",
+]
+
 # Local dev environment.
 dev = [
-    { include-group = "test" },
+    { include-group = "test-deps" },
+    { include-group = "local-test" },
 ]
 
 [tool.uv]
@@ -174,8 +198,10 @@ find-links = ["https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html"]
 conflicts = [
     [
         { group = "deploy-deps" },
-        { group = "docs" },
+        { group = "deploy" },
         { group = "test" },
+        { group = "dev" },
+        { group = "docs" },
         { group = "hgweb" },
         { group = "hg-web-replication" },
         { group = "hg-web-tools" },
@@ -190,8 +216,15 @@ conflicts = [
 
 [tool.uv.sources]
 # Editable installs of internal packages.
-vcsreplicator = { path = "pylib/vcsreplicator", editable = true }
+mozilla-hg-hooks = { path = "hghooks", editable = true }
+bugsy = { path = "pylib/Bugsy", editable = true }
+mozhg = { path = "pylib/mozhg", editable = true }
+pushlog-client = { path = "pylib/mozhginfo", editable = true }
 mozautomation = { path = "pylib/mozautomation", editable = true }
+vcttesting = { path = "testing", editable = true }
+hgmolib = { path = "hgserver/hgmolib", editable = true }
+mozansible = { path = "pylib/mozansible", editable = true }
+vcsreplicator = { path = "pylib/vcsreplicator", editable = true }
 
 # Configure LSP/linter tools to target Python 3.6 (the lowest version
 # used in production) even though the lockfile targets 3.9+.

@@ -2,114 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import errno
 import os
 import shutil
 import subprocess
 import sys
-
-
-HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
-CREATE_VIRTUALENV = os.path.join(ROOT, "testing", "create-virtualenv")
-
-
-SITECUSTOMIZE = b"""
-import os
-
-if os.environ.get('CODE_COVERAGE', False):
-    import uuid
-    import coverage
-
-    covpath = os.path.join(os.environ['COVERAGE_DIR'], 'data',
-                           'coverage.%s' % uuid.uuid1())
-    cov = coverage.Coverage(data_file=covpath, auto_data=True, branch=True)
-    cov._warn_no_data = False
-    cov._warn_unimported_source = False
-    cov.start()
-"""
-
-
-def create_virtualenv(name=None, python="python"):
-    path = os.path.join(ROOT, "venv")
-
-    env = dict(os.environ)
-    env["PYTHON_VERSION"] = python
-
-    if name:
-        path = os.path.join(path, name)
-
-    try:
-        os.makedirs(os.path.dirname(path))
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-    if os.name == "nt":
-        bin_dir = os.path.join(path, "Scripts")
-        pip = os.path.join(bin_dir, "pip.exe")
-        python = os.path.join(bin_dir, python + ".exe")
-        activate = os.path.join(bin_dir, "activate")
-    else:
-        bin_dir = os.path.join(path, "bin")
-        pip = os.path.join(bin_dir, "pip")
-        python = os.path.join(bin_dir, python)
-        activate = os.path.join(bin_dir, "activate")
-
-    res = {
-        "path": path,
-        "bin_dir": bin_dir,
-        "pip": pip,
-        "python": python,
-        "activate": activate,
-        "activate": os.path.join(bin_dir, "activate"),
-    }
-
-    env["ROOT"] = ROOT
-    env["VENV"] = path
-
-    if not os.path.exists(res["pip"]):
-        subprocess.check_call([CREATE_VIRTUALENV, path], env=env)
-
-    # Install a sitecustomize.py that starts code coverage if an environment
-    # variable is set.
-    with open(os.path.join(bin_dir, "sitecustomize.py"), "wb") as fh:
-        fh.write(SITECUSTOMIZE)
-
-    return res
-
-
-def activate_virtualenv(venv):
-    """Activate a virtualenv in the current Python process."""
-    with open(venv["activate"]) as f:
-        exec(f.read(), dict(__file__=venv["activate"]))
-
-
-def process_pip_requirements(venv, requirements):
-    args = [
-        venv["pip"],
-        "install",
-        "--upgrade",
-        "--require-hashes",
-        "-r",
-        os.path.join(ROOT, requirements),
-    ]
-    subprocess.check_call(args)
-
-
-def install_editable(venv, relpath, extra_env=None):
-    args = [
-        venv["pip"],
-        "install",
-        "--no-deps",
-        "--editable",
-        os.path.join(ROOT, relpath),
-    ]
-
-    env = dict(os.environ)
-    env.update(extra_env or {})
-
-    subprocess.check_call(args, env=env)
 
 
 def install_mercurials(venv, hg="hg"):
@@ -146,31 +42,27 @@ def install_mercurials(venv, hg="hg"):
 
     subprocess.check_call([hg, "pull"], cwd=hg_dir, env=hg_env)
 
-    try:
-        os.makedirs(mercurials)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    os.makedirs(mercurials, exist_ok=True)
 
     # Remove old versions.
-    for p in os.listdir(mercurials):
-        if p in (".", ".."):
-            continue
+    for entry in os.listdir(mercurials):
+        if entry not in VERSIONS:
+            print("removing old, unsupported Mercurial version: %s" % entry)
+            shutil.rmtree(os.path.join(mercurials, entry))
 
-        if p not in VERSIONS:
-            print("removing old, unsupported Mercurial version: %s" % p)
-            shutil.rmtree(os.path.join(mercurials, p))
-
-    for v in VERSIONS:
-        dest = os.path.join(mercurials, v)
+    for version in VERSIONS:
+        dest = os.path.join(mercurials, version)
 
         if os.path.exists(dest):
             continue
 
-        print("installing Mercurial %s to %s" % (v, dest))
+        print("installing Mercurial %s to %s" % (version, dest))
         try:
             subprocess.check_output(
-                [hg, "update", v], cwd=hg_dir, env=hg_env, stderr=subprocess.STDOUT
+                [hg, "update", version],
+                cwd=hg_dir,
+                env=hg_env,
+                stderr=subprocess.STDOUT,
             )
             # We don't care about support files, which only slow down
             # installation. So install-bin is a suitable target.
@@ -191,156 +83,12 @@ def install_mercurials(venv, hg="hg"):
                 env=hg_env,
                 stderr=subprocess.STDOUT,
             )
-        except subprocess.CalledProcessError as e:
-            print("error installing: %s" % e.output)
+        except subprocess.CalledProcessError as error:
+            print("error installing: %s" % error.output)
             raise Exception("could not install Mercurial")
 
 
-def docker_client():
-    """Attempt to obtain a Docker client.
-
-    Returns a client on success. None on failure.
-    """
-    from .docker import (
-        Docker,
-        params_from_env,
-    )
-
-    docker_url, tls = params_from_env(os.environ)
-
-    d = Docker(docker_url, tls=tls)
-
-    return d if d.is_alive() else None
-
-
-def create_docs():
-    """Create environment used for building docs."""
-    venv = create_virtualenv("docs")
-    process_pip_requirements(venv, "docs-requirements.txt")
-
-    install_editable(venv, "hghooks")
-    install_editable(venv, "pylib/Bugsy")
-    install_editable(venv, "pylib/mozhg")
-    install_editable(venv, "pylib/mozhginfo")
-    install_editable(venv, "pylib/mozautomation")
-    install_editable(venv, "testing")
-
-    return venv
-
-
-def create_hgdev():
-    """Create an environment used for hacking on Mercurial extensions."""
-    venv = create_virtualenv("hgdev")
-    reqs = "testing/requirements-hgdev.txt"
-
-    process_pip_requirements(venv, reqs)
-    install_editable(venv, "hghooks")
-    install_editable(venv, "pylib/Bugsy")
-    install_editable(venv, "pylib/mozhg")
-    install_editable(venv, "pylib/mozhginfo")
-    install_editable(venv, "pylib/mozautomation")
-    install_editable(venv, "testing")
-
-    install_mercurials(venv, hg=os.path.join(venv["bin_dir"], "hg"))
-
-    return venv
-
-
-def install_cinnabar(dest=None):
-    """Install git-cinnabar"""
-    if not dest:
-        dest = os.path.join(ROOT, "venv", "git-cinnabar")
-
-    if not os.path.exists(dest):
-        subprocess.check_call(
-            [
-                "git",
-                "clone",
-                "--branch",
-                "release",
-                "https://github.com/glandium/git-cinnabar.git",
-                dest,
-            ]
-        )
-
-    subprocess.check_call(["git", "pull"], cwd=dest)
-
-    subprocess.check_call(
-        [
-            "make",
-            "-j4",
-            "helper",
-            "NO_OPENSSL=1",
-            "NO_GETTEXT=1",
-        ],
-        cwd=dest,
-    )
-
-
-def create_global():
-    """Create the global test environment virtualenv
-
-    This functions the same as ./create-test-environment
-    """
-    from .hgmo import (
-        HgCluster,
-    )
-
-    # No `name` parameter since this will be the top-level venv
-    venv_py3 = create_virtualenv(name="py3", python="python3")
-
-    # Install third-party dependencies
-    process_pip_requirements(venv_py3, "test-requirements-3.txt")
-
-    # Install editable packages
-    editables = {
-        "hgserver/hgmolib",
-        "pylib/Bugsy",
-        "pylib/mozansible",
-        "pylib/mozhg",
-        "pylib/mozhginfo",
-        "pylib/mozautomation",
-        "pylib/vcsreplicator",
-        "hghooks",
-        "testing",
-    }
-    for package in editables:
-        install_editable(venv_py3, package)
-
-    install_mercurials(venv_py3)
-
-    cinnabar_dest = os.path.join(venv_py3["path"], "git-cinnabar")
-    install_cinnabar(dest=cinnabar_dest)
-
-    if os.getenv("NO_DOCKER"):
-        print("Not building Docker images because NO_DOCKER is set")
-    else:
-        print("Building Docker images.")
-        print("This could take a while and may consume a lot of internet bandwidth.")
-        print(
-            "If you don't want Docker images, it is safe to hit CTRL+c to abort this."
-        )
-
-        try:
-            HgCluster.build()
-        except subprocess.CalledProcessError:
-            print("You will not be able to run tests that require Docker.")
-            print(
-                "Please see https://docs.docker.com/installation/ for how to install Docker."
-            )
-            print("When Docker is installed, re-run this script")
-            print(
-                "To avoid re-building the Docker images next time, set the `NO_DOCKER` "
-                "environment variable to any value."
-            )
-            sys.exit(1)
-
-    return venv_py3
-
-
 if __name__ == "__main__":
-    import sys
-
     if sys.argv[1] != "install-mercurials":
         sys.exit(1)
 

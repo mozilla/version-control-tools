@@ -9,13 +9,16 @@ Improvements to the documentation in this repository are very welcome!
 Building Documentation Locally
 ==============================
 
-To build documentation locally, you will need a Python environment.
+To build documentation locally, you will need a Python environment
+with the ``docs`` dependency group installed. The group is declared
+in ``pyproject.toml`` and is materialised with
+`uv <https://docs.astral.sh/uv/>`_.
 
 Assuming you already have a copy of the source repository, run the
-following commands to activate the environment for building the docs::
+following commands to create and activate the environment::
 
-   $ ./create-environment docs
-   $ source venv/docs/bin/activate
+   $ uv sync --only-group docs --python 3.9
+   $ source .venv/bin/activate
 
 Then to build the docs::
 

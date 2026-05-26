@@ -74,21 +74,37 @@ dependency groups are declared in ``pyproject.toml``.
 Install ``uv`` first (see the upstream docs for options), then from the
 root of a version-control-tools checkout run::
 
-   $ ./create-environment test
+   $ ./run sync test
+
+This wraps ``uv sync --only-group test`` and materialises a virtualenv
+at ``.venv/``. The ``dev`` group is also available and is a superset of
+``test`` useful for interactive local work::
+
+   $ ./run sync dev
 
 .. tip::
 
-   You should periodically run ``create-environment test`` to ensure
-   everything is up to date. (Yes, the tools should do this
-   automatically.)
+   You should periodically re-run ``./run sync <group>`` to ensure
+   everything is up to date after pulling new changes.
 
 Activating an Environment
 =========================
 
-Once you've executed ``create-environment test``, you'll need to
-*activate* it so your current shell has access to all its wonders::
+Once ``./run sync`` has finished, *activate* the virtualenv so your
+current shell has access to all its wonders::
 
-   $ source venv/bin/activate
+   $ source .venv/bin/activate
+
+.. note::
+
+   Unlike the old ``create-environment test``, ``./run sync`` does not
+   build the Docker images used by the integration tests. After
+   syncing, run::
+
+      $ ./run hgmo build
+
+   to build the ``hgmo`` Docker images. This step can take a while on
+   the first run.
 
 boot2docker
 ===========

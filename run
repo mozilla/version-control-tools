@@ -43,7 +43,11 @@ def get_gid(group: str) -> int:
         sys.exit(f"Couldn't find group `{group}`")
 
 
-def env_cmd():
+SYNC_GROUPS = ["deploy", "dev", "test"]
+SYNC_PYTHON = "3.9"
+
+
+def env_cmd(args):
     user = getpass.getuser()
 
     uid, gid = get_user_uid_gid(user)
@@ -59,9 +63,25 @@ def env_cmd():
     return 0
 
 
+def sync_cmd(args):
+    if not args or args[0] not in SYNC_GROUPS:
+        print("./run sync [group]\n")
+        print("Create a local dev environment via `uv sync`.\n")
+        print("Available groups:")
+        for group in SYNC_GROUPS:
+            print(f"\t{group}")
+        return 1
+
+    group = args[0]
+    cmd = ["uv", "sync", "--only-group", group, "--python", SYNC_PYTHON]
+    print("$ {}".format(" ".join(cmd)))
+    os.execvp(cmd[0], cmd)
+
+
 COMMANDS = {
     "build": ("docker", "compose", "build"),
     "env": env_cmd,
+    "sync": sync_cmd,
     "hgmo": (
         "docker",
         "compose",
@@ -89,7 +109,7 @@ def main(args):
     cmd = COMMANDS[args[0]]
 
     if callable(cmd):
-        return cmd()
+        return cmd(args[1:])
 
     cmd = list(cmd) + args[1:]
 
