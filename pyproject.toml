@@ -149,21 +149,6 @@ hg-ssh-testing = [
     "moto[server]==1.0.0",
 ]
 
-hgdev = [
-    "coverage",
-    "feedparser",
-    "futures==3.1.1",
-    "ipaddress",
-    "mach==0.5.1",
-    "mercurial==5.0.1",
-    "mock",
-    "nose",
-    "pytest",
-    "redo",
-    "requests",
-    "PyYAML",
-]
-
 # Local editable packages shared across dev environments.
 local-common = [
     "mozilla-hg-hooks",
@@ -210,7 +195,6 @@ conflicts = [
         { group = "hg-ssh-bundles" },
         { group = "hg-ssh-pash" },
         { group = "hg-ssh-testing" },
-        { group = "hgdev" },
     ],
 ]
 

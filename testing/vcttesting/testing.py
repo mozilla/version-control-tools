@@ -38,7 +38,7 @@ UNIT_TEST_DIRS = {
         "venvs": {"global"},
     },
     "pylib": {
-        "venvs": {"global", "hgdev"},
+        "venvs": {"global"},
     },
     "hghooks/tests": {
         "venvs": {"global"},

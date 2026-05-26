@@ -76,11 +76,6 @@ GROUPS = {
         "python": "3.9",
         "find_links": [],
     },
-    "hgdev": {
-        "output": "testing/requirements-hgdev.txt",
-        "python": "3.9",
-        "find_links": [S3_FIND_LINKS],
-    },
 }
 
 
