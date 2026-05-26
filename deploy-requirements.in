@@ -1,7 +1,0 @@
---find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
-
--r ansible/files/requirements-ansible.in
-
-boto3
-mach==1.0.0
-mercurial==6.5.2

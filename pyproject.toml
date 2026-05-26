@@ -1,0 +1,199 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+[project]
+name = "version-control-tools"
+version = "0.0.0"
+requires-python = ">=3.9"
+
+# Dependency groups for all environments. Server deployment groups are
+# compiled into `.txt` files via `./upgrade-python-packages`. Local
+# development uses `uv sync --group dev`.
+[dependency-groups]
+# Shared dependency set for vcsreplicator (included by other groups).
+vcsreplicator-deps = [
+    "cbor2==4.1.2",
+    "kafka-python==1.4.6",
+    "kombu",
+    "python-hglib",
+]
+
+ansible = [
+    "ansible==4.8.0",
+]
+
+deploy-deps = [
+    { include-group = "ansible" },
+    # Without a lower bound, uv's resolver backtracks to a 2018-era boto3
+    # on Python 3.9; pip-compile didn't have this problem.
+    "boto3>=1.28",
+    "mach==1.0.0",
+    "mercurial==6.5.2",
+]
+
+deploy = [
+    { include-group = "deploy-deps" },
+    "vcttesting",
+]
+
+test = [
+    { include-group = "deploy-deps" },
+    { include-group = "vcsreplicator-deps" },
+    "backports.lzma",
+    "black==22.12.0",
+    "coverage",
+    "docker",
+    "docker-compose",
+    "flake8",
+    "lockfile",
+    "mock",
+    "mechanize",
+    "nose",
+    "Pygments==2.3.1",
+    "pytest",
+    "python-hglib",
+    "python-ldap",
+    "responses",
+    "sentry-sdk",
+]
+
+docs = [
+    "sphinxcontrib-blockdiag",
+    "sphinxcontrib-nwdiag",
+    "sphinxcontrib-seqdiag",
+    "Sphinx",
+    "sphinx-rtd-theme",
+    "backports.lzma",
+    "docker<2.6",
+    "coverage",
+    "futures",
+    "mach==0.5.1",
+    "mercurial==6.5.2",
+    "PyYAML",
+    "setuptools",
+]
+
+hgweb = [
+    "boto3",
+    "cbor2==4.1.2",
+    "ipaddress",
+    "mercurial==6.8.2",
+    "Pygments==2.1.3",
+]
+
+hg-web-replication = [
+    "boto3",
+    "cbor2==4.1.2",
+    "kafka-python==1.4.6",
+    "mercurial==6.8.2",
+    "pygments",
+    "python-hglib",
+    "PyYAML",
+    "six",
+    "tabulate",
+]
+
+hg-web-tools = [
+    "boto3",
+    "cbor2==4.1.2",
+    "mercurial==6.8.2",
+    "python-hglib",
+    "requests",
+    "tabulate",
+]
+
+hg-web-tools-py3 = [
+    "cbor2==4.1.2",
+    "datadiff",
+    "requests",
+    "voluptuous",
+]
+
+hg-ssh-tools = [
+    { include-group = "vcsreplicator-deps" },
+    "boto3",
+    "boto",
+    "mercurial==6.9.5",
+    "python-hglib",
+    "python-ldap>=3.4.2",
+    "tabulate",
+]
+
+hg-ssh-bundles = [
+    "boto3",
+    "google-cloud-storage==1.20.0",
+    # google-cloud-storage==1.20.0 caps google-cloud-core<2.0, and uv
+    # otherwise picks 1.5.0 (forcing protobuf 3.x and google-api-core 1.x).
+    # Pin the floor to keep newer transitive versions.
+    "google-cloud-core>=1.7",
+    "kafka-python==1.4.6",
+    "mercurial==6.9.5",
+    "python-hglib==2.6.1",
+]
+
+hg-ssh-pash = [
+    "kafka-python==1.4.6",
+    "mercurial==6.9.5",
+    "python-ldap",
+    "sentry-sdk==0.7.14",
+    "six",
+]
+
+hg-ssh-testing = [
+    "moto[server]==1.0.0",
+]
+
+hgdev = [
+    "coverage",
+    "feedparser",
+    "futures==3.1.1",
+    "ipaddress",
+    "mach==0.5.1",
+    "mercurial==5.0.1",
+    "mock",
+    "nose",
+    "pytest",
+    "redo",
+    "requests",
+    "PyYAML",
+]
+
+# Local dev environment.
+dev = [
+    { include-group = "test" },
+]
+
+[tool.uv]
+# S3 mirror for Mozilla packages (used during resolution).
+find-links = ["https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html"]
+
+# These groups are never installed together (they target separate
+# virtualenvs on different servers), so uv can resolve different
+# versions of the same package across them.
+conflicts = [
+    [
+        { group = "deploy-deps" },
+        { group = "docs" },
+        { group = "test" },
+        { group = "hgweb" },
+        { group = "hg-web-replication" },
+        { group = "hg-web-tools" },
+        { group = "hg-web-tools-py3" },
+        { group = "hg-ssh-tools" },
+        { group = "hg-ssh-bundles" },
+        { group = "hg-ssh-pash" },
+        { group = "hg-ssh-testing" },
+        { group = "hgdev" },
+    ],
+]
+
+[tool.uv.sources]
+# Editable installs of internal packages.
+vcsreplicator = { path = "pylib/vcsreplicator", editable = true }
+mozautomation = { path = "pylib/mozautomation", editable = true }
+
+# Configure LSP/linter tools to target Python 3.6 (the lowest version
+# used in production) even though the lockfile targets 3.9+.
+[tool.ruff]
+target-version = "py36"

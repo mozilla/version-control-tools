@@ -1,9 +1,0 @@
---find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html
---find-links /var/tmp/pip
-
-boto3
-# TODO determine why this can't be upgraded to 5.1.0
-cbor2==4.1.2
-ipaddress
-mercurial==6.8.2
-Pygments==2.1.3

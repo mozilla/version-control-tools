@@ -3,92 +3,163 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# This script is used to upgrade pip requirements files using pip-compile.
+# This script compiles dependency groups from `pyproject.toml` into
+# hash-locked `requirements.txt` files using `uv pip compile`. The
+# generated files are consumed by ansible tasks and Dockerfiles via
+# `pip install --require-hashes`.
 
 import argparse
-import os
-import pathlib
 import subprocess
 import sys
+from pathlib import Path
+
+S3_FIND_LINKS = (
+    "--find-links https://s3-us-west-2.amazonaws.com/moz-packages/pypi/index.html"
+)
+LOCAL_FIND_LINKS = "--find-links /var/tmp/pip"
+
+# Each entry maps a dependency group to its output path, target Python
+# version, and `--find-links` directives to prepend to the output.
+GROUPS = {
+    "ansible": {
+        "output": "ansible/files/requirements-ansible.txt",
+        "python": "3.9",
+        "find_links": [],
+    },
+    "docs": {
+        "output": "docs-requirements.txt",
+        "python": "3.7",
+        "find_links": [],
+    },
+    "deploy": {
+        "output": "deploy-requirements.txt",
+        "python": "3.9",
+        "find_links": [S3_FIND_LINKS],
+    },
+    "test": {
+        "output": "test-requirements-3.txt",
+        "python": "3.9",
+        "find_links": [S3_FIND_LINKS],
+    },
+    "hgweb": {
+        "output": "ansible/roles/hg-web/files/requirements-hgweb.txt",
+        "python": "3.6",
+        "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
+    },
+    "hg-web-replication": {
+        "output": "ansible/roles/hg-web/files/requirements-replication.txt",
+        "python": "3.6",
+        "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
+    },
+    "hg-web-tools": {
+        "output": "ansible/roles/hg-web/files/requirements-tools.txt",
+        "python": "3.6",
+        "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
+    },
+    "hg-web-tools-py3": {
+        "output": "ansible/roles/hg-web/files/requirements-tools-py3.txt",
+        "python": "3.6",
+        "find_links": [],
+    },
+    "hg-ssh-tools": {
+        "output": "ansible/roles/hg-ssh/files/requirements-tools.txt",
+        "python": "3.9",
+        "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
+    },
+    "hg-ssh-bundles": {
+        "output": "ansible/roles/hg-ssh/files/requirements-bundles.txt",
+        "python": "3.9",
+        "find_links": [],
+    },
+    "hg-ssh-pash": {
+        "output": "ansible/roles/hg-ssh-server/files/requirements-pash.txt",
+        "python": "3.9",
+        "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
+    },
+    "hg-ssh-testing": {
+        "output": "ansible/roles/test-hg-ssh/files/requirements-testing.txt",
+        "python": "3.9",
+        "find_links": [],
+    },
+    "hgdev": {
+        "output": "testing/requirements-hgdev.txt",
+        "python": "3.9",
+        "find_links": [S3_FIND_LINKS],
+    },
+}
 
 
-def process_input_file(
-    source: pathlib.Path, dest: pathlib.Path, pip_compile: pathlib.Path
-):
-    print("processing %s" % dest)
-
-    env = dict(os.environ)
-    env["CUSTOM_COMPILE_COMMAND"] = sys.argv[0]
+def compile_group(group: str, output_path: Path, python: str, find_links: list[str]):
+    """Compile a dependency group into a hash-locked requirements.txt file."""
+    print(f"Compiling {group} (python {python}) -> {output_path}")
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             [
-                str(pip_compile),
-                "--output-file",
-                str(dest.absolute()),
-                # We have a transitive dependency on setuptools, which requires this flag to be pinned
-                "--allow-unsafe",
+                "uv",
+                "pip",
+                "compile",
+                "pyproject.toml",
+                "--group",
+                group,
                 "--generate-hashes",
-                "--emit-trusted-host",
-                "--annotate",
-                "--header",
-                "--upgrade",
-                str(source),
+                "--annotation-style",
+                "line",
+                "--python-version",
+                python,
             ],
             check=True,
             capture_output=True,
-            env=env,
         )
-    except subprocess.CalledProcessError as err:
-        print("`pip-compile` errored attempting to upgrade %s" % source)
-        print(err.stderr.decode("utf-8"))
-        sys.exit(err.returncode)
+    except subprocess.CalledProcessError as error:
+        print(f"`uv pip compile` failed for group `{group}`:", file=sys.stderr)
+        print(error.stderr.decode("utf-8"), file=sys.stderr)
+        sys.exit(error.returncode)
+
+    compiled = result.stdout.decode()
+
+    if find_links:
+        header = "\n".join(find_links) + "\n\n"
+        compiled = header + compiled
+
+    output_path.write_text(compiled)
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "path", nargs="*", default=[], help="Explicit requirements file to operate on"
+    parser = argparse.ArgumentParser(
+        description="Compile dependency groups into hash-locked requirements.txt files."
     )
     parser.add_argument(
-        "--pip-compile",
-        default="pip-compile",
-        help="Path to `pip-compile` executable for desired interpreter",
+        "group",
+        nargs="*",
+        default=[],
+        help="Specific group(s) to compile. Compiles all if omitted.",
     )
 
     args = parser.parse_args()
 
-    if not args.path:
-        files = subprocess.check_output(["hg", "files"])
-        files = {f.strip() for f in files.splitlines() if f.strip()}
-
-        requirements = set()
-
-        for f in files:
-            if b"requirements" not in f or not f.endswith(b".txt"):
-                continue
-
-            base = f[:-4]
-            if b"%s.in" % base in files:
-                requirements.add(os.fsdecode(f))
-
-    else:
-        for p in args.path:
-            if "requirements" not in p or not p.endswith(".txt"):
-                print("%s does not appear to be a requirements file" % p)
+    if args.group:
+        targets = {}
+        for group in args.group:
+            if group not in GROUPS:
+                print(
+                    f"`{group}` is not a known dependency group.", file=sys.stderr
+                )
+                print(
+                    f"Known groups: {', '.join(sorted(GROUPS))}", file=sys.stderr
+                )
                 sys.exit(1)
+            targets[group] = GROUPS[group]
+    else:
+        targets = GROUPS
 
-        requirements = set(args.path)
-
-    for p in sorted(requirements):
-        assert p.endswith(".txt")
-        base = p[:-4]
-
-        source = pathlib.Path("%s.in" % base)
-        dest = pathlib.Path(p)
-        pip_compile = pathlib.Path(args.pip_compile).expanduser()
-
-        process_input_file(source, dest, pip_compile)
+    for group, config in sorted(targets.items()):
+        compile_group(
+            group,
+            Path(config["output"]),
+            config["python"],
+            config["find_links"],
+        )
 
 
 if __name__ == "__main__":

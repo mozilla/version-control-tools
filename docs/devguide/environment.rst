@@ -67,8 +67,12 @@ Creating and Updating Your Environment
 ======================================
 
 Development and testing requires the creation of a special environment
-containing all the prerequisites necessary to develop and test. This
-is accomplished by running the following command::
+containing all the prerequisites necessary to develop and test. The
+environment is managed by `uv <https://docs.astral.sh/uv/>`_ and the
+dependency groups are declared in ``pyproject.toml``.
+
+Install ``uv`` first (see the upstream docs for options), then from the
+root of a version-control-tools checkout run::
 
    $ ./create-environment test
 
