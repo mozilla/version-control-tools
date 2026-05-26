@@ -11,9 +11,15 @@ All code running on the servers behind hg.mozilla.org is in the
 version-control-tools repository.
 
 Deployment of new code to hg.mozilla.org is performed via an Ansible
-playbook defined in the version-control-tools repository. To deploy new
-code, simply run::
+playbook defined in the version-control-tools repository.
 
+The ``./deploy`` entry point runs inside the local ``deploy`` virtualenv
+managed by ``uv``. Create (or refresh) it from the root of a
+version-control-tools checkout, then activate it before invoking
+``./deploy``::
+
+   $ ./run sync deploy
+   $ source .venv/bin/activate
    $ ./deploy hgmo
 
 .. important::

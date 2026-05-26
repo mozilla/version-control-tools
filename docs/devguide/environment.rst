@@ -82,6 +82,14 @@ at ``.venv/``. The ``dev`` group is also available and is a superset of
 
    $ ./run sync dev
 
+The ``deploy`` group installs just what the ``./deploy`` entry point
+needs (Ansible, ``mach``, and ``vcttesting``) for running deployments
+against hg.mozilla.org::
+
+   $ ./run sync deploy
+   $ source .venv/bin/activate
+   $ ./deploy hgmo
+
 .. tip::
 
    You should periodically re-run ``./run sync <group>`` to ensure
