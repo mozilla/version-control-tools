@@ -127,11 +127,7 @@ hg-ssh-tools = [
 
 hg-ssh-bundles = [
     "boto3",
-    "google-cloud-storage==1.20.0",
-    # google-cloud-storage==1.20.0 caps google-cloud-core<2.0, and uv
-    # otherwise picks 1.5.0 (forcing protobuf 3.x and google-api-core 1.x).
-    # Pin the floor to keep newer transitive versions.
-    "google-cloud-core>=1.7",
+    "google-cloud-storage",
     "kafka-python==1.4.6",
     "mercurial==6.9.5",
     "python-hglib==2.6.1",

@@ -17,9 +17,8 @@ import time
 import traceback
 import warnings
 
-# Ignore annoying warnings from Google code (https://github.com/googleapis/google-cloud-python/issues/13974).
-# TODO: Remove this filter when that Google Python SDK issue is resolved.
-warnings.filterwarnings("ignore", "pkg_resources is deprecated as an API")
+# google-auth and google-api-core emit FutureWarning about Python 3.9 EOL.
+warnings.filterwarnings("ignore", category=FutureWarning, module="google")
 
 import boto3
 import botocore.exceptions
