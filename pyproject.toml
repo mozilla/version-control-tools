@@ -43,8 +43,11 @@ test-deps = [
     "backports.lzma",
     "black==22.12.0",
     "coverage",
-    "docker",
+    # docker-py 7.x is incompatible with docker-compose 1.29.2
+    "docker<7",
     "docker-compose",
+    # requests 2.32 breaks http+docker scheme used by docker-py <7.1.0 (https://github.com/docker/docker-py/issues/3256)
+    "requests<2.32",
     "flake8",
     "lockfile",
     "mock",
