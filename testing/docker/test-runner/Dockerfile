@@ -90,6 +90,10 @@ RUN pip install \
     -r /requirements.txt
 
 
+# Install Mercurials early so this layer is cached independently of vct source changes.
+ADD testing/vcttesting/install_mercurials.py /app/install_mercurials.py
+RUN python /app/install_mercurials.py
+
 ADD --chown=vct ./ /app/vct/
 
 # Install editable requirements.
@@ -108,9 +112,6 @@ RUN git clone \
     --branch release \
     https://github.com/glandium/git-cinnabar.git /app/venv/git-cinnabar
 WORKDIR /app/vct
-
-# Install Mercurials
-RUN python -m vcttesting.environment install-mercurials
 
 VOLUME /app/vct
 

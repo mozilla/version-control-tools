@@ -7,23 +7,23 @@ import shutil
 import subprocess
 import sys
 
+VERSIONS = [
+    "6.1.4",
+    "6.2.3",
+    "6.3.2",
+    "6.4.3",
+    "6.5.2",
+    "6.6.3",
+    "6.7.4",
+    "6.8.2",
+    "6.9.5",
+]
 
-def install_mercurials(venv, hg="hg"):
+
+def install_mercurials(venv_path, venv_python, hg="hg"):
     """Install supported Mercurial versions in a central location."""
-    VERSIONS = [
-        "6.1.4",
-        "6.2.3",
-        "6.3.2",
-        "6.4.3",
-        "6.5.2",
-        "6.6.3",
-        "6.7.4",
-        "6.8.2",
-        "6.9.5",
-    ]
-
     hg_dir = os.path.join("/app", "venv", "hg")
-    mercurials = os.path.join(venv["path"], "mercurials")
+    mercurials = os.path.join(venv_path, "mercurials")
 
     # Setting HGRCPATH to an empty value stops the global and user hgrc from
     # being loaded. These could interfere with behavior we expect from
@@ -71,7 +71,7 @@ def install_mercurials(venv, hg="hg"):
                     "make",
                     "install-bin",
                     "PREFIX=%s" % dest,
-                    "PYTHON=%s" % venv["python"],
+                    "PYTHON=%s" % venv_python,
                 ],
                 cwd=hg_dir,
                 env=hg_env,
@@ -89,13 +89,7 @@ def install_mercurials(venv, hg="hg"):
 
 
 if __name__ == "__main__":
-    if sys.argv[1] != "install-mercurials":
-        sys.exit(1)
-
-    venv = {
-        "path": os.path.join("/app", "venv"),
-        "python": os.path.join("/app", "venv", "bin", "python"),
-    }
-
-    install_mercurials(venv, hg="hg")
-    sys.exit(0)
+    install_mercurials(
+        venv_path=os.path.join("/app", "venv"),
+        venv_python=os.path.join("/app", "venv", "bin", "python"),
+    )
