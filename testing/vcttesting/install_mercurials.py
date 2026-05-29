@@ -20,27 +20,9 @@ VERSIONS = [
 ]
 
 
-def install_mercurials(venv_path, venv_python, hg="hg"):
-    """Install supported Mercurial versions in a central location."""
-    hg_dir = os.path.join("/app", "venv", "hg")
+def install_mercurials(venv_path, venv_python):
+    """Install supported Mercurial versions in isolated per-version venvs."""
     mercurials = os.path.join(venv_path, "mercurials")
-
-    # Setting HGRCPATH to an empty value stops the global and user hgrc from
-    # being loaded. These could interfere with behavior we expect from
-    # vanilla Mercurial.
-    hg_env = dict(os.environ)
-    hg_env["HGRCPATH"] = ""
-
-    # Ensure a Mercurial clone is present and up to date.
-    if not os.path.isdir(hg_dir):
-        print("cloning Mercurial repository to %s" % hg_dir)
-        subprocess.check_call(
-            [hg, "clone", "https://repo.mercurial-scm.org/hg", hg_dir],
-            cwd="/",
-            env=hg_env,
-        )
-
-    subprocess.check_call([hg, "pull"], cwd=hg_dir, env=hg_env)
 
     os.makedirs(mercurials, exist_ok=True)
 
@@ -57,35 +39,10 @@ def install_mercurials(venv_path, venv_python, hg="hg"):
             continue
 
         print("installing Mercurial %s to %s" % (version, dest))
-        try:
-            subprocess.check_output(
-                [hg, "update", version],
-                cwd=hg_dir,
-                env=hg_env,
-                stderr=subprocess.STDOUT,
-            )
-            # We don't care about support files, which only slow down
-            # installation. So install-bin is a suitable target.
-            subprocess.check_output(
-                [
-                    "make",
-                    "install-bin",
-                    "PREFIX=%s" % dest,
-                    "PYTHON=%s" % venv_python,
-                ],
-                cwd=hg_dir,
-                env=hg_env,
-                stderr=subprocess.STDOUT,
-            )
-            subprocess.check_output(
-                [hg, "--config", "extensions.purge=", "purge", "--all"],
-                cwd=hg_dir,
-                env=hg_env,
-                stderr=subprocess.STDOUT,
-            )
-        except subprocess.CalledProcessError as error:
-            print("error installing: %s" % error.output)
-            raise Exception("could not install Mercurial")
+        subprocess.check_call([venv_python, "-m", "venv", dest])
+        subprocess.check_call(
+            [os.path.join(dest, "bin", "pip"), "install", "mercurial==%s" % version]
+        )
 
 
 if __name__ == "__main__":
