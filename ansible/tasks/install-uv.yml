@@ -1,0 +1,46 @@
+---
+- name: check installed uv version
+  command: /usr/local/bin/uv --version
+  register: uv_installed_version
+  failed_when: false
+  changed_when: false
+
+- when: uv_installed_version.rc != 0 or '0.11.15' not in uv_installed_version.stdout
+  block:
+    - name: download uv tarball
+      get_url:
+        url: https://github.com/astral-sh/uv/releases/download/0.11.15/uv-x86_64-unknown-linux-gnu.tar.gz
+        dest: /var/tmp/uv-0.11.15.tar.gz
+        checksum: "sha256:b03e572f010bea94a4a52d42671ba72981e12894f71576181a1d26ff68546da7"
+
+    - name: extract uv
+      unarchive:
+        src: /var/tmp/uv-0.11.15.tar.gz
+        dest: /var/tmp/
+        remote_src: yes
+
+    - name: install uv binary
+      copy:
+        src: /var/tmp/uv-x86_64-unknown-linux-gnu/uv
+        dest: /usr/local/bin/uv
+        owner: root
+        group: root
+        mode: '0755'
+        remote_src: yes
+
+    - name: install uvx binary
+      copy:
+        src: /var/tmp/uv-x86_64-unknown-linux-gnu/uvx
+        dest: /usr/local/bin/uvx
+        owner: root
+        group: root
+        mode: '0755'
+        remote_src: yes
+
+- name: smoke test uv
+  command: /usr/local/bin/uv --version
+  changed_when: false
+
+- name: smoke test uvx
+  command: /usr/local/bin/uvx --version
+  changed_when: false

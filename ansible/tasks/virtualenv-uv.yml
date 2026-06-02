@@ -1,0 +1,31 @@
+---
+- name: check if virtualenv exists
+  stat:
+    path: "{{ venv }}"
+  register: venv_exists
+
+- name: check if virtualenv has the right python
+  stat:
+    path: "{{ venv }}/bin/python{{ python_version_number }}"
+  register: venv_python
+
+- name: delete virtualenv
+  file:
+    path: "{{ venv }}"
+    state: absent
+  when: venv_exists.stat.exists and not venv_python.stat.exists
+
+- name: create Python {{ python_version_number }} virtualenv in {{ venv }}
+  command: "uv venv --python {{ python_version_number }} --python-preference system {{ venv }}"
+  args:
+    creates: "{{ venv }}/bin/python{{ python_version_number }}"
+  environment:
+    UV_PYTHON_INSTALL_DIR: /opt/uv/python
+
+- name: copy requirements.txt for {{ venv }}
+  copy: src={{ requirements }}
+        dest={{ venv }}/requirements.txt
+        mode=0644
+
+- name: populate virtualenv {{ venv }}
+  command: "uv pip sync --require-hashes --python {{ venv }}/bin/python {{ venv }}/requirements.txt"

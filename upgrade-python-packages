@@ -38,22 +38,22 @@ GROUPS = {
     },
     "hgweb": {
         "output": "ansible/roles/hg-web/files/requirements-hgweb.txt",
-        "python": "3.6",
+        "python": "3.9",
         "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
     },
     "hg-web-replication": {
         "output": "ansible/roles/hg-web/files/requirements-replication.txt",
-        "python": "3.6",
+        "python": "3.9",
         "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
     },
     "hg-web-tools": {
         "output": "ansible/roles/hg-web/files/requirements-tools.txt",
-        "python": "3.6",
+        "python": "3.9",
         "find_links": [S3_FIND_LINKS, LOCAL_FIND_LINKS],
     },
     "hg-web-tools-py3": {
         "output": "ansible/roles/hg-web/files/requirements-tools-py3.txt",
-        "python": "3.6",
+        "python": "3.9",
         "find_links": [],
     },
     "hg-ssh-tools": {

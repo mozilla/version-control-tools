@@ -131,53 +131,40 @@
 #        owner=root
 #        group=root
 
+- name: install uv
+  include: ../../../tasks/install-uv.yml
+
 # We run a lot of our Python out of our virtualenvs because that is how you
 # are supposed to do Python.
 - name: create virtualenv for hgweb
-  include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/{{ python_version }}
+  include: ../../../tasks/virtualenv-uv.yml
            venv=/var/hg/venv_hgweb
            requirements=../roles/hg-web/files/requirements-hgweb.txt
 
 - name: create virtualenv for replication
-  include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/{{ python_version }}
+  include: ../../../tasks/virtualenv-uv.yml
            venv=/var/hg/venv_replication
            requirements=../roles/hg-web/files/requirements-replication.txt
 
 - name: create virtualenv for tools
-  include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/{{ python_version }}
+  include: ../../../tasks/virtualenv-uv.yml
            venv=/var/hg/venv_tools
            requirements=../roles/hg-web/files/requirements-tools.txt
 
 - name: create virtualenv for Python 3 tools
-  include: ../../../tasks/virtualenv3.yml
-           python=/usr/bin/{{ python_version }}
+  include: ../../../tasks/virtualenv-uv.yml
            venv=/var/hg/venv_tools_py3
            requirements=../roles/hg-web/files/requirements-tools-py3.txt
 
 # mod_wsgi is a Python package. But pip-compile doesn't like it for some reason.
 # We install it into the virtualenv as a one-off.
-- name: download mod_wsgi (python3.6)
-  get_url: url=https://github.com/GrahamDumpleton/mod_wsgi/archive/4.6.5.tar.gz
-           dest=/var/tmp/mod_wsgi-4.6.5.tar.gz
-           sha256sum=5cbe05f8b9b21a9e40d5d7226f4976643b1ee5e23a2d114bceae34d9948be5e0
-  when: ansible_distribution_major_version in ['7', '8']
-
-- name: install mod_wsgi (python3.6)
-  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/tmp/mod_wsgi-4.6.5.tar.gz
-  when: ansible_distribution_major_version in ['7', '8']
-
-- name: download mod_wsgi (python3.9)
+- name: download mod_wsgi
   get_url: url=https://files.pythonhosted.org/packages/74/98/812e68f5a1d51e9fe760c26fa2aef32147262a5985c4317329b6580e1ea9/mod_wsgi-4.7.1.tar.gz
            dest=/var/tmp/mod_wsgi-4.7.1.tar.gz
            sha256sum=eaeadc28d06ea42fa565c02b83504074ac558fca27f059e12bc5684d660e3cce
-  when: ansible_distribution_major_version == '9'
 
-- name: install mod_wsgi (python3.9)
-  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/tmp/mod_wsgi-4.7.1.tar.gz
-  when: ansible_distribution_major_version == '9'
+- name: install mod_wsgi
+  command: uv pip install --python /var/hg/venv_hgweb --upgrade --no-deps --reinstall /var/tmp/mod_wsgi-4.7.1.tar.gz
 
 # We have a chicken and egg problem with the prevent_hgweb_changes hook, which
 # is globally installed. If the hook isn't present, Mercurial won't allow
@@ -212,13 +199,13 @@
 # pip secures download of 3rd party packages.
 # --force-reinstall is there for completeness.
 - name: install vcsreplicator into replication virtualenv
-  command: /var/hg/venv_replication/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  command: uv pip install --python /var/hg/venv_replication --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/vcsreplicator
 
 - name: install vcsreplicator into hgweb virtualenv
-  command: /var/hg/venv_hgweb/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  command: uv pip install --python /var/hg/venv_hgweb --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/vcsreplicator
 
 - name: install mozautomation into tools virtualenv
-  command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/mozautomation
+  command: uv pip install --python /var/hg/venv_tools --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/mozautomation
 
 # Various extensions and hooks reference Python packages provided by
 # version-control-tools. Register links so all packages are available in

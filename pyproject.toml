@@ -209,7 +209,5 @@ hgmolib = { path = "hgserver/hgmolib", editable = true }
 mozansible = { path = "pylib/mozansible", editable = true }
 vcsreplicator = { path = "pylib/vcsreplicator", editable = true }
 
-# Configure LSP/linter tools to target Python 3.6 (the lowest version
-# used in production) even though the lockfile targets 3.9+.
 [tool.ruff]
-target-version = "py36"
+target-version = "py39"
