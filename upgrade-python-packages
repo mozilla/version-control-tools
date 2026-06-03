@@ -31,11 +31,6 @@ GROUPS = {
         "python": "3.7",
         "find_links": [],
     },
-    "test": {
-        "output": "test-requirements-3.txt",
-        "python": "3.9",
-        "find_links": [S3_FIND_LINKS],
-    },
     "hgweb": {
         "output": "ansible/roles/hg-web/files/requirements-hgweb.txt",
         "python": "3.9",
