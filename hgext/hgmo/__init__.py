@@ -793,6 +793,12 @@ def processbundlesmanifest(orig, repo, proto, *args, **kwargs):
     # Call original fxn wireproto.clonebundles
     manifest = orig(repo, proto, *args)
 
+    # TRACKING hg72 - upstream's legacy `clonebundles` joins newline-terminated
+    # lines with `\n`, leaving a blank line between each entry. Strip them so
+    # callers (and our filtering below) see a clean manifest.
+    nonempty = [l for l in manifest.data.splitlines() if l]
+    manifest.data = b"\n".join(nonempty + [b""]) if nonempty else b""
+
     if not isinstance(proto, webproto):
         return manifest
 
