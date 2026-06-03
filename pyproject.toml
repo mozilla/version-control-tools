@@ -57,6 +57,7 @@ test-deps = [
     "pytest",
     "python-hglib",
     "python-ldap",
+    "redo",
     "responses",
     "sentry-sdk",
 ]
