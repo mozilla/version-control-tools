@@ -11,11 +11,7 @@ RUN apt-get update && apt-get install -yq \
     libldap2-dev \
     libsasl2-dev \
     libssl-dev \
-    python3 \
     python3-dev \
-    python3-pip \
-    python3-venv \
-    python3-wheel \
     rsync \
     sqlite3 \
     make \
@@ -35,6 +31,8 @@ RUN apt-get update && apt-get install -yq \
     libxmlsec1-dev \
     libffi-dev \
     liblzma-dev
+
+COPY --from=ghcr.io/astral-sh/uv:0.11.15 /uv /usr/local/bin/uv
 
 ARG USER_ID
 ARG GROUP_ID
@@ -60,22 +58,13 @@ USER vct
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-# Install pyenv.
 ENV HOME="/vct"
-RUN git clone --depth=1 https://github.com/pyenv/pyenv.git $HOME/.pyenv
-ENV PYENV_ROOT="$HOME/.pyenv"
-ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
-RUN pyenv install 3.9.13
-RUN pyenv global 3.9.13
 
-# Create Python 3 venv
+# Create Python 3.9 venv with uv
 # Set `VIRTUAL_ENV` and `PATH` to replicate `source venv/bin/activate`
-# Install `wheel` since it seems to be missing
 ENV VIRTUAL_ENV=/app/venv
-RUN python3 -m venv $VIRTUAL_ENV
+RUN uv venv $VIRTUAL_ENV --python 3.9.13
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN pip install --upgrade pip
-RUN pip install wheel
 
 
 # Install Mercurials early so this layer is cached independently of vct source changes.
@@ -87,7 +76,7 @@ RUN python /app/install_mercurials.py
 # isn't mounted over by docker-compose
 ADD test-requirements-3.txt /requirements.txt
 WORKDIR /app
-RUN pip install \
+RUN uv pip install \
     --upgrade \
     --force-reinstall \
     --require-hashes \
@@ -96,15 +85,15 @@ RUN pip install \
 ADD --chown=vct ./ /app/vct/
 
 # Install editable requirements.
-RUN pip install --no-deps -e vct/pylib/Bugsy
-RUN pip install --no-deps -e vct/pylib/mozansible
-RUN pip install --no-deps -e vct/pylib/mozhg
-RUN pip install --no-deps -e vct/pylib/mozhginfo
-RUN pip install --no-deps -e vct/pylib/mozautomation
-RUN pip install --no-deps -e vct/hgserver/hgmolib
-RUN pip install --no-deps -e vct/pylib/vcsreplicator
-RUN pip install --no-deps -e vct/hghooks
-RUN pip install --no-deps -e vct/testing
+RUN uv pip install --no-deps -e vct/pylib/Bugsy
+RUN uv pip install --no-deps -e vct/pylib/mozansible
+RUN uv pip install --no-deps -e vct/pylib/mozhg
+RUN uv pip install --no-deps -e vct/pylib/mozhginfo
+RUN uv pip install --no-deps -e vct/pylib/mozautomation
+RUN uv pip install --no-deps -e vct/hgserver/hgmolib
+RUN uv pip install --no-deps -e vct/pylib/vcsreplicator
+RUN uv pip install --no-deps -e vct/hghooks
+RUN uv pip install --no-deps -e vct/testing
 
 # clone cinnabar for the `cinnabarclone` extension
 RUN git clone \
