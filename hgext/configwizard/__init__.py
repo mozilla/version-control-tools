@@ -25,6 +25,12 @@ from mercurial.commands import (
     update as hgupdate,
 )
 
+# TRACKING hg72 - `hg.repository` moved to `mercurial.repo.factory.repository`.
+try:
+    from mercurial.repo.factory import repository as _repository
+except ImportError:
+    _repository = hg.repository
+
 OUR_DIR = os.path.dirname(__file__)
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
@@ -840,7 +846,7 @@ def update_evolve(ui):
 
     # Pull and update evolve
     try:
-        local_evolve_repo = hg.repository(ui, local_evolve_path)
+        local_evolve_repo = _repository(ui, local_evolve_path)
 
         # Pull the latest stable, update to latest tag/release
         # TRACKING hg58 `source` param is now set via positional args
@@ -897,7 +903,7 @@ def _checkevolve(ui, cw):
             hg.clone(
                 ui, {}, REMOTE_EVOLVE_PATH, branch=(b"stable",), dest=local_evolve_path, update=False
             )
-            local_evolve_repo = hg.repository(ui, local_evolve_path)
+            local_evolve_repo = _repository(ui, local_evolve_path)
             hgupdate(ui, local_evolve_repo, rev=b"last(tag())")
             _enableext(cw, "evolve", evolve_config_value)
 
