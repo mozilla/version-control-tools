@@ -18,3 +18,7 @@
 - name: reread supervisor
   command: /usr/bin/supervisorctl reread
   ignore_errors: True
+
+- name: graceful restart httpd
+  service: name=httpd state=reloaded
+  ignore_errors: True

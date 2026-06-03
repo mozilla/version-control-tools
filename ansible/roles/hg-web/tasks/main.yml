@@ -286,6 +286,7 @@
 # We control httpd.conf for features like server-status
 - name: install httpd.conf file
   template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+  notify: graceful restart httpd
 
 - name: directory for httpd logs
   file: path=/var/log/httpd/hg.mozilla.org
