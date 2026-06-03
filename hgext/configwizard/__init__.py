@@ -31,6 +31,12 @@ try:
 except ImportError:
     _repository = hg.repository
 
+# TRACKING hg72 - `hg.clone` moved to `mercurial.cmd_impls.clone.clone`.
+try:
+    from mercurial.cmd_impls.clone import clone as _clone
+except ImportError:
+    _clone = hg.clone
+
 OUR_DIR = os.path.dirname(__file__)
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
@@ -900,7 +906,7 @@ def _checkevolve(ui, cw):
 
         try:
             # Clone the evolve extension and enable
-            hg.clone(
+            _clone(
                 ui, {}, REMOTE_EVOLVE_PATH, branch=(b"stable",), dest=local_evolve_path, update=False
             )
             local_evolve_repo = _repository(ui, local_evolve_path)
