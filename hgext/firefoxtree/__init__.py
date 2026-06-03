@@ -739,7 +739,15 @@ def extsetup(ui):
             extensions.wrapfunction(hg, "peer", wrapped_peer)
     else:
         extensions.wrapfunction(hg, "_peerorrepo", wrapped_peerorrepo)
-    extensions.wrapfunction(hg, "share", share)
+    # TRACKING hg72 - `hg.share` was moved to `mercurial.cmd_impls.clone.share`
+    # and the `share` extension (and other callers) now use that location
+    # directly, bypassing our wrap on `hg.share`.
+    try:
+        from mercurial.cmd_impls import clone as _clone_impl
+
+        extensions.wrapfunction(_clone_impl, "share", share)
+    except ImportError:
+        extensions.wrapfunction(hg, "share", share)
     extensions.wrapfunction(exchange, "push", push)
     extensions.wrapfunction(exchange, "_pullobsolete", wrappedpullobsolete)
     extensions.wrapfunction(exchange, "_pullbookmarks", wrappedpullbookmarks)
