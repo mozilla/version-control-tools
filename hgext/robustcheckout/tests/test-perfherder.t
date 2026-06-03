@@ -8,7 +8,8 @@
   streaming all changes
   7 files to transfer, 1.08 KB of data (hg67 !)
   6 files to transfer, 1.08 KB of data (no-hg67 !)
-  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 7 files / 1.08 KB in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

@@ -7,7 +7,8 @@
   streaming all changes
   7 files to transfer, 1.08 KB of data (hg67 !)
   6 files to transfer, 1.08 KB of data (no-hg67 !)
-  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 1.08 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 7 files / 1.08 KB in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets b8b78f0253d8:aada1b3e573f (?)
@@ -29,7 +30,8 @@ Attempting to pull/checkout an unrelated repo will blow away the destination
   streaming all changes
   8 files to transfer, 760 bytes of data (hg67 !)
   7 files to transfer, 760 bytes of data (no-hg67 !)
-  transferred 760 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 760 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 8 files / 760 bytes in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)

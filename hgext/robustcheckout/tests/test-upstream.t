@@ -9,7 +9,8 @@ Specifying an upstream repo will clone from it and pull from normal repo
   (sharing from new pooled repository b8b78f0253d822e33ba652fd3d80a5c0837cfdf3)
   streaming all changes
   \d+ files to transfer, \d+ bytes of data (re)
-  transferred \d+ bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred \d+ bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned \d+ files / \d+ bytes in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets b8b78f0253d8 (?)

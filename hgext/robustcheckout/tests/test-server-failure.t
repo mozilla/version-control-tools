@@ -9,7 +9,8 @@ Extension works with default config
   streaming all changes
   7 files to transfer, 723 bytes of data (hg67 !)
   6 files to transfer, 723 bytes of data (no-hg67 !)
-  transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 7 files / 723 bytes in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   new changesets 96ee1d7354c4:94086d65796f (?)
   no changes found
@@ -119,7 +120,8 @@ Recovering server will result in good clone
   streaming all changes
   7 files to transfer, 723 bytes of data (hg67 !)
   6 files to transfer, 723 bytes of data (no-hg67 !)
-  transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 723 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 7 files / 723 bytes in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   new changesets 96ee1d7354c4:94086d65796f (?)
   searching for changes
   new changesets 96ee1d7354c4:94086d65796f (?)

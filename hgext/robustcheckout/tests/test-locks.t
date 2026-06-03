@@ -103,7 +103,8 @@ to be acquired.
   streaming all changes
   7 files to transfer, 717 bytes of data (hg67 !)
   6 files to transfer, 717 bytes of data (no-hg67 !)
-  transferred 717 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 717 bytes in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 7 files / 717 bytes in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets 65cd4e3b46a3:7d5b54cb09e1 (?)
@@ -138,7 +139,8 @@ Simulate a held lock on the store for a pull plus working directory update.
   streaming all changes
   8 files to transfer, 1.02 KB of data (hg67 !)
   7 files to transfer, 1.02 KB of data (no-hg67 !)
-  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 8 files / 1.02 KB in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets 65cd4e3b46a3:fca136d824da (?)
@@ -159,7 +161,8 @@ Simulate a held lock on the store without a working directory
   streaming all changes
   8 files to transfer, 1.02 KB of data (hg67 !)
   7 files to transfer, 1.02 KB of data (no-hg67 !)
-  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re)
+  transferred 1.02 KB in \d+\.\d+ seconds \(\d+(\.\d+)? KB/sec\) (re) (no-hg70 !)
+  stream-cloned 8 files / 1.02 KB in \d+(\.\d+)? seconds \(\d+(\.\d+)? KB/sec\) (re) (hg70 !)
   searching for changes
   no changes found
   new changesets 65cd4e3b46a3:fca136d824da (?)
