@@ -82,6 +82,16 @@ from mercurial import (
     registrar,
 )
 
+# TRACKING hg72 - `hg.repository`/`hg.peer` moved to `mercurial.repo.factory`.
+try:
+    from mercurial.repo import factory as _repofactory
+
+    _repository = _repofactory.repository
+    _peer = _repofactory.peer
+except ImportError:
+    _repository = hg.repository
+    _peer = hg.peer
+
 minimumhgversion = b"4.8"
 testedwith = b"4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.9"
 
@@ -271,7 +281,7 @@ def unifyrepo(ui, settings, **opts):
     # Verify all source repos have the same revision 0
     rev0s = set()
     for source in conf.sources:
-        repo = hg.repository(ui, path=source["path"])
+        repo = _repository(ui, path=source["path"])
 
         # Verify
         node = repo[0].node()
@@ -309,7 +319,7 @@ def unifyrepo(ui, settings, **opts):
     sourcerepos = {}
     for source in conf.sources:
         path = source["path"]
-        sourcerepo = hg.repository(ui, path=source["path"])
+        sourcerepo = _repository(ui, path=source["path"])
         sourcerepos[path] = sourcerepo
         pushlog = getattr(sourcerepo, "pushlog", None)
 
@@ -423,7 +433,7 @@ def unifyrepo(ui, settings, **opts):
 
     destui = ui.copy()
 
-    destrepo = hg.repository(
+    destrepo = _repository(
         destui, path=conf.destpath, create=not os.path.exists(conf.destpath)
     )
     destcl = destrepo.changelog
@@ -433,13 +443,13 @@ def unifyrepo(ui, settings, **opts):
         b"%d/%d nodes will be pulled\n" % (len(pullpushinfo), len(inversenodeinfo))
     )
 
-    stagerepo = hg.repository(
+    stagerepo = _repository(
         stageui, path=conf.stagepath, create=not os.path.exists(conf.stagepath)
     )
 
     for source in conf.sources:
         path = source["path"]
-        sourcepeer = hg.peer(ui, {}, path)
+        sourcepeer = _peer(ui, {}, path)
         ui.write(b"pulling %s into %s\n" % (path, conf.stagepath))
         exchange.pull(stagerepo, sourcepeer)
 
@@ -455,7 +465,7 @@ def unifyrepo(ui, settings, **opts):
         ui.write(b"nothing to do; exiting\n")
         return
 
-    stagepeer = hg.peer(ui, {}, conf.stagepath)
+    stagepeer = _peer(ui, {}, conf.stagepath)
 
     for node in pullnodes:
         # TODO Bug 1265002 - we should update bookmarks when we pull.
