@@ -21,6 +21,12 @@ from mercurial import (
     util,
 )
 
+# TRACKING hg72 - `cmdutil.bailifchanged` moved to `scmutil.bail_if_changed`.
+try:
+    from mercurial.scmutil import bail_if_changed as _bail_if_changed
+except ImportError:
+    from mercurial.cmdutil import bailifchanged as _bail_if_changed
+
 
 def newparents(repo, ctx, revmap):
     """Obtain the parent nodes of a potentially rewritten changeset.
@@ -149,7 +155,7 @@ def replacechangesets(repo, oldnodes, createfn, backuptopic=b"replacing"):
     dirstaterev = repo[repo.dirstate.p1()].rev()
     if dirstaterev in impactedrevs:
         cmdutil.checkunfinished(repo)
-        cmdutil.bailifchanged(repo)
+        _bail_if_changed(repo)
 
     obsenabled = False
     if hasattr(obsolete, "isenabled"):
