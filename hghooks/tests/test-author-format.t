@@ -307,7 +307,8 @@ Make sure the suggested instructions work
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   grafting 1:c46d23f5af6e "valid"
   grafting 2:e9718df8a2f3 "invalid1"
-  grafting 3:f088c66168eb "invalid2" (tip)
+  grafting 3:f088c66168eb "invalid2" (tip) (no-hg72 !)
+  grafting 3:f088c66168eb "invalid2" (hg72 !)
   $ hg push -r .
   pushing to $TESTTMP/server
   searching for changes
