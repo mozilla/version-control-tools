@@ -6,7 +6,12 @@ from __future__ import absolute_import
 import os
 
 from mercurial.match import match
-from mercurial.hg import repository
+
+# TRACKING hg72 - `hg.repository` moved to `mercurial.repo.factory.repository`.
+try:
+    from mercurial.repo.factory import repository
+except ImportError:
+    from mercurial.hg import repository
 
 from ..checks import PreTxnChangegroupCheck, print_banner
 
