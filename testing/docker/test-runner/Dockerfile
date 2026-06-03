@@ -71,35 +71,21 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ADD testing/vcttesting/install_mercurials.py /app/install_mercurials.py
 RUN python /app/install_mercurials.py
 
-# Install requirements for testing
-# Use /app as the workdir to the installed .egg-info
-# isn't mounted over by docker-compose
-ADD test-requirements-3.txt /requirements.txt
-WORKDIR /app
-RUN uv pip install \
-    --upgrade \
-    --force-reinstall \
-    --require-hashes \
-    -r /requirements.txt
+# Install external test dependencies early for layer caching.
+# Use /app/vct as workdir so uv finds pyproject.toml/uv.lock.
+ADD pyproject.toml uv.lock /app/vct/
+WORKDIR /app/vct
+RUN uv sync --no-dev --group test --no-install-project --frozen
 
 ADD --chown=vct ./ /app/vct/
 
-# Install editable requirements.
-RUN uv pip install --no-deps -e vct/pylib/Bugsy
-RUN uv pip install --no-deps -e vct/pylib/mozansible
-RUN uv pip install --no-deps -e vct/pylib/mozhg
-RUN uv pip install --no-deps -e vct/pylib/mozhginfo
-RUN uv pip install --no-deps -e vct/pylib/mozautomation
-RUN uv pip install --no-deps -e vct/hgserver/hgmolib
-RUN uv pip install --no-deps -e vct/pylib/vcsreplicator
-RUN uv pip install --no-deps -e vct/hghooks
-RUN uv pip install --no-deps -e vct/testing
+# Install editable local packages.
+RUN uv sync --no-dev --group test --group local-test --no-install-project --frozen
 
 # clone cinnabar for the `cinnabarclone` extension
 RUN git clone \
     --branch release \
     https://github.com/glandium/git-cinnabar.git /app/venv/git-cinnabar
-WORKDIR /app/vct
 
 VOLUME /app/vct
 
