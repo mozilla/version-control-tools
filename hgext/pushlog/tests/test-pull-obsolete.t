@@ -139,9 +139,9 @@ An uncompressed clone transfers obsolete changesets and markers
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-obsolete2
   streaming all changes
-  12 files to transfer, 1.6* KB of data (glob) (hg67 !)
-  11 files to transfer, 1.6* KB of data (glob) (no-hg67 !)
-  transferred 1.6* KB in * seconds (* KB/sec) (glob)
+  * files to transfer, * KB of data (glob)
+  transferred * KB in * seconds (* */sec) (glob) (no-hg70 !)
+  stream-cloned * files / * KB in * seconds (* */sec) (glob) (hg70 !)
 
 #endif
 
@@ -196,9 +196,9 @@ for hidden changesets should still be fetched.
 #else
   $ hg clone -U --uncompressed ssh://user@dummy/$TESTTMP/server clone-phasehack
   streaming all changes
-  12 files to transfer, 1.6* KB of data (glob) (hg67 !)
-  11 files to transfer, 1.6* KB of data (glob) (no-hg67 !)
-  transferred 1.6* KB in * seconds (* KB/sec) (glob)
+  * files to transfer, * KB of data (glob)
+  transferred * KB in * seconds (* */sec) (glob) (no-hg70 !)
+  stream-cloned * files / * KB in * seconds (* */sec) (glob) (hg70 !)
 
 #endif
 
@@ -253,9 +253,9 @@ been introduced on the server. Here, remote-hidden changesets are known locally.
 #else
   $ hg clone --uncompressed -U ssh://user@dummy/$TESTTMP/server incremental-pull
   streaming all changes
-  12 files to transfer, 1.6* KB of data (glob) (hg67 !)
-  11 files to transfer, 1.6* KB of data (glob) (no-hg67 !)
-  transferred 1.6* KB in * seconds (* KB/sec) (glob)
+  * files to transfer, * KB of data (glob)
+  transferred * KB in * seconds (* */sec) (glob) (no-hg70 !)
+  stream-cloned * files / * KB in * seconds (* */sec) (glob) (hg70 !)
 #endif
 
   $ rm incremental-pull/.hg/store/obsstore
