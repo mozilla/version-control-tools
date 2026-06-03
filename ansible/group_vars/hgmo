@@ -50,3 +50,8 @@ kafka_min_insync_replicas: 3
 # doesn't work. So ignore it on these hosts.
 ignore_zookeeper_user:
   - hgssh2.dmz.mdc1.mozilla.com
+
+# OpenSSH 9.2+ penalises source IPs for connections that don't authenticate.
+# All client connections are proxied through the load balancer, so its IPs
+# accumulate penalties for normal client behaviour. Exempt them. Bug 2044586.
+sshd_hg_per_source_penalty_exempt_list: 63.245.208.205,63.245.208.206

@@ -65,3 +65,10 @@ ForceCommand /usr/local/bin/pash_wrapper
 # See bug 1038478.
 MaxStartups 50
 MaxSessions 50
+
+{% if sshd_hg_per_source_penalty_exempt_list is defined %}
+# OpenSSH 9.2+ penalises source IPs for connections that don't authenticate.
+# All client connections are proxied through the load balancer, so its IPs
+# accumulate penalties for normal client behaviour. Exempt them. Bug 2044586.
+PerSourcePenaltyExemptList {{ sshd_hg_per_source_penalty_exempt_list }}
+{% endif %}
