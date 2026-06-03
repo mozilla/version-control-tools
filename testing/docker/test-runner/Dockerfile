@@ -78,6 +78,10 @@ RUN pip install --upgrade pip
 RUN pip install wheel
 
 
+# Install Mercurials early so this layer is cached independently of vct source changes.
+ADD testing/vcttesting/install_mercurials.py /app/install_mercurials.py
+RUN python /app/install_mercurials.py
+
 # Install requirements for testing
 # Use /app as the workdir to the installed .egg-info
 # isn't mounted over by docker-compose
@@ -88,11 +92,6 @@ RUN pip install \
     --force-reinstall \
     --require-hashes \
     -r /requirements.txt
-
-
-# Install Mercurials early so this layer is cached independently of vct source changes.
-ADD testing/vcttesting/install_mercurials.py /app/install_mercurials.py
-RUN python /app/install_mercurials.py
 
 ADD --chown=vct ./ /app/vct/
 
