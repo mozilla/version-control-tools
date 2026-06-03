@@ -75,12 +75,12 @@ RUN python /app/install_mercurials.py
 # Use /app/vct as workdir so uv finds pyproject.toml/uv.lock.
 ADD pyproject.toml uv.lock /app/vct/
 WORKDIR /app/vct
-RUN uv sync --no-dev --group test --no-install-project --frozen
+RUN uv sync --active --no-dev --group test --no-install-project --frozen
 
 ADD --chown=vct ./ /app/vct/
 
 # Install editable local packages.
-RUN uv sync --no-dev --group test --group local-test --no-install-project --frozen
+RUN uv sync --active --no-dev --group test --group local-test --no-install-project --frozen
 
 # clone cinnabar for the `cinnabarclone` extension
 RUN git clone \
