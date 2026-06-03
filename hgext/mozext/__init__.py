@@ -236,6 +236,12 @@ try:
 except ImportError:
     from mercurial.cmdutil import bailifchanged as _bail_if_changed
 
+# TRACKING hg72 - `revset._substringmatcher` moved to `revset_predicates`.
+try:
+    from mercurial.revset_predicates import _substringmatcher
+except ImportError:
+    _substringmatcher = revset._substringmatcher
+
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
@@ -733,7 +739,7 @@ def revset_me(repo, subset, x):
     ircnick = get_ircnick(repo.ui)
 
     n = encoding.lower(me)
-    kind, pattern, matcher = revset._substringmatcher(n)
+    kind, pattern, matcher = _substringmatcher(n)
 
     def fltr(x):
         ctx = repo[x]
