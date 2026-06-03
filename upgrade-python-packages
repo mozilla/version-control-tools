@@ -26,11 +26,6 @@ GROUPS = {
         "python": "3.9",
         "find_links": [],
     },
-    "docs": {
-        "output": "docs-requirements.txt",
-        "python": "3.7",
-        "find_links": [],
-    },
     "hgweb": {
         "output": "ansible/roles/hg-web/files/requirements-hgweb.txt",
         "python": "3.9",
