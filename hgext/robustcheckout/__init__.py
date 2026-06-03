@@ -39,6 +39,16 @@ from mercurial import (
     vfs,
 )
 
+# TRACKING hg72 - `hg.repository`/`hg.peer` moved to `mercurial.repo.factory`.
+try:
+    from mercurial.repo import factory as _repofactory
+
+    _repository = _repofactory.repository
+    _peer = _repofactory.peer
+except ImportError:
+    _repository = hg.repository
+    _peer = hg.peer
+
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
@@ -479,7 +489,7 @@ def _docheckout(
     def handlerepoerror(e):
         if pycompat.bytestr(e) == _(b"abandoned transaction found"):
             ui.warn(b"(abandoned transaction found; trying to recover)\n")
-            repo = hg.repository(ui, dest)
+            repo = _repository(ui, dest)
             if not repo.recover():
                 ui.warn(b"(could not recover repo state; deleting shared store)\n")
                 with timeit("remove_unrecovered_shared_store", "remove-store"):
@@ -587,7 +597,7 @@ def _docheckout(
     cloneurl = upstream or url
 
     try:
-        clonepeer = hg.peer(ui, {}, cloneurl)
+        clonepeer = _peer(ui, {}, cloneurl)
         rootnode = peerlookup(clonepeer, b"0")
     except error.RepoLookupError:
         raise error.Abort(b"unable to resolve root revision from clone source")
@@ -719,7 +729,7 @@ def _docheckout(
     # The destination .hg directory should exist. Now make sure we have the
     # wanted revision.
 
-    repo = hg.repository(ui, dest)
+    repo = _repository(ui, dest)
 
     # We only pull if we are using symbolic names or the requested revision
     # doesn't exist.
@@ -746,7 +756,7 @@ def _docheckout(
 
         remote = None
         try:
-            remote = hg.peer(repo, {}, url)
+            remote = _peer(repo, {}, url)
             pullrevs = [peerlookup(remote, revision or branch)]
             checkoutrevision = hex(pullrevs[0])
             if branch:
