@@ -728,7 +728,15 @@ def template_fxheads(context, mapping):
 def extsetup(ui):
     # TRACKING hg64 - `_peerorrepo` is removed, wrap `hg.peer` directly.
     if util.versiontuple() >= (6, 4):
-        extensions.wrapfunction(hg, "peer", wrapped_peer)
+        # TRACKING hg72 - `hg.peer` was moved to `mercurial.repo.factory.peer`
+        # and core callers (e.g. `commands.pull`) now go straight there, so we
+        # need to wrap the new location too.
+        try:
+            from mercurial.repo import factory as _repofactory
+
+            extensions.wrapfunction(_repofactory, "peer", wrapped_peer)
+        except ImportError:
+            extensions.wrapfunction(hg, "peer", wrapped_peer)
     else:
         extensions.wrapfunction(hg, "_peerorrepo", wrapped_peerorrepo)
     extensions.wrapfunction(hg, "share", share)
