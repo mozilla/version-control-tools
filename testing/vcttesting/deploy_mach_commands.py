@@ -39,6 +39,10 @@ class DeployCommands(object):
         "--skip-kafka", action="store_true", help="Skip Kafka cluster deployment if present"
     )
     @CommandArgument("--verbosity", type=int, help="How verbose to be with output")
+    @CommandArgument(
+        "--limit",
+        help="Ansible host pattern to limit deployment targets (e.g. hgssh3.dmz.mdc1.mozilla.com:hgweb1.dmz.mdc1.mozilla.com)",
+    )
     def hgmo(
         self,
         skip_hgssh=False,
@@ -46,6 +50,7 @@ class DeployCommands(object):
         skip_mirrors=False,
         skip_kafka=False,
         verbosity=None,
+        limit=None,
     ):
         from vcttesting.deploy import deploy_hgmo as deploy
 
@@ -55,6 +60,7 @@ class DeployCommands(object):
             skip_hgweb=skip_hgweb,
             skip_kafka=skip_kafka,
             verbosity=verbosity,
+            limit=limit,
         )
 
     @Command(

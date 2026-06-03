@@ -25,7 +25,7 @@ ANSIBLE = os.path.join(ROOT, "ansible")
 logger = logging.getLogger(__name__)
 
 
-def run_playbook(name, extra_vars=None, verbosity=0):
+def run_playbook(name, extra_vars=None, verbosity=0, limit=None):
     get_and_write_vct_node()
 
     extra_vars = extra_vars or {}
@@ -42,6 +42,8 @@ def run_playbook(name, extra_vars=None, verbosity=0):
     ]
     if verbosity:
         args.append("-%s" % ("v" * verbosity))
+    if limit:
+        args += ["--limit", limit]
 
     logger.info("$ %s" % " ".join([quote(a) for a in args]))
     return subprocess.call(args, cwd=ANSIBLE)
@@ -53,6 +55,7 @@ def deploy_hgmo(
     skip_mirrors=False,
     skip_kafka=False,
     verbosity=0,
+    limit=None,
 ):
     """Deploy to hg.mozilla.org."""
     extra = {
@@ -63,7 +66,7 @@ def deploy_hgmo(
         "vct": ROOT,
     }
 
-    return run_playbook("deploy-hgmo", extra_vars=extra, verbosity=verbosity)
+    return run_playbook("deploy-hgmo", extra_vars=extra, verbosity=verbosity, limit=limit)
 
 
 def hgmo_strip(repo, rev, verbosity=0):
