@@ -21,10 +21,11 @@ def hook(ui, repo, source=None, **kwargs):
     if source in (b"pull", b"strip"):
         return 0
 
-    for branch, heads in repo.branchmap().iteritems():
+    branchmap = repo.branchmap()
+    for branch in branchmap:
         newheads = []
 
-        for node in heads:
+        for node in branchmap.branchheads(branch, closed=True):
             ctx = repo[node]
 
             # Filter closed branch heads.
