@@ -59,6 +59,12 @@ from mercurial.hgweb.common import (
     HTTP_NOT_FOUND,
 )
 
+# TRACKING hg72 - `hg.repository` moved to `mercurial.repo.factory.repository`.
+try:
+    from mercurial.repo.factory import repository as _repository
+except ImportError:
+    _repository = hg.repository
+
 OUR_DIR = os.path.dirname(__file__)
 ROOT = os.path.normpath(os.path.join(OUR_DIR, "..", ".."))
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
@@ -629,7 +635,7 @@ def servehgmo(orig, ui, repo, *args, **kwargs):
         # Since new extensions may have been flagged for loading, we need
         # to obtain a new repo instance to a) trigger loading of these
         # extensions b) force extensions' reposetup function to run.
-        repo = hg.repository(ui, repo.root)
+        repo = _repository(ui, repo.root)
 
     return orig(ui, repo, *args, **kwargs)
 
