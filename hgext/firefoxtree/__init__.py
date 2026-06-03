@@ -117,6 +117,12 @@ from mozhg.util import import_module
 # TRACKING hg59
 urlutil = import_module("mercurial.utils.urlutil")
 
+# TRACKING hg72 - `hg.repository` moved to `mercurial.repo.factory.repository`.
+try:
+    from mercurial.repo.factory import repository as _repository
+except ImportError:
+    _repository = hg.repository
+
 testedwith = b"4.6 4.7 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8 5.9"
 minimumhgversion = b"4.6"
 buglink = b"https://bugzilla.mozilla.org/enter_bug.cgi?product=Developer%20Services&component=Mercurial%3A%20firefoxtree"
@@ -209,12 +215,12 @@ def share(orig, ui, source, *args, **kwargs):
         # TRACKING hg59 - `ui.expandpath` is deprecated
         if util.versiontuple(n=2) >= (5, 9):
             origsource, source, branches = urlutil.get_clone_path(ui, source)
-            srcrepo = hg.repository(ui, source)
+            srcrepo = _repository(ui, source)
         else:
             origsource = ui.expandpath(source)
             source, branches = hg.parseurl(origsource)
 
-        srcrepo = hg.repository(ui, source)
+        srcrepo = _repository(ui, source)
     else:
         srcrepo = source.local()
 
@@ -243,7 +249,7 @@ def share(orig, ui, source, *args, **kwargs):
         vfs = scmutil.vfs
 
     destwvfs = vfs(dest, realpath=True)
-    r = hg.repository(ui, destwvfs.base)
+    r = _repository(ui, destwvfs.base)
 
     with r.wlock():
         with r.vfs(b"shared", b"ab") as fh:
