@@ -20,7 +20,7 @@ VERSIONS = [
 ]
 
 
-def install_mercurials(venv_path, venv_python):
+def install_mercurials(venv_path):
     """Install supported Mercurial versions in isolated per-version venvs."""
     mercurials = os.path.join(venv_path, "mercurials")
 
@@ -39,14 +39,13 @@ def install_mercurials(venv_path, venv_python):
             continue
 
         print("installing Mercurial %s to %s" % (version, dest))
-        subprocess.check_call([venv_python, "-m", "venv", dest])
+        subprocess.check_call(["uv", "venv", dest])
         subprocess.check_call(
-            [os.path.join(dest, "bin", "pip"), "install", "mercurial==%s" % version]
+            ["uv", "pip", "install", "--python", dest, "mercurial==%s" % version]
         )
 
 
 if __name__ == "__main__":
     install_mercurials(
         venv_path=os.path.join("/app", "venv"),
-        venv_python=os.path.join("/app", "venv", "bin", "python"),
     )
