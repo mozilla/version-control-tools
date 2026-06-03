@@ -97,15 +97,15 @@ RUN python /app/install_mercurials.py
 ADD --chown=vct ./ /app/vct/
 
 # Install editable requirements.
-RUN pip install -e vct/pylib/Bugsy
-RUN pip install -e vct/pylib/mozansible
-RUN pip install -e vct/pylib/mozhg
-RUN pip install -e vct/pylib/mozhginfo
-RUN pip install -e vct/pylib/mozautomation
-RUN pip install -e vct/hgserver/hgmolib
-RUN pip install -e vct/pylib/vcsreplicator
-RUN pip install -e vct/hghooks
-RUN pip install -e vct/testing
+RUN pip install --no-deps -e vct/pylib/Bugsy
+RUN pip install --no-deps -e vct/pylib/mozansible
+RUN pip install --no-deps -e vct/pylib/mozhg
+RUN pip install --no-deps -e vct/pylib/mozhginfo
+RUN pip install --no-deps -e vct/pylib/mozautomation
+RUN pip install --no-deps -e vct/hgserver/hgmolib
+RUN pip install --no-deps -e vct/pylib/vcsreplicator
+RUN pip install --no-deps -e vct/hghooks
+RUN pip install --no-deps -e vct/testing
 
 # clone cinnabar for the `cinnabarclone` extension
 RUN git clone \
