@@ -79,6 +79,7 @@
         owner=root
         group=root
         mode=0755
+  tags: vct-sync
 
 - name: systemd service file for hg sshd
   copy: src=sshd_hg.service
@@ -139,6 +140,7 @@
     - pash_wrapper
     - repo_group.py
     - sh_helper.py
+  tags: vct-sync
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf

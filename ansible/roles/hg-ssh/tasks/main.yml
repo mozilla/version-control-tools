@@ -156,15 +156,19 @@
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -rlpt --chmod=Dg+s,ugo+r --delete-after /vct/ /var/hg/version-control-tools/
   when: is_testing is defined
+  tags: vct-sync
 
 - name: install vcsreplicator into tools virtualenv
   command: /var/hg/venv_tools/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  tags: vct-sync
 
 - name: install vcsreplicator into bundles virtualenv
   command: /var/hg/venv_bundles/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  tags: vct-sync
 
 - name: install hgmolib into bundles virtualenv
   command: /var/hg/venv_bundles/bin/pip install --upgrade --no-deps --force-reinstall /var/hg/version-control-tools/hgserver/hgmolib
+  tags: vct-sync
 
 - name: install rsyslog policy for hg
   copy: src=rsyslog-hg.conf

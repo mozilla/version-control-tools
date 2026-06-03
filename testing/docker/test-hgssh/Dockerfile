@@ -21,11 +21,17 @@ ENV LC_ALL=C.UTF-8
 
 RUN pip3 install --upgrade pip setuptools
 
-COPY . /vct
+# Copy only ansible/ first so that system setup is cached independently of
+# changes to the rest of the vct source tree.
+COPY ansible/ /vct/ansible/
 
 RUN pip3 install --require-hashes -r /vct/ansible/files/requirements-ansible.txt
 RUN mkdir /etc/ansible && echo -e '[local]\nlocalhost\n' > /etc/ansible/hosts
 
 WORKDIR /vct/ansible
-RUN ansible-playbook -c local test-hgmaster.yml
+RUN ansible-playbook -c local test-hgmaster.yml --skip-tags vct-sync
+
+# Now copy the full source tree and run only the vct-dependent tasks.
+COPY . /vct
+RUN ansible-playbook -c local test-hgmaster.yml --tags vct-sync
 WORKDIR /vct

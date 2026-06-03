@@ -188,6 +188,7 @@
 - name: rsync version-control-tools repo (Docker only)
   command: /usr/bin/rsync -rlpt --delete-after /vct/ /var/hg/version-control-tools/
   when: is_testing is defined
+  tags: vct-sync
 
 - name: delete ignored files from version-control-tools repo (server only)
   command: /var/hg/venv_hgweb/bin/hg --config extensions.purge= -R /var/hg/version-control-tools purge --all
@@ -200,12 +201,15 @@
 # --force-reinstall is there for completeness.
 - name: install vcsreplicator into replication virtualenv
   command: uv pip install --python /var/hg/venv_replication --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  tags: vct-sync
 
 - name: install vcsreplicator into hgweb virtualenv
   command: uv pip install --python /var/hg/venv_hgweb --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/vcsreplicator
+  tags: vct-sync
 
 - name: install mozautomation into tools virtualenv
   command: uv pip install --python /var/hg/venv_tools --upgrade --no-deps --reinstall /var/hg/version-control-tools/pylib/mozautomation
+  tags: vct-sync
 
 # Various extensions and hooks reference Python packages provided by
 # version-control-tools. Register links so all packages are available in
@@ -222,12 +226,15 @@
     - { venv: venv_replication, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_tools, path: pylib/mozhg, pth: mozhg }
     - { venv: venv_replication, path: hgserver/hgmolib, pth: hgmolib }
+  tags: vct-sync
 
 - name: synchronize hg templates
   command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
+  tags: vct-sync
 
 - name: synchronize hg templates
   command: /usr/bin/rsync -a --delete-after /var/hg/version-control-tools/hgtemplates/ /repo/hg/hg_templates/
+  tags: vct-sync
 
 - name: directory for hgweb static files
   file: path=/repo/hg/htdocs/static
@@ -235,11 +242,13 @@
         owner=hg
         group=hg
         mode=0775
+  tags: vct-sync
 
 # We need to do this before hgrc is written, as hgrc references the per-revision
 # directory.
 - name: synchronize static files to versioned directory
   command: /usr/bin/rsync -a /repo/hg/hg_templates/static/ /repo/hg/htdocs/static/{{ vct_node | mandatory }}/
+  tags: vct-sync
 
 - name: symlink to latest static files
   file: src=/repo/hg/htdocs/static/{{ vct_node | mandatory }}
@@ -247,6 +256,7 @@
         state=link
         owner=hg
         group=hg
+  tags: vct-sync
 
 # TODO we orphan "old" revisions of static content. We could potentially
 # purge old revisions. But since the size of static content is small and there
@@ -334,6 +344,7 @@
 # by a CRON that runs every few minutes.
 - name: synchronize wsgi files
   command: /usr/bin/rsync -a --delete --filter='P users/' /var/hg/version-control-tools/hgwsgi/ /repo/hg/webroot_wsgi/
+  tags: vct-sync
 
 - name: set ownership of wsgi files
   file:
@@ -341,6 +352,7 @@
     recurse: yes
     owner: hg
     group: hg
+  tags: vct-sync
 
 - name: install the script that creates user repo wsgi files
   copy: src=make_user_wsgi_dirs.py dest=/usr/local/bin/make_user_wsgi_dirs.py mode=0755
@@ -413,6 +425,7 @@
   with_items:
     - { search: VCTNODE, replace: "{{ vct_node | mandatory }}" }
     - { search: DEPLOYDATE, replace: "{{ ansible_date_time.iso8601 }}" }
+  tags: vct-sync
 
 - name: adjust file permissions for hg templates
   file:
