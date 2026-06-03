@@ -62,3 +62,4 @@ Check logs for errors
 
 Cleanup
 
+  $ hgmo clean
