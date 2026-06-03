@@ -49,6 +49,12 @@ except ImportError:
     _repository = hg.repository
     _peer = hg.peer
 
+# TRACKING hg72 - `hg.clone` moved to `mercurial.cmd_impls.clone.clone`.
+try:
+    from mercurial.cmd_impls.clone import clone as _clone
+except ImportError:
+    _clone = hg.clone
+
 # Causes worker to purge caches on process exit and for task to retry.
 EXIT_PURGE_CACHE = 72
 
@@ -690,7 +696,7 @@ def _docheckout(
         try:
             with timeit("clone", "clone"):
                 shareopts = {b"pool": sharebase, b"mode": b"identity"}
-                res = hg.clone(
+                res = _clone(
                     ui,
                     {},
                     clonepeer,
