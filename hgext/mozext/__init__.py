@@ -230,6 +230,12 @@ from mercurial.utils import (
     dateutil,
 )
 
+# TRACKING hg72 - `cmdutil.bailifchanged` moved to `scmutil.bail_if_changed`.
+try:
+    from mercurial.scmutil import bail_if_changed as _bail_if_changed
+except ImportError:
+    from mercurial.cmdutil import bailifchanged as _bail_if_changed
+
 
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
@@ -1163,7 +1169,7 @@ def do_backout(
 ):
     if not opts.get("force"):
         ui.status(b"checking for uncommitted changes\n")
-        cmdutil.bailifchanged(repo)
+        _bail_if_changed(repo)
     backout = not opts.get("apply")
     desc = {
         "action": b"backout",
