@@ -37,6 +37,12 @@ from mercurial.utils import (
     dateutil,
 )
 
+# TRACKING hg72 - `revset._substringmatcher` moved to `revset_predicates`.
+try:
+    from mercurial.revset_predicates import _substringmatcher
+except ImportError:
+    _substringmatcher = revset._substringmatcher
+
 OUR_DIR = os.path.normpath(os.path.dirname(__file__))
 with open(os.path.join(OUR_DIR, "..", "bootstrap.py")) as f:
     exec(f.read())
@@ -1188,7 +1194,7 @@ def revset_pushuser(repo, subset, x):
     """
     l = revset.getargs(x, 1, 1, b"pushuser requires one argument")
     n = encoding.lower(revset.getstring(l[0], b"pushuser requires a string"))
-    kind, pattern, matcher = revset._substringmatcher(n)
+    kind, pattern, matcher = _substringmatcher(n)
 
     def getrevs():
         to_rev = repo.changelog.rev
