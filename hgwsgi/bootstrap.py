@@ -12,7 +12,30 @@ os.environ["HGENCODING"] = "UTF-8"
 
 
 from mercurial.hgweb import hgwebdir
-from mercurial import pycompat
+from mercurial.hgweb import hgwebdir_mod_inner
+from mercurial import error, pycompat
+
+
+def _compat_findrepos(orig):
+    """Patch findrepos to restore pre-7.2 behaviour for missing repo paths.
+
+    Mercurial 7.2 (c3b91e39df52) added strict validation that raises
+    InputError when a configured repo path is not a valid repository. This
+    patch catches that error per-path and includes the path in the routing
+    anyway, matching pre-7.2 behaviour where absent repos were present in
+    the routing and would simply 404 at open time.
+    """
+    def wrapper(paths):
+        repos = []
+        for name, path in paths:
+            try:
+                repos.extend(orig([(name, path)]))
+            except error.InputError:
+                repos.append((name.strip(b'/'), path))
+        return repos
+    return wrapper
+
+hgwebdir_mod_inner.findrepos = _compat_findrepos(hgwebdir_mod_inner.findrepos)
 
 
 # Set HTTPS_PROXY from /etc/environment value, if present. We don't
