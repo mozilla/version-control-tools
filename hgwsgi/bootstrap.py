@@ -15,6 +15,26 @@ from mercurial.hgweb import hgwebdir
 from mercurial.hgweb import hgwebdir_mod_inner
 from mercurial import error, pycompat
 
+# Force-populate the template keyword/default-template registries at worker
+# startup. Since Mercurial 7.2 (56da8902ae00, "cycle-breaking: get the
+# template's keywords from `tables` in `formatter`"), templateformatter reads
+# its default keywords from tables.template_keyword_table but no longer imports
+# templatekw -- and that table is only populated as a side effect of *executing*
+# templatekw (its @templatekeyword decorators run at module body execution).
+# Under demandimport, a worker that serves an archive download before rendering
+# any keyword-using page never executes templatekw, so `latesttag` is
+# unregistered and .hg_archival.txt rendering 500s with
+# "ParseError: '' is not iterable of mappings".
+#
+# NB: a plain `import templatekw` under demandimport only creates a lazy proxy
+# and does NOT run the module body, so it would not populate the registry. Use
+# demandimport.deactivated() to force a real, eager import here.
+# Upstream: https://foss.heptapod.net/mercurial/mercurial-devel/-/work_items/10127
+from mercurial import demandimport
+
+with demandimport.deactivated():
+    from mercurial import templatekw  # noqa: F401  (imported for its side effects)
+
 
 def _compat_findrepos(orig):
     """Patch findrepos to restore pre-7.2 behaviour for missing repo paths.
