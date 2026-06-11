@@ -15,25 +15,24 @@ from mercurial.hgweb import hgwebdir
 from mercurial.hgweb import hgwebdir_mod_inner
 from mercurial import error, pycompat
 
-# Force-populate the template keyword/default-template registries at worker
-# startup. Since Mercurial 7.2 (56da8902ae00, "cycle-breaking: get the
-# template's keywords from `tables` in `formatter`"), templateformatter reads
-# its default keywords from tables.template_keyword_table but no longer imports
-# templatekw -- and that table is only populated as a side effect of *executing*
-# templatekw (its @templatekeyword decorators run at module body execution).
-# Under demandimport, a worker that serves an archive download before rendering
-# any keyword-using page never executes templatekw, so `latesttag` is
-# unregistered and .hg_archival.txt rendering 500s with
+# Force the registration modules (template keywords, revsets, web commands,
+# bundle2 part handlers, ...) to be imported and run at worker startup. Since
+# Mercurial 7.2, modules register their items in small "inert" `tables` modules
+# to break import cycles, and those tables are only populated as a side effect
+# of *executing* the registering module's body. A worker can reach a code path
+# (e.g. serving an archive download, which renders .hg_archival.txt) before the
+# relevant module body has run, leaving its table empty -- for the archive case
+# `latesttag` is unregistered and rendering 500s with
 # "ParseError: '' is not iterable of mappings".
 #
-# NB: a plain `import templatekw` under demandimport only creates a lazy proxy
-# and does NOT run the module body, so it would not populate the registry. Use
-# demandimport.deactivated() to force a real, eager import here.
+# mercurial.initialization.init() is the upstream-blessed entry point for this:
+# it eagerly imports and runs every registration module. mercurial.hgweb.hgweb()
+# calls it, but mercurial.hgweb.hgwebdir() -- which make_application() uses for
+# the multi-repo view -- does not, so we call it ourselves here.
 # Upstream: https://foss.heptapod.net/mercurial/mercurial-devel/-/work_items/10127
-from mercurial import demandimport
+from mercurial import initialization
 
-with demandimport.deactivated():
-    from mercurial import templatekw  # noqa: F401  (imported for its side effects)
+initialization.init()
 
 
 def _compat_findrepos(orig):
