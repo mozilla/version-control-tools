@@ -170,6 +170,7 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding static/livemarks16.png
   adding static/mercurial.js
   adding static/moz-logo-bw-rgb.svg
+  adding static/pushlog.js
   adding static/style-gitweb.css
   adding static/style-paper.css
   adding static/style.css
@@ -257,6 +258,8 @@ Always test against the version of Mercurial we have deployed to hg.mo
   applying patch opengraph.patch
   applying patch from stdin
   applying patch pushchangedfiles.patch
+  applying patch from stdin
+  applying patch remove-inline-js.patch
   applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the

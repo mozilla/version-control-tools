@@ -49,7 +49,9 @@
 | rev {rev}: {changenav%navshort}
 </div>
 
-<table class="bigtable">
+<table class="bigtable"
+       data-ajax-url="{url|urlescape}shortlog/%next%{sessionvars%urlparameter}"
+       data-ajax-next='{nextentry%"{node}"}'>
 <thead>
  <tr>
   <th class="age">age</th>
@@ -67,21 +69,6 @@
 <a href="{url|urlescape}shortlog/{symrev}{morevars%urlparameter}">more</a>
 | rev {rev}: {changenav%navshort}
 </div>
-
-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
-    ajaxScrollInit(
-            '{url|urlescape}shortlog/%next%{sessionvars%urlparameter}',
-            '{nextentry%"{node}"}', <!-- NEXTHASH
-            function (htmlText) \{
-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
-                return m ? m[1] : null;
-            },
-            '.bigtable > tbody',
-            '<tr class="%class%">\\
-            <td colspan="3" style="text-align: center;">%text%</td>\\
-            </tr>'
-    );
-</script>
 
 </div>
 </div>

@@ -26,16 +26,16 @@ guessmime = True
 # bugzilla.mo is for l10n tool.
 # TODO find out URL for l10n tools needing this and restrict to that.
 
-# script-src limits to /static/ and nonce so repository content can't be
-# loaded as scripts. (URLs like /raw-file/ could load JS checked into repos.)
+# script-src limits to /static/ so repository content can't be loaded as
+# scripts. (URLs like /raw-file/ could load JS checked into repos.)
 # CSP doesn't allow "self"-reflected paths - only URLs. In Docker, we don't
 # know what the hostname is. So we use "self" in that environment and a full
 # URL in production.
 
 {% if is_testing is not defined %}
-csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 {% else %}
-csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/ 'nonce-%nonce%'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
+csp = default-src 'none'; connect-src 'self' https://bugzilla.mozilla.org/; img-src 'self'; script-src 'self' https://hg.mozilla.org/static/ https://hg-edge.mozilla.org/static/; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; frame-ancestors https:
 {% endif %}
 
 # We don't allow pushes over HTTP. But if this isn't set, pushing to https://

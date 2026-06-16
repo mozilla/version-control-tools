@@ -18,3 +18,4 @@ mailmap.patch
 pushlog-relative-date.patch
 opengraph.patch
 pushchangedfiles.patch
+remove-inline-js.patch

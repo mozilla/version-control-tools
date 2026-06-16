@@ -1,0 +1,379 @@
+# HG changeset patch
+# User Julien Cristau <jcristau@mozilla.com>
+# Date 1780413185 0
+#      Tue Jun 02 15:13:05 2026 +0000
+hgtemplates: replace inline javascript with static scripts + inline data (Bug 2044362)
+
+diff -r e130ef49d87e hgtemplates/gitweb/fileannotate.tmpl
+--- a/hgtemplates/gitweb/fileannotate.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -65,10 +65,6 @@
+ 
+ {diffoptsform}
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    renderDiffOptsForm();
+-</script>
+-
+ <div class="page_body">
+ <table>
+ <tbody class="sourcelines"
+diff -r e130ef49d87e hgtemplates/gitweb/graph.tmpl
+--- a/hgtemplates/gitweb/graph.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -35,17 +35,15 @@
+ 
+ <noscript>The revision graph only works with JavaScript-enabled browsers.</noscript>
+ 
+-<div id="wrapper">
++<div id="wrapper"
++     data-ajax-url="{url|urlescape}graph/%next%{graphvars%urlparameter}"
++     data-ajax-next='{nextentry%"{node}"}'
++     data-ajax-mode="graph"
++     data-graph-scale="{bg_height}">
+ <canvas id="graph"></canvas>
+ <ul id="graphnodes">{nodes%graphentry}</ul>
+ </div>
+-
+-<script{if(nonce, ' nonce="{nonce}"')}>
+-var data = {jsdata|json};
+-var graph = new Graph();
+-graph.scale({bg_height});
+-graph.render(data);
+-</script>
++<script type="application/json" id="graph-data">{jsdata|json}</script>
+ 
+ <div class="extra_nav">
+ <a href="{url|urlescape}graph/{symrev}{lessvars%urlparameter}">less</a>
+@@ -53,18 +51,4 @@
+ | {changenav%navgraph}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}graph/%next%{graphvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '#wrapper',
+-            '<div class="%class%" style="text-align: center;">%text%</div>',
+-            'graph'
+-    );
+-</script>
+-
+ {footer}
+diff -r e130ef49d87e hgtemplates/gitweb/shortlog.tmpl
+--- a/hgtemplates/gitweb/shortlog.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -29,7 +29,9 @@
+ </div>
+ 
+ <div class="title">&nbsp;</div>
+-<table class="shortlogtable" cellspacing="0">
++<table class="shortlogtable" cellspacing="0"
++       data-ajax-url="{url|urlescape}shortlog/%next%{sessionvars%urlparameter}"
++       data-ajax-next='{nextentry%"{node}"}'>
+ {entries%shortlogentry}
+ </table>
+ 
+@@ -37,19 +39,4 @@
+ {changenav%navshort}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}shortlog/%next%{sessionvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '.shortlogtable > tbody:nth-of-type(1)',
+-            '<tr class="%class%">\
+-            <td colspan="4" style="text-align: center;">%text%</td>\
+-            </tr>'
+-    );
+-</script>
+-
+ {footer}
+diff -r e130ef49d87e hgtemplates/gitweb_mozilla/fileannotate.tmpl
+--- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -76,10 +76,6 @@
+ 
+ {diffoptsform}
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    renderDiffOptsForm();
+-</script>
+-
+ <div class="page_body">
+ <table>
+ <tbody class="sourcelines"
+diff -r e130ef49d87e hgtemplates/gitweb_mozilla/graph.tmpl
+--- a/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb_mozilla/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -45,17 +45,15 @@
+ 
+ <noscript>The revision graph only works with JavaScript-enabled browsers.</noscript>
+ 
+-<div id="wrapper">
++<div id="wrapper"
++     data-ajax-url="{url|urlescape}graph/%next%{graphvars%urlparameter}"
++     data-ajax-next='{nextentry%"{node}"}'
++     data-ajax-mode="graph"
++     data-graph-scale="{bg_height}">
+ <canvas id="graph"></canvas>
+ <ul id="graphnodes">{nodes%graphentry}</ul>
+ </div>
+-
+-<script{if(nonce, ' nonce="{nonce}"')}>
+-var data = {jsdata|json};
+-var graph = new Graph();
+-graph.scale({bg_height});
+-graph.render(data);
+-</script>
++<script type="application/json" id="graph-data">{jsdata|json}</script>
+ 
+ <div class="extra_nav">
+ <a href="{url|urlescape}graph/{symrev}{lessvars%urlparameter}">less</a>
+@@ -63,18 +61,4 @@
+ | {changenav%navgraph}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}graph/%next%{graphvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '#wrapper',
+-            '<div class="%class%" style="text-align: center;">%text%</div>',
+-            'graph'
+-    );
+-</script>
+-
+ {footer}
+diff -r e130ef49d87e hgtemplates/gitweb_mozilla/shortlog.tmpl
+--- a/hgtemplates/gitweb_mozilla/shortlog.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/gitweb_mozilla/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -34,7 +34,9 @@
+ </div>
+ 
+ <div class="title">&nbsp;</div>
+-<table class="shortlogtable" cellspacing="0">
++<table class="shortlogtable" cellspacing="0"
++       data-ajax-url="{url|urlescape}shortlog/%next%{sessionvars%urlparameter}"
++       data-ajax-next='{nextentry%"{node}"}'>
+ {entries%shortlogentry}
+ </table>
+ 
+@@ -42,19 +44,4 @@
+ {changenav%navshort}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}shortlog/%next%{sessionvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '.shortlogtable > tbody:nth-of-type(1)',
+-            '<tr class="%class%">\
+-            <td colspan="4" style="text-align: center;">%text%</td>\
+-            </tr>'
+-    );
+-</script>
+-
+ {footer}
+diff -r e130ef49d87e hgtemplates/paper/fileannotate.tmpl
+--- a/hgtemplates/paper/fileannotate.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/paper/fileannotate.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -67,10 +67,6 @@
+ 
+ {diffoptsform}
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    renderDiffOptsForm();
+-</script>
+-
+ <div class="overflow">
+ <table class="bigtable">
+ <thead>
+diff -r e130ef49d87e hgtemplates/paper/graph.tmpl
+--- a/hgtemplates/paper/graph.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/paper/graph.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -51,17 +51,15 @@
+ 
+ <noscript><p>The revision graph only works with JavaScript-enabled browsers.</p></noscript>
+ 
+-<div id="wrapper">
++<div id="wrapper"
++     data-ajax-url="{url|urlescape}graph/%next%{graphvars%urlparameter}"
++     data-ajax-next='{nextentry%"{node}"}'
++     data-ajax-mode="graph"
++     data-graph-scale="{bg_height}">
+ <canvas id="graph"></canvas>
+ <ul id="graphnodes" class="stripes2">{nodes%graphentry}</ul>
+ </div>
+-
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-var data = {jsdata|json};
+-var graph = new Graph();
+-graph.scale({bg_height});
+-graph.render(data);
+-</script>
++<script type="application/json" id="graph-data">{jsdata|json}</script>
+ 
+ <div class="navigate">
+ <a href="{url|urlescape}graph/{symrev}{lessvars%urlparameter}">less</a>
+@@ -69,20 +67,6 @@
+ | rev {rev}: {changenav%navgraph}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}graph/%next%{graphvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '#wrapper',
+-            '<div class="%class%" style="text-align: center;">%text%</div>',
+-            'graph'
+-    );
+-</script>
+-
+ </div>
+ </div>
+ 
+diff -r e130ef49d87e hgtemplates/paper/shortlog.tmpl
+--- a/hgtemplates/paper/shortlog.tmpl	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/paper/shortlog.tmpl	Thu Jan 01 00:00:00 1970 +0000
+@@ -49,7 +49,9 @@
+ | rev {rev}: {changenav%navshort}
+ </div>
+ 
+-<table class="bigtable">
++<table class="bigtable"
++       data-ajax-url="{url|urlescape}shortlog/%next%{sessionvars%urlparameter}"
++       data-ajax-next='{nextentry%"{node}"}'>
+ <thead>
+  <tr>
+   <th class="age">age</th>
+@@ -68,21 +70,6 @@
+ | rev {rev}: {changenav%navshort}
+ </div>
+ 
+-<script type="text/javascript"{if(nonce, ' nonce="{nonce}"')}>
+-    ajaxScrollInit(
+-            '{url|urlescape}shortlog/%next%{sessionvars%urlparameter}',
+-            '{nextentry%"{node}"}', <!-- NEXTHASH
+-            function (htmlText) \{
+-                var m = htmlText.match(/'(\w+)', <!-- NEXTHASH/);
+-                return m ? m[1] : null;
+-            },
+-            '.bigtable > tbody',
+-            '<tr class="%class%">\\
+-            <td colspan="3" style="text-align: center;">%text%</td>\\
+-            </tr>'
+-    );
+-</script>
+-
+ </div>
+ </div>
+ 
+diff -r e130ef49d87e hgtemplates/static/mercurial.js
+--- a/hgtemplates/static/mercurial.js	Thu Apr 25 17:22:02 2024 +0000
++++ b/hgtemplates/static/mercurial.js	Thu Jan 01 00:00:00 1970 +0000
+@@ -424,14 +424,15 @@
+     process_dates('.' + curClass);
+ }
+ 
+-function ajaxScrollInit(urlFormat,
+-                        nextPageVar,
+-                        nextPageVarGet,
+-                        containerSelector,
+-                        messageFormat,
+-                        mode) {
++function initAjaxScroll(configEl) {
++    var urlFormat = configEl.dataset.ajaxUrl;
++    var nextPageVar = configEl.dataset.ajaxNext || null;
++    var mode = configEl.dataset.ajaxMode || '';
+     var updateInitiated = false;
+-    var container = document.querySelector(containerSelector);
++    var container = (mode === 'graph') ? configEl : configEl.querySelector('tbody');
++    var messageFormat = (mode === 'graph')
++        ? '<div class="%class%" style="text-align: center;">%text%</div>'
++        : '<tr class="%class%"><td colspan="99" style="text-align: center;">%text%</td></tr>';
+ 
+     function scrollHandler() {
+         if (updateInitiated) {
+@@ -470,17 +471,17 @@
+                     var doc = docFromHTML(htmlText);
+ 
+                     if (mode === 'graph') {
+-                        var graph = window.graph;
+-                        var dataStr = htmlText.match(/^\s*var data = (.*);$/m)[1];
+-                        var data = JSON.parse(dataStr);
+-                        graph.reset();
++                        var dataEl = doc.getElementById('graph-data');
++                        var data = JSON.parse(dataEl.textContent);
++                        window.graph.reset();
+                         adoptChildren(doc.querySelector('#graphnodes'), container.querySelector('#graphnodes'));
+-                        graph.render(data);
++                        window.graph.render(data);
+                     } else {
+-                        adoptChildren(doc.querySelector(containerSelector), container);
++                        adoptChildren(doc.querySelector('tbody'), container);
+                     }
+ 
+-                    nextPageVar = nextPageVarGet(htmlText);
++                    var nextConfigEl = doc.querySelector('[data-ajax-url]');
++                    nextPageVar = nextConfigEl ? (nextConfigEl.dataset.ajaxNext || null) : null;
+                 },
+                 function onerror(errorText) {
+                     var message = {
+@@ -511,6 +512,9 @@
+     }
+ 
+     var form = document.getElementById("diffopts-form");
++    if (!form) {
++        return;
++    }
+ 
+     var KEYS = [
+         "ignorews",
+@@ -574,7 +575,22 @@
+ }
+ 
+ document.addEventListener('DOMContentLoaded', function() {
+-   process_dates();
+-   addDiffStatToggle();
+-   addLineWrapToggle();
++    process_dates();
++    addDiffStatToggle();
++    addLineWrapToggle();
++    renderDiffOptsForm();
++
++    var graphDataEl = document.getElementById('graph-data');
++    if (graphDataEl) {
++        var wrapper = document.getElementById('wrapper');
++        var data = JSON.parse(graphDataEl.textContent);
++        window.graph = new Graph();
++        window.graph.scale(parseInt(wrapper.dataset.graphScale, 10));
++        window.graph.render(data);
++    }
++
++    var scrollEls = document.querySelectorAll('[data-ajax-url]');
++    for (var i = 0; i < scrollEls.length; i++) {
++        initAjaxScroll(scrollEls[i]);
++    }
+ }, false);

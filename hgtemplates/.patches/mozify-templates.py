@@ -33,6 +33,7 @@ COPY_FILES = {
     'static/jquery-1.2.6.min.js',
     'static/livemarks16.png',
     'static/moz-logo-bw-rgb.svg',
+    'static/pushlog.js',
 }
 
 REPLACEMENTS = [

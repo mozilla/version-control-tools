@@ -424,14 +424,15 @@ function adoptChildren(from, to) {
     process_dates('.' + curClass);
 }
 
-function ajaxScrollInit(urlFormat,
-                        nextPageVar,
-                        nextPageVarGet,
-                        containerSelector,
-                        messageFormat,
-                        mode) {
+function initAjaxScroll(configEl) {
+    var urlFormat = configEl.dataset.ajaxUrl;
+    var nextPageVar = configEl.dataset.ajaxNext || null;
+    var mode = configEl.dataset.ajaxMode || '';
     var updateInitiated = false;
-    var container = document.querySelector(containerSelector);
+    var container = (mode === 'graph') ? configEl : configEl.querySelector('tbody');
+    var messageFormat = (mode === 'graph')
+        ? '<div class="%class%" style="text-align: center;">%text%</div>'
+        : '<tr class="%class%"><td colspan="99" style="text-align: center;">%text%</td></tr>';
 
     function scrollHandler() {
         if (updateInitiated) {
@@ -470,17 +471,17 @@ function ajaxScrollInit(urlFormat,
                     var doc = docFromHTML(htmlText);
 
                     if (mode === 'graph') {
-                        var graph = window.graph;
-                        var dataStr = htmlText.match(/^\s*var data = (.*);$/m)[1];
-                        var data = JSON.parse(dataStr);
-                        graph.reset();
+                        var dataEl = doc.getElementById('graph-data');
+                        var data = JSON.parse(dataEl.textContent);
+                        window.graph.reset();
                         adoptChildren(doc.querySelector('#graphnodes'), container.querySelector('#graphnodes'));
-                        graph.render(data);
+                        window.graph.render(data);
                     } else {
-                        adoptChildren(doc.querySelector(containerSelector), container);
+                        adoptChildren(doc.querySelector('tbody'), container);
                     }
 
-                    nextPageVar = nextPageVarGet(htmlText);
+                    var nextConfigEl = doc.querySelector('[data-ajax-url]');
+                    nextPageVar = nextConfigEl ? (nextConfigEl.dataset.ajaxNext || null) : null;
                 },
                 function onerror(errorText) {
                     var message = {
@@ -511,6 +512,9 @@ function renderDiffOptsForm() {
     }
 
     var form = document.getElementById("diffopts-form");
+    if (!form) {
+        return;
+    }
 
     var KEYS = [
         "ignorews",
@@ -574,7 +578,22 @@ function addLineWrapToggle() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-   process_dates();
-   addDiffStatToggle();
-   addLineWrapToggle();
+    process_dates();
+    addDiffStatToggle();
+    addLineWrapToggle();
+    renderDiffOptsForm();
+
+    var graphDataEl = document.getElementById('graph-data');
+    if (graphDataEl) {
+        var wrapper = document.getElementById('wrapper');
+        var data = JSON.parse(graphDataEl.textContent);
+        window.graph = new Graph();
+        window.graph.scale(parseInt(wrapper.dataset.graphScale, 10));
+        window.graph.render(data);
+    }
+
+    var scrollEls = document.querySelectorAll('[data-ajax-url]');
+    for (var i = 0; i < scrollEls.length; i++) {
+        initAjaxScroll(scrollEls[i]);
+    }
 }, false);
