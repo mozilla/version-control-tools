@@ -13,7 +13,7 @@ Create a dummy repo
 HTTP POST should be used for some HTTP requests
 
   $ hg -q clone ${HGWEB_0_URL}mozilla-central clone
-  $ hgmo exec hgweb0 cat /var/log/httpd/hg.mozilla.org/access_log
+  $ hgmo exec hgweb0 grep -v 'internal dummy connection' /var/log/httpd/hg.mozilla.org/access_log
   * "GET /mozilla-central?cmd=capabilities HTTP/1.1" 200 * "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
   * "POST /mozilla-central?cmd=batch HTTP/1.1" 200 * "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
   * "POST /mozilla-central?cmd=getbundle HTTP/1.1" 200 * "-" "mercurial/proto-1.0 (Mercurial *)" (glob)
