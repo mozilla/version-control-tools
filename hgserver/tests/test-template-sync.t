@@ -166,7 +166,6 @@ Always test against the version of Mercurial we have deployed to hg.mo
   adding static/followlines.js
   adding static/hgicon.png
   adding static/hglogo.png
-  adding static/jquery-1.2.6.min.js
   adding static/livemarks16.png
   adding static/mercurial.js
   adding static/moz-logo-bw-rgb.svg

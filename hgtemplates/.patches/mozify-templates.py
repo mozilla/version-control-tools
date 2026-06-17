@@ -30,7 +30,6 @@ COPY_FILES = {
     'gitweb_mozilla/firefoxreleases.tmpl',
     'gitweb_mozilla/pushlog.tmpl',
     'gitweb_mozilla/repoinfo.tmpl',
-    'static/jquery-1.2.6.min.js',
     'static/livemarks16.png',
     'static/moz-logo-bw-rgb.svg',
     'static/pushlog.js',
