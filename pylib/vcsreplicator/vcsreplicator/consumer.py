@@ -375,7 +375,7 @@ def process_hg_pushkey(config, path, namespace, key, old, new, ret):
     with get_hg_client(path) as c:
         logger.warn("executing pushkey on %s for %s[%s]" % (path, namespace, key))
 
-        args = ["debugpushkey", path, namespace, key, old, new]
+        args = hglib.util.cmdbuilder("debugpushkey", path, namespace, key, old, new)
         res, out, err = run_command(c, args)
 
         if res and res != ret:
