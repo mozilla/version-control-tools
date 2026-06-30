@@ -94,6 +94,17 @@ LimitRequestFields 1000
         Header set Cache-Control "max-age=31536000, immutable"
     </Location>
 
+    # hgweb rendered pages at tip/default can be cached briefly.
+    <LocationMatch "/(tip|default)(/|$)">
+        Header onsuccess set Cache-Control "public, max-age=60"
+    </LocationMatch>
+
+    # hgweb rendered pages at a specific revision can be cached for an hour.
+    # Not immutable: template changes and child changesets affect the output.
+    <LocationMatch "/[0-9a-f]{40}(/|$)">
+        Header onsuccess set Cache-Control "public, max-age=3600"
+    </LocationMatch>
+
     # `raw-file` requests to specific revisions are immutable, and can be cached by supported clients.
     <LocationMatch "/raw-file/[0-9a-f]{40}/">
         Header onsuccess set Cache-Control "public, max-age=604800, immutable"
