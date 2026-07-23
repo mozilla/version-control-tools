@@ -119,7 +119,7 @@ Consuming the pushkey message will create a bookmark
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/mozilla-central, namespace/key: bookmarks/my-bookmark) from partition 2 offset 7
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[my-bookmark]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central bookmarks my-bookmark '' 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/mozilla-central bookmarks my-bookmark '' 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
 
@@ -331,7 +331,7 @@ Now test bookmark divergence
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/mozilla-central, namespace/key: bookmarks/divergent) from partition 2 offset 22
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for bookmarks[divergent]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central bookmarks divergent '' e20ecd72ffa991598a1b26333788345377318231
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/mozilla-central bookmarks divergent '' e20ecd72ffa991598a1b26333788345377318231
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
 

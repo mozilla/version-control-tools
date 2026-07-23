@@ -198,7 +198,7 @@ Changegroup message written
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) from partition 2 offset 13
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime
@@ -243,7 +243,7 @@ Creating obsolescence marker directly on server will result in replication
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) from partition 2 offset 17
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
   vcsreplicator.consumer   > 1 new obsolescence markers
   vcsreplicator.consumer   > obsoleted 1 changesets
   vcsreplicator.consumer   > True
@@ -382,7 +382,7 @@ Pushing obsolescence marker without bundle2 works
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) from partition 2 offset 25
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime
@@ -574,7 +574,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) from partition 2 offset 42
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime
@@ -602,7 +602,7 @@ Now let's check what happens when replication is lagging
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/obs, namespace/key: obsolete/dump0) from partition 2 offset 47
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/obs for obsolete[dump0]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/obs obsolete dump0 '' '*' (glob)
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ consumer --onetime

@@ -127,7 +127,7 @@ Locally bumping changeset to public will trigger a pushkey
   $ consumer --onetime
   vcsreplicator.consumer processing hg-pushkey-1: (repo: {moz}/mozilla-central, namespace/key: phases/77538e1ce4bec5f7aac58a7ceca2da0e38e90a72) from partition 2 offset 8
   vcsreplicator.consumer executing pushkey on $TESTTMP/repos/mozilla-central for phases[77538e1ce4bec5f7aac58a7ceca2da0e38e90a72]
-  vcsreplicator.consumer   $ hg debugpushkey $TESTTMP/repos/mozilla-central phases 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 1 0
+  vcsreplicator.consumer   $ hg debugpushkey -- $TESTTMP/repos/mozilla-central phases 77538e1ce4bec5f7aac58a7ceca2da0e38e90a72 1 0
   vcsreplicator.consumer   > True
   vcsreplicator.consumer   [0]
   $ hg -R $TESTTMP/repos/mozilla-central log -T '{rev} {phase}\n'
