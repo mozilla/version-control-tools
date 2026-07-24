@@ -537,4 +537,6 @@ def unifyrepo(ui, settings, **opts):
                 b"pushlog and bookmarks may not be replicated properly"
             )
 
-        vcsr.replicatecommand(destrepo.ui, destrepo)
+        # `heads=True` to advertise the new `last_push_id`, and avoid out of
+        # date replicated-data filtering out the newest pushlog entries.
+        vcsr.replicatecommand(destrepo.ui, destrepo, heads=True)

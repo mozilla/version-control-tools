@@ -151,6 +151,7 @@ Activate the unification daemon
   inserting 10 pushlog entries
   writing 3 bookmarks
   wrote synchronization message into replication log
+  wrote heads synchronization message into replication log
 
 Confirm unified repo replicates to all mirrors
 
@@ -272,6 +273,28 @@ Confirm unified repo replicates to all mirrors
      date:        Thu Jan 01 00:00:00 1970 +0000
      summary:     SOURCE
   
+
+Confirm the pushlog replicated and json-pushes exposes every aggregated push (bug 1977976).
+
+The heads message is aggregated onto the pending topic, so drain the heads
+consumer too (the content consumer above does not write replicated-data).
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/vcsreplicator-headsconsumer --wait-for-no-lag /etc/mercurial/vcsreplicator-pending.ini
+
+  $ hgmo exec hgssh /var/hg/venv_tools/bin/python -c 'import sqlite3, sys; print(sqlite3.connect(sys.argv[1]).execute("select max(id) from pushlog").fetchone()[0])' /repo/hg/mozilla/mozilla-unified/.hg/pushlog2.db
+  10
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/python -c 'import cbor2, sys; print(cbor2.load(open(sys.argv[1], "rb"))[b"last_push_id"])' /repo/hg/mozilla/mozilla-unified/.hg/replicated-data
+  10
+
+  $ hgmo exec hgweb0 /var/hg/venv_replication/bin/python -c 'import sqlite3, sys; print(sqlite3.connect(sys.argv[1]).execute("select max(id) from pushlog").fetchone()[0])' /repo/hg/mozilla/mozilla-unified/.hg/pushlog2.db
+  10
+
+  $ http --no-headers ${HGWEB_0_URL}mozilla-unified/json-pushes?version=2 --body-file body
+  200
+  $ python -c 'import json; d = json.load(open("body")); print(d["lastpushid"]); print(sorted(int(k) for k in d["pushes"]))'
+  10
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 Clean
 
