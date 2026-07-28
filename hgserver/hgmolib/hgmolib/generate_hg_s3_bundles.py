@@ -111,7 +111,7 @@ GCP_HOSTS = (
 
 GCS_ENDPOINT = "https://storage.googleapis.com"
 
-CDN = "https://hg.cdn.mozilla.net"
+CDN = "https://hg-edge.mozilla.org/bundles"
 
 BUNDLE_ROOT = "/repo/hg/bundles"
 

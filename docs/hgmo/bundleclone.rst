@@ -91,11 +91,11 @@ Example Manifests
 
 Here is an example *clone bundles* manifest::
 
-  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
+  https://hg-edge.mozilla.org/bundles/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.zstd-max.hg BUNDLESPEC=zstd-v2 ec2region=us-west-2
-  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
+  https://hg-edge.mozilla.org/bundles/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.gzip-v2.hg BUNDLESPEC=gzip-v2 ec2region=us-west-2
-  https://hg.cdn.mozilla.net/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog REQUIRESNI=true cdn=true
+  https://hg-edge.mozilla.org/bundles/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog REQUIRESNI=true cdn=true
   https://s3-us-west-2.amazonaws.com/moz-hg-bundles-us-west-2/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog ec2region=us-west-2
   https://storage.googleapis.com/moz-hg-bundles-gcp-us-central1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-central1
   https://storage.googleapis.com/moz-hg-bundles-gcp-us-west1/mozilla-unified/ffe303d8d0b74d7468c99d40c7d160779c213f1a.stream-v2.hg BUNDLESPEC=none-v2;stream=v2;requirements%3Dgeneraldelta%2Crevlogv1%2Csparserevlog gceregion=us-west1
@@ -179,8 +179,8 @@ volume (in terms of repository size and clone frequency) or have a need
 for bundles.
 
 The list of repositories with bundles enabled can be found at
-https://hg.cdn.mozilla.net/. A JSON document describing the
-bundles is available at https://hg.cdn.mozilla.net/bundles.json.
+https://hg-edge.mozilla.org/bundles/. A JSON document describing the
+bundles is available at https://hg-edge.mozilla.org/bundles/bundles.json.
 
 If you think bundles should be made available for a particular
 repository, let a server operator know by filing a

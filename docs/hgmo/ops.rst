@@ -606,7 +606,7 @@ hg-bundle-generate.timer and hg-bundle-generate.service
 
 These systemd units are responsible for creating Mercurial bundles for
 popular repositories and uploading them to S3. The bundles it produces
-are also available on a CDN at https://hg.cdn.mozilla.net/.
+are also available on a CDN at https://hg-edge.mozilla.org/bundles/.
 
 These bundles are advertised by Mercurial repositories to facilitate
 :ref:`bundle-based cloning <hgmo_bundleclone>`, which drastically reduces
