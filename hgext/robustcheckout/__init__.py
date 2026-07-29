@@ -691,7 +691,7 @@ def _docheckout(
             ui.write(b"(cloning from upstream repo %s)\n" % upstream)
 
         if not storevfs.exists():
-            behaviors.add(b"create-store")
+            behaviors.add("create-store")
 
         try:
             with timeit("clone", "clone"):
