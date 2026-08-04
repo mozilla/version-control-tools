@@ -846,6 +846,26 @@ def reposetup(ui, repo):
     class replicatingrepo(repo.__class__):
         """Custom repository class providing access to replication primitives."""
 
+        def transaction(self, *args, **kwargs):
+            # `localrepo.transaction` aborts on an abandoned journal before any
+            # hook fires, so recover here rather than from a hook.
+            #
+            # Skip nested transactions, which reuse the open one and keep a
+            # `journal` present for its lifetime.
+            if self.currenttransaction() is None:
+                # Recover under the store lock: its holder owns any live
+                # transaction, so a `journal` we see while holding it must be
+                # abandoned. This also serialises concurrent pushes. The
+                # acquisition is reentrant and cheap when we already hold it.
+                with self.lock():
+                    if self.svfs.exists(b"journal"):
+                        self.ui.warn(
+                            _(b"abandoned transaction found; running recover\n")
+                        )
+                        self.recover()
+
+            return super(replicatingrepo, self).transaction(*args, **kwargs)
+
         @property
         def replicationwireprotopath(self):
             """Return the path to this repo as it is represented over wire.
