@@ -248,24 +248,34 @@ There are some version control operations that scale with the number of
 heads. This means that the repository gets slower as the number of heads
 increases.
 
-To work around this slowness, we periodically remove old heads. We do this
-by performing dummy merges. The procedure for this is as follows::
+To work around this slowness, we periodically remove old heads by performing
+dummy merges: each head is merged into a recent ``mozilla-central`` revision,
+which makes it an ancestor rather than a head.
 
-   # Clone the Try repo. This will be very slow unless --uncompressed is used.
-   $ hg clone --uncompressed -U https://hg.mozilla.org/try
-   $ cd try
-   # Verify heads to merge (this could take a while on first run)
-   $ hg log -r 'head() and branch(default) and not public()'
-   # Capture the list of heads to merge
-   $ hg log -r 'head() and branch(default) and not public()' -T '{node}\n' > heads
-   # Update the working directory to the revision to be merged into. A recent
-   # mozilla-central revision is typically fine.
-   $ hg up <revision>
-   # Do the merge by invoking `hg debugsetparents` repeatedly
-   $ for p2 in `cat heads`; do echo $p2; hg debugsetparents . $p2; hg commit -m 'Merge try head'; done
-   # Push to try without scheduling any jobs
-   # You may wish to post in Matrix or Slack with a notice as well
-   $ hg push -r . ssh://hg.mozilla.org/try
+``scripts/merge_try_heads.py`` performs this. It clones ``mozilla-unified``
+as a seed, rather than ``mozilla-central``, because ``mozilla-unified``
+publishes a ``central`` bookmark naming the revision to merge into. It pulls
+Try's heads into that clone and merges them. It never pushes, printing the
+push command to run instead. Re-running against the same directory resumes
+where the last run stopped. See ``--help`` for the rest::
+
+   # Pull Try's heads, then merge them.
+   $ uv run --script scripts/merge_try_heads.py ~/try-merge
+
+   # Merge the heads already in the clone, fetching nothing.
+   $ uv run --script scripts/merge_try_heads.py ~/try-merge --no-pull
+
+   # Publish the merges, dropping the head count by the number merged.
+   $ HGRCPATH=~/try-merge.hgrc hg -R ~/try-merge push -r <tip> ssh://hg.mozilla.org/try
+
+The merge commit messages contain no try syntax, so no jobs are scheduled.
+You may wish to post in Matrix or Slack with a notice as well.
+
+.. note::
+
+   If a run reports that it deferred most of its batches, lower
+   ``--batch-size``. Try truncates large responses, so a batch asking for too
+   much fails however often it is retried.
 
 Clonebundles Management
 =======================
