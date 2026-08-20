@@ -674,15 +674,16 @@ For more, see :ref:`hgmo_notification`.
 This service is essentially identical to ``pulsenotifier.service``
 except it publishes to Amazon services, not Pulse.
 
-``unifyrepo.service``
+``unifyrepo@.service``
 ---------------------
 
-This systemd service periodically aggregates the contents of various
+This systemd service template periodically aggregates the contents of various
 repositories into other repositories.
 
-This service and the repositories it writes to are currently experimental.
-
 This service only runs on the master server.
+
+The template accepts two values (``%i``): ``mozilla`` or ``comm``, which will direct
+it to use either ``/etc/mercurial/unify-%i-unified.ini``
 
 Monitoring and Alerts
 =====================

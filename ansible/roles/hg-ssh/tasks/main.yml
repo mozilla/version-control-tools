@@ -236,13 +236,6 @@
     - unify-mozilla-unified.ini
     - unify-comm-unified.ini
 
-- name: sysconfig file for unify repo daemon
-  copy: src=sysconfig-unifyrepo
-        dest=/etc/sysconfig/unifyrepo
-        owner=root
-        group=root
-        mode=0644
-
 # Ideally, we would have separate override files for each service. But
 # it doesn't appear systemd allows there to be a generic e.g.
 # mail-unit-output@.service and an instance e.g.
@@ -264,6 +257,21 @@
   notify: systemd daemon reload
   when: is_testing is not defined
 
+- name: deprecated systemd services are disabled (server only)
+  service: name={{ item }}
+           state=stopped
+           enabled=no
+  when: is_testing is not defined
+  with_items:
+    - unifyrepo.service
+
+- name: delete deprecated service config
+  file: state=absent path={{ item }}
+  when: is_testing is not defined
+  with_items:
+    - /etc/sysconfig/unifyrepo
+    - /etc/systemd/system/unifyrepo.service
+
 - name: install systemd unit files
   copy: src={{ item }}
         dest=/etc/systemd/system/{{ item }}
@@ -281,7 +289,7 @@
     - pushdataaggregator.service
     - pushdataaggregator-pending.service
     - snsnotifier.service
-    - unifyrepo.service
+    - unifyrepo@.service
     - hg-master-monitor.service
     - hg-master-monitor.timer
     - try-replicatesync.service
@@ -298,7 +306,8 @@
     - pushdataaggregator.service
     - pushdataaggregator-pending.service
     - snsnotifier.service
-    - unifyrepo.service
+    - unifyrepo@comm.service
+    - unifyrepo@mozilla.service
     - hg-master-monitor.timer
     - try-replicatesync.timer
 
