@@ -4,6 +4,8 @@ a:hover, a:visited, a:active { color:#880000; }
 div.page_header { height:25px; padding:8px; font-size:18px; font-weight:bold; background-color:#d9d8d1; }
 div.page_header a:visited { color:#0000cc; }
 div.page_header a:hover { color:#880000; }
+div.retired_banner { padding:8px; font-size:14px; font-weight:bold; text-align:center; background-color:#d70022; color:#ffffff; }
+div.retired_banner a, div.retired_banner a:hover, div.retired_banner a:visited, div.retired_banner a:active { color:#ffffff; text-decoration:underline; }
 div.page_nav {
     padding:8px;
     display: flex;

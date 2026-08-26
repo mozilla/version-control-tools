@@ -1,0 +1,247 @@
+# HG changeset patch
+# User Connor Sheehan <sheehan@mozilla.com>
+# Date 1787961600 0
+#      Mon Aug 25 12:00:00 2026 +0000
+hgtemplates: add a banner for retired repositories (Bug 2066467)
+
+`{retiredbanner}` expands to nothing unless the repository sets
+`readonly.retiredurl` in its hgrc. The `firefoxreleases`, `pushlog` and
+`repoinfo` templates are copied from v-c-t verbatim, so they carry the
+banner without being patched here.
+
+diff --git a/hgtemplates/gitweb_mozilla/bookmarks.tmpl b/hgtemplates/gitweb_mozilla/bookmarks.tmpl
+--- a/hgtemplates/gitweb_mozilla/bookmarks.tmpl
++++ b/hgtemplates/gitweb_mozilla/bookmarks.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/branches.tmpl b/hgtemplates/gitweb_mozilla/branches.tmpl
+--- a/hgtemplates/gitweb_mozilla/branches.tmpl
++++ b/hgtemplates/gitweb_mozilla/branches.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/changelog.tmpl b/hgtemplates/gitweb_mozilla/changelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/changelog.tmpl
++++ b/hgtemplates/gitweb_mozilla/changelog.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/changeset.tmpl b/hgtemplates/gitweb_mozilla/changeset.tmpl
+--- a/hgtemplates/gitweb_mozilla/changeset.tmpl
++++ b/hgtemplates/gitweb_mozilla/changeset.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/error.tmpl b/hgtemplates/gitweb_mozilla/error.tmpl
+--- a/hgtemplates/gitweb_mozilla/error.tmpl
++++ b/hgtemplates/gitweb_mozilla/error.tmpl
+@@ -10,6 +10,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/fileannotate.tmpl b/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+--- a/hgtemplates/gitweb_mozilla/fileannotate.tmpl
++++ b/hgtemplates/gitweb_mozilla/fileannotate.tmpl
+@@ -12,6 +12,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/filecomparison.tmpl b/hgtemplates/gitweb_mozilla/filecomparison.tmpl
+--- a/hgtemplates/gitweb_mozilla/filecomparison.tmpl
++++ b/hgtemplates/gitweb_mozilla/filecomparison.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/filediff.tmpl b/hgtemplates/gitweb_mozilla/filediff.tmpl
+--- a/hgtemplates/gitweb_mozilla/filediff.tmpl
++++ b/hgtemplates/gitweb_mozilla/filediff.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/filelog.tmpl b/hgtemplates/gitweb_mozilla/filelog.tmpl
+--- a/hgtemplates/gitweb_mozilla/filelog.tmpl
++++ b/hgtemplates/gitweb_mozilla/filelog.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/filerevision.tmpl b/hgtemplates/gitweb_mozilla/filerevision.tmpl
+--- a/hgtemplates/gitweb_mozilla/filerevision.tmpl
++++ b/hgtemplates/gitweb_mozilla/filerevision.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/graph.tmpl b/hgtemplates/gitweb_mozilla/graph.tmpl
+--- a/hgtemplates/gitweb_mozilla/graph.tmpl
++++ b/hgtemplates/gitweb_mozilla/graph.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/help.tmpl b/hgtemplates/gitweb_mozilla/help.tmpl
+--- a/hgtemplates/gitweb_mozilla/help.tmpl
++++ b/hgtemplates/gitweb_mozilla/help.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/helptopics.tmpl b/hgtemplates/gitweb_mozilla/helptopics.tmpl
+--- a/hgtemplates/gitweb_mozilla/helptopics.tmpl
++++ b/hgtemplates/gitweb_mozilla/helptopics.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/manifest.tmpl b/hgtemplates/gitweb_mozilla/manifest.tmpl
+--- a/hgtemplates/gitweb_mozilla/manifest.tmpl
++++ b/hgtemplates/gitweb_mozilla/manifest.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/map b/hgtemplates/gitweb_mozilla/map
+--- a/hgtemplates/gitweb_mozilla/map
++++ b/hgtemplates/gitweb_mozilla/map
+@@ -2,6 +2,11 @@ default = 'summary'
+ mimetype = 'text/html; charset={encoding}'
+ header = header.tmpl
+ footer = footer.tmpl
++retiredbanner = '{if(retiredurl, '
++  <div class="retired_banner">
++    This repository is retired and read only.
++    The code now lives at <a href="{retiredurl|escape}">{retiredurl|escape}</a>.
++  </div>')}'
+ search = search.tmpl
+ changelog = changelog.tmpl
+ summary = summary.tmpl
+diff --git a/hgtemplates/gitweb_mozilla/notfound.tmpl b/hgtemplates/gitweb_mozilla/notfound.tmpl
+--- a/hgtemplates/gitweb_mozilla/notfound.tmpl
++++ b/hgtemplates/gitweb_mozilla/notfound.tmpl
+@@ -7,6 +7,7 @@
+ </head>
+ 
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/search.tmpl b/hgtemplates/gitweb_mozilla/search.tmpl
+--- a/hgtemplates/gitweb_mozilla/search.tmpl
++++ b/hgtemplates/gitweb_mozilla/search.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/shortlog.tmpl b/hgtemplates/gitweb_mozilla/shortlog.tmpl
+--- a/hgtemplates/gitweb_mozilla/shortlog.tmpl
++++ b/hgtemplates/gitweb_mozilla/shortlog.tmpl
+@@ -6,6 +6,7 @@
+    href="{url|urlescape}rss-log" title="RSS feed for {repo|escape}"/>
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/summary.tmpl b/hgtemplates/gitweb_mozilla/summary.tmpl
+--- a/hgtemplates/gitweb_mozilla/summary.tmpl
++++ b/hgtemplates/gitweb_mozilla/summary.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+     <div class="logo">
+diff --git a/hgtemplates/gitweb_mozilla/tags.tmpl b/hgtemplates/gitweb_mozilla/tags.tmpl
+--- a/hgtemplates/gitweb_mozilla/tags.tmpl
++++ b/hgtemplates/gitweb_mozilla/tags.tmpl
+@@ -11,6 +11,7 @@
+ 
+ </head>
+ <body>
++{retiredbanner}
+ 
+ <div class="page_header">
+ <div class="logo">
+diff --git a/hgtemplates/static/style-gitweb.css b/hgtemplates/static/style-gitweb.css
+--- a/hgtemplates/static/style-gitweb.css
++++ b/hgtemplates/static/style-gitweb.css
+@@ -4,6 +4,8 @@ a:hover, a:visited, a:active { color:#88
+ div.page_header { height:25px; padding:8px; font-size:18px; font-weight:bold; background-color:#d9d8d1; }
+ div.page_header a:visited { color:#0000cc; }
+ div.page_header a:hover { color:#880000; }
++div.retired_banner { padding:8px; font-size:14px; font-weight:bold; text-align:center; background-color:#d70022; color:#ffffff; }
++div.retired_banner a, div.retired_banner a:hover, div.retired_banner a:visited, div.retired_banner a:active { color:#ffffff; text-decoration:underline; }
+ div.page_nav {
+     padding:8px;
+     display: flex;

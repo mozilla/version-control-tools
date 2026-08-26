@@ -19,3 +19,4 @@ pushlog-relative-date.patch
 opengraph.patch
 pushchangedfiles.patch
 remove-inline-js.patch
+retired-banner.patch

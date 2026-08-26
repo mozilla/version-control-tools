@@ -14,6 +14,12 @@ If the ``readonly.globalreasonfile`` config option is set, it defines another
 path to be checked. It operates the same as ``.hg/readonlyreason`` except it
 can be set in your global hgrc to allow a single file to mark all repositories
 as read only.
+
+A repository can also be retired by setting ``readonly.retiredurl`` in its
+``.hg/hgrc`` to the URL of the repository that replaces it. Retired
+repositories are read only and clients are told where the code now lives.
+Since the setting lives in the repository's hgrc it is replicated to the
+hgweb mirrors, where the ``hgmo`` extension uses it to display a banner.
 """
 
 import errno
@@ -33,6 +39,7 @@ configtable = {}
 configitem = registrar.configitem(configtable)
 
 configitem(b"readonly", b"globalreasonfile", default=None)
+configitem(b"readonly", b"retiredurl", default=None)
 
 
 def prechangegrouphook(ui, repo, **kwargs):
@@ -44,6 +51,13 @@ def prepushkeyhook(ui, repo, namespace=None, **kwargs):
 
 
 def checkreadonly(ui, repo, op):
+    retiredurl = ui.config(b"readonly", b"retiredurl")
+    if retiredurl:
+        ui.warn(_(b"repository is retired and read only\n"))
+        ui.warn(_(b"the code in this repository now lives at %s\n") % retiredurl)
+        ui.warn(_(b"refusing to %s\n") % op)
+        return True
+
     try:
         reporeason = repo.vfs.read(b"readonlyreason")
 

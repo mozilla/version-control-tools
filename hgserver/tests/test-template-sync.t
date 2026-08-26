@@ -260,6 +260,8 @@ Always test against the version of Mercurial we have deployed to hg.mo
   applying patch from stdin
   applying patch remove-inline-js.patch
   applying patch from stdin
+  applying patch retired-banner.patch
+  applying patch from stdin
 
 And replace the working directory with what is in this repository, modulo the
 patches.

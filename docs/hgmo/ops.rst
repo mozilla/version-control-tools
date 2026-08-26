@@ -201,6 +201,24 @@ To mark all repositories on hg.mozilla.org as read-only, create the
 ``/repo/hg/readonlyreason`` file. If the file has content, it will
 be printed to the user.
 
+Retiring Repositories in Place
+==============================
+
+When the code in a repository moves elsewhere (e.g. to GitHub) but its URLs
+should keep working so old links in bugs and commit messages resolve, the
+repository can be retired in place instead of being deleted.
+
+Set ``readonly.retiredurl`` in the repository's ``.hg/hgrc`` on the SSH
+master::
+
+  [readonly]
+  retiredurl = https://github.com/mozilla/nspr
+
+Pushes are then denied with a message pointing at the new location. Replicate
+the hgrc to the mirrors with ``hg replicatehgrc`` (see `Managing Repository
+Hooks`_) and hgweb will display a banner advertising the new location on every
+page of the repository.
+
 Retiring Repositories
 =====================
 

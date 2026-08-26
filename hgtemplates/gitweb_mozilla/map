@@ -2,6 +2,11 @@ default = 'summary'
 mimetype = 'text/html; charset={encoding}'
 header = header.tmpl
 footer = footer.tmpl
+retiredbanner = '{if(retiredurl, '
+  <div class="retired_banner">
+    This repository is retired and read only.
+    The code now lives at <a href="{retiredurl|escape}">{retiredurl|escape}</a>.
+  </div>')}'
 search = search.tmpl
 changelog = changelog.tmpl
 summary = summary.tmpl

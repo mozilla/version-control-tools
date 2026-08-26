@@ -18,6 +18,11 @@ hgmo.convertsource
 
    Value is a relative or absolute path to the repo. e.g.
    ``/mozilla-central``.
+
+readonly.retiredurl
+   When set, the repository has been retired and hgweb pages display a banner
+   pointing at the URL where the code now lives. The ``readonly`` extension
+   reads the same option on the SSH server to reject writes.
 """
 
 import copy
@@ -51,6 +56,7 @@ from mercurial import (
     wireprotov1server,
 )
 from mercurial.hgweb import (
+    hgweb_mod,
     webcommands,
     webutil,
 )
@@ -105,6 +111,9 @@ configitem(b"hgmo", b"gcpippath", default=None)
 configitem(b"hgmo", b"pullclonebundlesmanifest", default=configitems.dynamicdefault)
 configitem(b"hgmo", b"replacebookmarks", default=configitems.dynamicdefault)
 configitem(b"hgmo", b"instance-data-path", default=None)
+
+# Owned by the `readonly` extension, which is not loaded on hgweb.
+configitem(b"readonly", b"retiredurl", default=None)
 
 
 @templatefilters.templatefilter(b"mozlink")
@@ -920,6 +929,15 @@ def filelog(orig, web):
         tmpl.__class__ = orig_class
 
 
+def templater(orig, self, req):
+    """Wraps hgweb's templater to expose the retired repository URL."""
+    tmpl = orig(self, req)
+
+    tmpl.defaults[b"retiredurl"] = self.config(b"readonly", b"retiredurl") or b""
+
+    return tmpl
+
+
 def hgwebfastannotate(orig, req, fctx, ui):
     import hgext.fastannotate.support as fasupport
 
@@ -934,6 +952,7 @@ def extsetup(ui):
     extensions.wrapfunction(webutil, "changelistentry", changelistentry)
     extensions.wrapfunction(bookmarks, "updatefromremote", bmupdatefromremote)
     extensions.wrapfunction(webcommands, "filelog", filelog)
+    extensions.wrapfunction(hgweb_mod.requestcontext, "templater", templater)
 
     # Install IP filtering for bundle URLs.
 
