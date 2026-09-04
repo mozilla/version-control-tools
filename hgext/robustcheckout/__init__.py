@@ -24,6 +24,7 @@ import time
 from mercurial.i18n import _
 from mercurial.node import hex, nullid
 from mercurial import (
+    bundle2,
     commands,
     configitems,
     error,
@@ -151,6 +152,13 @@ def remove_dangling_links(ui, path):
         ),
         (b"", b"sparseprofile", b"", b"Sparse checkout profile to use (path in repo)"),
         (
+            b"",
+            b"bundle",
+            b"",
+            b"Path to a local bundle to apply before pulling from the remote\n"
+            b"(used to obtain the wanted revision without an expensive pull)",
+        ),
+        (
             b"U",
             b"noupdate",
             False,
@@ -172,6 +180,7 @@ def robustcheckout(
     sharebase=None,
     networkattempts=None,
     sparseprofile=None,
+    bundle=None,
     noupdate=False,
 ):
     """Ensure a working copy has the specified revision checked out.
@@ -280,6 +289,7 @@ def robustcheckout(
             behaviors,
             networkattempts,
             sparse_profile=sparseprofile,
+            bundle=bundle,
             noupdate=noupdate,
         )
     finally:
@@ -379,6 +389,7 @@ def _docheckout(
     networkattemptlimit,
     networkattempts=None,
     sparse_profile=None,
+    bundle=None,
     noupdate=False,
 ):
     if not networkattempts:
@@ -399,6 +410,7 @@ def _docheckout(
             networkattemptlimit,
             networkattempts=networkattempts,
             sparse_profile=sparse_profile,
+            bundle=bundle,
             noupdate=noupdate,
         )
 
@@ -736,6 +748,42 @@ def _docheckout(
     # wanted revision.
 
     repo = _repository(ui, dest)
+
+    # If a local bundle was provided (typically a decision-task artifact holding
+    # the changesets between the CDN clone bundle and the wanted revision), apply
+    # it now. When it contains the wanted revision this lets the local-revision
+    # check below short-circuit the expensive pull from the remote. Failure to
+    # apply (e.g. the bundle's base changesets aren't present in the store) is
+    # non-fatal: we simply fall back to pulling from the remote.
+    if bundle:
+        if not os.path.exists(bundle):
+            ui.warn(b"(bundle %s does not exist; skipping)\n" % bundle)
+        else:
+            ui.write(b"(applying bundle %s)\n" % bundle)
+            try:
+                with timeit("unbundle_artifact", "unbundle"), repo.lock(), repo.transaction(
+                    b"robustcheckout-bundle"
+                ) as tr:
+                    with open(bundle, "rb") as fp:
+                        gen = exchange.readbundle(ui, fp, bundle)
+                        bundle2.applybundle(
+                            repo,
+                            gen,
+                            tr,
+                            source=b"unbundle",
+                            url=b"bundle:" + pycompat.bytestr(bundle),
+                        )
+            except (
+                error.Abort,
+                error.BundleValueError,
+                error.RevlogError,
+                IOError,
+                OSError,
+            ) as e:
+                ui.warn(
+                    b"(could not apply bundle %s: %s; falling back to pull)\n"
+                    % (bundle, pycompat.bytestr(str(e)))
+                )
 
     # We only pull if we are using symbolic names or the requested revision
     # doesn't exist.
