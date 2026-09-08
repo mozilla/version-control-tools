@@ -65,6 +65,10 @@
     
     - name: stream clone repository
       command: /var/hg/venv_tools/bin/hg --config extensions.vcsreplicator=! --config extensions.pushlog=! --config extensions.replicateowner=! --config extensions.readonly=! clone -U --stream https://hg.mozilla.org/{{ hostvars['localhost'].source_repo }} /repo/hg/mozilla/projects/{{ twig }}
+      register: clone_result
+      until: clone_result.rc == 0
+      retries: 3
+      delay: 60
 
 - hosts: hgweb-prod
   gather_facts: no
