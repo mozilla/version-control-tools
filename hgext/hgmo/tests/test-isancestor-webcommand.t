@@ -101,6 +101,17 @@ Unknown test revision raises reasonable error
   "error": "unknown node revision foobar"
   } (hg48 !)
 
+A revset expression is treated as a literal symbol, not evaluated. This
+guards against unsafe predicates such as `remote()` reaching the evaluator.
+
+  $ http "http://localhost:$HGPORT/json-isancestor/?head=e4e891475ac0099835bb15a6b636adbdb85f753e&node=remote('tip',%20'http://169.254.169.254/')" --header content-type
+  404
+  content-type: application/json
+  
+  { (hg48 !)
+  "error": "unknown node revision remote('tip', 'http://169.254.169.254/')" (hg48 !)
+  } (hg48 !)
+
 Confirm no errors in log
 
   $ cat ../server/error.log

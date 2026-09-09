@@ -501,12 +501,12 @@ def isancestorwebcommand(web):
     node = req.qsparams[b"node"]
 
     try:
-        headctx = scmutil.revsingle(web.repo, head)
+        headctx = scmutil.revsymbol(web.repo, head)
     except error.RepoLookupError:
         raise ErrorResponse(HTTP_NOT_FOUND, b"unknown head revision %s" % head)
 
     try:
-        testctx = scmutil.revsingle(web.repo, node)
+        testctx = scmutil.revsymbol(web.repo, node)
     except error.RepoLookupError:
         raise ErrorResponse(HTTP_NOT_FOUND, b"unknown node revision %s" % node)
 
