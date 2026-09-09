@@ -391,7 +391,11 @@ def automationrelevancewebcommand(web):
     # about what to do if the changeset isn't visible.
     urepo = repo.unfiltered()
 
-    revs = list(urepo.revs(b"automationrelevant(%r)", req.qsparams[b"node"]))
+    # Resolve the requested node as a literal symbol before evaluating the
+    # revset. Splicing the raw parameter with `%r` would let a caller invoke
+    # unsafe predicates such as `remote()` (SSRF) or `nodefromfile()`.
+    basectx = scmutil.revsymbol(urepo, req.qsparams[b"node"])
+    revs = list(urepo.revs(b"automationrelevant(%d)", basectx.rev()))
 
     # The pushlog extensions wraps webutil.commonentry and the way it is called
     # means pushlog opens a SQLite connection on every call. This is inefficient.
@@ -469,7 +473,11 @@ def push_changed_files_webcommand(web):
     # about what to do if the changeset isn't visible.
     urepo = repo.unfiltered()
 
-    revs = list(urepo.revs(b"automationrelevant(%r)", req.qsparams[b"node"]))
+    # Resolve the requested node as a literal symbol before evaluating the
+    # revset. Splicing the raw parameter with `%r` would let a caller invoke
+    # unsafe predicates such as `remote()` (SSRF) or `nodefromfile()`.
+    basectx = scmutil.revsymbol(urepo, req.qsparams[b"node"])
+    revs = list(urepo.revs(b"automationrelevant(%d)", basectx.rev()))
 
     # The pushlog extensions wraps webutil.commonentry and the way it is called
     # means pushlog opens a SQLite connection on every call. This is inefficient.

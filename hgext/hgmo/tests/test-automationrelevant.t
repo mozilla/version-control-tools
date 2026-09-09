@@ -772,6 +772,27 @@ Web command for exposing just the changed files in a push works.
   }
 
 
+The node parameter is resolved as a literal symbol before the revset is
+evaluated, so unsafe predicates such as `remote()` and `nodefromfile()`
+cannot be injected.
+
+  $ http "http://localhost:$HGPORT/json-automationrelevance/?node=remote('tip',%20'http://169.254.169.254/')" --header content-type
+  404
+  content-type: application/json
+  
+  { (hg48 !)
+  "error": "unknown revision 'remote('tip', 'http://169.254.169.254/')'" (hg48 !)
+  } (hg48 !)
+
+  $ http "http://localhost:$HGPORT/json-pushchangedfiles/?node=nodefromfile('/etc/passwd')" --header content-type
+  404
+  content-type: application/json
+  
+  { (hg48 !)
+  "error": "unknown revision 'nodefromfile('/etc/passwd')'" (hg48 !)
+  } (hg48 !)
+
+
 Confirm no errors in log
 
   $ cd ../server
