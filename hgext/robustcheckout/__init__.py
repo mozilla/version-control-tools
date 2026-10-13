@@ -165,6 +165,12 @@ def remove_dangling_links(ui, path):
             b"the clone will include an empty working directory\n"
             b"(only a repository)",
         ),
+        (
+            b"",
+            b"perfherderoutput",
+            b"",
+            b"Path to a file where Perfherder data should be written",
+        ),
     ],
     b"[OPTION]... URL DEST",
     norepo=True,
@@ -182,6 +188,7 @@ def robustcheckout(
     sparseprofile=None,
     bundle=None,
     noupdate=False,
+    perfherderoutput=None,
 ):
     """Ensure a working copy has the specified revision checked out.
 
@@ -369,10 +376,14 @@ def robustcheckout(
                         "subtests": [],
                     }
                 )
+            perfherder_data = json.dumps(perfherder, sort_keys=True)
             ui.write(
                 b"PERFHERDER_DATA: %s\n"
-                % pycompat.bytestr(json.dumps(perfherder, sort_keys=True))
+                % pycompat.bytestr(perfherder_data)
             )
+            if perfherderoutput:
+                with open(perfherderoutput, "w", encoding="utf-8") as fh:
+                    fh.write(perfherder_data)
 
 
 def _docheckout(

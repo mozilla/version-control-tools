@@ -38,6 +38,21 @@ Existing share reports properly
   updated to 5d6cdc75a09bcccf76f9339a28e1d89360c59dce
   PERFHERDER_DATA: {"framework": {"name": "vcs"}, "suites": \[{"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "clone", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "update", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "overall", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "overall_pull", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "overall_pull_fullcheckout", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}, {"extraOptions": \["c5\.4xlarge"\], "hgVersion": "\d+\.\d+(\.\d)*", "lowerIsBetter": true, "name": "overall_pull_emptywdir", "serverUrl": "\$LOCALHOST:\$HGPORT", "shouldAlert": false, "subtests": \[\], "value": \d+\.\d+}\]} (re)
 
+Data is written to --perfherderoutput
+
+  $ hg robustcheckout http://localhost:$HGPORT/repo0 dest3 --revision 5d6cdc75a09b --perfherderoutput perfherder.json > /dev/null
+  (using Mercurial *) (glob)
+  $ $PYTHON -c 'import json; d = json.load(open("perfherder.json")); print(d["framework"]); print([s["name"] for s in d["suites"]])'
+  {'name': 'vcs'}
+  ['clone', 'update', 'overall', 'overall_pull', 'overall_pull_fullcheckout', 'overall_pull_emptywdir']
+
+No data is written outside of Taskcluster
+
+  $ env -u TASKCLUSTER_INSTANCE_TYPE hg robustcheckout http://localhost:$HGPORT/repo0 dest4 --revision 5d6cdc75a09b --perfherderoutput perfherder2.json > /dev/null
+  (using Mercurial *) (glob)
+  $ test -e perfherder2.json
+  [1]
+
 Confirm no errors in log
 
   $ cat ./server/error.log
