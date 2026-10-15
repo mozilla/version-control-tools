@@ -165,6 +165,30 @@ def get_backoutbynode(ext_name, repo, ctx):
     return None
 
 
+def find_git_commits(ext_name, repo, ctx, git_commits):
+    """Look for the changesets of git commits in the ancestors of ctx.
+
+    Returns a dict mapping the git commits which were found to the revisions of
+    their changesets.
+    """
+    # Looking up extra data is expensive, so we limit the search to the most
+    # recent ancestors and stop as soon as all git commits are found. This finds
+    # most reverted commits because reverts typically happen shortly after a bad
+    # commit is introduced.
+    searchlimit = repo.ui.configint(ext_name, b"backoutsearchlimit", 100)
+    cl = repo.changelog
+    remaining = set(git_commits)
+    found = {}
+    for i, rev in enumerate(cl.ancestors([ctx.rev()], inclusive=True)):
+        if i >= searchlimit or not remaining:
+            break
+        git_commit = cl.changelogrevision(rev).extra.get(b"git_commit")
+        if git_commit in remaining:
+            remaining.remove(git_commit)
+            found[git_commit] = rev
+    return found
+
+
 class timers(object):
     """Logs times to blackbox logger."""
 

@@ -70,6 +70,33 @@ Reference a reverted git commit that doesn't exist (or is too far in the past) (
   [1]
 
 
+Revert multiple git commits, which are linked in the order of the commit message
+
+  $ cat >> .hg/hgrc << EOF
+  > [extensions]
+  > commitextra = $TESTDIR/hgext/hgmo/tests/commitextra.py
+  > EOF
+  $ echo git1 > foo
+  $ hg commit -m 'Bug 1 - git commit 1' --extra git_commit=1111111111111111111111111111111111111111
+  $ echo git2 > foo
+  $ hg commit -m 'Bug 2 - git commit 2' --extra git_commit=2222222222222222222222222222222222222222
+  $ echo revert > foo
+  $ hg commit -m 'Revert "Bug 2 - git commit 2"
+  > 
+  > This reverts commit 2222222222222222222222222222222222222222.
+  > 
+  > Revert "Bug 1 - git commit 1"
+  > 
+  > This reverts commit 1111111111111111111111111111111111111111.'
+  $ hg -q push
+
+  $ hg log -r 'tip~1 + tip~2' -T '{node} {desc}\n'
+  fa3449ceff3162e873735464f99ee5480f1b7c24 Bug 2 - git commit 2
+  75bfbe54234060a884328066636afd2df71b1175 Bug 1 - git commit 1
+  $ http http://localhost:$HGPORT/rev/tip --body-file body >/dev/null
+  $ grep '<td>backs out' body
+  <tr><td>backs out</td><td><a style="font-family: monospace" href="/rev/fa3449ceff3162e873735464f99ee5480f1b7c24">fa3449ceff3162e873735464f99ee5480f1b7c24</a><br /><a style="font-family: monospace" href="/rev/75bfbe54234060a884328066636afd2df71b1175">75bfbe54234060a884328066636afd2df71b1175</a></td></tr>
+
 Confirm no errors in log
 
   $ cat ../server/error.log
