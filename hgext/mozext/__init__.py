@@ -951,11 +951,21 @@ def template_backsoutnodes(context, mapping):
     reverts = parse_reverts(description)
     if reverts and reverts[0]:
         searchlimit = repo.ui.configint(b"mozext", b"backoutsearchlimit", 100)
-        backouts = []
-        for bctx in repo.set(b"last(::%d, %s)", ctx.rev(), searchlimit):
-            git_commit = bctx.extra().get(b"git_commit")
-            if git_commit and git_commit in reverts[0]:
-                backouts.append(short(bctx.node()))
+        cl = repo.changelog
+        remaining = set(reverts[0])
+        revs = []
+        # Walk the recent ancestors of ctx from the most recent one, stopping as
+        # soon as all the reverted commits are found, since they are usually
+        # close to the revert. Looking up extra data is expensive, so the search
+        # is limited to the `searchlimit` most recent ancestors.
+        for i, rev in enumerate(cl.ancestors([ctx.rev()], inclusive=True)):
+            if i >= searchlimit or not remaining:
+                break
+            git_commit = cl.changelogrevision(rev).extra.get(b"git_commit")
+            if git_commit in remaining:
+                remaining.remove(git_commit)
+                revs.append(rev)
+        backouts = [short(cl.node(rev)) for rev in sorted(revs)]
         return templateutil.hybridlist(backouts, b"backouts")
 
 
