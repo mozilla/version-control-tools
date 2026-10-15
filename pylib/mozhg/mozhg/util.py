@@ -175,7 +175,7 @@ def find_git_commits(ext_name, repo, ctx, git_commits):
     # recent ancestors and stop as soon as all git commits are found. This finds
     # most reverted commits because reverts typically happen shortly after a bad
     # commit is introduced.
-    searchlimit = repo.ui.configint(ext_name, b"backoutsearchlimit", 100)
+    searchlimit = repo.ui.configint(ext_name, b"backoutsearchlimit", 500)
     cl = repo.changelog
     remaining = set(git_commits)
     found = {}
