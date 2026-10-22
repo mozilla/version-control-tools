@@ -74,6 +74,24 @@ configitem(b"robustcheckout", b"retryjittermin", default=configitems.dynamicdefa
 configitem(b"robustcheckout", b"retryjittermax", default=configitems.dynamicdefault)
 
 
+def record_marker(name, start, end):
+    """Add a marker to the profile of the resource monitor run-task runs, if
+    any, using the forwarding protocol of mozsystemmonitor."""
+    path = os.environ.get("MOZ_RESOURCE_MONITOR_FORWARD")
+    if not path:
+        return
+    # 2 is the "Tasks" category.
+    record = ["marker", "robustcheckout", start, end, {"type": "Text", "text": name}, 2]
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_APPEND)
+        try:
+            os.write(fd, (json.dumps(record) + "\n").encode("utf-8"))
+        finally:
+            os.close(fd)
+    except OSError:
+        pass
+
+
 def getsparse():
     from mercurial import sparse
 
@@ -281,6 +299,7 @@ def robustcheckout(
     optimes = []
     behaviors = set()
     start = time.time()
+    monotonic_start = time.monotonic()
 
     try:
         return _docheckout(
@@ -307,6 +326,7 @@ def robustcheckout(
 
         # ``overall`` is always the total operation time.
         optimes.append(("overall", overall))
+        record_marker("overall", monotonic_start, time.monotonic())
 
         def record_op(name):
             # If special behaviors due to "corrupt" storage occur, we vary the
@@ -431,6 +451,7 @@ def _docheckout(
         errored = False
         try:
             start = time.time()
+            monotonic_start = time.monotonic()
             yield
         except Exception:
             errored = True
@@ -442,6 +463,7 @@ def _docheckout(
                 op += "_errored"
 
             optimes.append((op, elapsed))
+            record_marker(op, monotonic_start, time.monotonic())
 
     ui.write(b"ensuring %s@%s is available at %s\n" % (url, revision or branch, dest))
 
