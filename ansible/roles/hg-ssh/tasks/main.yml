@@ -257,21 +257,6 @@
   notify: systemd daemon reload
   when: is_testing is not defined
 
-- name: deprecated systemd services are disabled (server only)
-  service: name={{ item }}
-           state=stopped
-           enabled=no
-  when: is_testing is not defined
-  with_items:
-    - unifyrepo.service
-
-- name: delete deprecated service config
-  file: state=absent path={{ item }}
-  when: is_testing is not defined
-  with_items:
-    - /etc/sysconfig/unifyrepo
-    - /etc/systemd/system/unifyrepo.service
-
 - name: install systemd unit files
   copy: src={{ item }}
         dest=/etc/systemd/system/{{ item }}
