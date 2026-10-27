@@ -74,7 +74,7 @@ class TreeStatusClient(object):
 
     def __init__(
         self,
-        base_uri=b"https://treestatus.prod.lando.prod.cloudops.mozgcp.net/",
+        base_uri=b"https://lando.moz.tools/api/treestatus/",
         opener=None,
     ):
         self._base_uri = base_uri
