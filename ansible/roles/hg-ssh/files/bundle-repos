@@ -1,3 +1,4 @@
+mozilla-unified zstd_max
 mozilla-central zstd_max
 integration/mozilla-inbound
 releases/mozilla-release
@@ -10,7 +11,6 @@ releases/mozilla-esr115
 releases/mozilla-esr128
 releases/mozilla-esr140
 releases/mozilla-esr153
-mozilla-unified zstd_max
 hgcustom/version-control-tools
 comm-central zstd_max
 comm-unified zstd_max
