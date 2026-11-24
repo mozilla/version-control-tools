@@ -5,6 +5,23 @@
 # that servers are nowhere close to CPU capacity when WSGI process count is
 # equivalent to CPU core count. So, we run more WSGI processes than cores.
 wsgi_processes: "{{ ansible_processor_vcpus * 2 }}"
+# Limits on WSGI daemon processes. On 2026-11-19 runaway json-pushes requests
+# grew workers to tens of GB and ran for ~45 minutes after Apache had given up
+# on them, causing OOM kills on hgweb1-3 (Bug 2095495).
+#
+# Seconds a single request may run before mod_wsgi restarts the process.
+# Apache stops waiting for a response after `Timeout` (360s) and returns a
+# 504, but without this the daemon keeps working on the abandoned request
+# indefinitely. Legitimate full-tree archive downloads of mozilla-central
+# have taken up to ~65 minutes.
+wsgi_request_timeout: 5400
+# Maximum address space (RLIMIT_AS) of each process, in bytes. Allocations
+# beyond it fail with MemoryError, failing that request instead of OOMing the
+# host. Address space was within ~0.6GB of RSS for workers in the OOM report;
+# idle workers use ~0.5GB and busy ones were seen at up to ~2.5GB.
+# (`memory-limit`, i.e. RLIMIT_DATA, is not used: on the EL7 3.10 kernel it
+# does not cover mmap()ed memory, which is most of Python's allocations.)
+wsgi_virtual_memory_limit: 17179869184  # 16GiB
 httpd_start_servers: 8
 httpd_min_spare_servers: 5
 httpd_max_spare_servers: 20

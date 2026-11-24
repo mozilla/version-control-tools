@@ -40,7 +40,7 @@ LimitRequestFields 1000
     SetEnv HGENCODING UTF-8
     SetEnv LC_TYPE UTF-8
 
-    WSGIDaemonProcess hg.mozilla.org processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 user=hg group=hg display-name=hg.mozilla.org
+    WSGIDaemonProcess hg.mozilla.org processes={{ wsgi_processes }} threads=1 maximum-requests=20 deadlock-timeout=60 inactivity-timeout=300 request-timeout={{ wsgi_request_timeout }} virtual-memory-limit={{ wsgi_virtual_memory_limit }} user=hg group=hg display-name=hg.mozilla.org
     WSGIProcessGroup hg.mozilla.org
 
     # This is needed so sub-interpreters aren't used. This prevents a
