@@ -73,6 +73,10 @@ configitem(b"pushlog", b"githgsyncworkerfirefox", default=configitems.dynamicdef
 configitem(
     b"pushlog", b"githgsyncworkerthunderbird", default=configitems.dynamicdefault
 )
+# Maximum number of pushes a single web pushlog query (json-pushes,
+# pushloghtml, atom feed) may match. Queries matching more are rejected
+# instead of being rendered entirely in memory. 0 disables the limit.
+configitem(b"pushlog", b"maxquerypushes", default=10000)
 configitem(b"pushlog", b"remoteuserprefix", default=None)
 configitem(b"pushlog", b"retrydelayms", default=1500)
 configitem(b"pushlog", b"timeoutro", default=configitems.dynamicdefault)

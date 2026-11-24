@@ -154,14 +154,30 @@ class PushlogQuery(object):
                 only_replicated=True,
             )
 
-            for push in pushes:
-                if self.tipsonly:
-                    nodes = [push.nodes[0]]
-                else:
-                    nodes = push.nodes
+            # Range queries are otherwise unbounded (e.g. `fromchange=15000`
+            # on try matches over a million pushes) and the full response is
+            # built in memory, which can take tens of GB. Bail out as soon as
+            # the limit is exceeded rather than after reading every row.
+            maxpushes = self.repo.ui.configint(b"pushlog", b"maxquerypushes")
 
-                for node in nodes:
-                    self.entries.append((push.pushid, push.user, push.when, node))
+            try:
+                for count, push in enumerate(pushes):
+                    if maxpushes and count >= maxpushes:
+                        raise ErrorResponse(
+                            400,
+                            b"query matches more than %d pushes; narrow it "
+                            b"with endID, tochange or enddate" % maxpushes,
+                        )
+
+                    if self.tipsonly:
+                        nodes = [push.nodes[0]]
+                    else:
+                        nodes = push.nodes
+
+                    for node in nodes:
+                        self.entries.append((push.pushid, push.user, push.when, node))
+            finally:
+                pushes.close()
 
         self.lastpushid = self.repo.pushlog.last_push_id_replicated()
 
